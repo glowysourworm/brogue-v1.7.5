@@ -1,0 +1,31 @@
+# depslib dependency file v1.0
+1571084942 source:c:\backup\_source\git\brogue-v1.7.5\src\platform\curses-platform.c
+	<stdio.h>
+	<string.h>
+	<time.h>
+	"term.h"
+	<sys/timeb.h>
+	<stdint.h>
+	<signal.h>
+	"platform.h"
+
+1571084943 c:\backup\_source\git\brogue-v1.7.5\src\platform\term.h
+
+1571084942 c:\backup\_source\git\brogue-v1.7.5\src\platform\platform.h
+	"Rogue.h"
+
+1571084942 source:c:\backup\_source\git\brogue-v1.7.5\src\platform\tcod-platform.c
+	<stdio.h>
+	<string.h>
+	<time.h>
+	<SDL/SDL.h>
+	"libtcod.h"
+	"platform.h"
+
+1571084943 source:c:\backup\_source\git\brogue-v1.7.5\src\platform\term.c
+	<ncurses.h>
+	"term.h"
+	<math.h>
+	<stdlib.h>
+	<string.h>
+
