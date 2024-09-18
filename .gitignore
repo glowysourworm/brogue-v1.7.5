@@ -30,3 +30,7 @@
 *.exe
 *.out
 *.app
+*.ipch
+/brogue/.vs
+/brogue/brogue-hd/x64/Debug
+/brogue/brogue/x64

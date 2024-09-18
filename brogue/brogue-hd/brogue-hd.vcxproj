@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{c8a6cd2b-c5b1-4325-a995-e7c8bdfd32ef}</ProjectGuid>
+    <RootNamespace>broguehd</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="array2D.cpp" />
+    <ClCompile Include="binarySearchTree.cpp" />
+    <ClCompile Include="brogue-hd.cpp" />
+    <ClCompile Include="brogueCell.cpp" />
+    <ClCompile Include="brogueContentGrid.cpp" />
+    <ClCompile Include="brogueCreature.cpp" />
+    <ClCompile Include="brogueCreatureHorde.cpp" />
+    <ClCompile Include="brogueGame.cpp" />
+    <ClCompile Include="brogueGrid.cpp" />
+    <ClCompile Include="brogueItem.cpp" />
+    <ClCompile Include="brogueLevel.cpp" />
+    <ClCompile Include="brogueMachine.cpp" />
+    <ClCompile Include="brogueMessageQueue.cpp" />
+    <ClCompile Include="brogueObject.cpp" />
+    <ClCompile Include="broguePlayer.cpp" />
+    <ClCompile Include="brogueRememberedCell.cpp" />
+    <ClCompile Include="brogueView.cpp" />
+    <ClCompile Include="cellDisplayBuffer.cpp" />
+    <ClCompile Include="contentGenerator.cpp" />
+    <ClCompile Include="creature.cpp" />
+    <ClCompile Include="dijkstra.cpp" />
+    <ClCompile Include="flare.cpp" />
+    <ClCompile Include="gameController.cpp" />
+    <ClCompile Include="gameData.cpp" />
+    <ClCompile Include="grid.cpp" />
+    <ClCompile Include="item.cpp" />
+    <ClCompile Include="keyProcessor.cpp" />
+    <ClCompile Include="layoutGenerator.cpp" />
+    <ClCompile Include="levelData.cpp" />
+    <ClCompile Include="levelProcessor.cpp" />
+    <ClCompile Include="levelRenderer.cpp" />
+    <ClCompile Include="lightSource.cpp" />
+    <ClCompile Include="machine.cpp" />
+    <ClCompile Include="openglRenderer.cpp" />
+    <ClCompile Include="playbackProcessor.cpp" />
+    <ClCompile Include="playerCharacter.cpp" />
+    <ClCompile Include="randomGenerator.cpp" />
+    <ClCompile Include="gridRegion.cpp" />
+    <ClCompile Include="renderingController.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="array2D.h" />
+    <ClInclude Include="boltEffectDeclaration.h" />
+    <ClInclude Include="brogueContentGrid.h" />
+    <ClInclude Include="brogueCreature.h" />
+    <ClInclude Include="brogueCreatureHorde.h" />
+    <ClInclude Include="brogueMachine.h" />
+    <ClInclude Include="brogueObject.h" />
+    <ClInclude Include="broguePlayer.h" />
+    <ClInclude Include="creatureBehaviorDeclaration.h" />
+    <ClInclude Include="creatureBehaviorMap.h" />
+    <ClInclude Include="dungeonFeature.h" />
+    <ClInclude Include="itemDeclaration.h" />
+    <ClInclude Include="itemTemplate.h" />
+    <ClInclude Include="linearGenerationParameters.h" />
+    <ClInclude Include="machineDeclaration.h" />
+    <ClInclude Include="machineFeature.h" />
+    <ClInclude Include="machineGenerator.h" />
+    <ClInclude Include="binarySearchTree.h" />
+    <ClInclude Include="blueprint.h" />
+    <ClInclude Include="blueprintDeclaration.h" />
+    <ClInclude Include="bolt.h" />
+    <ClInclude Include="boltDeclaration.h" />
+    <ClInclude Include="brogueCell.h" />
+    <ClInclude Include="broguedef.h" />
+    <ClInclude Include="broguefile.h" />
+    <ClInclude Include="brogueGame.h" />
+    <ClInclude Include="brogueGrid.h" />
+    <ClInclude Include="brogueLevel.h" />
+    <ClInclude Include="brogueMessageQueue.h" />
+    <ClInclude Include="brogueRememberedCell.h" />
+    <ClInclude Include="brogueView.h" />
+    <ClInclude Include="button.h" />
+    <ClInclude Include="brogueCellDisplay.h" />
+    <ClInclude Include="gridCell.h" />
+    <ClInclude Include="color.h" />
+    <ClInclude Include="colorConstants.h" />
+    <ClInclude Include="colorString.h" />
+    <ClInclude Include="command.h" />
+    <ClInclude Include="contentGenerator.h" />
+    <ClInclude Include="creatureDeclaration.h" />
+    <ClInclude Include="dijkstra.h" />
+    <ClInclude Include="dungeon.h" />
+    <ClInclude Include="dungeonConstants.h" />
+    <ClInclude Include="dungeonDeclaration.h" />
+    <ClInclude Include="feat.h" />
+    <ClInclude Include="fileio.h" />
+    <ClInclude Include="flare.h" />
+    <ClInclude Include="floorTileType.h" />
+    <ClInclude Include="gameConstants.h" />
+    <ClInclude Include="gameController.h" />
+    <ClInclude Include="gameData.h" />
+    <ClInclude Include="grid.h" />
+    <ClInclude Include="griddef.h" />
+    <ClInclude Include="gridMethods.h" />
+    <ClInclude Include="gridRect.h" />
+    <ClInclude Include="brogueLevelMethods.h" />
+    <ClInclude Include="brogueItem.h" />
+    <ClInclude Include="itemConstants.h" />
+    <ClInclude Include="itemFlavor.h" />
+    <ClInclude Include="itemTable.h" />
+    <ClInclude Include="keyProcessor.h" />
+    <ClInclude Include="layoutGenerator.h" />
+    <ClInclude Include="levelData.h" />
+    <ClInclude Include="levelProcessor.h" />
+    <ClInclude Include="levelRenderer.h" />
+    <ClInclude Include="light.h" />
+    <ClInclude Include="lightConstants.h" />
+    <ClInclude Include="lightSource.h" />
+    <ClInclude Include="machineConstants.h" />
+    <ClInclude Include="mathdef.h" />
+    <ClInclude Include="messageData.h" />
+    <ClInclude Include="creature.h" />
+    <ClInclude Include="creatureWords.h" />
+    <ClInclude Include="openglRenderer.h" />
+    <ClInclude Include="playbackProcessor.h" />
+    <ClInclude Include="playerCharacter.h" />
+    <ClInclude Include="powerTables.h" />
+    <ClInclude Include="randomGenerator.h" />
+    <ClInclude Include="playbackData.h" />
+    <ClInclude Include="gridRegion.h" />
+    <ClInclude Include="renderingController.h" />
+    <ClInclude Include="statusEffectDeclaration.h" />
+    <ClInclude Include="terrainDeclaration.h" />
+    <ClInclude Include="vectordef.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

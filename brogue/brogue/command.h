@@ -1,0 +1,12 @@
+#pragma once
+
+enum NGCommands {
+	NG_NOTHING = 0,
+	NG_NEW_GAME,
+	NG_NEW_GAME_WITH_SEED,
+	NG_OPEN_GAME,
+	NG_VIEW_RECORDING,
+	NG_HIGH_SCORES,
+	NG_SCUM,
+	NG_QUIT,
+};

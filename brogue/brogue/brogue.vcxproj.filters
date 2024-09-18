@@ -1,0 +1,182 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="brogue.cpp" />
+    <ClCompile Include="Architect.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="buttons.c">
+      <Filter>rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Combat.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="curses-platform.c">
+      <Filter>platform</Filter>
+    </ClCompile>
+    <ClCompile Include="dijkstra.c">
+      <Filter>math</Filter>
+    </ClCompile>
+    <ClCompile Include="grid.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="io.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="Items.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="light.c">
+      <Filter>rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="mainMenu.c">
+      <Filter>rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Monsters.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="Movement.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="platformdependent.c">
+      <Filter>platform</Filter>
+    </ClCompile>
+    <ClCompile Include="random.c">
+      <Filter>math</Filter>
+    </ClCompile>
+    <ClCompile Include="Recordings.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="RogueMain.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="Time.c">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="sqrt.c">
+      <Filter>math</Filter>
+    </ClCompile>
+    <ClCompile Include="tcod-platform.c">
+      <Filter>platform</Filter>
+    </ClCompile>
+    <ClCompile Include="term.c">
+      <Filter>platform</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="roguedef.h" />
+    <ClInclude Include="autoGenerator.h">
+      <Filter>declaration</Filter>
+    </ClInclude>
+    <ClInclude Include="blueprintDeclaration.h">
+      <Filter>declaration</Filter>
+    </ClInclude>
+    <ClInclude Include="blueprint.h">
+      <Filter>constant</Filter>
+    </ClInclude>
+    <ClInclude Include="bolt.h">
+      <Filter>constant</Filter>
+    </ClInclude>
+    <ClInclude Include="boltDeclaration.h">
+      <Filter>declaration</Filter>
+    </ClInclude>
+    <ClInclude Include="button.h">
+      <Filter>constant</Filter>
+    </ClInclude>
+    <ClInclude Include="color.h">
+      <Filter>constant</Filter>
+    </ClInclude>
+    <ClInclude Include="command.h">
+      <Filter>constant</Filter>
+    </ClInclude>
+    <ClInclude Include="monsterConstants.h">
+      <Filter>constant</Filter>
+    </ClInclude>
+    <ClInclude Include="creature.h">
+      <Filter>declaration</Filter>
+    </ClInclude>
+    <ClInclude Include="dungeon.h">
+      <Filter>constant</Filter>
+    </ClInclude>
+    <ClInclude Include="dungeonConstants.h">
+      <Filter>constant</Filter>
+    </ClInclude>
+    <ClInclude Include="dungeonDeclaration.h">
+      <Filter>declaration</Filter>
+    </ClInclude>
+    <ClInclude Include="feat.h">
+      <Filter>declaration</Filter>
+    </ClInclude>
+    <ClInclude Include="game.h">
+      <Filter>declaration</Filter>
+    </ClInclude>
+    <ClInclude Include="gameConstants.h">
+      <Filter>constant</Filter>
+    </ClInclude>
+    <ClInclude Include="item.h">
+      <Filter>constant</Filter>
+    </ClInclude>
+    <ClInclude Include="itemConstants.h">
+      <Filter>constant</Filter>
+    </ClInclude>
+    <ClInclude Include="itemFlavor.h">
+      <Filter>constant</Filter>
+    </ClInclude>
+    <ClInclude Include="levelData.h">
+      <Filter>declaration</Filter>
+    </ClInclude>
+    <ClInclude Include="lightConstants.h">
+      <Filter>constant</Filter>
+    </ClInclude>
+    <ClInclude Include="machine.h">
+      <Filter>constant</Filter>
+    </ClInclude>
+    <ClInclude Include="monster.h">
+      <Filter>constant</Filter>
+    </ClInclude>
+    <ClInclude Include="monsterDeclaration.h">
+      <Filter>declaration</Filter>
+    </ClInclude>
+    <ClInclude Include="monsterWords.h">
+      <Filter>constant</Filter>
+    </ClInclude>
+    <ClInclude Include="platform.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="PlatformDefines.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="playerCharacter.h">
+      <Filter>declaration</Filter>
+    </ClInclude>
+    <ClInclude Include="powerTables.h">
+      <Filter>declaration</Filter>
+    </ClInclude>
+    <ClInclude Include="term.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="rogueGame.h">
+      <Filter>declaration</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="game">
+      <UniqueIdentifier>{ecdbf198-22ed-4d2f-a44d-f9d1688867fa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="declaration">
+      <UniqueIdentifier>{d54d1ee4-53c4-41ea-933c-41c29ae66bdc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="constant">
+      <UniqueIdentifier>{2808d7f6-5985-4c95-891d-a2bb4adba562}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="rendering">
+      <UniqueIdentifier>{742935c6-2214-4e1e-b046-666a754b9e92}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="platform">
+      <UniqueIdentifier>{280a729a-7aeb-4c44-91c3-a1782f6c897f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="math">
+      <UniqueIdentifier>{5a868dfa-5e7d-48c8-aa06-1c1c62986a9c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
