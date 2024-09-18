@@ -4,7 +4,7 @@
 
 using namespace std;
 
-namespace brogueHd
+namespace brogueHd::component
 {
     // Stole this implementation:  This should be a balanced BST. The implementation looks
     //                             clean enough; and will be changed if there are any issues.
@@ -27,9 +27,19 @@ namespace brogueHd
         ~binarySearchTree();
 
         /// <summary>
+        /// Returns the number of nodes in the tree
+        /// </summary>
+        long count() const;
+
+        /// <summary>
         /// Creates data node for the tree; and balances the tree
         /// </summary>
         void insert(K key, T data);
+
+        /// <summary>
+        /// Returns true if the BST contains the specified key (uses hash table backing)
+        /// </summary>
+        bool containsKey(K key) const;
 
         /// <summary>
         /// Searches for the node closest (greater than) to the specified key
@@ -41,6 +51,11 @@ namespace brogueHd
         /// </summary>
         /// <param name="key">Key for an existing node. Throws exception for mismatched key.</param>
         void remove(K key);
+
+        /// <summary>
+        /// Clears out all data
+        /// </summary>
+        void clear();
 
         /// <summary>
         /// Gets the minimum value from the tree

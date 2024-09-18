@@ -1,11 +1,12 @@
 #pragma once
 
+#include "iteratordef.h"
 #include <vector>
 #include <functional>
 
 using namespace std;
 
-namespace brogueHd
+namespace brogueHd::backend::extension
 {
 	namespace collection
 	{
@@ -37,6 +38,21 @@ namespace brogueHd
 		}
 
 		/// <summary>
+		/// Returns true if the collection contains any items that pass the supplied predicate
+		/// </summary>
+		template<typename T>
+		static bool any(std::vector<T> collection, function<bool(T)> predicate)
+		{
+			for (int index = 0; index < collection.size(); index++)
+			{
+				if (predicate(collection[index])
+					return true;
+			}
+
+			return false;
+		}
+
+		/// <summary>
 		/// Returns a new collection with elements that match the given predicate
 		/// </summary>
 		template<typename T>
@@ -57,7 +73,7 @@ namespace brogueHd
 		/// Returns the element of the collection that contains the maximum value for the selector
 		/// </summary>
 		template<typename T, typename V>
-		static T max(std::vector<T> collection, function<V(T)> selector)
+		static T maxOf(std::vector<T> collection, function<V(T)> selector)
 		{
 			V max = NULL;
 			int maxIndex = -1;
@@ -86,7 +102,7 @@ namespace brogueHd
 		/// Returns the element of the collection that contains the minimum value for the selector
 		/// </summary>
 		template<typename T, typename V>
-		static T min(std::vector<T> collection, function<V(T)> selector)
+		static T minOf(std::vector<T> collection, function<V(T)> selector)
 		{
 			V min = NULL;
 			int minIndex = -1;

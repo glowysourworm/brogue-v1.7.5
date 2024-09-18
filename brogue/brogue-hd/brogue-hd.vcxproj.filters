@@ -73,9 +73,6 @@
     <Filter Include="Source Files\frontend\renderer">
       <UniqueIdentifier>{8539ee47-062f-4fba-9f14-acf1754e9266}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\backend\processor\methods">
-      <UniqueIdentifier>{4fe0bf1d-b9ed-46a8-9381-715e69286493}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\backend\methods">
       <UniqueIdentifier>{19e8db3f-3028-4fc5-a766-0acc4a985a66}</UniqueIdentifier>
     </Filter>
@@ -109,8 +106,11 @@
     <Filter Include="Header Files\backend\math">
       <UniqueIdentifier>{7ef00c19-f2cc-40de-adeb-1ccaafce3b1b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\backend\collection">
-      <UniqueIdentifier>{f0945e2c-bf3b-417e-a333-1817bdfac101}</UniqueIdentifier>
+    <Filter Include="Header Files\backend\extension">
+      <UniqueIdentifier>{f2f7f77b-b324-40fa-9971-0eefe7d426dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\backend\math">
+      <UniqueIdentifier>{220ffa64-55f0-4bcd-a3ca-df530f00bd73}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -167,9 +167,6 @@
     </ClCompile>
     <ClCompile Include="brogueView.cpp">
       <Filter>Source Files\backend\model</Filter>
-    </ClCompile>
-    <ClCompile Include="dijkstra.cpp">
-      <Filter>Source Files\backend\processor</Filter>
     </ClCompile>
     <ClCompile Include="gameController.cpp">
       <Filter>Source Files\backend\controller</Filter>
@@ -230,6 +227,9 @@
     </ClCompile>
     <ClCompile Include="brogueCreatureHorde.cpp">
       <Filter>Source Files\backend\model</Filter>
+    </ClCompile>
+    <ClCompile Include="dijkstra.cpp">
+      <Filter>Source Files\backend\math</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -297,9 +297,6 @@
       <Filter>Header Files\backend\generator</Filter>
     </ClInclude>
     <ClInclude Include="keyProcessor.h">
-      <Filter>Header Files\backend\processor</Filter>
-    </ClInclude>
-    <ClInclude Include="dijkstra.h">
       <Filter>Header Files\backend\processor</Filter>
     </ClInclude>
     <ClInclude Include="levelRenderer.h">
@@ -476,14 +473,35 @@
     <ClInclude Include="playbackData.h">
       <Filter>Header Files\backend\model\io</Filter>
     </ClInclude>
-    <ClInclude Include="vectordef.h">
-      <Filter>Header Files\backend\collection</Filter>
-    </ClInclude>
     <ClInclude Include="messageData.h">
       <Filter>Header Files\backend\model\game</Filter>
     </ClInclude>
     <ClInclude Include="powerTables.h">
       <Filter>Header Files\backend\model\game</Filter>
+    </ClInclude>
+    <ClInclude Include="dijkstra.h">
+      <Filter>Header Files\backend\math</Filter>
+    </ClInclude>
+    <ClInclude Include="vectordef.h">
+      <Filter>Header Files\backend\extension</Filter>
+    </ClInclude>
+    <ClInclude Include="comparabledef.h">
+      <Filter>Header Files\backend\extension</Filter>
+    </ClInclude>
+    <ClInclude Include="hashGenerator.h">
+      <Filter>Header Files\backend\generator</Filter>
+    </ClInclude>
+    <ClInclude Include="exceptionHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mapextension.h">
+      <Filter>Header Files\backend\extension</Filter>
+    </ClInclude>
+    <ClInclude Include="iteratordef.h">
+      <Filter>Header Files\backend\extension</Filter>
+    </ClInclude>
+    <ClInclude Include="arraydef.h">
+      <Filter>Header Files\backend\extension</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

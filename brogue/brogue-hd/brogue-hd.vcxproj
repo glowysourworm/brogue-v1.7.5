@@ -182,6 +182,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="array2D.h" />
+    <ClInclude Include="arraydef.h" />
     <ClInclude Include="boltEffectDeclaration.h" />
     <ClInclude Include="brogueContentGrid.h" />
     <ClInclude Include="brogueCreature.h" />
@@ -189,11 +190,15 @@
     <ClInclude Include="brogueMachine.h" />
     <ClInclude Include="brogueObject.h" />
     <ClInclude Include="broguePlayer.h" />
+    <ClInclude Include="comparabledef.h" />
     <ClInclude Include="creatureBehaviorDeclaration.h" />
     <ClInclude Include="creatureBehaviorMap.h" />
     <ClInclude Include="dungeonFeature.h" />
+    <ClInclude Include="exceptionHandler.h" />
+    <ClInclude Include="hashGenerator.h" />
     <ClInclude Include="itemDeclaration.h" />
     <ClInclude Include="itemTemplate.h" />
+    <ClInclude Include="iteratordef.h" />
     <ClInclude Include="linearGenerationParameters.h" />
     <ClInclude Include="machineDeclaration.h" />
     <ClInclude Include="machineFeature.h" />
@@ -250,6 +255,7 @@
     <ClInclude Include="lightConstants.h" />
     <ClInclude Include="lightSource.h" />
     <ClInclude Include="machineConstants.h" />
+    <ClInclude Include="mapextension.h" />
     <ClInclude Include="mathdef.h" />
     <ClInclude Include="messageData.h" />
     <ClInclude Include="creature.h" />

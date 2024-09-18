@@ -4,9 +4,12 @@
 #include "griddef.h"
 #include "gridRect.h"
 #include "broguedef.h"
+#include "iteratordef.h"
 #include <functional>
 
 using namespace std;
+
+using namespace brogueHd::backend::extension;
 
 namespace brogueHd
 {
@@ -17,15 +20,6 @@ namespace brogueHd
 		const short cDirs[8][2] = { {0, 1}, {1, 1}, {1, 0}, {1, -1}, {0, -1}, {-1, -1}, {-1, 0}, {-1, 1} };
 
 	*/
-
-	/// <summary>
-	/// Instructs the iterator to either continue or break out of its loop
-	/// </summary>
-	enum iterationCallback
-	{
-		iterate = 0,
-		breakAndReturn = 1
-	};
 
 	/// <summary>
 	/// Example predicate. User predicates will be made depending on usage

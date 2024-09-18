@@ -6,7 +6,7 @@
 
 using namespace std;
 
-namespace brogueHd
+namespace brogueHd::component
 {
     template<typename K, typename T>
     binarySearchTree<K, T>::binarySearchTree()
@@ -18,16 +18,36 @@ namespace brogueHd
     template<typename K, typename T>
     binarySearchTree<K, T>::~binarySearchTree()
     {
+        this->clear();
+
+        _root = NULL;
+        _nodeMap = NULL;
+    }
+
+    template<typename K, typename T>
+    void binarySearchTree<K, T>::clear()
+    {
         if (_root != NULL)
         {
-            // Deletes recursively
-            deleteNode(_root);
+            // Clear out nodes, clear out node map
+            this->deleteImpl(_root, _root->key);
 
+            // Null out the root
             _root = NULL;
-        }
+        }        
+    }
 
-        _nodeMap->clear();
-        _nodeMap = NULL;
+    template<typename K, typename T>
+    long binarySearchTree<K, T>::count() const
+    {
+        // Nodemap is never nulled until the destructor
+        return _nodeMap->count();
+    }
+
+    template<typename K, typename T>
+    bool binarySearchTree<K, T>::containsKey(K key) const
+    {
+        return _nodeMap->find(key) != NULL;
     }
 
     template<typename K, typename T>
@@ -197,13 +217,23 @@ namespace brogueHd
             if (node->left == NULL)
             {
                 Node<K, T>* temp = node->right;
+
+                // Update node map
+                _nodeMap->erase(node->key);
+
                 delete node;
+
                 return temp;
             }
             else if (node->right == NULL) 
             {
                 Node<K, T>* temp = node->left;
+
+                // Update node map
+                _nodeMap->erase(node->key);
+
                 delete node;
+
                 return temp;
             }
 
@@ -215,7 +245,7 @@ namespace brogueHd
             node->data = temp->data;
 
             // Delete the inorder successor
-            node->right = deleteNode(node->right, temp->data);
+            node->right = deleteImpl(node->right, temp->data);
         }
 
         return node;

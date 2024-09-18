@@ -2,114 +2,141 @@
 
 #include "broguedef.h"
 #include "creature.h"
-#include "brogueCell.h"
+#include "gridCell.h"
+#include "grid.h"
+#include "binarySearchTree.h"
 #include <functional>
 
 using namespace std;
 
-namespace brogueHd
+using namespace brogueHd::component;
+using namespace brogueHd::backend::model::layout;
+
+namespace brogueHd::backend::math
 {
-	struct pdsLink {
-		short distance;
-		short cost;
-		pdsLink* left, * right;
-	};
+	//struct pdsLink {
+	//	short distance;
+	//	short cost;
+	//	pdsLink* left, * right;
+	//};
 
-	struct pdsMap {
-		boolean eightWays;
+	//struct pdsMap {
+	//	boolean eightWays;
 
-		pdsLink front;
-		pdsLink links[DCOLS * DROWS];
-	};
+	//	pdsLink front;
+	//	pdsLink links[DCOLS * DROWS];
+	//};
 
+    // Constraint for template function to help cast the brogue item details
+    //
+    template<typename T>
+    concept gridCellConstraint = requires(T a)
+    {
+        { a } -> std::convertible_to<gridCell*>;
+    };
+
+    template<gridCellConstraint T>
 	class dijkstra
 	{
 
 	public:
 
         /// <summary>
-        /// 
+        /// Creates an instance of dijkstra's map component with the specified, declarative, delegates and constraints.
         /// </summary>
         /// <param name="mapCostPredicate">Delegate used to fetch a cost for the specified column / row of the grid</param>
         /// <param name="mapPredicate">Delegate used to mask off areas of the map from the entire algorithm. Set to TRUE to ALLOW use of the location for the algorithm.</param>
-        dijkstra(std::function<bool(brogueCell)> mapPredicate,
-                 std::function<short(brogueCell)> mapCostPredicate);
+		dijkstra<T>::dijkstra(gridRect parentBoundary,
+							  gridRect relativeBoundary,
+						      bool obeyCardinalMovement,
+							  std::function<bool(short, short)> mapPredicate,
+							  std::function<short(short, short)> mapCostPredicate,
+							  std::function<T(short, short)> locatorCallback);
 
         ~dijkstra();
 
-        void initialize(brogueCell source, brogueCell targets[], bool obeyCardinalMovement);
+        void initialize(T source, T targets[], bool obeyCardinalMovement);
 
-		void pdsUpdate(pdsMap* map);
+		/// <summary>
+		/// Runs Dijkstra's algorithm ONCE. WILL NOT RE-RUN.
+		/// </summary>
+		void run();
 
-		void pdsClear(pdsMap* map, short maxDistance, boolean eightWays);
+		/// <summary>
+		/// Returns one of the result paths from dijkstra's algorithm
+		/// </summary>
+		T* getResultPath(T targetLocation);
 
-		short pdsGetDistance(pdsMap* map, short x, short y);
+		//void pdsUpdate(pdsMap* map);
 
-		void pdsSetDistance(pdsMap* map, short x, short y, short distance);
+		//void pdsClear(pdsMap* map, short maxDistance, boolean eightWays);
 
-		void pdsSetCosts(pdsMap* map, short** costMap);
+		//short pdsGetDistance(pdsMap* map, short x, short y);
 
-		void pdsBatchInput(pdsMap* map, short** distanceMap, short** costMap, short maxDistance, boolean eightWays);
+		//void pdsSetDistance(pdsMap* map, short x, short y, short distance);
 
-		void pdsBatchOutput(pdsMap* map, short** distanceMap);
+		//void pdsSetCosts(pdsMap* map, short** costMap);
 
-		void pdsInvalidate(pdsMap* map, short maxDistance);
+		//void pdsBatchInput(pdsMap* map, short** distanceMap, short** costMap, short maxDistance, boolean eightWays);
 
-		void dijkstraScan(short** distanceMap, short** costMap, boolean useDiagonals);
+		//void pdsBatchOutput(pdsMap* map, short** distanceMap);
 
-		void calculateDistances(short** distanceMap,
-								short destinationX, 
-								short destinationY,
-								unsigned long blockingTerrainFlags,
-								creature* traveler,
-								boolean canUseSecretDoors,
-								boolean eightWays);
+		//void pdsInvalidate(pdsMap* map, short maxDistance);
 
-		short pathingDistance(short x1, short y1, short x2, short y2, unsigned long blockingTerrainFlags);
+		//void dijkstraScan(short** distanceMap, short** costMap, boolean useDiagonals);
 
+		//void calculateDistances(short** distanceMap,
+		//						short destinationX, 
+		//						short destinationY,
+		//						unsigned long blockingTerrainFlags,
+		//						creature* traveler,
+		//						boolean canUseSecretDoors,
+		//						boolean eightWays);
+
+		//short pathingDistance(short x1, short y1, short x2, short y2, unsigned long blockingTerrainFlags);
 
 	private:
 
-        std::function<bool(brogueCell)> _mapPredicate;
-        std::function<short(brogueCell)> _mapCostPredicate;
+		/// <summary>
+		/// Generates path from completed run
+		/// </summary>
+		T* generatePath(T targetLocation);
 
 
-            /// <summary>
-            /// 2D array of output values for Dijkstra's algorithm
-            /// </summary>
-        public Grid<float> OutputMap{ get; private set; }
+		/// <summary>
+		/// Updates the output map which contains the calculated path steps
+		/// </summary>
+		/// <param name="currentWeight">Weight of current location</param>
+		void updateOutputMap(float currentWeight, int destColumn, int destRow, int sourceColumn, int sourceRow);
 
-        public readonly static float MapCostMin = 1;
-        public readonly static float MapCostLow = 2;
-        public readonly static float MapCostMedium = 5;
-        public readonly static float MapCostHigh = 10;
+	private:
 
-        /// <summary>
-        /// Constant that indicates that a region is off-limits to the Dijkstra map. (THIS SHOULD BE AVOIDED AS CALLBACK COST)
-        /// </summary>
-        protected readonly static float MapCostInfinity = float.PositiveInfinity;
+		std::function<T(short, short)> _locatorCallback;
+        std::function<bool(short, short)> _mapPredicate;
+        std::function<short(short, short)> _mapCostPredicate;
 
-        private readonly GridBoundary _relativeBoundary;
-        private readonly DijkstraMapPredicate _predicate;
-        private readonly DijkstraMapAvoidCallback _avoidCallback;
-        private readonly DijkstraMapLocatorCallback _locatorCallback;
-        private readonly Metric _euclideanMetric;
+		gridRect _parentBoundary;						// The larger of the two boundaries. Each grid<> instance should
+		gridRect _relativeBoundary;						// use the larger parent boundary. Relative boundary is used to 
+														// limit usage of the grid.
 
-        // Visited locations on the map
-        private Grid<bool> _visitedMap;
+		T _sourceLocation;
+		T[] _targetLocations;
 
-        // Locations that have been added to the frontier
-        private Grid<bool> _locationMap;
+        grid<short>* _outputMap;
+
+        grid<bool>* _visitedMap;                        // Visited locations on the map
+        grid<bool>* _locationMap;                       // Locations that have been added to the frontier
 
         // Frontier BST for the map
-        BinarySearchTree<float, SimpleDictionary<T, T>> _frontier;
+		binarySearchTree<float, std::map<T, T>>* _frontier;
 
-        // Completed Paths
-        SimpleDictionary<T, IReadOnlyList<T>> _completedPaths;
-        SimpleDictionary<T, bool> _validPaths;
+		// These maps are stored per target location
+		std::map<T, T[]> _completedPaths;
+		std::map<T, bool> _validPaths;
 
         bool _initialized = false;
         bool _finished = false;
+		bool _obeyCardinalMovement = false;
 	};
 }
 
