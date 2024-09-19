@@ -29,9 +29,10 @@ namespace brogueHd::backend::math
 		_mapCostPredicate = mapCostPredicate;
 		_locatorCallback = locatorCallback;
 
-		_outputMap = new grid<short>(parentBoundary.width, parentBoundary.height, 0, SHRT_MAX);
-		_visitedMap = new grid<bool>(parentBoundary.width, parentBoundary.height, false, true);
-		_locationMap = new grid<bool>(parentBoundary.width, parentBoundary.height, false, true);
+		// Set these to be the full size of the parent
+		_outputMap = new array2D<short>(parentBoundary);
+		_visitedMap = new array2D<bool>(parentBoundary);
+		_locationMap = new array2D<bool>(parentBoundary);
 
 		_frontier = new binarySearchTree<float, std::map<T, T>>();
 	}

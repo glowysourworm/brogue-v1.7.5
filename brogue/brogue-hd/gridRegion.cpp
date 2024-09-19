@@ -1,16 +1,32 @@
 #include "gridRegion.h"
-#include "griddef.h"
+#include "gridDefinitions.h"
+#include "grid.h"
+#include "gridRect.h"
+
+using namespace std;
+
+using namespace brogueHd::backend::math;
 
 namespace brogueHd::backend::model::layout
 {
-	template<typename T>
-	gridRegion<T>::gridRegion(const grid<T>* parentGrid, gridRect boundary)
+	template<gridCellConstraint T>
+	gridRegion<T>::gridRegion(T* locations,
+								T* edgeLocations,
+								T* westExposedLocations,
+								T* northExposedLocations,
+								T* eastExposedLocations,
+								T* southExposedLocations,
+								T* northWestCornerLocations,
+								T* northEastCornerLocations,
+								T* southEastCornerLocations,
+								T* southWestCornerLocations,
+								gridRect relativeBoundary)
 	{
 		_grid = parentGrid;
 		_boundary = boundary;
 	}
 
-	template<typename T>
+	template<gridCellConstraint T>
 	gridRegion<T>::~gridRegion()
 	{
 		if (_grid != NULL)
@@ -21,13 +37,13 @@ namespace brogueHd::backend::model::layout
 		}
 	}
 
-	template<typename T>
+	template<gridCellConstraint T>
 	T gridRegion<T>::get(short column, short row) const
 	{
-		return _grid->get(column, row);
+		return _array2D[column][row];
 	}
 
-	template<typename T>
+	template<gridCellConstraint T>
 	gridRect gridRegion<T>::getBoundary() const
 	{
 		return _boundary;

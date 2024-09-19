@@ -1,10 +1,15 @@
 #pragma once
 
+#include "array2D.h"
 #include "grid.h"
-#include "griddef.h"
+#include "gridDefinitions.h"
+#include "gridRect.h"
+#include "dijkstra.h"
 #include <functional>
 
 using namespace std;
+
+using namespace brogueHd::backend::math;
 
 namespace brogueHd::backend::model::layout
 {
@@ -14,24 +19,41 @@ namespace brogueHd::backend::model::layout
 	/// of the parent grid. Each function and call will be protected to utilize only this region. No grid
 	/// offsets are required for use.
 	/// </summary>
-	template<typename T>
+	template<gridCellConstraint T>
 	class gridRegion
 	{
 	public:
 
-		gridRegion(const grid<T>* parentGrid, gridRect boundary);
+		gridRegion(T* locations,
+					T* edgeLocations,
+					T* westExposedLocations,
+					T* northExposedLocations,
+					T* eastExposedLocations,
+					T* southExposedLocations,
+					T* northWestCornerLocations,
+					T* northEastCornerLocations,
+					T* southEastCornerLocations,
+					T* southWestCornerLocations,
+					gridRect parentBoundary,
+					gridRect relativeBoundary,
+					gridRect largestRectangularSubRegion);
+
+
 		~gridRegion();
 
 		gridRect getBoundary() const;
 
+	public:
+
 		/// <summary>
 		/// Returns value from the underlying grid. This is the index space of the parent grid.
 		/// </summary>
-		T get(short parentColumn, short parentRow) const;
+		T get(short column, short row) const;
 
 	private:
 
-		grid<T>* _grid;
+		array2D<T>* _array2D;
+
 		gridRect _boundary;
 	};
 }

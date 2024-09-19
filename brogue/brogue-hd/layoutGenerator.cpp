@@ -1,11 +1,9 @@
 #include "layoutGenerator.h"
 #include "randomGenerator.h"
-#include "griddef.h"
+#include "gridDefinitions.h"
 #include "dungeonConstants.h"
 #include "dungeon.h"
 #include "vectordef.h"
-
-using namespace brogueHd::collection;
 
 namespace brogueHd
 {

@@ -165,6 +165,9 @@
     <ClCompile Include="gameController.cpp" />
     <ClCompile Include="gameData.cpp" />
     <ClCompile Include="grid.cpp" />
+    <ClCompile Include="gridConstructor.cpp" />
+    <ClCompile Include="gridRegionConstructor.cpp" />
+    <ClCompile Include="gridRegionLocator.cpp" />
     <ClCompile Include="item.cpp" />
     <ClCompile Include="keyProcessor.cpp" />
     <ClCompile Include="layoutGenerator.cpp" />
@@ -178,6 +181,7 @@
     <ClCompile Include="playerCharacter.cpp" />
     <ClCompile Include="randomGenerator.cpp" />
     <ClCompile Include="gridRegion.cpp" />
+    <ClCompile Include="regionGenerator.cpp" />
     <ClCompile Include="renderingController.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -190,11 +194,16 @@
     <ClInclude Include="brogueMachine.h" />
     <ClInclude Include="brogueObject.h" />
     <ClInclude Include="broguePlayer.h" />
+    <ClInclude Include="cellularAutomataParameters.h" />
     <ClInclude Include="comparabledef.h" />
     <ClInclude Include="creatureBehaviorDeclaration.h" />
     <ClInclude Include="creatureBehaviorMap.h" />
     <ClInclude Include="dungeonFeature.h" />
     <ClInclude Include="exceptionHandler.h" />
+    <ClInclude Include="floodFillData.h" />
+    <ClInclude Include="gridConstructor.h" />
+    <ClInclude Include="gridRegionConstructor.h" />
+    <ClInclude Include="gridRegionLocator.h" />
     <ClInclude Include="hashGenerator.h" />
     <ClInclude Include="itemDeclaration.h" />
     <ClInclude Include="itemTemplate.h" />
@@ -238,7 +247,7 @@
     <ClInclude Include="gameController.h" />
     <ClInclude Include="gameData.h" />
     <ClInclude Include="grid.h" />
-    <ClInclude Include="griddef.h" />
+    <ClInclude Include="gridDefinitions.h" />
     <ClInclude Include="gridMethods.h" />
     <ClInclude Include="gridRect.h" />
     <ClInclude Include="brogueLevelMethods.h" />
@@ -267,6 +276,7 @@
     <ClInclude Include="randomGenerator.h" />
     <ClInclude Include="playbackData.h" />
     <ClInclude Include="gridRegion.h" />
+    <ClInclude Include="regionGenerator.h" />
     <ClInclude Include="renderingController.h" />
     <ClInclude Include="statusEffectDeclaration.h" />
     <ClInclude Include="terrainDeclaration.h" />

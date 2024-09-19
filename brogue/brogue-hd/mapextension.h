@@ -53,4 +53,17 @@ namespace brogueHd::backend::extension
 
 		return NULL;
 	}
+
+	template<typename K, typename V>
+	K* getKeys(const std::map<K, V>& map)
+	{
+		std::vector<K> result;
+
+		for (std::iterator it = map->begin(); it <= map->end(); it++)
+		{
+			result.push_back(it->first);
+		}
+
+		return result.data();
+	}
 }

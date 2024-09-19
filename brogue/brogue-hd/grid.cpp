@@ -3,8 +3,9 @@
 #include "color.h"
 #include "gridRegion.h"
 #include "gridMethods.h"
-#include "griddef.h"
+#include "gridDefinitions.h"
 #include "randomGenerator.h"
+#include "exceptionHandler.h"
 #include <functional>
 #include <exception>
 
@@ -12,8 +13,8 @@ using namespace std;
 
 namespace brogueHd::backend::model::layout
 {
-    template<comparable T>
-    grid<T>::grid(short columns, short rows, T zeroValue, T maxValue)
+    template<gridCellConstraint T>
+    grid<T>::grid(short columns, short rows)
     {
         _grid = new T[columns][rows];
         _rows = rows;
@@ -22,7 +23,7 @@ namespace brogueHd::backend::model::layout
         _maxValue = maxValue;
     }
 
-    template<comparable T>
+    template<gridCellConstraint T>
     grid<T>::~grid()
     {
         delete[][] _grid;
@@ -31,37 +32,70 @@ namespace brogueHd::backend::model::layout
         delete _maxValue;
     }
 
-    template<comparable T>
+    template<gridCellConstraint T>
     T grid<T>::get(short column, short row) const
     {
         return _grid[column][row];
     }
 
-    template<comparable T>
+    template<gridCellConstraint T>
+    T grid<T>::getOrNull(short column, short row) const
+    {
+        if (!_grid->isDefined(column, row))
+            return NULL;
+
+        return _grid[column][row];
+    }
+
+    template<gridCellConstraint T>
+    T grid<T>::getAdjacent(short column, short row, brogueCompass direction) const
+    {
+        switch (brogueCompass)
+        {
+        case brogueCompass::None:
+            return NULL;
+
+        case brogueCompass::N:
+            return this->getOrNull(column, row - 1);
+
+        case brogueCompass::S:
+            return this->getOrNull(column, row + 1);
+
+        case brogueCompass::E:
+            return this->getOrNull(column + 1, row);
+
+        case brogueCompass::W:
+            return this->getOrNull(column - 1, row);
+
+        case brogueCompass::NW:
+            return this->getOrNull(column - 1, row - 1);
+
+        case brogueCompass::NE:
+            return this->getOrNull(column + 1, row - 1);
+
+        case brogueCompass::SW:
+            return this->getOrNull(column - 1, row + 1);
+
+        case brogueCompass::SE:
+            return this->getOrNull(column + 1, row + 1);
+        default:
+            return NULL;
+        }
+    }
+
+    template<gridCellConstraint T>
     gridRect grid<T>::getBoundary() const
     {
         return gridRect(0, 0, _columns, _rows);
     }
 
-    template<comparable T>
-    short grid<T>::columnCount() const
+    template<gridCellConstraint T>
+    bool grid<T>::isDefined(short column, short row) const
     {
-        return _columns;
+        return _grid[column][row] != NULL;
     }
 
-    template<comparable T>
-    short grid<T>::rowCount() const
-    {
-        return _rows;
-    }
-
-    template<comparable T>
-    bool grid<T>::isZeroValue(short column, short row) const
-    {
-        return _grid[column][row] == _zeroValue;
-    }
-
-    template<comparable T>
+    template<gridCellConstraint T>
     bool grid<T>::isInBounds(short column, short row) const
     {
         if (column < 0 ||
@@ -73,7 +107,7 @@ namespace brogueHd::backend::model::layout
         return true;
     }
 
-    template<comparable T>
+    template<gridCellConstraint T>
     void grid<T>::set(short column, short row, T value)
     {
         if (column < 0 ||
@@ -93,109 +127,6 @@ namespace brogueHd::backend::model::layout
 
         else
             _grid[column][row] = value;
-    }
-
-    template<comparable T>
-    void grid<T>::fill(T fillValue)
-    {
-        iterate(this, [](short column, short row) 
-        { 
-            this->set(column, row, fillValue); 
-        });
-    }
-
-    template<comparable T>
-    short grid<T>::floodFill(short x, short y, T eligibleValueMin, T eligibleValueMax, T fillValue) 
-    {
-        enum directions dir;
-        short newX, newY, fillCount = 1;
-
-        brogueAssert(fillValue < eligibleValueMin || fillValue > eligibleValueMax);
-
-        // Fill the current cell
-        //
-        this->set(x, y, fillValue);
-
-        // Recurse over the cardinally adjacent cells and fill eligible ones
-        //
-        iterateAroundCardinal(this, x, y, true, [](short column, short row)
-        {
-            if (_grid[column, row] >= eligibleValueMin &&
-                _grid[newX][newY] <= eligibleValueMax)
-            {
-                fillCount += floodFill(newX, newY, eligibleValueMin, eligibleValueMax, fillValue);
-            }
-        });
-
-        return fillCount;
-    }
-
-    template<comparable T>
-    void grid<T>::setRectangle(short x, short y, short width, short height, T value) 
-    {
-        short i, j;
-
-        for (i = x; i < x + width; i++) {
-            for (j = y; j < y + height; j++) {
-                this->set(i, j, value);
-            }
-        }
-    }
-
-    template<comparable T>
-    void grid<T>::setCircle(short x, short y, short radius, T value) 
-    {
-        short i, j;
-
-        for (i = max(0, x - radius - 1); i < max(_columns, x + radius); i++) {
-            for (j = max(0, y - radius - 1); j < max(_rows, y + radius); j++) {
-                if ((i - x) * (i - x) + (j - y) * (j - y) < radius * radius + radius) {
-                    this->set(i, j, value);
-                }
-            }
-        }
-    }
-
-    template<comparable T>
-    void grid<T>::setIntersection(const grid<T>* otherGrid, T setValue) 
-    {
-        short i, j;
-        for (i = 0; i < _columns; i++)
-        {
-            for (j = 0; j < _rows; j++)
-            {
-                // Set intersection based on comparison
-                //
-                if (!this->isZeroValue() && !otherGrid->isZeroValue())
-                    this->set(i, j, setValue);
-            }
-        }
-    }
-
-    template<comparable T>
-    void grid<T>::setUnion(const grid<T>* otherGrid, T setValue)
-    {
-        short i, j;
-        for (i = 0; i < _columns; i++)
-        {
-            for (j = 0; j < _rows; j++)
-            {
-                // Set union based on comparison
-                //
-                if (!this->isZeroValue() || !otherGrid->isZeroValue())
-                    this->set(i, j, setValue);
-            }
-        }
-    }
-
-    template<comparable T>
-    void grid<T>::setFor(function<bool(short, short, T)> predicate, T setValue)
-    {
-        iterate(this, [](short column, short row)
-        {
-            if (predicate(column, row, _grid[i][j]))
-                this->set(column, row, setValue);
-        });
     }
 
     // Fills grid locations with the given value if they match any terrain flags or map flags.
@@ -241,7 +172,7 @@ namespace brogueHd::backend::model::layout
     //    }
     //}
 
-    template<comparable T>
+    template<gridCellConstraint T>
     short grid<T>::count(T value) 
     {
         short count = 0;
@@ -255,8 +186,8 @@ namespace brogueHd::backend::model::layout
         return count;
     }
 
-    template<comparable T>
-    T grid<T>::search(function<bool(T, T)> aggregateComparator) const
+    template<gridCellConstraint T>
+    T grid<T>::search(gridDelegates::gridAggregateComparer aggregateComparator) const
     {
         T searchValue;
         
@@ -267,6 +198,88 @@ namespace brogueHd::backend::model::layout
         });
 
         return searchValue;
+    }
+
+    template<gridCellConstraint T>
+    bool grid<T>::isEdge(short column, short row) const
+    {
+        return isEdge(column, row, [](short, short, T value) 
+        {
+            return value != NULL;
+        });
+    }
+
+    /// <summary>
+    /// Returns true if the location is at the edge of the grid (using NULL comparison), or 
+    /// the provided predicate.
+    /// </summary>
+    template<gridCellConstraint T>
+    bool grid<T>::isEdge(short column, short row, gridDelegates::gridPredicate predicate) const
+    {
+        T north = this->getOrNull(column, row - 1);
+        T south = this->getOrNull((column, row + 1);
+        T east = this->getOrNull((column + 1, row);
+        T west = this->getOrNull((column - 1, row);
+        T northEast = this->getOrNull((column + 1, row - 1);
+        T northWest = this->getOrNull((column - 1, row - 1);
+        T southEast = this->getOrNull((column + 1, row + 1);
+        T southWest = this->getOrNull((column - 1, row + 1);
+
+        return (north == NULL || (north != NULL && !predicate(column, row - 1, north))) ||
+                (south == NULL || (south != NULL && !predicate(column, row + 1, south))) ||
+                (east == NULL || (east != NULL && !predicate(column + 1, row, east))) ||
+                (west == NULL || (west != NULL && !predicate(column - 1, row, west))) ||
+                (northEast == NULL || (northEast != NULL && !predicate(column + 1, row - 1, northEast))) ||
+                (northWest == NULL || (northWest != NULL && !predicate(column - 1, row - 1, northWest))) ||
+                (southEast == NULL || (southEast != NULL && !predicate(column + 1, row + 1, southEast))) ||
+                (southWest == NULL || (southWest != NULL && !predicate(column - 1, row + 1, southWest)));
+    }
+
+    template<gridCellConstraint T>
+    bool grid<T>::isExposedEdge(int column, int row, brogueCompass direction, gridDelegates::gridPredicate predicate) const
+    {
+        T north = this->getOrNull(column, row - 1);
+        T south = this->getOrNull((column, row + 1);
+        T east = this->getOrNull((column + 1, row);
+        T west = this->getOrNull((column - 1, row);
+
+        if (direction == brogueCompass::N)
+            return north == NULL || (north != NULL && !predicate(column, row - 1, north));
+
+        else if (direction == brogueCompass::S)
+            return south == NULL || (south != NULL && !predicate(column, row + 1, south));
+
+        else if (direction == brogueCompass::E)
+            return east == NULL || (east != NULL && !predicate(column + 1, row, east));
+
+        else if (direction == brogueCompass::W)
+            return west == NULL || (west != NULL && !predicate(column - 1, row, west));
+
+        else
+            brogueException::show("Invalid use of direction parameter:  grid.isExposedEdge");
+    }
+
+    template<gridCellConstraint T>
+    bool grid<T>::isExposedCorner(int column, int row, brogueCompass direction, gridDelegates::gridPredicate predicate) const
+    {
+        if (direction == brogueCompass::NW)
+            return isExposedEdge(grid, column, row, Compass.N, predicate) &&
+                   isExposedEdge(grid, column, row, Compass.W, predicate);
+
+        else if (direction == brogueCompass::NE)
+            return isExposedEdge(grid, column, row, Compass.N, predicate) &&
+                   isExposedEdge(grid, column, row, Compass.E, predicate);
+
+        else if (direction == brogueCompass::SE)
+            return isExposedEdge(grid, column, row, Compass.S, predicate) &&
+                   isExposedEdge(grid, column, row, Compass.E, predicate);
+
+        else if (direction == brogueCompass::SW)
+            return isExposedEdge(grid, column, row, Compass.S, predicate) &&
+                   isExposedEdge(grid, column, row, Compass.W, predicate);
+
+        else
+            brogueException::show("Invalid use of direction parameter:  grid.isExposedCorner");
     }
 
     //// Takes a grid as a mask of valid locations, chooses one randomly and returns it as (x, y).
@@ -421,149 +434,149 @@ namespace brogueHd::backend::model::layout
     //    }
     //}
 
-    template<comparable T>
-    void grid<T>::cellularAutomataIteration(cellularAutomataParameters parameters)
-    {
-        short nbCount;
+    //template<gridCellConstraint T>
+    //void grid<T>::cellularAutomataIteration(cellularAutomataParameters parameters)
+    //{
+    //    short nbCount;
 
-        iterateIn(this, column, row, width, height, [](short columnRect, short rowRect)
-        {
-            // Count of "alive" cells at this location
-            nbCount = 0;
+    //    iterateIn(this, column, row, width, height, [](short columnRect, short rowRect)
+    //    {
+    //        // Count of "alive" cells at this location
+    //        nbCount = 0;
 
-            iterateAround(this, columnRect, rowRect, true, [](short i, short j)
-            {
-                // If our grid "is defined" here
-                //
-                if (!this->isZeroValue(i, j))
-                    nbCount++;
-            });
+    //        iterateAround(this, columnRect, rowRect, true, [](short i, short j)
+    //        {
+    //            // If our grid "is defined" here
+    //            //
+    //            if (!this->isZeroValue(i, j))
+    //                nbCount++;
+    //        });
 
-            if (this->isZeroValue(columnRect, rowRect) && birthParameters[nbCount])
-            {
-                this->set(columnRect, rowRect, birthValue)	    // birth
-            }
-            else if (!this->isZeroValue(columnRect, rowRect) && survivalParameters[nbCount])
-            {
-                // survival
-            }
-            else
-            {
-                this->set(columnRect, rowRect, _zeroValue);     // death
-            }
-        });
-    }
+    //        if (this->isZeroValue(columnRect, rowRect) && birthParameters[nbCount])
+    //        {
+    //            this->set(columnRect, rowRect, birthValue)	    // birth
+    //        }
+    //        else if (!this->isZeroValue(columnRect, rowRect) && survivalParameters[nbCount])
+    //        {
+    //            // survival
+    //        }
+    //        else
+    //        {
+    //            this->set(columnRect, rowRect, _zeroValue);     // death
+    //        }
+    //    });
+    //}
 
-    template<comparable T>
-    short grid<T>::fillContiguousRegion(short column, short row, T fillValue) 
-    {
-        short numberOfCells = 1;
+    //template<gridCellConstraint T>
+    //short grid<T>::fillContiguousRegion(short column, short row, T fillValue) 
+    //{
+    //    short numberOfCells = 1;
 
-        // Fill current cell value
-        //
-        this->set(column, row, fillValue);
+    //    // Fill current cell value
+    //    //
+    //    this->set(column, row, fillValue);
 
-        // Recurse through in a flood-fill fashion
-        //
-        iterateAroundCardinal(this, column, row, true, [](short x, short y)
-        {
-            // If the neighbor is an unmarked region cell
-            //
-            if (!this->isZeroValue(x,y))
-            { 
-                numberOfCells += this->fillContiguousRegion(x, y, fillValue); // then recurse.
-            }
-        });
+    //    // Recurse through in a flood-fill fashion
+    //    //
+    //    iterateAroundCardinal(this, column, row, true, [](short x, short y)
+    //    {
+    //        // If the neighbor is an unmarked region cell
+    //        //
+    //        if (!this->isZeroValue(x,y))
+    //        { 
+    //            numberOfCells += this->fillContiguousRegion(x, y, fillValue); // then recurse.
+    //        }
+    //    });
 
-        return numberOfCells;
-    }
+    //    return numberOfCells;
+    //}
 
-    template<comparable T>
-    void generateCellularAutomata(randomGenerator* randomGenerator, cellularAutomataParameters parameters)
-    {
-        // Procedure
-        //
-        // 1) Generate white noise in the specified region
-        // 2) Run the cellularAutomataSmoothing function the specified number of times
-        //      -> While iterating:  try to check original Brogue constraints
-        //        
+    //template<gridCellConstraint T>
+    //void generateCellularAutomata(randomGenerator* randomGenerator, cellularAutomataParameters parameters)
+    //{
+    //    // Procedure
+    //    //
+    //    // 1) Generate white noise in the specified region
+    //    // 2) Run the cellularAutomataSmoothing function the specified number of times
+    //    //      -> While iterating:  try to check original Brogue constraints
+    //    //        
 
-        short random, smoothingPassesMax;
+    //    short random, smoothingPassesMax;
 
-        // Generate white noise inside the chosen rectangle
-        //
-        iterateIn(this, column, row, width, height, [](short x, short y)
-        {
-            if (randomGenerator->rand_percent(random))
-                this->set(x, y, fillValue);
-        });
+    //    // Generate white noise inside the chosen rectangle
+    //    //
+    //    iterateIn(this, column, row, width, height, [](short x, short y)
+    //    {
+    //        if (randomGenerator->rand_percent(random))
+    //            this->set(x, y, fillValue);
+    //    });
 
-        // Run smoothing iterations
-        //
-        for (int index = 0; index < clamp(smoothingPasses, CELLULAR_AUTOMATA_MAX); index++)
-        {
-            this->cellularAutomataIteration(parameters);
-        }
-    }
+    //    // Run smoothing iterations
+    //    //
+    //    for (int index = 0; index < clamp(smoothingPasses, CELLULAR_AUTOMATA_MAX); index++)
+    //    {
+    //        this->cellularAutomataIteration(parameters);
+    //    }
+    //}
 
-    template<comparable T>
-    std::vector<gridRegion<T>*> grid<T>::locateRegions(function<bool(T)> predicate, T fillValue)
-    {
-        std::vector<gridRegion<T>*> result;
+    //template<gridCellConstraint T>
+    //std::vector<gridRegion<T>*> grid<T>::locateRegions(function<bool(T)> predicate, T fillValue)
+    //{
+    //    std::vector<gridRegion<T>*> result;
 
-        iterate(this, [](short column, short row)
-        {
-            // Check history
-            for (int index = 0; index < result.size(); index++)
-            {
-                // Return from iterator (only)
-                if (predicate(result[i][column, row]))
-                    return;
-            }
+    //    iterate(this, [](short column, short row)
+    //    {
+    //        // Check history
+    //        for (int index = 0; index < result.size(); index++)
+    //        {
+    //            // Return from iterator (only)
+    //            if (predicate(result[i][column, row]))
+    //                return;
+    //        }
 
-            // Check to see if we're at a valid location
-            if (predicate(_grid[column, row]))
-            {
-                // Start a new region
-                grid<T>* regionGrid = new grid<T>(_columns, _rows, _zeroValue, _maxValue);
+    //        // Check to see if we're at a valid location
+    //        if (predicate(_grid[column, row]))
+    //        {
+    //            // Start a new region
+    //            grid<T>* regionGrid = new grid<T>(_columns, _rows, _zeroValue, _maxValue);
 
-                // Keep track of the boundary
-                gridRect boundary(column, row, 0, 0);
+    //            // Keep track of the boundary
+    //            gridRect boundary(column, row, 0, 0);
 
-                // Set initial value
-                regionGrid->set(column, row, fillValue);
+    //            // Set initial value
+    //            regionGrid->set(column, row, fillValue);
 
-                // Recurse to fill out the grid
-                this->locateRegionRecurse(regionGrid, column, row, predicate, fillValue, predicate);
+    //            // Recurse to fill out the grid
+    //            this->locateRegionRecurse(regionGrid, column, row, predicate, fillValue, predicate);
 
-                // Set result
-                result.push_back(new gridRegion<T>(regionGrid, boundary));
-            }
-        });
+    //            // Set result
+    //            result.push_back(new gridRegion<T>(regionGrid, boundary));
+    //        }
+    //    });
 
-        return result;
-    }
+    //    return result;
+    //}
 
-    template<comparable T>
-    void grid<T>::locateRegionRecurse(grid<T>* regionGrid, gridRect& boundary, short currentColumn, short currentRow, T fillValue, function<bool(T)> predicate)
-    {
-        // Recurse through in a flood-fill fashion
-        //
-        iterateAroundCardinal(this, currentColumn, currentRow, true, [](short x, short y)
-        {
-            // Neighbor Cell:  Protect from infinite recursion by checking region grid
-            //
-            if (predicate(this, x,y) && !predicate(regionGrid, x, y))
-            {
-                // Mark as region
-                regionGrid->set(x, y, fillValue);
+    //template<gridCellConstraint T>
+    //void grid<T>::locateRegionRecurse(grid<T>* regionGrid, gridRect& boundary, short currentColumn, short currentRow, T fillValue, function<bool(T)> predicate)
+    //{
+    //    // Recurse through in a flood-fill fashion
+    //    //
+    //    iterateAroundCardinal(this, currentColumn, currentRow, true, [](short x, short y)
+    //    {
+    //        // Neighbor Cell:  Protect from infinite recursion by checking region grid
+    //        //
+    //        if (predicate(this, x,y) && !predicate(regionGrid, x, y))
+    //        {
+    //            // Mark as region
+    //            regionGrid->set(x, y, fillValue);
 
-                // Expand boundary
-                boundary.expand(x, y);
+    //            // Expand boundary
+    //            boundary.expand(x, y);
 
-                // Recurse
-                locateRegionRecurse(regionGrid, boundary, x, y, fillValue, predicate);
-            }
-        });
-    }
+    //            // Recurse
+    //            locateRegionRecurse(regionGrid, boundary, x, y, fillValue, predicate);
+    //        }
+    //    });
+    //}
 }

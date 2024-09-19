@@ -1,14 +1,11 @@
 #pragma once
 
-#include "broguedef.h"
 #include "gridRect.h"
-#include <array>
+#include "broguedef.h"
 
-using namespace std;
-
-namespace broguehHd
+namespace brogueHd::backend::model::layout
 {
-	struct cellularAutomataParameters 
+	struct cellularAutomataParameters
 	{
 		gridRect boundary;
 		short fillValue;
@@ -36,9 +33,8 @@ namespace broguehHd
 			// TODO: Use std library
 			strcpy(birthParameters, abirthParameters);
 			strcpy(survivalParameters, asurvivalParameters);
-			
+
 			smoothingIterations = asmoothingIterations;
 		}
-
 	};
 }

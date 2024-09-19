@@ -1,7 +1,7 @@
 #pragma once
 
 #include "grid.h"
-#include "griddef.h"
+#include "gridDefinitions.h"
 #include "gridRect.h"
 #include "broguedef.h"
 #include "iteratordef.h"
@@ -10,8 +10,9 @@
 using namespace std;
 
 using namespace brogueHd::backend::extension;
+using namespace brogueHd::backend::model::layout;
 
-namespace brogueHd
+namespace brogueHd::backend::model::layout
 {
 
 	/*
@@ -21,21 +22,8 @@ namespace brogueHd
 
 	*/
 
-	/// <summary>
-	/// Example predicate. User predicates will be made depending on usage
-	/// </summary>
-	/// <typeparam name="T">Grid type</typeparam>
-	/// <param name="column">callback (current) column</param>
-	/// <param name="row">callback (current) row</param>
-	/// <param name="value">callback (current) value</param>
-	template<typename T>
-	static bool gridPredicate(short column, short row, T value)
-	{
-		return true;
-	}
-
-	template<typename T>
-	static void iterate(const grid<T>* grid, function<iterationCallback(short, short)> callback)
+	template<gridCellConstraint T>
+	static void iterate(const grid<T>* grid, gridDelegates::gridIterationCallback callback)
 	{
 		bool userBreak = false;
 
@@ -49,8 +37,8 @@ namespace brogueHd
 		}
 	}
 
-	template<typename T>
-	static void iterate(const gridRect& boundary, function<iterationCallback(short, short)> callback)
+	template<gridCellConstraint T>
+	static void iterate(const gridRect& boundary, gridDelegates::gridIterationCallback callback)
 	{
 		bool userBreak = false;
 
@@ -64,12 +52,12 @@ namespace brogueHd
 		}
 	}
 
-	template<typename T>
+	template<gridCellConstraint T>
 	static void iterateOutward(const grid<T>* grid, 
 							   short centerColumn, 
 							   short centerRow, 
 							   short distance, 
-							   function<iterationCallback(short, short)> callback)
+							   gridDelegates::gridIterationCallback callback)
 	{
 		bool userBreak = false;
 
@@ -89,8 +77,8 @@ namespace brogueHd
 		}
 	}
 
-	template<typename T>
-	static void iterateIn(const grid<T>* grid, gridRect boundary, function<iterationCallback(short, short)> callback)
+	template<gridCellConstraint T>
+	static void iterateIn(const grid<T>* grid, gridRect boundary, gridDelegates::gridIterationCallback callback)
 	{
 		bool userBreak = false;
 
@@ -107,8 +95,8 @@ namespace brogueHd
 		}
 	}
 
-	template<typename T>
-	static void iterateIn(const gridRegion<T>* grid, gridRect boundary, function<iterationCallback(short, short)> callback)
+	template<gridCellConstraint T>
+	static void iterateIn(const gridRegion<T>* grid, gridRect boundary, gridDelegates::gridIterationCallback callback)
 	{
 		bool userBreak = false;
 
@@ -127,8 +115,8 @@ namespace brogueHd
 		}
 	}
 
-	template<typename T>
-	static void iterateInCircle(const grid<T>* grid, gridRect boundary, function<iterationCallback(short, short)> callback)
+	template<gridCellConstraint T>
+	static void iterateInCircle(const grid<T>* grid, gridRect boundary, gridDelegates::gridIterationCallback callback)
 	{
 		bool userBreak = false;
 
@@ -148,8 +136,8 @@ namespace brogueHd
 		}
 	}
 
-	template<typename T>
-	static void iterateAround(const grid<T>* grid, short column, short row, bool withinBounds, function<iterationCallback(short, short)> callback)
+	template<gridCellConstraint T>
+	static void iterateAround(const grid<T>* grid, short column, short row, bool withinBounds, gridDelegates::gridIterationCallback callback)
 	{
 		short newX, newY;
 
@@ -177,8 +165,8 @@ namespace brogueHd
 		}
 	}
 
-	template<typename T>
-	static void iterateAroundCardinal(const grid<T>* grid, short column, short row, bool withinBounds, function<iterationCallback(short, short)> callback)
+	template<gridCellConstraint T>
+	static void iterateAroundCardinal(const grid<T>* grid, short column, short row, bool withinBounds, gridDelegates::gridIterationCallback callback)
 	{
 		short newX, newY;
 

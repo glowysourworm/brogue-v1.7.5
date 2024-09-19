@@ -5,6 +5,7 @@
 #include "gridCell.h"
 #include "griddef.h"
 #include "gridRect.h"
+#include "gridRegion.h"
 #include "dungeonDeclaration.h"
 #include "dungeonConstants.h"
 #include <functional>

@@ -88,9 +88,6 @@
     <Filter Include="Header Files\backend\model\lighting">
       <UniqueIdentifier>{5a98f268-6784-43a5-a1a8-d5553bc676ea}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\backend\model\generation">
-      <UniqueIdentifier>{4cf08ea0-1b5a-4aa1-bd85-35d32b4b2d85}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\backend\model\item">
       <UniqueIdentifier>{26ac1662-cb27-4e69-aefb-28f6c61447d4}</UniqueIdentifier>
     </Filter>
@@ -111,6 +108,12 @@
     </Filter>
     <Filter Include="Source Files\backend\math">
       <UniqueIdentifier>{220ffa64-55f0-4bcd-a3ca-df530f00bd73}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\backend\model\construction">
+      <UniqueIdentifier>{4cf08ea0-1b5a-4aa1-bd85-35d32b4b2d85}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\backend\model\construction">
+      <UniqueIdentifier>{0d09d2a0-9793-47dc-90a1-775429bc19e3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -231,6 +234,18 @@
     <ClCompile Include="dijkstra.cpp">
       <Filter>Source Files\backend\math</Filter>
     </ClCompile>
+    <ClCompile Include="regionGenerator.cpp">
+      <Filter>Source Files\backend\generator</Filter>
+    </ClCompile>
+    <ClCompile Include="gridRegionLocator.cpp">
+      <Filter>Source Files\backend\model\construction</Filter>
+    </ClCompile>
+    <ClCompile Include="gridConstructor.cpp">
+      <Filter>Source Files\backend\model\construction</Filter>
+    </ClCompile>
+    <ClCompile Include="gridRegionConstructor.cpp">
+      <Filter>Source Files\backend\model\construction</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="broguedef.h">
@@ -345,7 +360,7 @@
       <Filter>Header Files\backend\model\lighting</Filter>
     </ClInclude>
     <ClInclude Include="linearGenerationParameters.h">
-      <Filter>Header Files\backend\model\generation</Filter>
+      <Filter>Header Files\backend\model\construction</Filter>
     </ClInclude>
     <ClInclude Include="lightSource.h">
       <Filter>Header Files\backend\model\lighting</Filter>
@@ -458,7 +473,7 @@
     <ClInclude Include="fileio.h">
       <Filter>Header Files\backend\model\io</Filter>
     </ClInclude>
-    <ClInclude Include="griddef.h">
+    <ClInclude Include="gridDefinitions.h">
       <Filter>Header Files\backend\model\layout</Filter>
     </ClInclude>
     <ClInclude Include="gridMethods.h">
@@ -502,6 +517,24 @@
     </ClInclude>
     <ClInclude Include="arraydef.h">
       <Filter>Header Files\backend\extension</Filter>
+    </ClInclude>
+    <ClInclude Include="regionGenerator.h">
+      <Filter>Header Files\backend\generator</Filter>
+    </ClInclude>
+    <ClInclude Include="floodFillData.h">
+      <Filter>Header Files\backend\model\layout</Filter>
+    </ClInclude>
+    <ClInclude Include="cellularAutomataParameters.h">
+      <Filter>Header Files\backend\model\layout</Filter>
+    </ClInclude>
+    <ClInclude Include="gridRegionLocator.h">
+      <Filter>Header Files\backend\model\construction</Filter>
+    </ClInclude>
+    <ClInclude Include="gridConstructor.h">
+      <Filter>Header Files\backend\model\construction</Filter>
+    </ClInclude>
+    <ClInclude Include="gridRegionConstructor.h">
+      <Filter>Header Files\backend\model\construction</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

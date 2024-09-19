@@ -1,10 +1,10 @@
 #include "array2D.h"
-#include "griddef.h"
+#include "gridDefinitions.h"
 
 namespace brogueHd::backend::model::layout
 {
 	template<typename T>
-	array2D<T>::array2D(gridRect subBoundary)
+	array2D<T>::array2D(gridRect parentBoundary, gridRect subBoundary)
 	{
 		_array = new T * [subBoundary.width()];
 
@@ -30,5 +30,11 @@ namespace brogueHd::backend::model::layout
 	T array2D<T>::get(short column, short row)
 	{
 		return _array[column - _parentColumn][row - _parentRow];
+	}
+
+	template<typename T>
+	void array2D<T>::set(short column, short row, T value)
+	{
+		_array[column - _parentColumn][row - _parentRow] = value;
 	}
 }

@@ -1,6 +1,11 @@
 #pragma once
 
 #include "hashGenerator.h"
+#include <string>
+#include <format>
+#include <iostream>
+
+using namespace std;
 
 using namespace brogueHd::backend::generator;
 
@@ -32,6 +37,11 @@ namespace brogueHd::backend::model::layout
 		{
 			return cell1.column != cell2.column ||
 				   cell1.row != cell2.row;
+		}
+
+		char* getString()
+		{
+			return std::format("(Col={}, Row={})", column, row);
 		}
 
 		unsigned long getHashCode()

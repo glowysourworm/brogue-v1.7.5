@@ -4,6 +4,7 @@
 #include "creature.h"
 #include "gridCell.h"
 #include "grid.h"
+#include "gridConstraint.h"
 #include "binarySearchTree.h"
 #include <functional>
 
@@ -26,14 +27,6 @@ namespace brogueHd::backend::math
 	//	pdsLink front;
 	//	pdsLink links[DCOLS * DROWS];
 	//};
-
-    // Constraint for template function to help cast the brogue item details
-    //
-    template<typename T>
-    concept gridCellConstraint = requires(T a)
-    {
-        { a } -> std::convertible_to<gridCell*>;
-    };
 
     template<gridCellConstraint T>
 	class dijkstra
@@ -122,10 +115,10 @@ namespace brogueHd::backend::math
 		T _sourceLocation;
 		T[] _targetLocations;
 
-        grid<short>* _outputMap;
+        array2D<short>* _outputMap;
 
-        grid<bool>* _visitedMap;                        // Visited locations on the map
-        grid<bool>* _locationMap;                       // Locations that have been added to the frontier
+		array2D<bool>* _visitedMap;                        // Visited locations on the map
+		array2D<bool>* _locationMap;                       // Locations that have been added to the frontier
 
         // Frontier BST for the map
 		binarySearchTree<float, std::map<T, T>>* _frontier;
