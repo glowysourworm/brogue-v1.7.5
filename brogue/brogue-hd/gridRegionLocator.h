@@ -3,7 +3,7 @@
 #include "grid.h"
 #include "gridRegion.h"
 #include "gridDefinitions.h"
-#include "floodFillData.h"
+#include "gridRegionConstructor.h"
 #include <functional>
 
 using namespace std;
@@ -34,13 +34,7 @@ namespace brogueHd::backend::model::construction
 
 	private:
 
-		floodFillData<T> runFloodFill(gridDelegates::gridPredicate inclusionPredicate);
-
-		gridRect calculateLargestRectangle(const gridRect& regionBoundary);
-
-		bool validateFloodFill(const floodFillData<T>& data);
-
-		void locateRegionRecurse(grid<T>* regionGrid, gridRect& boundary, short currentColumn, short currentRow, T fillValue, gridDelegates::gridPredicate predicate);
+		gridRegionConstructor<T>* runFloodFill(short column, short row, gridDelegates::gridPredicate inclusionPredicate);
 
 	private:
 

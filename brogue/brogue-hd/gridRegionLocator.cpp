@@ -1,9 +1,11 @@
 #include "gridRegionLocator.h"
-#include "floodFillData.h"
+#include "gridRegionConstructor.h"
 #include "mathdef.h"
 #include "grid.h"
 #include "exceptionHandler.h"
 #include "gridDefinitions.h"
+#include "iteratordef.h"
+#include <vector>
 
 using namespace std;
 
@@ -26,17 +28,61 @@ namespace brogueHd::backend::model::construction
     template<gridCellConstraint T>
     std::vector<gridRegion<T>*> gridRegionLocator<T>::locateRegions()
     {
-        
+        return locateRegions([](short column, short row, T value)
+        {
+            return value != NULL;
+        });
     }
 
     template<gridCellConstraint T>
-    std::vector<gridRegion<T>*> gridRegionLocator<T>::locateRegions(gridDelegates::gridPredicate predicate)
+    std::vector<gridRegion<T>*> gridRegionLocator<T>::locateRegions(gridDelegates::gridPredicate inclusionPredicate)
     {
+        std::vector<gridRegion<T>*> result;
 
+        // Procedure
+        //
+        // 1) Iterate the entire grid
+        //      -> Callback (over history) to see if this location is in predicate
+        //      -> Be sure we have not already visited this (new) region
+        //
+        iterate(_grid, [](short column, short row)
+        {
+            // Check history
+            for (int index = 0; index < result.size(); index++)
+            {
+                // Return from iterator (only)
+                if (inclusionPredicate(result[i]->get(column, row)))
+                    return iterationCallback::iterate;
+            }
+
+            // Check to see if we're at a valid location
+            if (inclusionPredicate(_grid[column, row]))
+            {
+                // Start a new region
+                grid<T>* regionGrid = new grid<T>(_columns, _rows);
+
+                // Keep track of the boundary (starts empty and expands)
+                gridRect boundary(column, row, 0, 0);
+
+                // Set initial value
+                regionGrid->set(column, row, new T(column, row));
+
+                // Recurse to fill out the grid
+                gridRegionConstructor<T>* constructor = runFloodFill(regionGrid, column, row, inclusionPredicate);
+
+                // Validate / Complete the region
+                gridRegion<T>* region = constructor->complete();
+
+                // Set result
+                result.push_back(region);
+            }
+        });
+
+        return result;
     }
 
     template<gridCellConstraint T>
-    floodFillData<T> runFloodFill(short column, short row, gridDelegates::gridPredicate predicate)
+    gridRegionConstructor<T>* gridRegionLocator<T>::runFloodFill(short column, short row, gridDelegates::gridPredicate inclusionPredicate)
     {
         if (!_grid->isDefined(column, row) || !predicate(column, row, _grid->get(column, row)))
             brogueException::show("Trying to start FloodFill in non-region location");
@@ -57,7 +103,7 @@ namespace brogueHd::backend::model::construction
         regionGrid[column, row] = firstElement;
 
         // Collect the region data in a constructor
-        var regionConstructor = new RegionConstructor<T, TResult>(parentBoundary, predicate, selector);
+        gridRegionConstructor<T>* regionConstructor = new gridRegionConstructor(gridRect(column, row, 0, 0), inclusionPredicate);
 
         while (resultQueue.count() > 0)
         {
@@ -71,7 +117,7 @@ namespace brogueHd::backend::model::construction
             regionLocations.insert(regionLocation, regionLocation);
 
             // Add to region constructor
-            regionConstructor.insert(regionLocation);
+            regionConstructor.addCell(regionLocation);
 
             // Search cardinally adjacent cells (N,S,E,W)
             T north = _grid->get(regionLocation.column, regionLocation.row - 1);
@@ -91,7 +137,7 @@ namespace brogueHd::backend::model::construction
             // N
             if (north != null &&
                 regionGrid[north.column][north.row] == NULL &&
-                predicate(north.column, north.row, north))
+                inclusionPredicate(north.column, north.row, north))
             {
                 // Add location to region grid
                 regionGrid[north.column][north.row] = north;
@@ -103,7 +149,7 @@ namespace brogueHd::backend::model::construction
             // S
             if (south != null &&
                 regionGrid[south.column][south.row] == NULL &&
-                predicate(south.column, south.row, south))
+                inclusionPredicate(south.column, south.row, south))
             {
                 // Add location to region grid
                 regionGrid[south.column][south.row] = south;
@@ -115,7 +161,7 @@ namespace brogueHd::backend::model::construction
             // E
             if (east != null &&
                 regionGrid[east.column][east.row] == NULL &&
-                predicate(east.column, east.row, east))
+                inclusionPredicate(east.column, east.row, east))
             {
                 // Add location to region grid
                 regionGrid[east.column][east.row] = east;
@@ -127,7 +173,7 @@ namespace brogueHd::backend::model::construction
             // W
             if (west != null &&
                 regionGrid[west.column][west.row] == NULL &&
-                predicate(west.column, west.row, west))
+                inclusionPredicate(west.column, west.row, west))
             {
                 // Add location to region grid
                 regionGrid[west.column][west.row] = west;
@@ -138,17 +184,5 @@ namespace brogueHd::backend::model::construction
         }
 
         return regionConstructor;
-    }
-
-    template<gridCellConstraint T>
-    bool gridRegionLocator<T>::validateFloodFill(const floodFillData<T>& data)
-    {
-
-    }
-
-    template<gridCellConstraint T>
-    void gridRegionLocator<T>::locateRegionRecurse(grid<T>* regionGrid, gridRect& boundary, short currentColumn, short currentRow, gridDelegates::gridPredicate predicate)
-    {
-
     }
 }

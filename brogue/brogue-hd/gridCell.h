@@ -13,6 +13,8 @@ namespace brogueHd::backend::model::layout
 {
 	class gridCell 
 	{
+	public:
+
 		short column;
 		short row;
 

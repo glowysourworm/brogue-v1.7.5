@@ -521,9 +521,6 @@
     <ClInclude Include="regionGenerator.h">
       <Filter>Header Files\backend\generator</Filter>
     </ClInclude>
-    <ClInclude Include="floodFillData.h">
-      <Filter>Header Files\backend\model\layout</Filter>
-    </ClInclude>
     <ClInclude Include="cellularAutomataParameters.h">
       <Filter>Header Files\backend\model\layout</Filter>
     </ClInclude>

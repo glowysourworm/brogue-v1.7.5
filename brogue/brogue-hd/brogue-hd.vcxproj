@@ -200,7 +200,6 @@
     <ClInclude Include="creatureBehaviorMap.h" />
     <ClInclude Include="dungeonFeature.h" />
     <ClInclude Include="exceptionHandler.h" />
-    <ClInclude Include="floodFillData.h" />
     <ClInclude Include="gridConstructor.h" />
     <ClInclude Include="gridRegionConstructor.h" />
     <ClInclude Include="gridRegionLocator.h" />
