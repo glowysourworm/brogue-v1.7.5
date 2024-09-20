@@ -5,7 +5,8 @@
 
 namespace brogueHd::backend::model::game
 {
-	struct colorString {
+	struct colorString 
+	{
 
 		char theString[COLS * 2];
 		color theColors[COLS * 2];

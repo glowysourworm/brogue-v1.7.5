@@ -19,6 +19,11 @@ namespace brogueHd::backend::model::layout
 		T get(short column, short row);
 		void set(short column, short row, T value);
 
+		bool isDefined(short column, short row) const;
+		bool isInBounds(short column, short row) const;
+
+		gridRect getBoundary() const;
+
 	private:
 
 		T** _array;

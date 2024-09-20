@@ -1,5 +1,6 @@
 #pragma once
 
+#include "brogueLayout.h"
 #include "brogueLevel.h"
 #include "randomGenerator.h"
 
@@ -11,21 +12,29 @@ namespace brogueHd::backend::generator
 	{
 	public:
 
-		layoutGenerator(brogueLevel* level, randomGenerator* randomGenerator);
+		/// <summary>
+		/// Creates the base layout, terrain, and machine terrain for the leve
+		/// </summary>
+		/// <param name="profile">The dungeon profile:  must contain all parameters</param>
+		layoutGenerator();
 		~layoutGenerator();
 
-		void generateDungeon(brogueLevel* level);
+		void initialize(const dungeonProfile& profile);
+		void clear();
+
+		brogueLayout& generateLayout();
 
 	private:
 
-		void designRandomRoom(dungeonProfile roomProfile);
-		void designCavern(dungeonProfile roomProfile);
-		void designEntranceRoom(dungeonProfile roomProfile);
-		void designCrossRoom(dungeonProfile roomProfile);
-		void designSymmetricalCrossRoom(dungeonProfile roomProfile);
-		void designSmallRoom(dungeonProfile roomProfile);
-		void designCircularRoom(dungeonProfile roomProfile);
-		void designChunkyRoom(dungeonProfile roomProfile);
+		void createRooms();
+		void designateMachineRooms();
+		void triangulateRooms();
+		void connectRooms();
+		void createTerrain();
+
+	private:
+
+
 
 	private:
 

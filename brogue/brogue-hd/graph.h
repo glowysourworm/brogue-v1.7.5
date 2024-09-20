@@ -28,7 +28,7 @@ namespace brogueHd::backend::math
 
     private:
 
-        std::vector<TNode*> _nodes;
+        std::vector<TNode*>* _nodes;
 
         graphEdgeCollection* _edgeCollection;
     }

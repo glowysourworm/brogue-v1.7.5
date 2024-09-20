@@ -8,32 +8,26 @@ namespace brogueHd::backend::model::layout
 	struct cellularAutomataParameters
 	{
 		gridRect boundary;
-		short fillValue;
 		float fillRatio;
-		boolean birthParameters[9];
-		boolean survivalParameters[9];
+		short birthCount;
+		short survivalCount;
 		short smoothingIterations;
 
 		cellularAutomataParameters()
 		{
-			boundary = gridRect();
-			fillValue = 0;
-			fillRatio = 0;
-			//birthParameters = "ttttttttt";
-			//survivalParameters = "ttttttttt";
-			smoothingIterations = 0;
+			boundary = gridRect(0, 0, DCOLS, DROWS);
+			fillRatio = 0.55;
+			birthCount = 3;
+			survivalCount = 5;
+			smoothingIterations = 5;
 		}
 
-		cellularAutomataParameters(gridRect aboundary, short afillValue, float afillRatio, boolean abirthParameters[9], boolean asurvivalParameters[9], short asmoothingIterations)
+		cellularAutomataParameters(gridRect aboundary, float afillRatio, short abirthCount, short asurvivalCount, short asmoothingIterations)
 		{
 			boundary = aboundary;
-			fillValue = afillValue;
 			fillRatio = afillRatio;
-
-			// TODO: Use std library
-			strcpy(birthParameters, abirthParameters);
-			strcpy(survivalParameters, asurvivalParameters);
-
+			birthCount = abirthCount;
+			survivalCount = asurvivalCount;
 			smoothingIterations = asmoothingIterations;
 		}
 	};

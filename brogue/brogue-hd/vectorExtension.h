@@ -15,6 +15,20 @@ namespace brogueHd::backend::extension
 	struct vectorExtension 
 	{
 		/// <summary>
+		/// Iterates the specified collection looking for the specified element
+		/// </summary>
+		static bool contains(std::vector<T> collection, T item)
+		{
+			for (int index = 0; index < collection.size(); index++)
+			{
+				if (collection[index] == item)
+					return true;
+			}
+
+			return false;
+		}
+
+		/// <summary>
 		/// Iterates the specified collection and calls the user's callback
 		/// </summary>
 		static void forEach(std::vector<T> collection, extensionDelegates::simpleCallback callback)

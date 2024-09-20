@@ -67,4 +67,39 @@ namespace brogueHd::backend::extension
 		/// </summary>
 		typedef std::function<iterationCallback(K key, V value)> simpleCallback;
 	};
+
+	template<typename T>
+	struct extensionArray2DDelegates
+	{
+	public:
+
+		/// <summary>
+		/// Definition of function to provide feedback based on current grid (iteration) values
+		/// </summary>
+		typedef std::function<bool(short column, short row, T value)> simplePredicate;
+
+		/// <summary>
+		/// Definition of function for standard iteration callbacks. Return value instructs the
+		/// parent loop to either continue or break and return.
+		/// </summary>
+		typedef std::function<iterationCallback(short column, short row)> simpleCallback;
+
+		/// <summary>
+		/// Searches grid for requested value based on comparison. Each truthy aggregateComparator result will store
+		/// the next value as the going compare-ee. This compare-ee will be passed as the first argument of the comparator.
+		/// The second argument will be the current grid value.
+		/// </summary>
+		typedef std::function<bool(T aggregate, T value)> aggregateComparer;
+
+		/// <summary>
+		/// Definition of function to select a value from the grid cell type.
+		/// </summary>
+		template<typename TResult>
+		typedef std::function<TResult(T item)> simpleSelector;
+
+		/// <summary>
+		/// Defines a constructor (or getter) method for grid cells
+		/// </summary>
+		typedef std::function<T(short, short)> simpleConstructor;
+	};
 }

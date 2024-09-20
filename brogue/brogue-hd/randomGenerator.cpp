@@ -1,8 +1,8 @@
 #include "randomGenerator.h"
-#include "broguedef.h"
+#include "brogueMath.h"
 #include <random>
 
-namespace brogueHd
+namespace brogueHd::backend::generator
 {
 	randomGenerator::randomGenerator(int id)
 	{
@@ -119,8 +119,10 @@ namespace brogueHd
 	}
 
 	// Get a random int between lowerBound and upperBound, inclusive
-	boolean randomGenerator::rand_percent(short& percent)
+	float randomGenerator::uniform()
 	{
+		
+
 		return (rand_range(0, 99) < clamp(percent, 0, 100));
 	}
 

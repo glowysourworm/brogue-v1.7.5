@@ -421,9 +421,9 @@ namespace brogueHd
 
 	#define UNKNOWN_KEY			(128+19)
 
-	#define min(x, y)		(((x) < (y)) ? (x) : (y))
-	#define max(x, y)		(((x) > (y)) ? (x) : (y))
-	#define clamp(x, low, hi)	(min(hi, max(x, low))) // pins x to the [y, z] interval
+	//#define min(x, y)		(((x) < (y)) ? (x) : (y))
+	//#define max(x, y)		(((x) > (y)) ? (x) : (y))
+	//#define clamp(x, low, hi)	(min(hi, max(x, low))) // pins x to the [y, z] interval
 
 	//#define terrainFlags(x, y)					(tileCatalog[pmap[x][y].layers[DUNGEON]].flags \
 	//										| tileCatalog[pmap[x][y].layers[LIQUID]].flags \

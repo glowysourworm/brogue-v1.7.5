@@ -148,7 +148,7 @@
     <ClCompile Include="brogueCreature.cpp" />
     <ClCompile Include="brogueCreatureHorde.cpp" />
     <ClCompile Include="brogueGame.cpp" />
-    <ClCompile Include="brogueGrid.cpp" />
+    <ClCompile Include="brogueLayout.cpp" />
     <ClCompile Include="brogueItem.cpp" />
     <ClCompile Include="brogueLevel.cpp" />
     <ClCompile Include="brogueMachine.cpp" />
@@ -182,8 +182,9 @@
     <ClCompile Include="playerCharacter.cpp" />
     <ClCompile Include="randomGenerator.cpp" />
     <ClCompile Include="gridRegion.cpp" />
-    <ClCompile Include="regionGenerator.cpp" />
+    <ClCompile Include="roomGenerator.cpp" />
     <ClCompile Include="renderingController.cpp" />
+    <ClCompile Include="terrainGenerator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="array2D.h" />
@@ -226,7 +227,7 @@
     <ClInclude Include="broguedef.h" />
     <ClInclude Include="broguefile.h" />
     <ClInclude Include="brogueGame.h" />
-    <ClInclude Include="brogueGrid.h" />
+    <ClInclude Include="brogueLayout.h" />
     <ClInclude Include="brogueLevel.h" />
     <ClInclude Include="brogueMessageQueue.h" />
     <ClInclude Include="brogueRememberedCell.h" />
@@ -253,7 +254,7 @@
     <ClInclude Include="gameData.h" />
     <ClInclude Include="grid.h" />
     <ClInclude Include="gridDefinitions.h" />
-    <ClInclude Include="gridMethods.h" />
+    <ClInclude Include="array2DExtension.h" />
     <ClInclude Include="gridRect.h" />
     <ClInclude Include="brogueLevelMethods.h" />
     <ClInclude Include="brogueItem.h" />
@@ -281,10 +282,11 @@
     <ClInclude Include="randomGenerator.h" />
     <ClInclude Include="playbackData.h" />
     <ClInclude Include="gridRegion.h" />
-    <ClInclude Include="regionGenerator.h" />
+    <ClInclude Include="roomGenerator.h" />
     <ClInclude Include="renderingController.h" />
     <ClInclude Include="statusEffectDeclaration.h" />
     <ClInclude Include="terrainDeclaration.h" />
+    <ClInclude Include="terrainGenerator.h" />
     <ClInclude Include="vectorExtension.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "broguedef.h"
+
 namespace brogueHd::backend::math
 {
     typedef struct randomRange {

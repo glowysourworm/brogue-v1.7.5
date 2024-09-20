@@ -3,7 +3,6 @@
 #include "gridDefinitions.h"
 #include "dungeonConstants.h"
 #include "dungeon.h"
-#include "vectordef.h"
 
 namespace brogueHd
 {
@@ -19,29 +18,102 @@ namespace brogueHd
         
 	}
 
+    void layoutGenerator::clear()
+    {
 
-	void layoutGenerator::generateDungeon()
+    }
+
+    void levelGenerator::initialize(const dungeonProfile& profile)
+    {
+
+    }
+
+	void layoutGenerator::generateLayout()
 	{
-		dungeonProfile profile, firstRoomProfile;
-
-		// Select dungeon profiles
-		profile = dungeonProfileCatalog[DP_BASIC];
-		firstRoomProfile = dungeonProfileCatalog[DP_BASIC_FIRST_ROOM];
-
-		// Adjust profiles for depth
-		profile.adjustDungeonProfileForDepth(_level->getDepth());
-		firstRoomProfile.adjustDungeonFirstRoomProfileForDepth(_level->getDepth());
-
-		designRandomRoom(firstRoomProfile);
-
-		if (D_INSPECT_LEVELGEN) {
-			//colorOverDungeon(&darkGrayBrogue);
-			//hiliteGrid(grid, &whiteBrogue, 100);
-			//temporaryMessage("First room placed:", true);
-		}
-
-		attachRooms(grid, &theDP, 35, 35);
+        // Procedure
+        //
+        // 1) Create Rooms: Grid tiling using blueprints
+        //      -> Start with entrance tile
+        //      -> Create the room cells (including hallways)
+        //      -> Create room connection points using edge nearest-neighbors
+        //      -> Position room according to blueprints
+        //      -> Repeat according to room tiling
+        // 
+        // 2) Identify Regions: Run the gridRegionLocator over the grid
+        //      -> Find all contiguous regions
+        //      -> Create gridRegion to store: 
+        //          -> connection points
+        //          -> largest room rectangle
+        //          -> room points of interest
+        //          -> edge locations
+        // 
+        // 3) Designate Machine Rooms
+        //      -> TODO: Choose based on room based on the above
+        //
+        // 4) Triangulate Rooms
+        //      -> Create Delaunay Triangulation of connection points
+        //      -> Remove Uniform[0,1] random corridors back towards
+        //         Minimum Spanning Tree (MST)
+        //      -> Creates Room Graph
+        //
+        // 5) Connect Rooms
+        //      -> Use Dijkstra's map to complete corridors (fixes any gaps)
+        //
+        // 6) Create Terrain (including chasms)
+        //      -> Create all terrain using terrain constructor
+        //      -> (Honor masks, leave passage lanes around the edges)
+        //
+        // 7) Create Distance Map
+        //      -> Starting at stairwell
+        //      -> Store data for querying location cost
+        //         (Stairs down will be in the highest room cost)
+        // 
+        // 8) Create Passage Map
+        //      -> Use Dijkstra's map to move between rooms
+        //          -> Complete machines
+        //          -> Mark number of steps on each tile (choke points)
+        //          -> Store the results (adds to difficulty rating of cells)
+        //
 	}
+
+    void layoutGenerator::createRooms()
+    {
+        dungeonProfile profile, firstRoomProfile;
+
+        // Select dungeon profiles
+        profile = dungeonProfileCatalog[DP_BASIC];
+        firstRoomProfile = dungeonProfileCatalog[DP_BASIC_FIRST_ROOM];
+
+        // Adjust profiles for depth
+        profile.adjustDungeonProfileForDepth(_level->getDepth());
+        firstRoomProfile.adjustDungeonFirstRoomProfileForDepth(_level->getDepth());
+
+        designRandomRoom(firstRoomProfile);
+
+        if (D_INSPECT_LEVELGEN) {
+            //colorOverDungeon(&darkGrayBrogue);
+            //hiliteGrid(grid, &whiteBrogue, 100);
+            //temporaryMessage("First room placed:", true);
+        }
+
+        attachRooms(grid, &theDP, 35, 35);
+    }
+    void layoutGenerator::designateMachineRooms()
+    {
+
+    }
+    void layoutGenerator::triangulateRooms()
+    {
+
+    }
+    void layoutGenerator::connectRooms()
+    {
+
+    }
+    void layoutGenerator::createTerrain()
+    {
+
+    }
 
 	void layoutGenerator::designRandomRoom(dungeonProfile roomProfile)
 	{
@@ -101,16 +173,20 @@ namespace brogueHd
 
     void layoutGenerator::designCavern(dungeonProfile roomProfile, short minWidth, short minHeight, short maxWidth, short maxHeight)
     {       
-        float fillRatio = 0.55;                                     
-        short smoothingIterations = 5;                              
+        float fillRatio = 0.55;
+        short smoothingIterations = 5;
 
         // Grid "on" value
         short fillValue = 1;
 
-        grid<short>* blobGrid = new grid<short>(DCOLS, DROWS, 0, fillValue);
+        // Parent boundary with 1 padding
+        gridRect boundary = gridRect(1, 1, DCOLS - 1, DROWS - 1);
+
+
+        array2D<short> blobGrid(DCOLS, DROWS, 0, fillValue);
 
         // Boundary for cellular automata to process:  Leaves a single cell border
-        gridRect boundary = gridRect(1, 1, DCOLS - 1, DROWS - 1);
+
 
         // CA Algorithm Parameters
         cellularAutomataParameters parameters = cellularAutomataParameters(boundary, fillValue, fillRatio, "ffffffttt", "ffffttttt", smoothingIterations);
@@ -120,39 +196,39 @@ namespace brogueHd
 
         // Locate regions using flood fill method
         std::vector<gridRegion<short>*> regions = blobGrid->locateRegions([fillValue](short value)
-        {
-            return value == fillValue;
+            {
+                return value == fillValue;
 
-        }, fillValue);
+            }, fillValue);
 
         // Filter regions to comply to size constraints
         std::vector<gridRegion<short>*> validRegions = collection::where(regions, [minWidth, minHeight, maxWidth, maxHeight](bool(gridRegion<short>* region))
-        {
-            return region->getBoundary().width >= minWidth &&
-                   region->getBoundary().width <= maxWidth &&
-                   region->getBoundary().height >= minHeight &&
-                   region->getBoundary().height <= maxHeight;
-        });
+            {
+                return region->getBoundary().width >= minWidth &&
+                    region->getBoundary().width <= maxWidth &&
+                    region->getBoundary().height >= minHeight &&
+                    region->getBoundary().height <= maxHeight;
+            });
 
         // Select largest area region from valid regions
         gridRegion<short>* maxRegion = collection::max(validRegions, [](gridRegion<short>* region)
-        {
-            return region->getBoundary().area();
-        });
+            {
+                return region->getBoundary().area();
+            });
 
         // Position the new cave in the middle of the grid...
         gridRect blobBoundary = maxRegion->getBoundary();
         gridRect caveBoundary = gridRect(maxWidth - blobBoundary.width / 2,
-                                         maxHeight - blobBoundary.height / 2,
-                                         blobBoundary.width,
-                                         blobBoundary.height);
+            maxHeight - blobBoundary.height / 2,
+            blobBoundary.width,
+            blobBoundary.height);
 
 
         // ...and copy it to the master grid.
         _level->levelGrid->addCells(maxRegion, [fillValue](short value)
-        {
-            return value == fillValue;
-        });
+            {
+                return value == fillValue;
+            });
     }
 
     // This is a special room that appears at the entrance to the dungeon on depth 1.

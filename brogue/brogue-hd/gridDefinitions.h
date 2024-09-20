@@ -62,7 +62,7 @@ namespace brogueHd::backend::model::layout
 		/// Definition of function to select a value from the grid cell type.
 		/// </summary>
 		template<typename TResult>
-		typedef std::function<TResult(T)> gridSelector;
+		typedef std::function<TResult(T item)> gridSelector;
 
 		/// <summary>
 		/// Defines a constructor (or getter) method for grid cells

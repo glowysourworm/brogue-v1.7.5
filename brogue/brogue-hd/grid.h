@@ -4,7 +4,8 @@
 #include "broguedef.h"
 #include "gridDefinitions.h"
 #include "gridRegion.h"
-#include "comparabledef.h"
+#include "extensionDefinitions.h"
+#include "array2D.h"
 #include <functional>
 
 using namespace std;
@@ -37,9 +38,9 @@ namespace brogueHd::backend::model::layout
 		bool areAdjacent(T location, T otherLocation) const;
 
 		/// <summary>
-		/// Returns the boundary of the grid
+		/// Returns the relative boundary of the grid (parent boundary contains this boundary)
 		/// </summary>
-		gridRect getBoundary() const;
+		gridRect getRelativeBoundary() const;
 
 		/// <summary>
 		/// Returns true if the (column, row) correspond to the grid's zero value
@@ -104,12 +105,7 @@ namespace brogueHd::backend::model::layout
 
 	private:
 
-		T** _grid;
-		short _rows;
-		short _columns;
-
-		T _zeroValue;
-		T _maxValue;
+		array2D<T>* _grid;
 	};
 }
 

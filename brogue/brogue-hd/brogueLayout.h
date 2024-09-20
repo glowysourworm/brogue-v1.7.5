@@ -11,15 +11,15 @@
 
 using namespace std;
 
-namespace brogueHd::backend::model::layout
+namespace brogueHd::backend::model
 {
-	class brogueGrid
+	class brogueLayout
 	{
 
 	public:
 
-		brogueGrid();
-		~brogueGrid();
+		brogueLayout();
+		~brogueLayout();
 
 		bool isDefined(short column, short row) const;
 
@@ -28,7 +28,7 @@ namespace brogueHd::backend::model::layout
 		gridRect getBoundary() const;
 
 		void addCell(short column, short row);
-		void addCells(gridRegion<short>* grid, function<bool(short)> predicate);
+		void addCells(array2D<short>* grid, function<bool(short)> predicate);
 		void addCells(gridRect boundary);
 		void addCellsInCircle(gridRect boundary);
 
@@ -53,13 +53,13 @@ namespace brogueHd::backend::model::layout
 		grid<brogueCell*>* _mainGrid;
 
 		// Grid containing permanent dungeon layers
-		grid<permanentDungeonLayers>* _permanentGrid;
+		array2D<permanentDungeonLayers>* _permanentGrid;
 
 		// Grid containing temporary dungeon layers
-		grid<temporaryDungeonLayers>* _temporaryGrid;
+		array2D<temporaryDungeonLayers>* _temporaryGrid;
 
 		// Grid containing flag-enum for categories of features:  TODO
-		grid<dungeonFeatureCategories>* _featureCategoriesGrid;
+		array2D<dungeonFeatureCategories>* _featureCategoriesGrid;
 
 		//short cost;
 

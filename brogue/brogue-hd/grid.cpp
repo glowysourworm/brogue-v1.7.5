@@ -7,47 +7,44 @@
 #include "gridDefinitions.h"
 #include "randomGenerator.h"
 #include "exceptionHandler.h"
+#include "array2D.h"
 #include <functional>
 #include <exception>
 
 using namespace std;
 
-namespace brogueHd::backend::math;
+using namespace brogueHd::backend::math;
 
 namespace brogueHd::backend::model::layout
 {
     template<gridCellConstraint T>
-    grid<T>::grid(short columns, short rows)
+    grid<T>::grid(gridRect parentBoundary, gridRect relativeBoundary)
     {
-        _grid = new T[columns][rows];
-        _rows = rows;
-        _columns = columns;
-        _zeroValue = zeroValue;
-        _maxValue = maxValue;
+        _grid = new array2D(parentBoundary, relativeBoundary);
     }
 
     template<gridCellConstraint T>
     grid<T>::~grid()
     {
-        delete[][] _grid;
+        // Added grid cells from this class
+        //gridMethods::iterate(_grid, [](short column, short row)
+        //{
+        //    delete _grid->get(column, row);
+        //});
 
-        delete _zeroValue;
-        delete _maxValue;
+        delete _grid;
     }
 
     template<gridCellConstraint T>
     T grid<T>::get(short column, short row) const
     {
-        return _grid[column][row];
+        return _grid->get(column, row);
     }
 
     template<gridCellConstraint T>
     T grid<T>::getOrNull(short column, short row) const
     {
-        if (!_grid->isDefined(column, row))
-            return NULL;
-
-        return _grid[column][row];
+        return _grid->get(column, row);
     }
 
     template<gridCellConstraint T>
@@ -87,15 +84,15 @@ namespace brogueHd::backend::model::layout
     }
 
     template<gridCellConstraint T>
-    gridRect grid<T>::getBoundary() const
+    gridRect grid<T>::getRelativeBoundary() const
     {
-        return gridRect(0, 0, _columns, _rows);
+        return _grid->getRelativeBoundary();
     }
 
     template<gridCellConstraint T>
     bool grid<T>::isDefined(short column, short row) const
     {
-        return _grid[column][row] != NULL;
+        return _grid->isDefined(column, row);
     }
 
     template<gridCellConstraint T>
@@ -180,9 +177,9 @@ namespace brogueHd::backend::model::layout
     {
         short count = 0;
 
-        iterate(this, [](short column, short row)
+        gridMethods::iterate(this, [](short column, short row)
         {
-            if (_grid[column, row] == value)
+            if (_grid->get(column, row) == value)
                 count++;
         });
 
@@ -490,38 +487,7 @@ namespace brogueHd::backend::model::layout
     //    }
     //}
 
-    //template<gridCellConstraint T>
-    //void grid<T>::cellularAutomataIteration(cellularAutomataParameters parameters)
-    //{
-    //    short nbCount;
 
-    //    iterateIn(this, column, row, width, height, [](short columnRect, short rowRect)
-    //    {
-    //        // Count of "alive" cells at this location
-    //        nbCount = 0;
-
-    //        iterateAround(this, columnRect, rowRect, true, [](short i, short j)
-    //        {
-    //            // If our grid "is defined" here
-    //            //
-    //            if (!this->isZeroValue(i, j))
-    //                nbCount++;
-    //        });
-
-    //        if (this->isZeroValue(columnRect, rowRect) && birthParameters[nbCount])
-    //        {
-    //            this->set(columnRect, rowRect, birthValue)	    // birth
-    //        }
-    //        else if (!this->isZeroValue(columnRect, rowRect) && survivalParameters[nbCount])
-    //        {
-    //            // survival
-    //        }
-    //        else
-    //        {
-    //            this->set(columnRect, rowRect, _zeroValue);     // death
-    //        }
-    //    });
-    //}
 
     //template<gridCellConstraint T>
     //short grid<T>::fillContiguousRegion(short column, short row, T fillValue) 
@@ -545,34 +511,6 @@ namespace brogueHd::backend::model::layout
     //    });
 
     //    return numberOfCells;
-    //}
-
-    //template<gridCellConstraint T>
-    //void generateCellularAutomata(randomGenerator* randomGenerator, cellularAutomataParameters parameters)
-    //{
-    //    // Procedure
-    //    //
-    //    // 1) Generate white noise in the specified region
-    //    // 2) Run the cellularAutomataSmoothing function the specified number of times
-    //    //      -> While iterating:  try to check original Brogue constraints
-    //    //        
-
-    //    short random, smoothingPassesMax;
-
-    //    // Generate white noise inside the chosen rectangle
-    //    //
-    //    iterateIn(this, column, row, width, height, [](short x, short y)
-    //    {
-    //        if (randomGenerator->rand_percent(random))
-    //            this->set(x, y, fillValue);
-    //    });
-
-    //    // Run smoothing iterations
-    //    //
-    //    for (int index = 0; index < clamp(smoothingPasses, CELLULAR_AUTOMATA_MAX); index++)
-    //    {
-    //        this->cellularAutomataIteration(parameters);
-    //    }
     //}
 
     //template<gridCellConstraint T>

@@ -4,6 +4,8 @@
 #include "mathdef.h"
 #include "broguedef.h"
 
+using namespace brogueHd::backend::math;
+
 namespace brogueHd::backend::generator
 {
 	class randomGenerator
@@ -41,11 +43,6 @@ namespace brogueHd::backend::generator
 		short randClumpedRange(short lowerBound, short upperBound, short clumpFactor);
 
 		/// <summary>
-		/// Modifies the percent input to create a random percentage. Returns true if successful.
-		/// </summary>
-		boolean rand_percent(short& percent);
-
-		/// <summary>
 		/// Randomizes the input array
 		/// </summary>
 		void shuffleList(short* list, short listLength);
@@ -60,12 +57,12 @@ namespace brogueHd::backend::generator
 		/// </summary>
 		int rand_range(int lowerBound, int upperBound);
 
-	private:
-
 		/// <summary>
 		/// Generates next double Uniform[0,1] and keeps private members updated
 		/// </summary>
 		double next();
+
+	private:
 
 		/// <summary>
 		/// Calls next random number [0, RAND_MAX] and scales it to the 
