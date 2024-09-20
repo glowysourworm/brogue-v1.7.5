@@ -3,6 +3,8 @@
 #include "dungeonDeclaration.h"
 #include "color.h"
 
+using namespace brogueHd::backend::model::game;
+
 namespace brogueHd::backend::model::creature
 {
 	struct creatureWords 

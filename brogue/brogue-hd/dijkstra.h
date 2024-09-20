@@ -4,7 +4,7 @@
 #include "creature.h"
 #include "gridCell.h"
 #include "grid.h"
-#include "gridConstraint.h"
+#include "gridDefinitions.h"
 #include "binarySearchTree.h"
 #include <functional>
 

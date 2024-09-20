@@ -3,7 +3,7 @@
 #include "broguedef.h"
 #include "mathdef.h"
 
-namespace brogueHd
+namespace brogueHd::backend::model::game
 {
 	typedef struct keyLocationProfile {
 		short x;

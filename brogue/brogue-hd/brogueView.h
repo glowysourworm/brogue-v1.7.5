@@ -3,7 +3,9 @@
 #include "array2D.h"
 #include "brogueCellDisplay.h"
 
-namespace brogueHd
+using namespace brogueHd::backend::model::layout;
+
+namespace brogueHd::backend::model
 {
 	class brogueView
 	{

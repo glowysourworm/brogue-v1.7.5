@@ -30,7 +30,7 @@ namespace brogueHd::backend::generator
         static unsigned long createHashImpl(T data[], unsigned long previousHash)
         {
             // Start New / Continue
-            unsigned long hash = previousHash ?? LARGE_PRIME;
+            unsigned long hash = previousHash == 0 ? LARGE_PRIME : previousHash;
             bool found = false;
 
             for (int index = 0; index < SIZEOF(data); index++)

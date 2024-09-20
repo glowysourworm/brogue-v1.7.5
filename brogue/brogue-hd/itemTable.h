@@ -2,6 +2,9 @@
 
 #include "broguedef.h"
 #include "dungeonDeclaration.h"
+#include "itemDeclaration.h"
+
+using namespace brogueHd::backend::model::game;
 
 namespace brogueHd::backend::model::item
 {

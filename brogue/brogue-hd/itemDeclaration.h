@@ -4,7 +4,8 @@
 #include "color.h"
 #include "mathdef.h"
 #include "dungeonDeclaration.h"
-#include "monster.h"
+
+using namespace brogueHd::backend::model::game;
 
 namespace brogueHd::backend::model::item
 {

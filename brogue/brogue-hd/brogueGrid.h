@@ -3,7 +3,6 @@
 #include "brogueCell.h"
 #include "grid.h"
 #include "gridCell.h"
-#include "griddef.h"
 #include "gridRect.h"
 #include "gridRegion.h"
 #include "dungeonDeclaration.h"

@@ -1,6 +1,9 @@
 #pragma once
 
 #include "brogueLevel.h"
+#include "grid.h"
+
+using namespace brogueHd::backend::model;
 
 namespace brogueHd::backend::generator
 {
@@ -22,7 +25,7 @@ namespace brogueHd::backend::generator
 
 		brogueLevel* _level;
 
-		grid<bool>* _validLocations;	// This should be initialized from the terrain layers. Each dungeon content placed will 
+		array2D<bool>* _validLocations;	// This should be initialized from the terrain layers. Each dungeon content placed will 
 										// set its location to "false".
 
 	};

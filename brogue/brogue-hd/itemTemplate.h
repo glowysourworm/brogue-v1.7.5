@@ -1,6 +1,11 @@
 #pragma once
 
+#include "mathdef.h"
 #include "dungeon.h"
+#include "dungeonDeclaration.h"
+
+using namespace brogueHd::backend::math;
+using namespace brogueHd::backend::model::game;
 
 namespace brogueHd::backend::model::item
 {
@@ -25,4 +30,5 @@ namespace brogueHd::backend::model::item
 		boolean called;
 		char description[1500];
 	} itemTable;
+
 }

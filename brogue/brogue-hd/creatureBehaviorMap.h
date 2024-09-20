@@ -1,7 +1,6 @@
 #pragma once
 
-#include "grid.h"
-#include "gridCell.h"
+#include "array2D.h"
 #include "brogueGrid.h"
 #include "brogueObject.h"
 #include "creatureBehaviorDeclaration.h"
@@ -20,7 +19,7 @@ namespace brogueHd::backend::model::creature
 		/// <summary>
 		/// Updates creature behavior maps based on gloabl maps. Should be run each turn.
 		/// </summary>
-		void update(brogueGrid* layoutGrid, grid<brogueObject>* contentGrid);
+		void update(brogueGrid* layoutGrid, array2D<brogueObject>* contentGrid);
 
 	private:
 
@@ -42,11 +41,11 @@ namespace brogueHd::backend::model::creature
 
 		*/
 
-		grid<bool>*	 _visibilityMap;
-		grid<bool>*  _visibilityMapLastTurn;	// Map from last turn
-		grid<short>* _goalMap;					// This map varies depending on the creature (also, friendly or enemy, "mapToMe")
-		grid<short>* _fleeMap;
-		grid<short>* _scentMap;
+		array2D<bool>*	 _visibilityMap;
+		array2D<bool>*  _visibilityMapLastTurn;	// Map from last turn
+		array2D<short>* _goalMap;					// This map varies depending on the creature (also, friendly or enemy, "mapToMe")
+		array2D<short>* _fleeMap;
+		array2D<short>* _scentMap;
 
 		// Collections of cells left over from updating the visibility. These will indicate cells that
 		// have changed.

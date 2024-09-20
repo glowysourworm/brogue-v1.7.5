@@ -3,7 +3,8 @@
 #include "light.h"
 #include "color.h"
 #include "broguedef.h"
-#include "monsterConstants.h"
+
+using namespace brogueHd::backend::model::lighting;
 
 namespace brogueHd::backend::model::layout
 {

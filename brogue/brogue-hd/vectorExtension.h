@@ -1,6 +1,6 @@
 #pragma once
 
-#include "iteratordef.h"
+#include "extensionDefinitions.h"
 #include <vector>
 #include <functional>
 
@@ -8,25 +8,28 @@ using namespace std;
 
 namespace brogueHd::backend::extension
 {
-	namespace collection
+	/// <summary>
+	/// Set of methods for iterating, querying, and working with vector iteration.
+	/// </summary>
+	template<typename T, typename V>
+	struct vectorExtension 
 	{
 		/// <summary>
 		/// Iterates the specified collection and calls the user's callback
 		/// </summary>
-		template<typename T>
-		static void forEach(std::vector<T> collection, function<void(T)> callback)
+		static void forEach(std::vector<T> collection, extensionDelegates::simpleCallback callback)
 		{
 			for (int index = 0; index < collection.size(); index++)
 			{
-				predicate(collection[index]);
+				if ((callback(collection[index]) & iterationCallback::breakAndReturn) != 0)
+					return;
 			}
 		}
 
 		/// <summary>
 		/// Returns the first element in the collection that matches the given predicate
 		/// </summary>
-		template<typename T>
-		static T first(std::vector<T> collection, function<bool(T)> predicate)
+		static T first(std::vector<T> collection, extensionDelegates::simplePredicate predicate)
 		{
 			for (int index = 0; index < collection.size(); index++)
 			{
@@ -40,8 +43,7 @@ namespace brogueHd::backend::extension
 		/// <summary>
 		/// Returns true if the collection contains any items that pass the supplied predicate
 		/// </summary>
-		template<typename T>
-		static bool any(std::vector<T> collection, function<bool(T)> predicate)
+		static bool any(std::vector<T> collection, extensionDelegates::simplePredicate predicate)
 		{
 			for (int index = 0; index < collection.size(); index++)
 			{
@@ -55,8 +57,7 @@ namespace brogueHd::backend::extension
 		/// <summary>
 		/// Returns a new collection with elements that match the given predicate
 		/// </summary>
-		template<typename T>
-		static std::vector<T> where(std::vector<T> collection, function<bool(T)> predicate)
+		static std::vector<T> where(std::vector<T> collection, extensionDelegates::simplePredicate predicate)
 		{
 			std::vector<T> result;
 
@@ -68,12 +69,15 @@ namespace brogueHd::backend::extension
 
 			return result;
 		}
+	};
 
+	template<typename T, typename V>
+	struct vectorExtensionSelectors
+	{
 		/// <summary>
 		/// Returns the element of the collection that contains the maximum value for the selector
 		/// </summary>
-		template<typename T, typename V>
-		static T maxOf(std::vector<T> collection, function<V(T)> selector)
+		static T maxOf(std::vector<T> collection, extensionDelegates::simpleSelector selector)
 		{
 			V max = NULL;
 			int maxIndex = -1;
@@ -101,8 +105,7 @@ namespace brogueHd::backend::extension
 		/// <summary>
 		/// Returns the element of the collection that contains the minimum value for the selector
 		/// </summary>
-		template<typename T, typename V>
-		static T minOf(std::vector<T> collection, function<V(T)> selector)
+		static T minOf(std::vector<T> collection, extensionDelegates::simpleSelector selector)
 		{
 			V min = NULL;
 			int minIndex = -1;
@@ -126,5 +129,5 @@ namespace brogueHd::backend::extension
 
 			return min == NULL ? NULL : collection[minIndex];
 		}
-	}
+	};
 }

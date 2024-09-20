@@ -4,7 +4,7 @@
 #include "mathdef.h"
 #include "broguedef.h"
 
-namespace brogueHd
+namespace brogueHd::backend::generator
 {
 	class randomGenerator
 	{
@@ -17,7 +17,7 @@ namespace brogueHd
 		/// <summary>
 		/// Returns true if id matches the provided id
 		/// </summary>
-		bool checkId(int id) { return _id == id };
+		bool checkId(int id) { return _id == id; }
 
 		/// <summary>
 		/// Reseeds the random number generator

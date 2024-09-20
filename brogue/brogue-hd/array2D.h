@@ -16,19 +16,6 @@ namespace brogueHd::backend::model::layout
 		array2D(gridRect parentBoundary, gridRect subBoundary);
 		~array2D();
 
-		static T operator [][](short column, short row)
-		{
-			return this->get(column, row);
-		}
-		static void operator [][](short column, short row, T value)
-		{
-			this->set(column, row, value);
-		}
-
-
-
-	private:
-
 		T get(short column, short row);
 		void set(short column, short row, T value);
 

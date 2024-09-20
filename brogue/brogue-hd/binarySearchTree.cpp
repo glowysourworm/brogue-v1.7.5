@@ -125,10 +125,10 @@ namespace brogueHd::component
 
         // Recurse
         else if (root->data < key) 
-            return searchNode(root->right, key);
+            return searchNode(_root->right, key);
 
         else
-            return searchNode(root->left, key);
+            return searchNode(_root->left, key);
     }
 
     template<typename K, typename T>
@@ -141,7 +141,7 @@ namespace brogueHd::component
         // Map already searched
 
         // Recurse
-        else if (root->data < key) 
+        else if (_root->data < key)
         {
             return searchNode(node->right, key);
         }

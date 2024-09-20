@@ -14,7 +14,7 @@ using namespace brogueHd::backend::model::layout;
 using namespace brogueHd::backend::model::effect;
 using namespace brogueHd::backend::model::lighting;
 
-namespace brogueHd
+namespace brogueHd::backend::model::game
 {
 
 	const machineGenerator autoGeneratorCatalog[NUMBER_AUTOGENERATORS] = {

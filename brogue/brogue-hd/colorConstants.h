@@ -3,7 +3,7 @@
 #include "color.h"
 #include "dungeonDeclaration.h"
 
-namespace brogueHd
+namespace brogueHd::backend::model::game
 {
 	// Red		Green	Blue	RedRand	GreenRand	BlueRand	Rand	Dances?
 	// basic colors

@@ -4,7 +4,7 @@
 
 using namespace std;
 
-namespace brogueHd
+namespace brogueHd::backend::model::io
 {
 	static class fileio
 	{

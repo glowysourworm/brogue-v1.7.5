@@ -3,7 +3,9 @@
 #include "brogueLevel.h"
 #include "randomGenerator.h"
 
-namespace brogueHd
+using namespace brogueHd::backend::model;
+
+namespace brogueHd::backend::generator
 {
 	class layoutGenerator
 	{

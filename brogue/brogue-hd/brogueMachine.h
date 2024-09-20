@@ -3,7 +3,6 @@
 #include "machineConstants.h"
 #include "machineFeature.h"
 #include "machineGenerator.h"
-#include "generationParameters.h"
 
 using namespace brogueHd::backend::model::machine;
 

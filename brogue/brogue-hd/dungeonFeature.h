@@ -2,6 +2,9 @@
 
 #include "broguedef.h"
 #include "color.h"
+#include "dungeonConstants.h"
+
+using namespace brogueHd::backend::model::game;
 
 namespace brogueHd::backend::model::effect
 {
@@ -22,19 +25,19 @@ namespace brogueHd::backend::model::effect
 	struct dungeonFeature 
 	{
 		// tile info:
-		enum tileType tile;
-		enum dungeonLayers layer;
+		tileType tile;
+		dungeonLayers layer;
 
 		// spawning pattern:
 		short startProbability;
 		short probabilityDecrement;
 		unsigned long flags;
 		char description[DCOLS];
-		enum lightType lightFlare;
+		lightType lightFlare;
 		const color* flashColor;
 		short effectRadius;
-		enum tileType propagationTerrain;
-		enum dungeonFeatureTypes subsequentDF;
+		tileType propagationTerrain;
+		dungeonFeatureTypes subsequentDF;
 		boolean messageDisplayed;
 	};
 }

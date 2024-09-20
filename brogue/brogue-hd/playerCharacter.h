@@ -2,7 +2,7 @@
 
 #include "broguedef.h"
 
-namespace brogueHd
+namespace brogueHd::backend::model
 {
 	class playerCharacter
 	{
@@ -41,18 +41,18 @@ namespace brogueHd
 		short strength;
 		unsigned short monsterSpawnFuse;	// how much longer till a random monster spawns
 
-		item* weapon;
-		item* armor;
-		item* ringLeft;
-		item* ringRight;
+		//item* weapon;
+		//item* armor;
+		//item* ringLeft;
+		//item* ringRight;
 
-		flare** flares;
+		//flare** flares;
 		short flareCount;
 		short flareCapacity;
 
-		creature* yendorWarden;
+		//creature* yendorWarden;
 
-		lightSource minersLight;
+		//lightSource minersLight;
 		int64_t minersLightRadius;
 		short ticksTillUpdateEnvironment;	// so that some periodic things happen in objective time
 		unsigned short scentTurnNumber;		// helps make scent-casting work
@@ -68,7 +68,7 @@ namespace brogueHd
 		short downLoc[2];					// downstairs location this level
 
 		short cursorLoc[2];					// used for the return key functionality
-		creature* lastTarget;				// to keep track of the last monster the player has thrown at or zapped
+		//creature* lastTarget;				// to keep track of the last monster the player has thrown at or zapped
 		short rewardRoomsGenerated;			// to meter the number of reward machines
 		short machineNumber;				// so each machine on a level gets a unique number
 		short sidebarLocationList[ROWS * 2][2];	// to keep track of which location each line of the sidebar references
@@ -111,7 +111,7 @@ namespace brogueHd
 		short reaping;
 
 		// feats:
-		boolean featRecord[FEAT_COUNT];
+		//boolean featRecord[FEAT_COUNT];
 
 		// waypoints:
 		short** wpDistance[MAX_WAYPOINT_COUNT];

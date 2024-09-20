@@ -2,7 +2,7 @@
 
 #include "broguedef.h"
 
-namespace brogueHd
+namespace brogueHd::backend::model::item
 {
 	char itemTitles[NUMBER_SCROLL_KINDS][30];
 

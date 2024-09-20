@@ -5,7 +5,7 @@
 
 using namespace std;
 
-namespace brogueHd
+namespace brogueHd::backend::model::io
 {
 	/// <summary>
 	/// Data structure for recording info:  used during playback mode

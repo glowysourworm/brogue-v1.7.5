@@ -1,5 +1,6 @@
 #include "grid.h"
 #include "broguedef.h"
+#include "brogueMath.h"
 #include "color.h"
 #include "gridRegion.h"
 #include "gridMethods.h"
@@ -10,6 +11,8 @@
 #include <exception>
 
 using namespace std;
+
+namespace brogueHd::backend::math;
 
 namespace brogueHd::backend::model::layout
 {
@@ -281,6 +284,59 @@ namespace brogueHd::backend::model::layout
         else
             brogueException::show("Invalid use of direction parameter:  grid.isExposedCorner");
     }
+
+    template<gridCellConstraint T>
+    bool grid<T>::areAdjacent(T location, T otherLocation) const
+    {
+        if (!this->isDefined(location.column, location.row))
+            return false;
+
+        if (!this->isDefined(otherLocation.column, otherLocation.row))
+            return false;
+
+        if (brogueMath::abs(otherLocation.column - location.column) > 1)
+            return false;
+
+        if (brogueMath::abs(otherLocation.row - location.row) > 1)
+            return false;
+
+        return true;
+    }
+
+    ///// <summary>
+    ///// Checks for grid adjacency using an AND mask with the provided compass constrained direction.
+    ///// </summary>
+    //public static CompassConstrained GetAdjacency<T>(this Grid<T> grid, int column, int row)
+    //{
+    //    CompassConstrained result = CompassConstrained.Null;
+
+    //    if (grid.IsDefined(column, row - 1))
+    //        result |= CompassConstrained.N;
+
+    //    if (grid.IsDefined(column, row + 1))
+    //        result |= CompassConstrained.S;
+
+    //    if (grid.IsDefined(column + 1, row))
+    //        result |= CompassConstrained.E;
+
+    //    if (grid.IsDefined(column - 1, row))
+    //        result |= CompassConstrained.W;
+
+    //    if (grid.IsDefined(column + 1, row - 1))
+    //        result |= CompassConstrained.NE;
+
+    //    if (grid.IsDefined(column - 1, row - 1))
+    //        result |= CompassConstrained.NW;
+
+    //    if (grid.IsDefined(column + 1, row + 1))
+    //        result |= CompassConstrained.SE;
+
+    //    if (grid.IsDefined(column - 1, row + 1))
+    //        result |= CompassConstrained.SW;
+
+    //    return result;
+    //}
+
 
     //// Takes a grid as a mask of valid locations, chooses one randomly and returns it as (x, y).
     //// If there are no valid locations, returns (-1, -1).

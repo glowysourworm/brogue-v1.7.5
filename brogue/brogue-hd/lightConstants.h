@@ -1,6 +1,6 @@
 #pragma once
 
-namespace brogueHd
+namespace brogueHd::backend::model::lighting
 {
 	enum lightType {
 		NO_LIGHT,

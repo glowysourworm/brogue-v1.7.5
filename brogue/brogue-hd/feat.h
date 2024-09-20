@@ -2,7 +2,7 @@
 
 #include "broguedef.h"
 
-namespace brogueHd
+namespace brogueHd::backend::model::game
 {
     enum featTypes {
         FEAT_PURE_MAGE = 0,

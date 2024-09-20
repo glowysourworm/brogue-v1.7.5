@@ -2,8 +2,9 @@
 
 #include "levelData.h"
 #include "brogueLevel.h"
-#include "creature.h"
-#include "item.h"
+#include "brogueCreature.h"
+#include "broguePlayer.h"
+#include "creatureDeclaration.h"
 #include "brogueCellDisplay.h"
 #include "brogueMessageQueue.h"
 #include "playerCharacter.h"
@@ -11,7 +12,9 @@
 
 using namespace std;
 
-namespace brogueHd
+using namespace brogueHd::backend::model::creature;
+
+namespace brogueHd::backend::model
 {
 	class brogueGame
 	{
@@ -36,15 +39,17 @@ namespace brogueHd
 
 		// levelData* _levels;
 
-		creature player;
+		// TODO: Move these to the content grid
+
+		broguePlayer* _player;
 		playerCharacter rogue;
-		creature* monsters;
-		creature* dormantMonsters;
-		creature* graveyard;
-		creature* purgatory;
-		item* floorItems;
-		item* packItems;
-		item* monsterItemsHopper;
+		brogueCreature* monsters;
+		brogueCreature* dormantMonsters;
+		brogueCreature* graveyard;
+		brogueCreature* purgatory;
+		brogueItem* floorItems;
+		brogueItem* packItems;
+		brogueItem* monsterItemsHopper;
 
 		short currentDepth;					// which dungeon level are we on
 		//short deepesteLevel;

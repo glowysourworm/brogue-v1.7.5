@@ -3,7 +3,9 @@
 #include "command.h"
 #include "openglRenderer.h"
 
-namespace brogueHd
+using namespace brogueHd::backend::model::game;
+
+namespace brogueHd::backend::controller
 {
 	class renderingController
 	{
@@ -17,16 +19,18 @@ namespace brogueHd
 		/// </summary>
 		void setViewMode(BrogueGameMode mode);
 
+		/// <summary>
+		/// Renders view to device output
+		/// </summary>
+		void renderView();
+
+	private:
+
 		void renderMenuView();
 		void renderHighScoresView();
 		void renderSetSeedView();
 		void renderOpenGameView();
 		void renderGameView();
-
-		/// <summary>
-		/// Renders view to device output
-		/// </summary>
-		void drawView();
 
 	private:
 

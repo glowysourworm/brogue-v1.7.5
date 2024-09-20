@@ -8,9 +8,14 @@
 #include "randomGenerator.h"
 #include "playbackProcessor.h"
 
+using namespace brogueHd::backend::model::io;
+using namespace brogueHd::backend::generator;
+using namespace brogueHd::backend::processor;
+using namespace brogueHd::backend::model;
+
 using namespace std;
 
-namespace brogueHd
+namespace brogueHd::backend::controller
 {
 	class gameController
 	{

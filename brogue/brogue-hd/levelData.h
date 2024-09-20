@@ -1,6 +1,6 @@
 #pragma once
 
-namespace brogueHd
+namespace brogueHd::backend::model
 {
 	// Stores the necessary info about a level so it can be regenerated:
 	struct levelData 

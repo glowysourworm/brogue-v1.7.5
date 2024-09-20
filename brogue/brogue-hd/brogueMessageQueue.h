@@ -8,7 +8,7 @@
 
 using namespace std;
 
-namespace brogueHd
+namespace brogueHd::backend::model
 {
 	class brogueMessageQueue
 	{

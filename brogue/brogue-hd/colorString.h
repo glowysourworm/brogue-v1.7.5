@@ -3,7 +3,7 @@
 #include "broguedef.h"
 #include "color.h"
 
-namespace brogueHd
+namespace brogueHd::backend::model::game
 {
 	struct colorString {
 

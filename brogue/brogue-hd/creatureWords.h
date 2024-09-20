@@ -2,9 +2,9 @@
 
 #include "creatureDeclaration.h"
 
-namespace brogueHd
+namespace brogueHd::backend::model::creature
 {
-	const creatureWords monsterText[NUMBER_MONSTER_KINDS] = 
+	const creatureWords monsterText[NUMBER_MONSTER_KINDS] =
 	{
 	{"A naked adventurer in an unforgiving place, bereft of equipment and confused about the circumstances.",
 		"studying", "Studying",

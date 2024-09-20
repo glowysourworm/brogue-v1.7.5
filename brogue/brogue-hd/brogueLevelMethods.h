@@ -1,6 +1,14 @@
 #pragma once
 
 #include "brogueLevel.h"
+#include "terrainDeclaration.h"
+#include "floorTileType.h"
+#include "machineFeature.h"
+#include "dungeonConstants.h"
+
+using namespace brogueHd::backend::model::game;
+using namespace brogueHd::backend::model::machine;
+using namespace brogueHd::backend::model::layout;
 
 namespace brogueHd::backend::methods
 {
@@ -41,22 +49,26 @@ namespace brogueHd::backend::methods
 
 		// Need to move physical data from the display struct
 		//
-		for (int index = 0; index < SIZEOF(cell->display.layers); index++)
-		{
-			if ((cell->display.layers[index] & terrainFlag) != 0)
-				return true;
-		}
+		//for (int index = 0; index < SIZEOF(cell->display.layers); index++)
+		//{
+		//	if ((cell->display.layers[index] & terrainFlag) != 0)
+		//		return true;
+		//}
+
+		return false;
 	}
 
 	static bool isTerrain(brogueCell* cell, terrainFlagCatalog terrainFlag)
 	{
 		// Need to move physical data from the display struct
 		//
-		for (int index = 0; index < SIZEOF(cell->display.layers); index++)
-		{
-			if ((cell->display.layers[index] & terrainFlag) != 0)
-				return true;
-		}
+		//for (int index = 0; index < SIZEOF(cell->display.layers); index++)
+		//{
+		//	if ((cell->display.layers[index] & terrainFlag) != 0)
+		//		return true;
+		//}
+
+		return false;
 	}
 
 	static bool isPathingBlocker(brogueLevel* level, short column, short row)
@@ -65,11 +77,13 @@ namespace brogueHd::backend::methods
 
 		// Need to move physical data from the display struct
 		//
-		for (int index = 0; index < SIZEOF(cell->display.layers); index++)
-		{
-			if ((cell->display.layers[index] & T_PATHING_BLOCKER) != 0)
-				return true;
-		}
+		//for (int index = 0; index < SIZEOF(cell->display.layers); index++)
+		//{
+		//	if ((cell->display.layers[index] & T_PATHING_BLOCKER) != 0)
+		//		return true;
+		//}
+
+		return false;
 	}
 	
 	static bool isAutoDescent(brogueLevel* level, short column, short row)
@@ -78,11 +92,13 @@ namespace brogueHd::backend::methods
 
 		// Need to move physical data from the display struct
 		//
-		for (int index = 0; index < SIZEOF(cell->display.layers); index++)
-		{
-			if ((cell->display.layers[index] & T_AUTO_DESCENT) != 0)
-				return true;
-		}
+		//for (int index = 0; index < SIZEOF(cell->display.layers); index++)
+		//{
+		//	if ((cell->display.layers[index] & T_AUTO_DESCENT) != 0)
+		//		return true;
+		//}
+
+		return false;
 	}
 
 	static bool terrainLayersContains(const tileType* layers, terrainFlagCatalog flagMask)

@@ -1,13 +1,17 @@
 #pragma once
 
+#include "dungeonConstants.h"
+
+using namespace brogueHd::backend::model::game;
+
 namespace brogueHd::backend::model::machine
 {
 	struct machineFeature 
 	{
 		// terrain
-		enum dungeonFeatureTypes featureDF;	// generate this DF at the feature location (0 for none)
-		enum tileType terrain;				// generate this terrain tile at the feature location (0 for none)
-		enum dungeonLayers layer;			// generate the terrain tile in this layer
+		dungeonFeatureTypes featureDF;	// generate this DF at the feature location (0 for none)
+		tileType terrain;				// generate this terrain tile at the feature location (0 for none)
+		dungeonLayers layer;			// generate the terrain tile in this layer
 
 		short instanceCountRange[2];		// generate this range of instances of this feature
 		short minimumInstanceCount;			// abort if fewer than this

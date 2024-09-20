@@ -1,8 +1,11 @@
 #pragma once
 
+#include "color.h"
 #include "broguedef.h"
 
-namespace brogueHd
+using namespace brogueHd::backend::model::game;
+
+namespace brogueHd::backend::model::effect
 {
     typedef struct bolt {
         char name[DCOLS];

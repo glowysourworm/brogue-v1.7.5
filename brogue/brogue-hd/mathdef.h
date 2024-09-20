@@ -1,6 +1,6 @@
 #pragma once
 
-namespace brogueHd
+namespace brogueHd::backend::math
 {
     typedef struct randomRange {
         short lowerBound;

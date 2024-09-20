@@ -3,7 +3,7 @@
 #include "bolt.h"
 #include "boltDeclaration.h"
 
-namespace brogueHd
+namespace brogueHd::backend::model::effect
 {
 
     const bolt boltCatalog[NUMBER_BOLT_KINDS] = {

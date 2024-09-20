@@ -6,7 +6,7 @@
 
 using namespace std;
 
-namespace brogueHd
+namespace brogueHd::backend::model::game
 {
 	struct messageData
 	{

@@ -157,13 +157,14 @@
     <ClCompile Include="broguePlayer.cpp" />
     <ClCompile Include="brogueRememberedCell.cpp" />
     <ClCompile Include="brogueView.cpp" />
-    <ClCompile Include="cellDisplayBuffer.cpp" />
     <ClCompile Include="contentGenerator.cpp" />
     <ClCompile Include="creature.cpp" />
     <ClCompile Include="dijkstra.cpp" />
     <ClCompile Include="flare.cpp" />
     <ClCompile Include="gameController.cpp" />
     <ClCompile Include="gameData.cpp" />
+    <ClCompile Include="graph.cpp" />
+    <ClCompile Include="graphEdgeCollection.cpp" />
     <ClCompile Include="grid.cpp" />
     <ClCompile Include="gridConstructor.cpp" />
     <ClCompile Include="gridRegionConstructor.cpp" />
@@ -186,27 +187,32 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="array2D.h" />
-    <ClInclude Include="arraydef.h" />
+    <ClInclude Include="arrayExtension.h" />
     <ClInclude Include="boltEffectDeclaration.h" />
     <ClInclude Include="brogueContentGrid.h" />
     <ClInclude Include="brogueCreature.h" />
     <ClInclude Include="brogueCreatureHorde.h" />
     <ClInclude Include="brogueMachine.h" />
+    <ClInclude Include="brogueMath.h" />
     <ClInclude Include="brogueObject.h" />
     <ClInclude Include="broguePlayer.h" />
     <ClInclude Include="cellularAutomataParameters.h" />
-    <ClInclude Include="comparabledef.h" />
     <ClInclude Include="creatureBehaviorDeclaration.h" />
     <ClInclude Include="creatureBehaviorMap.h" />
     <ClInclude Include="dungeonFeature.h" />
     <ClInclude Include="exceptionHandler.h" />
+    <ClInclude Include="extensionDefinitions.h" />
+    <ClInclude Include="graph.h" />
+    <ClInclude Include="graphDefinitions.h" />
+    <ClInclude Include="graphEdge.h" />
+    <ClInclude Include="graphEdgeCollection.h" />
+    <ClInclude Include="graphNode.h" />
     <ClInclude Include="gridConstructor.h" />
     <ClInclude Include="gridRegionConstructor.h" />
     <ClInclude Include="gridRegionLocator.h" />
     <ClInclude Include="hashGenerator.h" />
     <ClInclude Include="itemDeclaration.h" />
     <ClInclude Include="itemTemplate.h" />
-    <ClInclude Include="iteratordef.h" />
     <ClInclude Include="linearGenerationParameters.h" />
     <ClInclude Include="machineDeclaration.h" />
     <ClInclude Include="machineFeature.h" />
@@ -263,7 +269,7 @@
     <ClInclude Include="lightConstants.h" />
     <ClInclude Include="lightSource.h" />
     <ClInclude Include="machineConstants.h" />
-    <ClInclude Include="mapextension.h" />
+    <ClInclude Include="mapExtension.h" />
     <ClInclude Include="mathdef.h" />
     <ClInclude Include="messageData.h" />
     <ClInclude Include="creature.h" />
@@ -279,7 +285,7 @@
     <ClInclude Include="renderingController.h" />
     <ClInclude Include="statusEffectDeclaration.h" />
     <ClInclude Include="terrainDeclaration.h" />
-    <ClInclude Include="vectordef.h" />
+    <ClInclude Include="vectorExtension.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

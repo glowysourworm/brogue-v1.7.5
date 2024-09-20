@@ -1,6 +1,9 @@
 #include "renderingController.h"
+#include "gameConstants.h"
 
-namespace brogueHd
+using namespace brogueHd::backend::model::game;
+
+namespace brogueHd::backend::controller
 {
 	renderingController::renderingController()
 	{
@@ -16,29 +19,42 @@ namespace brogueHd
 		_mode = mode;
 	}
 
+
 	void renderingController::renderView()
 	{
 		switch (_mode)
 		{
-		case brogueHd::Menu:
-			renderMenu();
+		case brogueHd::backend::model::game::BrogueGameMode::Menu:
+			renderMenuView();
 			break;
-		case brogueHd::HighScores:
-			renderHighScores();
+		case brogueHd::backend::model::game::BrogueGameMode::MenuHighScores:
+			renderHighScoresView();
 			break;
-		case brogueHd::SetSeed:
-			renderSetSeed();
+		case brogueHd::backend::model::game::BrogueGameMode::MenuSetSeed:
+			renderSetSeedView();
 			break;
-		case brogueHd::OpenGame:
-			renderOpenGame();
+		case brogueHd::backend::model::game::BrogueGameMode::MenuOpenGame:
+			renderOpenGameView();
 			break;
-		case brogueHd::Game:
-			renderGame();
+		case brogueHd::backend::model::game::BrogueGameMode::Game:
+			renderGameView();
+			break;
+		case brogueHd::backend::model::game::BrogueGameMode::Playback:
+			// TODO
+			break;
+		case brogueHd::backend::model::game::BrogueGameMode::Scum:
+			// TODO
+			break;
+		case brogueHd::backend::model::game::BrogueGameMode::Quit:
+			// TODO
 			break;
 		default:
 			break;
 		}
+	}
 
+	void renderingController::renderMenuView()
+	{
 		//signed short flames[COLS][(ROWS + MENU_FLAME_ROW_PADDING)][3]; // red, green and blue
 		//signed short colorSources[MENU_FLAME_COLOR_SOURCE_COUNT][4]; // red, green, blue, and rand, one for each color source (no more than MENU_FLAME_COLOR_SOURCE_COUNT).
 		//const color* colors[COLS][(ROWS + MENU_FLAME_ROW_PADDING)];
@@ -172,52 +188,64 @@ namespace brogueHd
 		//	}
 		//}
 	}
+	void renderingController::renderHighScoresView()
+	{
+
+	}
+	void renderingController::renderOpenGameView()
+	{
+
+	}
+	void renderingController::renderGameView()
+	{
+
+	}
 
 	void renderingController::renderSetSeedView()
 	{
-		// Prompt for seed; default is the previous game's seed.
-		sprintf(maxSeed, "%lu", ULONG_MAX);
+		//// Prompt for seed; default is the previous game's seed.
+		//sprintf(maxSeed, "%lu", ULONG_MAX);
 
-		if (previousGameSeed == 0)
-		{
-			seedDefault[0] = '\0';
-		}
-		else
-		{
-			sprintf(seedDefault, "%lu", previousGameSeed);
-		}
-		if (getInputTextString(buf, "Generate dungeon with seed number:",
-			log10(ULONG_MAX) + 1,
-			seedDefault,
-			"",
-			TEXT_INPUT_NUMBERS,
-			true)
-			&& buf[0] != '\0') {
-			seedTooBig = false;
-			if (strlen(buf) > strlen(maxSeed)) {
-				seedTooBig = true;
-			}
-			else if (strlen(buf) == strlen(maxSeed)) {
-				for (i = 0; maxSeed[i]; i++) {
-					if (maxSeed[i] > buf[i]) {
-						break; // we're good
-					}
-					else if (maxSeed[i] < buf[i]) {
-						seedTooBig = true;
-						break;
-					}
-				}
-			}
-			if (seedTooBig) {
-				rogue.nextGameSeed = ULONG_MAX;
-			}
-			else {
-				sscanf(buf, "%lu", &rogue.nextGameSeed);
-			}
-		}
-		else {
-			rogue.nextGame = NG_NOTHING;
-			break; // Don't start a new game after all.
-		}
+		//if (previousGameSeed == 0)
+		//{
+		//	seedDefault[0] = '\0';
+		//}
+		//else
+		//{
+		//	sprintf(seedDefault, "%lu", previousGameSeed);
+		//}
+		//if (getInputTextString(buf, "Generate dungeon with seed number:",
+		//	log10(ULONG_MAX) + 1,
+		//	seedDefault,
+		//	"",
+		//	TEXT_INPUT_NUMBERS,
+		//	true)
+		//	&& buf[0] != '\0') {
+		//	seedTooBig = false;
+		//	if (strlen(buf) > strlen(maxSeed)) {
+		//		seedTooBig = true;
+		//	}
+		//	else if (strlen(buf) == strlen(maxSeed)) {
+		//		for (i = 0; maxSeed[i]; i++) {
+		//			if (maxSeed[i] > buf[i]) {
+		//				break; // we're good
+		//			}
+		//			else if (maxSeed[i] < buf[i]) {
+		//				seedTooBig = true;
+		//				break;
+		//			}
+		//		}
+		//	}
+		//	if (seedTooBig) {
+		//		rogue.nextGameSeed = ULONG_MAX;
+		//	}
+		//	else {
+		//		sscanf(buf, "%lu", &rogue.nextGameSeed);
+		//	}
+		//}
+		//else {
+		//	rogue.nextGame = NG_NOTHING;
+		//	break; // Don't start a new game after all.
+		//}
 	}
 }

@@ -32,6 +32,11 @@ namespace brogueHd::backend::model::layout
 		T getAdjacent(short column, short row, brogueCompass direction) const;
 
 		/// <summary>
+		/// Returns true if grid cell locations are adjacent
+		/// </summary>
+		bool areAdjacent(T location, T otherLocation) const;
+
+		/// <summary>
 		/// Returns the boundary of the grid
 		/// </summary>
 		gridRect getBoundary() const;
@@ -88,7 +93,7 @@ namespace brogueHd::backend::model::layout
 		/// out of bounds OR is null FOR the provided NON-CARDINAL direction.
 		/// </summary>
 		/// <param name="direction">Compass direction treated with DIRECT EQUALITY! (DOESN'T USE FLAGS)</param>
-		bool IsExposedCorner(int column, int row, brogueCompass direction, gridDelegates::gridPredicate predicate) const;
+		bool isExposedCorner(int column, int row, brogueCompass direction, gridDelegates::gridPredicate predicate) const;
 
 	private:
 

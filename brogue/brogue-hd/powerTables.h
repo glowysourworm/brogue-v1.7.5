@@ -38,7 +38,7 @@
 
 // game data formulae:
 
-namespace brogueHd
+namespace brogueHd::backend::model::game
 {
     short wandDominate(creature* monst) {
         return (((monst)->currentHP * 5 < (monst)->info.maxHP) ? 100 : \

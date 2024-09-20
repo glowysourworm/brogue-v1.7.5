@@ -120,9 +120,6 @@
     <ClCompile Include="brogue-hd.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="cellDisplayBuffer.cpp">
-      <Filter>Source Files\backend\model\layout</Filter>
-    </ClCompile>
     <ClCompile Include="creature.cpp">
       <Filter>Source Files\backend\model</Filter>
     </ClCompile>
@@ -246,6 +243,12 @@
     <ClCompile Include="gridRegionConstructor.cpp">
       <Filter>Source Files\backend\model\construction</Filter>
     </ClCompile>
+    <ClCompile Include="graph.cpp">
+      <Filter>Source Files\backend\math</Filter>
+    </ClCompile>
+    <ClCompile Include="graphEdgeCollection.cpp">
+      <Filter>Source Files\backend\math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="broguedef.h">
@@ -355,9 +358,6 @@
     </ClInclude>
     <ClInclude Include="blueprintDeclaration.h">
       <Filter>Header Files\backend\model\layout</Filter>
-    </ClInclude>
-    <ClInclude Include="boltDeclaration.h">
-      <Filter>Header Files\backend\model\lighting</Filter>
     </ClInclude>
     <ClInclude Include="linearGenerationParameters.h">
       <Filter>Header Files\backend\model\construction</Filter>
@@ -497,10 +497,7 @@
     <ClInclude Include="dijkstra.h">
       <Filter>Header Files\backend\math</Filter>
     </ClInclude>
-    <ClInclude Include="vectordef.h">
-      <Filter>Header Files\backend\extension</Filter>
-    </ClInclude>
-    <ClInclude Include="comparabledef.h">
+    <ClInclude Include="vectorExtension.h">
       <Filter>Header Files\backend\extension</Filter>
     </ClInclude>
     <ClInclude Include="hashGenerator.h">
@@ -509,13 +506,10 @@
     <ClInclude Include="exceptionHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="mapextension.h">
+    <ClInclude Include="mapExtension.h">
       <Filter>Header Files\backend\extension</Filter>
     </ClInclude>
-    <ClInclude Include="iteratordef.h">
-      <Filter>Header Files\backend\extension</Filter>
-    </ClInclude>
-    <ClInclude Include="arraydef.h">
+    <ClInclude Include="arrayExtension.h">
       <Filter>Header Files\backend\extension</Filter>
     </ClInclude>
     <ClInclude Include="regionGenerator.h">
@@ -532,6 +526,30 @@
     </ClInclude>
     <ClInclude Include="gridRegionConstructor.h">
       <Filter>Header Files\backend\model\construction</Filter>
+    </ClInclude>
+    <ClInclude Include="boltDeclaration.h">
+      <Filter>Header Files\backend\model\effect</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueMath.h">
+      <Filter>Header Files\backend\math</Filter>
+    </ClInclude>
+    <ClInclude Include="graph.h">
+      <Filter>Header Files\backend\math</Filter>
+    </ClInclude>
+    <ClInclude Include="graphEdgeCollection.h">
+      <Filter>Header Files\backend\math</Filter>
+    </ClInclude>
+    <ClInclude Include="extensionDefinitions.h">
+      <Filter>Header Files\backend\extension</Filter>
+    </ClInclude>
+    <ClInclude Include="graphEdge.h">
+      <Filter>Header Files\backend\math</Filter>
+    </ClInclude>
+    <ClInclude Include="graphDefinitions.h">
+      <Filter>Header Files\backend\math</Filter>
+    </ClInclude>
+    <ClInclude Include="graphNode.h">
+      <Filter>Header Files\backend\math</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

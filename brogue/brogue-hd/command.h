@@ -1,6 +1,6 @@
 #pragma once
 
-namespace brogueHd
+namespace brogueHd::backend::model::game
 {
 	enum NGCommands {
 		NG_NOTHING = 0,

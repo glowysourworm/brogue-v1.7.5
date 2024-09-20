@@ -2,7 +2,6 @@
 
 #include "brogueGrid.h"
 #include "brogueContentGrid.h"
-#include "monster.h"
 #include "gridCell.h"
 
 using namespace std;
