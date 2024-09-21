@@ -57,6 +57,9 @@ namespace brogueHd::backend::model::layout
 		short terrainRandomValues[8];					// TODO: Figure this out!
 		bool isWayPoint;
 
+		char machine;
+		bool disposableHere;
+
 		// Dummy variable:  Leaving a tag here for use; but it's just for compatability with dijkstra's map
 		short tagValue;
 	};

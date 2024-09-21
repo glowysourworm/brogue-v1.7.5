@@ -148,9 +148,11 @@
     <ClCompile Include="brogueCreature.cpp" />
     <ClCompile Include="brogueCreatureHorde.cpp" />
     <ClCompile Include="brogueGame.cpp" />
+    <ClCompile Include="brogueGameProfile.cpp" />
     <ClCompile Include="brogueLayout.cpp" />
     <ClCompile Include="brogueItem.cpp" />
     <ClCompile Include="brogueLevel.cpp" />
+    <ClCompile Include="brogueLevelProfile.cpp" />
     <ClCompile Include="brogueMachine.cpp" />
     <ClCompile Include="brogueMessageQueue.cpp" />
     <ClCompile Include="brogueObject.cpp" />
@@ -193,6 +195,8 @@
     <ClInclude Include="brogueContentGrid.h" />
     <ClInclude Include="brogueCreature.h" />
     <ClInclude Include="brogueCreatureHorde.h" />
+    <ClInclude Include="brogueGameProfile.h" />
+    <ClInclude Include="brogueLevelProfile.h" />
     <ClInclude Include="brogueMachine.h" />
     <ClInclude Include="brogueMath.h" />
     <ClInclude Include="brogueObject.h" />

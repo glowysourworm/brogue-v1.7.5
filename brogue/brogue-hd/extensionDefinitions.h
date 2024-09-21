@@ -53,7 +53,7 @@ namespace brogueHd::backend::extension
 		typedef std::function<V(T item)> simpleSelector;
 	};
 	
-	template<typename K, typename V>
+	template<typename K, typename V, typename VResult>
 	struct extensionMapDelegates
 	{
 		/// <summary>
@@ -66,6 +66,11 @@ namespace brogueHd::backend::extension
 		/// value to either break, or continue the loop.
 		/// </summary>
 		typedef std::function<iterationCallback(K key, V value)> simpleCallback;
+
+		/// <summary>
+		/// Definition of selector for the value type
+		/// </summary>
+		typedef std::function<VResult(V value)> valueSelector;
 	};
 
 	template<typename T>

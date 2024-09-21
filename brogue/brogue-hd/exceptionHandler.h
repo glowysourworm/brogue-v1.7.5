@@ -10,7 +10,8 @@ namespace brogueHd
 {
 	static class brogueException
 	{
-		static void show(char* message, bool halt = false)
+	public:
+		static void show(const char* message, bool halt = false)
 		{
 
 #ifdef DEBUG

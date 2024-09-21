@@ -1,14 +1,9 @@
 #include "grid.h"
-#include "broguedef.h"
 #include "brogueMath.h"
-#include "color.h"
 #include "gridRegion.h"
-#include "gridMethods.h"
 #include "gridDefinitions.h"
-#include "randomGenerator.h"
 #include "exceptionHandler.h"
 #include "array2D.h"
-#include <functional>
 #include <exception>
 
 using namespace std;
@@ -187,7 +182,7 @@ namespace brogueHd::backend::model::layout
     }
 
     template<gridCellConstraint T>
-    T grid<T>::search(gridDelegates::gridAggregateComparer aggregateComparator) const
+    T grid<T>::search(extensionArray2DDelegates<T>::aggregateComparer aggregateComparator) const
     {
         T searchValue;
         
@@ -214,7 +209,7 @@ namespace brogueHd::backend::model::layout
     /// the provided predicate.
     /// </summary>
     template<gridCellConstraint T>
-    bool grid<T>::isEdge(short column, short row, gridDelegates::gridPredicate predicate) const
+    bool grid<T>::isEdge(short column, short row, extensionArray2DDelegates<T>::simplePredicate predicate) const
     {
         T north = this->getOrNull(column, row - 1);
         T south = this->getOrNull((column, row + 1);
@@ -236,7 +231,7 @@ namespace brogueHd::backend::model::layout
     }
 
     template<gridCellConstraint T>
-    bool grid<T>::isExposedEdge(int column, int row, brogueCompass direction, gridDelegates::gridPredicate predicate) const
+    bool grid<T>::isExposedEdge(int column, int row, brogueCompass direction, extensionArray2DDelegates<T>::simplePredicate predicate) const
     {
         T north = this->getOrNull(column, row - 1);
         T south = this->getOrNull((column, row + 1);
@@ -260,7 +255,7 @@ namespace brogueHd::backend::model::layout
     }
 
     template<gridCellConstraint T>
-    bool grid<T>::isExposedCorner(int column, int row, brogueCompass direction, gridDelegates::gridPredicate predicate) const
+    bool grid<T>::isExposedCorner(int column, int row, brogueCompass direction, extensionArray2DDelegates<T>::simplePredicate predicate) const
     {
         if (direction == brogueCompass::NW)
             return isExposedEdge(grid, column, row, Compass.N, predicate) &&
@@ -291,10 +286,10 @@ namespace brogueHd::backend::model::layout
         if (!this->isDefined(otherLocation.column, otherLocation.row))
             return false;
 
-        if (brogueMath::abs(otherLocation.column - location.column) > 1)
+        if (brogueMath<short>::abs(otherLocation.column - location.column) > 1)
             return false;
 
-        if (brogueMath::abs(otherLocation.row - location.row) > 1)
+        if (brogueMath<short>::abs(otherLocation.row - location.row) > 1)
             return false;
 
         return true;

@@ -5,67 +5,76 @@
 
 namespace brogueHd::backend::model::game
 {
-	typedef struct keyLocationProfile {
-		short x;
-		short y;
-		short machine;
-		boolean disposableHere;
-	} keyLocationProfile;
 
-	enum dungeonProfileTypes {
+	/*
+
+	dungeonProfile dungeonProfileCatalog[NUMBER_DUNGEON_PROFILES] = {
+		// Room frequencies:
+		//      0. Cross room
+		//      1. Small symmetrical cross room
+		//      2. Small room
+		//      3. Circular room
+		//      4. Chunky room
+		//      5. Cave
+		//      6. Cavern (the kind that fills a level)
+		//      7. Entrance room (the big upside-down T room at the start of depth 1)
+
+		// Room frequencies
+		// 0    1   2   3   4   5   6   7   Corridor chance
+		{{2,    1,  1,  1,  7,  1,  0,  0}, 10},    // Basic dungeon generation (further adjusted by depth)
+		{{10,   0,  0,  3,  7,  10, 10, 0}, 0},     // First room for basic dungeon generation (further adjusted by depth)
+
+		{{0,    0,  1,  0,  0,  0,  0,  0}, 0},     // Goblin warrens
+		{{0,    5,  0,  1,  0,  0,  0,  0}, 0},     // Sentinel sanctuaries
+	};
+
+	*/
+
+
+	enum levelTypes : int
+	{
 		DP_BASIC,
 		DP_BASIC_FIRST_ROOM,
 
 		DP_GOBLIN_WARREN,
-		DP_SENTINEL_SANCTUARY,
-
-		NUMBER_DUNGEON_PROFILES,
+		DP_SENTINEL_SANCTUARY
 	};
 
-	// Level profiles, affecting what rooms get chosen and how they're connected:
-	typedef struct dungeonProfile 
+	enum roomTypes : int
 	{
-		// Room type weights (in the natural dungeon, these are also adjusted based on depth):
-		short roomFrequencies[ROOM_TYPE_COUNT];
+		CrossRoom = 0,
+		SmallSymmetricalCrossRoom,
+		SmallRoom,
+		CircularRoom,
+		ChunkyRoom,
+		Cave,
 
+		// The kind that fills a level
+		Cavern,
+
+		// Upside-down T room at the start of depth 1
+		MainEntranceRoom
+	};
+
+	struct brogueRoomInfo
+	{
+		roomTypes type;
+		short frequency;
 		short corridorChance;
 
-		void adjustDungeonProfileForDepth(short depth) 
+		brogueRoomInfo()
+		{}
+		brogueRoomInfo(roomTypes atype, short afrequency, short acorridorChance)
 		{
-			const short descentPercent = clamp(100 * (depth - 1) / (AMULET_LEVEL - 1), 0, 100);
-
-			roomFrequencies[0] += 20 * (100 - descentPercent) / 100;
-			roomFrequencies[1] += 10 * (100 - descentPercent) / 100;
-			roomFrequencies[3] += 7 * (100 - descentPercent) / 100;
-			roomFrequencies[5] += 10 * descentPercent / 100;
-
-			corridorChance += 80 * (100 - descentPercent) / 100;
+			type = atype;
+			frequency = afrequency;
+			corridorChance = acorridorChance;
 		}
-
-		void adjustDungeonFirstRoomProfileForDepth(short depth) 
-		{
-			short i;
-			const short descentPercent = clamp(100 * (depth - 1) / (AMULET_LEVEL - 1), 0, 100);
-
-			if (depth == 1)
-			{
-				// All dungeons start with the entrance room on depth 1.
-				for (i = 0; i < ROOM_TYPE_COUNT; i++) 
-				{
-					roomFrequencies[i] = 0;
-				}
-				roomFrequencies[7] = 1;
-			}
-			else 
-			{
-				roomFrequencies[6] += 50 * descentPercent / 100;
-			}
-		}
-
-	} dungeonProfile;
+	};
 
 	// Dungeon flags
-	enum tileFlags {
+	enum tileFlags 
+	{
 		DISCOVERED = Fl(0),
 		VISIBLE = Fl(1),	// cell has sufficient light and is in field of view, ready to draw.
 		HAS_PLAYER = Fl(2),

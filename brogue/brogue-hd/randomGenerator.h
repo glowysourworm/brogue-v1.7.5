@@ -32,6 +32,11 @@ namespace brogueHd::backend::generator
 		short randWeighted(const short weights[]);
 
 		/// <summary>
+		/// Returns random index from std vector based on its weights
+		/// </summary>
+		short randWeighted(const std::vector<short>& weights);
+
+		/// <summary>
 		/// Returns random from the provided range, using the clumping factor
 		/// </summary>
 		short randClump(randomRange theRange);

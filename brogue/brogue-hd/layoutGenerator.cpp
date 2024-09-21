@@ -28,7 +28,7 @@ namespace brogueHd
 
     }
 
-	void layoutGenerator::generateLayout()
+    brogueLayout& layoutGenerator::generateLayout()
 	{
         // Procedure
         //
@@ -74,6 +74,8 @@ namespace brogueHd
         //          -> Mark number of steps on each tile (choke points)
         //          -> Store the results (adds to difficulty rating of cells)
         //
+
+        this->createRooms();
 	}
 
     void layoutGenerator::createRooms()

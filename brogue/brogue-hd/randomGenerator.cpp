@@ -63,6 +63,11 @@ namespace brogueHd::backend::generator
 		return lowerBound + range(upperBound - lowerBound + 1);
 	}
 
+	short randomGenerator::randWeighted(const std::vector<short>& weights)
+	{
+		return randWeighted(weights.data());
+	}
+
 	short randomGenerator::randWeighted(const short weights[])
 	{
 		int sum = 0;

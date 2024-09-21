@@ -252,6 +252,12 @@
     <ClCompile Include="terrainGenerator.cpp">
       <Filter>Source Files\backend\generator</Filter>
     </ClCompile>
+    <ClCompile Include="brogueGameProfile.cpp">
+      <Filter>Source Files\backend\model</Filter>
+    </ClCompile>
+    <ClCompile Include="brogueLevelProfile.cpp">
+      <Filter>Source Files\backend\model</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="broguedef.h">
@@ -556,6 +562,12 @@
     </ClInclude>
     <ClInclude Include="array2D.h">
       <Filter>Header Files\backend\extension</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueGameProfile.h">
+      <Filter>Header Files\backend\model</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueLevelProfile.h">
+      <Filter>Header Files\backend\model</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

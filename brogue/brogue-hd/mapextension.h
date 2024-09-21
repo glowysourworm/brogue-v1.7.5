@@ -11,7 +11,7 @@ namespace brogueHd::backend::extension
 	/// <summary>
 	/// Static methods to operate on the std::map data structure
 	/// </summary>
-	template<typename K, typename V>
+	template<typename K, typename V, typename VResult>
 	struct mapExtension
 	{
 		static bool any(const std::map<K, V>& map, extensionMapDelegates::simplePredicate predicate)
@@ -51,6 +51,44 @@ namespace brogueHd::backend::extension
 			{
 				if (predicate(it->first, it->second))
 					return it->first;
+			}
+
+			return NULL;
+		}
+
+		static std::vector<VResult> selectFromValues(const std::map<K, V>& map, extensionMapDelegates::simpleSelector selector)
+		{
+			std::vector<VResult> result;
+
+			for (std::iterator it = map->begin(); it <= map->end(); it++)
+			{
+				result.push_back(selector(it->second));
+			}
+
+			return result;
+		}
+
+		static K getKeyAt(const std::map<K, V>& map, int index)
+		{
+			int counter = 0;
+
+			for (std::iterator it = map->begin(); it <= map->end(); it++)
+			{
+				if (counter++ == index)
+					return it->first;
+			}
+
+			return NULL;
+		}
+
+		static V getValueAt(const std::map<K, V>& map, int index)
+		{
+			int counter = 0;
+
+			for (std::iterator it = map->begin(); it <= map->end(); it++)
+			{
+				if (counter++ == index)
+					return it->second;
 			}
 
 			return NULL;
