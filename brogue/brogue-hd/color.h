@@ -20,7 +20,7 @@ namespace brogueHd::backend::model::game
 		short rand;
 
 		// Flag: this color "dances" with every refresh:
-		boolean colorDances;
+		bool colorDances;
 
 		color() {}
 		color(const color& color)
@@ -34,7 +34,7 @@ namespace brogueHd::backend::model::game
 			rand = color.rand;
 			colorDances = color.colorDances;
 		}
-		color(short ared, short agreen, short ablue, short rred, short rgreen, short rblue, short rrand, boolean acolorDances)
+		color(short ared, short agreen, short ablue, short rred, short rgreen, short rblue, short rrand, bool acolorDances)
 		{
 			red = ared;
 			green = agreen;

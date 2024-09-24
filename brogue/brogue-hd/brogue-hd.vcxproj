@@ -143,6 +143,7 @@
     <ClCompile Include="binarySearchTree.cpp" />
     <ClCompile Include="brogue-hd.cpp" />
     <ClCompile Include="brogueCell.cpp" />
+    <ClCompile Include="brogueColorMap.cpp" />
     <ClCompile Include="brogueConsole.cpp" />
     <ClCompile Include="brogueContentGrid.cpp" />
     <ClCompile Include="brogueCreature.cpp" />
@@ -200,6 +201,7 @@
     <ClInclude Include="accretionTile.h" />
     <ClInclude Include="arrayExtension.h" />
     <ClInclude Include="boltEffectDeclaration.h" />
+    <ClInclude Include="brogueColorMap.h" />
     <ClInclude Include="brogueConsole.h" />
     <ClInclude Include="brogueContentGrid.h" />
     <ClInclude Include="brogueCreature.h" />
@@ -217,6 +219,7 @@
     <ClInclude Include="delaunayAlgorithm.h" />
     <ClInclude Include="developerConsole.h" />
     <ClInclude Include="dungeonFeature.h" />
+    <ClInclude Include="EnumString.h" />
     <ClInclude Include="exceptionHandler.h" />
     <ClInclude Include="extensionDefinitions.h" />
     <ClInclude Include="gameConsole.h" />

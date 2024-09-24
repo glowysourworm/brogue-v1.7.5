@@ -4,11 +4,16 @@
 #include "exceptionHandler.h"
 #include "playbackData.h"
 #include "gameData.h"
+#include "stringExtension.h"
+#include "brogueColorMap.h"
 #include <string>
 #include <fstream>
+#include <format>
 
 using namespace std;
+using namespace brogueHd::backend::extension;
 using namespace brogueHd::backend::model;
+using namespace brogueHd::backend::model::game;
 using namespace brogueHd::backend::processor;
 
 namespace brogueHd::backend::controller
@@ -129,6 +134,114 @@ namespace brogueHd::backend::controller
 			brogueException::show(std::string("gameController::loadKeyMap:  ") + ex.what());
 			throw ex;
 		}
+	}
+
+	brogueColorMap* resourceController::loadColors(const char* path)
+	{
+		brogueColorMap* result = new brogueColorMap();
+
+		try
+		{
+			ifstream stream(path);
+
+			// collection,name,red,green,blue,redRand,greenRand,blueRand,rand,colorDances
+
+			
+			std::string nextLine;
+
+			while (std::getline(stream, nextLine))
+			{
+				// Comment
+				if (nextLine.starts_with('#'))
+					continue;
+
+				// Split by comma and white space
+				std::string* strings = stringExtension::split(nextLine, ", ");
+
+				if (SIZEOF(strings) != 10)
+					continue;
+
+				color nextColor;
+				colorCollections collection;
+				
+				EnumString<colorCollections>::To(collection, strings[0]);
+
+				nextColor.red = stringExtension::convert<short>(strings[2]);
+				nextColor.green = stringExtension::convert<short>(strings[3]);
+				nextColor.blue = stringExtension::convert<short>(strings[4]);
+				nextColor.redRand = stringExtension::convert<short>(strings[5]);
+				nextColor.greenRand = stringExtension::convert<short>(strings[6]);
+				nextColor.blueRand = stringExtension::convert<short>(strings[7]);
+				nextColor.rand = stringExtension::convert<short>(strings[8]);
+				nextColor.colorDances = stringExtension::convert<bool>(strings[9]);
+
+				switch (collection)
+				{
+				case colorCollections::game:
+					gameColors gameSelector;
+					EnumString<gameColors>::To(gameSelector, strings[1]);
+					result->setColor(gameSelector, nextColor);
+					break;
+				case colorCollections::bolt:
+					boltColors boltSelector;
+					EnumString<boltColors>::To(boltSelector, strings[1]);
+					result->setColor(boltSelector, nextColor);
+					break;
+				case colorCollections::tile:
+					tileColors tileSelector;
+					EnumString<tileColors>::To(tileSelector, strings[1]);
+					result->setColor(tileSelector, nextColor);
+					break;
+				case colorCollections::creature:
+					creatureColors creatureSelector;
+					EnumString<creatureColors>::To(creatureSelector, strings[1]);
+					result->setColor(creatureSelector, nextColor);
+					break;
+				case colorCollections::light:
+					lightColors lightSelector;
+					EnumString<lightColors>::To(lightSelector, strings[1]);
+					result->setColor(lightSelector, nextColor);
+					break;
+				case colorCollections::flare:
+					flareColors flareSelector;
+					EnumString<flareColors>::To(flareSelector, strings[1]);
+					result->setColor(flareSelector, nextColor);
+					break;
+				case colorCollections::multipliers:
+					colorMultipliers multiplierSelector;
+					EnumString<colorMultipliers>::To(multiplierSelector, strings[1]);
+					result->setColor(multiplierSelector, nextColor);
+					break;
+				case colorCollections::blood:
+					bloodColors bloodSelector;
+					EnumString<bloodColors>::To(bloodSelector, strings[1]);
+					result->setColor(bloodSelector, nextColor);
+					break;
+				case colorCollections::gas:
+					gasColors gasSelector;
+					EnumString<gasColors>::To(gasSelector, strings[1]);
+					result->setColor(gasSelector, nextColor);
+					break;
+				case colorCollections::interface:
+					interfaceColors interfaceSelector;
+					EnumString<interfaceColors>::To(interfaceSelector, strings[1]);
+					result->setColor(interfaceSelector, nextColor);
+					break;
+				default:
+					break;
+				}
+			} 
+
+			return result;
+		}
+		catch (std::exception ex)
+		{
+			brogueException::show(std::format("Error opening colors.csv:  {}", ex.what()));
+
+			delete result;
+		}
+
+		return NULL;
 	}
 
 	gameData* loadGame(char* path)

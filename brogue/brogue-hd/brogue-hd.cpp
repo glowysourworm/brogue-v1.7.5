@@ -1,4 +1,3 @@
-
 #include "broguedef.h"
 #include "gameConsole.h"
 #include "developerConsole.h"
@@ -15,7 +14,6 @@ using namespace brogueHd::backend::controller;
 
 namespace brogueHd
 {
-
 	int main(int argc, char* argv[])
 	{
 		brogueConsole defaultConsole;
@@ -60,7 +58,8 @@ namespace brogueHd
 			}
 
 			// Print Help for the menu loop
-			currentConsole.printHelp(std::cout);
+			if (iterate)
+				currentConsole.printHelp(std::cout);
 		}
 
 		delete brogueResourceController;

@@ -121,6 +121,9 @@
     <Filter Include="Source Files\console">
       <UniqueIdentifier>{15939b54-040a-4765-bb80-c9c6166b4686}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\vendor">
+      <UniqueIdentifier>{ea1548fc-c383-4514-9f29-5fa6cb6e3d7d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="brogue-hd.cpp">
@@ -287,6 +290,9 @@
     </ClCompile>
     <ClCompile Include="resourceController.cpp">
       <Filter>Source Files\backend\controller</Filter>
+    </ClCompile>
+    <ClCompile Include="brogueColorMap.cpp">
+      <Filter>Source Files\backend\model</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -649,6 +655,12 @@
     </ClInclude>
     <ClInclude Include="command.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueColorMap.h">
+      <Filter>Header Files\backend\model</Filter>
+    </ClInclude>
+    <ClInclude Include="EnumString.h">
+      <Filter>Header Files\vendor</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -7,6 +7,6 @@ namespace brogueHd::console
 
 	brogueConsoleReturn resourceConsole::command(std::string input, ostream& stream)
 	{
-
+		
 	}
 }

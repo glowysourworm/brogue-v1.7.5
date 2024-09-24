@@ -24,8 +24,8 @@ namespace brogueHd
 	#define BROGUE_VERSION_STRING "1.7.5"
 
 	// STD Library / substitutions
-	#define SIZEOF(x)						sizeof(x);			// Size of an array
-	#define STRCMP(x, y)					strcmp(x,y);		// String compare
+	#define SIZEOF(x)						sizeof(x)			// Size of an array
+	#define STRCMP(x, y)					strcmp(x,y)			// String compare
 
 	// debug macros -- define DEBUGGING as 1 to enable wizard mode.
 	#define DEBUGGING						0
@@ -489,6 +489,5 @@ namespace brogueHd
 	#define PDS_CELL(map, x, y) ((map)->links + ((x) + DCOLS * (y)))
 
 	typedef struct pdsLink pdsLink;
-	typedef struct pdsMap pdsMap;
-
+	typedef struct pdsMap pdsMap;			
 }

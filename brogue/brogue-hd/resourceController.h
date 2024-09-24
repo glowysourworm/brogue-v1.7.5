@@ -21,6 +21,11 @@ namespace brogueHd::backend::controller
 		brogueScoresFile* getHighScores(short& mostRecentLineNumber);
 
 		/// <summary>
+		/// Loads colors.csv file
+		/// </summary>
+		brogueColorMap* loadColors(const char* path);
+
+		/// <summary>
 		/// Loads key map from file
 		/// </summary>
 		void loadKeymap(const keyProcessor& keyProcessor);
