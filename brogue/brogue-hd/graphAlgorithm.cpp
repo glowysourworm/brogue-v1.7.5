@@ -23,7 +23,7 @@ namespace brogueHd::backend::math
     }
 
     template<isGridLocatorNode TNode, isGridLocatorEdge TEdge>
-    graph<TNode, TEdge> run(const std::vector<TNode>& vertices)
+    graph<TNode, TEdge>* run(const std::vector<TNode>& vertices)
     {
         // Overridden in child class
     }

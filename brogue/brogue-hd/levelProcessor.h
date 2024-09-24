@@ -3,6 +3,8 @@
 #include "playerCharacter.h"
 #include "brogueLevel.h"
 
+using namespace brogueHd::backend::model;
+
 namespace brogueHd::backend::processor
 {
 	class levelProcessor

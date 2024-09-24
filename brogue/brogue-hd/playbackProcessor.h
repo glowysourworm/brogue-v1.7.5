@@ -4,6 +4,8 @@
 
 using namespace std;
 
+using namespace brogueHd::backend::model::io;
+
 namespace brogueHd::backend::processor
 {
 	class playbackProcessor

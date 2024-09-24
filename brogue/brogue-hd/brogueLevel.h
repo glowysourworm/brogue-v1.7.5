@@ -1,6 +1,6 @@
 #pragma once
 
-#include "brogueGrid.h"
+#include "brogueLayout.h"
 #include "brogueContentGrid.h"
 #include "gridCell.h"
 
@@ -21,7 +21,7 @@ namespace brogueHd::backend::model
 
 	public:
 
-		brogueGrid* levelGrid;
+		brogueLayout* layout;
 
 		brogueContentGrid* contentGrid;
 
@@ -36,9 +36,9 @@ namespace brogueHd::backend::model
 		unsigned long _levelSeed;
 		//unsigned long _awaySince;		// Parameter to "burn in" level. Simulate it for N turns so that swamp gas accumulates, swamps percolate, etc...
 
-		gridCell* _upStairsLoc;
-		gridCell* _downStairsLoc;
-		gridCell* _playerExitedVia;
+		gridLocator* _upStairsLoc;
+		gridLocator* _downStairsLoc;
+		gridLocator* _playerExitedVia;
 	};
 }
 

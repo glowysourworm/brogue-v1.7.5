@@ -46,7 +46,7 @@ namespace brogueHd::backend::math
 	}
 
 	template<isGridLocator T>
-	void dijkstra<T>::initialize(T source, T targets[], bool obeyCardinalMovement)
+	void dijkstra<T>::initialize(T source, T targets[])
 	{
 		_sourceLocation = sourceLocation;
 		_targetLocations = targetLocations;

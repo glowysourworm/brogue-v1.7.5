@@ -1,6 +1,6 @@
 #pragma once
 
-#include "array2D.h"
+#include "grid.h"
 #include "brogueCellDisplay.h"
 
 using namespace brogueHd::backend::model::layout;
@@ -18,7 +18,7 @@ namespace brogueHd::backend::model
 
 	private:
 
-		array2D<brogueCellDisplay*>* _view;
+		grid<brogueCellDisplay*>* _view;
 	};
 }
 

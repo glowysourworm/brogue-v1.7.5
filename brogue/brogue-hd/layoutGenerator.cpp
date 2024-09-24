@@ -6,6 +6,7 @@
 #include "delaunayAlgorithm.h"
 #include "primsAlgorithm.h"
 #include "vectorExtension.h"
+#include "arrayExtension.h"
 #include "exceptionHandler.h"
 
 namespace brogueHd::backend::generator
@@ -78,6 +79,7 @@ namespace brogueHd::backend::generator
         //
         // 3) Triangulate Rooms
         //      -> Create Delaunay Triangulation of connection points
+        //      -> Create Minimum Spanning Tree (MST) using Prim's Algorithm
         //      -> Remove Uniform[0,1] random corridors back towards
         //         Minimum Spanning Tree (MST)
         //      -> Creates Room Graph
@@ -107,9 +109,11 @@ namespace brogueHd::backend::generator
         // Machine Rooms
 
         // Triangulate Rooms:  Creates Delaunay Triangulation of the connection point vertices
-        graph<gridLocatorNode, gridLocatorEdge> delaunayGraph = this->triangulateRooms();
+        this->triangulateRooms();
 
-
+        // Connect Rooms:  Create cells in the grid for the delaunay triangulation of the 
+        //                 connection points of the room tiles
+        this->connectRooms();
 	}
 
     void layoutGenerator::createRooms()
@@ -409,7 +413,7 @@ namespace brogueHd::backend::generator
         return constructor.complete();
     }
 
-    graph<gridLocatorNode, gridLocatorEdge> layoutGenerator::triangulateRooms()
+    void layoutGenerator::triangulateRooms()
     {
         // Create delaunay triangulator with graph edge constructor
         delaunayAlgorithm<gridLocatorNode, gridLocatorEdge> triangulator([](gridLocatorNode node1, gridLocatorNode node2)
@@ -435,6 +439,109 @@ namespace brogueHd::backend::generator
                 connectionNodes.push_back(gridLocatorNode(item.connectionPointW));
         });
 
-        return triangulator.run(connectionNodes);
+        _delaunayGraph = triangulator.run(connectionNodes);
+    }
+
+    void layoutGenerator::connectRooms()
+    {
+        // Procedure
+        //
+        // 1) Iterate Edges: DELAUNAY GRAPH
+        //      -> Find edges that are not self-referential (use room tiles)
+        //      -> Collect these edges to pass to dijkstra
+        //
+        // 2) Run Dijkstra to set cells in the primary grid
+        //
+
+        std::vector<gridLocatorEdge> corridorEdges;
+        std::vector<accretionTile> roomTiles = *_roomTiles;
+
+        _delaunayGraph->iterateEdges([&roomTiles, &corridorEdges](gridLocatorEdge edge)
+        {
+            bool isCorridorEdge = false;
+
+            vectorExtension<accretionTile>::forEach(roomTiles, [&edge, &isCorridorEdge](accretionTile tile)
+            {
+                int connectionCount = 0;
+
+                // North
+                if (tile.hasNorthConnection && 
+                   (tile.connectionPointN == edge.node1.locator ||
+                    tile.connectionPointN == edge.node2.locator))
+                    connectionCount++;
+
+                // South
+                if (tile.hasSouthConnection &&
+                   (tile.connectionPointS == edge.node1.locator ||
+                    tile.connectionPointS == edge.node2.locator))
+                    connectionCount++;
+
+                // East
+                if (tile.hasEastConnection &&
+                   (tile.connectionPointE == edge.node1.locator ||
+                    tile.connectionPointE == edge.node2.locator))
+                    connectionCount++;
+
+                // West
+                if (tile.hasWestConnection &&
+                   (tile.connectionPointW == edge.node1.locator ||
+                    tile.connectionPointW == edge.node2.locator))
+                    connectionCount++;
+
+                if (connectionCount == 1)
+                { 
+                    isCorridorEdge = true;
+                    return iterationCallback::breakAndReturn;
+                }
+            });
+
+            if (isCorridorEdge)
+                corridorEdges.push_back(edge);
+        });
+
+        grid<gridLocator> grid = *_grid;
+
+        // Use the corridor edges to call dijkstra
+        dijkstra<gridLocator> algorithm(
+            _grid->getParentBoundary(), 
+            _grid->getRelativeBoundary(), 
+            true,                           // Cardinal Movement (for laying corridors)
+
+            // Primary Inclusion Predicate (is it in the grid?)
+            [&grid](short column, short row)
+            {
+                return grid->isDefined(column, row);
+            },
+
+            // Then, the map cost is queried (what is the movement cost?)
+            [&grid](short column, short row)
+            {
+                return 1;
+            },
+
+            // Then, it will need the locators from the grid to keep its internal data temporarily
+            [&grid](short column, short row)
+            {
+                return grid->get(column, row);
+            });
+
+        // Iterate each corridor edge and run dijkstra to finalize the connection
+        vectorExtension<gridLocatorEdge>::forEach(corridorEdges, [&algorithm, &grid](gridLocatorEdge edge)
+        {
+            gridLocator source = edge.node1.locator;
+            gridLocator targets[1] = { edge.node2.locator };
+            
+            // Run Dijkstra
+            algorithm.initialize(source, targets);
+            algorithm.run();
+
+            gridLocator* resultPath = algorithm.getResultPath(targets[0]);
+
+            // Set corridors
+            arrayExtension<gridLocator>::forEach(resultPath, [&grid](gridLocator locator)
+            {
+                grid->set(locator.column, locator.row, locator);
+            });
+        });
     }
 }

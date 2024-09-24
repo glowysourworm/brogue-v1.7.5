@@ -3,6 +3,7 @@
 #include "binarySearchTree.h"
 #include <map>
 #include <exception>
+#include "exceptionHandler.h"
 
 using namespace std;
 
@@ -83,7 +84,7 @@ namespace brogueHd::component
         }
 
         else
-            throw std::runtime_error("Error in BST tree:  Trying to insert duplicate node");
+            brogueException::show("Error in BST tree:  Trying to insert duplicate node");
     }
 
     template<typename K, typename T>
@@ -124,7 +125,7 @@ namespace brogueHd::component
             return _nodeMap[key];
 
         // Recurse
-        else if (root->data < key) 
+        else if (_root->data < key)
             return searchNode(_root->right, key);
 
         else

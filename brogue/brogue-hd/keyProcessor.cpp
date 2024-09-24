@@ -4,11 +4,11 @@
 
 using namespace std;
 
-namespace brogueHd
+namespace brogueHd::backend::processor
 {
 	keyProcessor::keyProcessor()
 	{
-		_keyMap = new keyMap[KEY_ID_MAXIMUM];
+		_keyMap = new std::map<std::string, std::string>();
 	}
 
 	keyProcessor::~keyProcessor()
@@ -18,7 +18,7 @@ namespace brogueHd
 
 	void keyProcessor::addKeyMap(char* inputCharacter, char* outputCharacter)
 	{
-		if (_keyMap.find(inputCharacter) == NULL)
-			_keyMap.insert(inputCharacter, outputCharacter);
+		if (!_keyMap->contains(std::string(inputCharacter)))
+			_keyMap->insert(std::string(inputCharacter), std::string(outputCharacter));
 	}
 }

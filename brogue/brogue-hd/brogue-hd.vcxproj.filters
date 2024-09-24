@@ -115,6 +115,12 @@
     <Filter Include="Source Files\backend\model\construction">
       <UniqueIdentifier>{0d09d2a0-9793-47dc-90a1-775429bc19e3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\console">
+      <UniqueIdentifier>{15f65e3e-9bc9-4e95-8b4a-717a8edd7943}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\console">
+      <UniqueIdentifier>{15939b54-040a-4765-bb80-c9c6166b4686}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="brogue-hd.cpp">
@@ -255,9 +261,6 @@
     <ClCompile Include="brogueLevelProfile.cpp">
       <Filter>Source Files\backend\model</Filter>
     </ClCompile>
-    <ClCompile Include="accretionTiling.cpp">
-      <Filter>Source Files\backend\model\layout</Filter>
-    </ClCompile>
     <ClCompile Include="noiseGenerator.cpp">
       <Filter>Source Files\backend\generator</Filter>
     </ClCompile>
@@ -269,6 +272,21 @@
     </ClCompile>
     <ClCompile Include="graphAlgorithm.cpp">
       <Filter>Source Files\backend\math</Filter>
+    </ClCompile>
+    <ClCompile Include="brogueConsole.cpp">
+      <Filter>Source Files\console</Filter>
+    </ClCompile>
+    <ClCompile Include="developerConsole.cpp">
+      <Filter>Source Files\console</Filter>
+    </ClCompile>
+    <ClCompile Include="resourceConsole.cpp">
+      <Filter>Source Files\console</Filter>
+    </ClCompile>
+    <ClCompile Include="gameConsole.cpp">
+      <Filter>Source Files\console</Filter>
+    </ClCompile>
+    <ClCompile Include="resourceController.cpp">
+      <Filter>Source Files\backend\controller</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -455,9 +473,6 @@
     <ClInclude Include="dungeon.h">
       <Filter>Header Files\backend\model\game</Filter>
     </ClInclude>
-    <ClInclude Include="command.h">
-      <Filter>Header Files\backend\model\game</Filter>
-    </ClInclude>
     <ClInclude Include="blueprint.h">
       <Filter>Header Files\backend\model\layout</Filter>
     </ClInclude>
@@ -578,9 +593,6 @@
     <ClInclude Include="brogueLevelProfile.h">
       <Filter>Header Files\backend\model</Filter>
     </ClInclude>
-    <ClInclude Include="accretionTiling.h">
-      <Filter>Header Files\backend\model\layout</Filter>
-    </ClInclude>
     <ClInclude Include="accretionTile.h">
       <Filter>Header Files\backend\model\layout</Filter>
     </ClInclude>
@@ -617,5 +629,31 @@
     <ClInclude Include="brogueRoom.h">
       <Filter>Header Files\backend\model</Filter>
     </ClInclude>
+    <ClInclude Include="brogueConsole.h">
+      <Filter>Header Files\console</Filter>
+    </ClInclude>
+    <ClInclude Include="developerConsole.h">
+      <Filter>Header Files\console</Filter>
+    </ClInclude>
+    <ClInclude Include="resourceConsole.h">
+      <Filter>Header Files\console</Filter>
+    </ClInclude>
+    <ClInclude Include="gameConsole.h">
+      <Filter>Header Files\console</Filter>
+    </ClInclude>
+    <ClInclude Include="resourceController.h">
+      <Filter>Header Files\backend\controller</Filter>
+    </ClInclude>
+    <ClInclude Include="stringExtension.h">
+      <Filter>Header Files\backend\extension</Filter>
+    </ClInclude>
+    <ClInclude Include="command.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\resources\colors.csv">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

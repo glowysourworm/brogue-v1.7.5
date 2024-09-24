@@ -3,6 +3,9 @@
 #include "mathdef.h"
 #include "color.h"
 
+using namespace brogueHd::backend::math;
+using namespace brogueHd::backend::model::game;
+
 namespace brogueHd::backend::model::lighting
 {
 	typedef struct lightSource {

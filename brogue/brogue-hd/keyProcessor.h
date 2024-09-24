@@ -1,6 +1,7 @@
 #pragma once
 
 #include "broguefile.h"
+#include <map>
 
 using namespace std;
 
@@ -20,7 +21,7 @@ namespace brogueHd::backend::processor
 
 	private:
 
-		std::map<std::string, std::string> _keyMap;
+		std::map<std::string, std::string>* _keyMap;
 	};
 }
 

@@ -18,11 +18,8 @@ namespace brogueHd::backend::generator
 		brogueAssert(id == RANDOM_GENERATOR_MAIN || id == RANDOM_GENERATOR_COSMETIC)
 
 		_id = id;
-		_seed = seed;
-		_numbersGenerated = 0;
 
-		// Seed the generator for later use with rand()
-		srand(seed);
+		this->reset(seed);
 	}
 
 	randomGenerator::~randomGenerator()
@@ -39,6 +36,15 @@ namespace brogueHd::backend::generator
 		_numbersGenerated++;
 
 		return nextRand;
+	}
+
+	void randomGenerator::reset(unsigned long seed)
+	{
+		_seed = seed;
+		_numbersGenerated = 0;
+
+		// Seed the generator for later use with rand()
+		srand(seed);
 	}
 
 	int randomGenerator::range(int upperBound)
@@ -121,14 +127,6 @@ namespace brogueHd::backend::generator
 		}
 
 		return (total + lowerBound);
-	}
-
-	// Get a random int between lowerBound and upperBound, inclusive
-	float randomGenerator::uniform()
-	{
-		
-
-		return (rand_range(0, 99) < clamp(percent, 0, 100));
 	}
 
 	void randomGenerator::shuffleList(short* list, short listLength)

@@ -5,6 +5,7 @@
 
 namespace brogueHd::backend::model::game
 {
+/*
 	// Red		Green	Blue	RedRand	GreenRand	BlueRand	Rand	Dances?
 	// basic colors
 	const color whiteBrogue = { 100,	100,	100,	0,		0,			0,			0,		false };
@@ -291,7 +292,7 @@ namespace brogueHd::backend::model::game
 	//const color flameTitleColor = {0, 0, 0, 11, 11, 18, 0, true}; // *pale blue*
 	//const color flameTitleColor = {0, 0, 0, 15, 15, 9, 0, true}; // pale yellow
 	//const color flameTitleColor = {0, 0, 0, 15, 9, 15, 0, true}; // pale purple
-
+*/
 	// Color array was changed - creating a compiler errro
 	color* dynamicColors[NUMBER_DYNAMIC_COLORS][3] = {
 		// used color			shallow color				deep color

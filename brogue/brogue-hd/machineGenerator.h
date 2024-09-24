@@ -1,6 +1,12 @@
 #pragma once
 
 #include "linearGenerationParameters.h"
+#include "machineDeclaration.h"
+#include "machineConstants.h"
+#include "floorTileType.h"
+#include "machineFeature.h"
+#include "dungeonFeature.h"
+#include "dungeonDeclaration.h"
 #include "dungeonConstants.h"
 
 using namespace brogueHd::backend::model::game;

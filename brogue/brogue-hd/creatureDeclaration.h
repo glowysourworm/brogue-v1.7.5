@@ -2,6 +2,7 @@
 
 #include "dungeonDeclaration.h"
 #include "color.h"
+#include "mathdef.h"
 
 using namespace brogueHd::backend::model::game;
 
@@ -69,8 +70,9 @@ namespace brogueHd::backend::model::creature
 	// Defines all creatures, which include monsters and the player:
 	struct creatureInfo
 	{
-		enum creatureTypes monsterID; // index number for the monsterCatalog
-		char monsterName[COLS];
+		enum creatureTypes id; // index number for the monsterCatalog
+		char name[COLS];
+		char symbol;
 
 		short maxHP;
 		short defense;

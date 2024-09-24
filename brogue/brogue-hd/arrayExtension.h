@@ -9,6 +9,22 @@ using namespace std;
 namespace brogueHd::backend::extension
 {
 	/// <summary>
+	/// Definitions for most of the basic delegates in the extensions namespace
+	/// </summary>
+	template<typename T>
+	struct arrayDelegates
+	{
+	public:
+
+		/// <summary>
+		/// Definition of function to provide callback: 1) user can return iterationCallback 
+		/// value to either break, or continue the loop.
+		/// </summary>
+		/// <param name="value">callback (current) value</param>
+		typedef std::function<iterationCallback(T item)> callback;
+	};
+
+	/// <summary>
 	/// Iterates the specified collection and calls the user's callback
 	/// </summary>
 	template<typename T>
@@ -19,7 +35,7 @@ namespace brogueHd::backend::extension
 		/// </summary>
 		/// <param name="collection">simple array</param>
 		/// <param name="callback">(see extensionDelegates)</param>
-		static void forEach(const T collection[], extensionDelegates::simpleCallback callback)
+		static void forEach(const T collection[], arrayDelegates<T>::callback callback)
 		{
 			for (int index = 0; index < SIZEOF(collection); index++)
 			{

@@ -140,10 +140,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="accretionTiling.cpp" />
     <ClCompile Include="binarySearchTree.cpp" />
     <ClCompile Include="brogue-hd.cpp" />
     <ClCompile Include="brogueCell.cpp" />
+    <ClCompile Include="brogueConsole.cpp" />
     <ClCompile Include="brogueContentGrid.cpp" />
     <ClCompile Include="brogueCreature.cpp" />
     <ClCompile Include="brogueCreatureHorde.cpp" />
@@ -162,8 +162,10 @@
     <ClCompile Include="contentGenerator.cpp" />
     <ClCompile Include="creature.cpp" />
     <ClCompile Include="delaunayAlgorithm.cpp" />
+    <ClCompile Include="developerConsole.cpp" />
     <ClCompile Include="dijkstra.cpp" />
     <ClCompile Include="flare.cpp" />
+    <ClCompile Include="gameConsole.cpp" />
     <ClCompile Include="gameController.cpp" />
     <ClCompile Include="gameData.cpp" />
     <ClCompile Include="graph.cpp" />
@@ -188,15 +190,17 @@
     <ClCompile Include="primsAlgorithm.cpp" />
     <ClCompile Include="randomGenerator.cpp" />
     <ClCompile Include="gridRegion.cpp" />
+    <ClCompile Include="resourceConsole.cpp" />
+    <ClCompile Include="resourceController.cpp" />
     <ClCompile Include="roomGenerator.cpp" />
     <ClCompile Include="renderingController.cpp" />
     <ClCompile Include="terrainGenerator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="accretionTile.h" />
-    <ClInclude Include="accretionTiling.h" />
     <ClInclude Include="arrayExtension.h" />
     <ClInclude Include="boltEffectDeclaration.h" />
+    <ClInclude Include="brogueConsole.h" />
     <ClInclude Include="brogueContentGrid.h" />
     <ClInclude Include="brogueCreature.h" />
     <ClInclude Include="brogueCreatureHorde.h" />
@@ -211,9 +215,11 @@
     <ClInclude Include="creatureBehaviorDeclaration.h" />
     <ClInclude Include="creatureBehaviorMap.h" />
     <ClInclude Include="delaunayAlgorithm.h" />
+    <ClInclude Include="developerConsole.h" />
     <ClInclude Include="dungeonFeature.h" />
     <ClInclude Include="exceptionHandler.h" />
     <ClInclude Include="extensionDefinitions.h" />
+    <ClInclude Include="gameConsole.h" />
     <ClInclude Include="graph.h" />
     <ClInclude Include="graphAlgorithm.h" />
     <ClInclude Include="graphDefinitions.h" />
@@ -300,14 +306,20 @@
     <ClInclude Include="randomGenerator.h" />
     <ClInclude Include="playbackData.h" />
     <ClInclude Include="gridRegion.h" />
+    <ClInclude Include="resourceConsole.h" />
+    <ClInclude Include="resourceController.h" />
     <ClInclude Include="roomGenerator.h" />
     <ClInclude Include="renderingController.h" />
     <ClInclude Include="statusEffectDeclaration.h" />
+    <ClInclude Include="stringExtension.h" />
     <ClInclude Include="terrainDeclaration.h" />
     <ClInclude Include="terrainGenerator.h" />
     <ClInclude Include="triangle.h" />
     <ClInclude Include="vector.h" />
     <ClInclude Include="vectorExtension.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\resources\colors.csv" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

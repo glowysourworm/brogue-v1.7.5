@@ -37,8 +37,8 @@ namespace brogueHd::backend::generator
 		bool attemptConnection(accretionTile& roomTile, const gridRect& attemptRect, short interRoomPadding) const;
 
 		void designateMachineRooms();
-		graph<gridLocatorNode, gridLocatorEdge> triangulateRooms();
-		void connectRooms(graph<gridLocatorNode, gridLocatorEdge> delaunayGraph);
+		void triangulateRooms();
+		void connectRooms();
 		void createTerrain();
 
 		/// <summary>
@@ -52,6 +52,8 @@ namespace brogueHd::backend::generator
 		grid<gridLocator>* _grid;
 
 		std::vector<accretionTile>* _roomTiles;
+
+		graph<gridLocatorNode, gridLocatorEdge>* _delaunayGraph;
 
 		brogueLevelProfile _profile;
 

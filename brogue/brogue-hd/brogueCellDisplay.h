@@ -4,6 +4,7 @@
 #include "color.h"
 #include "broguedef.h"
 
+using namespace brogueHd::backend::model::game;
 using namespace brogueHd::backend::model::lighting;
 
 namespace brogueHd::backend::model::layout

@@ -1,7 +1,6 @@
 #include "levelProcessor.h"
 #include "brogueLevel.h"
 #include "colorConstants.h"
-#include "levelProcessorMethods.h"
 
 using namespace brogueHd::backend::processor::methods;
 
@@ -24,7 +23,7 @@ namespace brogueHd
 		short loc[2], i, j, x, y, px, py, flying, dir;
 		boolean placedPlayer;
 		creature* monst;
-		enum dungeonLayers layer;
+		dungeonLayers layer;
 		unsigned long timeAway;
 		short** mapToStairs;
 		short** mapToPit;

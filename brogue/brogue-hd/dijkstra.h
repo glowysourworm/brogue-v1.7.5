@@ -28,6 +28,28 @@ namespace brogueHd::backend::math
 	//	pdsLink links[DCOLS * DROWS];
 	//};
 
+	/// <summary>
+	/// Delegate definitions for working with dijkstra's map
+	/// </summary>
+	template<isGridLocator T>
+	struct dijkstraDelegates
+	{
+		/// <summary>
+		/// Decision predicate: calls user code to make a decision on the map
+		/// </summary>
+		typedef std::function<bool(short column, short row)> predicate;
+
+		/// <summary>
+		/// Cost predicate:  calls user code to provide a movement cost to the map
+		/// </summary>
+		typedef std::function<short(short column, short row)> costPredicate;
+
+		/// <summary>
+		/// Locator Callback:  Provides locator instances to the algorithm
+		/// </summary>
+		typedef std::function<T(short column, short row)> locatorCallback;
+	};
+
     template<isGridLocator T>
 	class dijkstra
 	{
@@ -42,13 +64,13 @@ namespace brogueHd::backend::math
 		dijkstra<T>::dijkstra(gridRect parentBoundary,
 							  gridRect relativeBoundary,
 						      bool obeyCardinalMovement,
-							  std::function<bool(short, short)> mapPredicate,
-							  std::function<short(short, short)> mapCostPredicate,
-							  std::function<T(short, short)> locatorCallback);
+							  dijkstraDelegates::predicate mapPredicate,
+							  dijkstraDelegates::costPredicate mapCostPredicate,
+							  dijkstraDelegates::locatorCallback locatorCallback);
 
         ~dijkstra();
 
-        void initialize(T source, T targets[], bool obeyCardinalMovement);
+        void initialize(T source, T targets[]);
 
 		/// <summary>
 		/// Runs Dijkstra's algorithm ONCE. WILL NOT RE-RUN.
@@ -115,10 +137,10 @@ namespace brogueHd::backend::math
 		T _sourceLocation;
 		T[] _targetLocations;
 
-        array2D<short>* _outputMap;
+        grid<short>* _outputMap;
 
-		array2D<bool>* _visitedMap;                        // Visited locations on the map
-		array2D<bool>* _locationMap;                       // Locations that have been added to the frontier
+		grid<bool>* _visitedMap;                        // Visited locations on the map
+		grid<bool>* _locationMap;                       // Locations that have been added to the frontier
 
         // Frontier BST for the map
 		binarySearchTree<float, std::map<T, T>>* _frontier;

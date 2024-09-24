@@ -19,7 +19,7 @@ namespace brogueHd::backend::math
     }
 
     template<isGridLocatorNode TNode, isGridLocatorEdge TEdge>
-    graph<TNode, TEdge> primsAlgorithm<TNode, TEdge>::run(const std::vector<TNode>& vertices)
+    graph<TNode, TEdge>* primsAlgorithm<TNode, TEdge>::run(const std::vector<TNode>& vertices)
     {
         if (vertices.count() < 3)
             return this->createDefaultGraph(vertices);
@@ -28,7 +28,7 @@ namespace brogueHd::backend::math
     }
 
     template<isGridLocatorNode TNode, isGridLocatorEdge TEdge>
-    graph<TNode, TEdge> primsAlgorithm<TNode, TEdge>::createMST(const std::vector<TNode>& vertices)
+    graph<TNode, TEdge>* primsAlgorithm<TNode, TEdge>::createMST(const std::vector<TNode>& vertices)
     {
         // NOTE*** The MST is being created on a graph of REGIONS. This will behave differently than a
         //         graph of vertices. So, the input graph should be the FULL GRAPH to avoid issues with

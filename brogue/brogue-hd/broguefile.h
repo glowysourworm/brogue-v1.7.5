@@ -101,8 +101,8 @@ namespace brogueHd::backend::model::io
 		enum BrogueEventType eventType;
 		signed long param1;
 		signed long param2;
-		boolean controlKey;
-		boolean shiftKey;
+		bool controlKey;
+		bool shiftKey;
 
 	public:
 
@@ -115,8 +115,8 @@ namespace brogueHd::backend::model::io
 			stream.write(reinterpret_cast<char*>(this->eventType), SIZEOF(BrogueEventType));
 			stream.write(reinterpret_cast<char*>(this->param1), SIZEOF(long));
 			stream.write(reinterpret_cast<char*>(this->param2), SIZEOF(long));
-			stream.write(reinterpret_cast<char*>(this->controlKey), SIZEOF(boolean));
-			stream.write(reinterpret_cast<char*>(this->shiftKey), SIZEOF(boolean));
+			stream.write(reinterpret_cast<char*>(this->controlKey), SIZEOF(bool));
+			stream.write(reinterpret_cast<char*>(this->shiftKey), SIZEOF(bool));
 		}
 
 		static brogueEvent deserialize(std::istream& stream)
@@ -126,8 +126,8 @@ namespace brogueHd::backend::model::io
 			stream.read(reinterpret_cast<char*>(&result.eventType), SIZEOF(BrogueEventType));
 			stream.read(reinterpret_cast<char*>(&result.param1), SIZEOF(long));
 			stream.read(reinterpret_cast<char*>(&result.param2), SIZEOF(long));
-			stream.read(reinterpret_cast<char*>(&result.controlKey), SIZEOF(boolean));
-			stream.read(reinterpret_cast<char*>(&result.shiftKey), SIZEOF(boolean));
+			stream.read(reinterpret_cast<char*>(&result.controlKey), SIZEOF(bool));
+			stream.read(reinterpret_cast<char*>(&result.shiftKey), SIZEOF(bool));
 
 			return result;
 		}

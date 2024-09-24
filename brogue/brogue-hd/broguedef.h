@@ -65,7 +65,7 @@ namespace brogueHd
 	#define brogueAssert(x)
 	#endif
 
-	#define boolean					char
+	//#define boolean					char
 
 	#define false					0
 	#define true					1

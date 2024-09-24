@@ -1,7 +1,18 @@
 #pragma once
 
-namespace brogueHd::backend::model::game
+namespace brogueHd
 {
+	enum brogueConsoleReturn
+	{
+		Continue = 0,
+		Completed = 1,
+		Completed_SetMode_Game = 2,
+		Completed_SetMode_Dev = 3,
+		Completed_SetMode_Resource = 4,
+		CompletedWithError = 5,
+		Exit = 6
+	};
+
 	enum NGCommands {
 		NG_NOTHING = 0,
 		NG_NEW_GAME,

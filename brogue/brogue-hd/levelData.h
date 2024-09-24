@@ -5,7 +5,7 @@ namespace brogueHd::backend::model
 	// Stores the necessary info about a level so it can be regenerated:
 	struct levelData 
 	{
-		boolean visited;
+		bool visited;
 		//pcell mapStorage[DCOLS][DROWS];
 		struct item* items;
 		struct creature* monsters;

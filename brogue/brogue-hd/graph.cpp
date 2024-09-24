@@ -3,6 +3,7 @@
 #include "arrayExtension.h"
 #include "graphDefinitions.h"
 #include "graph.h"
+#include "vectorExtension.h"
 
 namespace brogueHd::backend::math
 {
@@ -71,5 +72,23 @@ namespace brogueHd::backend::math
     TEdge& graph<TNode, TEdge>::findEdge(TNode* node1, TNode* node2)
     {
         return _edgeCollection->findEdge(node1, node2);
+    }
+
+    template<graphNodeType TNode, graphEdgeType TEdge>
+    void graph<TNode, TEdge>::iterateNodes(vectorDelegates<TNode>::callback callback)
+    {
+        vectorExtension<TNode>::forEach(_nodes, [](TNode node)
+        {
+            callback(node);
+        });
+    }
+
+    template<graphNodeType TNode, graphEdgeType TEdge>
+    void graph<TNode, TEdge>::iterateEdges(vectorDelegates<TEdge>::callback callback)
+    {
+        vectorExtension<TEdge>::forEach(_edgeCollection->getEdges(), [](TEdge edge)
+        {
+            callback(edge);
+        });
     }
 }

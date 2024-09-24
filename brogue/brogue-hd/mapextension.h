@@ -8,13 +8,34 @@ using namespace std;
 
 namespace brogueHd::backend::extension
 {
+	template<typename K, typename V>
+	struct mapDelegates
+	{
+		/// <summary>
+		/// Definition of simple predicate for any key-value map
+		/// </summary>
+		typedef std::function<bool(K key, V value)> predicate;
+
+		/// <summary>
+		/// Definition of function to provide callback: 1) user can return iterationCallback 
+		/// value to either break, or continue the loop.
+		/// </summary>
+		typedef std::function<iterationCallback(K key, V value)> callback;
+
+		/// <summary>
+		/// Definition of selector for the value type
+		/// </summary>
+		template<typename VResult>
+		typedef std::function<VResult(V value)> selector;
+	};
+
 	/// <summary>
 	/// Static methods to operate on the std::map data structure
 	/// </summary>
 	template<typename K, typename V, typename VResult>
 	struct mapExtension
 	{
-		static bool any(const std::map<K, V>& map, extensionMapDelegates::simplePredicate predicate)
+		static bool any(const std::map<K, V>& map, mapDelegates<K, V>::predicate predicate)
 		{
 			for (std::iterator it = map->begin(); it <= map->end(); it++)
 			{
@@ -25,7 +46,7 @@ namespace brogueHd::backend::extension
 			return false;
 		}
 
-		static K firstKey(const std::map<K, V>& map, extensionMapDelegates::simpleCallback callback)
+		static K firstKey(const std::map<K, V>& map, mapDelegates<K, V>::callback callback)
 		{
 			for (std::iterator it = map->begin(); it <= map->end(); it++)
 			{
@@ -36,7 +57,7 @@ namespace brogueHd::backend::extension
 			return NULL;
 		}
 
-		static void forEach(const std::map<K, V>& map, extensionMapDelegates::simpleCallback callback)
+		static void forEach(const std::map<K, V>& map, mapDelegates<K, V>::callback callback)
 		{
 			for (std::iterator it = map->begin(); it <= map->end(); it++)
 			{
@@ -45,7 +66,7 @@ namespace brogueHd::backend::extension
 			}
 		}
 
-		static K firstOrDefaultKey(const std::map<K, V>& map, extensionMapDelegates::simplePredicate predicate)
+		static K firstOrDefaultKey(const std::map<K, V>& map, mapDelegates<K, V>::predicate predicate)
 		{
 			for (std::iterator it = map->begin(); it <= map->end(); it++)
 			{
@@ -56,7 +77,7 @@ namespace brogueHd::backend::extension
 			return NULL;
 		}
 
-		static std::vector<VResult> selectFromValues(const std::map<K, V>& map, extensionMapDelegates::simpleSelector selector)
+		static std::vector<VResult> selectFromValues(const std::map<K, V>& map, mapDelegates<K, V>::selector selector)
 		{
 			std::vector<VResult> result;
 
