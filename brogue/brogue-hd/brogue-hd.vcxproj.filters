@@ -207,9 +207,6 @@
     <ClCompile Include="broguePlayer.cpp">
       <Filter>Source Files\backend\model</Filter>
     </ClCompile>
-    <ClCompile Include="array2D.cpp">
-      <Filter>Source Files\backend\model\layout</Filter>
-    </ClCompile>
     <ClCompile Include="brogueObject.cpp">
       <Filter>Source Files\backend\model</Filter>
     </ClCompile>
@@ -257,6 +254,21 @@
     </ClCompile>
     <ClCompile Include="brogueLevelProfile.cpp">
       <Filter>Source Files\backend\model</Filter>
+    </ClCompile>
+    <ClCompile Include="accretionTiling.cpp">
+      <Filter>Source Files\backend\model\layout</Filter>
+    </ClCompile>
+    <ClCompile Include="noiseGenerator.cpp">
+      <Filter>Source Files\backend\generator</Filter>
+    </ClCompile>
+    <ClCompile Include="delaunayAlgorithm.cpp">
+      <Filter>Source Files\backend\math</Filter>
+    </ClCompile>
+    <ClCompile Include="primsAlgorithm.cpp">
+      <Filter>Source Files\backend\math</Filter>
+    </ClCompile>
+    <ClCompile Include="graphAlgorithm.cpp">
+      <Filter>Source Files\backend\math</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -557,16 +569,52 @@
     <ClInclude Include="terrainGenerator.h">
       <Filter>Header Files\backend\generator</Filter>
     </ClInclude>
-    <ClInclude Include="array2DExtension.h">
-      <Filter>Header Files\backend\extension</Filter>
-    </ClInclude>
-    <ClInclude Include="array2D.h">
+    <ClInclude Include="gridExtension.h">
       <Filter>Header Files\backend\extension</Filter>
     </ClInclude>
     <ClInclude Include="brogueGameProfile.h">
       <Filter>Header Files\backend\model</Filter>
     </ClInclude>
     <ClInclude Include="brogueLevelProfile.h">
+      <Filter>Header Files\backend\model</Filter>
+    </ClInclude>
+    <ClInclude Include="accretionTiling.h">
+      <Filter>Header Files\backend\model\layout</Filter>
+    </ClInclude>
+    <ClInclude Include="accretionTile.h">
+      <Filter>Header Files\backend\model\layout</Filter>
+    </ClInclude>
+    <ClInclude Include="noiseGenerator.h">
+      <Filter>Header Files\backend\generator</Filter>
+    </ClInclude>
+    <ClInclude Include="gridLocator.h">
+      <Filter>Header Files\backend\model\layout</Filter>
+    </ClInclude>
+    <ClInclude Include="delaunayAlgorithm.h">
+      <Filter>Header Files\backend\math</Filter>
+    </ClInclude>
+    <ClInclude Include="gridLocatorNode.h">
+      <Filter>Header Files\backend\model\layout</Filter>
+    </ClInclude>
+    <ClInclude Include="gridLocatorEdge.h">
+      <Filter>Header Files\backend\model\layout</Filter>
+    </ClInclude>
+    <ClInclude Include="triangle.h">
+      <Filter>Header Files\backend\math</Filter>
+    </ClInclude>
+    <ClInclude Include="point.h">
+      <Filter>Header Files\backend\math</Filter>
+    </ClInclude>
+    <ClInclude Include="vector.h">
+      <Filter>Header Files\backend\math</Filter>
+    </ClInclude>
+    <ClInclude Include="primsAlgorithm.h">
+      <Filter>Header Files\backend\math</Filter>
+    </ClInclude>
+    <ClInclude Include="graphAlgorithm.h">
+      <Filter>Header Files\backend\math</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueRoom.h">
       <Filter>Header Files\backend\model</Filter>
     </ClInclude>
   </ItemGroup>

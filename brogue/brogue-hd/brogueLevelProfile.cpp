@@ -164,6 +164,11 @@ namespace brogueHd::backend::model
 		return brogueRoomInfo(roomType, roomFrequency, corridorFrequency);
 	}
 
+	brogueRoomInfo brogueLevelProfile::getEntranceRoom()
+	{
+		return _roomInfo->at(roomTypes::MainEntranceRoom);
+	}
+
 	brogueRoomInfo brogueLevelProfile::getRandomRoomInfo()
 	{
 		std::vector<short> weights = mapExtension<roomTypes, brogueRoomInfo, short>::selectFromValues(*_roomInfo, [](brogueRoomInfo info)

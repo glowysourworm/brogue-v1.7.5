@@ -11,7 +11,7 @@ namespace brogueHd::backend::extension
 	/// <summary>
 	/// Set of methods for iterating, querying, and working with vector iteration.
 	/// </summary>
-	template<typename T, typename V>
+	template<typename T>
 	struct vectorExtension 
 	{
 		/// <summary>
@@ -26,6 +26,56 @@ namespace brogueHd::backend::extension
 			}
 
 			return false;
+		}
+
+		template<typename TResult>
+		static std::vector<TResult> select(std::vector<T> collection, extensionDelegates<T>::simpleSelector selector)
+		{
+			std::vector<TResult> result;
+
+			for (int index = 0; index < collection.size(); index++)
+			{
+				result.push_back(selector(collection[index]));
+			}
+
+			return result;
+		}
+
+		/// <summary>
+		/// (ALTERS COLLECTION!) Removes and returns all elements that match the given predicate
+		/// </summary>
+		static std::vector<T> remove(std::vector<T>& collection, extensionDelegates<T>::simplePredicate predicate)
+		{
+			std::vector<T> result;
+
+			for (std::iterator it = collection.end(); it != collection.begin(); it--)
+			{
+				if (predicate(collection[index]))
+				{
+					result.push_back(collection.at(it));
+					collection.erase(it);
+				}
+			}
+
+			return result;
+		}
+
+		/// <summary>
+		/// Creates a collection EXCEPT for those that pass the predicate.
+		/// </summary>
+		static std::vector<T> except(const std::vector<T>&, extensionDelegates<T>::simplePredicate predicate)
+		{
+			std::vector<T> result;
+
+			for (std::iterator it = collection.begin(); it != collection.end(); it++)
+			{
+				if (!predicate(collection[index]))
+				{
+					result.push_back(collection.at(it));
+				}
+			}
+
+			return result;
 		}
 
 		/// <summary>
@@ -83,6 +133,59 @@ namespace brogueHd::backend::extension
 
 			return result;
 		}
+
+
+		/// <summary>
+		/// Makes a callback to the user function each time a distinc pair of elements if found
+		/// </summary>
+		static void distinctPairs(const std::vector<T>& collection1,
+								  const std::vector<T>& collection2,
+								  extensionDelegates::pairs callback)
+		{
+			std::map<T, std::map<T, T>> lookup;
+
+			for (int index1 = 0; index1 < collection1.size() ;index1++)
+			{
+				for (int index2 = 0; index2 < collection2.size(); index2++)
+				{
+					// Ignore equal items
+					if (collection1[index1] == collection2[index2])
+						continue;
+
+					// Ignore duplicate pairs (item1, item2)
+					if (lookup.contains(collection1[index1]) &&
+						lookup[collection1[index1]].contains(collection2[index2]))
+						continue;
+
+					// Ignore duplicate pairs (item2, item1)
+					if (lookup.contains(collection2[index2]) &&
+						lookup[collection2[index2]].contains(collection1[index1]))
+						continue;
+
+					else
+					{
+						// RESULT
+						callback(collection1[index1], collection2[index2]);
+
+						// Store lookup 1 -> 2
+						if (lookup.contains(key1))
+							lookup[collection1[index1]].insert(collection2[index2], collection2[index2]);
+
+						else
+							lookup.insert(collection1[index1], std::map<T, T>(){ { collection2[index2], collection2[index2] } };
+
+						// Store lookup 2 -> 1
+						if (lookup.contains(key2))
+							lookup[collection2[index2]].insert(collection1[index1], collection1[index1]);
+
+						else
+							lookup.insert(collection2[index2], std::map<T, T>() { { collection1[index1], collection1[index1] } };
+					}
+				}
+			}
+		}
+
+
 	};
 
 	template<typename T, typename V>

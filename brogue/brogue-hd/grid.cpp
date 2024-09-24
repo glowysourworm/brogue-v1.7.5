@@ -2,8 +2,8 @@
 #include "brogueMath.h"
 #include "gridRegion.h"
 #include "gridDefinitions.h"
+#include "gridExtension.h"
 #include "exceptionHandler.h"
-#include "array2D.h"
 #include <exception>
 
 using namespace std;
@@ -12,37 +12,41 @@ using namespace brogueHd::backend::math;
 
 namespace brogueHd::backend::model::layout
 {
-    template<gridCellConstraint T>
+    template<typename T>
     grid<T>::grid(gridRect parentBoundary, gridRect relativeBoundary)
     {
-        _grid = new array2D(parentBoundary, relativeBoundary);
+        _grid = new T*[relativeBoundary.width];
+
+        for (int index = 0; index < relativeBoundary.height; index++)
+            _grid[index] = new T[relativeBoundary.height];
+
+        _relativeBoundary = relativeBoundary;
+        _parentBoundary = parentBoundary;
     }
 
-    template<gridCellConstraint T>
+    template<typename T>
     grid<T>::~grid()
     {
         // Added grid cells from this class
-        //gridMethods::iterate(_grid, [](short column, short row)
-        //{
-        //    delete _grid->get(column, row);
-        //});
+        for (int index = 0; index < _relativeBoundary.height; index++)
+            delete[] _grid[index];
 
-        delete _grid;
+        delete[] _grid;
     }
 
-    template<gridCellConstraint T>
+    template<typename T>
     T grid<T>::get(short column, short row) const
     {
         return _grid->get(column, row);
     }
 
-    template<gridCellConstraint T>
+    template<typename T>
     T grid<T>::getOrNull(short column, short row) const
     {
         return _grid->get(column, row);
     }
 
-    template<gridCellConstraint T>
+    template<typename T>
     T grid<T>::getAdjacent(short column, short row, brogueCompass direction) const
     {
         switch (brogueCompass)
@@ -78,50 +82,112 @@ namespace brogueHd::backend::model::layout
         }
     }
 
-    template<gridCellConstraint T>
+    template<typename T>
+    gridLocator grid<T>::getAdjacentLocator(short column, short row, brogueCompass direction) const
+    {
+        switch (brogueCompass)
+        {
+        case brogueCompass::None:
+            return NULL;
+
+        case brogueCompass::N:
+            if (!this->isInBounds(column, row - 1))
+                return NULL:
+
+            return gridLocator(column, row - 1);
+
+        case brogueCompass::S:
+            if (!this->isInBounds(column, row + 1))
+                return NULL:
+
+            return gridLocator(column, row + 1);
+
+        case brogueCompass::E:
+            if (!this->isInBounds(column + 1, row))
+                return NULL:
+
+            return gridLocator(column + 1, row);
+
+        case brogueCompass::W:
+            if (!this->isInBounds(column - 1, row))
+                return NULL:
+
+            return gridLocator(column - 1, row);
+
+        case brogueCompass::NW:
+            if (!this->isInBounds(column - 1, row - 1))
+                return NULL:
+
+            return gridLocator(column - 1, row - 1);
+
+        case brogueCompass::NE:
+            if (!this->isInBounds(column + 1, row - 1))
+                return NULL:
+
+            return gridLocator(column + 1, row - 1);
+
+        case brogueCompass::SW:
+            if (!this->isInBounds(column - 1, row + 1))
+                return NULL:
+
+            return gridLocator(column - 1, row + 1);
+
+        case brogueCompass::SE:
+            if (!this->isInBounds(column + 1, row + 1))
+                return NULL:
+
+            return gridLocator(column + 1, row + 1);
+        default:
+            return NULL;
+        }
+    }
+
+    template<typename T>
     gridRect grid<T>::getRelativeBoundary() const
     {
-        return _grid->getRelativeBoundary();
+        return _relativeBoundary;
     }
 
-    template<gridCellConstraint T>
+    template<typename T>
+    gridRect grid<T>::getParentBoundary() const
+    {
+        return _parentBoundary;
+    }
+
+    template<typename T>
     bool grid<T>::isDefined(short column, short row) const
     {
-        return _grid->isDefined(column, row);
+        return _grid->get(column, row) != NULL;
     }
 
-    template<gridCellConstraint T>
+    template<typename T>
     bool grid<T>::isInBounds(short column, short row) const
     {
-        if (column < 0 ||
-            row < 0 ||
-            column > _columns - 1 ||
-            row > _rows - 1)
-            return false;
-
-        return true;
+        return _relativeBoundary.contains(column, row);
     }
 
-    template<gridCellConstraint T>
+    template<typename T>
     void grid<T>::set(short column, short row, T value)
     {
         if (column < 0 ||
             row < 0 ||
             column > _columns - 1 ||
             row > _rows - 1)
-            throw std::runtime_exception(std::string("Grid out of bounds:  grid.cpp"));
+            brogueException::show("Grid out of bounds:  grid.cpp");
 
-        // Clips the value for the grid (not sure how to handle all template situations). This
-        // seems to compile for the grid<short>.
-        //
-        if (value < _zeroValue)
-            _grid[column][row] = _zeroValue;
+        if (this->isDefined(column, row))
+            brogueException::show("Trying to overwrite grid value:  grid.cpp (use remove first)");
+            
+        _grid[column][row] = value;
+    }
 
-        else if (value > _maxValue)
-            _grid[column][row] = _maxValue;
-
-        else
-            _grid[column][row] = value;
+    template<typename T>
+    void grid<T>::setFromRegion(gridRegion<T>* region)
+    {
+        region->iterateLocations([](short column, short row, T item)
+        {
+            this->set(column, row, item);
+        });
     }
 
     // Fills grid locations with the given value if they match any terrain flags or map flags.
@@ -167,22 +233,8 @@ namespace brogueHd::backend::model::layout
     //    }
     //}
 
-    template<gridCellConstraint T>
-    short grid<T>::count(T value) 
-    {
-        short count = 0;
-
-        gridMethods::iterate(this, [](short column, short row)
-        {
-            if (_grid->get(column, row) == value)
-                count++;
-        });
-
-        return count;
-    }
-
-    template<gridCellConstraint T>
-    T grid<T>::search(extensionArray2DDelegates<T>::aggregateComparer aggregateComparator) const
+    template<typename T>
+    T grid<T>::search(gridDelegates<T>::aggregateComparer aggregateComparator) const
     {
         T searchValue;
         
@@ -195,7 +247,7 @@ namespace brogueHd::backend::model::layout
         return searchValue;
     }
 
-    template<gridCellConstraint T>
+    template<typename T>
     bool grid<T>::isEdge(short column, short row) const
     {
         return isEdge(column, row, [](short, short, T value) 
@@ -208,8 +260,8 @@ namespace brogueHd::backend::model::layout
     /// Returns true if the location is at the edge of the grid (using NULL comparison), or 
     /// the provided predicate.
     /// </summary>
-    template<gridCellConstraint T>
-    bool grid<T>::isEdge(short column, short row, extensionArray2DDelegates<T>::simplePredicate predicate) const
+    template<typename T>
+    bool grid<T>::isEdge(short column, short row, gridDelegates<T>::simplePredicate predicate) const
     {
         T north = this->getOrNull(column, row - 1);
         T south = this->getOrNull((column, row + 1);
@@ -230,8 +282,8 @@ namespace brogueHd::backend::model::layout
                 (southWest == NULL || (southWest != NULL && !predicate(column - 1, row + 1, southWest)));
     }
 
-    template<gridCellConstraint T>
-    bool grid<T>::isExposedEdge(int column, int row, brogueCompass direction, extensionArray2DDelegates<T>::simplePredicate predicate) const
+    template<typename T>
+    bool grid<T>::isExposedEdge(int column, int row, brogueCompass direction, gridDelegates<T>::simplePredicate predicate) const
     {
         T north = this->getOrNull(column, row - 1);
         T south = this->getOrNull((column, row + 1);
@@ -254,8 +306,8 @@ namespace brogueHd::backend::model::layout
             brogueException::show("Invalid use of direction parameter:  grid.isExposedEdge");
     }
 
-    template<gridCellConstraint T>
-    bool grid<T>::isExposedCorner(int column, int row, brogueCompass direction, extensionArray2DDelegates<T>::simplePredicate predicate) const
+    template<typename T>
+    bool grid<T>::isExposedCorner(int column, int row, brogueCompass direction, gridExtension<T>::simplePredicate predicate) const
     {
         if (direction == brogueCompass::NW)
             return isExposedEdge(grid, column, row, Compass.N, predicate) &&
@@ -277,7 +329,7 @@ namespace brogueHd::backend::model::layout
             brogueException::show("Invalid use of direction parameter:  grid.isExposedCorner");
     }
 
-    template<gridCellConstraint T>
+    template<typename T>
     bool grid<T>::areAdjacent(T location, T otherLocation) const
     {
         if (!this->isDefined(location.column, location.row))

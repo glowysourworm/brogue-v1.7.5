@@ -1,43 +1,299 @@
 #include "roomGenerator.h"
 #include "extensionDefinitions.h"
+#include "vectorExtension.h"
 #include "gridDefinitions.h"
-#include "gridMethods.h"
+#include "gridRegion.h"
+#include "brogueMath.h"
+#include "gridExtension.h"
 
+using namespace brogueHd::backend::math;
 using namespace brogueHd::backend::extension;
 using namespace brogueHd::backend::model::layout;
 
 namespace brogueHd::backend::generator
 {
-	void roomGenerator::designRandomRoom(grid<brogueCell*>* grid, const gridRect& roomBoundary, const dungeonProfile& roomProfile)
+	roomGenerator::roomGenerator(noiseGenerator* noiseGenerator, randomGenerator* randomGenerator)
 	{
+		_randomGenerator = randomGenerator;
+		_noiseGenerator = noiseGenerator;
 
+		// This gets changed during generation
+		gridRect paddedBoundary = gridRect(1, 1, DCOLS - 1, DROWS - 1);
+
+		// Brogue v1.7.5
+		float fillRatio = 0.55;
+		short birthCount = 6;
+		short survivalCount = 4;
+		short smoothingIterations = 5;	// This was a change:  Probably can get away with fewer iterations (was >= 10)
+
+		// CA Algorithm Parameters:  These are for the cavern room (Brogue v1.7.5)
+		_cavernParameters = new cellularAutomataParameters(paddedBoundary, fillRatio, birthCount, survivalCount, smoothingIterations);
 	}
-	void roomGenerator::designCavern(grid<brogueCell*>* grid, const gridRect& roomBoundary, const dungeonProfile& roomProfile)
-	{
 
+	roomGenerator::~roomGenerator()
+	{
+		delete _cavernParameters;
 	}
-	void roomGenerator::designEntranceRoom(grid<brogueCell*>* grid, const gridRect& roomBoundary, const dungeonProfile& roomProfile)
-	{
 
+	void roomGenerator::designCavern(gridRegionConstructor<gridLocator>& regionConstructor,
+										const gridRect& parentBoundary,
+										const gridRect& relativeBoundary,
+										const gridRect& minSize,
+										const gridRect& maxSize)
+	{
+		grid<gridLocator> designGrid(parentBoundary, relativeBoundary);
+		gridRegionLocator<gridLocator> regionLocator;
+
+		// Create cellular automata using cavern parameters
+		_noiseGenerator->cellularAutomata(*_cavernParameters, [&designGrid](short column, short row, bool result)
+		{			
+			if (result)
+				designGrid.set(column, row, brogueCell(column, row));
+		});
+
+		// Locate regions using flood fill method:  Find the max area region
+		gridRegion<gridLocator>* maxRegion;
+		std::vector<gridRegion<gridLocator>*> validRegions;
+
+		// (MEMORY) Locate Regions
+		std::vector<gridRegion<gridLocator>*> regions = regionLocator.locateRegions(designGrid);
+
+		// Filter regions to comply to size constraints
+		validRegions = vectorExtension<gridRegion<gridLocator>*>::where(regions, [&minSize, &maxSize](bool(gridRegion<T>* region))
+		{
+			return region->getBoundary().width >= minSize.width &&
+				   region->getBoundary().width <= maxSize.width &&
+				   region->getBoundary().height >= minSize.height &&
+				   region->getBoundary().height <= maxSize.height;
+		});
+
+		// Select largest area region from valid regions
+		maxRegion = vectorExtensionSelectors<gridRegion<gridLocator>*, long>::maxOf(validRegions, [](gridRegion<T>* region)
+		{
+			return region->getBoundary().area();
+		});
+
+		// Position the new cave in the middle of the grid...
+		gridRect blobBoundary = maxRegion->getBoundary();
+		gridRect caveBoundary = gridRect(maxSize.width - blobBoundary.width / 2,
+										 maxSize.height - blobBoundary.height / 2,
+										 blobBoundary.width,
+										 blobBoundary.height);
+
+		gridLocator translation(caveBoundary.column - blobBoundary.column, caveBoundary.row - blobBoundary.row);
+
+		// Mutator
+		maxRegion->translate(translation);
+		
+		// ...and copy it to the master grid.
+		maxRegion->iterateLocations([&regionConstructor](short column, short row, T cell)
+		{
+			regionConstructor.add(column, row, cell);
+		});
+
+		// (MEMORY) Don't need the region pointers. Data is alive in the regionConstructor
+		vectorExtension<gridRegion<gridLocator>*>::forEach(regions, [](gridRegion<T>* region)
+		{
+			delete region;
+		});
 	}
-	void roomGenerator::designCrossRoom(grid<brogueCell*>* grid, const gridRect& roomBoundary, const dungeonProfile& roomProfile)
-	{
 
+	void roomGenerator::designEntranceRoom(gridRegionConstructor<gridLocator>& regionConstructor)
+	{
+		short roomWidth, roomHeight, roomWidth2, roomHeight2, roomX, roomY, roomX2, roomY2;
+
+		roomWidth = 8;
+		roomHeight = 10;
+		roomWidth2 = 20;
+		roomHeight2 = 5;
+		roomX = DCOLS / 2 - roomWidth / 2 - 1;
+		roomY = DROWS - roomHeight - 2;
+		roomX2 = DCOLS / 2 - roomWidth2 / 2 - 1;
+		roomY2 = DROWS - roomHeight2 - 2;
+
+		gridRect room1(roomX, roomY, roomWidth, roomHeight);
+		gridRect room2(roomX2, roomY2, roomWidth2, roomHeight2);
+
+		// Add Room 1
+		gridRectExtension::iterate(room1, [&regionConstructor](short column, short row) ->
+		{
+			regionConstructor.addCell(column, row, brogueCell(column, row));
+		});
+
+		// Add Room 2
+		gridRectExtension::iterate(room2, [&regionConstructor](short column, short row)
+		{
+			regionConstructor.addCell(column, row, brogueCell(column, row));
+		});
 	}
-	void roomGenerator::designSymmetricalCrossRoom(grid<brogueCell*>* grid, const gridRect& roomBoundary, const dungeonProfile& roomProfile)
-	{
 
+	void roomGenerator::designCrossRoom(gridRegionConstructor<gridLocator>& regionConstructor)
+	{
+		short roomWidth, roomHeight, roomWidth2, roomHeight2, roomX, roomY, roomX2, roomY2;
+
+		roomWidth = _randomGenerator->rand_range(3, 12);
+		roomX = _randomGenerator->rand_range(max(0, DCOLS / 2 - (roomWidth - 1)), min(DCOLS, DCOLS / 2));
+		roomWidth2 = _randomGenerator->rand_range(4, 20);
+		roomX2 = (roomX + (roomWidth / 2) + _randomGenerator->rand_range(0, 2) + _randomGenerator->rand_range(0, 2) - 3) - (roomWidth2 / 2);
+
+		roomHeight = _randomGenerator->rand_range(3, 7);
+		roomY = (DROWS / 2 - roomHeight);
+
+		roomHeight2 = _randomGenerator->rand_range(2, 5);
+		roomY2 = (DROWS / 2 - roomHeight2 - (_randomGenerator->rand_range(0, 2) + _randomGenerator->rand_range(0, 1)));
+
+		gridRect room1(roomX - 5, roomY + 5, roomWidth, roomHeight);
+		gridRect room2(roomX2 - 5, roomY2 + 5, roomWidth2, roomHeight2);
+
+		// Add Room 1
+		gridRectExtension::iterate(room1, [&regionConstructor](short column, short row)
+		{
+			regionConstructor.addCell(column, row, brogueCell(column, row));
+		});
+
+		// Add Room 2
+		gridRectExtension::iterate(room2, [&regionConstructor](short column, short row)
+		{
+			regionConstructor.addCell(column, row, brogueCell(column, row));
+		});
 	}
-	void roomGenerator::designSmallRoom(grid<brogueCell*>* grid, const gridRect& roomBoundary, const dungeonProfile& roomProfile)
-	{
 
+	void roomGenerator::designSymmetricalCrossRoom(gridRegionConstructor<gridLocator>& regionConstructor)
+	{
+		short majorWidth, majorHeight, minorWidth, minorHeight;
+
+		majorWidth = _randomGenerator->rand_range(4, 8);
+		majorHeight = _randomGenerator->rand_range(4, 5);
+
+		minorWidth = _randomGenerator->rand_range(3, 4);
+		if (majorHeight % 2 == 0) {
+			minorWidth -= 1;
+		}
+		minorHeight = 3;//rand_range(2, 3);
+		if (majorWidth % 2 == 0) {
+			minorHeight -= 1;
+		}
+
+		gridRect room1((DCOLS - majorWidth) / 2, (DROWS - minorHeight) / 2, majorWidth, minorHeight);
+		gridRect room2((DCOLS - minorWidth) / 2, (DROWS - majorHeight) / 2, minorWidth, majorHeight);
+
+		// Add Room 1
+		gridRectExtension::iterate(room1, [&regionConstructor](short column, short row)
+		{
+			regionConstructor.addCell(column, row, brogueCell(column, row));
+		});
+
+		// Add Room 2
+		gridRectExtension::iterate(room2, [&regionConstructor](short column, short row)
+		{
+			regionConstructor.addCell(column, row, brogueCell(column, row));
+		});
 	}
-	void roomGenerator::designCircularRoom(grid<brogueCell*>* grid, const gridRect& roomBoundary, const dungeonProfile& roomProfile)
-	{
 
+	void roomGenerator::designSmallRoom(gridRegionConstructor<gridLocator>& regionConstructor)
+	{
+		short width, height;
+
+		width = _randomGenerator->rand_range(3, 6);
+		height = _randomGenerator->rand_range(2, 4);
+
+		gridRect room((DCOLS - width) / 2, (DROWS - height) / 2, width, height);
+
+		// Add Room
+		gridRectExtension::iterate(room, [&regionConstructor](short column, short row)
+		{
+			regionConstructor.addCell(column, row, brogueCell(column, row));
+		});
 	}
-	void roomGenerator::designChunkyRoom(grid<brogueCell*>* grid, const gridRect& roomBoundary, const dungeonProfile& roomProfile)
-	{
 
+	void roomGenerator::designCircularRoom(gridRegionConstructor<gridLocator>& regionConstructor, const gridRect& parentBoundary, const gridRect& relativeBoundary)
+	{
+		grid<bool> setGrid(parentBoundary, relativeBoundary);
+		short radius;
+
+		// 5% Chance
+		if (_randomGenerator->next() >= 0.05)
+		{
+			radius = _randomGenerator->rand_range(4, 10);
+		}
+		else
+		{
+			radius = _randomGenerator->rand_range(2, 4);
+		}
+
+		//drawCircleOnGrid(grid, DCOLS / 2, DROWS / 2, radius, 1);
+
+		gridRect setRect = gridRect::fromCircle(DCOLS / 2, DROWS / 2, radius, radius);
+
+		gridRectExtension::iterateInCircle(setRect, [&setGrid](short column, short row)
+		{
+			setGrid.set(column, row, true);
+		});
+
+		//if (radius > 6
+		//    && rand_percent(50)) {
+		//    drawCircleOnGrid(grid, DCOLS / 2, DROWS / 2, rand_range(3, radius - 3), 0);
+		//}
+
+		// 50%
+		if (radius > 6 && _randomGenerator->next() >= 0.5)
+		{
+			// TODO:  FIGURE OUT ZERO VALUE! (last parameter from above. probably chasm)
+
+			short removeRadius = _randomGenerator->rand_range(3, radius - 3);
+			gridRect removeRect = gridRect::fromCircle(DCOLS / 2 - removeRadius, DCOLS / 2 - removeRadius, removeRadius, removeRadius);
+
+			gridRectExtension::iterateInCircle(setRect, [&setGrid](short column, short row)
+			{
+				setGrid.set(column, row, false);
+			});
+		}
+	}
+
+	void roomGenerator::designChunkyRoom(gridRegionConstructor<gridLocator>& regionConstructor, const gridRect& parentBoundary, const gridRect& relativeBoundary)
+	{
+		short x, y;
+		short minX, maxX, minY, maxY;
+		short chunkCount = _randomGenerator->rand_range(2, 8);
+
+		grid<bool> setGrid(parentBoundary, parentBoundary);
+
+		// Set small room
+		gridRectExtension::iterateInCircle(gridRect(0, 0, 2, 2), [&setGrid, &regionConstructor](short column, short row)
+		{
+			setGrid.set(column, row, true);
+			regionConstructor.addCell(brogueCell(column, row));
+		});
+
+		minX = DCOLS / 2 - 3;
+		maxX = DCOLS / 2 + 3;
+		minY = DROWS / 2 - 3;
+		maxY = DROWS / 2 + 3;
+
+		for (short i = 0; i < chunkCount; i++)
+		{
+			x = _randomGenerator->rand_range(minX, maxX);
+			y = _randomGenerator->rand_range(minY, maxY);
+
+			if (setGrid.isDefined(x, y))
+			{
+				//            colorOverDungeon(&darkGray);
+				//            hiliteGrid(grid, &white, 100);
+
+				gridRectExtension::iterateInCircle(gridRect(x, y, 2, 2), [&setGrid, &regionConstructor](short column, short row)
+				{
+					setGrid.set(column, row, true);
+					regionConstructor.addCell(brogueCell(column, row));
+				});
+
+				minX = brogueMath<short>::max(1, brogueMath<short>::min(x - 3, minX));
+				maxX = brogueMath<short>::min(DCOLS - 2, brogueMath<short>::max(x + 3, maxX));
+				minY = brogueMath<short>::max(1, brogueMath<short>::min(y - 3, minY));
+				maxY = brogueMath<short>::min(DROWS - 2, brogueMath<short>::max(y + 3, maxY));
+
+				//            hiliteGrid(grid, &green, 50);
+				//            temporaryMessage("Added a chunk:", true);
+			}
+		}
 	}
 }

@@ -13,7 +13,7 @@ namespace brogueHd::backend::math
 	/// <summary>
 	/// Defines an edge collection for a graph. Type definitions are similar to the graph.
 	/// </summary>
-    template<GraphEdgeCollectionTemplate>
+    template<graphNodeType TNode, graphEdgeType TEdge>
 	class graphEdgeCollection
 	{
 	public:

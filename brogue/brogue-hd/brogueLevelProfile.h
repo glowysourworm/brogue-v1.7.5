@@ -19,6 +19,7 @@ namespace brogueHd::backend::model
 		~brogueLevelProfile();
 
 		brogueRoomInfo getRandomRoomInfo();
+		brogueRoomInfo getEntranceRoom();
 
 	private:
 

@@ -8,12 +8,12 @@ using namespace brogueHd::backend::model::layout;
 
 namespace brogueHd::backend::model::construction
 {
-    template<gridCellConstraint T>
+    template<isGridLocator T>
     class gridRegionConstructor
     {
     public:
 
-        gridRegionConstructor(gridRect parentBoundary, gridDelegates::gridPredicate inclusionPredicate);
+        gridRegionConstructor(gridRect parentBoundary, gridDelegates<T>::predicate inclusionPredicate);
         ~gridRegionConstructor();
 
         /// <summary>
@@ -24,14 +24,24 @@ namespace brogueHd::backend::model::construction
         /// <summary>
         /// Adds new cell to the region, and updates collections.
         /// </summary>
-        void addCell(T cell);
+        void add(short column, short row, T item);
+
+        /// <summary>
+        /// Sets new cells in the grid using the parameterless constructor
+        /// </summary>
+        void add(const grid<T>& grid);
+
+        /// <summary>
+        /// Sets new cells in the grid using the parameterless constructor
+        /// </summary>
+        void add(T* itemArray);
 
     private:
 
-        array2D<T>* complete();
-        bool isConnected(T cell);
-        void addEdges(T cell);
-        void addBoundary(T cell);
+        void completeImpl();
+        bool isConnected(short column, short row, T item);
+        void addEdges(short column, short row, T item);
+        void addBoundary(short column, short row, T item);
         void validate();
         void validateRegionCollection(std::map<T, T> collection);
         gridRect calculateLargestRectangle();

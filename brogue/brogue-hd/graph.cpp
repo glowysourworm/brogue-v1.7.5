@@ -6,8 +6,8 @@
 
 namespace brogueHd::backend::math
 {
-    template<GraphTemplate>
-    graph<TValue, TWeight, TNode, TEdge>::graph(const TNode* nodes, const TEdge* edges)
+    template<graphNodeType TNode, graphEdgeType TEdge>
+    graph<TNode, TEdge>::graph(const TNode* nodes, const TEdge* edges)
     {
         _nodes = new std::vector<TNode*>(nodes);
         _edgeCollection = new graphEdgeCollection(nodes, edges);
@@ -17,15 +17,25 @@ namespace brogueHd::backend::math
         //    _nodes->push_back(node);
         //});
     }
-    template<GraphTemplate>
-    graph<TValue, TWeight, TNode, TEdge>::~graph()
+
+    template<graphNodeType TNode, graphEdgeType TEdge>
+    graph<TNode, TEdge>::graph(const TNode* nodes)
+    {
+        TEdge edges[0];
+
+        _nodes = new std::vector<TNode*>(nodes);
+        _edgeCollection = new graphEdgeCollection(nodes, &edges);
+    }
+
+    template<graphNodeType TNode, graphEdgeType TEdge>
+    graph<TNode, TEdge>::~graph()
     {
         delete _nodes;
         delete _edgeCollection;
     }
 
-    template<GraphTemplate>
-    void graph<TValue, TWeight, TNode, TEdge>::addEdge(TEdge* edge)
+    template<graphNodeType TNode, graphEdgeType TEdge>
+    void graph<TNode, TEdge>::addEdge(TEdge* edge)
     {
         if (!vectorExtension::contains(_nodes, edge->node1))
             _nodes->push_back(edge->node1);
@@ -36,8 +46,8 @@ namespace brogueHd::backend::math
         _edgeCollection->addEdge(edge);
     }
 
-    template<GraphTemplate>
-    void graph<TValue, TWeight, TNode, TEdge>::modify(TEdge* existingEdge, TEdge* newEdge)
+    template<graphNodeType TNode, graphEdgeType TEdge>
+    void graph<TNode, TEdge>::modify(TEdge* existingEdge, TEdge* newEdge)
     {
         if (vectorExtension::contains(_nodes, edge->node1))
             _nodes->erase(edge->node1);
@@ -51,14 +61,14 @@ namespace brogueHd::backend::math
         this->addEdge(newEdge);
     }
 
-    template<GraphTemplate>
-    TEdge& graph<TValue, TWeight, TNode, TEdge>::getAdjacentEdges(TNode* node)
+    template<graphNodeType TNode, graphEdgeType TEdge>
+    TEdge& graph<TNode, TEdge>::getAdjacentEdges(TNode* node)
     {
         return _edgeCollection->getAdjacentEdges(node);
     }
 
-    template<GraphTemplate>
-    TEdge& graph<TValue, TWeight, TNode, TEdge>::findEdge(TNode* node1, TNode* node2)
+    template<graphNodeType TNode, graphEdgeType TEdge>
+    TEdge& graph<TNode, TEdge>::findEdge(TNode* node1, TNode* node2)
     {
         return _edgeCollection->findEdge(node1, node2);
     }

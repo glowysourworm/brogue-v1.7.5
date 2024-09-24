@@ -1,18 +1,20 @@
 #pragma once
 
-#include "mapextension.h"
+#include "mapExtension.h"
+#include "gridExtension.h"
 #include "gridRect.h"
 #include "gridDefinitions.h"
 #include "gridRegionConstructor.h"
 #include "exceptionHandler.h"
+#include "vectorExtension.h"
 
 using namespace brogueHd::backend::extension;
 using namespace brogueHd::backend::model::layout;
 
 namespace brogueHd::backend::model::construction
 {
-    template<gridCellConstraint T>
-    gridRegionConstructor<T>::gridRegionConstructor(gridRect parentBoundary, gridDelegates::gridPredicate inclusionPredicate)
+    template<isGridLocator T>
+    gridRegionConstructor<T>::gridRegionConstructor(gridRect parentBoundary, gridDelegates<T>::predicate inclusionPredicate)
     {
         // This component is pretty much free-standing
         // _regionCentroidCalculator = IocContainer.Get<IRegionCentroidCalculator>();
@@ -30,16 +32,16 @@ namespace brogueHd::backend::model::construction
         _completed = false;
     }
 
-    template<gridCellConstraint T>
+    template<isGridLocator T>
     gridRegionConstructor<T>::~gridRegionConstructor()
     {
         delete _grid;
     }
 
-    template<gridCellConstraint T>
+    template<isGridLocator T>
     gridRegion<T>* gridRegionConstructor<T>::complete()
     {
-        complete();
+        completeImpl();
         validate();
 
         //var centroids = _regionCentroidCalculator.CalculateCentroidLocations(regionInfo);
@@ -62,8 +64,8 @@ namespace brogueHd::backend::model::construction
                                         largestSubRectangle);
     }
 
-    template<gridCellConstraint T>
-    void gridRegionConstructor<T>::addCell(T cell)
+    template<isGridLocator T>
+    void gridRegionConstructor<T>::add(short column, short row, T item)
     {
         if (_completed)
             brogueException::show("Trying to add location to a completed region constructor:  gridRegionConstructor.addCell");
@@ -85,118 +87,129 @@ namespace brogueHd::backend::model::construction
         }
     }
 
-    template<gridCellConstraint T>
-    array2D<T>* gridRegionConstructor<T>::complete()
+    template<isGridLocator T>
+    void gridRegionConstructor<T>::add(const grid<T>& grid)
+    {
+        gridRegionCosntructor<T>* that = this;
+
+        array2DExtension<T>::iterate(grid, [&that](short column, short row, T item)
+        {
+            if (item != NULL)
+                that->add(column, row, item);
+        });
+    }
+
+    template<isGridLocator T>
+    void gridRegionConstructor<T>::add(T* locators)
+    {
+        for (int index = 0; index < SIZEOF(locators); index++)
+        {
+            this->add(locators[index].column, locators[index].row, locators[index]);
+        }
+    }
+
+    template<isGridLocator T>
+    void gridRegionConstructor<T>::completeImpl()
     {
         if (_completed)
             return;
 
         _calculatedBoundary = gridRect(_left, _top, _right, _bottom);
 
-        // Create the final grid and edge grid according to the final boundary
-        array2D<T> resultGrid(_parentBoundary, _calculatedBoundary);
-
-        forEach(_locations, [](T key, T value) 
-        {
-            resultGrid[key.column, key.row] = key;
-        });
-
-        // Iterate twice to add the proper edges
+        // Complete the edge collections
         forEach(_locations, [](T key, T value)
         {
             addEdges(key);
         });
 
         _completed = true;
-
-        return resultGrid;
     }
 
-    template<gridCellConstraint T>
-    bool gridRegionConstructor<T>::isConnected(T location)
+    template<isGridLocator T>
+    bool gridRegionConstructor<T>::isConnected(short column, short row, T item)
     {
         // ONE of the adjacent elements MUST be in the grid - using the predicate to verify
-        T north = _grid.getAdjacent(location.column, location.row, brogueCompass::N);
-        T south = _grid.getAdjacent(location.column, location.row, brogueCompass::S);
-        T east = _grid.getAdjacent(location.column, location.row, brogueCompass::E);
-        T west = _grid.getAdjacent(location.column, location.row, brogueCompass::W);
+        T north = _grid.getAdjacent(column, row, brogueCompass::N);
+        T south = _grid.getAdjacent(column, row, brogueCompass::S);
+        T east = _grid.getAdjacent(column, row, brogueCompass::E);
+        T west = _grid.getAdjacent(column, row, brogueCompass::W);
 
-        if (north != NULL && _predicate(north.column, north.row, north))
+        if (north != NULL && _predicate(column, row - 1, north))
             return true;
 
-        if (south != NULL && _predicate(south.column, south.row, south))
+        if (south != NULL && _predicate(column, row + 1, south))
             return true;
 
-        if (east != NULL && _predicate(east.column, east.row, east))
+        if (east != NULL && _predicate(column + 1, row, east))
             return true;
 
-        if (west != NULL && _predicate(west.column, west.row, west))
+        if (west != NULL && _predicate(column - 1, row, west))
             return true;
 
         return false;
     }
 
-    template<gridCellConstraint T>
-    void gridRegionConstructor<T>::addEdges(T location)
+    template<isGridLocator T>
+    void gridRegionConstructor<T>::addEdges(short column, short row, T item)
     {
         // Edges and Corners
-        if (_grid.isEdge(location.column, location.row, _predicate))
+        if (_grid.isEdge(column, row, _predicate))
         {
             _edgeLocations.insert(location, location);
 
             // Check for specificity:  Storing addition information about exposed edges, corners, and geometry
 
             // N
-            if (_grid->isExposedEdge(location.column, location.row, brogueCompass::N, _predicate))
+            if (_grid->isExposedEdge(column, row, brogueCompass::N, _predicate))
                 _northEdges.insert(location, location);
 
             // S
-            if (_grid->isExposedEdge(location.column, location.row, brogueCompass::S, _predicate))
+            if (_grid->isExposedEdge(column, row, brogueCompass::S, _predicate))
                 _southEdges.insert(location, location);
 
             // E
-            if (_grid->isExposedEdge(location.column, location.row, brogueCompass::E, _predicate))
+            if (_grid->isExposedEdge(column, row, brogueCompass::E, _predicate))
                 _eastEdges.insert(location, location);
 
             // W
-            if (_grid->isExposedEdge(location.column, location.row, brogueCompass::W, _predicate))
+            if (_grid->isExposedEdge(column, row, brogueCompass::W, _predicate))
                 _westEdges.insert(location, location);
 
             // NW Corner
-            if (_grid->isExposedCorner(location.column, location.row, brogueCompass::NW, _predicate))
+            if (_grid->isExposedCorner(column, row, brogueCompass::NW, _predicate))
                 _nwCorners.insert(location, location);
 
             // NE Corner
-            if (_grid->isExposedCorner(location.column, location.row, brogueCompass::NE, _predicate))
+            if (_grid->isExposedCorner(column, row, brogueCompass::NE, _predicate))
                 _neCorners.insert(location, location);
 
             // SE Corner
-            if (_grid->isExposedCorner(location.column, location.row, brogueCompass::SE, _predicate))
+            if (_grid->isExposedCorner(column, row, brogueCompass::SE, _predicate))
                 _seCorners.insert(location, location);
 
             // SW Corner
-            if (_grid->isExposedCorner(location.column, location.row, brogueCompass::SW, _predicate))
+            if (_grid->isExposedCorner(column, row, brogueCompass::SW, _predicate))
                 _swCorners.insert(location, location);
         }
     }
 
-    template<gridCellConstraint T>
-    void gridRegionConstructor<T>::addBoundary(T location)
+    template<isGridLocator T>
+    void gridRegionConstructor<T>::addBoundary(short column, short row, T item)
     {
-        if (location.Column < _left)
+        if (column < _left)
             _left = location.Column;
 
-        if (location.Column > _right)
+        if (column > _right)
             _right = location.Column;
 
-        if (location.Row < _top)
+        if (row < _top)
             _top = location.Row;
 
-        if (location.Row > _bottom)
+        if (row > _bottom)
             _bottom = location.Row;
     }
 
-    template<gridCellConstraint T>
+    template<isGridLocator T>
     void gridRegionConstructor<T>::validate()
     {
         forEach(_locations, [](T key, T value)
@@ -218,14 +231,14 @@ namespace brogueHd::backend::model::construction
         validateRegionCollection("SW Corner Locations", _swCorners);
     }
 
-    template<gridCellConstraint T>
+    template<isGridLocator T>
     void gridRegionConstructor<T>::validateRegionCollection(std::map<T, T> collection)
     {
         if (collection.count() <= 0)
             brogueException::show("Collection for building regions is not valid:  gridRegionConstructor.validate");
     }
 
-    template<gridCellConstraint T>
+    template<isGridLocator T>
     gridRect gridRegionConstructor<T>::calculateLargestRectangle()
     {
         // Procedure

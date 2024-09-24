@@ -13,12 +13,15 @@ namespace brogueHd::backend::math
     /// </summary>
     /// <typeparam name="TValue">Type for the node value</typeparam>
     /// <typeparam name="TWeight">Type for the node weight</typeparam>
-    template<GraphTemplate>
+    //template<GraphTemplate>
+
+    template<graphNodeType TNode, graphEdgeType TEdge>
     class graph
     {
     public:
 
         graph(const TNode* nodes, const TEdge* edges);
+        graph(const TNode* nodes);
         ~graph();
 
         void addEdge(TEdge* edge);

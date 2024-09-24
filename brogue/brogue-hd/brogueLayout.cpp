@@ -1,5 +1,5 @@
 #include "brogueLayout.h"
-#include "gridMethods.h"
+#include "array2DExtension.h"
 #include "gridDefinitions.h"
 #include "brogueCell.h"
 
@@ -42,87 +42,6 @@ namespace brogueHd::backend::model
 	brogueCell* brogueLayout::getCell(short column, short row) const
 	{
 		//return _grid->get(column, row);
-	}
-
-	void brogueLayout::addCell(short column, short row)
-	{
-		//brogueAssert(_brogueGrid[column][row] == NULL);
-
-		//// Be sure to clean up memory on remove...
-		////
-		//_grid->set(column, row, new brogueCell());
-	}
-
-	void brogueLayout::addCells(array2D<short>* region, function<bool(short)> predicate)
-	{
-		//brogueGrid* that = this;
-
-		//// javascript... 
-		//iterateIn(region, region->getBoundary(), [that, region, predicate](short column, short row)
-		//{
-		//	if (predicate(region->get(column, row)))
-		//		that->addCell(column, row);
-		//});
-	}
-
-	void brogueLayout::addCells(gridRect boundary)
-	{
-		//brogueGrid* that = this;
-
-		//iterate(boundary, [that](short column, short row)
-		//{
-		//	that->addCell(column, row);
-		//});
-	}
-
-	void brogueLayout::addCellsInCircle(gridRect boundary)
-	{
-		//brogueAssert(boundary.width == boundary.height);
-
-		//brogueGrid* that = this;
-
-		//// Need to use this function for creating new instances of the value. TODO: Craft a class
-		//// hierarchy that includes instance factory.
-		////
-		//iterateInCircle(_grid, boundary, [that](short column, short row)
-		//{
-		//	if (!that->isDefined(column, row))
-		//		that->addCell(column, row);
-		//});
-	}
-
-	void brogueLayout::removeCell(short column, short row)
-	{
-		//if (this->isDefined(column, row))
-		//{
-		//	// Delete memory for the brogueCell instance
-		//	//
-		//	delete _grid->get(column, row);
-		//}
-	}
-
-	void brogueLayout::removeCells(gridRect boundary)
-	{
-		//brogueGrid* that = this;
-
-		//iterateIn(_grid, boundary, [that](short column, short row)
-		//{
-		//	if (that->isDefined(column, row))
-		//		that->removeCell(column, row);
-		//});
-	}
-
-	void brogueLayout::removeCellsInCircle(gridRect boundary)
-	{
-		//brogueAssert(boundary.width == boundary.height);
-
-		//brogueGrid* that = this;
-
-		//iterateInCircle(_grid, boundary, [that](short column, short row)
-		//{
-		//	if (that->isDefined(column, row))
-		//		that->removeCell(column, row);
-		//});
 	}
 
 	void brogueLayout::iterateAdjacentCells(short column, short row, function<bool(short, short, brogueCell*)> callback)

@@ -4,7 +4,7 @@
 #include "grid.h"
 #include "exceptionHandler.h"
 #include "gridDefinitions.h"
-#include "iteratordef.h"
+#include "extensionDefinitions.h"
 #include <vector>
 
 using namespace std;
@@ -14,9 +14,8 @@ using namespace brogueHd::backend::model::layout;
 namespace brogueHd::backend::model::construction
 {
     template<gridCellConstraint T>
-    gridRegionLocator<T>::gridRegionLocator(const grid<T>*& grid)
+    gridRegionLocator<T>::gridRegionLocator()
     {
-        _grid = grid;
     }
 
     template<gridCellConstraint T>
@@ -26,18 +25,18 @@ namespace brogueHd::backend::model::construction
     }
 
     template<gridCellConstraint T>
-    std::vector<gridRegion<T>*> gridRegionLocator<T>::locateRegions()
+    std::vector<gridRegion<T>*> gridRegionLocator<T>::locateRegions(const grid<T>& grid)
     {
-        return locateRegions([](short column, short row, T value)
+        return locateRegions(grid, [](short column, short row, T value)
         {
             return value != NULL;
         });
     }
 
     template<gridCellConstraint T>
-    std::vector<gridRegion<T>*> gridRegionLocator<T>::locateRegions(gridDelegates::gridPredicate inclusionPredicate)
+    std::vector<gridRegion<T>*> gridRegionLocator<T>::locateRegions(const grid<T>& grid, extensionDelegates<T>::simplePredicate inclusionPredicate)
     {
-        std::vector<gridRegion<T>*> result;
+        std::vector<gridRegion<T>> result;
 
         // Procedure
         //
@@ -45,7 +44,7 @@ namespace brogueHd::backend::model::construction
         //      -> Callback (over history) to see if this location is in predicate
         //      -> Be sure we have not already visited this (new) region
         //
-        iterate(_grid, [](short column, short row)
+        iterate(grid, [](short column, short row)
         {
             // Check history
             for (int index = 0; index < result.size(); index++)
@@ -56,7 +55,7 @@ namespace brogueHd::backend::model::construction
             }
 
             // Check to see if we're at a valid location
-            if (inclusionPredicate(_grid[column, row]))
+            if (inclusionPredicate(grid[column, row]))
             {
                 // Start a new region
                 grid<T>* regionGrid = new grid<T>(_columns, _rows);
@@ -82,7 +81,25 @@ namespace brogueHd::backend::model::construction
     }
 
     template<gridCellConstraint T>
-    gridRegionConstructor<T>* gridRegionLocator<T>::runFloodFill(short column, short row, gridDelegates::gridPredicate inclusionPredicate)
+    gridRegion<T>* gridRegionLocator<T>::identifyRegion(const grid<T>& grid, short column, short row, extensionDelegates<T>::simplePredicate inclusionPredicate)
+    {
+        if (!grid->isDefined(column, row))
+            return NULL;
+
+        // Create the constructor
+        gridRegionConstructor<T>* constructor = this->runFloodFill(column, row, inclusionPredicate);
+
+        // Validate -> Setup Region
+        gridRegion<T>* finalRegion = constructor->complete();
+
+        // MEMORY!
+        delete constructor;
+
+        return finalRegion;
+    }
+
+    template<gridCellConstraint T>
+    gridRegionConstructor<T>* gridRegionLocator<T>::runFloodFill(const grid<T>& grid, short column, short row, extensionDelegates<T>::simplePredicate inclusionPredicate)
     {
         if (!_grid->isDefined(column, row) || !predicate(column, row, _grid->get(column, row)))
             brogueException::show("Trying to start FloodFill in non-region location");
@@ -97,7 +114,7 @@ namespace brogueHd::backend::model::construction
         std::list<T> resultQueue;
 
         // Process the first location
-        T firstElement = _grid->get(column, row);
+        T firstElement = grid->get(column, row);
 
         resultQueue.push_back(firstElement);
         regionGrid[column, row] = firstElement;
@@ -120,10 +137,10 @@ namespace brogueHd::backend::model::construction
             regionConstructor.addCell(regionLocation);
 
             // Search cardinally adjacent cells (N,S,E,W)
-            T north = _grid->get(regionLocation.column, regionLocation.row - 1);
-            T south = _grid->get(regionLocation.column, regionLocation.row + 1);
-            T east = _grid->get(regionLocation.column + 1, regionLocation.row);
-            T west = _grid->get(regionLocation.column - 1, regionLocation.row);
+            T north = grid->get(regionLocation.column, regionLocation.row - 1);
+            T south = grid->get(regionLocation.column, regionLocation.row + 1);
+            T east = grid->get(regionLocation.column + 1, regionLocation.row);
+            T west = grid->get(regionLocation.column - 1, regionLocation.row);
 
             // Procedure: DON'T SET RESULT ARRAYS HERE
             //

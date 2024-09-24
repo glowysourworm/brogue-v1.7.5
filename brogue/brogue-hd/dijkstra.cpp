@@ -1,7 +1,5 @@
 #include "dijkstra.h"
 #include "gridRect.h"
-#include "vectordef.h"
-#include "gridMethods.h"
 #include "exceptionHandler.h"
 #include "mapextension.h"
 #include "binarySearchTree.h"
@@ -14,7 +12,7 @@ using namespace brogueHd::backend::model::layout;
 namespace brogueHd::backend::math
 {
 
-	template<gridCellConstraint T>
+	template<isGridLocator T>
 	dijkstra<T>::dijkstra(gridRect parentBoundary,
 						  gridRect relativeBoundary,
 						  bool obeyCardinalMovement,
@@ -37,7 +35,7 @@ namespace brogueHd::backend::math
 		_frontier = new binarySearchTree<float, std::map<T, T>>();
 	}
 
-	template<gridCellConstraint T>
+	template<isGridLocator T>
 	dijkstra<T>::~dijkstra()
 	{
 		delete _outputMap;
@@ -47,7 +45,7 @@ namespace brogueHd::backend::math
 		delete _frontier;
 	}
 
-	template<gridCellConstraint T>
+	template<isGridLocator T>
 	void dijkstra<T>::initialize(T source, T targets[], bool obeyCardinalMovement)
 	{
 		_sourceLocation = sourceLocation;
@@ -83,7 +81,7 @@ namespace brogueHd::backend::math
 		_finished = false;
 	}
 
-	template<gridCellConstraint T>
+	template<isGridLocator T>
 	void dijkstra<T>::run()
 	{
 		if (!_initialized)
@@ -257,7 +255,7 @@ namespace brogueHd::backend::math
 		_finished = true;
 	}
 
-	template<gridCellConstraint T>
+	template<isGridLocator T>
 	T* dijkstra<T>::getResultPath(T targetLocation)
 	{
 		if (!_finished)
@@ -266,7 +264,7 @@ namespace brogueHd::backend::math
 		return _completedPaths[targetLocation];
 	}
 
-	template<gridCellConstraint T>
+	template<isGridLocator T>
 	T* dijkstra<T>::generatePath(T targetLocation)
 	{
 		if (!contains(_targetLocations, targetLocation))
@@ -390,7 +388,7 @@ namespace brogueHd::backend::math
 		return resultArray;
 	}
 
-	template<gridCellConstraint T>
+	template<isGridLocator T>
 	void dijkstra<T>::updateOutputMap(float currentWeight, int destColumn, int destRow, int sourceColumn, int sourceRow)
 	{
 		// Procedure

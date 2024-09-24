@@ -6,22 +6,36 @@
 
 namespace brogueHd::backend::math
 {
-	template<typename TNode, typename TValue>
-	concept graphNodeType = requires(TNode a, TValue b)
+	// Abstract graph constraints
+	template<typename TNode>
+	concept graphNodeType = requires(TNode a)
 	{
-		{ a } -> std::convertible_to<graphNode<TValue>>;
+		{ a } -> std::convertible_to<graphNode>;
 	};
 
-	template<typename TEdge, typename TNode, typename TWeight, typename TValue>
-	concept graphEdgeType = requires(TEdge a, TNode b)
+	template<typename TEdge>
+	concept graphEdgeType = requires(TEdge a)
 	{
-		{ a } -> std::convertible_to<graphEdge<TWeight, TValue>>;
-		{ b } -> std::convertible_to<graphNode<TValue>>;
+		{ a } -> std::convertible_to<graphEdge>;
 	};
 
-	// This template got a little unruly
-	#define GraphTemplate typename TValue, typename TWeight, graphNodeType<TValue> TNode, graphEdgeType<TNode, TWeight, TValue> TEdge
+	// Grid specific graph constraints
+	template<typename TNode>
+	concept isGridLocatorNode = requires(TNode a)
+	{
+		{ a } -> std::convertible_to<gridLocatorNode>;
+	};
 
-	// This template got a little unruly
-	#define GraphEdgeCollectionTemplate typename TWeight, typename TValue, graphNodeType<TValue> TNode, graphEdgeType<TNode, TWeight, TValue> TEdge
+	template<typename TEdge>
+	concept isGridLocatorEdge = requires(TEdge a)
+	{
+		{ a } -> std::convertible_to<gridLocatorEdge>;
+	};
+
+	// Graph Delegates
+	template<typename TNode, typename TEdge>
+	struct graphDelegates
+	{
+		typedef function<TEdge(TNode node1, TNode node2)> edgeConstructor;
+	};
 }

@@ -28,7 +28,7 @@ namespace brogueHd::backend::math
 	//	pdsLink links[DCOLS * DROWS];
 	//};
 
-    template<gridCellConstraint T>
+    template<isGridLocator T>
 	class dijkstra
 	{
 

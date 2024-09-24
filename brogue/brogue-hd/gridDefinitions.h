@@ -1,6 +1,6 @@
 #pragma once
 
-#include "gridCell.h"
+#include "gridLocator.h"
 #include <array>
 #include <functional>
 
@@ -27,8 +27,8 @@ namespace brogueHd::backend::model::layout
 	// Constraint for template function to help cast the brogue item details
 	//
 	template<typename T>
-	concept gridCellConstraint = requires(T a)
+	concept isGridLocator = requires(T a)
 	{
-		{ a } -> std::convertible_to<gridCell*>;
+		{ a } -> std::convertible_to<gridLocator>;
 	};
 }

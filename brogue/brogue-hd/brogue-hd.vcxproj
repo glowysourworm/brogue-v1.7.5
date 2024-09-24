@@ -140,7 +140,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="array2D.cpp" />
+    <ClCompile Include="accretionTiling.cpp" />
     <ClCompile Include="binarySearchTree.cpp" />
     <ClCompile Include="brogue-hd.cpp" />
     <ClCompile Include="brogueCell.cpp" />
@@ -161,11 +161,13 @@
     <ClCompile Include="brogueView.cpp" />
     <ClCompile Include="contentGenerator.cpp" />
     <ClCompile Include="creature.cpp" />
+    <ClCompile Include="delaunayAlgorithm.cpp" />
     <ClCompile Include="dijkstra.cpp" />
     <ClCompile Include="flare.cpp" />
     <ClCompile Include="gameController.cpp" />
     <ClCompile Include="gameData.cpp" />
     <ClCompile Include="graph.cpp" />
+    <ClCompile Include="graphAlgorithm.cpp" />
     <ClCompile Include="graphEdgeCollection.cpp" />
     <ClCompile Include="grid.cpp" />
     <ClCompile Include="gridConstructor.cpp" />
@@ -179,9 +181,11 @@
     <ClCompile Include="levelRenderer.cpp" />
     <ClCompile Include="lightSource.cpp" />
     <ClCompile Include="machine.cpp" />
+    <ClCompile Include="noiseGenerator.cpp" />
     <ClCompile Include="openglRenderer.cpp" />
     <ClCompile Include="playbackProcessor.cpp" />
     <ClCompile Include="playerCharacter.cpp" />
+    <ClCompile Include="primsAlgorithm.cpp" />
     <ClCompile Include="randomGenerator.cpp" />
     <ClCompile Include="gridRegion.cpp" />
     <ClCompile Include="roomGenerator.cpp" />
@@ -189,7 +193,8 @@
     <ClCompile Include="terrainGenerator.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="array2D.h" />
+    <ClInclude Include="accretionTile.h" />
+    <ClInclude Include="accretionTiling.h" />
     <ClInclude Include="arrayExtension.h" />
     <ClInclude Include="boltEffectDeclaration.h" />
     <ClInclude Include="brogueContentGrid.h" />
@@ -201,18 +206,24 @@
     <ClInclude Include="brogueMath.h" />
     <ClInclude Include="brogueObject.h" />
     <ClInclude Include="broguePlayer.h" />
+    <ClInclude Include="brogueRoom.h" />
     <ClInclude Include="cellularAutomataParameters.h" />
     <ClInclude Include="creatureBehaviorDeclaration.h" />
     <ClInclude Include="creatureBehaviorMap.h" />
+    <ClInclude Include="delaunayAlgorithm.h" />
     <ClInclude Include="dungeonFeature.h" />
     <ClInclude Include="exceptionHandler.h" />
     <ClInclude Include="extensionDefinitions.h" />
     <ClInclude Include="graph.h" />
+    <ClInclude Include="graphAlgorithm.h" />
     <ClInclude Include="graphDefinitions.h" />
     <ClInclude Include="graphEdge.h" />
     <ClInclude Include="graphEdgeCollection.h" />
     <ClInclude Include="graphNode.h" />
     <ClInclude Include="gridConstructor.h" />
+    <ClInclude Include="gridLocator.h" />
+    <ClInclude Include="gridLocatorEdge.h" />
+    <ClInclude Include="gridLocatorNode.h" />
     <ClInclude Include="gridRegionConstructor.h" />
     <ClInclude Include="gridRegionLocator.h" />
     <ClInclude Include="hashGenerator.h" />
@@ -258,7 +269,7 @@
     <ClInclude Include="gameData.h" />
     <ClInclude Include="grid.h" />
     <ClInclude Include="gridDefinitions.h" />
-    <ClInclude Include="array2DExtension.h" />
+    <ClInclude Include="gridExtension.h" />
     <ClInclude Include="gridRect.h" />
     <ClInclude Include="brogueLevelMethods.h" />
     <ClInclude Include="brogueItem.h" />
@@ -279,10 +290,13 @@
     <ClInclude Include="messageData.h" />
     <ClInclude Include="creature.h" />
     <ClInclude Include="creatureWords.h" />
+    <ClInclude Include="noiseGenerator.h" />
     <ClInclude Include="openglRenderer.h" />
     <ClInclude Include="playbackProcessor.h" />
     <ClInclude Include="playerCharacter.h" />
+    <ClInclude Include="point.h" />
     <ClInclude Include="powerTables.h" />
+    <ClInclude Include="primsAlgorithm.h" />
     <ClInclude Include="randomGenerator.h" />
     <ClInclude Include="playbackData.h" />
     <ClInclude Include="gridRegion.h" />
@@ -291,6 +305,8 @@
     <ClInclude Include="statusEffectDeclaration.h" />
     <ClInclude Include="terrainDeclaration.h" />
     <ClInclude Include="terrainGenerator.h" />
+    <ClInclude Include="triangle.h" />
+    <ClInclude Include="vector.h" />
     <ClInclude Include="vectorExtension.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

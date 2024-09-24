@@ -1,10 +1,7 @@
 #pragma once
 
-#include "brogueCell.h"
 #include "grid.h"
-#include "gridCell.h"
-#include "gridRect.h"
-#include "gridRegion.h"
+#include "brogueRoom.h"
 #include "dungeonDeclaration.h"
 #include "dungeonConstants.h"
 #include <functional>
@@ -27,15 +24,6 @@ namespace brogueHd::backend::model
 
 		gridRect getBoundary() const;
 
-		void addCell(short column, short row);
-		void addCells(array2D<short>* grid, function<bool(short)> predicate);
-		void addCells(gridRect boundary);
-		void addCellsInCircle(gridRect boundary);
-
-		void removeCell(short column, short row);
-		void removeCells(gridRect boundary);
-		void removeCellsInCircle(gridRect boundary);
-
 		/// <summary>
 		/// Iterates adjacent cells to satisfy the user predicate. Returns the result cell, (or null), and 
 		/// will have updated the column and row, (or -1's).
@@ -49,17 +37,19 @@ namespace brogueHd::backend::model
 
 	private:
 
+		std::vector<brogueRoom*>* _rooms;
+
 		// May need to break into separate grids
 		grid<brogueCell*>* _mainGrid;
 
 		// Grid containing permanent dungeon layers
-		array2D<permanentDungeonLayers>* _permanentGrid;
+		grid<permanentDungeonLayers>* _permanentGrid;
 
 		// Grid containing temporary dungeon layers
-		array2D<temporaryDungeonLayers>* _temporaryGrid;
+		grid<temporaryDungeonLayers>* _temporaryGrid;
 
 		// Grid containing flag-enum for categories of features:  TODO
-		array2D<dungeonFeatureCategories>* _featureCategoriesGrid;
+		grid<dungeonFeatureCategories>* _featureCategoriesGrid;
 
 		//short cost;
 

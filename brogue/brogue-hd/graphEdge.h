@@ -4,12 +4,9 @@
 
 namespace brogueHd::backend::math
 {
-	template<typename TWeight, typename TValue>
 	struct graphEdge
 	{
-		graphNode<TValue> node1;
-		graphNode<TValue> node2;
-
-		TWeight weight;
+		graphNode node1;
+		graphNode node2;
 	};
 }

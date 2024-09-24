@@ -1,5 +1,6 @@
 #pragma once
 
+#include "gridLocator.h"
 #include "dungeonDeclaration.h"
 #include "brogueCellDisplay.h"
 
@@ -18,39 +19,17 @@ namespace brogueHd::backend::model::layout
 	//	pdsLink links[DCOLS * DROWS];
 	//};
 
-	class brogueCell : public gridCell
+	struct brogueCell : gridLocator
 	{
-
-	public:
-
-		brogueCell(){}
-		brogueCell(short column, short row) 
-		{ 
-			this->column = column; 
-			this->row = row; 
-		};
+		// Sets default values (isEmpty() == true)
+		brogueCell()
+		{
+		}
+		brogueCell(short column, short row)
+		{
+			// Base struct
+		}
 		~brogueCell() {};
-
-		static bool operator >=(const brogueCell& cell1, const brogueCell& cell2)
-		{
-			return cell1.tagValue >= cell2.tagValue;
-		}
-		static bool operator <=(const brogueCell& cell1, const brogueCell& cell2)
-		{
-			return cell1.tagValue <= cell2.tagValue;
-		}
-		static bool operator >(const brogueCell& cell1, const brogueCell& cell2)
-		{
-			return cell1.tagValue > cell2.tagValue;
-		}
-		static bool operator <(const brogueCell& cell1, const brogueCell& cell2)
-		{
-			return cell1.tagValue < cell2.tagValue;
-		}
-		static bool operator ==(const brogueCell& cell1, const brogueCell& cell2)
-		{
-			return cell1.tagValue == cell2.tagValue;
-		}
 
 	public:
 
@@ -59,9 +38,6 @@ namespace brogueHd::backend::model::layout
 
 		char machine;
 		bool disposableHere;
-
-		// Dummy variable:  Leaving a tag here for use; but it's just for compatability with dijkstra's map
-		short tagValue;
 	};
 }
 
