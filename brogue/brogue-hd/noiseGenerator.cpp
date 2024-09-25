@@ -2,7 +2,7 @@
 
 #include "noiseGenerator.h"
 #include "brogueMath.h"
-#include "array2DExtension.h"
+#include "gridExtension.h"
 
 using namespace brogueHd::backend::math;
 using namespace brogueHd::backend::model;
@@ -34,13 +34,13 @@ namespace brogueHd::backend::generator
         gridRect parentBoundary = gridRect(1, 1, DCOLS - 1, DROWS - 1);
 
         // Array for generating the result
-        array2D<bool> resultGrid(parentBoundary, parameters.boundary);
+        grid<bool> resultGrid(parentBoundary, parameters.boundary);
 
         randomGenerator* rand = _randomGenerator;
 
         // Generate white noise inside the chosen rectangle
         //
-        array2DExtension<bool>::iterate(parameters.boundary, [&rand, &parameters, &resultGrid](short x, short y)
+        gridExtension<bool>::iterate(parameters.boundary, [&rand, &parameters, &resultGrid](short x, short y, bool item)
         {
             if (rand->next() <= parameters.fillRatio)
                 resultGrid.set(x, y, true);
@@ -54,21 +54,21 @@ namespace brogueHd::backend::generator
         }
 
         // Callback
-        array2DExtension<bool>::iterate(parameters.boundary, [&rand, &parameters, &resultGrid, &userCallback](short x, short y)
+        gridExtension<bool>::iterate(parameters.boundary, [&rand, &parameters, &resultGrid, &userCallback](short x, short y)
         {
             userCallback(x, y, resultGrid.get(x, y));
         });
     }
 
-    void noiseGenerator::cellularAutomataIteration(array2D<bool>& resultGrid, const cellularAutomataParameters& parameters)
+    void noiseGenerator::cellularAutomataIteration(grid<bool>& resultGrid, const cellularAutomataParameters& parameters)
     {
         short count = 0;
 
-        array2DExtension<bool>::iterate(&resultGrid, [&resultGrid, &parameters, &count](short columnRect, short rowRect)
+        gridExtension<bool>::iterate(&resultGrid, [&resultGrid, &parameters, &count](short columnRect, short rowRect)
         {
             count = 0;
 
-            array2DExtension<bool>::iterateAround(&resultGrid, columnRect, rowRect, true, [&resultGrid, &count](short i, short j)
+            gridExtension<bool>::iterateAround(&resultGrid, columnRect, rowRect, true, [&resultGrid, &count](short i, short j)
             {
                 // Count number of alive cells
                 //

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "brogueCell.h"
 #include "grid.h"
 #include "gridDefinitions.h"
 #include "noiseGenerator.h"

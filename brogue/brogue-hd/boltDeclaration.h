@@ -7,11 +7,11 @@ using namespace brogueHd::backend::model::game;
 
 namespace brogueHd::backend::model::effect
 {
-    typedef struct bolt {
+    struct bolt {
         char name[DCOLS];
         char description[COLS];
         char abilityDescription[COLS * 2];
-        uchar theChar;
+        char theChar;
         const color* foreColor;
         const color* backColor;
         short boltEffect;
@@ -20,5 +20,5 @@ namespace brogueHd::backend::model::effect
         short targetDF;
         unsigned long forbiddenMonsterFlags;
         unsigned long flags;
-    } bolt;
+    };
 }

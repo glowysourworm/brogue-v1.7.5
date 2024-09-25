@@ -42,7 +42,7 @@ namespace brogueHd::backend::model::game
 	/// Temporary LAYERS of the dungeon map. These can be a result of enemy or friendly actions; and live on
 	/// separate grids inside brogueGrid.h
 	/// </summary>
-	enum temporaryDungeonLayers
+	enum class temporaryDungeonLayers
 	{
 		// Temporary Chasm:  Created by a bloat
 		CHASM = 0,

@@ -1,7 +1,6 @@
 #include "contentGenerator.h"
 #include "brogueLevel.h"
 #include "broguedef.h"
-#include "gridMethods.h"
 #include "dungeonConstants.h"
 #include "brogueLevelMethods.h"
 
@@ -31,7 +30,7 @@ namespace brogueHd::backend::generator
 	{
 		short i, j, dir;
 		short upLoc[2], downLoc[2], ** mapToStairs, ** mapToPit;
-		creature* monst;
+		creatureInfo* monst;
 		item* theItem;
 		char grid[DCOLS][DROWS];
 		short n = rogue.depthLevel - 1;

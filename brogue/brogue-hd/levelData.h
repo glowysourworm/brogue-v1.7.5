@@ -1,5 +1,9 @@
 #pragma once
 
+#include "creatureDeclaration.h"
+
+using namespace brogueHd::backend::model::creature;
+
 namespace brogueHd::backend::model
 {
 	// Stores the necessary info about a level so it can be regenerated:
@@ -7,9 +11,9 @@ namespace brogueHd::backend::model
 	{
 		bool visited;
 		//pcell mapStorage[DCOLS][DROWS];
-		struct item* items;
-		struct creature* monsters;
-		struct creature* dormantMonsters;
+		item* items;
+		creatureInfo* monsters;
+		creatureInfo* dormantMonsters;
 		short** scentMap;
 		unsigned long levelSeed;
 		short upStairsLoc[2];

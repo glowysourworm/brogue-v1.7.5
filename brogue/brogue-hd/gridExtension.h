@@ -3,11 +3,13 @@
 #include "grid.h"
 #include "extensionDefinitions.h"
 #include "gridRect.h"
+#include "brogueMath.h"
 #include <functional>
 
 using namespace std;
 
 using namespace brogueHd::backend::model::layout;
+using namespace brogueHd::backend::math;
 
 namespace brogueHd::backend::extension
 {
@@ -72,7 +74,7 @@ namespace brogueHd::backend::extension
 	template<typename T>
 	struct gridExtension
 	{
-		static void iterate(const grid<T>& grid, gridDelegates::callback callback)
+		static void iterate(const grid<T>& grid, gridDelegates<T>::callback callback)
 		{
 			bool userBreak = false;
 
@@ -92,16 +94,16 @@ namespace brogueHd::backend::extension
 								   short centerColumn,
 								   short centerRow,
 								   short distance,
-									gridDelegates::callback callback)
+								   gridDelegates<T>::callback callback)
 		{
 			bool userBreak = false;
 
 			gridRect boundary = grid->getBoundary();
 
-			short left = brogueMath::clamp(centerColumn - distance, boundary.left(), boundary.right());
-			short right = brogueMath::clamp(centerColumn + distance, boundary.left(), boundary.right());
-			short top = brogueMath::clamp(centerRow - distance, boundary.top(), boundary.bottom());
-			short bottom = brogueMath::clamp(centerColumn + distance, boundary.top(), boundary.bottom());
+			short left = brogueMath<short>::clamp(centerColumn - distance, boundary.left(), boundary.right());
+			short right = brogueMath<short>::clamp(centerColumn + distance, boundary.left(), boundary.right());
+			short top = brogueMath<short>::clamp(centerRow - distance, boundary.top(), boundary.bottom());
+			short bottom = brogueMath<short>::clamp(centerColumn + distance, boundary.top(), boundary.bottom());
 
 			for (short i = left; i <= right && !userBreak; i++)
 			{
@@ -113,7 +115,7 @@ namespace brogueHd::backend::extension
 			}
 		}
 
-		static void iterateIn(const grid<T>& grid, gridRect boundary, gridDelegates::callback callback)
+		static void iterateIn(const grid<T>& grid, gridRect boundary, gridDelegates<T>::callback callback)
 		{
 			bool userBreak = false;
 
@@ -132,59 +134,80 @@ namespace brogueHd::backend::extension
 			}
 		}
 
-		static void iterateAround(const grid<T>& grid, short column, short row, bool withinBounds, gridDelegates::callback callback)
+		static void iterateAround(const grid<T>& grid, short column, short row, bool withinBounds, gridDelegates<T>::callback callback)
 		{
 			short newX, newY;
 
 			bool userBreak = false;
 
-			for (short dir = 0; dir < DIRECTION_COUNT && !userBreak; dir++)
+			for (short i = column - 1; i < column + 1 && !userBreak; i++)
 			{
-				newX = i + nbDirs[dir][0];
-				newY = j + nbDirs[dir][1];
-
-				if (withinBounds)
+				for (short j = row - 1; j < row + 1 && !userBreak; j++)
 				{
-					if (grid->isInBounds(newX, newY))
+					if (withinBounds)
 					{
-						userBreak = callback(newX, newY);
+						if (grid.isInBounds(i, j))
+							userBreak = callback(grid->get(i, j));
 					}
-
-				}
-
-				// Unsafe
-				else
-				{
-					userBreak = callback(newX, newY);
+					else
+					{
+						userBreak = callback(grid->get(i, j));
+					}
 				}
 			}
 		}
 
-		static void iterateAroundCardinal(const grid<T>& grid, short column, short row, bool withinBounds, gridDelegates::callback callback)
+		static void iterateAroundCardinal(const grid<T>& grid, short column, short row, bool withinBounds, gridDelegates<T>::callback callback)
 		{
-			short newX, newY;
+			iterationCallback response = iterationCallback::iterate;
 
-			bool userBreak = false;
+			// North
+			T north = grid->getAdjacentUnsafe(column, row - 1);
 
-			for (short dir = 0; dir < 4 && !userBreak; dir++)
-			{
-				newX = column + nbDirs[dir][0];
-				newY = row + nbDirs[dir][1];
+			if (grid->isInBounds(column, row - 1))
+				response = callback(column, row - 1, north);
 
-				if (withinBounds)
-				{
-					if (grid->isInBounds(newX, newY))
-					{
-						userBreak = callback(newX, newY);
-					}
-				}
+			else if (!withinBounds)
+				response = callback(column, row - 1, north);
 
-				// Unsafe
-				else
-				{
-					userBreak = callback(newX, newY);
-				}
-			}
+			if (response == iterationCallback::breakAndReturn)
+				return;
+
+			// South
+			T south = grid->getAdjacentUnsafe(column, row + 1);
+
+			if (grid->isInBounds(column, row + 1))
+				response = callback(column, row + 1, south);
+
+			else if (!withinBounds)
+				response = callback(column, row + 1, south);
+
+			if (response == iterationCallback::breakAndReturn)
+				return;
+
+			// East
+			T east = grid->getAdjacentUnsafe(column + 1, row);
+
+			if (grid->isInBounds(column + 1, row))
+				response = callback(column + 1, row, east);
+
+			else if (!withinBounds)
+				response = callback(column + 1, row, east);
+
+			if (response == iterationCallback::breakAndReturn)
+				return;
+
+			// West
+			T west = grid->getAdjacentUnsafe(column - 1, row);
+
+			if (grid->isInBounds(column - 1, row))
+				response = callback(column - 1, row, west);
+
+			else if (!withinBounds)
+				response = callback(column - 1, row, west);
+
+			if (response == iterationCallback::breakAndReturn)
+				return;
 		}
 	};
 

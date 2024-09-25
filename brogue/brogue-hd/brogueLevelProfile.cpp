@@ -171,13 +171,13 @@ namespace brogueHd::backend::model
 
 	brogueRoomInfo brogueLevelProfile::getRandomRoomInfo()
 	{
-		std::vector<short> weights = mapExtension<roomTypes, brogueRoomInfo, short>::selectFromValues(*_roomInfo, [](brogueRoomInfo info)
+		std::vector<short> weights = mapExtension<roomTypes, brogueRoomInfo>::selectFromValues<short>(*_roomInfo, [](brogueRoomInfo info)
 		{
 			return info.frequency;
 		});
 
 		short randomIndex = _randomGenerator->randWeighted(weights);
 
-		return mapExtension<roomTypes, brogueRoomInfo, short>::getValueAt(*_roomInfo, randomIndex);
+		return mapExtension<roomTypes, brogueRoomInfo>::getValueAt(*_roomInfo, randomIndex);
 	}
 }

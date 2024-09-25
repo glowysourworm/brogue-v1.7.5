@@ -72,7 +72,7 @@ namespace brogueHd::backend::model::construction
 
         bool _completed;
 
-        gridDelegates::gridPredicate _predicate;
+        gridDelegates<T>::gridPredicate _predicate;
     };
 }
 

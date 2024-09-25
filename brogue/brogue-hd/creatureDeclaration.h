@@ -1,8 +1,8 @@
 #pragma once
 
-#include "dungeonDeclaration.h"
+#include "lightConstants.h"
+#include "dungeonConstants.h"
 #include "color.h"
-#include "mathdef.h"
 
 using namespace brogueHd::backend::model::game;
 
@@ -19,7 +19,7 @@ namespace brogueHd::backend::model::creature
 
 	};
 
-	typedef struct hordeType 
+	struct hordeType 
 	{
 		creatureTypes leaderType;
 
@@ -35,9 +35,9 @@ namespace brogueHd::backend::model::creature
 		tileType spawnsIn;
 		short machine;
 
-		enum hordeFlags flags;
+		hordeFlags flags;
 
-	} hordeType;
+	};
 
 	struct mutation 
 	{
@@ -49,8 +49,8 @@ namespace brogueHd::backend::model::creature
 		short defenseFactor;
 		short damageFactor;
 		short DFChance;
-		enum dungeonFeatureTypes DFType;
-		enum lightType light;
+		permanentDungeonLayers DFType;
+		lightType light;
 		unsigned long monsterFlags;
 		unsigned long monsterAbilityFlags;
 		unsigned long forbiddenFlags;
@@ -63,14 +63,13 @@ namespace brogueHd::backend::model::creature
 		char name[30];
 		short frequency;
 		short maxDepth;
-		enum creatureTypes memberList[15];
-
+		creatureTypes memberList[15];
 	};
 
 	// Defines all creatures, which include monsters and the player:
 	struct creatureInfo
 	{
-		enum creatureTypes id; // index number for the monsterCatalog
+		creatureTypes id; // index number for the monsterCatalog
 		char name[COLS];
 		char symbol;
 
@@ -82,8 +81,8 @@ namespace brogueHd::backend::model::creature
 		short movementSpeed;
 		short attackSpeed;
 
-		enum dungeonFeatureTypes bloodType;
-		enum lightType intrinsicLightType;
+		dungeonFeatureBodilyFluids bloodType;
+		lightType intrinsicLightType;
 
 		// NEXT*** THESE NEED TO BE BROKEN UP; AND REDUCED. Dungeon features are too big to 
 		//		   try and encapsulate the ones that are specific to creatures. So, probably
@@ -91,8 +90,8 @@ namespace brogueHd::backend::model::creature
 		//		   will be shared among brogueObject instances.
 
 		short DFChance;						// percent chance to spawn the dungeon feature per awake turn
-		enum dungeonFeatureTypes DFType;	// kind of dungeon feature
-		enum boltType bolts[20];
+		permanentDungeonLayers DFType;	// kind of dungeon feature
+		boltType bolts[20];
 		unsigned long flags;
 		unsigned long abilityFlags;
 	};

@@ -33,6 +33,11 @@ namespace brogueHd::backend::model::layout
 		T getAdjacent(short column, short row, brogueCompass direction) const;
 
 		/// <summary>
+		/// Gets adjacent element from the grid (OR NULL)
+		/// </summary>
+		T getAdjacentUnsafe(short column, short row, brogueCompass direction) const;
+
+		/// <summary>
 		/// Gets adjacent as cell's locator (or NULL if out of bounds)
 		/// </summary>
 		gridLocator getAdjacentLocator(short column, short row, brogueCompass direction) const;
@@ -104,13 +109,6 @@ namespace brogueHd::backend::model::layout
 		/// </summary>
 		/// <param name="direction">Compass direction treated with DIRECT EQUALITY! (DOESN'T USE FLAGS)</param>
 		bool isExposedCorner(int column, int row, brogueCompass direction, gridDelegates<T>::simplePredicate predicate) const;
-
-	private:
-
-		/// <summary>
-		/// Returns value from the grid
-		/// </summary>
-		T getOrNull(short column, short row) const;
 
 	private:
 

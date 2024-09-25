@@ -41,9 +41,39 @@ namespace brogueHd::backend::model::layout
     }
 
     template<typename T>
-    T grid<T>::getOrNull(short column, short row) const
+    T grid<T>::getAdjacentUnsafe(short column, short row, brogueCompass direction) const
     {
-        return _grid->get(column, row);
+        switch (brogueCompass)
+        {
+        case brogueCompass::None:
+            return NULL;
+
+        case brogueCompass::N:
+            return this->get(column, row - 1);
+
+        case brogueCompass::S:
+            return this->get(column, row + 1);
+
+        case brogueCompass::E:
+            return this->get(column + 1, row);
+
+        case brogueCompass::W:
+            return this->get(column - 1, row);
+
+        case brogueCompass::NW:
+            return this->get(column - 1, row - 1);
+
+        case brogueCompass::NE:
+            return this->get(column + 1, row - 1);
+
+        case brogueCompass::SW:
+            return this->get(column - 1, row + 1);
+
+        case brogueCompass::SE:
+            return this->get(column + 1, row + 1);
+        default:
+            return NULL;
+        }
     }
 
     template<typename T>
@@ -55,28 +85,45 @@ namespace brogueHd::backend::model::layout
             return NULL;
 
         case brogueCompass::N:
-            return this->getOrNull(column, row - 1);
+            if (!this->isInBounds(column, row - 1))
+                brogueException::show("Out of bounds exception:  grid::getAdjacent");
 
+            return this->get(column, row - 1);
         case brogueCompass::S:
-            return this->getOrNull(column, row + 1);
+            if (!this->isInBounds(column, row + 1))
+                brogueException::show("Out of bounds exception:  grid::getAdjacent");
 
+            return this->get(column, row + 1);
         case brogueCompass::E:
-            return this->getOrNull(column + 1, row);
+            if (!this->isInBounds(column + 1, row))
+                brogueException::show("Out of bounds exception:  grid::getAdjacent");
 
+            return this->get(column + 1, row);
         case brogueCompass::W:
-            return this->getOrNull(column - 1, row);
+            if (!this->isInBounds(column - 1, row))
+                brogueException::show("Out of bounds exception:  grid::getAdjacent");
 
+            return this->get(column - 1, row);
         case brogueCompass::NW:
-            return this->getOrNull(column - 1, row - 1);
+            if (!this->isInBounds(column - 1, row - 1))
+                brogueException::show("Out of bounds exception:  grid::getAdjacent");
 
+            return this->get(column - 1, row - 1);
         case brogueCompass::NE:
-            return this->getOrNull(column + 1, row - 1);
+            if (!this->isInBounds(column + 1, row - 1))
+                brogueException::show("Out of bounds exception:  grid::getAdjacent");
 
+            return this->get(column + 1, row - 1);
         case brogueCompass::SW:
-            return this->getOrNull(column - 1, row + 1);
+            if (!this->isInBounds(column - 1, row + 1))
+                brogueException::show("Out of bounds exception:  grid::getAdjacent");
 
+            return this->get(column - 1, row + 1);
         case brogueCompass::SE:
-            return this->getOrNull(column + 1, row + 1);
+            if (!this->isInBounds(column + 1, row + 1))
+                brogueException::show("Out of bounds exception:  grid::getAdjacent");
+
+            return this->get(column + 1, row + 1);
         default:
             return NULL;
         }

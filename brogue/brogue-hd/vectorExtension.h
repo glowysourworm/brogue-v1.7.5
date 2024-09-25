@@ -61,7 +61,7 @@ namespace brogueHd::backend::extension
 		}
 
 		template<typename TResult>
-		static std::vector<TResult> select(std::vector<T> collection, vectorDelegates<TResult>::selector selector)
+		static std::vector<TResult> select(std::vector<T> collection, vectorDelegates<T>::selector selector)
 		{
 			std::vector<TResult> result;
 
@@ -76,7 +76,7 @@ namespace brogueHd::backend::extension
 		/// <summary>
 		/// (ALTERS COLLECTION!) Removes and returns all elements that match the given predicate
 		/// </summary>
-		static std::vector<T> remove(std::vector<T>& collection, vectorDelegates::predicate predicate)
+		static std::vector<T> remove(std::vector<T>& collection, vectorDelegates<T>::predicate predicate)
 		{
 			std::vector<T> result;
 
@@ -95,7 +95,7 @@ namespace brogueHd::backend::extension
 		/// <summary>
 		/// Creates a collection EXCEPT for those that pass the predicate.
 		/// </summary>
-		static std::vector<T> except(const std::vector<T>&, vectorDelegates::predicate predicate)
+		static std::vector<T> except(const std::vector<T>&, vectorDelegates<T>::predicate predicate)
 		{
 			std::vector<T> result;
 
@@ -113,7 +113,7 @@ namespace brogueHd::backend::extension
 		/// <summary>
 		/// Iterates the specified collection and calls the user's callback
 		/// </summary>
-		static void forEach(std::vector<T> collection, vectorDelegates::callback callback)
+		static void forEach(std::vector<T> collection, vectorDelegates<T>::callback callback)
 		{
 			for (int index = 0; index < collection.size(); index++)
 			{
@@ -125,7 +125,7 @@ namespace brogueHd::backend::extension
 		/// <summary>
 		/// Returns the first element in the collection that matches the given predicate
 		/// </summary>
-		static T first(std::vector<T> collection, vectorDelegates::predicate predicate)
+		static T first(std::vector<T> collection, vectorDelegates<T>::predicate predicate)
 		{
 			for (int index = 0; index < collection.size(); index++)
 			{
@@ -139,7 +139,7 @@ namespace brogueHd::backend::extension
 		/// <summary>
 		/// Returns true if the collection contains any items that pass the supplied predicate
 		/// </summary>
-		static bool any(std::vector<T> collection, vectorDelegates::predicate predicate)
+		static bool any(std::vector<T> collection, vectorDelegates<T>::predicate predicate)
 		{
 			for (int index = 0; index < collection.size(); index++)
 			{
@@ -153,7 +153,7 @@ namespace brogueHd::backend::extension
 		/// <summary>
 		/// Returns a new collection with elements that match the given predicate
 		/// </summary>
-		static std::vector<T> where(std::vector<T> collection, vectorDelegates::predicate predicate)
+		static std::vector<T> where(std::vector<T> collection, vectorDelegates<T>::predicate predicate)
 		{
 			std::vector<T> result;
 
@@ -172,7 +172,7 @@ namespace brogueHd::backend::extension
 		/// </summary>
 		static void distinctPairs(const std::vector<T>& collection1,
 								  const std::vector<T>& collection2,
-								  vectorDelegates::pairs callback)
+									vectorDelegates<T>::pairs callback)
 		{
 			std::map<T, std::map<T, T>> lookup;
 
@@ -221,7 +221,7 @@ namespace brogueHd::backend::extension
 		/// Returns the element of the collection that contains the maximum value for the selector
 		/// </summary>
 		template<typename V>
-		static T maxOf(std::vector<T> collection, vectorDelegates<V>::selector selector)
+		static T maxOf(std::vector<T> collection, vectorDelegates<T>::selector selector)
 		{
 			V max = NULL;
 			int maxIndex = -1;
@@ -250,7 +250,7 @@ namespace brogueHd::backend::extension
 		/// Returns the element of the collection that contains the minimum value for the selector
 		/// </summary>
 		template<typename V>
-		static T minOf(std::vector<T> collection, vectorDelegates<V>::selector selector)
+		static T minOf(std::vector<T> collection, vectorDelegates<T>::selector selector)
 		{
 			V min = NULL;
 			int minIndex = -1;

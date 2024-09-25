@@ -1,7 +1,6 @@
 #pragma once
 
 #include "broguedef.h"
-#include "mathdef.h"
 
 namespace brogueHd::backend::model::game
 {

@@ -413,9 +413,6 @@
     <ClInclude Include="creature.h">
       <Filter>Header Files\backend\model\creature</Filter>
     </ClInclude>
-    <ClInclude Include="creatureWords.h">
-      <Filter>Header Files\backend\model\creature</Filter>
-    </ClInclude>
     <ClInclude Include="broguePlayer.h">
       <Filter>Header Files\backend\model</Filter>
     </ClInclude>
@@ -481,9 +478,6 @@
     </ClInclude>
     <ClInclude Include="colorConstants.h">
       <Filter>Header Files\backend\model\game</Filter>
-    </ClInclude>
-    <ClInclude Include="bolt.h">
-      <Filter>Header Files\backend\model\effect</Filter>
     </ClInclude>
     <ClInclude Include="button.h">
       <Filter>Header Files\frontend</Filter>
@@ -686,6 +680,9 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="..\resources\light.csv">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\creatureWords.csv">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

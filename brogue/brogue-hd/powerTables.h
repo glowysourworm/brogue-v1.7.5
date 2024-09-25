@@ -1,28 +1,13 @@
-/*
- *  PowerTables.c
- *  Brogue
- *
- *  Created by Brian Walker on 4/9/17.
- *  Copyright 2017. All rights reserved.
- *
- *  This file is part of Brogue.
- *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU Affero General Public License as
- *  published by the Free Software Foundation, either version 3 of the
- *  License, or (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU Affero General Public License for more details.
- *
- *  You should have received a copy of the GNU Affero General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+#pragma once
 
-#include "broguedef.h"
+#include "brogueMath.h"
+#include "creature.h"
+#include "creatureDeclaration.h"
 
+using namespace brogueHd::backend::model::creature;
+
+// The Great Pender Prime: ...
+//
 // As of v1.7.5, Brogue does not use floating-point math in any calculations
 // that have an effect on substantive gameplay. The two operations that were
 // annoying to convert were sqrt() (handled by an open source fixed point sqrt
@@ -36,14 +21,31 @@
 // without much affecting the results. So now pow() has been replaced by lookup tables.
 // Hopefully this will help with out of sync errors for saved games and recordings...
 
-// game data formulae:
+// Are You Nuts??? Data truncation is very "in" nowadays. Get with it buddy...!
+//
+// "The Education of Pender Prime:  Canto I"  pow( {the obtusely long and meaningless C++ __cplusplus __stdcall _dumdumSquad}, {ANY NUMBER})
+//                                  purportedly does work...as reported by goblin wizards in the very far reaches of middle-earth. 
+//
+//                                  However! One may always test this axi-umm.. with some programming "code". 
+//                                  e.g. UNIT TESTS! ("you hear thunder clap near your window")
+//
+//                                  Also:   short x = (short)pow( {the power of brogue v1.7.5} ) does provide a short value. Now that's pretty tall!
+//
+//                                  Ok, that's all for now. Let's try saving your "enchanted" idea of bitwise-shifting the enchant.. and see
+//                                  what we come up with.
+//
 
 namespace brogueHd::backend::model::game
 {
-    short wandDominate(creature* monst) {
-        return (((monst)->currentHP * 5 < (monst)->info.maxHP) ? 100 : \
-            max(0, 100 * ((monst)->info.maxHP - (monst)->currentHP) / (monst)->info.maxHP));
-    }
+    class brogueCalculations
+    {
+        static short wandDominate(const creatureInfo& monst) 
+        {
+            return (monst.currentHP * 5 < monst.info.maxHP) ? 100 : max(0, 100 * ((monst)->info.maxHP - (monst)->currentHP) / (monst)->info.maxHP);
+        }
+    };
+
+
 
     // All "enchant" parameters must already be multiplied by FP_FACTOR:
     short fp_staffDamageLow(int64_t enchant) { return ((int)(3 * (2 + (enchant)) / 4 >> FP_BASE)); }

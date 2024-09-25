@@ -23,7 +23,7 @@ namespace brogueHd::backend::model::game
     typedef struct feat {
         char name[100];
         char description[200];
-        boolean initialValue;
+        bool initialValue;
     } feat;
 
     const feat featTable[FEAT_COUNT] = {

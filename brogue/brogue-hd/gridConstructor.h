@@ -1,5 +1,6 @@
 #pragma once
 
+#include "cellularAutomataParameters.h"
 #include "gridDefinitions.h"
 #include "randomGenerator.h"
 #include "gridRect.h"
@@ -7,6 +8,7 @@
 
 using namespace std;
 
+using namespace brogueHd::backend::generator;
 using namespace brogueHd::backend::model::layout;
 
 namespace brogueHd::backend::model::construction
@@ -14,12 +16,12 @@ namespace brogueHd::backend::model::construction
 	/// <summary>
 	/// Constructs the primary grid for the level
 	/// </summary>
-	template<gridCellConstraint T>
+	template<isGridLocator T>
 	class gridConstructor
 	{
 	public:
 
-		gridConstructor(const gridRect& boundary, gridCellConstructor cellConstructor);
+		gridConstructor(const gridRect& boundary, gridDelegates<T>::constructor cellConstructor);
 		~gridConstructor();
 
 		/// <summary>
@@ -80,6 +82,6 @@ namespace brogueHd::backend::model::construction
 
 		grid<T>* _grid;
 
-		gridCellConstructor _cellConstructor;
+		gridDelegates<T>::constructor _cellConstructor;
 	};
 }

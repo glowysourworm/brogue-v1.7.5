@@ -3,6 +3,7 @@
 #include "grid.h"
 #include "gridRegion.h"
 #include "gridDefinitions.h"
+#include "gridExtension.h"
 #include "gridRegionConstructor.h"
 #include <functional>
 
@@ -30,16 +31,16 @@ namespace brogueHd::backend::model::construction
 		/// Creates regions from the grid using flood fill iteration. The region predicate is used to select
 		/// whether a particular cell is in / out of the region.
 		/// </summary>
-		std::vector<gridRegion<T>*> locateRegions(const grid<T>& grid, extensionDelegates<T>::simplePredicate inclusionPredicate);
+		std::vector<gridRegion<T>*> locateRegions(const grid<T>& grid, gridDelegates<T>::predicate inclusionPredicate);
 
 		/// <summary>
 		/// Creates region at the specified point (or NULL)
 		/// </summary>
-		gridRegion<T>* identifyRegion(const grid<T>& grid, short column, short row, extensionDelegates<T>::simplePredicate inclusionPredicate);
+		gridRegion<T>* identifyRegion(const grid<T>& grid, short column, short row, gridDelegates<T>::predicate inclusionPredicate);
 
 	private:
 
-		gridRegionConstructor<T>* runFloodFill(const grid<T>& grid, short column, short row, extensionDelegates<T>::simplePredicate inclusionPredicate);
+		gridRegionConstructor<T>* runFloodFill(const grid<T>& grid, short column, short row, gridDelegates<T>::predicate inclusionPredicate);
 	};
 }
 

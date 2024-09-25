@@ -3,8 +3,10 @@
 #include "broguedef.h"
 #include "color.h"
 #include "dungeonConstants.h"
+#include "lightConstants.h"
 
 using namespace brogueHd::backend::model::game;
+using namespace brogueHd::backend::model::lighting;
 
 namespace brogueHd::backend::model::effect
 {
@@ -26,7 +28,8 @@ namespace brogueHd::backend::model::effect
 	{
 		// tile info:
 		tileType tile;
-		dungeonLayers layer;
+		permanentDungeonLayers permanentLayer;
+		temporaryDungeonLayers temporaryLayer;
 
 		// spawning pattern:
 		short startProbability;
@@ -37,7 +40,9 @@ namespace brogueHd::backend::model::effect
 		const color* flashColor;
 		short effectRadius;
 		tileType propagationTerrain;
-		dungeonFeatureTypes subsequentDF;
-		boolean messageDisplayed;
+		//dungeonFeatureTypes subsequentDF;
+		permanentDungeonLayers subsequentDF_P;
+		temporaryDungeonLayers subsequentDF_T;
+		bool messageDisplayed;
 	};
 }

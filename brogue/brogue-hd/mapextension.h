@@ -32,7 +32,7 @@ namespace brogueHd::backend::extension
 	/// <summary>
 	/// Static methods to operate on the std::map data structure
 	/// </summary>
-	template<typename K, typename V, typename VResult>
+	template<typename K, typename V>
 	struct mapExtension
 	{
 		static bool any(const std::map<K, V>& map, mapDelegates<K, V>::predicate predicate)
@@ -77,6 +77,7 @@ namespace brogueHd::backend::extension
 			return NULL;
 		}
 
+		template<typename VResult>
 		static std::vector<VResult> selectFromValues(const std::map<K, V>& map, mapDelegates<K, V>::selector selector)
 		{
 			std::vector<VResult> result;

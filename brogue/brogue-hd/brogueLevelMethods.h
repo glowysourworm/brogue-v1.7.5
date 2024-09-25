@@ -45,7 +45,7 @@ namespace brogueHd::backend::methods
 	//#define cellHasTerrainFlag(x, y, flagMask)	((flagMask) & terrainFlags((x), (y)) ? true : false)
 	static bool isTerrain(brogueLevel* level, short column, short row, terrainFlagCatalog terrainFlag)
 	{
-		brogueCell* cell = level->levelGrid->getCell(column, row);
+		//brogueCell* cell = level->levelGrid->getCell(column, row);
 
 		// Need to move physical data from the display struct
 		//
@@ -73,7 +73,7 @@ namespace brogueHd::backend::methods
 
 	static bool isPathingBlocker(brogueLevel* level, short column, short row)
 	{
-		brogueCell* cell = level->levelGrid->getCell(column, row);
+		//brogueCell* cell = level->levelGrid->getCell(column, row);
 
 		// Need to move physical data from the display struct
 		//
@@ -88,7 +88,7 @@ namespace brogueHd::backend::methods
 	
 	static bool isAutoDescent(brogueLevel* level, short column, short row)
 	{
-		brogueCell* cell = level->levelGrid->getCell(column, row);
+		//brogueCell* cell = level->levelGrid->getCell(column, row);
 
 		// Need to move physical data from the display struct
 		//
@@ -103,20 +103,24 @@ namespace brogueHd::backend::methods
 
 	static bool terrainLayersContains(const tileType* layers, terrainFlagCatalog flagMask)
 	{
-		for (int index = 0; index < SIZEOF(layers); index++)
-		{
-			if ((layers[index] & T_AUTO_DESCENT) != 0)
-				return true;
-		}
+		//for (int index = 0; index < SIZEOF(layers); index++)
+		//{
+		//	if ((layers[index] & T_AUTO_DESCENT) != 0)
+		//		return true;
+		//}
+
+		return false;
 	}
 
 	static brogueCell* findAdjacentWalkableLocation(brogueLevel* level, short column, short row)
 	{
-		return level->levelGrid->checkAdjacentCells(column, row, [](brogueCell* cell)
-		{
-			return  terrainLayersContains(cell->display.layers, T_AUTO_DESCENT) ||
-					terrainLayersContains(cell->display.layers, T_PATHING_BLOCKER);
-		});
+		//return level->levelGrid->checkAdjacentCells(column, row, [](brogueCell* cell)
+		//{
+		//	return  terrainLayersContains(cell->display.layers, T_AUTO_DESCENT) ||
+		//			terrainLayersContains(cell->display.layers, T_PATHING_BLOCKER);
+		//});
+
+		return NULL;
 	}
 
 	static brogueCell* findValidStairLocation(brogueLevel* level)
@@ -177,5 +181,7 @@ namespace brogueHd::backend::methods
 		//	return false;
 		//}
 		//return true;
+
+		return NULL;
 	}
 }

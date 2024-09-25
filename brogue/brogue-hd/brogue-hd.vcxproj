@@ -245,7 +245,6 @@
     <ClInclude Include="binarySearchTree.h" />
     <ClInclude Include="blueprint.h" />
     <ClInclude Include="blueprintDeclaration.h" />
-    <ClInclude Include="bolt.h" />
     <ClInclude Include="boltDeclaration.h" />
     <ClInclude Include="brogueCell.h" />
     <ClInclude Include="broguedef.h" />
@@ -297,7 +296,6 @@
     <ClInclude Include="mathdef.h" />
     <ClInclude Include="messageData.h" />
     <ClInclude Include="creature.h" />
-    <ClInclude Include="creatureWords.h" />
     <ClInclude Include="noiseGenerator.h" />
     <ClInclude Include="openglRenderer.h" />
     <ClInclude Include="playbackProcessor.h" />
@@ -321,6 +319,7 @@
     <ClInclude Include="vectorExtension.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\resources\creatureWords.csv" />
     <None Include="..\resources\dungeonFeature.csv" />
     <None Include="..\resources\floorTileType.csv" />
     <None Include="..\resources\light.csv" />

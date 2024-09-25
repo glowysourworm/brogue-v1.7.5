@@ -16,13 +16,13 @@ namespace brogueHd::backend::processor
 
 		void initialize();
 
-		color messageColorFromVictim(creature* monst);
+		color messageColorFromVictim(creatureInfo* monst);
 
 	private:
 
 		brogueLevel* _level;
 
-		creature* _player;
+		creatureInfo* _player;
 	};
 }
 

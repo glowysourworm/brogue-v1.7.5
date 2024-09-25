@@ -1,6 +1,5 @@
 #pragma once
 
-#include "broguedef.h"
 #include "creature.h"
 #include "gridCell.h"
 #include "grid.h"
@@ -64,9 +63,9 @@ namespace brogueHd::backend::math
 		dijkstra<T>::dijkstra(gridRect parentBoundary,
 							  gridRect relativeBoundary,
 						      bool obeyCardinalMovement,
-							  dijkstraDelegates::predicate mapPredicate,
-							  dijkstraDelegates::costPredicate mapCostPredicate,
-							  dijkstraDelegates::locatorCallback locatorCallback);
+							  dijkstraDelegates<T>::predicate mapPredicate,
+							  dijkstraDelegates<T>::costPredicate mapCostPredicate,
+							  dijkstraDelegates<T>::locatorCallback locatorCallback);
 
         ~dijkstra();
 
@@ -126,9 +125,9 @@ namespace brogueHd::backend::math
 
 	private:
 
-		std::function<T(short, short)> _locatorCallback;
-        std::function<bool(short, short)> _mapPredicate;
-        std::function<short(short, short)> _mapCostPredicate;
+		dijkstraDelegates<T>::locatorCallback _locatorCallback;
+		dijkstraDelegates<T>::predicate _mapPredicate;
+		dijkstraDelegates<T>::costPredicate _mapCostPredicate;
 
 		gridRect _parentBoundary;						// The larger of the two boundaries. Each grid<> instance should
 		gridRect _relativeBoundary;						// use the larger parent boundary. Relative boundary is used to 

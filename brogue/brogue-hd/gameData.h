@@ -16,12 +16,12 @@ namespace brogueHd::backend::model
 
 		short depthLevel;					// which dungeon level are we on
 		short deepestLevel;
-		boolean disturbed;					// player should stop auto-acting
-		boolean gameHasEnded;				// stop everything and go to death screen
-		boolean highScoreSaved;				// so that it saves the high score only once
-		boolean blockCombatText;			// busy auto-fighting
-		boolean autoPlayingLevel;			// seriously, don't interrupt
-		boolean automationActive;			// cut some corners during redraws to speed things up
+		bool disturbed;					// player should stop auto-acting
+		bool gameHasEnded;				// stop everything and go to death screen
+		bool highScoreSaved;				// so that it saves the high score only once
+		bool blockCombatText;			// busy auto-fighting
+		bool autoPlayingLevel;			// seriously, don't interrupt
+		bool automationActive;			// cut some corners during redraws to speed things up
 
 	public:
 
@@ -54,7 +54,7 @@ namespace brogueHd::backend::model
 	public:
 
 		char displayedMessage[MESSAGE_LINES][COLS * 2];
-		boolean messageConfirmed[MESSAGE_LINES];
+		bool messageConfirmed[MESSAGE_LINES];
 		char combatText[COLS * 2];
 		short messageArchivePosition;
 		char messageArchive[MESSAGE_ARCHIVE_LINES][COLS * 2];
@@ -81,8 +81,8 @@ namespace brogueHd::backend::model
 		playerCharacter rogue;
 		//brogueConsole currentConsole;
 
-		boolean serverMode = false;
-		boolean noMenu = false;
+		bool serverMode = false;
+		bool noMenu = false;
 	};
 }
 

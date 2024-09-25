@@ -1,5 +1,7 @@
 #pragma once
 
+#include "EnumString.h"
+
 namespace brogueHd::backend::model::creature
 {
 	enum creatureStates {
@@ -152,4 +154,40 @@ namespace brogueHd::backend::model::creature
 		creatureStates creatureState;		// current behavioral state
 		creatureModes creatureMode;			// current behavioral mode (higher-level than state)
 	};
+
+//#define STRINGIFY(macro) #macro
+
+Begin_Enum_String(creatureBehaviorFlags)
+{
+	Enum_String_With_Description(MONST_INVISIBLE, "is invisible");
+	Enum_String_With_Description(MONST_INANIMATE, "is an inanimate object");
+	Enum_String_With_Description(MONST_IMMOBILE, "cannot move");
+	Enum_String_With_Description(MONST_CARRY_ITEM_100, "");
+	Enum_String_With_Description(MONST_CARRY_ITEM_25, "");
+	Enum_String_With_Description(MONST_ALWAYS_HUNTING, "");
+	Enum_String_With_Description(MONST_FLEES_NEAR_DEATH, "flees at low health");
+	Enum_String_With_Description(MONST_ATTACKABLE_THRU_WALLS, "");
+	Enum_String_With_Description(MONST_DEFEND_DEGRADE_WEAPON, "corrodes weapons when hit");
+	Enum_String_With_Description(MONST_IMMUNE_TO_WEAPONS, "is immune to weapon damage");
+	Enum_String_With_Description(MONST_FLIES, "flies");
+	Enum_String_With_Description(MONST_FLITS, "moves erratically");
+	Enum_String_With_Description(MONST_IMMUNE_TO_FIRE, "is immune to fire");
+	Enum_String_With_Description(MONST_CAST_SPELLS_SLOWLY, "");
+	Enum_String_With_Description(MONST_IMMUNE_TO_WEBS, "cannot be entangled");
+	Enum_String_With_Description(MONST_REFLECT_4, "can reflect magic spells");
+	Enum_String_With_Description(MONST_NEVER_SLEEPS, "never sleeps");
+	Enum_String_With_Description(MONST_FIERY, "burns unceasingly");
+	Enum_String_With_Description(MONST_INVULNERABLE, "is invulnerable");
+	Enum_String_With_Description(MONST_IMMUNE_TO_WATER, "is at home in water");
+	Enum_String_With_Description(MONST_RESTRICTED_TO_LIQUID, "cannot venture onto dry land");
+	Enum_String_With_Description(MONST_SUBMERGES, "submerges");
+	Enum_String_With_Description(MONST_MAINTAINS_DISTANCE, "keeps $HISHER distance");
+	Enum_String_With_Description(MONST_WILL_NOT_USE_STAIRS, "");
+	Enum_String_With_Description(MONST_DIES_IF_NEGATED, "is animated purely by magic");
+	Enum_String_With_Description(MONST_MALE, "");
+	Enum_String_With_Description(MONST_FEMALE, "");
+	Enum_String_With_Description(MONST_NOT_LISTED_IN_SIDEBAR, "");
+	Enum_String_With_Description(MONST_GETS_TURN_ON_ACTIVATION, "moves only when activated");
+}
+End_Enum_String;
 }

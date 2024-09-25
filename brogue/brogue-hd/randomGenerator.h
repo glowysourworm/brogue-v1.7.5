@@ -2,7 +2,6 @@
 
 #include <random>
 #include "mathdef.h"
-#include "broguedef.h"
 
 using namespace brogueHd::backend::math;
 

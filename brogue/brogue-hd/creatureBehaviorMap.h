@@ -49,12 +49,12 @@ namespace brogueHd::backend::model::creature
 
 		// Collections of cells left over from updating the visibility. These will indicate cells that
 		// have changed.
-		std::vector<gridCell> _visibleCells;
-		std::vector<gridCell> _visibleCellsDiff;			// Difference between last turn and this turn
+		std::vector<gridLocator> _visibleCells;
+		std::vector<gridLocator> _visibleCellsDiff;			// Difference between last turn and this turn
 
 		// UNSURE:  These should be sent in during calculation
 		short _numberOfWaypoints;
-		gridCell* _waypoints;
+		gridLocator* _waypoints;
 
 		// ???
 		//grid<short>* _mapToStairs;

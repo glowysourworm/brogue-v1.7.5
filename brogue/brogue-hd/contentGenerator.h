@@ -25,7 +25,7 @@ namespace brogueHd::backend::generator
 
 		brogueLevel* _level;
 
-		array2D<bool>* _validLocations;	// This should be initialized from the terrain layers. Each dungeon content placed will 
+		grid<bool>* _validLocations;	// This should be initialized from the terrain layers. Each dungeon content placed will 
 										// set its location to "false".
 
 	};
