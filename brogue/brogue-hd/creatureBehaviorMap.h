@@ -1,7 +1,7 @@
 #pragma once
 
-#include "array2D.h"
-#include "brogueGrid.h"
+#include "grid.h"
+#include "brogueCell.h"
 #include "brogueObject.h"
 #include "creatureBehaviorDeclaration.h"
 
@@ -19,7 +19,7 @@ namespace brogueHd::backend::model::creature
 		/// <summary>
 		/// Updates creature behavior maps based on gloabl maps. Should be run each turn.
 		/// </summary>
-		void update(brogueGrid* layoutGrid, array2D<brogueObject>* contentGrid);
+		void update(grid<brogueCell>* layoutGrid, grid<brogueObject>* contentGrid);
 
 	private:
 
@@ -41,16 +41,16 @@ namespace brogueHd::backend::model::creature
 
 		*/
 
-		array2D<bool>*	 _visibilityMap;
-		array2D<bool>*  _visibilityMapLastTurn;	// Map from last turn
-		array2D<short>* _goalMap;					// This map varies depending on the creature (also, friendly or enemy, "mapToMe")
-		array2D<short>* _fleeMap;
-		array2D<short>* _scentMap;
+		grid<bool>*	 _visibilityMap;
+		grid<bool>*  _visibilityMapLastTurn;	// Map from last turn
+		grid<short>* _goalMap;					// This map varies depending on the creature (also, friendly or enemy, "mapToMe")
+		grid<short>* _fleeMap;
+		grid<short>* _scentMap;
 
 		// Collections of cells left over from updating the visibility. These will indicate cells that
 		// have changed.
-		std::vector<gridCell*> _visibleCells;
-		std::vector<gridCell*> _visibleCellsDiff;			// Difference between last turn and this turn
+		std::vector<gridCell> _visibleCells;
+		std::vector<gridCell> _visibleCellsDiff;			// Difference between last turn and this turn
 
 		// UNSURE:  These should be sent in during calculation
 		short _numberOfWaypoints;

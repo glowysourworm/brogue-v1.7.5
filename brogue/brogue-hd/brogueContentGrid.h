@@ -20,7 +20,7 @@ namespace brogueHd::backend::model
 	private:
 
 		broguePlayer* _player;
-		brogueGrid* _grid;
+		//brogueGrid* _grid;
 
 		// All contents
 		grid<brogueObject*> _contentGrid;

@@ -21,18 +21,18 @@ namespace brogueHd::backend::model::creature
 
 	typedef struct hordeType 
 	{
-		enum monsterTypes leaderType;
+		creatureTypes leaderType;
 
 		// membership information
 		short numberOfMemberTypes;
-		enum monsterTypes memberType[5];
+		creatureTypes memberType[5];
 		randomRange memberCount[5];
 
 		// spawning information
 		short minLevel;
 		short maxLevel;
 		short frequency;
-		enum tileType spawnsIn;
+		tileType spawnsIn;
 		short machine;
 
 		enum hordeFlags flags;
@@ -63,7 +63,7 @@ namespace brogueHd::backend::model::creature
 		char name[30];
 		short frequency;
 		short maxDepth;
-		enum monsterTypes memberList[15];
+		enum creatureTypes memberList[15];
 
 	};
 

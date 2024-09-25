@@ -1,0 +1,67 @@
+color,radius,range,fadePercent,passThroughCreatures
+
+# {0},	NO_LIGHT
+
+minersLightColor,{0, 0, 1},35,true
+fireBoltColor,{300, 400, 1},0,false
+wispLightColor,{400, 800, 1},0,false
+fireBoltColor,{300, 400, 1},0,false
+pink,{600, 600, 1},0,true
+pixieColor,{400, 600, 1},50,false
+lichLightColor,{1500, 1500, 1},0,false
+flamedancerCoronaColor,{1000, 2000, 1},0,false
+sentinelLightColor,{300, 500, 1},0,false
+unicornLightColor,{300, 400, 1},0,false
+ifritLightColor,{300, 600, 1},0,false
+fireBoltColor,{400, 600, 1},0,false
+fireBoltColor,{150, 300, 1},0,false
+yendorLightColor,{1500, 1500, 1},0,false
+spectralBladeLightColor,{350, 350, 1},0,false
+summonedImageLightColor,{350, 350, 1},0,false
+lightningColor,{250, 250, 1},35,false
+explosiveAuraColor, {150, 200, 1},0,true
+lightningColor,{300, 300, 1},0,false
+telepathyColor,{200, 200, 1},0,true
+sacrificeTargetColor, {250, 250, 1},0,true
+
+// flares:
+scrollProtectionColor,{600, 600, 1},0,true
+scrollEnchantmentColor,{600, 600, 1},0,true
+potionStrengthColor,{600, 600, 1},0,true
+empowermentFlashColor,{600, 600, 1},0,true
+genericFlashColor,{300, 300, 1},0,true
+fireFlashColor,{800, 800, 1},0,false
+summoningFlashColor,{600, 600, 1},0,true
+explosionFlareColor,{5000, 5000, 1},0,true
+quietusFlashColor,{300, 300, 1},0,true
+slayingFlashColor,{300, 300, 1},0,true
+lightningColor, {800, 800, 1},0,false
+
+// glowing terrain:
+torchLightColor,{1000, 1000, 1},50,false
+lavaLightColor,{300, 300, 1},50,false
+sunLightColor,{200, 200, 1},25,true
+darknessPatchColor,{400, 400, 1},0,true
+fungusLightColor,{300, 300, 1},50,false
+fungusForestLightColor,{500, 500, 1},0,false
+algaeBlueLightColor,{300, 300, 1},0,false
+algaeGreenLightColor,{300, 300, 1},0,false
+ectoplasmColor,{200, 200, 1},50,false
+unicornLightColor,{200, 200, 1},0,false
+lavaLightColor,{200, 200, 1},50,false
+lavaLightColor,{500, 1000, 1},0,false
+lavaLightColor,{200, 300, 1},0,false
+explosionColor,{DCOLS * 100,DCOLS * 100,1},100,false
+dartFlashColor,{15 * 100,15 * 100,1},0,false
+portalActivateLightColor,{DCOLS * 100,DCOLS * 100,1},0,false
+confusionLightColor,{300, 300, 1},100,false
+darknessCloudColor,{500, 500, 1},0,true
+forceFieldLightColor,{200, 200, 1},50,false
+crystalWallLightColor,{300, 500, 1},50,false
+torchLightColor,{200, 400, 1},0,false
+hauntedTorchColor,{400, 600, 1},0,false
+glyphLightColor,{100, 100, 1},0,false
+glyphLightColor,{300, 300, 1},0,false
+sacredGlyphColor, {300, 300, 1},0,false
+descentLightColor,{600, 600, 1},0,false
+sacrificeTargetColor,{800, 1200, 1},0,true

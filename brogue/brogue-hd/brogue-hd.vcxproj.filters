@@ -476,9 +476,6 @@
     <ClInclude Include="dungeonConstants.h">
       <Filter>Header Files\backend\model\game</Filter>
     </ClInclude>
-    <ClInclude Include="dungeon.h">
-      <Filter>Header Files\backend\model\game</Filter>
-    </ClInclude>
     <ClInclude Include="blueprint.h">
       <Filter>Header Files\backend\model\layout</Filter>
     </ClInclude>
@@ -665,6 +662,30 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\resources\colors.csv">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\creature.csv">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\creatureClass.csv">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\horde.csv">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\mutation.csv">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\machineGenerator.csv">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\floorTileType.csv">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\dungeonFeature.csv">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\light.csv">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

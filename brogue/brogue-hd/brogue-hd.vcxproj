@@ -266,7 +266,6 @@
     <ClInclude Include="contentGenerator.h" />
     <ClInclude Include="creatureDeclaration.h" />
     <ClInclude Include="dijkstra.h" />
-    <ClInclude Include="dungeon.h" />
     <ClInclude Include="dungeonConstants.h" />
     <ClInclude Include="dungeonDeclaration.h" />
     <ClInclude Include="feat.h" />
@@ -322,7 +321,15 @@
     <ClInclude Include="vectorExtension.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\resources\dungeonFeature.csv" />
+    <None Include="..\resources\floorTileType.csv" />
+    <None Include="..\resources\light.csv" />
+    <None Include="..\resources\machineGenerator.csv" />
     <None Include="..\resources\colors.csv" />
+    <None Include="..\resources\creature.csv" />
+    <None Include="..\resources\creatureClass.csv" />
+    <None Include="..\resources\horde.csv" />
+    <None Include="..\resources\mutation.csv" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

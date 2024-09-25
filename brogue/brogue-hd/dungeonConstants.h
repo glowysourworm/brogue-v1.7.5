@@ -477,7 +477,7 @@ namespace brogueHd::backend::model::game
 		STENCH_SMOLDER,
 	};
 
-	enum tileType 
+	enum class tileType 
 	{
 		NOTHING = 0,
 		GRANITE,

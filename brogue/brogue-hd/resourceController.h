@@ -2,6 +2,7 @@
 
 #include "broguefile.h"
 #include "keyProcessor.h"
+#include "brogueColorMap.h"
 
 using namespace brogueHd::backend::processor;
 using namespace brogueHd::backend::model::io;
