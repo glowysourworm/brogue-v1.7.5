@@ -57,7 +57,7 @@ namespace brogueHd::console
 	{
 		for (int index = 0; index < SIZEOF(args); index++)
 		{
-			if (std::string(args[index]) == std::string(argument) &&
+			if (std::string(args[index]) == std::string(argumentName) &&
 				index < SIZEOF(args) + 1)
 			{
 				if (std::is_convertible<T, char*>())
@@ -67,10 +67,10 @@ namespace brogueHd::console
 					return std::string(args[index + 1]);
 
 				else if (std::is_convertible<T, int>())
-					return atoi(args[index + 1]);
+					return atoi(args[index + 1].c_str());
 
 				else if (std::is_convertible<T, unsigned long>())
-					return atol(args[index + 1]);
+					return atol(args[index + 1].c_str());
 
 				else
 					brogueException::show("Unhandled console command type:  " + typeid(T).name);

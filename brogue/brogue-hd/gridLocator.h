@@ -24,16 +24,16 @@ namespace brogueHd::backend::model::layout
 			row = arow;
 		}
 
-		static bool operator==(const gridLocator& cell1, const gridLocator& cell2)
+		bool operator==(const gridLocator& cell)
 		{
-			return cell1.column == cell2.column &&
-				cell1.row == cell2.row;
+			return column == cell.column &&
+				   row == cell.row;
 		}
 
-		static bool operator!=(const gridLocator& cell1, const gridLocator& cell2)
+		bool operator!=(const gridLocator& cell)
 		{
-			return cell1.column != cell2.column ||
-				cell1.row != cell2.row;
+			return column != cell.column ||
+				   row != cell.row;
 		}
 
 		gridLocator add(const gridLocator& cell)

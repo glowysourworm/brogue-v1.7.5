@@ -1,12 +1,13 @@
 #include "randomGenerator.h"
 #include "brogueMath.h"
+#include "exceptionHandler.h"
 #include <random>
 
 namespace brogueHd::backend::generator
 {
 	randomGenerator::randomGenerator(int id)
 	{
-		brogueAssert(id == RANDOM_GENERATOR_MAIN || id == RANDOM_GENERATOR_COSMETIC)
+		//brogueAssert(id == RANDOM_GENERATOR_MAIN || id == RANDOM_GENERATOR_COSMETIC)
 
 		_id = id;
 		_seed = 0;
@@ -15,7 +16,7 @@ namespace brogueHd::backend::generator
 
 	randomGenerator::randomGenerator(int id, unsigned long seed)
 	{
-		brogueAssert(id == RANDOM_GENERATOR_MAIN || id == RANDOM_GENERATOR_COSMETIC)
+		//brogueAssert(id == RANDOM_GENERATOR_MAIN || id == RANDOM_GENERATOR_COSMETIC)
 
 		_id = id;
 
@@ -55,7 +56,7 @@ namespace brogueHd::backend::generator
 
 	int randomGenerator::rand_range(int lowerBound, int upperBound)
 	{
-		brogueAssert(lowerBound <= INT_MAX && upperBound <= INT_MAX);
+		//brogueAssert(lowerBound <= INT_MAX && upperBound <= INT_MAX);
 
 		// TODO:  Refactor this to validate it using assert. There must have been some
 		//		  code path that wasn't using it properly. If we're going to use assert

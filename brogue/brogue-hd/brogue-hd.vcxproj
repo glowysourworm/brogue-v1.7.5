@@ -200,7 +200,7 @@
   <ItemGroup>
     <ClInclude Include="accretionTile.h" />
     <ClInclude Include="arrayExtension.h" />
-    <ClInclude Include="boltEffectDeclaration.h" />
+    <ClInclude Include="boltConstants.h" />
     <ClInclude Include="brogueColorMap.h" />
     <ClInclude Include="brogueConsole.h" />
     <ClInclude Include="brogueContentGrid.h" />
@@ -214,11 +214,15 @@
     <ClInclude Include="broguePlayer.h" />
     <ClInclude Include="brogueRoom.h" />
     <ClInclude Include="cellularAutomataParameters.h" />
-    <ClInclude Include="creatureBehaviorDeclaration.h" />
+    <ClInclude Include="creatureBehaviorConstants.h" />
+    <ClInclude Include="creatureBehavior.h" />
     <ClInclude Include="creatureBehaviorMap.h" />
+    <ClInclude Include="creatureConstants.h" />
     <ClInclude Include="delaunayAlgorithm.h" />
     <ClInclude Include="developerConsole.h" />
     <ClInclude Include="dungeonFeature.h" />
+    <ClInclude Include="dungeonFeatureConstants.h" />
+    <ClInclude Include="dungeonTemplate.h" />
     <ClInclude Include="EnumString.h" />
     <ClInclude Include="exceptionHandler.h" />
     <ClInclude Include="extensionDefinitions.h" />
@@ -236,16 +240,13 @@
     <ClInclude Include="gridRegionConstructor.h" />
     <ClInclude Include="gridRegionLocator.h" />
     <ClInclude Include="hashGenerator.h" />
-    <ClInclude Include="itemDeclaration.h" />
+    <ClInclude Include="item.h" />
     <ClInclude Include="itemTemplate.h" />
     <ClInclude Include="linearGenerationParameters.h" />
-    <ClInclude Include="machineDeclaration.h" />
-    <ClInclude Include="machineFeature.h" />
-    <ClInclude Include="machineGenerator.h" />
+    <ClInclude Include="machineTemplate.h" />
     <ClInclude Include="binarySearchTree.h" />
-    <ClInclude Include="blueprint.h" />
     <ClInclude Include="blueprintDeclaration.h" />
-    <ClInclude Include="boltDeclaration.h" />
+    <ClInclude Include="bolt.h" />
     <ClInclude Include="brogueCell.h" />
     <ClInclude Include="broguedef.h" />
     <ClInclude Include="broguefile.h" />
@@ -263,10 +264,10 @@
     <ClInclude Include="colorString.h" />
     <ClInclude Include="command.h" />
     <ClInclude Include="contentGenerator.h" />
-    <ClInclude Include="creatureDeclaration.h" />
+    <ClInclude Include="creature.h" />
     <ClInclude Include="dijkstra.h" />
     <ClInclude Include="dungeonConstants.h" />
-    <ClInclude Include="dungeonDeclaration.h" />
+    <ClInclude Include="dungeon.h" />
     <ClInclude Include="feat.h" />
     <ClInclude Include="fileio.h" />
     <ClInclude Include="flare.h" />
@@ -281,8 +282,6 @@
     <ClInclude Include="brogueLevelMethods.h" />
     <ClInclude Include="brogueItem.h" />
     <ClInclude Include="itemConstants.h" />
-    <ClInclude Include="itemFlavor.h" />
-    <ClInclude Include="itemTable.h" />
     <ClInclude Include="keyProcessor.h" />
     <ClInclude Include="layoutGenerator.h" />
     <ClInclude Include="levelData.h" />
@@ -290,12 +289,10 @@
     <ClInclude Include="levelRenderer.h" />
     <ClInclude Include="light.h" />
     <ClInclude Include="lightConstants.h" />
-    <ClInclude Include="lightSource.h" />
     <ClInclude Include="machineConstants.h" />
     <ClInclude Include="mapExtension.h" />
     <ClInclude Include="mathdef.h" />
     <ClInclude Include="messageData.h" />
-    <ClInclude Include="creature.h" />
     <ClInclude Include="noiseGenerator.h" />
     <ClInclude Include="openglRenderer.h" />
     <ClInclude Include="playbackProcessor.h" />
@@ -310,7 +307,8 @@
     <ClInclude Include="resourceController.h" />
     <ClInclude Include="roomGenerator.h" />
     <ClInclude Include="renderingController.h" />
-    <ClInclude Include="statusEffectDeclaration.h" />
+    <ClInclude Include="statusEffectConstants.h" />
+    <ClInclude Include="statusEffect.h" />
     <ClInclude Include="stringExtension.h" />
     <ClInclude Include="terrainDeclaration.h" />
     <ClInclude Include="terrainGenerator.h" />
@@ -319,9 +317,23 @@
     <ClInclude Include="vectorExtension.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\resources\armor.csv" />
+    <None Include="..\resources\armorRunicNames.csv" />
+    <None Include="..\resources\blueprint.csv" />
+    <None Include="..\resources\bolt.csv" />
+    <None Include="..\resources\charms.csv" />
+    <None Include="..\resources\creatureBehaviorDescription.csv" />
     <None Include="..\resources\creatureWords.csv" />
     <None Include="..\resources\dungeonFeature.csv" />
+    <None Include="..\resources\feat.csv" />
+    <None Include="..\resources\features.csv" />
     <None Include="..\resources\floorTileType.csv" />
+    <None Include="..\resources\food.csv" />
+    <None Include="..\resources\itemColors.csv" />
+    <None Include="..\resources\itemGems.csv" />
+    <None Include="..\resources\itemMetals.csv" />
+    <None Include="..\resources\itemWoods.csv" />
+    <None Include="..\resources\keys.csv" />
     <None Include="..\resources\light.csv" />
     <None Include="..\resources\machineGenerator.csv" />
     <None Include="..\resources\colors.csv" />
@@ -329,6 +341,14 @@
     <None Include="..\resources\creatureClass.csv" />
     <None Include="..\resources\horde.csv" />
     <None Include="..\resources\mutation.csv" />
+    <None Include="..\resources\potions.csv" />
+    <None Include="..\resources\rings.csv" />
+    <None Include="..\resources\scrolls.csv" />
+    <None Include="..\resources\staves.csv" />
+    <None Include="..\resources\titlePhonemes.csv" />
+    <None Include="..\resources\wands.csv" />
+    <None Include="..\resources\weaponRunicNames.csv" />
+    <None Include="..\resources\weapons.csv" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

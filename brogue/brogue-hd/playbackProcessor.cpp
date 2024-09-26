@@ -3,7 +3,7 @@
 
 using namespace std;
 
-namespace brogueHd
+namespace brogueHd::backend::processor
 {
 	playbackProcessor::playbackProcessor()
 	{

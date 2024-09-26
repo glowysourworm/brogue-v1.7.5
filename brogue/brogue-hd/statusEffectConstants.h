@@ -1,12 +1,8 @@
 #pragma once
 
-#include "color.h"
-#include "creatureDeclaration.h"
-#include "creatureBehaviorDeclaration.h"
-
-namespace brogueHd::backend::model::effect
+namespace brogueHd::backend::modelConstant
 {
-	enum statusEffects 
+	enum statusEffects
 	{
 		STATUS_SEARCHING = 0,
 		STATUS_DONNING,
@@ -35,19 +31,5 @@ namespace brogueHd::backend::model::effect
 		STATUS_INVISIBLE,
 		STATUS_AGGRAVATING,
 		NUMBER_OF_STATUS_EFFECTS
-	};
-
-	// This is just termporary
-	struct characterStatusEffect
-	{
-		statusEffects status[NUMBER_OF_STATUS_EFFECTS];
-		short maxStatus[NUMBER_OF_STATUS_EFFECTS];		// used to set the max point on the status bars
-	};
-
-	// TODO
-	struct characterEffect
-	{
-		short flashStrength;							// monster will flash soon; this indicates the percent strength of flash
-		color flashColor;								// the color that the monster will flash
 	};
 }

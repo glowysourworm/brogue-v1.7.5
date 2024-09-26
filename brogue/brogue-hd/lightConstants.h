@@ -1,8 +1,9 @@
 #pragma once
 
-namespace brogueHd::backend::model::lighting
+namespace brogueHd::backend::modelConstant
 {
-	enum lightType {
+	enum lightType 
+	{
 		NO_LIGHT,
 		MINERS_LIGHT,
 		BURNING_CREATURE_LIGHT,

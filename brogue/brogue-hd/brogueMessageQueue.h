@@ -8,6 +8,8 @@
 
 using namespace std;
 
+using namespace brogueHd::backend::model::game;
+
 namespace brogueHd::backend::model
 {
 	class brogueMessageQueue

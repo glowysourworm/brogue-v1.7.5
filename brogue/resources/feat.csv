@@ -1,0 +1,14 @@
+name,description,initialValue
+
+"Pure Mage", "Ascend without using fists or a weapon.", true
+"Pure Warrior","Ascend without using a staff, wand or charm.", true
+"Pacifist","Ascend without attacking a creature.", true
+"Archivist", "Ascend without drinking a potion or reading a scroll.", true
+"Companion", "Journey with an ally through 20 depths.", false
+"Specialist","Enchant an item up to or above +16.", false
+"Jellymancer", "Obtain at least 90 jelly allies simultaneously.", false
+"Indomitable", "Ascend without taking damage.", true
+"Mystic","Ascend without eating.", true
+"Dragonslayer","Kill a dragon with a melee attack.", false
+"Paladin", "Ascend without attacking an unaware or fleeing creature.", true
+

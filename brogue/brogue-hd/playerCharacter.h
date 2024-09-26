@@ -2,7 +2,7 @@
 
 #include "broguedef.h"
 
-namespace brogueHd::backend::model
+namespace brogueHd::backend::model::game
 {
 	class playerCharacter
 	{
@@ -16,24 +16,24 @@ namespace brogueHd::backend::model
 		//boolean blockCombatText;			// busy auto-fighting
 		//boolean autoPlayingLevel;			// seriously, don't interrupt
 		//boolean automationActive;			// cut some corners during redraws to speed things up
-		boolean justRested;					// previous turn was a rest -- used in stealth
-		boolean justSearched;				// previous turn was a search -- used in manual searches
-		boolean cautiousMode;				// used to prevent careless deaths caused by holding down a key
-		boolean receivedLevitationWarning;	// only warn you once when you're hovering dangerously over liquid
-		boolean updatedSafetyMapThisTurn;	// so it's updated no more than once per turn
-		boolean updatedAllySafetyMapThisTurn;	// so it's updated no more than once per turn
-		boolean updatedMapToSafeTerrainThisTurn;// so it's updated no more than once per turn
-		boolean updatedMapToShoreThisTurn;		// so it's updated no more than once per turn
-		boolean easyMode;					// enables easy mode
-		boolean inWater;					// helps with the blue water filter effect
-		boolean heardCombatThisTurn;		// so you get only one "you hear combat in the distance" per turn
-		boolean creaturesWillFlashThisTurn;	// there are creatures out there that need to flash before the turn ends
-		boolean staleLoopMap;				// recalculate the loop map at the end of the turn
-		boolean alreadyFell;				// so the player can fall only one depth per turn
-		boolean eligibleToUseStairs;		// so the player uses stairs only when he steps onto them
-		boolean trueColorMode;				// whether lighting effects are disabled
-		boolean displayAggroRangeMode;      // whether your stealth range is displayed
-		boolean quit;						// to skip the typical end-game theatrics when the player quits
+		bool justRested;					// previous turn was a rest -- used in stealth
+		bool justSearched;				// previous turn was a search -- used in manual searches
+		bool cautiousMode;				// used to prevent careless deaths caused by holding down a key
+		bool receivedLevitationWarning;	// only warn you once when you're hovering dangerously over liquid
+		bool updatedSafetyMapThisTurn;	// so it's updated no more than once per turn
+		bool updatedAllySafetyMapThisTurn;	// so it's updated no more than once per turn
+		bool updatedMapToSafeTerrainThisTurn;// so it's updated no more than once per turn
+		bool updatedMapToShoreThisTurn;		// so it's updated no more than once per turn
+		bool easyMode;					// enables easy mode
+		bool inWater;					// helps with the blue water filter effect
+		bool heardCombatThisTurn;		// so you get only one "you hear combat in the distance" per turn
+		bool creaturesWillFlashThisTurn;	// there are creatures out there that need to flash before the turn ends
+		bool staleLoopMap;				// recalculate the loop map at the end of the turn
+		bool alreadyFell;				// so the player can fall only one depth per turn
+		bool eligibleToUseStairs;		// so the player uses stairs only when he steps onto them
+		bool trueColorMode;				// whether lighting effects are disabled
+		bool displayAggroRangeMode;      // whether your stealth range is displayed
+		bool quit;						// to skip the typical end-game theatrics when the player quits
 		unsigned long seed;					// the master seed for generating the entire dungeon
 		short RNG;							// which RNG are we currently using?
 		unsigned long gold;					// how much gold we have
@@ -114,14 +114,14 @@ namespace brogueHd::backend::model
 		//boolean featRecord[FEAT_COUNT];
 
 		// waypoints:
-		short** wpDistance[MAX_WAYPOINT_COUNT];
-		short wpCount;
-		short wpCoordinates[MAX_WAYPOINT_COUNT][2];
-		short wpRefreshTicker;
+		//short** wpDistance[MAX_WAYPOINT_COUNT];
+		//short wpCount;
+		//short wpCoordinates[MAX_WAYPOINT_COUNT][2];
+		//short wpRefreshTicker;
 
 		// cursor trail:
 		short cursorPathIntensity;
-		boolean cursorMode;
+		bool cursorMode;
 	};
 }
 

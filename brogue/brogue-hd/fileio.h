@@ -1,6 +1,7 @@
 #pragma once
 
 #include "broguedef.h"
+#include <exception>
 
 using namespace std;
 
@@ -11,7 +12,7 @@ namespace brogueHd::backend::model::io
 
 	public:
 
-		static boolean fileExists(const char* pathname)
+		static bool fileExists(const char* pathname)
 		{
 			try
 			{
@@ -34,22 +35,22 @@ namespace brogueHd::backend::model::io
 			}
 		}
 
-		/// <summary>
-		/// Returns available file path (file, file 1, ..., file N)
-		/// </summary>
-		static void getAvailableFilePath(char* returnPath, const char* defaultPath, const char* suffix)
-		{
-			char fullPath[BROGUE_FILENAME_MAX];
-			short fileNameIterator = 2;
+		///// <summary>
+		///// Returns available file path (file, file 1, ..., file N)
+		///// </summary>
+		//static void getAvailableFilePath(char* returnPath, const char* defaultPath, const char* suffix)
+		//{
+		//	char fullPath[BROGUE_FILENAME_MAX];
+		//	short fileNameIterator = 2;
 
-			strcpy(returnPath, defaultPath);
-			sprintf(fullPath, "%s%s", returnPath, suffix);
-			while (fileExists(fullPath)) {
-				sprintf(returnPath, "%s %i", defaultPath, fileNameIterator);
-				sprintf(fullPath, "%s%s", returnPath, suffix);
-				fileNameIterator++;
-			}
-		}
+		//	strcpy(returnPath, defaultPath);
+		//	sprintf(fullPath, "%s%s", returnPath, suffix);
+		//	while (fileExists(fullPath)) {
+		//		sprintf(returnPath, "%s %i", defaultPath, fileNameIterator);
+		//		sprintf(fullPath, "%s%s", returnPath, suffix);
+		//		fileNameIterator++;
+		//	}
+		//}
 	};
 }
 

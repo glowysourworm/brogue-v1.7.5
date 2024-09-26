@@ -1,7 +1,7 @@
 #include "renderingController.h"
 #include "gameConstants.h"
 
-using namespace brogueHd::backend::model::game;
+using namespace brogueHd::backend::modelConstant;
 
 namespace brogueHd::backend::controller
 {
@@ -24,28 +24,28 @@ namespace brogueHd::backend::controller
 	{
 		switch (_mode)
 		{
-		case brogueHd::backend::model::game::BrogueGameMode::Menu:
+		case BrogueGameMode::Menu:
 			renderMenuView();
 			break;
-		case brogueHd::backend::model::game::BrogueGameMode::MenuHighScores:
+		case BrogueGameMode::MenuHighScores:
 			renderHighScoresView();
 			break;
-		case brogueHd::backend::model::game::BrogueGameMode::MenuSetSeed:
+		case BrogueGameMode::MenuSetSeed:
 			renderSetSeedView();
 			break;
-		case brogueHd::backend::model::game::BrogueGameMode::MenuOpenGame:
+		case BrogueGameMode::MenuOpenGame:
 			renderOpenGameView();
 			break;
-		case brogueHd::backend::model::game::BrogueGameMode::Game:
+		case BrogueGameMode::Game:
 			renderGameView();
 			break;
-		case brogueHd::backend::model::game::BrogueGameMode::Playback:
+		case BrogueGameMode::Playback:
 			// TODO
 			break;
-		case brogueHd::backend::model::game::BrogueGameMode::Scum:
+		case BrogueGameMode::Scum:
 			// TODO
 			break;
-		case brogueHd::backend::model::game::BrogueGameMode::Quit:
+		case BrogueGameMode::Quit:
 			// TODO
 			break;
 		default:

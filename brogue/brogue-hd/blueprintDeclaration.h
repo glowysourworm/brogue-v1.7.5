@@ -1,8 +1,8 @@
 #pragma once
 
-#include "machineFeature.h"
+#include "machineTemplate.h"
 
-using namespace brogueHd::backend::model::machine;
+using namespace brogueHd::backend::model::gameTemplate;
 
 namespace brogueHd::backend::model::layout
 {

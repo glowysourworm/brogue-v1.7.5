@@ -1,10 +1,12 @@
 #pragma once
 
+#include "broguedef.h"
 #include "EnumString.h"
 
-namespace brogueHd::backend::model::creature
+namespace brogueHd::backend::modelConstant
 {
-	enum creatureStates {
+	enum creatureStates 
+	{
 		MONSTER_SLEEPING,
 		MONSTER_TRACKING_SCENT,
 		MONSTER_WANDERING,
@@ -12,12 +14,14 @@ namespace brogueHd::backend::model::creature
 		MONSTER_ALLY,
 	};
 
-	enum creatureModes {
+	enum creatureModes 
+	{
 		MODE_NORMAL,
 		MODE_PERM_FLEEING
 	};
 
-	enum hordeFlags {
+	enum hordeFlags 
+	{
 		HORDE_DIES_ON_LEADER_DEATH = Fl(0),	// if the leader dies, the horde will die instead of electing new leader
 		HORDE_IS_SUMMONED = Fl(1),	// minions summoned when any creature is the same species as the leader and casts summon
 		HORDE_SUMMONED_AT_DISTANCE = Fl(2),    // summons will appear across the level, and will naturally path back to the leader
@@ -48,7 +52,8 @@ namespace brogueHd::backend::model::creature
 			| HORDE_SACRIFICE_TARGET),
 	};
 
-	enum creatureBehaviorFlags {
+	enum creatureBehaviorFlags 
+	{
 		MONST_INVISIBLE = Fl(0),	// monster is invisible
 		MONST_INANIMATE = Fl(1),	// monster has abbreviated stat bar display and is immune to many things
 		MONST_IMMOBILE = Fl(2),	// monster won't move or perform melee attacks
@@ -90,7 +95,8 @@ namespace brogueHd::backend::model::creature
 		MONST_NEVER_MUTATED = (MONST_INVISIBLE | MONST_INANIMATE | MONST_IMMOBILE | MONST_INVULNERABLE),
 	};
 
-	enum creatureAbilityFlags {
+	enum creatureAbilityFlags 
+	{
 		MA_HIT_HALLUCINATE = Fl(0),	// monster can hit to cause hallucinations
 		MA_HIT_STEAL_FLEE = Fl(1),	// monster can steal an item and then run away
 		MA_HIT_BURN = Fl(2),    // monster can hit to set you on fire
@@ -119,9 +125,7 @@ namespace brogueHd::backend::model::creature
 		MA_NEVER_MUTATED = (MA_KAMIKAZE),
 	};
 
-
-
-	enum creatureBookkeepingFlags 
+	enum creatureBookkeepingFlags
 	{
 		MB_WAS_VISIBLE = Fl(0),	// monster was visible to player last turn
 		MB_TELEPATHICALLY_REVEALED = Fl(1),    // player can magically see monster and adjacent cells
@@ -149,45 +153,83 @@ namespace brogueHd::backend::model::creature
 		MB_ALREADY_SEEN = Fl(23),   // seeing this monster won't interrupt exploration
 	};
 
-	struct creatureBehavior
+
+	Begin_Enum_String(creatureAbilityFlags)
 	{
-		creatureStates creatureState;		// current behavioral state
-		creatureModes creatureMode;			// current behavioral mode (higher-level than state)
-	};
+		Enum_String_With_Description(MA_HIT_HALLUCINATE, "can induce hallucinations");
+		Enum_String_With_Description(MA_HIT_STEAL_FLEE, "can steal items");
+		Enum_String_With_Description(MA_HIT_BURN, "lights enemies on fire when $HESHE hits");
+		Enum_String_With_Description(MA_ENTER_SUMMONS, "can possess $HISHER summoned allies");
+		Enum_String_With_Description(MA_HIT_DEGRADE_ARMOR, "corrodes armor when $HESHE hits");
+		Enum_String_With_Description(MA_CAST_SUMMON, "can summon allies");
+		Enum_String_With_Description(MA_SEIZES, "immobilizes $HISHER prey");
+		Enum_String_With_Description(MA_POISONS, "injects poison when $HESHE hits");
+		Enum_String_With_Description(MA_DF_ON_DEATH, "");
+		Enum_String_With_Description(MA_CLONE_SELF_ON_DEFEND, "divides in two when struck");
+		Enum_String_With_Description(MA_KAMIKAZE, "dies when $HESHE attacks");
+		Enum_String_With_Description(MA_TRANSFERENCE, "recovers health when $HESHE inflicts damage");
+		Enum_String_With_Description(MA_CAUSES_WEAKNESS, "saps strength when $HESHE inflicts damage");
 
-//#define STRINGIFY(macro) #macro
+		Enum_String_With_Description(MA_ATTACKS_PENETRATE, "attacks up to two opponents in a line");
+		Enum_String_With_Description(MA_ATTACKS_ALL_ADJACENT, "attacks all adjacent opponents at once");
+		Enum_String_With_Description(MA_ATTACKS_EXTEND, "attacks with a whip");
+		Enum_String_With_Description(MA_ATTACKS_STAGGER, "pushes opponents backward when $HESHE hits");
+		Enum_String_With_Description(MA_AVOID_CORRIDORS, "avoids attacking in corridors in a group");
+	}
+	End_Enum_String;
 
-Begin_Enum_String(creatureBehaviorFlags)
-{
-	Enum_String_With_Description(MONST_INVISIBLE, "is invisible");
-	Enum_String_With_Description(MONST_INANIMATE, "is an inanimate object");
-	Enum_String_With_Description(MONST_IMMOBILE, "cannot move");
-	Enum_String_With_Description(MONST_CARRY_ITEM_100, "");
-	Enum_String_With_Description(MONST_CARRY_ITEM_25, "");
-	Enum_String_With_Description(MONST_ALWAYS_HUNTING, "");
-	Enum_String_With_Description(MONST_FLEES_NEAR_DEATH, "flees at low health");
-	Enum_String_With_Description(MONST_ATTACKABLE_THRU_WALLS, "");
-	Enum_String_With_Description(MONST_DEFEND_DEGRADE_WEAPON, "corrodes weapons when hit");
-	Enum_String_With_Description(MONST_IMMUNE_TO_WEAPONS, "is immune to weapon damage");
-	Enum_String_With_Description(MONST_FLIES, "flies");
-	Enum_String_With_Description(MONST_FLITS, "moves erratically");
-	Enum_String_With_Description(MONST_IMMUNE_TO_FIRE, "is immune to fire");
-	Enum_String_With_Description(MONST_CAST_SPELLS_SLOWLY, "");
-	Enum_String_With_Description(MONST_IMMUNE_TO_WEBS, "cannot be entangled");
-	Enum_String_With_Description(MONST_REFLECT_4, "can reflect magic spells");
-	Enum_String_With_Description(MONST_NEVER_SLEEPS, "never sleeps");
-	Enum_String_With_Description(MONST_FIERY, "burns unceasingly");
-	Enum_String_With_Description(MONST_INVULNERABLE, "is invulnerable");
-	Enum_String_With_Description(MONST_IMMUNE_TO_WATER, "is at home in water");
-	Enum_String_With_Description(MONST_RESTRICTED_TO_LIQUID, "cannot venture onto dry land");
-	Enum_String_With_Description(MONST_SUBMERGES, "submerges");
-	Enum_String_With_Description(MONST_MAINTAINS_DISTANCE, "keeps $HISHER distance");
-	Enum_String_With_Description(MONST_WILL_NOT_USE_STAIRS, "");
-	Enum_String_With_Description(MONST_DIES_IF_NEGATED, "is animated purely by magic");
-	Enum_String_With_Description(MONST_MALE, "");
-	Enum_String_With_Description(MONST_FEMALE, "");
-	Enum_String_With_Description(MONST_NOT_LISTED_IN_SIDEBAR, "");
-	Enum_String_With_Description(MONST_GETS_TURN_ON_ACTIVATION, "moves only when activated");
-}
-End_Enum_String;
+	Begin_Enum_String(creatureBehaviorFlags)
+	{
+		Enum_String_With_Description(MONST_INVISIBLE, "is invisible");
+		Enum_String_With_Description(MONST_INANIMATE, "is an inanimate object");
+		Enum_String_With_Description(MONST_IMMOBILE, "cannot move");
+		Enum_String_With_Description(MONST_CARRY_ITEM_100, "");
+		Enum_String_With_Description(MONST_CARRY_ITEM_25, "");
+		Enum_String_With_Description(MONST_ALWAYS_HUNTING, "");
+		Enum_String_With_Description(MONST_FLEES_NEAR_DEATH, "flees at low health");
+		Enum_String_With_Description(MONST_ATTACKABLE_THRU_WALLS, "");
+		Enum_String_With_Description(MONST_DEFEND_DEGRADE_WEAPON, "corrodes weapons when hit");
+		Enum_String_With_Description(MONST_IMMUNE_TO_WEAPONS, "is immune to weapon damage");
+		Enum_String_With_Description(MONST_FLIES, "flies");
+		Enum_String_With_Description(MONST_FLITS, "moves erratically");
+		Enum_String_With_Description(MONST_IMMUNE_TO_FIRE, "is immune to fire");
+		Enum_String_With_Description(MONST_CAST_SPELLS_SLOWLY, "");
+		Enum_String_With_Description(MONST_IMMUNE_TO_WEBS, "cannot be entangled");
+		Enum_String_With_Description(MONST_REFLECT_4, "can reflect magic spells");
+		Enum_String_With_Description(MONST_NEVER_SLEEPS, "never sleeps");
+		Enum_String_With_Description(MONST_FIERY, "burns unceasingly");
+		Enum_String_With_Description(MONST_INVULNERABLE, "is invulnerable");
+		Enum_String_With_Description(MONST_IMMUNE_TO_WATER, "is at home in water");
+		Enum_String_With_Description(MONST_RESTRICTED_TO_LIQUID, "cannot venture onto dry land");
+		Enum_String_With_Description(MONST_SUBMERGES, "submerges");
+		Enum_String_With_Description(MONST_MAINTAINS_DISTANCE, "keeps $HISHER distance");
+		Enum_String_With_Description(MONST_WILL_NOT_USE_STAIRS, "");
+		Enum_String_With_Description(MONST_DIES_IF_NEGATED, "is animated purely by magic");
+		Enum_String_With_Description(MONST_MALE, "");
+		Enum_String_With_Description(MONST_FEMALE, "");
+		Enum_String_With_Description(MONST_NOT_LISTED_IN_SIDEBAR, "");
+		Enum_String_With_Description(MONST_GETS_TURN_ON_ACTIVATION, "moves only when activated");
+	}
+	End_Enum_String;
+
+	Begin_Enum_String(creatureBookkeepingFlags)
+	{
+		Enum_String_With_Description(MB_WAS_VISIBLE, "");
+		Enum_String_With_Description(MB_TELEPATHICALLY_REVEALED, "is telepathically bonded with you");
+		Enum_String_With_Description(MB_PREPLACED, "");
+		Enum_String_With_Description(MB_APPROACHING_UPSTAIRS, "");
+		Enum_String_With_Description(MB_APPROACHING_DOWNSTAIRS, "");
+		Enum_String_With_Description(MB_APPROACHING_PIT, "");
+		Enum_String_With_Description(MB_LEADER, "");
+		Enum_String_With_Description(MB_FOLLOWER, "");
+		Enum_String_With_Description(MB_CAPTIVE, "");
+		Enum_String_With_Description(MB_SEIZED, "has been immobilized");
+		Enum_String_With_Description(MB_SEIZING, "is currently holding $HISHER prey immobile");
+		Enum_String_With_Description(MB_SUBMERGED, "is submerged");
+		Enum_String_With_Description(MB_JUST_SUMMONED, "");
+		Enum_String_With_Description(MB_WILL_FLASH, "");
+		Enum_String_With_Description(MB_BOUND_TO_LEADER, "is anchored to reality by $HISHER summoner");
+		Enum_String_With_Description(MB_MARKED_FOR_SACRIFICE, "is marked for demonic sacrifice");
+	}
+	End_Enum_String;
 }

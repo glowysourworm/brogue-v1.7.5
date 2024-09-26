@@ -1,8 +1,12 @@
 #pragma once
 
-namespace brogueHd::backend::model::lighting
+#include "mathdef.h"
+#include "color.h"
+
+namespace brogueHd::backend::model::game
 {
-	struct light {
+	struct light 
+	{
 
 		short red;
 		short green;
@@ -20,5 +24,13 @@ namespace brogueHd::backend::model::lighting
 			return red == light.red && blue == light.blue && green == light.green;
 		}
 
+	};
+
+	struct lightSource
+	{
+		color lightColor;
+		randomRange lightRadius;
+		short radialFadeToPercent;
+		bool passThroughCreatures;			// generally no, but miner light does
 	};
 }

@@ -1,7 +1,5 @@
 #pragma once
 
-#include "broguedef.h"
-
 namespace brogueHd::backend::model::game
 {
 	struct color 
@@ -22,7 +20,17 @@ namespace brogueHd::backend::model::game
 		// Flag: this color "dances" with every refresh:
 		bool colorDances;
 
-		color() {}
+		color() 
+		{
+			red = 0;
+			green = 0;
+			blue = 0;
+			redRand = 0;
+			greenRand = 0;
+			blueRand = 0;
+			rand = 0;
+			colorDances = false;
+		}
 		color(const color& color)
 		{
 			red = color.red;

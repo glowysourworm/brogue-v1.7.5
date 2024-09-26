@@ -1,0 +1,230 @@
+#BLUEPRINTS:
+#depths	roomSize	freq	featureCt   	dungeonProfileType  flags		featureIndices[]
+
+#FEATURES:
+#DF		terrain		layer	instanceCtRange	minInsts			itemCat		itemKind	monsterKind		reqSpace		hordeFl		itemFlags	featureFlags
+
+depths,roomSize,freq,featureCt,dungeonProfileType,flags,DF,terrain,layer,instanceCtRange,minInsts,itemCat,itemKind,monsterKind,reqSpace,hordeFl,itemFlags,featureFlags
+
+# -- REWARD ROOMS -- (See features.csv for featureIndices[])
+
+# Mixed item library -- can check one item out at a time
+{1, 12},           {30, 50},	30,		6,			0,                  (BP_ROOM | BP_PURGE_INTERIOR | BP_SURROUND_WITH_WALLS | BP_OPEN_INTERIOR | BP_IMPREGNABLE | BP_REWARD), [0,1,2,3,4]
+
+# Single item category library -- can check one item out at a time
+{1, 12},           {30, 50},	15,		5,			0,                  (BP_ROOM | BP_PURGE_INTERIOR | BP_SURROUND_WITH_WALLS | BP_OPEN_INTERIOR | BP_IMPREGNABLE | BP_REWARD), [5,6,7,8,9,10]
+
+# Treasure room -- apothecary or archive (potions or scrolls)
+{8, AMULET_LEVEL},	{20, 40},	20,		6,			0,                  (BP_ROOM | BP_PURGE_INTERIOR | BP_SURROUND_WITH_WALLS | BP_OPEN_INTERIOR | BP_IMPREGNABLE | BP_REWARD),	[11,12,13,14,15,16]
+
+# Guaranteed good permanent item on a glowing pedestal (runic weapon/armor or 2 staffs)
+{5, 16},           {10, 30},	30,		6,			0,                  (BP_ROOM | BP_PURGE_INTERIOR | BP_SURROUND_WITH_WALLS | BP_OPEN_INTERIOR | BP_IMPREGNABLE | BP_REWARD), [17,18,19,20,21,22]
+
+# Guaranteed good consumable item on glowing pedestals (scrolls of enchanting, potion of life)
+{10, AMULET_LEVEL},{10, 30},	30,		5,			0,                  (BP_ROOM | BP_PURGE_INTERIOR | BP_SURROUND_WITH_WALLS | BP_OPEN_INTERIOR | BP_IMPREGNABLE | BP_REWARD), [23,24,25,26,27]
+
+# Commutation altars
+{13, AMULET_LEVEL},{10, 30},	50,		4,			0,                  (BP_ROOM | BP_PURGE_INTERIOR | BP_SURROUND_WITH_WALLS | BP_OPEN_INTERIOR | BP_IMPREGNABLE | BP_REWARD), [28,29,30,31]
+
+# Resurrection altar
+{13, AMULET_LEVEL},{10, 30},	15,		4,			0,                  (BP_ROOM | BP_PURGE_INTERIOR | BP_SURROUND_WITH_WALLS | BP_OPEN_INTERIOR | BP_IMPREGNABLE | BP_REWARD),	[32,33,34,35]
+
+# Outsourced item -- same item possibilities as in the good permanent item reward room (plus charms), but directly adopted by 1-2 key machines.
+{5, 17},           {0, 0},     20,		4,			0,                  (BP_REWARD | BP_NO_INTERIOR_FLAG), [36,37,38,39]
+
+# Dungeon -- two allies chained up for the taking
+{5, AMULET_LEVEL},	{30, 80},	4,		5,			0,                  (BP_ROOM | BP_REWARD), [40,41,42,43,44,45]
+
+# Kennel -- allies locked in cages in an open room; choose one or two to unlock and take with you.
+{5, AMULET_LEVEL},	{30, 80},	4,		4,			0,                  (BP_ROOM | BP_REWARD),	[46,47,48,49,50]
+
+# Vampire lair -- allies locked in cages and chained in a hidden room with a vampire in a coffin; vampire has one cage key.
+{10, AMULET_LEVEL},{50, 80},	3,		4,			0,                  (BP_ROOM | BP_REWARD | BP_SURROUND_WITH_WALLS | BP_PURGE_INTERIOR),	[51,52,53,54]
+
+# Legendary ally -- approach the altar with the crystal key to activate a portal and summon a legendary ally.
+{8, AMULET_LEVEL}, {30, 50},	10,		2,			0,                  (BP_ROOM | BP_REWARD), [55,56]
+
+# Goblin warren
+{5, 15},           {100, 200},	15,     9,			DP_GOBLIN_WARREN,   (BP_ROOM | BP_REWARD | BP_MAXIMIZE_INTERIOR | BP_REDESIGN_INTERIOR), [57,58,59,60,61,62,63,64,65]
+
+# Sentinel sanctuary
+{10, 23},           {100, 200}, 15,  10,			DP_SENTINEL_SANCTUARY, (BP_ROOM | BP_REWARD | BP_MAXIMIZE_INTERIOR | BP_REDESIGN_INTERIOR)[66,67,68,69,70,71,72,73,74,75]
+
+# -- AMULET HOLDER --
+
+# Statuary -- key on an altar, area full of statues; take key to cause statues to burst and reveal monsters
+{10, AMULET_LEVEL},{35, 40},	0,		4,			0,                  (BP_PURGE_INTERIOR | BP_OPEN_INTERIOR),	[76,77,78,79]
+
+# -- VESTIBULES --
+
+# Plain locked door, key guarded by an adoptive room
+{1, AMULET_LEVEL},	{1, 1},     150,		1,		0,                  (BP_VESTIBULE),	[80]
+
+# Plain secret door
+{2, AMULET_LEVEL},	{1, 1},     1,		1,			0,                  (BP_VESTIBULE),	[81]
+
+# Lever and either an exploding wall or a portcullis
+{4, AMULET_LEVEL},	{1, 1},     8,		3,			0,                  (BP_VESTIBULE),	[82,83,84]
+
+# Flammable barricade in the doorway -- burn the wooden barricade to enter
+{1, 6},			{1, 1},     10,		3,			0,                  (BP_VESTIBULE), [85,86,87]
+
+# Statue in the doorway -- use a scroll of shattering to enter
+{1, AMULET_LEVEL},	{1, 1},     6,		2,			0,                  (BP_VESTIBULE), [88,89]
+
+# Statue in the doorway -- bursts to reveal monster
+{5, AMULET_LEVEL},	{2, 2},     6,		2,			0,                  (BP_VESTIBULE), [90,91]
+
+# Throwing tutorial -- toss an item onto the pressure plate to retract the portcullis
+{1, 4},			{70, 70},	8,      3,          0,                  (BP_VESTIBULE), [92,93,94]
+
+# Pit traps -- area outside entrance is full of pit traps
+{1, AMULET_LEVEL},	{30, 60},	8,		3,			0,                  (BP_VESTIBULE | BP_OPEN_INTERIOR | BP_NO_INTERIOR_FLAG), [95,96,97]
+
+# Beckoning obstacle -- a mirrored totem guards the door, and glyph are around the doorway.
+{5, AMULET_LEVEL}, {15, 30},	8,		3,			0,                  (BP_VESTIBULE | BP_PURGE_INTERIOR | BP_OPEN_INTERIOR), [98,99,100,101]
+
+# Guardian obstacle -- a guardian is in the door on a glyph, with other glyphs scattered around.
+{6, AMULET_LEVEL}, {25, 25},	8,		4,          0,                  (BP_VESTIBULE | BP_OPEN_INTERIOR), [102,103,104,105]
+
+# -- KEY HOLDERS --
+
+# Nested item library -- can check one item out at a time, and one is a disposable key to another reward room
+{1, AMULET_LEVEL},	{30, 50},	35,		7,			0,                  (BP_ROOM | BP_PURGE_INTERIOR | BP_SURROUND_WITH_WALLS | BP_OPEN_INTERIOR | BP_ADOPT_ITEM | BP_IMPREGNABLE),	[106,107,108,109,110,111,112]
+
+# Secret room -- key on an altar in a secret room
+{1, AMULET_LEVEL},	{15, 100},	1,		2,			0,                  (BP_ROOM | BP_ADOPT_ITEM), [113,114]
+
+# Throwing tutorial -- toss an item onto the pressure plate to retract the cage and reveal the key
+{1, 4},			{70, 80},	8,		2,			0,                  (BP_ADOPT_ITEM), [115,116]
+
+# Rat trap -- getting the key triggers paralysis vents nearby and also causes rats to burst out of the walls
+{1,8},             {30, 70},	7,		3,          0,                  (BP_ADOPT_ITEM | BP_ROOM), [117,118,119]
+
+# Fun with fire -- trigger the fire trap and coax the fire over to the wooden barricade surrounding the altar and key
+{3, 10},			{80, 100},	10,		6,			0,                  (BP_ROOM | BP_ADOPT_ITEM | BP_PURGE_INTERIOR | BP_SURROUND_WITH_WALLS | BP_OPEN_INTERIOR), [119,120,121,122,123,124]
+
+# Flood room -- key on an altar in a room with pools of eel-infested waters; take key to flood room with shallow water
+{3, AMULET_LEVEL},	{80, 180},	10,		4,			0,                  (BP_ROOM | BP_SURROUND_WITH_WALLS | BP_PURGE_LIQUIDS | BP_PURGE_PATHING_BLOCKERS | BP_ADOPT_ITEM), [125,126,127,128]
+
+# Fire trap room -- key on an altar, pools of water, fire traps all over the place.
+{4, AMULET_LEVEL},	{80, 180},	6,		5,			0,                  (BP_ROOM | BP_SURROUND_WITH_WALLS | BP_PURGE_LIQUIDS | BP_PURGE_PATHING_BLOCKERS | BP_ADOPT_ITEM),	[129,130,131,132,133]
+
+# Thief area -- empty altar, monster with item, permanently fleeing.
+{3, AMULET_LEVEL},	{15, 20},	10,		2,			0,                  (BP_ADOPT_ITEM), [134,135]
+
+# Collapsing floor area -- key on an altar in an area; take key to cause the floor of the area to collapse
+{1, AMULET_LEVEL},	{45, 65},	13,		3,			0,                  (BP_ADOPT_ITEM | BP_TREAT_AS_BLOCKING),	[136,137,138]
+
+# Pit traps -- key on an altar, room full of pit traps
+{1, AMULET_LEVEL},	{30, 100},	10,		3,			0,                  (BP_ROOM | BP_ADOPT_ITEM),	[139,140,141]
+
+# Levitation challenge -- key on an altar, room filled with pit, levitation or lever elsewhere on level, bridge appears when you grab the key/lever.
+{1, 13},			{75, 120},	10,		9,			0,                  (BP_ROOM | BP_ADOPT_ITEM | BP_PURGE_INTERIOR | BP_OPEN_INTERIOR | BP_SURROUND_WITH_WALLS), [142,143,144,145,146,147,148]
+
+# Web climbing -- key on an altar, room filled with pit, spider at altar to shoot webs, bridge appears when you grab the key
+{7, AMULET_LEVEL},	{55, 90},	10,		7,			0,                  (BP_ROOM | BP_ADOPT_ITEM | BP_PURGE_INTERIOR | BP_OPEN_INTERIOR | BP_SURROUND_WITH_WALLS), [149,150,151,152,153]
+
+# Lava moat room -- key on an altar, room filled with lava, levitation/fire immunity/lever elsewhere on level, lava retracts when you grab the key/lever
+{3, 13},			{75, 120},	7,		7,			0,                  (BP_ROOM | BP_ADOPT_ITEM | BP_PURGE_INTERIOR | BP_SURROUND_WITH_WALLS | BP_OPEN_INTERIOR), [154,155,156,157,158,159,160]
+
+# Lava moat area -- key on an altar, surrounded with lava, levitation/fire immunity elsewhere on level, lava retracts when you grab the key
+{3, 13},			{40, 60},	3,		5,			0,                  (BP_ADOPT_ITEM | BP_PURGE_INTERIOR | BP_OPEN_INTERIOR | BP_TREAT_AS_BLOCKING), [161,162,163,164,165]
+
+# Poison gas -- key on an altar; take key to cause a caustic gas vent to appear and the door to be blocked; there is a hidden trapdoor or an escape item somewhere inside
+{4, AMULET_LEVEL},	{35, 60},	7,		7,			0,                  (BP_ROOM | BP_PURGE_INTERIOR | BP_SURROUND_WITH_WALLS | BP_ADOPT_ITEM),	[166,167,168,169,170,171,172]
+
+# Explosive situation -- key on an altar; take key to cause a methane gas vent to appear and a pilot light to ignite
+{7, AMULET_LEVEL},	{80, 90},	10,		5,			0,                  (BP_ROOM | BP_PURGE_LIQUIDS | BP_SURROUND_WITH_WALLS | BP_ADOPT_ITEM),	[173,174,175,176,177]
+
+# Burning grass -- key on an altar; take key to cause pilot light to ignite grass in room
+{1, 7},			{40, 110},	10,		6,			0,                  (BP_ROOM | BP_PURGE_INTERIOR | BP_SURROUND_WITH_WALLS | BP_ADOPT_ITEM | BP_OPEN_INTERIOR), [178,179,180,181,182,183]
+
+# Statuary -- key on an altar, area full of statues; take key to cause statues to burst and reveal monsters
+{10, AMULET_LEVEL},{35, 90},	10,		2,			0,                  (BP_ADOPT_ITEM | BP_NO_INTERIOR_FLAG), [184,185]
+
+# Guardian water puzzle -- key held by a guardian, flood trap in the room, glyphs scattered. Lure the guardian into the water to have him drop the key.
+{4, AMULET_LEVEL}, {35, 70},	8,		4,			0,                  (BP_ROOM | BP_PURGE_INTERIOR | BP_SURROUND_WITH_WALLS | BP_ADOPT_ITEM), [186,187,188,189]
+
+# Guardian gauntlet -- key in a room full of guardians, glyphs scattered and unavoidable.
+{6, AMULET_LEVEL}, {50, 95},	10,		6,			0,                  (BP_ROOM | BP_ADOPT_ITEM),	[190,191,192,193,194,195]
+
+# Guardian corridor -- key in a small room, with a connecting corridor full of glyphs, one guardian blocking the corridor.
+{4, AMULET_LEVEL}, {85, 100},   5,     7,          0,                  (BP_ROOM | BP_ADOPT_ITEM | BP_PURGE_INTERIOR | BP_OPEN_INTERIOR | BP_SURROUND_WITH_WALLS), [196,197,198,199,200,201,202]
+
+# Sacrifice altar -- lure the chosen monster from elsewhere on the level onto the altar to release the key.
+{4, AMULET_LEVEL}, {20, 60},   12,     6,          0,                  (BP_ROOM | BP_ADOPT_ITEM | BP_PURGE_INTERIOR | BP_OPEN_INTERIOR | BP_SURROUND_WITH_WALLS), [203,204,205,206,207,208]
+
+# Summoning circle -- key in a room with an eldritch totem, glyphs unavoidable.  (DISABLED. (Not fun enough.))
+{12, AMULET_LEVEL}, {50, 100},	0,		2,			0,                  (BP_ROOM | BP_OPEN_INTERIOR | BP_ADOPT_ITEM), [209,210]
+
+# Beckoning obstacle -- key surrounded by glyphs in a room with a mirrored totem.
+{5, AMULET_LEVEL}, {60, 100},	10,		4,			0,                  (BP_ROOM | BP_PURGE_INTERIOR | BP_SURROUND_WITH_WALLS | BP_OPEN_INTERIOR | BP_ADOPT_ITEM), [211,212,213,214]
+
+# Worms in the walls -- key on altar; take key to cause underworms to burst out of the walls
+{12,AMULET_LEVEL},	{7, 7},		7,		2,			0,                  (BP_ADOPT_ITEM), [215,216]
+
+# Mud pit -- key on an altar, room full of mud, take key to cause bog monsters to spawn in the mud
+{12, AMULET_LEVEL},{40, 90},	10,		3,			0,                  (BP_ROOM | BP_ADOPT_ITEM | BP_SURROUND_WITH_WALLS | BP_PURGE_LIQUIDS), [217,218,219]
+
+# Electric crystals -- key caged on an altar, darkened crystal globes around the room, lightning the globes to release the key.
+{6, AMULET_LEVEL},{40, 60},	10,		4,			0,                  (BP_ROOM | BP_ADOPT_ITEM | BP_SURROUND_WITH_WALLS | BP_OPEN_INTERIOR | BP_PURGE_INTERIOR), [220,221,222,223]
+
+# Zombie crypt -- key on an altar; coffins scattered around; brazier in the room; take key to cause zombies to burst out of all of the coffins
+{12, AMULET_LEVEL},{60, 90},	10,		8,			0,                  (BP_ROOM | BP_ADOPT_ITEM | BP_SURROUND_WITH_WALLS | BP_PURGE_INTERIOR),	[224,225,226,227,228,229,230,231]
+
+# Haunted house -- key on an altar; take key to cause the room to darken, ectoplasm to cover everything and phantoms to appear
+{16, AMULET_LEVEL},{45, 150},	10,		4,			0,                  (BP_ROOM | BP_ADOPT_ITEM | BP_PURGE_INTERIOR | BP_SURROUND_WITH_WALLS),	[232,233,234,235]
+
+# Worm tunnels -- hidden lever causes tunnels to open up revealing worm areas and a key
+{8, AMULET_LEVEL},{80, 175},	10,		6,			0,                  (BP_ROOM | BP_ADOPT_ITEM | BP_PURGE_INTERIOR | BP_MAXIMIZE_INTERIOR | BP_SURROUND_WITH_WALLS),	[236,237,238,239,240,241]
+
+# Gauntlet -- key on an altar; take key to cause turrets to emerge
+{5, 24},			{35, 90},	10,		2,			0,                  (BP_ADOPT_ITEM | BP_NO_INTERIOR_FLAG), [242,243]
+
+# Boss -- key is held by a boss atop a pile of bones in a secret room. A few fungus patches light up the area.
+{5, AMULET_LEVEL},	{40, 100},	18,		3,			0,                  (BP_ROOM | BP_ADOPT_ITEM | BP_SURROUND_WITH_WALLS | BP_PURGE_LIQUIDS), [244,245,246]
+
+# -- FLAVOR MACHINES --
+
+# Bloodwort -- bloodwort stalk, some pods, and surrounding grass
+{1,DEEPEST_LEVEL},	{5, 5},     0,          2,      0,                  (BP_TREAT_AS_BLOCKING), [247,248]
+
+# Shrine -- safe haven constructed and abandoned by a past adventurer
+{1,DEEPEST_LEVEL},	{15, 25},   0,          3,      0,                  (BP_ROOM | BP_PURGE_INTERIOR | BP_SURROUND_WITH_WALLS | BP_OPEN_INTERIOR), [249,250,251]
+
+# Idyll -- ponds and some grass and forest
+{1,DEEPEST_LEVEL},	{80, 120},	0,		2,			0,                  BP_NO_INTERIOR_FLAG, [252,253]
+
+# Swamp -- mud, grass and some shallow water
+{1,DEEPEST_LEVEL},	{50, 65},	0,		2,			0,                  BP_NO_INTERIOR_FLAG, [254,255]
+
+# Camp -- hay, junk, urine, vomit
+{1,DEEPEST_LEVEL},	{40, 50},	0,		4,			0,                  BP_NO_INTERIOR_FLAG, [256,257,258,259]
+
+# Remnant -- carpet surrounded by ash and with some statues
+{1,DEEPEST_LEVEL},	{80, 120},	0,		2,			0,                  BP_NO_INTERIOR_FLAG, [260,261]
+
+# Dismal -- blood, bones, charcoal, some rubble
+{1,DEEPEST_LEVEL},	{60, 70},	0,		3,			0,                  BP_NO_INTERIOR_FLAG, [262,263,264]
+
+# Chasm catwalk -- narrow bridge over a chasm, possibly under fire from a turret or two
+{1,DEEPEST_LEVEL - 1},{40, 80},	0,		4,			0,                  (BP_REQUIRE_BLOCKING | BP_OPEN_INTERIOR | BP_NO_INTERIOR_FLAG), [265,266,267,268]
+
+# Lake walk -- narrow bridge of shallow water through a lake, possibly under fire from a turret or two
+{1,DEEPEST_LEVEL},	{40, 80},	0,		3,			0,                  (BP_REQUIRE_BLOCKING | BP_OPEN_INTERIOR | BP_NO_INTERIOR_FLAG), [269,270,271]
+
+# Paralysis trap -- already-revealed pressure plate with a few hidden vents nearby.
+{1,DEEPEST_LEVEL},	{35, 40},	0,		2,			0,                  (BP_NO_INTERIOR_FLAG), [272,273]
+
+# Paralysis trap -- hidden pressure plate with a few vents nearby.
+{1,DEEPEST_LEVEL},	{35, 40},	0,		2,			0,                  (BP_NO_INTERIOR_FLAG), [274,275]
+
+# Statue comes alive -- innocent-looking statue that bursts to reveal a monster when the player approaches
+{1,DEEPEST_LEVEL},	{5, 5},		0,		3,			0,                  (BP_NO_INTERIOR_FLAG), [276,277,278]
+
+# Worms in the walls -- step on trigger region to cause underworms to burst out of the walls
+{1,DEEPEST_LEVEL},	{7, 7},		0,		2,			0,                  (BP_NO_INTERIOR_FLAG), [279,280]
+
+# Sentinels
+{1,DEEPEST_LEVEL},	{40, 40},	0,		2,			0,                  (BP_NO_INTERIOR_FLAG), [281,282]

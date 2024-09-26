@@ -8,7 +8,7 @@ namespace brogueHd::backend::model::layout
 {
 	struct floorTileType {
 		// appearance:
-		uchar displayChar;
+		char displayChar;
 		const color* foreColor;
 		const color* backColor;
 		short drawPriority;                     // priority (lower number means higher priority); governs drawing as well as tile replacement comparisons.

@@ -5,19 +5,18 @@
 #include "broguedef.h"
 
 using namespace brogueHd::backend::model::game;
-using namespace brogueHd::backend::model::lighting;
 
 namespace brogueHd::backend::model::layout
 {
 	struct brogueCellDisplay
 	{
-		uchar character;
+		char character;
 		color foreColor;
 		color backColor;
 		char opacity;
 		bool needsUpdate;
 
-		light light;
+		light lighting;
 		
 
 		//light oldLight;									// compare with subsequent lighting to determine whether to refresh cell
@@ -58,7 +57,7 @@ namespace brogueHd::backend::model::layout
 			backColor = copy.backColor;									// Careful with instances. These are non-unique
 			opacity = copy.opacity;
 			needsUpdate = copy.needsUpdate;
-			light = copy.light;											// Careful with instances. These are non-unique
+			lighting = copy.lighting;											// Careful with instances. These are non-unique
 		}
 
 		bool compare(const brogueCellDisplay& display)
@@ -68,7 +67,7 @@ namespace brogueHd::backend::model::layout
 				   backColor.compare(display.backColor) &&
 				   opacity == display.opacity &&
 				   needsUpdate == display.needsUpdate &&
-				   light.compare(display.light);
+					lighting.compare(display.lighting);
 		}
 	};
 }

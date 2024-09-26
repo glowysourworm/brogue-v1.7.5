@@ -94,21 +94,21 @@ namespace brogueHd::backend::model::layout
 		/// Returns true if the location is at the edge of the grid (using NULL comparison), or 
 		/// the provided predicate.
 		/// </summary>
-		bool isEdge(short column, short row, gridDelegates<T>::simplePredicate predicate) const;
+		bool isEdgeWhere(short column, short row, gridDelegates<T>::precicate predicate) const;
 
 		/// <summary>
 		/// Returns true if the adjacent element is positive with respect to the provided predicate OR is
 		/// out of bounds OR is null FOR the provided direction.
 		/// </summary>
 		/// <param name="direction">Compass direction treated with DIRECT EQUALITY! (DOESN'T USE FLAGS)</param>
-		bool isExposedEdge(int column, int row, brogueCompass direction, gridDelegates<T>::simplePredicate predicate) const;
+		bool isExposedEdge(int column, int row, brogueCompass direction, gridDelegates<T>::precicate predicate) const;
 
 		/// <summary>
 		/// Returns true if the adjacent element is positive with respect to the provided predicate OR is
 		/// out of bounds OR is null FOR the provided NON-CARDINAL direction.
 		/// </summary>
 		/// <param name="direction">Compass direction treated with DIRECT EQUALITY! (DOESN'T USE FLAGS)</param>
-		bool isExposedCorner(int column, int row, brogueCompass direction, gridDelegates<T>::simplePredicate predicate) const;
+		bool isExposedCorner(int column, int row, brogueCompass direction, gridDelegates<T>::precicate predicate) const;
 
 	private:
 

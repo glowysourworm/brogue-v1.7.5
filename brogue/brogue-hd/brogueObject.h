@@ -15,7 +15,7 @@ namespace brogueHd::backend::model
 
 	public:
 
-		uchar character;
+		char character;
 		color foreColor;
 		color backColor;
 		char opacity;

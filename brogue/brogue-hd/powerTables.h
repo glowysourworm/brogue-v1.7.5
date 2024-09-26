@@ -1,7 +1,6 @@
 #pragma once
 
 #include "brogueMath.h"
-#include "creature.h"
 #include "creatureDeclaration.h"
 
 using namespace brogueHd::backend::model::creature;

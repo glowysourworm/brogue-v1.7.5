@@ -1,0 +1,5 @@
+name,flavor,callTitle,frequency,marketValue,strengthRequired,range,identified,called,description
+
+"door key","", "", 1, 0,0, {0,0,0}, true, false, "The notches on this ancient iron key are well worn; its leather lanyard is battered by age. What door might it open?"
+"cage key","", "", 1, 0,0, {0,0,0}, true, false, "The rust accreted on this iron key has been stained with flecks of blood; it must have been used recently. What cage might it open?"
+"crystal orb","", "", 1, 0,	0, {0,0,0}, true, false, "A faceted orb, seemingly cut from a single crystal, sparkling and perpetually warm to the touch. What manner of device might such an object activate?"

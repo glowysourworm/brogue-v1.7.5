@@ -59,22 +59,18 @@ namespace brogueHd::backend::model
 		short messageArchivePosition;
 		char messageArchive[MESSAGE_ARCHIVE_LINES][COLS * 2];
 
-		char currentFilePath[BROGUE_FILENAME_MAX];
+		std::string currentFilePath;
 
 		char displayDetail[DCOLS][DROWS];		// used to make certain per-cell data accessible to external code (e.g. terminal adaptations)
 
-#ifdef AUDIT_RNG
-		FILE* RNGLogFile;
-#endif
-
-		unsigned char inputRecordBuffer[INPUT_RECORD_BUFFER + 100];
+		//unsigned char inputRecordBuffer[INPUT_RECORD_BUFFER + 100];
 		unsigned short locationInRecordingBuffer;
 		unsigned long randomNumbersGenerated;
 		unsigned long positionInPlaybackFile;
 		unsigned long lengthOfPlaybackFile;
 		unsigned long recordingLocation;
 		unsigned long maxLevelChanges;
-		char annotationPathname[BROGUE_FILENAME_MAX];	// pathname of annotation file
+		//char annotationPathname[BROGUE_FILENAME_MAX];	// pathname of annotation file
 		unsigned long gameSeed;
 
 		// Console / Game related declarations

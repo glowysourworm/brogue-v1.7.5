@@ -1,13 +1,17 @@
 #pragma once
 
-#include "itemConstants.h"
 #include "color.h"
 #include "mathdef.h"
-#include "dungeonDeclaration.h"
+#include "itemConstants.h"
+#include "creatureConstants.h"
+#include <string>
 
-using namespace brogueHd::backend::model::game;
+using namespace std;
 
-namespace brogueHd::backend::model::item
+using namespace brogueHd::backend::math;
+using namespace brogueHd::backend::modelConstant;
+
+namespace brogueHd::backend::model::game
 {
 	// Item Declarations:  This struct hierarchy will take care of item types (or "kinds" from Brogue)
 	//					   with enums galore! ...just separated by struct type inference. 
@@ -80,7 +84,7 @@ namespace brogueHd::backend::model::item
 
 		boltType bolt;
 		short charges;
-		monsterTypes vorpalEnemy;
+		creatureTypes vorpalEnemy;
 	};
 
 	struct itemStaff : itemBase
@@ -89,7 +93,7 @@ namespace brogueHd::backend::model::item
 
 		boltType bolt;
 		short charges;
-		monsterTypes vorpalEnemy;
+		creatureTypes vorpalEnemy;
 		short strengthRequired;
 	};
 
@@ -109,35 +113,20 @@ namespace brogueHd::backend::model::item
 	struct itemScroll : itemBase
 	{
 		scrollKind kind;
-		monsterTypes vorpalEnemy;
+		creatureTypes vorpalEnemy;
 	};
 
-	enum itemFlags {
-		ITEM_IDENTIFIED = Fl(0),
-		ITEM_EQUIPPED = Fl(1),
-		ITEM_CURSED = Fl(2),
-		ITEM_PROTECTED = Fl(3),
-		// unused               = Fl(4),
-		ITEM_RUNIC = Fl(5),
-		ITEM_RUNIC_HINTED = Fl(6),
-		ITEM_RUNIC_IDENTIFIED = Fl(7),
-		ITEM_CAN_BE_IDENTIFIED = Fl(8),
-		ITEM_PREPLACED = Fl(9),
-		ITEM_FLAMMABLE = Fl(10),
-		ITEM_MAGIC_DETECTED = Fl(11),
-		ITEM_MAX_CHARGES_KNOWN = Fl(12),
-		ITEM_IS_KEY = Fl(13),
-
-		ITEM_ATTACKS_STAGGER = Fl(14),	// mace, hammer
-		ITEM_ATTACKS_EXTEND = Fl(15),   // whip
-		ITEM_ATTACKS_QUICKLY = Fl(16),   // rapier
-		ITEM_ATTACKS_PENETRATE = Fl(17),	// spear, pike
-		ITEM_ATTACKS_ALL_ADJACENT = Fl(18),	// axe, war axe
-		ITEM_LUNGE_ATTACKS = Fl(19),   // rapier
-		ITEM_SNEAK_ATTACK_BONUS = Fl(20),   // dagger
-		ITEM_PASS_ATTACKS = Fl(21),   // flail
-
-		ITEM_KIND_AUTO_ID = Fl(22),	// the item type will become known when the item is picked up.
-		ITEM_PLAYER_AVOIDS = Fl(23),	// explore and travel will try to avoid picking the item up
+	struct itemTable
+	{
+		std::string name;
+		std::string flavor;
+		std::string callTitle;
+		short frequency;
+		short marketValue;
+		short strengthRequired;
+		randomRange range;
+		bool identified;
+		bool called;
+		std::string description;
 	};
 }

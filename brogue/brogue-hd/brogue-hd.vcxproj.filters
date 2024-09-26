@@ -76,23 +76,8 @@
     <Filter Include="Header Files\backend\methods">
       <UniqueIdentifier>{19e8db3f-3028-4fc5-a766-0acc4a985a66}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\backend\model\machine">
-      <UniqueIdentifier>{2155b911-cc1d-45e9-a5c9-3a55cd2a35f5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\backend\model\machine">
       <UniqueIdentifier>{f8a5de6e-584a-4f1a-9a51-0910cf1775e8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\backend\model\creature">
-      <UniqueIdentifier>{08c98907-ec80-4fbd-9e20-5a1d1bd7c3c2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\backend\model\lighting">
-      <UniqueIdentifier>{5a98f268-6784-43a5-a1a8-d5553bc676ea}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\backend\model\item">
-      <UniqueIdentifier>{26ac1662-cb27-4e69-aefb-28f6c61447d4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\backend\model\effect">
-      <UniqueIdentifier>{3744cba6-2f50-4a09-960b-0030a8a7a513}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\backend\model\game">
       <UniqueIdentifier>{b4b497ca-87eb-4e86-8726-0915fbca2ca9}</UniqueIdentifier>
@@ -123,6 +108,12 @@
     </Filter>
     <Filter Include="Header Files\vendor">
       <UniqueIdentifier>{ea1548fc-c383-4514-9f29-5fa6cb6e3d7d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\backend\modelConstant">
+      <UniqueIdentifier>{03af9654-3ceb-4669-bae7-524b19acd782}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\backend\model\gameTemplate">
+      <UniqueIdentifier>{d5740300-4ce7-4c66-96b9-3bd63b86651d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -302,16 +293,7 @@
     <ClInclude Include="brogueCellDisplay.h">
       <Filter>Header Files\backend\model\layout</Filter>
     </ClInclude>
-    <ClInclude Include="playerCharacter.h">
-      <Filter>Header Files\backend\model</Filter>
-    </ClInclude>
-    <ClInclude Include="levelData.h">
-      <Filter>Header Files\backend\model</Filter>
-    </ClInclude>
     <ClInclude Include="brogueItem.h">
-      <Filter>Header Files\backend\model</Filter>
-    </ClInclude>
-    <ClInclude Include="gameData.h">
       <Filter>Header Files\backend\model</Filter>
     </ClInclude>
     <ClInclude Include="grid.h">
@@ -380,23 +362,8 @@
     <ClInclude Include="brogueRememberedCell.h">
       <Filter>Header Files\backend\model\layout</Filter>
     </ClInclude>
-    <ClInclude Include="machineGenerator.h">
-      <Filter>Header Files\backend\model\machine</Filter>
-    </ClInclude>
     <ClInclude Include="brogueMachine.h">
       <Filter>Header Files\backend\model</Filter>
-    </ClInclude>
-    <ClInclude Include="machineConstants.h">
-      <Filter>Header Files\backend\model\machine</Filter>
-    </ClInclude>
-    <ClInclude Include="machineFeature.h">
-      <Filter>Header Files\backend\model\machine</Filter>
-    </ClInclude>
-    <ClInclude Include="creatureDeclaration.h">
-      <Filter>Header Files\backend\model\creature</Filter>
-    </ClInclude>
-    <ClInclude Include="flare.h">
-      <Filter>Header Files\backend\model\lighting</Filter>
     </ClInclude>
     <ClInclude Include="blueprintDeclaration.h">
       <Filter>Header Files\backend\model\layout</Filter>
@@ -404,14 +371,8 @@
     <ClInclude Include="linearGenerationParameters.h">
       <Filter>Header Files\backend\model\construction</Filter>
     </ClInclude>
-    <ClInclude Include="lightSource.h">
-      <Filter>Header Files\backend\model\lighting</Filter>
-    </ClInclude>
     <ClInclude Include="floorTileType.h">
       <Filter>Header Files\backend\model\layout</Filter>
-    </ClInclude>
-    <ClInclude Include="creature.h">
-      <Filter>Header Files\backend\model\creature</Filter>
     </ClInclude>
     <ClInclude Include="broguePlayer.h">
       <Filter>Header Files\backend\model</Filter>
@@ -419,65 +380,17 @@
     <ClInclude Include="brogueObject.h">
       <Filter>Header Files\backend\model</Filter>
     </ClInclude>
-    <ClInclude Include="itemTable.h">
-      <Filter>Header Files\backend\model\item</Filter>
-    </ClInclude>
-    <ClInclude Include="itemConstants.h">
-      <Filter>Header Files\backend\model\item</Filter>
-    </ClInclude>
-    <ClInclude Include="itemDeclaration.h">
-      <Filter>Header Files\backend\model\item</Filter>
-    </ClInclude>
-    <ClInclude Include="itemTemplate.h">
-      <Filter>Header Files\backend\model\item</Filter>
-    </ClInclude>
     <ClInclude Include="brogueContentGrid.h">
       <Filter>Header Files\backend\model</Filter>
     </ClInclude>
     <ClInclude Include="brogueCreature.h">
       <Filter>Header Files\backend\model</Filter>
     </ClInclude>
-    <ClInclude Include="creatureBehaviorDeclaration.h">
-      <Filter>Header Files\backend\model\creature</Filter>
-    </ClInclude>
     <ClInclude Include="brogueCreatureHorde.h">
       <Filter>Header Files\backend\model</Filter>
     </ClInclude>
-    <ClInclude Include="dungeonFeature.h">
-      <Filter>Header Files\backend\model\effect</Filter>
-    </ClInclude>
-    <ClInclude Include="boltEffectDeclaration.h">
-      <Filter>Header Files\backend\model\effect</Filter>
-    </ClInclude>
     <ClInclude Include="terrainDeclaration.h">
       <Filter>Header Files\backend\model\layout</Filter>
-    </ClInclude>
-    <ClInclude Include="statusEffectDeclaration.h">
-      <Filter>Header Files\backend\model\effect</Filter>
-    </ClInclude>
-    <ClInclude Include="machineDeclaration.h">
-      <Filter>Header Files\backend\model\machine</Filter>
-    </ClInclude>
-    <ClInclude Include="creatureBehaviorMap.h">
-      <Filter>Header Files\backend\model\creature</Filter>
-    </ClInclude>
-    <ClInclude Include="lightConstants.h">
-      <Filter>Header Files\backend\model\lighting</Filter>
-    </ClInclude>
-    <ClInclude Include="itemFlavor.h">
-      <Filter>Header Files\backend\model\item</Filter>
-    </ClInclude>
-    <ClInclude Include="gameConstants.h">
-      <Filter>Header Files\backend\model\game</Filter>
-    </ClInclude>
-    <ClInclude Include="dungeonConstants.h">
-      <Filter>Header Files\backend\model\game</Filter>
-    </ClInclude>
-    <ClInclude Include="blueprint.h">
-      <Filter>Header Files\backend\model\layout</Filter>
-    </ClInclude>
-    <ClInclude Include="colorConstants.h">
-      <Filter>Header Files\backend\model\game</Filter>
     </ClInclude>
     <ClInclude Include="button.h">
       <Filter>Header Files\frontend</Filter>
@@ -488,7 +401,7 @@
     <ClInclude Include="colorString.h">
       <Filter>Header Files\backend\model\game</Filter>
     </ClInclude>
-    <ClInclude Include="dungeonDeclaration.h">
+    <ClInclude Include="dungeon.h">
       <Filter>Header Files\backend\model\game</Filter>
     </ClInclude>
     <ClInclude Include="feat.h">
@@ -502,9 +415,6 @@
     </ClInclude>
     <ClInclude Include="gridDefinitions.h">
       <Filter>Header Files\backend\model\layout</Filter>
-    </ClInclude>
-    <ClInclude Include="light.h">
-      <Filter>Header Files\backend\model\lighting</Filter>
     </ClInclude>
     <ClInclude Include="mathdef.h">
       <Filter>Header Files\backend\math</Filter>
@@ -550,9 +460,6 @@
     </ClInclude>
     <ClInclude Include="gridRegionConstructor.h">
       <Filter>Header Files\backend\model\construction</Filter>
-    </ClInclude>
-    <ClInclude Include="boltDeclaration.h">
-      <Filter>Header Files\backend\model\effect</Filter>
     </ClInclude>
     <ClInclude Include="brogueMath.h">
       <Filter>Header Files\backend\math</Filter>
@@ -653,6 +560,84 @@
     <ClInclude Include="EnumString.h">
       <Filter>Header Files\vendor</Filter>
     </ClInclude>
+    <ClInclude Include="dungeonConstants.h">
+      <Filter>Header Files\backend\modelConstant</Filter>
+    </ClInclude>
+    <ClInclude Include="colorConstants.h">
+      <Filter>Header Files\backend\modelConstant</Filter>
+    </ClInclude>
+    <ClInclude Include="gameConstants.h">
+      <Filter>Header Files\backend\modelConstant</Filter>
+    </ClInclude>
+    <ClInclude Include="creatureBehaviorConstants.h">
+      <Filter>Header Files\backend\modelConstant</Filter>
+    </ClInclude>
+    <ClInclude Include="boltConstants.h">
+      <Filter>Header Files\backend\modelConstant</Filter>
+    </ClInclude>
+    <ClInclude Include="creatureConstants.h">
+      <Filter>Header Files\backend\modelConstant</Filter>
+    </ClInclude>
+    <ClInclude Include="dungeonFeatureConstants.h">
+      <Filter>Header Files\backend\modelConstant</Filter>
+    </ClInclude>
+    <ClInclude Include="statusEffectConstants.h">
+      <Filter>Header Files\backend\modelConstant</Filter>
+    </ClInclude>
+    <ClInclude Include="statusEffect.h">
+      <Filter>Header Files\backend\model\game</Filter>
+    </ClInclude>
+    <ClInclude Include="dungeonFeature.h">
+      <Filter>Header Files\backend\model\game</Filter>
+    </ClInclude>
+    <ClInclude Include="bolt.h">
+      <Filter>Header Files\backend\model\game</Filter>
+    </ClInclude>
+    <ClInclude Include="creatureBehavior.h">
+      <Filter>Header Files\backend\model\game</Filter>
+    </ClInclude>
+    <ClInclude Include="creatureBehaviorMap.h">
+      <Filter>Header Files\backend\model\game</Filter>
+    </ClInclude>
+    <ClInclude Include="creature.h">
+      <Filter>Header Files\backend\model\game</Filter>
+    </ClInclude>
+    <ClInclude Include="itemConstants.h">
+      <Filter>Header Files\backend\modelConstant</Filter>
+    </ClInclude>
+    <ClInclude Include="dungeonTemplate.h">
+      <Filter>Header Files\backend\model\gameTemplate</Filter>
+    </ClInclude>
+    <ClInclude Include="itemTemplate.h">
+      <Filter>Header Files\backend\model\gameTemplate</Filter>
+    </ClInclude>
+    <ClInclude Include="item.h">
+      <Filter>Header Files\backend\model\game</Filter>
+    </ClInclude>
+    <ClInclude Include="playerCharacter.h">
+      <Filter>Header Files\backend\model\game</Filter>
+    </ClInclude>
+    <ClInclude Include="levelData.h">
+      <Filter>Header Files\backend\model\game</Filter>
+    </ClInclude>
+    <ClInclude Include="gameData.h">
+      <Filter>Header Files\backend\model\game</Filter>
+    </ClInclude>
+    <ClInclude Include="lightConstants.h">
+      <Filter>Header Files\backend\modelConstant</Filter>
+    </ClInclude>
+    <ClInclude Include="light.h">
+      <Filter>Header Files\backend\model\game</Filter>
+    </ClInclude>
+    <ClInclude Include="flare.h">
+      <Filter>Header Files\backend\model\game</Filter>
+    </ClInclude>
+    <ClInclude Include="machineConstants.h">
+      <Filter>Header Files\backend\modelConstant</Filter>
+    </ClInclude>
+    <ClInclude Include="machineTemplate.h">
+      <Filter>Header Files\backend\model\gameTemplate</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\resources\colors.csv">
@@ -683,6 +668,72 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="..\resources\creatureWords.csv">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\feat.csv">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\itemColors.csv">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\itemGems.csv">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\itemMetals.csv">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\itemWoods.csv">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\armor.csv">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\armorRunicNames.csv">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\bolt.csv">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\charms.csv">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\creatureBehaviorDescription.csv">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\food.csv">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\keys.csv">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\potions.csv">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\rings.csv">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\scrolls.csv">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\staves.csv">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\titlePhonemes.csv">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\wands.csv">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\weaponRunicNames.csv">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\weapons.csv">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\blueprint.csv">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\features.csv">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

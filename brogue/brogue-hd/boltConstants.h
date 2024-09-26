@@ -1,8 +1,8 @@
 #pragma once
 
-namespace brogueHd::backend::model::effect
+namespace brogueHd::backend::modelConstant
 {
-	enum boltEffects 
+	enum boltEffects
 	{
 		BE_NONE,
 		BE_ATTACK,
@@ -28,7 +28,7 @@ namespace brogueHd::backend::model::effect
 		BE_SHIELDING,
 	};
 
-	enum boltFlags 
+	enum boltFlags
 	{
 		BF_PASSES_THRU_CREATURES = Fl(0),	// Bolt continues through creatures (e.g. lightning and tunneling)
 		BF_HALTS_BEFORE_OBSTRUCTION = Fl(1),    // Bolt takes effect the space before it terminates (e.g. conjuration, obstruction, blinking)

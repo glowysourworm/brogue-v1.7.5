@@ -3,7 +3,7 @@
 #include "grid.h"
 #include "brogueCell.h"
 #include "brogueObject.h"
-#include "creatureBehaviorDeclaration.h"
+#include "creatureBehavior.h"
 
 using namespace brogueHd::backend::model::layout;
 

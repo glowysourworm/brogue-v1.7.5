@@ -1,0 +1,4 @@
+name,flavor,callTitle,frequency,marketValue,strengthRequired,range,identified,called,description
+
+"ration of food","", "", 3, 25,1800, {0,0,0}, true, false, "A ration of food. Was it left by former adventurers? Is it a curious byproduct of the subterranean ecosystem?"
+"mango","", "", 1, 15,1550, {0,0,0}, true, false, "An odd fruit to be found so deep beneath the surface of the earth, but only slightly less filling than a ration of food."

@@ -7,7 +7,12 @@ namespace brogueHd::console
 
 	brogueConsoleReturn developerConsole::command(std::string input, ostream& stream)
 	{
-		
+		return brogueConsoleReturn::Completed;	
+	}
+
+	void developerConsole::printHelp(ostream& stream)
+	{
+
 	}
 }
 

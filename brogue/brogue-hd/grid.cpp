@@ -308,7 +308,7 @@ namespace brogueHd::backend::model::layout
     /// the provided predicate.
     /// </summary>
     template<typename T>
-    bool grid<T>::isEdge(short column, short row, gridDelegates<T>::simplePredicate predicate) const
+    bool grid<T>::isEdgeWhere(short column, short row, gridDelegates<T>::simplePredicate predicate) const
     {
         T north = this->getOrNull(column, row - 1);
         T south = this->getOrNull((column, row + 1);

@@ -11,6 +11,7 @@ namespace brogueHd::backend::model::game
 		char theString[COLS * 2];
 		color theColors[COLS * 2];
 
+		colorString(){}
 		colorString(char* message, color foreColor)
 		{
 			// Initialize arrays

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "broguedef.h"
+#include "command.h"
 #include <iostream>
 
 using namespace std;
