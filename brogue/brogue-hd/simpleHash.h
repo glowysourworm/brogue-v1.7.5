@@ -25,11 +25,14 @@ namespace brogueHd::component
 		/// value to either break, or continue the loop.
 		/// </summary>
 		typedef std::function<iterationCallback(K key, V value)> callback;
+	};
 
+	template<typename K, typename V, typename VResult>
+	struct simpleHashSelectorDelegates
+	{
 		/// <summary>
 		/// Definition of selector for the value type
 		/// </summary>
-		template<typename VResult>
 		typedef std::function<VResult(V value)> selector;
 	};
 
@@ -83,7 +86,7 @@ namespace brogueHd::component
 		simpleList<simplePair<K, V>> removeWhere(simpleHashDelegates<K, V>::predicate predicate);
 		
 		template<typename VResult>
-		simpleList<VResult> selectFromValues(simpleHashDelegates<K, V>::selector selector);
+		simpleList<VResult> selectFromValues(simpleHashSelectorDelegates<K, V, VResult>::selector selector);
 
 		//K getKeyAt(int index);
 		//V getValueAt(const std::map<K, V>& map, int index);

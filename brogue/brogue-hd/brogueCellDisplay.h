@@ -16,7 +16,7 @@ namespace brogueHd::backend::model::layout
 		char opacity;
 		bool needsUpdate;
 
-		light lighting;
+		//light lighting;
 		
 
 		//light oldLight;									// compare with subsequent lighting to determine whether to refresh cell
@@ -57,7 +57,7 @@ namespace brogueHd::backend::model::layout
 			backColor = copy.backColor;									// Careful with instances. These are non-unique
 			opacity = copy.opacity;
 			needsUpdate = copy.needsUpdate;
-			lighting = copy.lighting;											// Careful with instances. These are non-unique
+			//lighting = copy.lighting;											// Careful with instances. These are non-unique
 		}
 
 		bool compare(const brogueCellDisplay& display)
@@ -66,8 +66,8 @@ namespace brogueHd::backend::model::layout
 				   foreColor.compare(display.foreColor) &&
 				   backColor.compare(display.backColor) &&
 				   opacity == display.opacity &&
-				   needsUpdate == display.needsUpdate &&
-					lighting.compare(display.lighting);
+				   needsUpdate == display.needsUpdate;// &&
+					//lighting.compare(display.lighting);
 		}
 	};
 }

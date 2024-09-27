@@ -77,6 +77,20 @@ namespace brogueHd::component
 	}
 
 	template<typename T>
+	void simpleList<T>::addRange(T* list)
+	{
+		for (int index = 0; index < SIZEOF(list); index++)
+			this->add(list[index]);
+	}
+
+	template<typename T>
+	void simpleList<T>::addRange(const simpleList<T>& list)
+	{
+		for (int index = 0; index < list.count(); index++)
+			this->add(list[index]);
+	}
+
+	template<typename T>
 	void simpleList<T>::insert(int insertIndex, T item)
 	{
 		// Check capacity before using extra "swap space"

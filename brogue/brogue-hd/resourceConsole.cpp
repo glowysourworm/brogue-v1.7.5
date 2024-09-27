@@ -36,8 +36,8 @@ namespace brogueHd::console
 
 				color white = colorMap->getColor(gameColors::white);
 
-				stream << std::format("Color (.csv):  color({}, {}, {}, {}, {}, {})", 
-									   white.red, white.green, white.blue, white.redRand, white.greenRand, white.blueRand) << std::endl;
+				//stream << std::format("Color (.csv):  color({}, {}, {}, {}, {}, {})", 
+				//					   white.red, white.green, white.blue, white.redRand, white.greenRand, white.blueRand) << std::endl;
 			}
 			else
 				stream << "Loading Failed..." << std::endl;

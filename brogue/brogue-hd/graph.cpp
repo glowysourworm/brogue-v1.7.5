@@ -8,8 +8,8 @@ namespace brogueHd::backend::math
     template<graphNodeType TNode, graphEdgeType TEdge>
     graph<TNode, TEdge>::graph(const TNode* nodes, const TEdge* edges)
     {
-        _nodes = new simpleList<TNode*>(nodes);
-        _edgeCollection = new graphEdgeCollection(nodes, edges);
+        _nodes = new simpleList<TNode>(nodes);
+        _edgeCollection = new graphEdgeCollection<TNode, TEdge>(nodes, edges);
 
         //arrayExtension::forEach(nodes, [](TNode* node)
         //{
@@ -34,25 +34,25 @@ namespace brogueHd::backend::math
     }
 
     template<graphNodeType TNode, graphEdgeType TEdge>
-    void graph<TNode, TEdge>::addEdge(TEdge* edge)
+    void graph<TNode, TEdge>::addEdge(TEdge edge)
     {
-        if (!_nodes->contains(edge->node1))
-            _nodes->push_back(edge->node1);
+        if (!_nodes->contains(edge.node1))
+            _nodes->add(edge.node1);
 
-        if (!_nodes->contains(edge->node2))
-            _nodes->push_back(edge->node2);
+        if (!_nodes->contains(edge.node2))
+            _nodes->add(edge.node2);
 
         _edgeCollection->addEdge(edge);
     }
 
     template<graphNodeType TNode, graphEdgeType TEdge>
-    void graph<TNode, TEdge>::modify(TEdge* existingEdge, TEdge* newEdge)
+    void graph<TNode, TEdge>::modify(TEdge existingEdge, TEdge newEdge)
     {
-        if (_nodes->contains(edge->node1))
-            _nodes->erase(edge->node1);
+        if (_nodes->contains(newEdge.node1))
+            _nodes->remove(newEdge.node1);
 
-        if (_nodes->contains(edge->node2))
-            _nodes->erase(edge->node2);
+        if (_nodes->contains(newEdge.node2))
+            _nodes->remove(newEdge.node2);
 
         if (_edgeCollection->containsEdge(existingEdge))
             _edgeCollection->removeEdge(existingEdge);
@@ -61,25 +61,25 @@ namespace brogueHd::backend::math
     }
 
     template<graphNodeType TNode, graphEdgeType TEdge>
-    TEdge& graph<TNode, TEdge>::getAdjacentEdges(TNode* node)
+    simpleList<TEdge> graph<TNode, TEdge>::getAdjacentEdges(TNode node)
     {
         return _edgeCollection->getAdjacentEdges(node);
     }
 
     template<graphNodeType TNode, graphEdgeType TEdge>
-    TEdge& graph<TNode, TEdge>::findEdge(TNode* node1, TNode* node2)
+    TEdge graph<TNode, TEdge>::findEdge(TNode node1, TNode node2)
     {
         return _edgeCollection->findEdge(node1, node2);
     }
 
     template<graphNodeType TNode, graphEdgeType TEdge>
-    void graph<TNode, TEdge>::iterateNodes(simpleListDelegates<TNode*>::callback callback)
+    void graph<TNode, TEdge>::iterateNodes(simpleListDelegates<TNode>::callback callback)
     {
         _nodes->forEach(callback);
     }
 
     template<graphNodeType TNode, graphEdgeType TEdge>
-    void graph<TNode, TEdge>::iterateEdges(simpleListDelegates<TEdge*>::callback callback)
+    void graph<TNode, TEdge>::iterateEdges(simpleListDelegates<TEdge>::callback callback)
     {
         _edgeCollection->getEdges()->forEach(callback);
     }

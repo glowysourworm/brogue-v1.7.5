@@ -10,7 +10,6 @@ namespace brogueHd::component
 	{
 		_table = new simpleArray<simpleList<simplePair<K, V>>*>(0);
 		_list = new simpleList<simplePair<K, V>>();
-		_generator = generator;
 		_maxBucketSize = 0;
 	}
 
@@ -295,7 +294,7 @@ namespace brogueHd::component
 
 	template<typename K, typename V>
 	template<typename VResult>
-	simpleList<VResult> simpleHash<K, V>::selectFromValues(simpleHashDelegates<K, V>::selector selector)
+	simpleList<VResult> simpleHash<K, V>::selectFromValues(simpleHashSelectorDelegates<K, V, VResult>::selector selector)
 	{
 		simpleList<VResult> result;
 

@@ -20,7 +20,7 @@ namespace brogueHd::backend::math
 		/// <summary>
 		/// Returns FULL GRAPH:  Fully connected graph of all nodes
 		/// </summary>
-		graph<TNode, TEdge> createDefaultGraph(const std::vector<TNode>& vertices);
+		graph<TNode, TEdge>* createDefaultGraph(const simpleList<TNode>& vertices);
 
 		/// <summary>
 		/// Delegate that constructs the proper edge type

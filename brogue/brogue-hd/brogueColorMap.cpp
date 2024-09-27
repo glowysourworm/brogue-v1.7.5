@@ -1,5 +1,6 @@
 #pragma once
 
+#include "color.h"
 #include "colorConstants.h"
 #include "brogueColorMap.h"
 #include "simpleHash.h"

@@ -18,8 +18,8 @@ namespace brogueHd::backend::math
 	{
 	public:
 
-        graphEdgeCollection(const TEdge* edges[]);
-		graphEdgeCollection(const TEdge* edges[], const TNode* nodes[]);
+        graphEdgeCollection(TEdge* edges);
+		graphEdgeCollection(TEdge* edges, TNode* nodes);
 		~graphEdgeCollection();
 
         short edgeCount() const;
@@ -35,7 +35,7 @@ namespace brogueHd::backend::math
         bool containsEdge(const TNode& node1, const TNode& node2);
         TEdge findEdge(const TNode& node1, const TNode& node2);
 
-        simpleList<TEdge> getAdjacentEdges(const TNode* node);
+        simpleList<TEdge> getAdjacentEdges(const TNode& node);
         simpleList<TEdge> getEdges() const;
         simpleList<TNode> getNodes() const;
 
@@ -45,10 +45,7 @@ namespace brogueHd::backend::math
 
     private:
 
-        void initialize(TEdge* edges[], TNode* nodes[]);
-
-        long createDirectionalHashCode(TNode* node1, TNode* node2);
-        long createDirectionalHashCode(long oldHashCode1, long oldHashCode2);
+        void initialize(TEdge* edges, TNode* nodes);
 
     private:
 

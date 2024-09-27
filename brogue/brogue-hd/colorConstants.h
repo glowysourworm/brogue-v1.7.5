@@ -1,7 +1,6 @@
 #pragma once
 
 #include "color.h"
-#include "dungeonDeclaration.h"
 #include "EnumString.h"
 
 namespace brogueHd::backend::modelConstant
@@ -72,7 +71,7 @@ namespace brogueHd::backend::modelConstant
 		wallBackColorEnd,
 
 		mudWallForeColor,
-		mudWallForeColor,
+		//mudWallForeColor,
 		mudWallBackColor,
 		graniteBackColor,
 		floorForeColor,

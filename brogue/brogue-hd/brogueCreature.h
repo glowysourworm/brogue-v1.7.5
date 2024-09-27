@@ -3,6 +3,7 @@
 #include "broguedef.h"
 #include "brogueObject.h"
 #include "brogueItem.h"
+#include "creature.h"
 
 using namespace brogueHd::backend::model::creature;
 

@@ -22,7 +22,7 @@ namespace brogueHd::backend::math
 			y = ay;
 		}
 
-		static point<T>& operator =(const point<T>& copy)
+		point<T>& operator =(const point<T>& copy)
 		{
 			x = copy.x;
 			y = copy.y;
@@ -30,13 +30,13 @@ namespace brogueHd::backend::math
 			return this;
 		}
 
-		static bool operator != (const point<T>& point1, const point<T>& point2)
+		bool operator != (const point<T>& point)
 		{
-			return point1.x != point2.x || point1.y != point2.y;
+			return x != point.x || y != point.y;
 		}
-		static bool operator == (const point<T>& point1, const point<T>& point2)
+		bool operator == (const point<T>& point)
 		{
-			return point1.x == point2.x && point1.y == point2.y;
+			return x == point.x && y == point.y;
 		}
 
 		static vector<T> subtract(point<T> point2, point<T> point1)

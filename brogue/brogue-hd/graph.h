@@ -24,18 +24,18 @@ namespace brogueHd::backend::math
         graph(const TNode* nodes);
         ~graph();
 
-        void addEdge(TEdge* edge);
-        void modify(TEdge* existingEdge, TEdge* newEdge);
-        TEdge& getAdjacentEdges(TNode* node);
-        TEdge& findEdge(TNode* node1, TNode* node2);
+        void addEdge(TEdge edge);
+        void modify(TEdge existingEdge, TEdge newEdge);
+        simpleList<TEdge> getAdjacentEdges(TNode node);
+        TEdge findEdge(TNode node1, TNode node2);
 
-        void iterateNodes(simpleListDelegates<TNode*>::callback callback);
-        void iterateEdges(simpleListDelegates<TEdge*>::callback callback);
+        void iterateNodes(simpleListDelegates<TNode>::callback callback);
+        void iterateEdges(simpleListDelegates<TEdge>::callback callback);
 
     private:
 
-        simpleList<TNode*>* _nodes;
+        simpleList<TNode>* _nodes;
 
-        graphEdgeCollection* _edgeCollection;
+        graphEdgeCollection<TNode, TEdge>* _edgeCollection;
     }
 }

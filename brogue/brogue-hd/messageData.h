@@ -14,7 +14,7 @@ namespace brogueHd::backend::model::game
 		colorString message;
 		bool confirmed;
 
-		messageData(char* amessage, color textColor, bool aconfirmed)
+		messageData(const char* amessage, color textColor, bool aconfirmed)
 		{
 			// Check message length
 			//brogueAssert(SIZEOF(amessage) <= COLS * 2);
@@ -26,7 +26,7 @@ namespace brogueHd::backend::model::game
 			confirmed = aconfirmed;
 		}
 
-		void update(char* amessage, color atextColor, bool aconfirmed)
+		void update(const char* amessage, color atextColor, bool aconfirmed)
 		{
 			message.updateAll(amessage, atextColor);
 			confirmed = aconfirmed;

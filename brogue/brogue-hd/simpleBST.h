@@ -56,20 +56,20 @@ namespace brogueHd::component
     {
     public:
 
-        simpleBST<K, T>::simpleBST();
-        simpleBST<K, T>::~simpleBST();
+        simpleBST();
+        ~simpleBST();
 
-        void simpleBST<K, T>::insert(K key, T value);
-        bool simpleBST<K, T>::remove(K key);
-        bool simpleBST<K, T>::containsKey(K key);
+        void insert(K key, T value);
+        bool remove(K key);
+        bool containsKey(K key);
 
-        T simpleBST<K, T>::get(K key);
-        T simpleBST<K, T>::search(K key);
+        T get(K key);
+        T search(K key);
 
-        T simpleBST<K, T>::min();
-        K simpleBST<K, T>::minKey();
-        T simpleBST<K, T>::max();
-        K simpleBST<K, T>::maxKey();
+        T min();
+        K minKey();
+        T max();
+        K maxKey();
 
     private:
 
@@ -78,20 +78,20 @@ namespace brogueHd::component
             return (key1 > key2) - (key1 < key2);
         }
 
-        simpleBSTNode<K, T>* simpleBST<K, T>::successor(K searchKey);
-        simpleBSTNode<K, T>* simpleBST<K, T>::predecessor(K searchKey);
+        simpleBSTNode<K, T>* successor(K searchKey);
+        simpleBSTNode<K, T>* predecessor(K searchKey);
 
-        simpleBSTNode<K, T>* simpleBST<K, T>::insertImpl(simpleBSTNode<K, T>* node, K key, T value);
-        simpleBSTNode<K, T>* simpleBST<K, T>::removalImpl(simpleBSTNode<K, T>* node, K key);
-        simpleBSTNode<K, T>* simpleBST<K, T>::deleteMin(simpleBSTNode<K, T>* node);
-        simpleBSTNode<K, T>* simpleBST<K, T>::minImpl(simpleBSTNode<K, T>* node);
-        simpleBSTNode<K, T>* simpleBST<K, T>::maxImpl(simpleBSTNode<K, T>* node);
-        simpleBSTNode<K, T>* simpleBST<K, T>::searchImpl(K key, simpleBSTNode<K, T>* node);
-        simpleBSTNode<K, T>* simpleBST<K, T>::successorImpl(K key, simpleBSTNode<K, T>* node, simpleBSTNode<K, T>* savedParent);
-        simpleBSTNode<K, T>* simpleBST<K, T>::predecessorImpl(K key, simpleBSTNode<K, T>* node, simpleBSTNode<K, T>* savedParent);
-        simpleBSTNode<K, T>* simpleBST<K, T>::balance(simpleBSTNode<K, T>* node);
-        simpleBSTNode<K, T>* simpleBST<K, T>::rotateLeft(simpleBSTNode<K, T>* subTree);
-        simpleBSTNode<K, T>* simpleBST<K, T>::rotateRight(simpleBSTNode<K, T>* node);
+        simpleBSTNode<K, T>* insertImpl(simpleBSTNode<K, T>* node, K key, T value);
+        simpleBSTNode<K, T>* removalImpl(simpleBSTNode<K, T>* node, K key);
+        simpleBSTNode<K, T>* deleteMin(simpleBSTNode<K, T>* node);
+        simpleBSTNode<K, T>* minImpl(simpleBSTNode<K, T>* node);
+        simpleBSTNode<K, T>* maxImpl(simpleBSTNode<K, T>* node);
+        simpleBSTNode<K, T>* searchImpl(K key, simpleBSTNode<K, T>* node);
+        simpleBSTNode<K, T>* successorImpl(K key, simpleBSTNode<K, T>* node, simpleBSTNode<K, T>* savedParent);
+        simpleBSTNode<K, T>* predecessorImpl(K key, simpleBSTNode<K, T>* node, simpleBSTNode<K, T>* savedParent);
+        simpleBSTNode<K, T>* balance(simpleBSTNode<K, T>* node);
+        simpleBSTNode<K, T>* rotateLeft(simpleBSTNode<K, T>* subTree);
+        simpleBSTNode<K, T>* rotateRight(simpleBSTNode<K, T>* node);
 
     private:
 

@@ -3,9 +3,12 @@
 #include "broguefile.h"
 #include "keyProcessor.h"
 #include "brogueColorMap.h"
+#include "gameData.h"
+#include "playbackData.h"
 
 using namespace brogueHd::backend::processor;
 using namespace brogueHd::backend::model::io;
+using namespace brogueHd::backend::model::game;
 
 namespace brogueHd::backend::controller
 {

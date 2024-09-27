@@ -2,6 +2,7 @@
 
 #include "brogueObject.h"
 #include "itemConstants.h"
+#include "item.h"
 #include <functional>
 
 using namespace std;

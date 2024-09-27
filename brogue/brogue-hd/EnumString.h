@@ -151,7 +151,7 @@ typename EnumStringBase<D,E>::AssocMap &EnumStringBase<D,E>::GetMap()
 template <class D, class E>
 void EnumStringBase<D,E>::RegisterEnumerator(const E e, const std::string &eStr, const std::string &edStr)
 {
-    const bool bRegistered = GetMap().insert( typename AssocMap::value_type( eStr, MapEntry(e, edStr) ).second;
+    const bool bRegistered = GetMap().insert( typename AssocMap::value_type( eStr, MapEntry(e, edStr) )).second;
     assert( bRegistered );
     (void)sizeof( bRegistered ); // This is to avoid the pesky 'unused variable' warning in Release Builds.
 }

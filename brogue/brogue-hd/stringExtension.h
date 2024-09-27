@@ -1,6 +1,7 @@
 #pragma once
 
 #include "broguedef.h"
+#include "exceptionHandler.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -34,7 +35,7 @@ namespace brogueHd::backend::extension
 				return dynamic_cast<T>(convertBool(input));
 
 			else
-				brogueException::show(std::format("Unhandled type:  stringExtension::convert  {}", typeid(T).name));
+				brogueException::show("Unhandled type:  stringExtension::convert  {}" + std::string(typeid(T).name));
 				
 		}
 		static bool convertBool(const std::string& input)
@@ -47,7 +48,11 @@ namespace brogueHd::backend::extension
 		static std::string formatDate(time_t time)
 		{
 			char buffer[80];
-			std::strftime(buffer, 80, "%Y-%m-%d-%H:%M:%S", localtime(&time));
+			tm* timeValue;
+
+			localtime_s(timeValue, &time);
+
+			std::strftime(buffer, 80, "%Y-%m-%d-%H:%M:%S", timeValue);
 			std::string result(buffer);
 
 			return result;
@@ -83,19 +88,62 @@ namespace brogueHd::backend::extension
 				result += strings[index];
 			}
 		}
+		static bool isWhitespace(const std::string& s)
+		{
+			for (int index = 0; index < s.size(); index++)
+			{
+				if (isspace(s[index]))
+					return false;
+			}
+
+			return true;
+		}
 		static std::string* split(const std::string& input, const char* tokens)
 		{
-			std::vector<std::string> strings;
+			simpleList<std::string> result;
+			simpleList<std::string> list;
+			
+			list.add(input);
 
-			char* inputPtr = (char*)input.c_str();
-
-			do
+			for (int index = 0; index < SIZEOF(tokens); index++)
 			{
-				inputPtr = strtok(inputPtr, tokens);
+				for (int listIndex = 0; listIndex < list.count(); listIndex++)
+				{
+					int lastIndex = -1;
 
-			} while(inputPtr != NULL);
+					// Scan the string for the next token
+					for (int strIndex = 0; strIndex < list[listIndex].size(); strIndex++)
+					{
+						// Found token!
+						if (list[listIndex].at(strIndex) == tokens[index])
+						{
+							std::string subString = (lastIndex == -1) ? list[listIndex].substr(0, strIndex) : 
+																		list[listIndex].substr(lastIndex, strIndex - lastIndex);
 
-			return strings.data();
+							// Remove white space
+							if (!isWhitespace(subString))
+								result.add(subString);
+
+							lastIndex = strIndex;
+						}
+					}
+
+					// No match found
+					if (lastIndex == -1)
+						result.add(list[listIndex]);
+				}
+
+				// Setup results for next iteration
+				if (index < SIZEOF(tokens) - 1)
+				{
+					list.clear();
+					list.addRange(result);
+
+					result.clear();			// Search for smaller splits
+				}
+			}
+			
+			return result.getArray();
 		}
 	};
 }

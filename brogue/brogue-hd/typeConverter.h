@@ -16,7 +16,7 @@ namespace brogueHd::component
 		static char intToChar(int in)
 		{
 			char buffer[SIZEOF(int)];
-			itoa(in, buffer, 10);
+			_itoa_s(in, buffer, 10);
 			return *buffer;
 		}
 		static char shortToChar(short in)
@@ -27,20 +27,20 @@ namespace brogueHd::component
 		static char longToChar(long in)
 		{
 			char buffer[SIZEOF(long)];
-			ltoa(in, buffer, 10);
+			_ltoa_s(in, buffer, 10);
 			return *buffer;
 		}
 		static char ulongToChar(unsigned long in)
 		{
 			char buffer[SIZEOF(unsigned long)];
-			ltoa(in, buffer, 10);
+			_ltoa_s(in, buffer, 10);
 			return *buffer;
 		}
 
 		static std::string intToString(int in)
 		{
 			char buffer[SIZEOF(int)];
-			itoa(in, buffer, 10);
+			_itoa_s(in, buffer, 10);
 			return std::string(buffer);
 		}
 		static std::string shortToString(short in)
@@ -51,13 +51,13 @@ namespace brogueHd::component
 		static std::string longToString(long in)
 		{
 			char buffer[SIZEOF(long)];
-			ltoa(in, buffer, 10);
+			_ltoa_s(in, buffer, 10);
 			return std::string(buffer);
 		}
 		static std::string ulongToString(unsigned long in)
 		{
 			char buffer[SIZEOF(unsigned long)];
-			ltoa(in, buffer, 10);
+			_ltoa_s(in, buffer, 10);
 			return std::string(buffer);
 		}
 

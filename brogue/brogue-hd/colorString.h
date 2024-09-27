@@ -12,7 +12,7 @@ namespace brogueHd::backend::model::game
 		color theColors[COLS * 2];
 
 		colorString(){}
-		colorString(char* message, color foreColor)
+		colorString(const char* message, color foreColor)
 		{
 			// Initialize arrays
 			updateAll(message, foreColor);
@@ -24,7 +24,7 @@ namespace brogueHd::backend::model::game
 			theColors[index] = color;
 		}
 
-		void updateAll(char* message, color foreColor)
+		void updateAll(const char* message, color foreColor)
 		{
 			for (short index = 0; index < COLS * 2 && index < SIZEOF(message); index++)
 			{

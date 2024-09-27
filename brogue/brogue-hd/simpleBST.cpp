@@ -78,7 +78,7 @@ namespace brogueHd::component
         if (_nodeMap->contains(key))
             return _nodeMap->get(key)->value;
 
-        simpleBSTNode<K, V>* node = this->searchImpl(key, _root);
+        simpleBSTNode<K, T>* node = this->searchImpl(key, _root);
 
         if (node != NULL)
             return node->value;

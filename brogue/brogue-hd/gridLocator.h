@@ -60,7 +60,8 @@ namespace brogueHd::backend::model::layout
 
 		std::string getString()
 		{
-			return std::format("(Col={}, Row={})", typeConverter::shortToString(column), typeConverter::shortToString(row));
+			//return std::format("(Col={}, Row={})", typeConverter::shortToString(column), typeConverter::shortToString(row));
+			return std::string("TODO");
 		}
 	};
 }

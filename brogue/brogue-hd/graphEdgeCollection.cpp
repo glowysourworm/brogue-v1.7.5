@@ -8,21 +8,21 @@ using namespace brogueHd::backend::extension;
 namespace brogueHd::backend::math
 {
     template<graphNodeType TNode, graphEdgeType TEdge>
-    graphEdgeCollection<TNode, TEdge>::graphEdgeCollection(const TEdge* edges[])
+    graphEdgeCollection<TNode, TEdge>::graphEdgeCollection(TEdge* edges)
     {
-        _nodes = new simpleHash<TNode*, TNode*>();
-        _edges = new simpleHash<TEdge*, TEdge*>();
-        _nodeAdjacentEdges = new simpleHash<TNode*, simpleHash<TEdge*, TEdge*>>();
+        _nodes = new simpleHash<TNode, TNode>();
+        _edges = new simpleHash<TEdge, TEdge>();
+        _nodeAdjacentEdges = new simpleHash<TNode*, simpleHash<TEdge, TEdge>*>();
 
-        initialize(edges, TNode*[0]);
+        initialize(edges, TNode[0]);
     }
 
     template<graphNodeType TNode, graphEdgeType TEdge>
-    graphEdgeCollection<TNode, TEdge>::graphEdgeCollection(const TEdge* edges[], const TNode* nodes[])
+    graphEdgeCollection<TNode, TEdge>::graphEdgeCollection(TEdge* edges, TNode* nodes)
     {
-        _nodes = new simpleHash<TNode*, TNode*>();
-        _edges = new simpleHash<TEdge*, TEdge*>();
-        _nodeAdjacentEdges = new simpleHash<TNode*, simpleHash<TEdge*, TEdge*>>();
+        _nodes = new simpleHash<TNode, TNode>();
+        _edges = new simpleHash<TEdge, TEdge>();
+        _nodeAdjacentEdges = new simpleHash<TNode*, simpleHash<TEdge, TEdge>*>();
 
         initialize(edges, nodes);
     }
@@ -36,7 +36,7 @@ namespace brogueHd::backend::math
     }
 
     template<graphNodeType TNode, graphEdgeType TEdge>
-    void graphEdgeCollection<TNode, TEdge>::initialize(TEdge* edges[], TNode* nodes[])
+    void graphEdgeCollection<TNode, TEdge>::initialize(TEdge* edges, TNode* nodes)
     {
         graphEdgeCollection<TNode, TEdge>* that = this;
 
@@ -53,19 +53,6 @@ namespace brogueHd::backend::math
                 that->addNode(node);
         }
     }
-
-    template<graphNodeType TNode, graphEdgeType TEdge>
-    long graphEdgeCollection<TNode, TEdge>::createDirectionalHashCode(TNode* node1, TNode* node2)
-    {
-
-    }
-
-    template<graphNodeType TNode, graphEdgeType TEdge>
-    long graphEdgeCollection<TNode, TEdge>::createDirectionalHashCode(long oldHashCode1, long oldHashCode2)
-    {
-
-    }
-
 
     template<graphNodeType TNode, graphEdgeType TEdge>
     short graphEdgeCollection<TNode, TEdge>::edgeCount() const
@@ -196,7 +183,7 @@ namespace brogueHd::backend::math
     }
 
     template<graphNodeType TNode, graphEdgeType TEdge>
-    simpleList<TEdge> graphEdgeCollection<TNode, TEdge>::getAdjacentEdges(const TNode* node)
+    simpleList<TEdge> graphEdgeCollection<TNode, TEdge>::getAdjacentEdges(const TNode& node)
     {
         if (!_nodeAdjacentEdges->contains(node))
             brogueException::show("No adjacent edges contained for node:  graphEdgeCollection.getAdjacentEdges");

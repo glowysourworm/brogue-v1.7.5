@@ -61,6 +61,8 @@ namespace brogueHd::component
 		int count() const;
 
 		void add(T item);
+		void addRange(T* list);
+		void addRange(const simpleList<T>& list);
 		void insert(int index, T item);
 		void remove(T item);
 		void removeAt(int index);
@@ -76,7 +78,7 @@ namespace brogueHd::component
 		T* getArray();
 		simpleArray<T> toArray();
 
-		bool simpleList<T>::contains(T item);
+		bool contains(T item);
 
 		// Queries
 
@@ -104,10 +106,10 @@ namespace brogueHd::component
 		TResult min(simpleListSelectorDelegates<T, TResult>::selector selector);
 
 		template<typename TResult>
-		T simpleList<T>::withMin(simpleListSelectorDelegates<T, TResult>::selector selector);
+		T withMin(simpleListSelectorDelegates<T, TResult>::selector selector);
 
 		template<typename TResult>
-		T simpleList<T>::withMax(simpleListSelectorDelegates<T, TResult>::selector selector);
+		T withMax(simpleListSelectorDelegates<T, TResult>::selector selector);
 
 	private:
 

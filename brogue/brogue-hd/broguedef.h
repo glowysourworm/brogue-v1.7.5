@@ -26,6 +26,7 @@ namespace brogueHd
 	// STD Library / substitutions
 	#define SIZEOF(x)						sizeof(x)			// Size of an array
 	#define STRCMP(x, y)					strcmp(x,y)			// String compare
+	#define STRCPY(dest, src, count)		strncpy_s(dest, src, count)
 
 	//// debug macros -- define DEBUGGING as 1 to enable wizard mode.
 	//#define DEBUGGING						0
