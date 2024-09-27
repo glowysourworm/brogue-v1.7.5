@@ -2,7 +2,11 @@
 
 #include "graphNode.h"
 #include "graphEdge.h"
+#include "gridLocatorNode.h"
+#include "gridLocatorEdge.h"
 #include <functional>
+
+using namespace brogueHd::backend::model::layout;
 
 namespace brogueHd::backend::math
 {

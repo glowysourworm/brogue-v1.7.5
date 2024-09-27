@@ -34,7 +34,7 @@ namespace brogueHd::backend::extension
 				return dynamic_cast<T>(convertBool(input));
 
 			else
-				brogueException::show(std::format("Unhandled type:  stringExtension::convert  {}", typeid(T)));
+				brogueException::show(std::format("Unhandled type:  stringExtension::convert  {}", typeid(T).name));
 				
 		}
 		static bool convertBool(const std::string& input)

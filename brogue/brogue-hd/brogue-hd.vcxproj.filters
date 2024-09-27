@@ -189,7 +189,7 @@
     <ClCompile Include="keyProcessor.cpp">
       <Filter>Source Files\backend\processor</Filter>
     </ClCompile>
-    <ClCompile Include="binarySearchTree.cpp">
+    <ClCompile Include="simpleBST.cpp">
       <Filter>Source Files\component</Filter>
     </ClCompile>
     <ClCompile Include="levelProcessor.cpp">
@@ -285,6 +285,15 @@
     <ClCompile Include="brogueColorMap.cpp">
       <Filter>Source Files\backend\model</Filter>
     </ClCompile>
+    <ClCompile Include="simpleList.cpp">
+      <Filter>Source Files\component</Filter>
+    </ClCompile>
+    <ClCompile Include="simpleHash.cpp">
+      <Filter>Source Files\component</Filter>
+    </ClCompile>
+    <ClCompile Include="simpleArray.cpp">
+      <Filter>Source Files\component</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="broguedef.h">
@@ -347,7 +356,7 @@
     <ClInclude Include="openglRenderer.h">
       <Filter>Header Files\frontend\opengl</Filter>
     </ClInclude>
-    <ClInclude Include="binarySearchTree.h">
+    <ClInclude Include="simpleBST.h">
       <Filter>Header Files\component</Filter>
     </ClInclude>
     <ClInclude Include="levelProcessor.h">
@@ -431,20 +440,11 @@
     <ClInclude Include="dijkstra.h">
       <Filter>Header Files\backend\math</Filter>
     </ClInclude>
-    <ClInclude Include="vectorExtension.h">
-      <Filter>Header Files\backend\extension</Filter>
-    </ClInclude>
     <ClInclude Include="hashGenerator.h">
       <Filter>Header Files\backend\generator</Filter>
     </ClInclude>
     <ClInclude Include="exceptionHandler.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="mapExtension.h">
-      <Filter>Header Files\backend\extension</Filter>
-    </ClInclude>
-    <ClInclude Include="arrayExtension.h">
-      <Filter>Header Files\backend\extension</Filter>
     </ClInclude>
     <ClInclude Include="roomGenerator.h">
       <Filter>Header Files\backend\generator</Filter>
@@ -469,9 +469,6 @@
     </ClInclude>
     <ClInclude Include="graphEdgeCollection.h">
       <Filter>Header Files\backend\math</Filter>
-    </ClInclude>
-    <ClInclude Include="extensionDefinitions.h">
-      <Filter>Header Files\backend\extension</Filter>
     </ClInclude>
     <ClInclude Include="graphEdge.h">
       <Filter>Header Files\backend\math</Filter>
@@ -637,6 +634,21 @@
     </ClInclude>
     <ClInclude Include="machineTemplate.h">
       <Filter>Header Files\backend\model\gameTemplate</Filter>
+    </ClInclude>
+    <ClInclude Include="typeConverter.h">
+      <Filter>Header Files\component</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleList.h">
+      <Filter>Header Files\component</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleHash.h">
+      <Filter>Header Files\component</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleArray.h">
+      <Filter>Header Files\component</Filter>
+    </ClInclude>
+    <ClInclude Include="simple.h">
+      <Filter>Header Files\component</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

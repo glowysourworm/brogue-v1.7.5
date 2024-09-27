@@ -1,0 +1,296 @@
+#pragma once
+
+#include "simpleList.h"
+#include "simpleHash.h"
+#include "exceptionHandler.h"
+
+namespace brogueHd::component
+{
+	template<typename T>
+	simpleList<T>::simpleList()
+	{
+		_list = NULL;
+		_size = 0;
+		_sizeAlloc = 0;
+	}
+	template<typename T>
+	simpleList<T>::~simpleList()
+	{
+		if (_list != NULL)
+		{
+			delete [] _list;
+
+			_list = NULL;
+			_size = 0;
+			_sizeAlloc = 0;
+		}
+	}
+
+	template<typename T>
+	T simpleList<T>::operator[](int index)
+	{
+		return _list[index];
+	}
+
+	template<typename T>
+	T simpleList<T>::get(int index) const
+	{
+		return _list[index];
+	}
+
+	template<typename T>
+	int simpleList<T>::count() const
+	{
+		return _size;
+	}
+
+	template<typename T>
+	void simpleList<T>::add(T item)
+	{
+		// Reached capacity
+		//
+		if (_size == _sizeAlloc)
+		{
+			// Use doubling method: Always multiply size by 2 until {MaxIncrementalCapacity} is reached
+			//
+			int newSize = (_sizeAlloc == 0) ? 100 :
+						  (_sizeAlloc >= this->MaxIncrementalCapacity) ? (_sizeAlloc + this->MaxIncrementalCapacity) :
+						   _sizeAlloc * 2;
+
+			// Copy over the data
+			T* newList = new T[newSize];
+
+			for (int index = 0; index < _size; index++)
+			{
+				newList[index] = _list[index];
+			}
+
+			delete[] _list;
+
+			_sizeAlloc = newSize;
+		}
+
+		// Add the next item
+		_list[_size++] = item;
+	}
+	template<typename T>
+	void simpleList<T>::removeAt(int index)
+	{
+		if (index >= _size)
+			brogueException::show("Index is outside the bounds of the array");
+
+		for (int i = index; i < _size - 1; i++)
+		{
+			_list[i] = _list[i + 1];
+		}
+
+		_size--;
+	}
+
+	template<typename T>
+	bool simpleList<T>::contains(T item)
+	{
+		for (int index = 0; index < _size; index++)
+		{
+			if (_list[index] == item)
+				return true;
+		}
+
+		return false;
+	}
+	
+	template<typename T>
+	template<typename TResult>
+	simpleList<TResult> simpleList<T>::select(simpleListDelegates<T>::selector selector)
+	{
+		simpleList<TResult> result;
+
+		for (int index = 0; index < _size; index++)
+		{
+			result.add(selector(_list[index]));
+		}
+
+		return result;
+	}
+
+	template<typename T>
+	simpleList<T> simpleList<T>::remove(simpleListDelegates<T>::predicate predicate)
+	{
+		simpleList<T> result;
+
+		for (int index = _size - 1; index >= 0; index--)
+		{
+			if (predicate(_list[index]))
+			{
+				result.add(_list[index]);
+				
+				this->removeAt(index);
+			}
+		}
+
+		return result;
+	}
+
+	template<typename T>
+	simpleList<T> simpleList<T>::except(simpleListDelegates<T>::predicate predicate)
+	{
+		simpleList<T> result;
+
+		for (int index = 0; index < _size; index++)
+		{
+			if (!predicate(_list[index]))
+				result.add(_list[index]);
+		}
+
+		return result;
+	}
+
+	template<typename T>
+	void simpleList<T>::forEach(simpleListDelegates<T>::callback callback)
+	{
+		for (int index = 0; index < _size; index++)
+		{
+			if (callback(_list[index]) == iterationCallback::breakAndReturn)
+				return;
+		}
+	}
+
+	template<typename T>
+	T simpleList<T>::first(simpleListDelegates<T>::predicate predicate)
+	{
+		for (int index = 0; index < _size; index++)
+		{
+			if (predicate(_list[index])
+				return _list[index];
+		}
+
+		return NULL;
+	}
+
+	template<typename T>
+	bool simpleList<T>::any(simpleListDelegates<T>::predicate predicate)
+	{
+		for (int index = 0; index < _size; index++)
+		{
+			if (predicate(_list[index])
+				return true;
+		}
+
+		return false;
+	}
+
+	template<typename T>
+	simpleList<T> simpleList<T>::where(simpleListDelegates<T>::predicate predicate)
+	{
+		simpleList<T> result;
+
+		for (int index = 0; index < _size; index++)
+		{
+			if (predicate(_list[index])
+				return result.add(_list[index]);
+		}
+
+		return result;
+	}
+
+
+	template<typename T>
+	void simpleList<T>::distinctPairs(const simpleList<T>& collection1, const simpleList<T>& collection2, simpleListDelegates<T>::pairs callback)
+	{
+		simpleHash<T, simpleHash<T, T>> lookup;
+
+		for (int index1 = 0; index1 < collection1.count(); index1++)
+		{
+			for (int index2 = 0; index2 < collection2.count(); index2++)
+			{
+				// Ignore equal items
+				if (collection1[index1] == collection2[index2])
+					continue;
+
+				// Ignore duplicate pairs (item1, item2)
+				if (lookup.contains(collection1[index1]) &&
+					lookup[collection1[index1]].contains(collection2[index2]))
+					continue;
+
+				// Ignore duplicate pairs (item2, item1)
+				if (lookup.contains(collection2[index2]) &&
+					lookup[collection2[index2]].contains(collection1[index1]))
+					continue;
+
+				else
+				{
+					// RESULT
+					callback(collection1[index1], collection2[index2]);
+
+					// Store lookup 1 -> 2
+					if (lookup.contains(key1))
+						lookup[collection1[index1]].set(collection2[index2], collection2[index2]);
+
+					else
+						lookup.set(collection1[index1], simpleHash<T, T>() { { collection2[index2], collection2[index2] } };
+
+					// Store lookup 2 -> 1
+					if (lookup.contains(key2))
+						lookup[collection2[index2]].insert(collection1[index1], collection1[index1]);
+
+					else
+						lookup.set(collection2[index2], simpleHash<T, T>() { { collection1[index1], collection1[index1] } };
+				}
+			}
+		}
+	}
+
+	template<typename T>
+	template<typename V>
+	V simpleList<T>::maxOf(simpleListDelegates<T>::selector selector)
+	{
+		V max = NULL;
+		int maxIndex = -1;
+
+		for (int index = 0; index < _size; index++)
+		{
+			V current = selector(_list[index]);
+
+			if (max == NULL)
+			{
+				max = _list[index];
+				maxIndex = index;
+			}
+
+			else if (max < current)
+			{
+				max = current;
+				maxIndex = index;
+			}
+		}
+
+		return max == NULL ? NULL : _list[maxIndex];
+	}
+
+	template<typename T>
+	template<typename V>
+	V simpleList<T>::minOf(simpleListDelegates<T>::selector selector)
+	{
+		V min = NULL;
+		int minIndex = -1;
+
+		for (int index = 0; index < _size; index++)
+		{
+			V current = selector(_list[index]);
+
+			if (min == NULL)
+			{
+				min = _list[index];
+				minIndex = index;
+			}
+
+			else if (min > current)
+			{
+				min = current;
+				minIndex = index;
+			}
+		}
+
+		return min == NULL ? NULL : _list[minIndex];
+	}
+}

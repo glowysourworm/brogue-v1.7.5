@@ -24,10 +24,10 @@ namespace brogueHd::backend::generator
 
     private:
 
-        const unsigned long LARGE_PRIME = 5999471;
+        const long LARGE_PRIME = 5999471;
 
         template<isHashable T>
-        static unsigned long createHashImpl(T data[], unsigned long previousHash)
+        static long createHashImpl(T data[], long previousHash)
         {
             // Start New / Continue
             unsigned long hash = previousHash == 0 ? LARGE_PRIME : previousHash;
@@ -51,13 +51,13 @@ namespace brogueHd::backend::generator
     public:
 
         template<isHashable T>
-        static unsigned long createHash(T data[])
+        static long createHash(T data[])
         {
             return createHashImpl(data, 0);
         }
 
         template<isHashable T>
-        static unsigned long continueHash(T data[], const unsigned long previousHash)
+        static long continueHash(T data[], const unsigned long previousHash)
         {
             return createHashImpl(data, previousHash);
         }

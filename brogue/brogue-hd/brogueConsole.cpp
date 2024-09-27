@@ -64,16 +64,16 @@ namespace brogueHd::console
 					return args[index + 1];
 
 				else if (std::is_convertible<T, std::string>())
-					return std::string(args[index + 1]);
+					return (T)std::string(args[index + 1]);
 
 				else if (std::is_convertible<T, int>())
-					return atoi(args[index + 1].c_str());
+					return (T)atoi(args[index + 1].c_str());
 
 				else if (std::is_convertible<T, unsigned long>())
-					return atol(args[index + 1].c_str());
+					return (T)atol(args[index + 1].c_str());
 
 				else
-					brogueException::show("Unhandled console command type:  " + typeid(T).name);
+					brogueException::show("Unhandled console command type:  " + std::string(typeid(T).name));
 			}
 		}
 

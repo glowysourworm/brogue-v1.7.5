@@ -1,7 +1,7 @@
 #pragma once
 
 #include "grid.h"
-#include "extensionDefinitions.h"
+#include "simple.h"
 #include "gridRect.h"
 #include "brogueMath.h"
 #include <functional>

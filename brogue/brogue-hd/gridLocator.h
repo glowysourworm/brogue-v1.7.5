@@ -3,8 +3,11 @@
 #include <string>
 #include <format>
 #include <iostream>
+#include "stringExtension.h"
+#include "conversionExtension.h"
 
 using namespace std;
+using namespace brogueHd::backend::extension;
 
 namespace brogueHd::backend::model::layout
 {
@@ -55,9 +58,9 @@ namespace brogueHd::backend::model::layout
 			return gridLocator(-1, -1);
 		}
 
-		char* getString()
+		std::string getString()
 		{
-			return std::format("(Col={}, Row={})", column, row);
+			return std::format("(Col={}, Row={})", typeConverter::shortToString(column), typeConverter::shortToString(row));
 		}
 	};
 }
