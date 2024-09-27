@@ -1,24 +1,25 @@
 #pragma once
 
+#include "colorConstants.h"
 #include "brogueColorMap.h"
-#include <map>
+#include "simpleHash.h"
 
-using namespace std;
+using namespace brogueHd::backend::modelConstant;
 
 namespace brogueHd::backend::model
 {
 	brogueColorMap::brogueColorMap()
 	{
-		_gameColors = new std::map<gameColors, color>();
-		_boltColors = new std::map<boltColors, color>();
-		_tileColors = new std::map<tileColors, color>();
-		_creatureColors = new std::map<creatureColors, color>();
-		_lightColors = new std::map<lightColors, color>();
-		_flareColors = new std::map<flareColors, color>();
-		_colorMultipliers = new std::map<colorMultipliers, color>();
-		_bloodColors = new std::map<bloodColors, color>();
-		_gasColors = new std::map<gasColors, color>();
-		_interfaceColors = new std::map<interfaceColors, color>();
+		_gameColors = new simpleHash<gameColors, color>();
+		_boltColors = new simpleHash<boltColors, color>();
+		_tileColors = new simpleHash<tileColors, color>();
+		_creatureColors = new simpleHash<creatureColors, color>();
+		_lightColors = new simpleHash<lightColors, color>();
+		_flareColors = new simpleHash<flareColors, color>();
+		_colorMultipliers = new simpleHash<colorMultipliers, color>();
+		_bloodColors = new simpleHash<bloodColors, color>();
+		_gasColors = new simpleHash<gasColors, color>();
+		_interfaceColors = new simpleHash<interfaceColors, color>();
 	}
 	brogueColorMap::~brogueColorMap()
 	{
@@ -36,83 +37,83 @@ namespace brogueHd::backend::model
 
 	color brogueColorMap::getColor(gameColors colorSelector) const
 	{
-		return _gameColors->at(colorSelector);
+		return _gameColors->get(colorSelector);
 	}
 	color brogueColorMap::getColor(boltColors colorSelector) const
 	{
-		return _boltColors->at(colorSelector);
+		return _boltColors->get(colorSelector);
 	}
 	color brogueColorMap::getColor(tileColors colorSelector) const
 	{
-		return _tileColors->at(colorSelector);
+		return _tileColors->get(colorSelector);
 	}
 	color brogueColorMap::getColor(creatureColors colorSelector) const
 	{
-		return _creatureColors->at(colorSelector);
+		return _creatureColors->get(colorSelector);
 	}
 	color brogueColorMap::getColor(lightColors colorSelector) const
 	{
-		return _lightColors->at(colorSelector);
+		return _lightColors->get(colorSelector);
 	}
 	color brogueColorMap::getColor(flareColors colorSelector) const
 	{
-		return _flareColors->at(colorSelector);
+		return _flareColors->get(colorSelector);
 	}
 	color brogueColorMap::getColor(colorMultipliers colorSelector) const
 	{
-		return _colorMultipliers->at(colorSelector);
+		return _colorMultipliers->get(colorSelector);
 	}
 	color brogueColorMap::getColor(bloodColors colorSelector) const
 	{
-		return _bloodColors->at(colorSelector);
+		return _bloodColors->get(colorSelector);
 	}
 	color brogueColorMap::getColor(gasColors colorSelector) const
 	{
-		return _gasColors->at(colorSelector);
+		return _gasColors->get(colorSelector);
 	}
 	color brogueColorMap::getColor(interfaceColors colorSelector) const
 	{
-		return _interfaceColors->at(colorSelector);
+		return _interfaceColors->get(colorSelector);
 	}
 
 	void brogueColorMap::setColor(gameColors colorSelector, color value)
 	{
-		_gameColors->insert(colorSelector, value);
+		_gameColors->add(colorSelector, value);
 	}
 	void brogueColorMap::setColor(boltColors colorSelector, color value)
 	{
-		_boltColors->insert(colorSelector, value);
+		_boltColors->add(colorSelector, value);
 	}
 	void brogueColorMap::setColor(tileColors colorSelector, color value)
 	{
-		_tileColors->insert(colorSelector, value);
+		_tileColors->add(colorSelector, value);
 	}
 	void brogueColorMap::setColor(creatureColors colorSelector, color value)
 	{
-		_creatureColors->insert(colorSelector, value);
+		_creatureColors->add(colorSelector, value);
 	}
 	void brogueColorMap::setColor(lightColors colorSelector, color value)
 	{
-		_lightColors->insert(colorSelector, value);
+		_lightColors->add(colorSelector, value);
 	}
 	void brogueColorMap::setColor(flareColors colorSelector, color value)
 	{
-		_flareColors->insert(colorSelector, value);
+		_flareColors->add(colorSelector, value);
 	}
 	void brogueColorMap::setColor(colorMultipliers colorSelector, color value)
 	{
-		_colorMultipliers->insert(colorSelector, value);
+		_colorMultipliers->add(colorSelector, value);
 	}
 	void brogueColorMap::setColor(bloodColors colorSelector, color value)
 	{
-		_bloodColors->insert(colorSelector, value);
+		_bloodColors->add(colorSelector, value);
 	}
 	void brogueColorMap::setColor(gasColors colorSelector, color value)
 	{
-		_gasColors->insert(colorSelector, value);
+		_gasColors->add(colorSelector, value);
 	}
 	void brogueColorMap::setColor(interfaceColors colorSelector, color value)
 	{
-		_interfaceColors->insert(colorSelector, value);
+		_interfaceColors->add(colorSelector, value);
 	}
 }

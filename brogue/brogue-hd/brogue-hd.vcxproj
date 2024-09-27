@@ -116,7 +116,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -131,6 +131,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -174,7 +175,6 @@
     <ClCompile Include="graphAlgorithm.cpp" />
     <ClCompile Include="graphEdgeCollection.cpp" />
     <ClCompile Include="grid.cpp" />
-    <ClCompile Include="gridConstructor.cpp" />
     <ClCompile Include="gridRegionConstructor.cpp" />
     <ClCompile Include="gridRegionLocator.cpp" />
     <ClCompile Include="item.cpp" />
@@ -234,7 +234,6 @@
     <ClInclude Include="graphEdge.h" />
     <ClInclude Include="graphEdgeCollection.h" />
     <ClInclude Include="graphNode.h" />
-    <ClInclude Include="gridConstructor.h" />
     <ClInclude Include="gridLocator.h" />
     <ClInclude Include="gridLocatorEdge.h" />
     <ClInclude Include="gridLocatorNode.h" />

@@ -4,7 +4,7 @@ using namespace brogueHd::backend::model::machine;
 
 namespace brogueHd::backend::model
 {
-	brogueMachine::brogueMachine(machineGenerator generator, machineFeatureFlags featureFlags)
+	brogueMachine::brogueMachine(machineBase generator, machineFeatureFlags featureFlags)
 	{
 		_generator = generator;
 		_featureFlags = featureFlags;
@@ -14,7 +14,7 @@ namespace brogueHd::backend::model
 
 	}
 
-	machineGenerator brogueMachine::getGenerator() const
+	machineBase brogueMachine::getGenerator() const
 	{
 		return _generator;
 	}

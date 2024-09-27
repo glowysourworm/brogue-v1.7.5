@@ -5,7 +5,7 @@
 #include "gridExtension.h"
 #include "gridRect.h"
 #include "dijkstra.h"
-#include "simpleList.h"
+#include "simpleArray.h"
 #include <functional>
 
 using namespace std;
@@ -46,8 +46,8 @@ namespace brogueHd::backend::model::layout
 		gridRect getBoundary() const;
 		gridRect getParentBoundary() const;
 		gridRect getLargestSubRectangle() const;
-		simpleList<T>* getLocations();
-		simpleList<T>* getEdgeLocations();
+		simpleArray<T>* getLocations();
+		simpleArray<T>* getEdgeLocations();
 
 		/// <summary>
 		/// Translates this instance of the grid region using the provided translator
@@ -89,17 +89,17 @@ namespace brogueHd::backend::model::layout
 		/// <summary>
 		/// Gets locations with an exposed edge in the specified direction
 		/// </summary>
-		simpleList<T>* getEdges(brogueCompass direction);
+		simpleArray<T>* getEdges(brogueCompass direction);
 
 		/// <summary>
 		/// Gets the locations that are also along the bounding rectangle
 		/// </summary>
-		simpleList<T>& getBoundaryEdges(brogueCompass direction);
+		simpleArray<T>* getBoundaryEdges(brogueCompass direction);
 
 		/// <summary>
 		/// Gets locations with exposed corner
 		/// </summary>
-		simpleList<T>* getCorners(brogueCompass nonCardinalDirection);
+		simpleArray<T>* getCorners(brogueCompass nonCardinalDirection);
 
 	private:
 
@@ -125,20 +125,20 @@ namespace brogueHd::backend::model::layout
 
 		gridRect _largestRectangularSubRegion;
 
-		simpleList<T>* _locations;
-		simpleList<T>* _edgeLocations;
+		simpleArray<T>* _locations;
+		simpleArray<T>* _edgeLocations;
 
 		// Exposed Edge Faces
-		simpleList<T>* _northExposedLocations;
-		simpleList<T>* _southExposedLocations;
-		simpleList<T>* _westExposedLocations;
-		simpleList<T>* _eastExposedLocations;
+		simpleArray<T>* _northExposedLocations;
+		simpleArray<T>* _southExposedLocations;
+		simpleArray<T>* _westExposedLocations;
+		simpleArray<T>* _eastExposedLocations;
 		
 		// Corners
-		simpleList<T>* _northEastCornerLocations;
-		simpleList<T>* _northWestCornerLocations;
-		simpleList<T>* _southEastCornerLocations;
-		simpleList<T>* _southWestCornerLocations;
+		simpleArray<T>* _northEastCornerLocations;
+		simpleArray<T>* _northWestCornerLocations;
+		simpleArray<T>* _southEastCornerLocations;
+		simpleArray<T>* _southWestCornerLocations;
 	};
 }
 

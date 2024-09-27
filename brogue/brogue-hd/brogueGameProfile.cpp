@@ -11,15 +11,15 @@ namespace brogueHd::backend::model
 	brogueGameProfile::brogueGameProfile(randomGenerator* randomGenerator)
 	{
 		_randomGenerator = randomGenerator;
-		_levelProfiles = new std::vector<brogueLevelProfile*>();
+		_levelProfiles = new simpleList<brogueLevelProfile*>();
 
 		this->initialize();
 	}
 	brogueGameProfile::~brogueGameProfile()
 	{
-		for (int index = 0; index < _levelProfiles->size(); index++)
+		for (int index = 0; index < _levelProfiles->count(); index++)
 		{
-			delete _levelProfiles->at(index);
+			delete _levelProfiles->get(index);
 		}
 
 		delete _levelProfiles;
@@ -29,11 +29,11 @@ namespace brogueHd::backend::model
 		for (int levelNumber = 1; levelNumber < DEEPEST_LEVEL; levelNumber++)
 		{
 			if (levelNumber == 1)
-				_levelProfiles->push_back(new brogueLevelProfile(_randomGenerator, levelNumber, levelTypes::DP_BASIC_FIRST_ROOM));
+				_levelProfiles->add(new brogueLevelProfile(_randomGenerator, levelNumber, levelTypes::DP_BASIC_FIRST_ROOM));
 
 			// TODO:  Gather up which levels will get what profiles
 			else
-				_levelProfiles->push_back(new brogueLevelProfile(_randomGenerator, levelNumber, levelTypes::DP_BASIC));
+				_levelProfiles->add(new brogueLevelProfile(_randomGenerator, levelNumber, levelTypes::DP_BASIC));
 		}
 	}
 }

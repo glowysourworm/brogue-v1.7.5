@@ -1,6 +1,6 @@
 #include "brogueView.h"
 #include "gridRect.h"
-#include "array2D.h"
+#include "grid.h"
 #include "brogueCellDisplay.h"
 
 using namespace brogueHd::backend::model::layout;
@@ -9,7 +9,7 @@ namespace brogueHd::backend::model
 {
 	brogueView::brogueView(gridRect boundary)
 	{
-		_view = new array2D<brogueCellDisplay*>(boundary);
+		_view = new grid<brogueCellDisplay*>(boundary, boundary);
 	}
 	brogueView::~brogueView()
 	{
@@ -18,6 +18,6 @@ namespace brogueHd::backend::model
 
 	void brogueView::update(const brogueCellDisplay& display, short column, short row)
 	{
-		_view[column][row].update(display);
+		_view->get(column,row)->update(display);
 	}
 }

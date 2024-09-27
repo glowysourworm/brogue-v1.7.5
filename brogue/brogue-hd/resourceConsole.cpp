@@ -1,7 +1,12 @@
 #include "resourceConsole.h"
 #include "stringExtension.h"
 #include "brogueColorMap.h"
+#include "colorConstants.h"
+#include <format>
 
+using namespace std;
+
+using namespace brogueHd::backend::modelConstant;
 using namespace brogueHd::backend::model;
 using namespace brogueHd::backend::extension;
 

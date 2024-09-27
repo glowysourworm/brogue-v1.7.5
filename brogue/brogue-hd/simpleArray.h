@@ -21,6 +21,11 @@ namespace brogueHd::component
 		/// </summary>
 		/// <param name="value">callback (current) value</param>
 		typedef std::function<iterationCallback(T item)> callback;
+
+		/// <summary>
+		/// Definition of a simple decision predicate
+		/// </summary>
+		typedef std::function<bool(T item)> predicate;
 	};
 
 	template<typename T>
@@ -29,6 +34,7 @@ namespace brogueHd::component
 	public:
 
 		simpleArray(int size);
+		simpleArray(T* anArray);
 		~simpleArray();
 
 		int size() const;
@@ -38,9 +44,10 @@ namespace brogueHd::component
 		T& operator[](int index) override;
 
 		void set(int index, T value);		
+		bool contains(T item);
 
 		void forEach(simpleArrayDelegates<T>::callback callback);
-		bool contains(T item);
+		simpleArray<T> where(simpleArrayDelegates<T>::predicate predicate);
 
 	private:
 

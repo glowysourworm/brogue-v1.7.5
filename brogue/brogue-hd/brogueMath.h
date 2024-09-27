@@ -16,7 +16,7 @@ namespace brogueHd::backend::math
 		{ numberType } -> std::convertible_to<double>;
 	};
 
-	template<brogueMathType TMath>
+	template<brogueMathType TMath, std::same_as<TMath>... Args>
 	class brogueMath
 	{
 	public:
@@ -28,19 +28,31 @@ namespace brogueHd::backend::math
 
 			return x;
 		}
-		static TMath min(TMath x, TMath y)
+		static TMath min(TMath x, TMath... args)
 		{
-			if (x <= y)
+			// Variadic args... is treated as an array
+			//
+			if (SIZEOF(args...) == 0)
 				return x;
 
-			return y;
+			if (x <= min(args...))
+				return x;
+
+			else
+				return min(args...);
 		}
-		static TMath max(TMath x, TMath y)
+		static TMath max(TMath x, TMath... args)
 		{
-			if (x >= y)
+			// Variadic args... is treated as an array
+			//
+			if (SIZEOF(args...) == 0)
 				return x;
 
-			return y;
+			if (x > max(args...))
+				return x;
+
+			else
+				return max(args...);
 		}
 		static TMath clamp(TMath x, TMath low, TMath high)
 		{

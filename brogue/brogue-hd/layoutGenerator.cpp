@@ -121,7 +121,7 @@ namespace brogueHd::backend::generator
 
         short maxAttempts = 35;
         short interRoomPadding = 1;
-        std::vector<accretionTile> attemptRegions(maxAttempts);
+        simpleList<accretionTile> attemptRegions;
 
         // 1) Create 35 room (up front), 2) Attempt bolt-on until there are no more fits
         //
@@ -150,11 +150,11 @@ namespace brogueHd::backend::generator
             nextRoom.connectionPointE = eastEdge[randE];
             nextRoom.connectionPointW = westEdge[randW];
 
-            attemptRegions.push_back(nextRoom);
+            attemptRegions.add(nextRoom);
         }
 
         // Bolt-on
-        for (int index = 0; index < attemptRegions.size(); index++)
+        for (int index = 0; index < attemptRegions.count(); index++)
         {
             // First Room
             if (index == 0)
@@ -420,21 +420,21 @@ namespace brogueHd::backend::generator
         });
 
         // Create connection point vertices
-        std::vector<gridLocatorNode> connectionNodes;
+        simpleList<gridLocatorNode> connectionNodes;
         
         _roomTiles->forEach([&connectionNodes](accretionTile item)
         {
             if (item.hasEastConnection)
-                connectionNodes.push_back(gridLocatorNode(item.connectionPointE));
+                connectionNodes.add(gridLocatorNode(item.connectionPointE));
 
             if (item.hasNorthConnection)
-                connectionNodes.push_back(gridLocatorNode(item.connectionPointN));
+                connectionNodes.add(gridLocatorNode(item.connectionPointN));
 
             if (item.hasSouthConnection)
-                connectionNodes.push_back(gridLocatorNode(item.connectionPointS));
+                connectionNodes.add(gridLocatorNode(item.connectionPointS));
 
             if (item.hasWestConnection)
-                connectionNodes.push_back(gridLocatorNode(item.connectionPointW));
+                connectionNodes.add(gridLocatorNode(item.connectionPointW));
         });
 
         _delaunayGraph = triangulator.run(connectionNodes);

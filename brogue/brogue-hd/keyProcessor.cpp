@@ -8,7 +8,7 @@ namespace brogueHd::backend::processor
 {
 	keyProcessor::keyProcessor()
 	{
-		_keyMap = new std::map<std::string, std::string>();
+		_keyMap = new simpleHash<std::string, std::string>();
 	}
 
 	keyProcessor::~keyProcessor()
@@ -16,9 +16,9 @@ namespace brogueHd::backend::processor
 		delete _keyMap;
 	}
 
-	void keyProcessor::addKeyMap(char* inputCharacter, char* outputCharacter)
+	void keyProcessor::addKeyMap(const char* inputCharacter, const char* outputCharacter)
 	{
 		if (!_keyMap->contains(std::string(inputCharacter)))
-			_keyMap->insert(std::string(inputCharacter), std::string(outputCharacter));
+			_keyMap->add(std::string(inputCharacter), std::string(outputCharacter));
 	}
 }

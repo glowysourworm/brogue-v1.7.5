@@ -1,10 +1,9 @@
 #include "levelProcessor.h"
 #include "brogueLevel.h"
 #include "colorConstants.h"
+#include "item.h"
 
-using namespace brogueHd::backend::processor::methods;
-
-namespace brogueHd
+namespace brogueHd::backend::processor
 {
 	levelProcessor::levelProcessor(brogueLevel* level)
 	{
@@ -19,11 +18,11 @@ namespace brogueHd
 	void levelProcessor::initialize()
 	{
 		unsigned long oldSeed;
-		item* theItem;
+		itemBase* theItem;
 		short loc[2], i, j, x, y, px, py, flying, dir;
-		boolean placedPlayer;
-		creature* monst;
-		dungeonLayers layer;
+		bool placedPlayer;
+		//creature* monst;
+		//dungeonLayers layer;
 		unsigned long timeAway;
 		short** mapToStairs;
 		short** mapToPit;
@@ -52,7 +51,7 @@ namespace brogueHd
 		//rogue.cursorLoc[1] = -1;
 		//rogue.lastTarget = NULL;
 
-		connectingStairsDiscovered = stairsUpDiscovered(_level);
+		//connectingStairsDiscovered = stairsUpDiscovered(_level);
 
 		//connectingStairsDiscovered = (pmap[rogue.downLoc[0]][rogue.downLoc[1]].flags & (DISCOVERED | MAGIC_MAPPED) ? true : false);
 		//if (stairDirection == 0) { // fallen
@@ -68,11 +67,11 @@ namespace brogueHd
 		py = player.yLoc;
 
 		// Check for auto-descent
-		if (isAutoDescent(_level, _player->xLoc, _player->yLoc))
-		{
-			// Find walkable location
-			brogueCell* walkableCell = findAdjacentWalkableLocation(_level, _player->xLoc, _player->yLoc);
-		}
+		//if (isAutoDescent(_level, _player->xLoc, _player->yLoc))
+		//{
+		//	// Find walkable location
+		//	brogueCell* walkableCell = findAdjacentWalkableLocation(_level, _player->xLoc, _player->yLoc);
+		//}
 
 		// NEXT***  Calculate map to stairs to figure out how to initialize enemies
 		//
@@ -228,192 +227,193 @@ namespace brogueHd
 			// initializeLevel();
 			// setUpWaypoints();
 
-			shuffleTerrainColors(100, false);
+			//shuffleTerrainColors(100, false);
 
-			// If we somehow failed to generate the amulet altar,
-			// just toss an amulet in there somewhere.
-			// It'll be fiiine!
-			if (rogue.depthLevel == AMULET_LEVEL
-				&& !numberOfMatchingPackItems(AMULET, 0, 0, false)
-				&& levels[rogue.depthLevel - 1].visited == false) {
+			//// If we somehow failed to generate the amulet altar,
+			//// just toss an amulet in there somewhere.
+			//// It'll be fiiine!
+			//if (rogue.depthLevel == AMULET_LEVEL
+			//	&& !numberOfMatchingPackItems(AMULET, 0, 0, false)
+			//	&& levels[rogue.depthLevel - 1].visited == false) {
 
-				for (theItem = floorItems->nextItem; theItem != NULL; theItem = theItem->nextItem) {
-					if (theItem->category & AMULET) {
-						break;
-					}
-				}
-				for (monst = monsters->nextCreature; monst != NULL; monst = monst->nextCreature) {
-					if (monst->carriedItem
-						&& (monst->carriedItem->category & AMULET)) {
+			//	for (theItem = floorItems->nextItem; theItem != NULL; theItem = theItem->nextItem) {
+			//		if (theItem->category & AMULET) {
+			//			break;
+			//		}
+			//	}
+			//	for (monst = monsters->nextCreature; monst != NULL; monst = monst->nextCreature) {
+			//		if (monst->carriedItem
+			//			&& (monst->carriedItem->category & AMULET)) {
 
-						theItem = monst->carriedItem;
-						break;
-					}
-				}
-				if (!theItem) {
-					placeItem(generateItem(AMULET, 0), 0, 0);
-				}
-			}
-			seedRandomGenerator(oldSeed);
+			//			theItem = monst->carriedItem;
+			//			break;
+			//		}
+			//	}
+			//	if (!theItem) {
+			//		placeItem(generateItem(AMULET, 0), 0, 0);
+			//	}
+			//}
+		//	//seedRandomGenerator(oldSeed);
 
-			//logLevel();
+		//	//logLevel();
 
-			// Simulate 50 turns so the level is broken in (swamp gas accumulating, brimstone percolating, etc.).
-			timeAway = 50;
+		//	// Simulate 50 turns so the level is broken in (swamp gas accumulating, brimstone percolating, etc.).
+		//	timeAway = 50;
 
-		}
-		else { // level has already been visited
+		//}
+		//else 
+		//{ // level has already been visited
 
-		 // restore level
-			scentMap = levels[rogue.depthLevel - 1].scentMap;
-			timeAway = clamp(0, rogue.absoluteTurnNumber - levels[rogue.depthLevel - 1].awaySince, 30000);
+		// // restore level
+		//	scentMap = levels[rogue.depthLevel - 1].scentMap;
+		//	timeAway = clamp(0, rogue.absoluteTurnNumber - levels[rogue.depthLevel - 1].awaySince, 30000);
 
-			for (i = 0; i < DCOLS; i++) {
-				for (j = 0; j < DROWS; j++) {
-					for (layer = 0; layer < NUMBER_TERRAIN_LAYERS; layer++) {
-						pmap[i][j].layers[layer] = levels[rogue.depthLevel - 1].mapStorage[i][j].layers[layer];
-					}
-					pmap[i][j].volume = levels[rogue.depthLevel - 1].mapStorage[i][j].volume;
-					pmap[i][j].flags = (levels[rogue.depthLevel - 1].mapStorage[i][j].flags & PERMANENT_TILE_FLAGS);
-					pmap[i][j].rememberedAppearance = levels[rogue.depthLevel - 1].mapStorage[i][j].rememberedAppearance;
-					pmap[i][j].rememberedTerrain = levels[rogue.depthLevel - 1].mapStorage[i][j].rememberedTerrain;
-					pmap[i][j].rememberedItemCategory = levels[rogue.depthLevel - 1].mapStorage[i][j].rememberedItemCategory;
-					pmap[i][j].rememberedItemKind = levels[rogue.depthLevel - 1].mapStorage[i][j].rememberedItemKind;
-					pmap[i][j].rememberedCellFlags = levels[rogue.depthLevel - 1].mapStorage[i][j].rememberedCellFlags;
-					pmap[i][j].rememberedTerrainFlags = levels[rogue.depthLevel - 1].mapStorage[i][j].rememberedTerrainFlags;
-					pmap[i][j].machineNumber = levels[rogue.depthLevel - 1].mapStorage[i][j].machineNumber;
-				}
-			}
+		//	for (i = 0; i < DCOLS; i++) {
+		//		for (j = 0; j < DROWS; j++) {
+		//			for (layer = 0; layer < NUMBER_TERRAIN_LAYERS; layer++) {
+		//				pmap[i][j].layers[layer] = levels[rogue.depthLevel - 1].mapStorage[i][j].layers[layer];
+		//			}
+		//			pmap[i][j].volume = levels[rogue.depthLevel - 1].mapStorage[i][j].volume;
+		//			pmap[i][j].flags = (levels[rogue.depthLevel - 1].mapStorage[i][j].flags & PERMANENT_TILE_FLAGS);
+		//			pmap[i][j].rememberedAppearance = levels[rogue.depthLevel - 1].mapStorage[i][j].rememberedAppearance;
+		//			pmap[i][j].rememberedTerrain = levels[rogue.depthLevel - 1].mapStorage[i][j].rememberedTerrain;
+		//			pmap[i][j].rememberedItemCategory = levels[rogue.depthLevel - 1].mapStorage[i][j].rememberedItemCategory;
+		//			pmap[i][j].rememberedItemKind = levels[rogue.depthLevel - 1].mapStorage[i][j].rememberedItemKind;
+		//			pmap[i][j].rememberedCellFlags = levels[rogue.depthLevel - 1].mapStorage[i][j].rememberedCellFlags;
+		//			pmap[i][j].rememberedTerrainFlags = levels[rogue.depthLevel - 1].mapStorage[i][j].rememberedTerrainFlags;
+		//			pmap[i][j].machineNumber = levels[rogue.depthLevel - 1].mapStorage[i][j].machineNumber;
+		//		}
+		//	}
 
-			setUpWaypoints();
+		//	setUpWaypoints();
 
-			rogue.downLoc[0] = levels[rogue.depthLevel - 1].downStairsLoc[0];
-			rogue.downLoc[1] = levels[rogue.depthLevel - 1].downStairsLoc[1];
-			rogue.upLoc[0] = levels[rogue.depthLevel - 1].upStairsLoc[0];
-			rogue.upLoc[1] = levels[rogue.depthLevel - 1].upStairsLoc[1];
+		//	rogue.downLoc[0] = levels[rogue.depthLevel - 1].downStairsLoc[0];
+		//	rogue.downLoc[1] = levels[rogue.depthLevel - 1].downStairsLoc[1];
+		//	rogue.upLoc[0] = levels[rogue.depthLevel - 1].upStairsLoc[0];
+		//	rogue.upLoc[1] = levels[rogue.depthLevel - 1].upStairsLoc[1];
 
-			monsters->nextCreature = levels[rogue.depthLevel - 1].monsters;
-			dormantMonsters->nextCreature = levels[rogue.depthLevel - 1].dormantMonsters;
-			floorItems->nextItem = levels[rogue.depthLevel - 1].items;
+		//	monsters->nextCreature = levels[rogue.depthLevel - 1].monsters;
+		//	dormantMonsters->nextCreature = levels[rogue.depthLevel - 1].dormantMonsters;
+		//	floorItems->nextItem = levels[rogue.depthLevel - 1].items;
 
-			levels[rogue.depthLevel - 1].monsters = NULL;
-			levels[rogue.depthLevel - 1].dormantMonsters = NULL;
-			levels[rogue.depthLevel - 1].items = NULL;
+		//	levels[rogue.depthLevel - 1].monsters = NULL;
+		//	levels[rogue.depthLevel - 1].dormantMonsters = NULL;
+		//	levels[rogue.depthLevel - 1].items = NULL;
 
-			for (theItem = floorItems->nextItem; theItem != NULL; theItem = theItem->nextItem) {
-				restoreItem(theItem);
-			}
+		//	for (theItem = floorItems->nextItem; theItem != NULL; theItem = theItem->nextItem) {
+		//		restoreItem(theItem);
+		//	}
 
-			mapToStairs = allocGrid();
-			mapToPit = allocGrid();
-			fillGrid(mapToStairs, 0);
-			fillGrid(mapToPit, 0);
-			calculateDistances(mapToStairs, player.xLoc, player.yLoc, T_PATHING_BLOCKER, NULL, true, true);
-			calculateDistances(mapToPit, levels[rogue.depthLevel - 1].playerExitedVia[0],
-				levels[rogue.depthLevel - 1].playerExitedVia[0], T_PATHING_BLOCKER, NULL, true, true);
-			for (monst = monsters->nextCreature; monst != NULL; monst = monst->nextCreature) {
-				restoreMonster(monst, mapToStairs, mapToPit);
-			}
-			freeGrid(mapToStairs);
-			freeGrid(mapToPit);
-		}
+		//	mapToStairs = allocGrid();
+		//	mapToPit = allocGrid();
+		//	fillGrid(mapToStairs, 0);
+		//	fillGrid(mapToPit, 0);
+		//	calculateDistances(mapToStairs, player.xLoc, player.yLoc, T_PATHING_BLOCKER, NULL, true, true);
+		//	calculateDistances(mapToPit, levels[rogue.depthLevel - 1].playerExitedVia[0],
+		//		levels[rogue.depthLevel - 1].playerExitedVia[0], T_PATHING_BLOCKER, NULL, true, true);
+		//	for (monst = monsters->nextCreature; monst != NULL; monst = monst->nextCreature) {
+		//		restoreMonster(monst, mapToStairs, mapToPit);
+		//	}
+		//	freeGrid(mapToStairs);
+		//	freeGrid(mapToPit);
+		//}
 
-		// Simulate the environment!
-		// First bury the player in limbo while we run the simulation,
-		// so that any harmful terrain doesn't affect her during the process.
-		px = player.xLoc;
-		py = player.yLoc;
-		player.xLoc = player.yLoc = 0;
-		for (i = 0; i < 100 && i < (short)timeAway; i++) {
-			updateEnvironment();
-		}
-		player.xLoc = px;
-		player.yLoc = py;
+		//// Simulate the environment!
+		//// First bury the player in limbo while we run the simulation,
+		//// so that any harmful terrain doesn't affect her during the process.
+		//px = player.xLoc;
+		//py = player.yLoc;
+		//player.xLoc = player.yLoc = 0;
+		//for (i = 0; i < 100 && i < (short)timeAway; i++) {
+		//	updateEnvironment();
+		//}
+		//player.xLoc = px;
+		//player.yLoc = py;
 
-		if (!levels[rogue.depthLevel - 1].visited) {
-			levels[rogue.depthLevel - 1].visited = true;
-			if (rogue.depthLevel == AMULET_LEVEL) {
-				messageWithColor("An alien energy permeates the area. The Amulet of Yendor must be nearby!", &itemMessageColor, false);
-			}
-			else if (rogue.depthLevel == DEEPEST_LEVEL) {
-				messageWithColor("An overwhelming sense of peace and tranquility settles upon you.", &lightBlue, false);
-			}
-		}
+		//if (!levels[rogue.depthLevel - 1].visited) {
+		//	levels[rogue.depthLevel - 1].visited = true;
+		//	if (rogue.depthLevel == AMULET_LEVEL) {
+		//		messageWithColor("An alien energy permeates the area. The Amulet of Yendor must be nearby!", &itemMessageColor, false);
+		//	}
+		//	else if (rogue.depthLevel == DEEPEST_LEVEL) {
+		//		messageWithColor("An overwhelming sense of peace and tranquility settles upon you.", &lightBlue, false);
+		//	}
+		//}
 
-		// Position the player.
-		if (stairDirection == 0) { // fell into the level
+		//// Position the player.
+		//if (stairDirection == 0) { // fell into the level
 
-			getQualifyingLocNear(loc, player.xLoc, player.yLoc, true, 0,
-				(T_PATHING_BLOCKER),
-				(HAS_MONSTER | HAS_ITEM | HAS_STAIRS | IS_IN_MACHINE), false, false);
-		}
-		else {
-			if (stairDirection == 1) { // heading downward
-				player.xLoc = rogue.upLoc[0];
-				player.yLoc = rogue.upLoc[1];
-			}
-			else if (stairDirection == -1) { // heading upward
-				player.xLoc = rogue.downLoc[0];
-				player.yLoc = rogue.downLoc[1];
-			}
+		//	getQualifyingLocNear(loc, player.xLoc, player.yLoc, true, 0,
+		//		(T_PATHING_BLOCKER),
+		//		(HAS_MONSTER | HAS_ITEM | HAS_STAIRS | IS_IN_MACHINE), false, false);
+		//}
+		//else {
+		//	if (stairDirection == 1) { // heading downward
+		//		player.xLoc = rogue.upLoc[0];
+		//		player.yLoc = rogue.upLoc[1];
+		//	}
+		//	else if (stairDirection == -1) { // heading upward
+		//		player.xLoc = rogue.downLoc[0];
+		//		player.yLoc = rogue.downLoc[1];
+		//	}
 
-			placedPlayer = false;
-			for (dir = 0; dir < 4 && !placedPlayer; dir++) {
-				loc[0] = player.xLoc + nbDirs[dir][0];
-				loc[1] = player.yLoc + nbDirs[dir][1];
-				if (!cellHasTerrainFlag(loc[0], loc[1], T_PATHING_BLOCKER)
-					&& !(pmap[loc[0]][loc[1]].flags & (HAS_MONSTER | HAS_ITEM | HAS_STAIRS | IS_IN_MACHINE))) {
-					placedPlayer = true;
-				}
-			}
-			if (!placedPlayer) {
-				getQualifyingPathLocNear(&loc[0], &loc[1],
-					player.xLoc, player.yLoc,
-					true,
-					T_DIVIDES_LEVEL, NULL,
-					T_PATHING_BLOCKER, (HAS_MONSTER | HAS_ITEM | HAS_STAIRS | IS_IN_MACHINE),
-					false);
-			}
-		}
-		player.xLoc = loc[0];
-		player.yLoc = loc[1];
+		//	placedPlayer = false;
+		//	for (dir = 0; dir < 4 && !placedPlayer; dir++) {
+		//		loc[0] = player.xLoc + nbDirs[dir][0];
+		//		loc[1] = player.yLoc + nbDirs[dir][1];
+		//		if (!cellHasTerrainFlag(loc[0], loc[1], T_PATHING_BLOCKER)
+		//			&& !(pmap[loc[0]][loc[1]].flags & (HAS_MONSTER | HAS_ITEM | HAS_STAIRS | IS_IN_MACHINE))) {
+		//			placedPlayer = true;
+		//		}
+		//	}
+		//	if (!placedPlayer) {
+		//		getQualifyingPathLocNear(&loc[0], &loc[1],
+		//			player.xLoc, player.yLoc,
+		//			true,
+		//			T_DIVIDES_LEVEL, NULL,
+		//			T_PATHING_BLOCKER, (HAS_MONSTER | HAS_ITEM | HAS_STAIRS | IS_IN_MACHINE),
+		//			false);
+		//	}
+		//}
+		//player.xLoc = loc[0];
+		//player.yLoc = loc[1];
 
-		pmap[player.xLoc][player.yLoc].flags |= HAS_PLAYER;
+		//pmap[player.xLoc][player.yLoc].flags |= HAS_PLAYER;
 
-		if (connectingStairsDiscovered) {
-			for (i = rogue.upLoc[0] - 1; i <= rogue.upLoc[0] + 1; i++) {
-				for (j = rogue.upLoc[1] - 1; j <= rogue.upLoc[1] + 1; j++) {
-					if (coordinatesAreInMap(i, j)) {
-						discoverCell(i, j);
-					}
-				}
-			}
-		}
-		if (cellHasTerrainFlag(player.xLoc, player.yLoc, T_IS_DEEP_WATER) && !player.status[STATUS_LEVITATING]
-			&& !cellHasTerrainFlag(player.xLoc, player.yLoc, (T_ENTANGLES | T_OBSTRUCTS_PASSABILITY))) {
-			rogue.inWater = true;
-		}
+		//if (connectingStairsDiscovered) {
+		//	for (i = rogue.upLoc[0] - 1; i <= rogue.upLoc[0] + 1; i++) {
+		//		for (j = rogue.upLoc[1] - 1; j <= rogue.upLoc[1] + 1; j++) {
+		//			if (coordinatesAreInMap(i, j)) {
+		//				discoverCell(i, j);
+		//			}
+		//		}
+		//	}
+		//}
+		//if (cellHasTerrainFlag(player.xLoc, player.yLoc, T_IS_DEEP_WATER) && !player.status[STATUS_LEVITATING]
+		//	&& !cellHasTerrainFlag(player.xLoc, player.yLoc, (T_ENTANGLES | T_OBSTRUCTS_PASSABILITY))) {
+		//	rogue.inWater = true;
+		//}
 
-		updateMapToShore();
-		updateVision(true);
-		rogue.aggroRange = currentAggroValue();
+		//updateMapToShore();
+		//updateVision(true);
+		//rogue.aggroRange = currentAggroValue();
 
-		// update monster states so none are hunting if there is no scent and they can't see the player
-		for (monst = monsters->nextCreature; monst != NULL; monst = monst->nextCreature) {
-			updateMonsterState(monst);
-		}
+		//// update monster states so none are hunting if there is no scent and they can't see the player
+		//for (monst = monsters->nextCreature; monst != NULL; monst = monst->nextCreature) {
+		//	updateMonsterState(monst);
+		//}
 
-		rogue.playbackBetweenTurns = true;
-		displayLevel();
-		refreshSideBar(-1, -1, false);
+		//rogue.playbackBetweenTurns = true;
+		//displayLevel();
+		//refreshSideBar(-1, -1, false);
 
-		if (rogue.playerTurnNumber) {
-			rogue.playerTurnNumber++; // Increment even though no time has passed.
-		}
-		RNGCheck();
-		flushBufferToFile();
-		deleteAllFlares(); // So discovering something on the same turn that you fall down a level doesn't flash stuff on the previous level.
-		hideCursor();
+		//if (rogue.playerTurnNumber) {
+		//	rogue.playerTurnNumber++; // Increment even though no time has passed.
+		//}
+		//RNGCheck();
+		//flushBufferToFile();
+		//deleteAllFlares(); // So discovering something on the same turn that you fall down a level doesn't flash stuff on the previous level.
+		//hideCursor();
 	}
 
 	//// Returns a color for combat text based on the identity of the victim.

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "graphAlgorithm.h"
+#include "simpleList.h"
 
 namespace brogueHd::backend::math
 {
@@ -15,14 +16,14 @@ namespace brogueHd::backend::math
         primsAlgorithm(graphDelegates<TNode, TEdge>::edgeConstructor graphEdgeConstructor);
         ~primsAlgorithm();
 
-        graph<TNode, TEdge>* run(const std::vector<TNode>& vertices) override;
+        graph<TNode, TEdge>* run(const simpleList<TNode>& vertices) override;
 
     protected:
 
         /// <summary>
         /// Creates MST using Prim's Algorithm - which takes O(n log n)
         /// </summary>
-        graph<TNode, TEdge>* createMST(const std::vector<TNode>& vertices);
+        graph<TNode, TEdge>* createMST(const simpleList<TNode>& vertices);
         
 	};
 }

@@ -1,9 +1,9 @@
 #include "brogueGame.h"
 #include "brogueMessageQueue.h"
 
-namespace brogueHd
+namespace brogueHd::backend::model
 {
-	brogueGame::brogueGame(boolean serverMode, boolean noMenu)
+	brogueGame::brogueGame(bool serverMode, bool noMenu)
 	{
 		_messageQueue = new brogueMessageQueue();
 
@@ -15,16 +15,16 @@ namespace brogueHd
 		delete _messageQueue;
 	}
 
-	boolean brogueGame::getServerMode()
+	bool brogueGame::getServerMode()
 	{
 		return _serverMode;
 	}
-	boolean brogueGame::getNoMenu()
+	bool brogueGame::getNoMenu()
 	{
 		return _noMenu;
 	}
 
-	void brogueGame::outputMessage(char* msg, color theColor, boolean requireAcknowledgment)
+	void brogueGame::outputMessage(char* msg, color theColor, bool requireAcknowledgment)
 	{
 		_messageQueue->addMessage(msg, theColor, requireAcknowledgment);
 	}

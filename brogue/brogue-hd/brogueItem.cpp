@@ -1,6 +1,9 @@
 #pragma once
 
 #include "brogueItem.h"
+#include "itemConstants.h"
+
+using namespace brogueHd::backend::modelConstant;
 
 namespace brogueHd::backend::model
 {

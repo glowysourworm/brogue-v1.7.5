@@ -3,11 +3,7 @@
 #include "gridRegionConstructor.h"
 #include "grid.h"
 #include "gridRect.h"
-#include "vectorExtension.h"
-#include "arrayExtension.h"
 #include "exceptionHandler.h"
-
-using namespace std;
 
 using namespace brogueHd::backend::extension;
 using namespace brogueHd::backend::math;
@@ -93,40 +89,18 @@ namespace brogueHd::backend::model::layout
 
 		_largestRectangularSubRegion = largestRectangularSubRegion;
 
-		_locations = new std::vector<T>(SIZEOF(locations));
-		_edgeLocations = new std::vector<T>(SIZEOF(edgeLocations));
+		_locations = new simpleArray<T>(locations);
+		_edgeLocations = new simpleArray<T>(edgeLocations);
 
-		_northExposedLocations = new std::vector<T>(SIZEOF(northExposedLocations));
-		_southExposedLocations = new std::vector<T>(SIZEOF(southExposedLocations));
-		_eastExposedLocations = new std::vector<T>(SIZEOF(eastExposedLocations));
-		_westExposedLocations = new std::vector<T>(SIZEOF(westExposedLocations));
+		_northExposedLocations = new simpleArray<T>(northExposedLocations);
+		_southExposedLocations = new simpleArray<T>(southExposedLocations);
+		_eastExposedLocations = new simpleArray<T>(eastExposedLocations);
+		_westExposedLocations = new simpleArray<T>(westExposedLocations);
 
-		_northEastCornerLocations = new std::vector<T>(SIZEOF(northEastCornerLocations));
-		_northWestCornerLocations = new std::vector<T>(SIZEOF(northWestCornerLocations));
-		_southEastCornerLocations = new std::vector<T>(SIZEOF(southEastCornerLocations));
-		_southWestCornerLocations = new std::vector<T>(SIZEOF(southWestCornerLocations));
-
-		// Copy collections
-		arrayExtension<T>::forEach(locations, [&_locations, &_grid](T item)
-		{
-			_grid->set(item.column, item.row, item);
-			_locations->push_back(item);
-		});
-		arrayExtension<T>::forEach(edgeLocations, [&_edgeLocations, &_edgeGrid](T item)
-		{
-			_edgeGrid->set(item.column, item.row, item);
-			_edgeLocations->push_back(item);
-		});
-
-		arrayExtension<T>::forEach(northExposedLocations, [&_northExposedLocations](T item) { _northExposedLocations->push_back(item); });
-		arrayExtension<T>::forEach(southExposedLocations, [&_southExposedLocations](T item) { _southExposedLocations->push_back(item); });
-		arrayExtension<T>::forEach(eastExposedLocations, [&_eastExposedLocations](T item) { _eastExposedLocations->push_back(item); });
-		arrayExtension<T>::forEach(westExposedLocations, [&_westExposedLocations](T item) { _westExposedLocations->push_back(item); });
-
-		arrayExtension<T>::forEach(northEastCornerLocations, [&_northEastCornerLocations](T item) { _northEastCornerLocations->push_back(item); });
-		arrayExtension<T>::forEach(northWestCornerLocations, [&_northWestCornerLocations](T item) { _northWestCornerLocations->push_back(item); });
-		arrayExtension<T>::forEach(southEastCornerLocations, [&_southEastCornerLocations](T item) { _southEastCornerLocations->push_back(item); });
-		arrayExtension<T>::forEach(southWestCornerLocations, [&_southWestCornerLocations](T item) { _southWestCornerLocations->push_back(item); });
+		_northEastCornerLocations = new simpleArray<T>(northEastCornerLocations);
+		_northWestCornerLocations = new simpleArray<T>(northWestCornerLocations);
+		_southEastCornerLocations = new simpleArray<T>(southEastCornerLocations);
+		_southWestCornerLocations = new simpleArray<T>(southWestCornerLocations);
 	}
 
 	template<isGridLocator T>
@@ -176,19 +150,19 @@ namespace brogueHd::backend::model::layout
 	}
 
 	template<isGridLocator T>
-	std::vector<T>* gridRegion<T>::getLocations()
+	simpleArray<T>* gridRegion<T>::getLocations()
 	{
 		return _locations;
 	}
 
 	template<isGridLocator T>
-	std::vector<T>* gridRegion<T>::getEdgeLocations()
+	simpleArray<T>* gridRegion<T>::getEdgeLocations()
 	{
 		return _edgeLocations;
 	}
 
 	template<isGridLocator T>
-	std::vector<T>* gridRegion<T>::getEdges(brogueCompass direction)
+	simpleArray<T>* gridRegion<T>::getEdges(brogueCompass direction)
 	{
 		switch (direction)
 		{
@@ -206,27 +180,27 @@ namespace brogueHd::backend::model::layout
 	}
 
 	template<isGridLocator T>
-	std::vector<T>& gridRegion<T>::getBoundaryEdges(brogueCompass direction)
+	simpleArray<T>* gridRegion<T>::getBoundaryEdges(brogueCompass direction)
 	{
 		gridRect boundary = this->getBoundary();
 
 		switch (direction)
 		{
 		case brogueCompass::N:
-			return vectorExtension<T>::where(*_northExposedLocations, [&boundary](T item) { item.row == boundary.top()});
+			return _northExposedLocations->where([&boundary](T item) { item.row == boundary.top()});
 		case brogueCompass::S:
-			return vectorExtension<T>::where(*_southExposedLocations, [&boundary](T item) { item.row == boundary.bottom()});
+			return _southExposedLocations->where([&boundary](T item) { item.row == boundary.bottom()});
 		case brogueCompass::E:
-			return vectorExtension<T>::where(*_eastExposedLocations, [&boundary](T item) { item.row == boundary.right()});
+			return _eastExposedLocations->where([&boundary](T item) { item.row == boundary.right()});
 		case brogueCompass::W:
-			return vectorExtension<T>::where(*_westExposedLocations, [&boundary](T item) { item.row == boundary.left()});
+			return _westExposedLocations->where([&boundary](T item) { item.row == boundary.left()});
 		default:
 			brogueException::show("Must use cardinal direction for gridRegion<>::getEdges");
 		}
 	}
 
 	template<isGridLocator T>
-	std::vector<T>* gridRegion<T>::getCorners(brogueCompass nonCardinalDirection)
+	simpleArray<T>* gridRegion<T>::getCorners(brogueCompass nonCardinalDirection)
 	{
 		switch (nonCardinalDirection)
 		{
@@ -264,7 +238,7 @@ namespace brogueHd::backend::model::layout
 	template<isGridLocator T>
 	void gridRegion<T>::iterateLocations(gridDelegates<T>::callback callback)
 	{
-		vectorExtension<T>::forEach(_locations, [](T item)
+		_locations->forEach([](T item)
 		{
 			callback(item.column, item.row, item);
 		});
@@ -273,7 +247,7 @@ namespace brogueHd::backend::model::layout
 	template<isGridLocator T>
 	void gridRegion<T>::iterateEdges(gridDelegates<T>::callback callback)
 	{
-		vectorExtension<T>::forEach(_edgeLocations, [](T item)
+		_edgeLocations->forEach([](T item)
 		{
 			callback(item.column, item.row, item);
 		});
@@ -289,10 +263,10 @@ namespace brogueHd::backend::model::layout
 			return true;
 		});
 
-		vectorExtension<T>::forEach(_locations, [&constructor, &translation, &isLocator](short column, short row, T item)
+		_locations->forEach([&constructor, &translation, &isLocator](T item)
 		{
-			short newColumn = column + translation.column;
-			short newRow = row + translation.row;
+			short newColumn = item.column + translation.column;
+			short newRow = item.row + translation.row;
 
 			// Locators
 			if (isLocator)

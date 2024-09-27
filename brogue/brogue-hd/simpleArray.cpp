@@ -3,6 +3,7 @@
 #include "broguedef.h"
 #include "simple.h"
 #include "simpleArray.h"
+#include "simpleList.h"
 
 namespace brogueHd::component
 {
@@ -11,6 +12,16 @@ namespace brogueHd::component
 	{
 		_array = new T[size];
 		_size = size;
+	}
+
+	template<typename T>
+	simpleArray<T>::simpleArray(T* anArray)
+	{
+		_array = new T[SIZEOF(anArray)];
+		_size = SIZEOF(anArray);
+
+		for (int index = 0; index < _size; index++)
+			_array[index] = anArray[index];
 	}
 
 	template<typename T>
@@ -52,11 +63,25 @@ namespace brogueHd::component
 	template<typename T>
 	void simpleArray<T>::forEach(simpleArrayDelegates<T>::callback callback)
 	{
-		for (int index = 0; index < SIZEOF(collection); index++)
+		for (int index = 0; index < _size; index++)
 		{
 			if (callback(_array[index]) == iterationCallback::breakAndReturn)
 				return;
 		}
+	}
+
+	template<typename T>
+	simpleArray<T> simpleArray<T>::where(simpleArrayDelegates<T>::predicate predicate)
+	{
+		simpleList<T> result;
+
+		for (int index = 0; index < _size; index++)
+		{
+			if (predicate(_array[index]))
+				result.add(_array[index]);
+		}
+
+		return result.toArray();
 	}
 
 	template<typename T>

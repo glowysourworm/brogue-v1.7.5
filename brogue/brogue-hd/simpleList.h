@@ -1,6 +1,7 @@
 #pragma once
 
 #include "simple.h"
+#include "simpleArray.h"
 #include <functional>
 
 using namespace std;
@@ -20,23 +21,29 @@ namespace brogueHd::component
 		/// value to either break, or continue the loop.
 		/// </summary>
 		/// <param name="value">callback (current) value</param>
-		static typedef std::function<iterationCallback(T item)> callback;
+		typedef std::function<iterationCallback(T item)> callback;
 
 		/// <summary>
 		/// Definition of simple predicate (decision making function) for most collection types
 		/// </summary>
-		static typedef std::function<bool(T item)> predicate;
-
-		/// <summary>
-		/// Definition of selector for a value V from an item T.
-		/// </summary>
-		template<typename TResult>
-		static typedef std::function<TResult(T item)> selector;
+		typedef std::function<bool(T item)> predicate;
 
 		/// <summary>
 		/// Defines a pair of items for use with a user callback
 		/// </summary>
-		static typedef std::function<void(T item1, T item2)> pairs;
+		typedef std::function<void(T item1, T item2)> pairs;
+	};
+
+	/// </summary>
+	template<typename T, typename TResult>
+	struct simpleListSelectorDelegates
+	{
+	public:
+
+		/// <summary>
+		/// Definition of selector for a value V from an item T.
+		/// </summary>
+		static typedef std::function<TResult(T item)> selector;
 	};
 
 	template<typename T>
@@ -45,6 +52,7 @@ namespace brogueHd::component
 	public:
 		simpleList();
 		simpleList(T* anArray);
+		simpleList(const simpleList<T>& copy);
 		~simpleList();
 
 		T operator[](int index);
@@ -53,6 +61,8 @@ namespace brogueHd::component
 		int count() const;
 
 		void add(T item);
+		void insert(int index, T item);
+		void remove(T item);
 		void removeAt(int index);
 		void clear();
 
@@ -61,6 +71,10 @@ namespace brogueHd::component
 		int MaxIncrementalCapacity = 1000;
 
 	public:
+
+		// Container Selectors
+		T* getArray();
+		simpleArray<T> toArray();
 
 		bool simpleList<T>::contains(T item);
 
@@ -81,13 +95,23 @@ namespace brogueHd::component
 		// Selectors
 
 		template<typename TResult>
-		simpleList<TResult> select(simpleListDelegates<T>::selector selector);
+		simpleList<TResult> select(simpleListSelectorDelegates<T, TResult>::selector selector);
 
-		template<typename V>
-		V maxOf(simpleListDelegates<T>::selector selector);
+		template<typename TResult>
+		TResult max(simpleListSelectorDelegates<T, TResult>::selector selector);
 
-		template<typename V>
-		V minOf(simpleListDelegates<T>::selector selector);
+		template<typename TResult>
+		TResult min(simpleListSelectorDelegates<T, TResult>::selector selector);
+
+		template<typename TResult>
+		T simpleList<T>::withMin(simpleListSelectorDelegates<T, TResult>::selector selector);
+
+		template<typename TResult>
+		T simpleList<T>::withMax(simpleListSelectorDelegates<T, TResult>::selector selector);
+
+	private:
+
+		void reAllocate();
 
 	private:
 

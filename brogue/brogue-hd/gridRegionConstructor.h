@@ -45,7 +45,7 @@ namespace brogueHd::backend::model::construction
         void addEdges(short column, short row, T item);
         void addBoundary(short column, short row, T item);
         void validate();
-        void validateRegionCollection(std::map<T, T> collection);
+        void validateRegionCollection(simpleHash<T, T>* collection);
         gridRect calculateLargestRectangle();
 
     private:

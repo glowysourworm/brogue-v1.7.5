@@ -6,7 +6,7 @@
 namespace brogueHd::component
 {
 	template<typename K, typename V>
-	simpleHash<K, V>::simpleHash(simpleHashGenerator<K>::hashDelegate generator)
+	simpleHash<K, V>::simpleHash()
 	{
 		_table = new simpleArray<simpleList<simplePair<K, V>>*>(0);
 		_list = new simpleList<simplePair<K, V>>();
@@ -115,6 +115,14 @@ namespace brogueHd::component
 		}
 
 		return false;
+	}
+
+	template<typename K, typename V>
+	long simpleHash<K, V>::calculateHashCode(K key)
+	{
+		// Use std::hash until we find issues with it
+		//
+		return std::hash<K>();
 	}
 
 	template<typename K, typename V>

@@ -1,5 +1,4 @@
 #include "brogueLayout.h"
-#include "array2DExtension.h"
 #include "gridDefinitions.h"
 #include "brogueCell.h"
 

@@ -8,7 +8,7 @@ using namespace std;
 
 namespace brogueHd
 {
-	static class brogueException
+	class brogueException
 	{
 	public:
 

@@ -354,9 +354,9 @@ namespace brogueHd
 
 	//#define MAX_ITEMS_IN_MONSTER_ITEMS_HOPPER   100
 
-	//// Making these larger means cave generation will take more trials; set them too high and the program will hang.
-	//#define CAVE_MIN_WIDTH						50
-	//#define CAVE_MIN_HEIGHT						20
+	// Making these larger means cave generation will take more trials; set them too high and the program will hang.
+	#define CAVE_MIN_WIDTH						50
+	#define CAVE_MIN_HEIGHT						20
 
 	//// Keyboard commands:
 	//#define UP_KEY				'k'

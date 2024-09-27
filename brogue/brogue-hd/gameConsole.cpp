@@ -3,6 +3,7 @@
 #include "gameController.h"
 #include "stringExtension.h"
 #include "exceptionHandler.h"
+#include "broguefile.h"
 #include <format>
 
 using namespace std;
@@ -62,8 +63,8 @@ namespace brogueHd::console
 		bool noMenu = false;
 		bool serverMode = false;
 
-		rogueEvent theEvent;
-		char path[BROGUE_FILENAME_MAX], buf[100], seedDefault[100];
+		brogueEvent theEvent;
+		char path[4096], buf[100], seedDefault[100];
 		char maxSeed[40];
 
 		// Initialize Game Controller (some arguments are sent to controller)

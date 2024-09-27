@@ -1,13 +1,15 @@
 #pragma once
 
-#include "mapExtension.h"
 #include "gridExtension.h"
 #include "gridRect.h"
 #include "gridDefinitions.h"
 #include "gridRegionConstructor.h"
 #include "exceptionHandler.h"
-#include "vectorExtension.h"
+#include "brogueMath.h"
 
+using namespace std;
+
+using namespace brogueHd::backend::math;
 using namespace brogueHd::backend::extension;
 using namespace brogueHd::backend::model::layout;
 
@@ -24,10 +26,10 @@ namespace brogueHd::backend::model::construction
 
         _predicate = inclusionPredicate;
 
-        _top = SHRT_MAX;
-        _left = SHRT_MAX;
-        _right = SHRT_MIN;
-        _bottom = SHRT_MIN;
+        _top = std::numeric_limits<short>::max();
+        _left = std::numeric_limits<short>::max();
+        _right = std::numeric_limits<short>::min();
+        _bottom = std::numeric_limits<short>::min();
 
         _completed = false;
     }
@@ -92,7 +94,7 @@ namespace brogueHd::backend::model::construction
     {
         gridRegionCosntructor<T>* that = this;
 
-        array2DExtension<T>::iterate(grid, [&that](short column, short row, T item)
+        gridExtension<T>::iterate(grid, [&that](short column, short row, T item)
         {
             if (item != NULL)
                 that->add(column, row, item);
@@ -117,7 +119,7 @@ namespace brogueHd::backend::model::construction
         _calculatedBoundary = gridRect(_left, _top, _right, _bottom);
 
         // Complete the edge collections
-        forEach(_locations, [](T key, T value)
+        _locations->iterate([](T key, T value)
         {
             addEdges(key);
         });
@@ -153,43 +155,43 @@ namespace brogueHd::backend::model::construction
     void gridRegionConstructor<T>::addEdges(short column, short row, T item)
     {
         // Edges and Corners
-        if (_grid.isEdge(column, row, _predicate))
+        if (_grid->isEdge(column, row, _predicate))
         {
-            _edgeLocations.insert(location, location);
+            _edgeLocations->add(location, location);
 
             // Check for specificity:  Storing addition information about exposed edges, corners, and geometry
 
             // N
             if (_grid->isExposedEdge(column, row, brogueCompass::N, _predicate))
-                _northEdges.insert(location, location);
+                _northEdges->add(location, location);
 
             // S
             if (_grid->isExposedEdge(column, row, brogueCompass::S, _predicate))
-                _southEdges.insert(location, location);
+                _southEdges->add(location, location);
 
             // E
             if (_grid->isExposedEdge(column, row, brogueCompass::E, _predicate))
-                _eastEdges.insert(location, location);
+                _eastEdges->add(location, location);
 
             // W
             if (_grid->isExposedEdge(column, row, brogueCompass::W, _predicate))
-                _westEdges.insert(location, location);
+                _westEdges->add(location, location);
 
             // NW Corner
             if (_grid->isExposedCorner(column, row, brogueCompass::NW, _predicate))
-                _nwCorners.insert(location, location);
+                _nwCorners->add(location, location);
 
             // NE Corner
             if (_grid->isExposedCorner(column, row, brogueCompass::NE, _predicate))
-                _neCorners.insert(location, location);
+                _neCorners->add(location, location);
 
             // SE Corner
             if (_grid->isExposedCorner(column, row, brogueCompass::SE, _predicate))
-                _seCorners.insert(location, location);
+                _seCorners->add(location, location);
 
             // SW Corner
             if (_grid->isExposedCorner(column, row, brogueCompass::SW, _predicate))
-                _swCorners.insert(location, location);
+                _swCorners->add(location, location);
         }
     }
 
@@ -212,10 +214,10 @@ namespace brogueHd::backend::model::construction
     template<isGridLocator T>
     void gridRegionConstructor<T>::validate()
     {
-        forEach(_locations, [](T key, T value)
+        _locations->forEach([](T key, T value)
         {
             if (_grid->get(key.column, key.row) != key)
-                brogueException::show("RegionConstructor grid was not valid:  " + location.getString());
+                brogueException::show("RegionConstructor grid was not valid:  " + key.getString());
         });
 
         // VALIDATE COLLECTIONS
@@ -232,9 +234,9 @@ namespace brogueHd::backend::model::construction
     }
 
     template<isGridLocator T>
-    void gridRegionConstructor<T>::validateRegionCollection(std::map<T, T> collection)
+    void gridRegionConstructor<T>::validateRegionCollection(simpleHash<T, T>* collection)
     {
-        if (collection.count() <= 0)
+        if (collection->count() <= 0)
             brogueException::show("Collection for building regions is not valid:  gridRegionConstructor.validate");
     }
 
@@ -267,7 +269,7 @@ namespace brogueHd::backend::model::construction
                 short index = column - regionBoundary.left();
 
                 // FIRST, CHECK ROW INDEX TRACKING
-                if (!_grid->isZeroValue(column, row))
+                if (_grid->isDefined(column, row))
                     rowCounters[index]++;
                 else
                     rowCounters[index] = 0;
@@ -282,7 +284,7 @@ namespace brogueHd::backend::model::construction
 
                 for (short index2 = index1; index2 < rowCountersLength && minHeight > 0; index2++)
                 {
-                    minHeight = min(minHeight, rowCounters[index1], rowCounters[index2]);
+                    minHeight = brogueMath<short, short>::min(minHeight, rowCounters[index1], rowCounters[index2]);
 
                     // Current column against previous
                     if (rowCounters[index1] > bestArea)

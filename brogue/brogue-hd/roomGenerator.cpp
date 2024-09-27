@@ -71,7 +71,7 @@ namespace brogueHd::backend::generator
 		});
 
 		// Select largest area region from valid regions
-		maxRegion = validRegions.maxOf<short>([](gridRegion<gridLocator>* region)
+		maxRegion = validRegions.withMax<short>([](gridRegion<gridLocator>* region)
 		{
 			return region->getBoundary().area();
 		});

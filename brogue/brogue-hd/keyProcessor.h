@@ -17,7 +17,7 @@ namespace brogueHd::backend::processor
 		/// <summary>
 		/// Adds mapping for key stroke processing
 		/// </summary>
-		void addKeyMap(char* inputCharacter, char* outputCharacter);
+		void addKeyMap(const char* inputCharacter, const char* outputCharacter);
 
 	private:
 

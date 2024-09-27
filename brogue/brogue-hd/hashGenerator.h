@@ -19,8 +19,12 @@ namespace brogueHd::backend::generator
         { a } -> std::convertible_to<bool>;
     };
 
-    static class hashGenerator
+    class hashGenerator
     {
+    public:
+
+        hashGenerator(){};
+        ~hashGenerator(){};
 
     private:
 

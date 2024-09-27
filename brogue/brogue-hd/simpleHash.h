@@ -3,18 +3,15 @@
 #include "simple.h"
 #include "simpleArray.h"
 #include "simpleList.h"
+#include "hashGenerator.h"
 #include <functional>
 
 using namespace std;
 
+using namespace brogueHd::backend::generator;
+
 namespace brogueHd::component
 {
-	template<typename K>
-	struct simpleHashGenerator
-	{
-		static typedef function<long(K key)> hashDelegate;
-	};
-
 	template<typename K, typename V>
 	struct simpleHashDelegates
 	{
@@ -54,7 +51,7 @@ namespace brogueHd::component
 	class simpleHash
 	{
 	public:
-		simpleHash(simpleHashGenerator<K>::hashDelegate generator);
+		simpleHash();
 		~simpleHash();
 
 		V operator[](K key) const;
@@ -73,8 +70,8 @@ namespace brogueHd::component
 
 	private:
 
+		long calculateHashCode(K key);
 		int calculateBucketIndex(long hashCode) const;
-
 		void rehash(int newSize);
 
 	public:	// Extension Methods:  mostly queries
@@ -103,8 +100,5 @@ namespace brogueHd::component
 
 		// Bucket Sizes (prevents iteration of bucket lists during set(..))
 		int _maxBucketSize;
-
-		// Generates hash codes for keys
-		simpleHashGenerator<K>::hashDelegate _generator;
 	};
 }

@@ -24,6 +24,16 @@ namespace brogueHd::component
 			this->add(anArray[index]);
 	}
 	template<typename T>
+	simpleList<T>::simpleList(const simpleList<T>& copy)
+	{
+		_list = NULL;
+		_size = 0;
+		_sizeAlloc = 0;
+
+		for (int index = 0; index < copy.count(); index++)
+			this->add(copy[index]);
+	}
+	template<typename T>
 	simpleList<T>::~simpleList()
 	{
 		if (_list != NULL)
@@ -60,29 +70,56 @@ namespace brogueHd::component
 		// Reached capacity
 		//
 		if (_size == _sizeAlloc)
-		{
-			// Use doubling method: Always multiply size by 2 until {MaxIncrementalCapacity} is reached
-			//
-			int newSize = (_sizeAlloc == 0) ? 100 :
-						  (_sizeAlloc >= this->MaxIncrementalCapacity) ? (_sizeAlloc + this->MaxIncrementalCapacity) :
-						   _sizeAlloc * 2;
-
-			// Copy over the data
-			T* newList = new T[newSize];
-
-			for (int index = 0; index < _size; index++)
-			{
-				newList[index] = _list[index];
-			}
-
-			delete[] _list;
-
-			_sizeAlloc = newSize;
-		}
+			this->reAllocate();
 
 		// Add the next item
 		_list[_size++] = item;
 	}
+
+	template<typename T>
+	void simpleList<T>::insert(int insertIndex, T item)
+	{
+		// Check capacity before using extra "swap space"
+		if (_size == _sizeAlloc)
+			this->reAllocate();
+
+		// Start at back + 1  ->  insertion index
+		for (int index = _size; index >= insertIndex; index--)
+		{
+			_list[index] = _list[index - 1];
+		}
+
+		// Have space for the next item
+		_list[insertIndex] = item;
+
+		_size++;
+	}
+
+	template<typename T>
+	void simpleList<T>::reAllocate()
+	{
+		if (_size != _sizeAlloc)
+			brogueException::show("Trying to re-allocate memory for simple list before capacity is reached");
+
+		// Use doubling method: Always multiply size by 2 until {MaxIncrementalCapacity} is reached
+		//
+		int newSize = (_sizeAlloc == 0) ? 100 :
+			(_sizeAlloc >= this->MaxIncrementalCapacity) ? (_sizeAlloc + this->MaxIncrementalCapacity) :
+			_sizeAlloc * 2;
+
+		// Copy over the data
+		T* newList = new T[newSize];
+
+		for (int index = 0; index < _size; index++)
+		{
+			newList[index] = _list[index];
+		}
+
+		delete[] _list;
+
+		_sizeAlloc = newSize;
+	}
+
 	template<typename T>
 	void simpleList<T>::removeAt(int index)
 	{
@@ -95,6 +132,27 @@ namespace brogueHd::component
 		}
 
 		_size--;
+	}
+
+	template<typename T>
+	void simpleList<T>::remove(T item)
+	{
+		int itemIndex = -1;
+
+		for (int index = 0; index < _size; index++)
+		{
+			if (item == _list[index])
+			{
+				itemIndex = index;
+				break;
+			}
+		}
+
+		if (itemIndex > -1)
+			this->removeAt(itemIndex);
+
+		else
+			brogueException::show("Item not found in simpleList::remove");
 	}
 
 	template<typename T>
@@ -117,10 +175,22 @@ namespace brogueHd::component
 
 		return false;
 	}
+
+	template<typename T>
+	simpleArray<T> simpleList<T>::toArray()
+	{
+		return simpleArray<T>(_list);
+	}
+
+	template<typename T>
+	T* simpleList<T>::getArray()
+	{
+		return _list;
+	}
 	
 	template<typename T>
 	template<typename TResult>
-	simpleList<TResult> simpleList<T>::select(simpleListDelegates<T>::selector selector)
+	simpleList<TResult> simpleList<T>::select(simpleListSelectorDelegates<T, TResult>::selector selector)
 	{
 		simpleList<TResult> result;
 
@@ -260,19 +330,19 @@ namespace brogueHd::component
 	}
 
 	template<typename T>
-	template<typename V>
-	V simpleList<T>::maxOf(simpleListDelegates<T>::selector selector)
+	template<typename TResult>
+	TResult simpleList<T>::max(simpleListSelectorDelegates<T, TResult>::selector selector)
 	{
-		V max = NULL;
+		TResult max = NULL;
 		int maxIndex = -1;
 
 		for (int index = 0; index < _size; index++)
 		{
-			V current = selector(_list[index]);
+			TResult current = selector(_list[index]);
 
 			if (max == NULL)
 			{
-				max = _list[index];
+				max = current;
 				maxIndex = index;
 			}
 
@@ -283,23 +353,23 @@ namespace brogueHd::component
 			}
 		}
 
-		return max == NULL ? NULL : _list[maxIndex];
+		return max;
 	}
 
 	template<typename T>
-	template<typename V>
-	V simpleList<T>::minOf(simpleListDelegates<T>::selector selector)
+	template<typename TResult>
+	TResult simpleList<T>::min(simpleListSelectorDelegates<T, TResult>::selector selector)
 	{
-		V min = NULL;
+		TResult min = NULL;
 		int minIndex = -1;
 
 		for (int index = 0; index < _size; index++)
 		{
-			V current = selector(_list[index]);
+			TResult current = selector(_list[index]);
 
 			if (min == NULL)
 			{
-				min = _list[index];
+				min = current;
 				minIndex = index;
 			}
 
@@ -310,6 +380,60 @@ namespace brogueHd::component
 			}
 		}
 
+		return min;
+	}
+
+	template<typename T>
+	template<typename TResult>
+	T simpleList<T>::withMin(simpleListSelectorDelegates<T, TResult>::selector selector)
+	{
+		TResult min = NULL;
+		int minIndex = -1;
+
+		for (int index = 0; index < _size; index++)
+		{
+			TResult value = selector(_list[index]);
+
+			if (min == NULL)
+			{
+				min = value;
+				minIndex = index;
+			}
+
+			else if (min > value)
+			{
+				min = value;
+				minIndex = index;
+			}
+		}
+
 		return min == NULL ? NULL : _list[minIndex];
+	}
+
+	template<typename T>
+	template<typename TResult>
+	T simpleList<T>::withMax(simpleListSelectorDelegates<T, TResult>::selector selector)
+	{
+		TResult max = NULL;
+		int maxIndex = -1;
+
+		for (int index = 0; index < _size; index++)
+		{
+			TResult current = selector(_list[index]);
+
+			if (max == NULL)
+			{
+				max = current;
+				maxIndex = index;
+			}
+
+			else if (max < current)
+			{
+				max = current;
+				maxIndex = index;
+			}
+		}
+
+		return max == NULL ? NULL : _list[minIndex];
 	}
 }

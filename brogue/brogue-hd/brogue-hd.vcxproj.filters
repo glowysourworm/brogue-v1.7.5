@@ -231,9 +231,6 @@
     <ClCompile Include="gridRegionLocator.cpp">
       <Filter>Source Files\backend\model\construction</Filter>
     </ClCompile>
-    <ClCompile Include="gridConstructor.cpp">
-      <Filter>Source Files\backend\model\construction</Filter>
-    </ClCompile>
     <ClCompile Include="gridRegionConstructor.cpp">
       <Filter>Source Files\backend\model\construction</Filter>
     </ClCompile>
@@ -444,9 +441,6 @@
       <Filter>Header Files\backend\model\layout</Filter>
     </ClInclude>
     <ClInclude Include="gridRegionLocator.h">
-      <Filter>Header Files\backend\model\construction</Filter>
-    </ClInclude>
-    <ClInclude Include="gridConstructor.h">
       <Filter>Header Files\backend\model\construction</Filter>
     </ClInclude>
     <ClInclude Include="gridRegionConstructor.h">

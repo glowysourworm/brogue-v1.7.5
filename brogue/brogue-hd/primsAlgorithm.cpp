@@ -1,8 +1,8 @@
 #pragma once
 
 #include "primsAlgorithm.h"
-#include "vectorExtension.h"
 #include "exceptionHandler.h"
+#include "simpleList.h"
 
 namespace brogueHd::backend::math
 {
@@ -19,7 +19,7 @@ namespace brogueHd::backend::math
     }
 
     template<isGridLocatorNode TNode, isGridLocatorEdge TEdge>
-    graph<TNode, TEdge>* primsAlgorithm<TNode, TEdge>::run(const std::vector<TNode>& vertices)
+    graph<TNode, TEdge>* primsAlgorithm<TNode, TEdge>::run(const simpleList<TNode>& vertices)
     {
         if (vertices.count() < 3)
             return this->createDefaultGraph(vertices);
@@ -28,7 +28,7 @@ namespace brogueHd::backend::math
     }
 
     template<isGridLocatorNode TNode, isGridLocatorEdge TEdge>
-    graph<TNode, TEdge>* primsAlgorithm<TNode, TEdge>::createMST(const std::vector<TNode>& vertices)
+    graph<TNode, TEdge>* primsAlgorithm<TNode, TEdge>::createMST(const simpleList<TNode>& vertices)
     {
         // NOTE*** The MST is being created on a graph of REGIONS. This will behave differently than a
         //         graph of vertices. So, the input graph should be the FULL GRAPH to avoid issues with
@@ -45,9 +45,9 @@ namespace brogueHd::backend::math
 
         primsAlgorithm* that = this;
 
-        std::vector<TNode> unusedVertices(vertices.data());
-        std::vector<TNode> usedVertices;
-        std::vector<TEdge> treeEdges;
+        simpleList<TNode> unusedVertices(vertices);
+        simpleList<TNode> usedVertices;
+        simpleList<TEdge> treeEdges;
 
         while (usedVertices.count() < vertices.count())
         {
@@ -61,9 +61,9 @@ namespace brogueHd::backend::math
 
                 // Remove the first vertex - add to the used collection
                 unusedVertices.remove(firstVertex);
-                usedVertices.push_back(firstVertex);
+                usedVertices.add(firstVertex);
 
-                nextVertex = vectorExtensionSelectors<TNode>::minOf(unusedVertices, [&firstVertex](TNode vertex)
+                nextVertex = unusedVertices.withMin<short>([&firstVertex](TNode vertex)
                 {
                     return firstVertex.calculateDistance(vertex);
                 });
@@ -74,13 +74,13 @@ namespace brogueHd::backend::math
             else
             {
                 // Get the next edge that connects an UNUSED vertex to a USED vertex
-                vectorExtension<TNode>::forEach(unusedVertices, [&treeEdges, &that](TNode vertex)
+                unusedVertices.forEach([&treeEdges, &that](TNode vertex)
                 {
                     // Edges in the current tree
                     short potentialEdgeWeight = std::numeric_limits<short>::max();
                     TNode potentialNode = NULL;
 
-                    vectorExtension<TEdge>::forEach(treeEdges, [&vertex, &potentialEdgeWeight, &that](TEdge edge)
+                    treeEdges.forEach([&vertex, &potentialEdgeWeight, &that](TEdge edge)
                     {
                         short distance = edge.node1.calculateDistance(vertex);
 
@@ -95,7 +95,7 @@ namespace brogueHd::backend::math
                         if (distance < potentialEdgeWeight)
                         {
                             potentialEdgeWeight = distance;
-                            potentialNode = edge.AdjacentNode;
+                            potentialNode = edge.node2;
                         }
                     });
 
@@ -112,10 +112,10 @@ namespace brogueHd::backend::math
                 brogueException::show("No connection found between regions Minimum Spanning Tree:  primsAlgorithm.cpp");
 
             unusedVertices.remove(nextVertex);
-            usedVertices.push_back(nextVertex);
+            usedVertices.add(nextVertex);
 
             // Add next connection to the tree
-            treeEdges.push_back(nextEdge);
+            treeEdges.add(nextEdge);
         }
 
         return new graph<TNode, TEdge>(vertices, treeEdges);

@@ -3,8 +3,10 @@
 #include "exceptionHandler.h"
 #include "broguedef.h"
 #include "randomRange.h"
+#include "simpleList.h"
 #include <random>
 
+using namespace brogueHd::component;
 using namespace brogueHd::backend::math;
 
 namespace brogueHd::backend::generator
@@ -72,11 +74,6 @@ namespace brogueHd::backend::generator
 		}
 
 		return lowerBound + range(upperBound - lowerBound + 1);
-	}
-
-	short randomGenerator::randWeighted(const std::vector<short>& weights)
-	{
-		return randWeighted(weights.data());
 	}
 
 	short randomGenerator::randWeighted(const short weights[])
