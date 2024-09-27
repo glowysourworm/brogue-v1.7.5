@@ -1,9 +1,11 @@
 #include "contentGenerator.h"
 #include "brogueLevel.h"
 #include "broguedef.h"
+#include "item.h"
 #include "dungeonConstants.h"
 #include "brogueLevelMethods.h"
 
+using namespace brogueHd::backend::model::game;
 using namespace brogueHd::backend::methods;
 
 namespace brogueHd::backend::generator
@@ -11,7 +13,7 @@ namespace brogueHd::backend::generator
 	contentGenerator::contentGenerator(brogueLevel* level)
 	{
 		_level = level;
-		_validLocations = new grid<bool>(DCOLS, DROWS, false, true);
+		//_validLocations = new grid<bool>(DCOLS, DROWS, false, true);
 	}
 	contentGenerator::~contentGenerator()
 	{
@@ -31,9 +33,9 @@ namespace brogueHd::backend::generator
 		short i, j, dir;
 		short upLoc[2], downLoc[2], ** mapToStairs, ** mapToPit;
 		creatureInfo* monst;
-		item* theItem;
+		itemBase* theItem;
 		char grid[DCOLS][DROWS];
-		short n = rogue.depthLevel - 1;
+		//short n = rogue.depthLevel - 1;
 
 		// Procedure:
 		//
@@ -47,11 +49,11 @@ namespace brogueHd::backend::generator
 		//	}
 		//}
 
-		if (D_INSPECT_LEVELGEN) {
-			//dumpLevelToScreen();
-			//hiliteCharGrid(grid, &teal, 100);
-			//temporaryMessage("Stair location candidates:", true);
-		}
+		//if (D_INSPECT_LEVELGEN) {
+		//	//dumpLevelToScreen();
+		//	//hiliteCharGrid(grid, &teal, 100);
+		//	//temporaryMessage("Stair location candidates:", true);
+		//}
 
 		// NEXT*** Place stairs. Qualifying locations will be queried using map layers (not ready)
 		//
@@ -60,7 +62,7 @@ namespace brogueHd::backend::generator
 		brogueCell* torchLocation1;
 		brogueCell* torchLocation2;
 
-		placeStairs(stairsLocation, torchLocation1, torchLocation2);
+		//placeStairs(stairsLocation, torchLocation1, torchLocation2);
 
 		// NEXT*** Handle qualifying locations!!! 
 
@@ -118,54 +120,54 @@ namespace brogueHd::backend::generator
 		//rogue.upLoc[1] = upLoc[1];
 		//pmap[upLoc[0]][upLoc[1]].flags |= HAS_STAIRS;
 
-		if (!levels[rogue.depthLevel - 1].visited) {
+		//if (!levels[rogue.depthLevel - 1].visited) {
 
-			// Run a field of view check from up stairs so that monsters do not spawn within sight of it.
-			for (dir = 0; dir < 4; dir++) {
-				if (coordinatesAreInMap(upLoc[0] + nbDirs[dir][0], upLoc[1] + nbDirs[dir][1])
-					&& !cellHasTerrainFlag(upLoc[0] + nbDirs[dir][0], upLoc[1] + nbDirs[dir][1], T_OBSTRUCTS_PASSABILITY)) {
+		//	// Run a field of view check from up stairs so that monsters do not spawn within sight of it.
+		//	for (dir = 0; dir < 4; dir++) {
+		//		if (coordinatesAreInMap(upLoc[0] + nbDirs[dir][0], upLoc[1] + nbDirs[dir][1])
+		//			&& !cellHasTerrainFlag(upLoc[0] + nbDirs[dir][0], upLoc[1] + nbDirs[dir][1], T_OBSTRUCTS_PASSABILITY)) {
 
-					upLoc[0] += nbDirs[dir][0];
-					upLoc[1] += nbDirs[dir][1];
-					break;
-				}
-			}
-			zeroOutGrid(grid);
-			getFOVMask(grid, upLoc[0], upLoc[1], max(DCOLS, DROWS) << FP_BASE, (T_OBSTRUCTS_VISION), 0, false);
-			for (i = 0; i < DCOLS; i++) {
-				for (j = 0; j < DROWS; j++) {
-					if (grid[i][j]) {
-						pmap[i][j].flags |= IN_FIELD_OF_VIEW;
-					}
-				}
-			}
-			populateItems(upLoc[0], upLoc[1]);
-			populateMonsters();
-		}
+		//			upLoc[0] += nbDirs[dir][0];
+		//			upLoc[1] += nbDirs[dir][1];
+		//			break;
+		//		}
+		//	}
+		//	zeroOutGrid(grid);
+		//	getFOVMask(grid, upLoc[0], upLoc[1], max(DCOLS, DROWS) << FP_BASE, (T_OBSTRUCTS_VISION), 0, false);
+		//	for (i = 0; i < DCOLS; i++) {
+		//		for (j = 0; j < DROWS; j++) {
+		//			if (grid[i][j]) {
+		//				pmap[i][j].flags |= IN_FIELD_OF_VIEW;
+		//			}
+		//		}
+		//	}
+		//	populateItems(upLoc[0], upLoc[1]);
+		//	populateMonsters();
+		//}
 
-		// Restore items that fell from the previous depth.
-		for (theItem = floorItems->nextItem; theItem != NULL; theItem = theItem->nextItem) {
-			restoreItem(theItem);
-		}
+		//// Restore items that fell from the previous depth.
+		//for (theItem = floorItems->nextItem; theItem != NULL; theItem = theItem->nextItem) {
+		//	restoreItem(theItem);
+		//}
 
-		// Restore creatures that fell from the previous depth or that have been pathing toward the stairs.
-		mapToStairs = allocGrid();
-		fillGrid(mapToStairs, 0);
-		mapToPit = allocGrid();
-		fillGrid(mapToPit, 0);
-		calculateDistances(mapToStairs, player.xLoc, player.yLoc, T_PATHING_BLOCKER, NULL, true, true);
-		calculateDistances(mapToPit,
-			levels[rogue.depthLevel - 1].playerExitedVia[0],
-			levels[rogue.depthLevel - 1].playerExitedVia[1],
-			T_PATHING_BLOCKER,
-			NULL,
-			true,
-			true);
-		for (monst = monsters->nextCreature; monst != NULL; monst = monst->nextCreature) {
-			restoreMonster(monst, mapToStairs, mapToPit);
-		}
-		freeGrid(mapToStairs);
-		freeGrid(mapToPit);
+		//// Restore creatures that fell from the previous depth or that have been pathing toward the stairs.
+		//mapToStairs = allocGrid();
+		//fillGrid(mapToStairs, 0);
+		//mapToPit = allocGrid();
+		//fillGrid(mapToPit, 0);
+		//calculateDistances(mapToStairs, player.xLoc, player.yLoc, T_PATHING_BLOCKER, NULL, true, true);
+		//calculateDistances(mapToPit,
+		//	levels[rogue.depthLevel - 1].playerExitedVia[0],
+		//	levels[rogue.depthLevel - 1].playerExitedVia[1],
+		//	T_PATHING_BLOCKER,
+		//	NULL,
+		//	true,
+		//	true);
+		//for (monst = monsters->nextCreature; monst != NULL; monst = monst->nextCreature) {
+		//	restoreMonster(monst, mapToStairs, mapToPit);
+		//}
+		//freeGrid(mapToStairs);
+		//freeGrid(mapToPit);
 	}
 
 	void contentGenerator::placeStairs()
@@ -194,8 +196,8 @@ namespace brogueHd::backend::generator
 		//	  the CLEAR layer.
 		//
 
-		torchLocation1->display.layers[DUNGEON] = TORCH_WALL;
-		torchLocation2->display.layers[DUNGEON] = TORCH_WALL;
+		//torchLocation1->display.layers[DUNGEON] = TORCH_WALL;
+		//torchLocation2->display.layers[DUNGEON] = TORCH_WALL;
 
 		// NOTE:  Keep old code until we're ready.
 
@@ -212,16 +214,16 @@ namespace brogueHd::backend::generator
 		//	}
 		//}
 
-		_level->levelGrid->iterateAdjacentCells(stairsLocation->xLocation, 
-												stairsLocation->yLocation, 
-												[](short column, short row, brogueCell* cell)
-		{
-			if (cell->display.layers[DUNGEON] == GRANITE)
-				cell->display.layers[DUNGEON] = WALL;
+		//_level->levelGrid->iterateAdjacentCells(stairsLocation->xLocation, 
+		//										stairsLocation->yLocation, 
+		//										[](short column, short row, brogueCell* cell)
+		//{
+		//	if (cell->display.layers[DUNGEON] == GRANITE)
+		//		cell->display.layers[DUNGEON] = WALL;
 
-			if (isTerrain(cell, T_OBSTRUCTS_PASSABILITY))
-				cell->display.flags |= IMPREGNABLE;
-		});
+		//	if (isTerrain(cell, T_OBSTRUCTS_PASSABILITY))
+		//		cell->display.flags |= IMPREGNABLE;
+		//});
 
 		// Expose granite.
 		//for (dir = 0; dir < DIRECTION_COUNT; dir++) {
@@ -235,16 +237,16 @@ namespace brogueHd::backend::generator
 		//	}
 		//}
 
-		iterateOutward(_validLocations, 
-					   stairsLocation->xLocation, 
-					   stairsLocation->yLocation, 
-					   stairsClearance, 
-					   [](short column, short row)
-		{
-			_validLocations[column, row] = false;
+		//iterateOutward(_validLocations, 
+		//			   stairsLocation->xLocation, 
+		//			   stairsLocation->yLocation, 
+		//			   stairsClearance, 
+		//			   [](short column, short row)
+		//{
+		//	_validLocations[column, row] = false;
 
-			return iterationCallback::iterate;
-		});
+		//	return iterationCallback::iterate;
+		//});
 
 		// Zero out grid in the vicinity.
 		//for (newX = max(0, x - 5); newX < min(DCOLS, x + 5); newX++) {

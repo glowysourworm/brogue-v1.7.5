@@ -5,7 +5,6 @@
 #include "gridRect.h"
 #include "gridDefinitions.h"
 #include "gridRegion.h"
-#include "extensionDefinitions.h"
 #include <functional>
 
 using namespace std;

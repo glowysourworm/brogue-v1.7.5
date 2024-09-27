@@ -6,7 +6,9 @@
 #include "creatureConstants.h"
 #include "creatureBehaviorConstants.h"
 #include "boltConstants.h"
+#include "randomRange.h"
 
+using namespace brogueHd::backend::math;
 using namespace brogueHd::backend::modelConstant;
 using namespace brogueHd::backend::model::game;
 
@@ -93,7 +95,7 @@ namespace brogueHd::backend::model::creature
 
 		short DFChance;						// percent chance to spawn the dungeon feature per awake turn
 		permanentDungeonLayers DFType;	// kind of dungeon feature
-		boltType bolts[20];
+		//boltType bolts[20];
 		unsigned long flags;
 		unsigned long abilityFlags;
 	};

@@ -40,7 +40,7 @@ namespace brogueHd::backend::generator
 
         // Generate white noise inside the chosen rectangle
         //
-        gridExtension<bool>::iterate(parameters.boundary, [&rand, &parameters, &resultGrid](short x, short y, bool item)
+        gridRectExtension::iterate(parameters.boundary, [&rand, &parameters, &resultGrid](short x, short y)
         {
             if (rand->next() <= parameters.fillRatio)
                 resultGrid.set(x, y, true);
@@ -54,7 +54,7 @@ namespace brogueHd::backend::generator
         }
 
         // Callback
-        gridExtension<bool>::iterate(parameters.boundary, [&rand, &parameters, &resultGrid, &userCallback](short x, short y)
+        gridRectExtension::iterate(parameters.boundary, [&rand, &parameters, &resultGrid, &userCallback](short x, short y)
         {
             userCallback(x, y, resultGrid.get(x, y));
         });
@@ -91,7 +91,6 @@ namespace brogueHd::backend::generator
             // Death
             else
             {
-
                 resultGrid.set(columnRect, rowRect, false);
             }
         });

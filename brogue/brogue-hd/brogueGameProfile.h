@@ -1,6 +1,9 @@
 #pragma once
 
 #include "brogueLevelProfile.h"
+#include "simpleList.h"
+
+using namespace brogueHd::component;
 
 namespace brogueHd::backend::model
 {
@@ -31,7 +34,7 @@ namespace brogueHd::backend::model
 
 		randomGenerator* _randomGenerator;
 
-		std::vector<brogueLevelProfile*>* _levelProfiles;
+		simpleList<brogueLevelProfile*>* _levelProfiles;
 
 	};
 }

@@ -9,6 +9,7 @@ namespace brogueHd::component
 	simpleHash<K, V>::simpleHash(simpleHashGenerator<K>::hashDelegate generator)
 	{
 		_table = new simpleArray<simpleList<simplePair<K, V>>*>(0);
+		_list = new simpleList<simplePair<K, V>>();
 		_generator = generator;
 		_maxBucketSize = 0;
 	}
@@ -17,6 +18,7 @@ namespace brogueHd::component
 	simpleHash<K, V>::~simpleHash()
 	{
 		delete _table;
+		delete _list;
 	}
 
 	template<typename K, typename V>
@@ -36,13 +38,19 @@ namespace brogueHd::component
 	}
 
 	template<typename K, typename V>
+	simplePair<K, V> simpleHash<K, V>::getAt(int index)
+	{
+		return _list->get(index);
+	}
+
+	template<typename K, typename V>
 	V simpleHash<K, V>::operator[](K key) const
 	{
 		return this->get(key);
 	}
 
 	template<typename K, typename V>
-	void simpleHash<K, V>::set(K key, V value)
+	void simpleHash<K, V>::add(K key, V value)
 	{
 		// First rehash will give 100 buckets
 		if (_table->count() == 0)
@@ -69,7 +77,10 @@ namespace brogueHd::component
 		
 		// Add to the i-th bucket
 		//
-		_table->get(bucketIndex)->add(simplePair(key, value));
+		simplePair<K,V> pair = simplePair<K, V>(key, value);
+
+		_table->get(bucketIndex)->add(pair);
+		_list->add(pair);
 	}
 
 	template<typename K, typename V>
@@ -92,6 +103,16 @@ namespace brogueHd::component
 				return true;
 			}
 		}		
+
+		// TODO: Use Ordered List
+		for (int index = 0; index < _list->count(); index++)
+		{
+			if (_list->get(index).key == key)
+			{
+				_list->removeAt(index);
+				break;
+			}
+		}
 
 		return false;
 	}
@@ -121,14 +142,7 @@ namespace brogueHd::component
 	template<typename K, typename V>
 	int simpleHash<K, V>::count() const
 	{
-		int count = 0;
-
-		for (int index = 0; index < _table->count(); index++)
-		{
-			count += _table->get(index)->count();
-		}
-
-		return count;
+		return _list->count();
 	}
 
 	template<typename K, typename V>
@@ -152,6 +166,9 @@ namespace brogueHd::component
 		// Setup new hash table with the specified size limit
 		simpleArray<simpleList<simplePair<K, V>>*>* newTable = new simpleArray<simpleList<simplePair<K,V>>*>(newSize);
 
+		// Setup new follower list for indexOf retrieval
+		simpleList<simplePair<K, V>>* newList = new simpleList<simplePair<K, V>>();
+
 		// Reset the max bucket size tracker
 		_maxBucketSize = 0;
 
@@ -169,7 +186,10 @@ namespace brogueHd::component
 				if (newTable->get(newBucketIndex) == NULL)
 					newTable->set(newBucketIndex, new simpleList<simplePair<K,V>>());
 
-				newTable->get(newBucketIndex)->add(simplePair(key,value));
+				simplePair<K, V> pair(key, value);
+
+				newTable->get(newBucketIndex)->add(pair);
+				newList->add(pair);
 
 				// Track the new bucket size while we're here
 				if (newTable->get(newBucketIndex)->count() > _maxBucketSize)
@@ -179,9 +199,11 @@ namespace brogueHd::component
 
 		// Delete the old data container
 		delete _table;
+		delete _list;
 
 		// Set the new pointer
 		_table = newTable;
+		_list = newList;
 	}
 
 	template<typename K, typename V>
@@ -197,6 +219,25 @@ namespace brogueHd::component
 				return iterationCallback::breakAndReturn;
 			}
 		});
+
+		return result;
+	}
+
+	template<typename K, typename V>
+	simpleList<simplePair<K, V>> simpleHash<K, V>::removeWhere(simpleHashDelegates<K, V>::predicate predicate)
+	{
+		simpleList<simplePair<K, V>> result;
+
+		for (int index = _list->count() - 1; index >= 0; index--)
+		{
+			if (predicate(_list[index]))
+			{
+				result.add(_list[index]);
+				
+				// TODO: Either do this all in one loop (here), or make a removeRange function
+				this->remove(_list[index].key);
+			}
+		}
 
 		return result;
 	}

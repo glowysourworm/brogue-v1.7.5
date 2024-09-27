@@ -1,9 +1,6 @@
 #pragma once
 
 #include "graphEdgeCollection.h"
-#include "extensionDefinitions.h"
-#include "vectorExtension.h"
-#include "mapExtension.h"
 #include "exceptionHandler.h"
 
 using namespace brogueHd::backend::extension;
@@ -13,9 +10,9 @@ namespace brogueHd::backend::math
     template<graphNodeType TNode, graphEdgeType TEdge>
     graphEdgeCollection<TNode, TEdge>::graphEdgeCollection(const TEdge* edges[])
     {
-        _nodes = new std::map<TNode*, TNode*>();
-        _edges = new std::map<TNode*, TNode*>();
-        _nodeAdjacentEdges = new std::map<TNode*, std::map<TEdge*, TEdge*>>();
+        _nodes = new simpleHash<TNode*, TNode*>();
+        _edges = new simpleHash<TEdge*, TEdge*>();
+        _nodeAdjacentEdges = new simpleHash<TNode*, simpleHash<TEdge*, TEdge*>>();
 
         initialize(edges, TNode*[0]);
     }
@@ -23,9 +20,9 @@ namespace brogueHd::backend::math
     template<graphNodeType TNode, graphEdgeType TEdge>
     graphEdgeCollection<TNode, TEdge>::graphEdgeCollection(const TEdge* edges[], const TNode* nodes[])
     {
-        _nodes = new std::map<TNode*, TNode*>();
-        _edges = new std::map<TNode*, TNode*>();
-        _nodeAdjacentEdges = new std::map<TNode*, std::map<TEdge*, TEdge*>>();
+        _nodes = new simpleHash<TNode*, TNode*>();
+        _edges = new simpleHash<TEdge*, TEdge*>();
+        _nodeAdjacentEdges = new simpleHash<TNode*, simpleHash<TEdge*, TEdge*>>();
 
         initialize(edges, nodes);
     }
@@ -41,17 +38,19 @@ namespace brogueHd::backend::math
     template<graphNodeType TNode, graphEdgeType TEdge>
     void graphEdgeCollection<TNode, TEdge>::initialize(TEdge* edges[], TNode* nodes[])
     {
+        graphEdgeCollection<TNode, TEdge>* that = this;
+
         // Initialize for edges and adjacent vertex lookup
-        mapExtension<TEdge, TEdge>::forEach(edges, [](TEdge* edge)
+        edges->forEach([&that](TEdge* edge)
         {
-            this->addEdge(edge);
+            that->addEdge(edge);
         });
 
         // Look for any nodes not yet in the collections - add these
-        mapExtension<TNode, TNode>::forEach(nodes, [](TNode* node)
+        nodes->forEach([&that](TNode* node)
         {
-            if (!this->hasNode(node))
-                this->addNode(node);
+            if (!that->hasNode(node))
+                that->addNode(node);
         }
     }
 
@@ -81,115 +80,115 @@ namespace brogueHd::backend::math
     }
 
     template<graphNodeType TNode, graphEdgeType TEdge>
-    void graphEdgeCollection<TNode, TEdge>::addEdge(const TEdge* edge)
+    void graphEdgeCollection<TNode, TEdge>::addEdge(const TEdge& edge)
     {
-        if (edge->node1 == edge->node2)
+        if (edge.node1 == edge.node2)
             brogueException::show("Trying to add self-referencing edge to a graph:  graphEdgeCollection.addEdge");
 
         if (_edges->contains(edge))
             brogueException::show("Trying to insert duplicate edge key:  graphEdgeCollection.addEdge");
 
-        _edges->insert(edge, edge);
+        _edges->add(edge, edge);
 
         // Nodes
-        if (!_nodes->contains(edge->node1))
-            _nodes->insert(edge->node1, edge->node1);
+        if (!_nodes->contains(edge.node1))
+            _nodes->add(edge.node1, edge.node1);
 
         if (!_nodes->contains(edge->node2))
-            _nodes.Add(edge->node2, edge->node2);
+            _nodes->add(edge.node2, edge.node2);
 
         // Forward entry
-        if (_nodeAdjacentEdges->contains(edge->node1))
-            _nodeAdjacentEdges[edge->node1]->insert(edge, edge);
+        if (_nodeAdjacentEdges->contains(edge.node1))
+            _nodeAdjacentEdges[edge.node1]->add(edge, edge);
 
         else
         {
-            std::map<TEdge*, TEdge*> adjacentEdges;
+            simpleHash<TEdge, TEdge>* adjacentEdges;
 
-            adjacentEdges.insert(edge, edge);
+            adjacentEdges->add(edge, edge);
             
-            _nodeAdjacentEdges->insert(edge->node1, adjacentEdges);
+            _nodeAdjacentEdges->add(edge.node1, adjacentEdges);
         }
 
         // Reverse entry
-        if (_nodeAdjacentEdges->contains(edge->node2))
-            _nodeAdjacentEdges[edge->node2]->insert(edge, edge);
+        if (_nodeAdjacentEdges->contains(edge.node2))
+            _nodeAdjacentEdges[edge.node2]->add(edge, edge);
 
         else
         {
-            std::map<TEdge*, TEdge*> adjacentEdges;
+            simpleHash<TEdge, TEdge>* adjacentEdges = new simpleHash<TEdge, TEdge>();
 
-            adjacentEdges.insert(edge, edge);
+            adjacentEdges->add(edge, edge);
 
-            _nodeAdjacentEdges->insert(edge->node2, adjacentEdges);
+            _nodeAdjacentEdges->add(edge.node2, adjacentEdges);
         }
     }
 
     template<graphNodeType TNode, graphEdgeType TEdge>
-    void graphEdgeCollection<TNode, TEdge>::addNode(const TNode* node)
+    void graphEdgeCollection<TNode, TEdge>::addNode(const TNode& node)
     {
         if (!_nodes->contains(node))
             _nodes->insert(node, node);
 
         // Adjacent edges map
-        if (!_nodeAdjacentEdges->contains(node.GetHashCode()))
-            _nodeAdjacentEdges->insert(node, new std::map<TEdge*, TEdge*>());
+        if (!_nodeAdjacentEdges->contains(node))
+            _nodeAdjacentEdges->add(node, new simpleHash<TEdge, TEdge>());
     }
 
     template<graphNodeType TNode, graphEdgeType TEdge>
-    void graphEdgeCollection<TNode, TEdge>::removeEdge(const TEdge* edge)
+    void graphEdgeCollection<TNode, TEdge>::removeEdge(const TEdge& edge)
     {
         _edges->remove(edge);
 
-        if (_nodes->contains(edge->node1))
-            _nodes->remove(edge->node1);
+        if (_nodes->contains(edge.node1))
+            _nodes->remove(edge.node1);
 
-        if (_nodes->contains(edge->node2))
-            _nodes->remove(edge->node2);
+        if (_nodes->contains(edge.node2))
+            _nodes->remove(edge.node2);
 
         // Forward entry
-        if (_nodeAdjacentEdges.ContainsKey(edge.Node.GetHashCode()))
+        if (_nodeAdjacentEdges->containsKey(edge.node1))
         {
-            if (_nodeAdjacentEdges[edge->node1]->contains(edge))
-                _nodeAdjacentEdges[edge->node1]->remove(edge);
+            if (_nodeAdjacentEdges->get(edge.node1)->contains(edge))
+                _nodeAdjacentEdges->get(edge.node1)->remove(edge);
         }
 
         // Reverse entry
-        if (_nodeAdjacentEdges.ContainsKey(edge.AdjacentNode.GetHashCode()))
+        if (_nodeAdjacentEdges->containsKey(edge.node2))
         {
-            if (_nodeAdjacentEdges[edge->node2]->contains(edge))
-                _nodeAdjacentEdges[edge->node2]->remove(edge);
+            if (_nodeAdjacentEdges->get(edge.node2)->contains(edge))
+                _nodeAdjacentEdges->get(edge.node2)->remove(edge);
         }
     }
 
     template<graphNodeType TNode, graphEdgeType TEdge>
-    bool graphEdgeCollection<TNode, TEdge>::containsNode(const TNode* node)
+    bool graphEdgeCollection<TNode, TEdge>::containsNode(const TNode& node)
     {
         return _nodes->contains(node);
     }
 
     template<graphNodeType TNode, graphEdgeType TEdge>
-    bool graphEdgeCollection<TNode, TEdge>::containsEdge(const TEdge* edge)
+    bool graphEdgeCollection<TNode, TEdge>::containsEdge(const TEdge& edge)
     {
         return _edges->contains(edge);
     }
 
     template<graphNodeType TNode, graphEdgeType TEdge>
-    bool graphEdgeCollection<TNode, TEdge>::containsEdge(const TNode* node1, const TNode* node2)
+    bool graphEdgeCollection<TNode, TEdge>::containsEdge(const TNode& node1, const TNode& node2)
     {
         return findEdge(node1, node2) != NULL;
     }
 
     template<graphNodeType TNode, graphEdgeType TEdge>
-    TEdge& graphEdgeCollection<TNode, TEdge>::findEdge(const TNode* node1, const TNode* node2)
+    TEdge graphEdgeCollection<TNode, TEdge>::findEdge(const TNode& node1, const TNode& node2)
     {
-        return &mapExtension<TEdge, TEdge>::firstKey(_edges, [&node1, &node2](TEdge* key, TEdge* value)
+        return _edges->firstKey([&node1, &node2](TEdge key, TEdge value)
         {
-            if (key->node1 == node1 && key->node2 == node2)
+            if (key.node1 == node1 && key.node2 == node2)
             {
                 return key;
             }
-            else if (key->node2 == node1 && key->node1 == node2)
+            else if (key.node2 == node1 && key.node1 == node2)
             {
                 return key;
             }
@@ -197,24 +196,24 @@ namespace brogueHd::backend::math
     }
 
     template<graphNodeType TNode, graphEdgeType TEdge>
-    std::vector<TEdge*> graphEdgeCollection<TNode, TEdge>::getAdjacentEdges(const TNode* node)
+    simpleList<TEdge> graphEdgeCollection<TNode, TEdge>::getAdjacentEdges(const TNode* node)
     {
         if (!_nodeAdjacentEdges->contains(node))
             brogueException::show("No adjacent edges contained for node:  graphEdgeCollection.getAdjacentEdges");
 
-        return mapExtension<TEdge, TEdge>::getKeys(_nodeAdjacentEdges[node]);
+        return _nodeAdjacentEdges->get(node)->getKeys();
     }
 
     template<graphNodeType TNode, graphEdgeType TEdge>
-    std::vector<TEdge*> graphEdgeCollection<TNode, TEdge>::getEdges() const
+    simpleList<TEdge> graphEdgeCollection<TNode, TEdge>::getEdges() const
     {
-        return mapExtension<TEdge, TEdge>::getKeys(_edges);
+        return _edges->getValues();
     }
 
     template<graphNodeType TNode, graphEdgeType TEdge>
-    std::vector<TNode*> graphEdgeCollection<TNode, TEdge>::getNodes() const
+    simpleList<TNode> graphEdgeCollection<TNode, TEdge>::getNodes() const
     {
-        return mapExtension<TNode, TNode>::getKeys(_nodes);
+        return _nodes->getKeys();
     }
 
     template<graphNodeType TNode, graphEdgeType TEdge>
@@ -224,7 +223,7 @@ namespace brogueHd::backend::math
         _edges->clear();
 
         // Have to delete what was new'd
-        mapExtension<TNode, std::map<TEdge, TEdge>>::forEach(_nodeAdjacentEdges, [](TNode* node, std::map<TEdge*, TEdge*>* adjacentEdges)
+        _nodeAdjacentEdges->forEach([](TNode node, simpleHash<TEdge, TEdge>* adjacentEdges)
         {
             delete adjacentEdges;
         });
@@ -238,7 +237,7 @@ namespace brogueHd::backend::math
         _edges->clear();
 
         // Have to delete what was new'd
-        mapExtension<TNode, std::map<TEdge, TEdge>>::forEach(_nodeAdjacentEdges, [](TNode* node, std::map<TEdge*, TEdge*>* adjacentEdges)
+        _nodeAdjacentEdges->forEach([](TNode node, simpleHash<TEdge, TEdge>* adjacentEdges)
         {
             delete adjacentEdges;
         });
@@ -252,7 +251,7 @@ namespace brogueHd::backend::math
         _nodes->clear();
 
         // Have to delete what was new'd
-        mapExtension<TNode, std::map<TEdge, TEdge>>::forEach(_nodeAdjacentEdges, [](TNode* node, std::map<TEdge*, TEdge*>* adjacentEdges)
+        _nodeAdjacentEdges->forEach([](TNode* node, simpleHash<TEdge, TEdge>* adjacentEdges)
         {
             delete adjacentEdges;
         });

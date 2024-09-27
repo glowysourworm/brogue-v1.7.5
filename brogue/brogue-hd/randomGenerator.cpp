@@ -1,7 +1,11 @@
 #include "randomGenerator.h"
 #include "brogueMath.h"
 #include "exceptionHandler.h"
+#include "broguedef.h"
+#include "randomRange.h"
 #include <random>
+
+using namespace brogueHd::backend::math;
 
 namespace brogueHd::backend::generator
 {

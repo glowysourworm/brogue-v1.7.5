@@ -2,10 +2,7 @@
 
 #include "graphAlgorithm.h"
 #include "exceptionHandler.h"
-#include "vectorExtension.h"
-#include <vector>
 
-using namespace std;
 using namespace brogueHd::backend::extension;
 
 namespace brogueHd::backend::math
@@ -29,7 +26,7 @@ namespace brogueHd::backend::math
     }
 
     template<isGridLocatorNode TNode, isGridLocatorEdge TEdge>
-    graph<TNode, TEdge>* graphAlgorithm<TNode, TEdge>::createDefaultGraph(const std::vector<TNode>& vertices)
+    graph<TNode, TEdge>* graphAlgorithm<TNode, TEdge>::createDefaultGraph(const simpleList<TNode>& vertices)
     {
         if (vertices.count() == 0)
             brogueException::show("Trying to make a graph with zero vertices: delaunay.h");
@@ -41,11 +38,12 @@ namespace brogueHd::backend::math
 
         else
         {
-            std::vector<TEdge> edges;
+            simpleList<TEdge> edges;
+            graphAlgorithm<TNode, TEdge>* that = this;
 
-            vectorExtension<TNode>::distinctPairs(vertices, vertices, [&edges](TNode node1, TNode node2)
+            vectorExtension<TNode>::distinctPairs(vertices, vertices, [&edges, &that](TNode node1, TNode node2)
             {
-                edges.push_back(this->graphEdgeConstructor(node1, node2));
+                edges.add(that->graphEdgeConstructor(node1, node2));
             });
 
             return new graph<TNode, TEdge>(vertices, edges.data());

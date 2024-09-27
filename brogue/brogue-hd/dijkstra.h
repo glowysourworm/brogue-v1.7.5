@@ -4,7 +4,9 @@
 #include "gridCell.h"
 #include "grid.h"
 #include "gridDefinitions.h"
-#include "binarySearchTree.h"
+#include "simpleBST.h"
+#include "simpleHash.h"
+#include "simpleArray.h"
 #include <functional>
 
 using namespace std;
@@ -79,7 +81,7 @@ namespace brogueHd::backend::math
 		/// <summary>
 		/// Returns one of the result paths from dijkstra's algorithm
 		/// </summary>
-		T* getResultPath(T targetLocation);
+		simpleArray<T> getResultPath(T targetLocation);
 
 		//void pdsUpdate(pdsMap* map);
 
@@ -114,7 +116,7 @@ namespace brogueHd::backend::math
 		/// <summary>
 		/// Generates path from completed run
 		/// </summary>
-		T* generatePath(T targetLocation);
+		simpleArray<T> generatePath(T targetLocation);
 
 
 		/// <summary>
@@ -142,11 +144,11 @@ namespace brogueHd::backend::math
 		grid<bool>* _locationMap;                       // Locations that have been added to the frontier
 
         // Frontier BST for the map
-		binarySearchTree<float, std::map<T, T>>* _frontier;
+		simpleBST<float, simpleHash<T, T>*>* _frontier;
 
 		// These maps are stored per target location
-		std::map<T, T[]> _completedPaths;
-		std::map<T, bool> _validPaths;
+		simpleHash<T, simpleArray<T>>* _completedPaths;	// Stack allocated arrays
+		simpleHash<T, bool>* _validPaths;
 
         bool _initialized = false;
         bool _finished = false;

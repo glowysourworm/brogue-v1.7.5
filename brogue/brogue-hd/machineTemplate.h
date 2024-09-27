@@ -22,7 +22,7 @@ namespace brogueHd::backend::model::gameTemplate
 
 		//dungeonFeatureTypes DFType;
 
-		machineTypes machine; // Machine placement also respects BP_ placement flags in the machine blueprint
+		//machineTypes machine; // Machine placement also respects BP_ placement flags in the machine blueprint
 
 		// Parameters governing when and where it spawns:
 		tileType requiredDungeonFoundationType;
@@ -35,7 +35,7 @@ namespace brogueHd::backend::model::gameTemplate
 	struct machineFeature
 	{
 		// terrain
-		dungeonFeauture		feature;		// TODO!  This is just a placeholder
+		//dungeonFeauture		feature;		// TODO!  This is just a placeholder
 		//dungeonFeatureTypes featureDF;		// generate this DF at the feature location (0 for none)
 		//tileType terrain;					// generate this terrain tile at the feature location (0 for none)
 		//temporaryDungeonLayers layer;		// generate the terrain tile in this layer

@@ -4,7 +4,9 @@
 #include "brogueCell.h"
 #include "brogueObject.h"
 #include "creatureBehavior.h"
+#include "simpleList.h"
 
+using namespace brogueHd::component;
 using namespace brogueHd::backend::model::layout;
 
 namespace brogueHd::backend::model::creature
@@ -49,8 +51,8 @@ namespace brogueHd::backend::model::creature
 
 		// Collections of cells left over from updating the visibility. These will indicate cells that
 		// have changed.
-		std::vector<gridLocator> _visibleCells;
-		std::vector<gridLocator> _visibleCellsDiff;			// Difference between last turn and this turn
+		simpleList<gridLocator>* _visibleCells;
+		simpleList<gridLocator>* _visibleCellsDiff;			// Difference between last turn and this turn
 
 		// UNSURE:  These should be sent in during calculation
 		short _numberOfWaypoints;

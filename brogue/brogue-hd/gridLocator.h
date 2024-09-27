@@ -4,10 +4,10 @@
 #include <format>
 #include <iostream>
 #include "stringExtension.h"
-#include "conversionExtension.h"
+#include "typeConverter.h"
 
 using namespace std;
-using namespace brogueHd::backend::extension;
+using namespace brogueHd::component;
 
 namespace brogueHd::backend::model::layout
 {

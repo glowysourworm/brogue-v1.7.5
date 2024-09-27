@@ -1,6 +1,6 @@
 #pragma once
 
-#include "mathdef.h"
+#include "randomRange.h"
 #include "dungeonTemplate.h"
 #include <string>
 

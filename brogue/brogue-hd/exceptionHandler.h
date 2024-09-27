@@ -11,6 +11,12 @@ namespace brogueHd
 	static class brogueException
 	{
 	public:
+
+		static void show(const std::string& message, bool halt = false)
+		{
+			show(message.c_str(), halt);
+		}
+
 		static void show(const char* message, bool halt = false)
 		{
 

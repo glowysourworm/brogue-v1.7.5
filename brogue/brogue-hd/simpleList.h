@@ -20,23 +20,23 @@ namespace brogueHd::component
 		/// value to either break, or continue the loop.
 		/// </summary>
 		/// <param name="value">callback (current) value</param>
-		typedef std::function<iterationCallback(T item)> callback;
+		static typedef std::function<iterationCallback(T item)> callback;
 
 		/// <summary>
 		/// Definition of simple predicate (decision making function) for most collection types
 		/// </summary>
-		typedef std::function<bool(T item)> predicate;
+		static typedef std::function<bool(T item)> predicate;
 
 		/// <summary>
 		/// Definition of selector for a value V from an item T.
 		/// </summary>
 		template<typename TResult>
-		typedef std::function<TResult(T item)> selector;
+		static typedef std::function<TResult(T item)> selector;
 
 		/// <summary>
 		/// Defines a pair of items for use with a user callback
 		/// </summary>
-		typedef std::function<void(T item1, T item2)> pairs;
+		static typedef std::function<void(T item1, T item2)> pairs;
 	};
 
 	template<typename T>
@@ -44,6 +44,7 @@ namespace brogueHd::component
 	{
 	public:
 		simpleList();
+		simpleList(T* anArray);
 		~simpleList();
 
 		T operator[](int index);
@@ -53,6 +54,7 @@ namespace brogueHd::component
 
 		void add(T item);
 		void removeAt(int index);
+		void clear();
 
 	protected:
 

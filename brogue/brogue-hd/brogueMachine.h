@@ -1,9 +1,9 @@
 #pragma once
 
 #include "machineConstants.h"
-#include "machineFeature.h"
-#include "machineGenerator.h"
+#include "machineTemplate.h"
 
+using namespace brogueHd::backend::model::gameTemplate;
 using namespace brogueHd::backend::model::machine;
 
 namespace brogueHd::backend::model
@@ -12,15 +12,15 @@ namespace brogueHd::backend::model
 	{
 	public:
 		
-		brogueMachine(machineGenerator generator, machineFeatureFlags featureFlags);
+		brogueMachine(machineBase generator, machineFeatureFlags featureFlags);
 		~brogueMachine();
 
-		machineGenerator getGenerator() const;
+		machineBase getGenerator() const;
 		machineFeatureFlags getFeatureFlags() const;
 
 	private:
 
-		machineGenerator _generator;
+		machineBase _generator;
 		machineFeatureFlags _featureFlags;
 
 	};

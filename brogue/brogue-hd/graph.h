@@ -2,10 +2,9 @@
 
 #include "graphDefinitions.h"
 #include "graphEdgeCollection.h"
-#include "vectorExtension.h"
-#include <vector>
+#include "simpleList.h"
 
-using namespace std;
+using namespace brogueHd::component;
 
 namespace brogueHd::backend::math
 {
@@ -30,12 +29,12 @@ namespace brogueHd::backend::math
         TEdge& getAdjacentEdges(TNode* node);
         TEdge& findEdge(TNode* node1, TNode* node2);
 
-        void iterateNodes(vectorDelegates<TNode>::callback callback);
-        void iterateEdges(vectorDelegates<TEdge>::callback callback);
+        void iterateNodes(simpleListDelegates<TNode*>::callback callback);
+        void iterateEdges(simpleListDelegates<TEdge*>::callback callback);
 
     private:
 
-        std::vector<TNode*>* _nodes;
+        simpleList<TNode*>* _nodes;
 
         graphEdgeCollection* _edgeCollection;
     }

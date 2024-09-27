@@ -3,14 +3,13 @@
 #include "grid.h"
 #include "gridDefinitions.h"
 #include "gridExtension.h"
-#include "extensionDefinitions.h"
 #include "gridRect.h"
 #include "dijkstra.h"
+#include "simpleList.h"
 #include <functional>
-#include <vector>
 
 using namespace std;
-
+using namespace brogueHd::component;
 using namespace brogueHd::backend::math;
 
 namespace brogueHd::backend::model::layout
@@ -47,8 +46,8 @@ namespace brogueHd::backend::model::layout
 		gridRect getBoundary() const;
 		gridRect getParentBoundary() const;
 		gridRect getLargestSubRectangle() const;
-		std::vector<T>* getLocations();
-		std::vector<T>* getEdgeLocations();
+		simpleList<T>* getLocations();
+		simpleList<T>* getEdgeLocations();
 
 		/// <summary>
 		/// Translates this instance of the grid region using the provided translator
@@ -90,17 +89,17 @@ namespace brogueHd::backend::model::layout
 		/// <summary>
 		/// Gets locations with an exposed edge in the specified direction
 		/// </summary>
-		std::vector<T>* getEdges(brogueCompass direction);
+		simpleList<T>* getEdges(brogueCompass direction);
 
 		/// <summary>
 		/// Gets the locations that are also along the bounding rectangle
 		/// </summary>
-		std::vector<T>& getBoundaryEdges(brogueCompass direction);
+		simpleList<T>& getBoundaryEdges(brogueCompass direction);
 
 		/// <summary>
 		/// Gets locations with exposed corner
 		/// </summary>
-		std::vector<T>* getCorners(brogueCompass nonCardinalDirection);
+		simpleList<T>* getCorners(brogueCompass nonCardinalDirection);
 
 	private:
 
@@ -126,20 +125,20 @@ namespace brogueHd::backend::model::layout
 
 		gridRect _largestRectangularSubRegion;
 
-		std::vector<T>* _locations;
-		std::vector<T>* _edgeLocations;
+		simpleList<T>* _locations;
+		simpleList<T>* _edgeLocations;
 
 		// Exposed Edge Faces
-		std::vector<T>* _northExposedLocations;
-		std::vector<T>* _southExposedLocations;
-		std::vector<T>* _westExposedLocations;
-		std::vector<T>* _eastExposedLocations;
+		simpleList<T>* _northExposedLocations;
+		simpleList<T>* _southExposedLocations;
+		simpleList<T>* _westExposedLocations;
+		simpleList<T>* _eastExposedLocations;
 		
 		// Corners
-		std::vector<T>* _northEastCornerLocations;
-		std::vector<T>* _northWestCornerLocations;
-		std::vector<T>* _southEastCornerLocations;
-		std::vector<T>* _southWestCornerLocations;
+		simpleList<T>* _northEastCornerLocations;
+		simpleList<T>* _northWestCornerLocations;
+		simpleList<T>* _southEastCornerLocations;
+		simpleList<T>* _southWestCornerLocations;
 	};
 }
 

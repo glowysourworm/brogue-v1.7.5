@@ -2,11 +2,12 @@
 
 #include "grid.h"
 #include "brogueRoom.h"
-#include "dungeonDeclaration.h"
 #include "dungeonConstants.h"
+#include "simpleList.h"
 #include <functional>
 
 using namespace std;
+using namespace brogueHd::component;
 
 namespace brogueHd::backend::model
 {
@@ -37,7 +38,7 @@ namespace brogueHd::backend::model
 
 	private:
 
-		std::vector<brogueRoom*>* _rooms;
+		simpleList<brogueRoom*>* _rooms;
 
 		// May need to break into separate grids
 		grid<brogueCell*>* _mainGrid;

@@ -1,12 +1,11 @@
 #include "dijkstra.h"
 #include "gridRect.h"
+#include "brogueMath.h"
 #include "exceptionHandler.h"
-#include "mapextension.h"
-#include "binarySearchTree.h"
 #include <functional>
 
 using namespace std;
-
+using namespace brogueHd::backend::math;
 using namespace brogueHd::backend::model::layout;
 
 namespace brogueHd::backend::math
@@ -16,9 +15,9 @@ namespace brogueHd::backend::math
 	dijkstra<T>::dijkstra(gridRect parentBoundary,
 						  gridRect relativeBoundary,
 						  bool obeyCardinalMovement,
-						  std::function<bool(short, short)> mapPredicate,
-						  std::function<short(short, short)> mapCostPredicate,
-						  std::function<T(short, short)> locatorCallback)
+						  dijkstraDelegates<T>::predicate mapPredicate,
+						  dijkstraDelegates<T>::costPredicate mapCostPredicate,
+						  dijkstraDelegates<T>::locatorCallback locatorCallback)
 	{
 		_parentBoundary = parentBoundary;
 		_relativeBoundary = relativeBoundary;
@@ -28,11 +27,11 @@ namespace brogueHd::backend::math
 		_locatorCallback = locatorCallback;
 
 		// Set these to be the full size of the parent
-		_outputMap = new array2D<short>(parentBoundary);
-		_visitedMap = new array2D<bool>(parentBoundary);
-		_locationMap = new array2D<bool>(parentBoundary);
+		_outputMap = new grid<short>(parentBoundary);
+		_visitedMap = new grid<bool>(parentBoundary);
+		_locationMap = new grid<bool>(parentBoundary);
 
-		_frontier = new binarySearchTree<float, std::map<T, T>>();
+		_frontier = new simpleBST<float, simpleHash<T, T>*>();
 	}
 
 	template<isGridLocator T>
@@ -41,6 +40,12 @@ namespace brogueHd::backend::math
 		delete _outputMap;
 		delete _visitedMap;
 		delete _locationMap;
+
+		// Must delete the allocated hash table memory
+		_frontier->iterate([](float key, simpleHash<T, T>* value)
+		{
+			delete value; // -> ~simpleBSTNode()
+		});
 
 		delete _frontier;
 	}
@@ -58,7 +63,7 @@ namespace brogueHd::backend::math
 		_completedPaths.clear();
 		_validPaths.clear();
 
-		iterate(_relativeBoundary, [](short column, short row)
+		gridRectExtension::iterate(_relativeBoundary, [](short column, short row)
 		{
 			// CHECK PREDICATE TO SET MAP COST OFF LIMITS
 			var passesPredicate = _predicate(column, row);
@@ -91,11 +96,11 @@ namespace brogueHd::backend::math
 			return;
 
 		// Track goal progress
-		std::map<T, bool> goalDict;
+		simpleHash<T, bool> goalDict;
 
 		// Not sure about hashing
 		for (int index = 0; index < SIZEOF(_targetLocations); index++)
-			goalDict.insert(_targetLocations[index], _targetLocations[index]);
+			goalDict.set(_targetLocations[index], _targetLocations[index]);
 
 		// Process the first element
 		short column = _sourceLocation->column;
@@ -105,7 +110,7 @@ namespace brogueHd::backend::math
 
 		// Iterate while any target not reached (AND) not visited
 		while (!_visitedMap->get(column, row) &&
-				any(goalDict, [](T key, T value)
+				goalDict.any([](T key, T value)
 				{
 					return !value;
 				});
@@ -178,7 +183,7 @@ namespace brogueHd::backend::math
 			lastLocator = _locatorCallback(column, row);
 
 			// Get locator from the goal dictionary
-			T goalLocator = firstOrDefaultKey(goalDict, [](T key, bool value)
+			T goalLocator = goalDict.firstOrDefaultKey([](T key, bool value)
 			{
 				return key.column == lastLocator.column && key.row == lastLocator.row;
 			});
@@ -188,10 +193,10 @@ namespace brogueHd::backend::math
 				goalDict[goalLocator] = true;
 
 			// Select next location from frontier queue - using the smallest weight
-			if (_frontier.count() > 0)
+			if (_frontier->count() > 0)
 			{
 				// Lists in the frontier must have an entry
-				std::map<T, T> nextCostDict = _frontier->min();
+				simpleHash<T, T>* nextCostDict = _frontier->min();
 				float nextCost = _frontier->minKey();
 
 				// Get the first from the dictionary
@@ -200,11 +205,11 @@ namespace brogueHd::backend::math
 				T nextNode = NULL;
 
 				// CHECK FOR GOAL LOCATION!
-				forEach(goalDict, [](T key, bool value)
+				goalDict.forEach([](T key, bool value)
 				{
 					if (!value)
 					{
-						nextNode = firstOrDefaultKey(nextCostDict, [](T ckey, T cvalue)
+						nextNode = nextCostDict->firstOrDefaultKey([](T ckey, T cvalue)
 						{
 							return ckey.column == location.column &&
 								   ckey.row == location.row;
@@ -217,26 +222,26 @@ namespace brogueHd::backend::math
 
 				// Otherwise, set to the next location (should be first dictionary key)
 				if (nextNode == NULL)
-					nextNode = nextCostDict.begin()->first;
+					nextNode = nextCostDict->getAt(0).key;
 
 				// Maintain frontier hash
-				var removed = nextCostDict.erase(nextNode);
+				nextCostDict->remove(nextNode);
 
-				if (nextCostDict.count() == 0)
-					_frontier.remove(nextCost);
+				if (nextCostDict->count() == 0)
+					_frontier->remove(nextCost);
 
 				// Move to next location
-				column = nextNode.Column;
-				row = nextNode.Row;
+				column = nextNode.column;
+				row = nextNode.row;
 			}
 		}
 
 		// No goals were found for the last locator; OR any failed paths were found (TODO: Take a look at fail conditions)
-		if (!any(goalDict, [](T key, bool value)
+		if (!goalDict.any([](T key, bool value)
 			{
 				return key.column == lastLocator.column && key.row == lastLocator.row;
 			}) ||
-			any(goalDict, [](T key, bool value)
+			goalDict.any([](T key, bool value)
 			{
 				return !value;
 			})
@@ -245,35 +250,35 @@ namespace brogueHd::backend::math
 		}
 
 		// GENERATE PATHS
-		for (int index = 0; index < _targetLocations; index++)
+		for (int index = 0; index < SIZEOF(_targetLocations); index++)
 		{
-			T[] completedPath = generatePath(_targetLocations[index]);
+			simpleArray<T> completedPath = generatePath(_targetLocations[index]);
 
-			_completedPaths.insert(_targetLocations[index], completedPath);
+			_completedPaths->add(_targetLocations[index], completedPath);
 		}
 
 		_finished = true;
 	}
 
 	template<isGridLocator T>
-	T* dijkstra<T>::getResultPath(T targetLocation)
+	simpleArray<T> dijkstra<T>::getResultPath(T targetLocation)
 	{
 		if (!_finished)
 			brogueException::show("Must first call dijkstra.run() before calling getResultPath(..)");
 
-		return _completedPaths[targetLocation];
+		return _completedPaths->get(targetLocation);
 	}
 
 	template<isGridLocator T>
-	T* dijkstra<T>::generatePath(T targetLocation)
+	simpleArray<T> dijkstra<T>::generatePath(T targetLocation)
 	{
 		if (!contains(_targetLocations, targetLocation))
 			brogueException::show("Requested target location not specified by the constructor dijkstra.h");
 
 		// Reverse ordered - starting with target
-		std::vector<T> result;
+		simpleList<T> result;
 
-		result.push_back(targetLocation);
+		result.add(targetLocation);
 
 		// Validate
 		bool valid = _predicate(targetLocation.column, targetLocation.row);
@@ -287,15 +292,15 @@ namespace brogueHd::backend::math
 		// Find the "easiest" route to the goal (also, see operators for gridCell)
 		while (currentLocation != goalLocation)
 		{
-			short column = currentLocation.Column;
-			short row = currentLocation.Row;
+			short column = currentLocation.column;
+			short row = currentLocation.row;
 
 			short north = row - 1 >= _relativeBoundary.top();
 			short south = row + 1 <= _relativeBoundary.bottom();
 			short east = column + 1 <= _relativeBoundary.right();
 			short west = column - 1 >= _relativeBoundary.left();
 
-			short lowestWeight = SHRT_MAX;
+			short lowestWeight = std::numeric_limits<short>::max();
 			T lowestWeightLocation = currentLocation;
 
 			if (north && (_outputMap->get(column, row - 1) < lowestWeight))
@@ -346,7 +351,7 @@ namespace brogueHd::backend::math
 				lowestWeight = _outputMap->get(column - 1, row + 1);
 			}
 
-			if (lowestWeight == SHRT_MAX)
+			if (lowestWeight == std::numeric_limits<short>::max())
 			{
 				brogueException::show("Mishandled Dijkstra Map dijkstra.generatePath()");
 			}
@@ -354,15 +359,15 @@ namespace brogueHd::backend::math
 			currentLocation = lowestWeightLocation;
 
 			// Add this to the path
-			if (!any(result, [&lowestWeightLocation](T alocation)
+			if (!result.any([&lowestWeightLocation](T alocation)
 			{
 				return alocation == lowestWeightLocation;
 			})
 			{
-				result.push_back(lowestWeightLocation);
+				result.add(lowestWeightLocation);
 
 				// VAILDATE
-				valid &= _predicate(lowestWeightLocation.Column, lowestWeightLocation.Row);
+				valid &= _predicate(lowestWeightLocation.column, lowestWeightLocation.row);
 
 				if (!valid)
 					brogueException::show("Invalid path found:  dijkstra.generatePath");
@@ -375,12 +380,12 @@ namespace brogueHd::backend::math
 		}
 
 		// VAILDATE
-		valid &= _predicate(goalLocation.Column, goalLocation.Row);
+		valid &= _predicate(goalLocation.column, goalLocation.row);
 
 		// NOTE:  ADD SOURCE LOCATION FOR INCLUSIVE PATH (not needed)
 
 		// Reverse the path to build a result array
-		T resultArray = T[result.size()];
+		simpleArray<T> resultArray(result.size());
 
 		for (int index = result.size() - 1; index >= 0; index--)
 			resultArray[result.size() - 1 - index] = result[index];
@@ -412,7 +417,7 @@ namespace brogueHd::backend::math
 		short cost = _mapCostPredicate(destColumn, destRow);
 
 		// Update the output map
-		_outputMap->set(destColumn, destRow, min(_outputMap->get(destColumn, destRow), currentWeight + cost));
+		_outputMap->set(destColumn, destRow, brogueMath<short>::min(_outputMap->get(destColumn, destRow), currentWeight + cost));
 
 		// Update the frontier
 		short newWeight = _outputMap->get(destColumn, destRow);
@@ -423,18 +428,18 @@ namespace brogueHd::backend::math
 			T newLocator = _locatorCallback(destColumn, destRow);
 
 			// Check for existing weight list
-			std::map<T, T> weightList;
+			simpleHash<T, T>* weightList;
 
 			// Initialize the new locator on the frontier
-			if (_frontier.containsKey(newWeight))
+			if (_frontier->containsKey(newWeight))
 			{
-				weightList = _frontier.search(newWeight);
-				weightList.insert(newLocator, newLocator);
+				weightList = _frontier->search(newWeight);
+				weightList->add(newLocator, newLocator);
 			}
 			else
 			{
-				weightList.insert(newLocator, newLocator);
-				_frontier.insert(newWeight, weightList);
+				weightList->add(newLocator, newLocator);
+				_frontier->insert(newWeight, weightList);
 			}
 				
 
@@ -452,67 +457,67 @@ namespace brogueHd::backend::math
 		// UPDATE THE FRONTIER
 
 		// Both weights are absent from the frontier
-		if (!_frontier.containsKey(oldWeight) &&
-			!_frontier.containsKey(newWeight))
+		if (!_frontier->containsKey(oldWeight) &&
+			!_frontier->containsKey(newWeight))
 		{
-			std::map<T, T> newList;
+			simpleHash<T, T>* newList = new simpleHash<T, T>();
 
-			newList.insert(destLocator, destLocator);
+			newList->add(destLocator, destLocator);
 
-			_frontier.Insert(newWeight, newList);
+			_frontier->insert(newWeight, newList);
 		}
 
 		// Old weight list exists; New weight list is absent
-		else if (_frontier.containsKey(oldWeight) &&
-				!_frontier.containsKey(newWeight))
+		else if (_frontier->containsKey(oldWeight) &&
+				!_frontier->containsKey(newWeight))
 		{
-			std::map<T, T> oldList = _frontier->search(oldWeight);
-			std::map<T, T> newList;
+			simpleHash<T, T>* oldList = _frontier->search(oldWeight);
+			simpleHash<T, T>* newList = new simpleHash<T, T>();
 
-			newList.insert(destLocator, destLocator);
+			newList->insert(destLocator, destLocator);
 
 			// Check for existing locator
-			if (oldList.contains(destLocator))
-				oldList.remove(destLocator);
+			if (oldList->contains(destLocator))
+				oldList->remove(destLocator);
 
 			// Remove unused node
-			if (oldList.count() == 0)
-				_frontier.remove(oldWeight);
+			if (oldList->count() == 0)
+				_frontier->remove(oldWeight);
 
 			// Insert new node in the frontier
 			_frontier->insert(newWeight, newList);
 		}
 
 		// Old weight is absent; New weight exists
-		else if (!_frontier.containsKey(oldWeight) &&
-				  _frontier.containsKey(newWeight))
+		else if (!_frontier->containsKey(oldWeight) &&
+				  _frontier->containsKey(newWeight))
 		{
-			std::map<T, T> newList = _frontier->search(newWeight);
+			simpleHash<T, T>* newList = _frontier->search(newWeight);
 
 			// Locator doesn't exist in list
-			if (!newList.contains(destLocator))
-				 newList.insert(destLocator, destLocator);
+			if (!newList->contains(destLocator))
+				 newList->insert(destLocator, destLocator);
 		}
 
 		// Both old and new weight lists exist
 		else
 		{
-			std::map<T, T> oldList = _frontier->search(oldWeight);
-			std::map<T, T> newList = _frontier->search(newWeight);
+			simpleHash<T, T>* oldList = _frontier->search(oldWeight);
+			simpleHash<T, T>* newList = _frontier->search(newWeight);
 
 			// Check that they're different lists
 			if (oldList != newList)
 			{
 				// Check that old weight list has element removed
-				if (oldList.containsKey(destLocator))
-					oldList.remove(destLocator);
+				if (oldList->containsKey(destLocator))
+					oldList->remove(destLocator);
 
-				if (oldList.count() == 0)
-					_frontier.remove(oldWeight);
+				if (oldList->count() == 0)
+					_frontier->remove(oldWeight);
 
 				// Check that new weight list has element added
-				if (!newList.containsKey(destLocator))
-					 newList.insert(destLocator, destLocator);
+				if (!newList->containsKey(destLocator))
+					 newList->insert(destLocator, destLocator);
 			}
 		}
 	}

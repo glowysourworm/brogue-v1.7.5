@@ -3,8 +3,6 @@
 #include "broguedef.h"
 #include "brogueObject.h"
 #include "brogueItem.h"
-#include "creatureDeclaration.h"
-#include "creatureBehaviorDeclaration.h"
 
 using namespace brogueHd::backend::model::creature;
 

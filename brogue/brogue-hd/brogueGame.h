@@ -4,14 +4,12 @@
 #include "brogueLevel.h"
 #include "brogueCreature.h"
 #include "broguePlayer.h"
-#include "creatureDeclaration.h"
 #include "brogueCellDisplay.h"
 #include "brogueMessageQueue.h"
 #include "playerCharacter.h"
-#include <vector>
+#include "simpleList.h"
 
-using namespace std;
-
+using namespace brogueHd::component;
 using namespace brogueHd::backend::model::creature;
 
 namespace brogueHd::backend::model
@@ -20,22 +18,22 @@ namespace brogueHd::backend::model
 	{
 	public:
 
-		brogueGame(boolean serverMode, boolean noMenu);
+		brogueGame(bool serverMode, bool noMenu);
 		~brogueGame();
 
-		boolean getServerMode();
-		boolean getNoMenu();
+		bool getServerMode();
+		bool getNoMenu();
 
-		void outputMessage(char* msg, color theColor, boolean requireAcknowledgment);
+		void outputMessage(char* msg, color theColor, bool requireAcknowledgment);
 
 	private:
 
-		std::vector<brogueLevel*> _levels;
+		simpleList<brogueLevel*>* _levels;
 
 		brogueMessageQueue* _messageQueue;
 
-		boolean _serverMode;
-		boolean _noMenu;
+		bool _serverMode;
+		bool _noMenu;
 
 		// levelData* _levels;
 
@@ -53,12 +51,12 @@ namespace brogueHd::backend::model
 
 		short currentDepth;					// which dungeon level are we on
 		//short deepesteLevel;
-		boolean disturbed;					// player should stop auto-acting
-		boolean gameHasEnded;				// stop everything and go to death screen
-		boolean highScoreSaved;				// so that it saves the high score only once
-		boolean blockCombatText;			// busy auto-fighting
-		boolean autoPlayingLevel;			// seriously, don't interrupt
-		boolean automationActive;			// cut some corners during redraws to speed things up
+		bool disturbed;					// player should stop auto-acting
+		bool gameHasEnded;				// stop everything and go to death screen
+		bool highScoreSaved;				// so that it saves the high score only once
+		bool blockCombatText;			// busy auto-fighting
+		bool autoPlayingLevel;			// seriously, don't interrupt
+		bool automationActive;			// cut some corners during redraws to speed things up
 
 		//tcell tmap[DCOLS][DROWS];						// grids with info about the map
 		//pcell pmap[DCOLS][DROWS];

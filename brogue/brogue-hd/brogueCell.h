@@ -1,7 +1,6 @@
 #pragma once
 
 #include "gridLocator.h"
-#include "dungeonDeclaration.h"
 #include "brogueCellDisplay.h"
 
 namespace brogueHd::backend::model::layout

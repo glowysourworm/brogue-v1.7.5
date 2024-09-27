@@ -3,8 +3,8 @@
 #include "broguedef.h"
 #include "messageData.h"
 #include "color.h"
+#include "simpleList.h"
 #include <string>
-#include <vector>
 
 using namespace std;
 
@@ -37,7 +37,7 @@ namespace brogueHd::backend::model
 
 		short _currentMessageIndex;
 
-		std::vector<messageData*> _messages;
+		simpleList<messageData*>* _messages;
 
 		messageData* _flavorMessage;
 

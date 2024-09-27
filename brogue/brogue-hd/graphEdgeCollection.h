@@ -3,10 +3,10 @@
 #include "graphDefinitions.h"
 #include "graphNode.h"
 #include "graphEdge.h"
-#include <map>
-#include <vector>
+#include "simpleList.h"
+#include "simpleHash.h"
 
-using namespace std;
+using namespace brogueHd::component;
 
 namespace brogueHd::backend::math
 {
@@ -25,19 +25,19 @@ namespace brogueHd::backend::math
         short edgeCount() const;
         short nodeCount() const;
 
-        void addEdge(const TEdge* edge);
-        void addNode(const TNode* node);
+        void addEdge(const TEdge& edge);
+        void addNode(const TNode& node);
 
-        void removeEdge(const TEdge* edge);
+        void removeEdge(const TEdge& edge);
 
-        bool containsNode(const TNode* node);
-        bool containsEdge(const TEdge* edge);
-        bool containsEdge(const TNode* node1, const TNode* node2);
-        TEdge& findEdge(const TNode* node1, const TNode* node2);
+        bool containsNode(const TNode& node);
+        bool containsEdge(const TEdge& edge);
+        bool containsEdge(const TNode& node1, const TNode& node2);
+        TEdge findEdge(const TNode& node1, const TNode& node2);
 
-        std::vector<TEdge*> getAdjacentEdges(const TNode* node);
-        std::vector<TEdge*> getEdges() const;
-        std::vector<TNode*> getNodes() const;
+        simpleList<TEdge> getAdjacentEdges(const TNode* node);
+        simpleList<TEdge> getEdges() const;
+        simpleList<TNode> getNodes() const;
 
         void clear();
         void clearEdges();
@@ -52,8 +52,8 @@ namespace brogueHd::backend::math
 
     private:
 
-        std::map<TNode*, TNode*>* _nodes;
-        std::map<TEdge*, TEdge*>* _edges;
-        std::map<TNode*, std::map<TEdge*, TEdge*>*>* _nodeAdjacentEdges;
+        simpleHash<TNode, TNode>* _nodes;
+        simpleHash<TEdge, TEdge>* _edges;
+        simpleHash<TNode, simpleHash<TEdge, TEdge>*>* _nodeAdjacentEdges;
 	};
 }

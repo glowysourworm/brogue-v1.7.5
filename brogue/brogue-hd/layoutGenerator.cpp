@@ -5,8 +5,6 @@
 #include "dungeon.h"
 #include "delaunayAlgorithm.h"
 #include "primsAlgorithm.h"
-#include "vectorExtension.h"
-#include "arrayExtension.h"
 #include "exceptionHandler.h"
 
 namespace brogueHd::backend::generator
@@ -16,7 +14,7 @@ namespace brogueHd::backend::generator
         if(!randomGenerator->checkId(RANDOM_GENERATOR_MAIN))
             brogueException::show("Improper use of random number generator:  layoutGenerator.cpp");
 
-        _roomTiles = new std::vector<accretionTile>();
+        _roomTiles = new simpleList<accretionTile>();
 		_randomGenerator = randomGenerator;
         _initialized = false;
 	}
@@ -38,7 +36,7 @@ namespace brogueHd::backend::generator
         _initialized = false;
     }
 
-    void layoutGenerator::initialize(const brogueLevelProfile& profile)
+    void layoutGenerator::initialize(brogueLevelProfile* profile)
     {        
         this->clear();
 
@@ -130,19 +128,19 @@ namespace brogueHd::backend::generator
         for (short index = 0; index < maxAttempts; index++)
         {
             // MEMORY!
-            gridRegion<gridLocator>* nextRegion = index == 0 ? this->createRoom(_profile.getEntranceRoom()) :
-                                                               this->createRoom(_profile.getRandomRoomInfo());
+            gridRegion<gridLocator>* nextRegion = index == 0 ? this->createRoom(_profile->getEntranceRoom()) :
+                                                               this->createRoom(_profile->getRandomRoomInfo());
 
             // Connection Points
-            std::vector<gridLocator> northEdge = nextRegion->getBoundaryEdges(brogueCompass::N);
-            std::vector<gridLocator> southEdge = nextRegion->getBoundaryEdges(brogueCompass::S);
-            std::vector<gridLocator> eastEdge = nextRegion->getBoundaryEdges(brogueCompass::E);
-            std::vector<gridLocator> westEdge = nextRegion->getBoundaryEdges(brogueCompass::W);
+            simpleList<gridLocator> northEdge = nextRegion->getBoundaryEdges(brogueCompass::N);
+            simpleList<gridLocator> southEdge = nextRegion->getBoundaryEdges(brogueCompass::S);
+            simpleList<gridLocator> eastEdge = nextRegion->getBoundaryEdges(brogueCompass::E);
+            simpleList<gridLocator> westEdge = nextRegion->getBoundaryEdges(brogueCompass::W);
 
-            int randN = _randomGenerator->rand_range(0, northEdge.size());
-            int randS = _randomGenerator->rand_range(0, southEdge.size());
-            int randE = _randomGenerator->rand_range(0, eastEdge.size());
-            int randW = _randomGenerator->rand_range(0, westEdge.size());
+            int randN = _randomGenerator->rand_range(0, northEdge.count());
+            int randS = _randomGenerator->rand_range(0, southEdge.count());
+            int randE = _randomGenerator->rand_range(0, eastEdge.count());
+            int randW = _randomGenerator->rand_range(0, westEdge.count());
 
             accretionTile nextRoom;
 
@@ -165,7 +163,7 @@ namespace brogueHd::backend::generator
                 //        have been by design (Brogue v1.7.5); but probably only matters for
                 //        the first level.
                 //
-                _roomTiles->push_back(attemptRegions[index]);
+                _roomTiles->add(attemptRegions[index]);
 
                 // Set final room locations
                 _grid->setFromRegion(attemptRegions[index].region);
@@ -174,7 +172,7 @@ namespace brogueHd::backend::generator
             // Accrete rooms - translating the attempt room into place (modifies attempt region)
             else if (attemptConnection(attemptRegions[index], _grid->getParentBoundary(), interRoomPadding))
             {
-                _roomTiles->push_back(attemptRegions[index]);
+                _roomTiles->add(attemptRegions[index]);
 
                 // Set final room locations
                 _grid->setFromRegion(attemptRegions[index].region);
@@ -212,9 +210,9 @@ namespace brogueHd::backend::generator
         //                 padding.
         //
         
-        for (int index = 0; index < _roomTiles->size(); index++)
+        for (int index = 0; index < _roomTiles->count(); index++)
         {
-            accretionTile tile = _roomTiles->at(index);
+            accretionTile tile = _roomTiles->get(index);
 
             bool northAttempt = false;
             bool southAttempt = false;
@@ -424,7 +422,7 @@ namespace brogueHd::backend::generator
         // Create connection point vertices
         std::vector<gridLocatorNode> connectionNodes;
         
-        vectorExtension<accretionTile>::forEach(*_roomTiles, [&connectionNodes](accretionTile item)
+        _roomTiles->forEach([&connectionNodes](accretionTile item)
         {
             if (item.hasEastConnection)
                 connectionNodes.push_back(gridLocatorNode(item.connectionPointE));
@@ -453,14 +451,14 @@ namespace brogueHd::backend::generator
         // 2) Run Dijkstra to set cells in the primary grid
         //
 
-        std::vector<gridLocatorEdge> corridorEdges;
-        std::vector<accretionTile> roomTiles = *_roomTiles;
+        simpleList<gridLocatorEdge> corridorEdges;
+        simpleList<accretionTile> roomTiles = *_roomTiles;
 
         _delaunayGraph->iterateEdges([&roomTiles, &corridorEdges](gridLocatorEdge edge)
         {
             bool isCorridorEdge = false;
 
-            vectorExtension<accretionTile>::forEach(roomTiles, [&edge, &isCorridorEdge](accretionTile tile)
+            roomTiles.forEach([&edge, &isCorridorEdge](accretionTile tile)
             {
                 int connectionCount = 0;
 
@@ -496,7 +494,7 @@ namespace brogueHd::backend::generator
             });
 
             if (isCorridorEdge)
-                corridorEdges.push_back(edge);
+                corridorEdges.add(edge);
         });
 
         grid<gridLocator> grid = *_grid;
@@ -510,7 +508,7 @@ namespace brogueHd::backend::generator
             // Primary Inclusion Predicate (is it in the grid?)
             [&grid](short column, short row)
             {
-                return grid->isDefined(column, row);
+                return grid.isDefined(column, row);
             },
 
             // Then, the map cost is queried (what is the movement cost?)
@@ -522,11 +520,11 @@ namespace brogueHd::backend::generator
             // Then, it will need the locators from the grid to keep its internal data temporarily
             [&grid](short column, short row)
             {
-                return grid->get(column, row);
+                return grid.get(column, row);
             });
 
         // Iterate each corridor edge and run dijkstra to finalize the connection
-        vectorExtension<gridLocatorEdge>::forEach(corridorEdges, [&algorithm, &grid](gridLocatorEdge edge)
+        corridorEdges.forEach([&algorithm, &grid](gridLocatorEdge edge)
         {
             gridLocator source = edge.node1.locator;
             gridLocator targets[1] = { edge.node2.locator };
@@ -535,12 +533,12 @@ namespace brogueHd::backend::generator
             algorithm.initialize(source, targets);
             algorithm.run();
 
-            gridLocator* resultPath = algorithm.getResultPath(targets[0]);
+            simpleArray<gridLocator> resultPath = algorithm.getResultPath(targets[0]);
 
             // Set corridors
-            arrayExtension<gridLocator>::forEach(resultPath, [&grid](gridLocator locator)
+            resultPath.forEach([&grid](gridLocator locator)
             {
-                grid->set(locator.column, locator.row, locator);
+                grid.set(locator.column, locator.row, locator);
             });
         });
     }

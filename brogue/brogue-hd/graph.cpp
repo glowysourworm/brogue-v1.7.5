@@ -1,16 +1,14 @@
 #pragma once 
 
-#include "arrayExtension.h"
 #include "graphDefinitions.h"
 #include "graph.h"
-#include "vectorExtension.h"
 
 namespace brogueHd::backend::math
 {
     template<graphNodeType TNode, graphEdgeType TEdge>
     graph<TNode, TEdge>::graph(const TNode* nodes, const TEdge* edges)
     {
-        _nodes = new std::vector<TNode*>(nodes);
+        _nodes = new simpleList<TNode*>(nodes);
         _edgeCollection = new graphEdgeCollection(nodes, edges);
 
         //arrayExtension::forEach(nodes, [](TNode* node)
@@ -24,7 +22,7 @@ namespace brogueHd::backend::math
     {
         TEdge edges[0];
 
-        _nodes = new std::vector<TNode*>(nodes);
+        _nodes = new simpleList<TNode*>(nodes);
         _edgeCollection = new graphEdgeCollection(nodes, &edges);
     }
 
@@ -38,10 +36,10 @@ namespace brogueHd::backend::math
     template<graphNodeType TNode, graphEdgeType TEdge>
     void graph<TNode, TEdge>::addEdge(TEdge* edge)
     {
-        if (!vectorExtension::contains(_nodes, edge->node1))
+        if (!_nodes->contains(edge->node1))
             _nodes->push_back(edge->node1);
 
-        if (!vectorExtension::contains(_nodes, edge->node2))
+        if (!_nodes->contains(edge->node2))
             _nodes->push_back(edge->node2);
 
         _edgeCollection->addEdge(edge);
@@ -50,10 +48,10 @@ namespace brogueHd::backend::math
     template<graphNodeType TNode, graphEdgeType TEdge>
     void graph<TNode, TEdge>::modify(TEdge* existingEdge, TEdge* newEdge)
     {
-        if (vectorExtension::contains(_nodes, edge->node1))
+        if (_nodes->contains(edge->node1))
             _nodes->erase(edge->node1);
 
-        if (vectorExtension::contains(_nodes, edge->node2))
+        if (_nodes->contains(edge->node2))
             _nodes->erase(edge->node2);
 
         if (_edgeCollection->containsEdge(existingEdge))
@@ -75,20 +73,14 @@ namespace brogueHd::backend::math
     }
 
     template<graphNodeType TNode, graphEdgeType TEdge>
-    void graph<TNode, TEdge>::iterateNodes(vectorDelegates<TNode>::callback callback)
+    void graph<TNode, TEdge>::iterateNodes(simpleListDelegates<TNode*>::callback callback)
     {
-        vectorExtension<TNode>::forEach(_nodes, [](TNode node)
-        {
-            callback(node);
-        });
+        _nodes->forEach(callback);
     }
 
     template<graphNodeType TNode, graphEdgeType TEdge>
-    void graph<TNode, TEdge>::iterateEdges(vectorDelegates<TEdge>::callback callback)
+    void graph<TNode, TEdge>::iterateEdges(simpleListDelegates<TEdge*>::callback callback)
     {
-        vectorExtension<TEdge>::forEach(_edgeCollection->getEdges(), [](TEdge edge)
-        {
-            callback(edge);
-        });
+        _edgeCollection->getEdges()->forEach(callback);
     }
 }

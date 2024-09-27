@@ -39,12 +39,12 @@ namespace brogueHd::backend::controller
 				// Initialize
 				scoresFile = new brogueScoresFile();
 
-				for (int index = 0; index < HIGH_SCORES_COUNT; index++)
-				{
-					char description[COLS] = "Died to the great penderprime...";
+				//for (int index = 0; index < HIGH_SCORES_COUNT; index++)
+				//{
+				//	char description[COLS] = "Died to the great penderprime...";
 
-					scoresFile->add(brogueScoreEntry(10000, time(0), description));
-				}
+				//	scoresFile->add(brogueScoreEntry(10000, time(0), description));
+				//}
 
 				// Create empty file
 				scoresFile->serialize(stream);

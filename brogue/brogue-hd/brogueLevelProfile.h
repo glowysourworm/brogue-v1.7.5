@@ -1,11 +1,10 @@
 #pragma once
 
-#include "dungeonDeclaration.h"
+#include "dungeon.h"
 #include "randomGenerator.h"
-#include <map>
+#include "simpleHash.h"
 
-using namespace std;
-
+using namespace brogueHd::component;
 using namespace brogueHd::backend::generator;
 using namespace brogueHd::backend::model::game;
 
@@ -30,13 +29,13 @@ namespace brogueHd::backend::model
 
 		randomGenerator* _randomGenerator;
 
-		std::map<roomTypes, brogueRoomInfo>* _roomInfo;
+		simpleHash<roomTypes, brogueRoomInfo>* _roomInfo;
 
 		// Room Frequency static data
-		std::map<levelTypes, std::map<roomTypes, short>> _roomFrequencyMap;
+		simpleHash<levelTypes, simpleHash<roomTypes, short>*>* _roomFrequencyMap;
 
 		// Corridor static data
-		std::map<levelTypes, short> _corridorFrequencyMap;
+		simpleHash<levelTypes, short>* _corridorFrequencyMap;
 
 		short _depth;
 		levelTypes _levelType;

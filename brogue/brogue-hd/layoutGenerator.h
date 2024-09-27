@@ -1,5 +1,7 @@
 #pragma once
 
+#include "broguedef.h"
+#include "simpleList.h"
 #include "accretionTile.h"
 #include "brogueLayout.h"
 #include "brogueLevel.h"
@@ -7,6 +9,7 @@
 #include "roomGenerator.h"
 #include "randomGenerator.h"
 
+using namespace brogueHd::component;
 using namespace brogueHd::backend::model;
 
 namespace brogueHd::backend::generator
@@ -22,7 +25,7 @@ namespace brogueHd::backend::generator
 		layoutGenerator(randomGenerator* randomGenerator);
 		~layoutGenerator();
 
-		void initialize(const brogueLevelProfile& profile);
+		void initialize(brogueLevelProfile* profile);
 		void clear();
 
 		brogueLayout* generateLayout();
@@ -51,11 +54,11 @@ namespace brogueHd::backend::generator
 
 		grid<gridLocator>* _grid;
 
-		std::vector<accretionTile>* _roomTiles;
+		simpleList<accretionTile>* _roomTiles;
 
 		graph<gridLocatorNode, gridLocatorEdge>* _delaunayGraph;
 
-		brogueLevelProfile _profile;
+		brogueLevelProfile* _profile;
 
 		bool _initialized;
 

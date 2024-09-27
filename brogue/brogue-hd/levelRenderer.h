@@ -5,7 +5,11 @@
 #include "openglRenderer.h"
 #include "brogueView.h"
 
-namespace brogueHd
+using namespace brogueHd::backend::model;
+using namespace brogueHd::backend::generator;
+using namespace brogueHd::frontend::opengl;
+
+namespace brogueHd::frontend::renderer
 {
 	class levelRenderer : public openglRenderer
 	{

@@ -8,7 +8,7 @@ namespace brogueHd::backend::math
 		T x;
 		T y;
 
-        public T dot(vector<T> vector)
+        T dot(vector<T> vector)
         {
             return (x * vector.x) + (y * vector.y);
         }
@@ -16,7 +16,7 @@ namespace brogueHd::backend::math
         /// <summary>
         /// Returns the value of the cross product (casted in 3 dimensions)
         /// </summary>
-        public T cross(vector<T> vector)
+        T cross(vector<T> vector)
         {
             return (x * vector.y) - (vector.x * y);
         }

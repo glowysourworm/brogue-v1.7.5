@@ -29,7 +29,7 @@ namespace brogueHd::component
     }
 
     template<isComparable K, typename T>
-    void simpleBST<K, T>::set(K key, T value)
+    void simpleBST<K, T>::insert(K key, T value)
     {
         // Insert value into the tree -> Rebalance the tree
         _root = this->insertImpl(_root, key, value);
@@ -61,24 +61,29 @@ namespace brogueHd::component
     }
 
     template<isComparable K, typename T>
-    simpleBSTNode<K, T>* simpleBST<K, T>::get(K key)
+    T simpleBST<K, T>::get(K key)
     {
         // Utilize dictionary for O(1) lookup
         if (_nodeMap->contains(key))
-            return _nodeMap->get(key);
+            return _nodeMap->get(key)->value;
 
         else
             brogueException::show("Trying to retrieve hash-backed node from BST without checking");
     }
 
     template<isComparable K, typename T>
-    simpleBSTNode<K, T>* simpleBST<K, T>::search(K key)
+    T simpleBST<K, T>::search(K key)
     {
         // Utilize dictionary for O(1) lookup
         if (_nodeMap->contains(key))
-            return _nodeMap->get(key);
+            return _nodeMap->get(key)->value;
 
-        return this->searchImpl(key, _root);
+        simpleBSTNode<K, V>* node = this->searchImpl(key, _root);
+
+        if (node != NULL)
+            return node->value;
+
+        return NULL;
     }
 
     template<isComparable K, typename T>

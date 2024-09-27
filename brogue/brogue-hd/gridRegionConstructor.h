@@ -3,7 +3,9 @@
 #include "grid.h"
 #include "gridRect.h"
 #include "gridDefinitions.h"
+#include "simpleHash.h"
 
+using namespace brogueHd::component;
 using namespace brogueHd::backend::model::layout;
 
 namespace brogueHd::backend::model::construction
@@ -50,18 +52,18 @@ namespace brogueHd::backend::model::construction
 
         grid<T>* _grid;
 
-        std::map<T, T> _locations;
-        std::map<T, T> _edgeLocations;
+        simpleHash<T, T>* _locations;
+        simpleHash<T, T>* _edgeLocations;
 
-        std::map<T, T> _northEdges;
-        std::map<T, T> _southEdges;
-        std::map<T, T> _eastEdges;
-        std::map<T, T> _westEdges;
+        simpleHash<T, T>* _northEdges;
+        simpleHash<T, T>* _southEdges;
+        simpleHash<T, T>* _eastEdges;
+        simpleHash<T, T>* _westEdges;
 
-        std::map<T, T> _nwCorners;
-        std::map<T, T> _neCorners;
-        std::map<T, T> _seCorners;
-        std::map<T, T> _swCorners;
+        simpleHash<T, T>* _nwCorners;
+        simpleHash<T, T>* _neCorners;
+        simpleHash<T, T>* _seCorners;
+        simpleHash<T, T>* _swCorners;
 
         gridRect _calculatedBoundary;
 

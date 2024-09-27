@@ -2,6 +2,9 @@
 
 #include "broguedef.h"
 #include "color.h"
+#include "brogueCellDisplay.h"
+
+using namespace brogueHd::backend::model::layout;
 
 namespace brogueHd
 {
@@ -12,7 +15,7 @@ namespace brogueHd
 		signed long hotkey[10];		// up to 10 hotkeys to trigger the button
 		color buttonColor;			// background of the button; further gradient-ized when displayed
 		short opacity;				// further reduced by 50% if not enabled
-		uchar symbol[COLS];			// Automatically replace the nth asterisk in the button label text with
+		char symbol[COLS];			// Automatically replace the nth asterisk in the button label text with
 									// the nth character supplied here, if one is given.
 									// (Primarily to display magic character and item symbols in the inventory display.)
 		unsigned long flags;
@@ -53,8 +56,8 @@ namespace brogueHd
 		short winHeight;
 
 		// Graphical buffers:
-		cellDisplayBuffer dbuf[COLS][ROWS]; // Where buttons are drawn.
-		cellDisplayBuffer rbuf[COLS][ROWS]; // Reversion screen state.
+		brogueCellDisplay dbuf[COLS][ROWS]; // Where buttons are drawn.
+		brogueCellDisplay rbuf[COLS][ROWS]; // Reversion screen state.
 
 	} buttonState;
 }

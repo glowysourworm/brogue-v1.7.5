@@ -12,6 +12,8 @@ namespace brogueHd::backend::math
 		{ numberType } -> std::convertible_to<short>;
 		{ numberType } -> std::convertible_to<long>;
 		{ numberType } -> std::convertible_to<int>;
+		{ numberType } -> std::convertible_to<float>;
+		{ numberType } -> std::convertible_to<double>;
 	};
 
 	template<brogueMathType TMath>

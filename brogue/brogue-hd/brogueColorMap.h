@@ -1,8 +1,8 @@
 #pragma once
 #include "colorConstants.h"
-#include <map>
+#include "simpleHash.h"
 
-using namespace std;
+using namespace brogueHd::component;
 using namespace brogueHd::backend::model::game;
 
 namespace brogueHd::backend::model
@@ -37,15 +37,15 @@ namespace brogueHd::backend::model
 		color getColor(interfaceColors colorSelector) const;
 
 	private:
-		std::map<gameColors, color>* _gameColors;
-		std::map<boltColors, color>* _boltColors;
-		std::map<tileColors, color>* _tileColors;
-		std::map<creatureColors, color>* _creatureColors;
-		std::map<lightColors, color>* _lightColors;
-		std::map<flareColors, color>* _flareColors;
-		std::map<colorMultipliers, color>* _colorMultipliers;
-		std::map<bloodColors, color>* _bloodColors;
-		std::map<gasColors, color>* _gasColors;
-		std::map<interfaceColors, color>* _interfaceColors;
+		simpleHash<gameColors, color>* _gameColors;
+		simpleHash<boltColors, color>* _boltColors;
+		simpleHash<tileColors, color>* _tileColors;
+		simpleHash<creatureColors, color>* _creatureColors;
+		simpleHash<lightColors, color>* _lightColors;
+		simpleHash<flareColors, color>* _flareColors;
+		simpleHash<colorMultipliers, color>* _colorMultipliers;
+		simpleHash<bloodColors, color>* _bloodColors;
+		simpleHash<gasColors, color>* _gasColors;
+		simpleHash<interfaceColors, color>* _interfaceColors;
 	};
 }

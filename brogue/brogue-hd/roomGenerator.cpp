@@ -1,11 +1,14 @@
+#pragma once
+
 #include "roomGenerator.h"
-#include "extensionDefinitions.h"
-#include "vectorExtension.h"
 #include "gridDefinitions.h"
 #include "gridRegion.h"
 #include "brogueMath.h"
+#include "brogueCell.h"
 #include "gridExtension.h"
+#include "simpleList.h"
 
+using namespace brogueHd::component;
 using namespace brogueHd::backend::math;
 using namespace brogueHd::backend::extension;
 using namespace brogueHd::backend::model::layout;
@@ -53,13 +56,13 @@ namespace brogueHd::backend::generator
 
 		// Locate regions using flood fill method:  Find the max area region
 		gridRegion<gridLocator>* maxRegion;
-		std::vector<gridRegion<gridLocator>*> validRegions;
+		simpleList<gridRegion<gridLocator>*> validRegions;
 
 		// (MEMORY) Locate Regions
-		std::vector<gridRegion<gridLocator>*> regions = regionLocator.locateRegions(designGrid);
+		simpleList<gridRegion<gridLocator>*> regions = regionLocator.locateRegions(designGrid);
 
 		// Filter regions to comply to size constraints
-		validRegions = vectorExtension<gridRegion<gridLocator>*>::where(regions, [&minSize, &maxSize](bool(gridRegion<T>* region))
+		validRegions = regions.where([&minSize, &maxSize](gridRegion<gridLocator>* region)
 		{
 			return region->getBoundary().width >= minSize.width &&
 				   region->getBoundary().width <= maxSize.width &&
@@ -68,7 +71,7 @@ namespace brogueHd::backend::generator
 		});
 
 		// Select largest area region from valid regions
-		maxRegion = vectorExtensionSelectors<gridRegion<gridLocator>*, long>::maxOf(validRegions, [](gridRegion<T>* region)
+		maxRegion = validRegions.maxOf<short>([](gridRegion<gridLocator>* region)
 		{
 			return region->getBoundary().area();
 		});
@@ -91,8 +94,8 @@ namespace brogueHd::backend::generator
 			regionConstructor.add(column, row, cell);
 		});
 
-		// (MEMORY) Don't need the region pointers. Data is alive in the regionConstructor
-		vectorExtension<gridRegion<gridLocator>*>::forEach(regions, [](gridRegion<T>* region)
+		// (MEMORY) Don't need the region containers. Data is alive in the regionConstructor
+		regions.forEach([](gridRegion<gridLocator>* region)
 		{
 			delete region;
 		});
@@ -115,15 +118,15 @@ namespace brogueHd::backend::generator
 		gridRect room2(roomX2, roomY2, roomWidth2, roomHeight2);
 
 		// Add Room 1
-		gridRectExtension::iterate(room1, [&regionConstructor](short column, short row) ->
+		gridRectExtension::iterate(room1, [&regionConstructor](short column, short row)
 		{
-			regionConstructor.addCell(column, row, brogueCell(column, row));
+			regionConstructor.add(column, row, gridLocator(column, row));
 		});
 
 		// Add Room 2
 		gridRectExtension::iterate(room2, [&regionConstructor](short column, short row)
 		{
-			regionConstructor.addCell(column, row, brogueCell(column, row));
+			regionConstructor.add(column, row, gridLocator(column, row));
 		});
 	}
 
@@ -148,13 +151,13 @@ namespace brogueHd::backend::generator
 		// Add Room 1
 		gridRectExtension::iterate(room1, [&regionConstructor](short column, short row)
 		{
-			regionConstructor.addCell(column, row, brogueCell(column, row));
+			regionConstructor.add(column, row, gridLocator(column, row));
 		});
 
 		// Add Room 2
 		gridRectExtension::iterate(room2, [&regionConstructor](short column, short row)
 		{
-			regionConstructor.addCell(column, row, brogueCell(column, row));
+			regionConstructor.add(column, row, gridLocator(column, row));
 		});
 	}
 
@@ -180,13 +183,13 @@ namespace brogueHd::backend::generator
 		// Add Room 1
 		gridRectExtension::iterate(room1, [&regionConstructor](short column, short row)
 		{
-			regionConstructor.addCell(column, row, brogueCell(column, row));
+			regionConstructor.add(column, row, gridLocator(column, row));
 		});
 
 		// Add Room 2
 		gridRectExtension::iterate(room2, [&regionConstructor](short column, short row)
 		{
-			regionConstructor.addCell(column, row, brogueCell(column, row));
+			regionConstructor.add(column, row, gridLocator(column, row));
 		});
 	}
 
@@ -202,7 +205,7 @@ namespace brogueHd::backend::generator
 		// Add Room
 		gridRectExtension::iterate(room, [&regionConstructor](short column, short row)
 		{
-			regionConstructor.addCell(column, row, brogueCell(column, row));
+			regionConstructor.add(column, row, gridLocator(column, row));
 		});
 	}
 
@@ -262,7 +265,7 @@ namespace brogueHd::backend::generator
 		gridRectExtension::iterateInCircle(gridRect(0, 0, 2, 2), [&setGrid, &regionConstructor](short column, short row)
 		{
 			setGrid.set(column, row, true);
-			regionConstructor.addCell(brogueCell(column, row));
+			regionConstructor.add(column, row, gridLocator(column, row));
 		});
 
 		minX = DCOLS / 2 - 3;
@@ -283,7 +286,7 @@ namespace brogueHd::backend::generator
 				gridRectExtension::iterateInCircle(gridRect(x, y, 2, 2), [&setGrid, &regionConstructor](short column, short row)
 				{
 					setGrid.set(column, row, true);
-					regionConstructor.addCell(brogueCell(column, row));
+					regionConstructor.add(column, row, gridLocator(column, row));
 				});
 
 				minX = brogueMath<short>::max(1, brogueMath<short>::min(x - 3, minX));

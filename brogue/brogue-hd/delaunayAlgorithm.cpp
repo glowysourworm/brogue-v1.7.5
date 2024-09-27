@@ -2,11 +2,9 @@
 
 #include "delaunayAlgorithm.h"
 #include "triangle.h"
-#include "vectorExtension.h"
-#include <vector>
+#include "simpleList.h"
 
-using namespace std;
-
+using namespace brogueHd::component;
 using namespace brogueHd::backend::extension;
 
 namespace brogueHd::backend::math
@@ -23,7 +21,7 @@ namespace brogueHd::backend::math
     }
 
     template<isGridLocatorNode TNode, isGridLocatorEdge TEdge>
-    graph<TNode, TEdge>* delaunayAlgorithm<TNode, TEdge>::run(const std::vector<TNode>& vertices)
+    graph<TNode, TEdge>* delaunayAlgorithm<TNode, TEdge>::run(const simpleList<TNode>& vertices)
     {
         if (vertices.count() < 3)
             return this->createDefaultGraph(vertices);
@@ -32,7 +30,7 @@ namespace brogueHd::backend::math
     }
 
     template<isGridLocatorNode TNode, isGridLocatorEdge TEdge>
-    graph<TNode, TEdge>* delaunayAlgorithm<TNode, TEdge>::bowyerWatson(const std::vector<TNode>& vertices)
+    graph<TNode, TEdge>* delaunayAlgorithm<TNode, TEdge>::bowyerWatson(const simpleList<TNode>& vertices)
     {
         if (vertices.count() < 3)
         {
@@ -78,7 +76,7 @@ namespace brogueHd::backend::math
         short left = std::numeric_limits<short>::max();
         short right = std::numeric_limits<short>::min();
 
-        vectorExtension<TNode>::forEach(vertices, [](TNode vertex)
+        vertices.forEach([](TNode vertex)
         {
             if (vertex.locator.row < top)
                 top = vertex.locator.row;
@@ -102,15 +100,15 @@ namespace brogueHd::backend::math
         //
         triangle<short> superTriangle(point1, point2, point3);
 
-        std::vector<triangle<short>> triangles;
-        std::vector<triangle<short>> badTriangles;
-        std::vector<triangle<short>> otherBadTriangles;
+        simpleList<triangle<short>> triangles;
+        simpleList<triangle<short>> badTriangles;
+        simpleList<triangle<short>> otherBadTriangles;
 
-        triangles.push_back(superTriangle);
+        triangles.add(superTriangle);
 
         // Add points: one-at-a-time
         //
-        vectorExtension<TNode>::forEach(vertices, [&triangles, &badTriangles, &otherBadTriangles](TNode graphVertex)
+        vertices.forEach([&triangles, &badTriangles, &otherBadTriangles](TNode graphVertex)
         {
             point<T> vertexPoint(graphVertex.locator.column, graphVertex.locator.row);
             
@@ -118,7 +116,7 @@ namespace brogueHd::backend::math
             //
             // Remove those triangles from the mesh and return them
             //
-            badTriangles = vectorExtension<triangle<short>>::remove(triangles, [&vertexPoint](triangle<short> triangle)
+            badTriangles = triangles.remove([&vertexPoint](triangle<short> triangle)
             {
                 return triangle.circumCircleContains(vertexPoint);
             });
@@ -126,46 +124,46 @@ namespace brogueHd::backend::math
             // Use edges from the polygon hole to create new triangles. This should be an "outline" of
             // the bad triangles. So, use all edges from the bad triangles except for shared edges.
             //
-            vectorExtension<triangle<short>>::forEach(badTriangles, [&otherBadTriangles, &vertexPoint](triangle<short> badTriangle)
+            badTriangles.forEach([&otherBadTriangles, &vertexPoint](triangle<short> badTriangle)
             {
-                otherBadTriangles = vectorExtension<triangle<short>>::except(badTriangles, [](triangle<short> triangle)
+                otherBadTriangles = badTriangles.except([](triangle<short> triangle)
                 {
                     return triangle == badTriangle;
                 });
 
-                bool edge12 = vectorExtension<triangle<short>>::any(otherBadTriangles, [&badTriangle](triangle<short> triangle)
+                bool edge12 = otherBadTriangles.any([&badTriangle](triangle<short> triangle)
                 {
                     return triangle.containsEqualEdge(triangle.point1, triangle.point2);
                 });
 
-                bool edge23 = vectorExtension<triangle<short>>::any(otherBadTriangles, [&badTriangle](triangle<short> triangle)
+                bool edge23 = otherBadTriangles.any([&badTriangle](triangle<short> triangle)
                 {
                     return triangle.containsEqualEdge(triangle.point2, triangle.point3);
                 });
 
-                bool edge31 = vectorExtension<triangle<short>>::any(otherBadTriangles, [&badTriangle](triangle<short> triangle)
+                bool edge31 = otherBadTriangles.any([&badTriangle](triangle<short> triangle)
                 {
                     return triangle.containsEqualEdge(triangle.point3, triangle.point1);
                 });
 
                 // Check Shared Edges 1 -> 2
                 if (!edge12)
-                    triangles.push_back(triangle<short>(badTriangle.point1, badTriangle.point2, vertexPoint));
+                    triangles.add(triangle<short>(badTriangle.point1, badTriangle.point2, vertexPoint));
 
                 // 2 -> 3
                 if (!edge23)
-                    triangles.push_back(triangle<short>(badTriangle.point2, badTriangle.point3, vertexPoint));
+                    triangles.add(triangle<short>(badTriangle.point2, badTriangle.point3, vertexPoint));
 
                 // 3 -> 1
                 if (!edge31)
-                    triangles.push_back(triangle<short>(badTriangle.point3, badTriangle.point1, vertexPoint));
+                    triangles.add(triangle<short>(badTriangle.point3, badTriangle.point1, vertexPoint));
             });
         });
 
         // Create the delaunay graph using distinct edges
-        std::vector<TEdge> delaunayEdges;
+        simpleList<TEdge> delaunayEdges;
 
-        vectorExtension<triangle<short>>::forEach(triangles, [&delaunayEdges, &point1, &point2, &point3](triangle<short> triangle)
+        triangles.forEach([&delaunayEdges, &point1, &point2, &point3](triangle<short> triangle)
         {
             // (Cleaning Up) Remove any edges shared with the "super-triangle" vertices
             //
@@ -179,12 +177,12 @@ namespace brogueHd::backend::math
                 triangle.point2 != point3)
             {
                 // Check for equivalent edge
-                if (!vectorExtension<TEdge>::any(delaunayEdges, [&triangle](TEdge edge) 
+                if (!delaunayEdges.any([&triangle](TEdge edge)
                 {
                     return edge.isEquivalent(triangle.point1, triangle.point2);
                 }))
                 {
-                    delaunayEdges.push_back(this->graphEdgeConstructor(triangle.point1, triangle.point2));
+                    delaunayEdges.add(this->graphEdgeConstructor(triangle.point1, triangle.point2));
                 }
             }
 
@@ -197,12 +195,12 @@ namespace brogueHd::backend::math
                 triangle.Point3 != point3)
             {
                 // Check for equivalent edge
-                if (!vectorExtension<TEdge>::any(delaunayEdges, [&triangle](TEdge edge)
+                if (!delaunayEdges.any([&triangle](TEdge edge)
                 {
                     return edge.isEquivalent(triangle.point2, triangle.point3);
                 }))
                 {
-                    delaunayEdges.push_back(this->graphEdgeConstructor(triangle.point2, triangle.point3));
+                    delaunayEdges.add(this->graphEdgeConstructor(triangle.point2, triangle.point3));
                 }
             }
 
@@ -215,12 +213,12 @@ namespace brogueHd::backend::math
                 triangle.Point1 != point3)
             {
                 // Check for equivalent edge
-                if (!vectorExtension<TEdge>::any(delaunayEdges, [&triangle](TEdge edge)
+                if (!delaunayEdges.any([&triangle](TEdge edge)
                 {
                     return edge.isEquivalent(triangle.point3, triangle.point1);
                 }))
                 {
-                    delaunayEdges.push_back(this->graphEdgeConstructor(triangle.point3, triangle.point1));
+                    delaunayEdges.add(this->graphEdgeConstructor(triangle.point3, triangle.point1));
                 }
             }
         }

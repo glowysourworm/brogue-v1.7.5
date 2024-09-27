@@ -1,7 +1,7 @@
 #pragma once
 
 #include "color.h"
-#include "mathdef.h"
+#include "randomRange.h"
 #include "itemConstants.h"
 #include "creatureConstants.h"
 #include <string>

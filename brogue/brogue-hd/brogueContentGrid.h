@@ -3,6 +3,9 @@
 #include "broguePlayer.h"
 #include "brogueItem.h"
 #include "brogueCreature.h"
+#include "simpleList.h"
+
+using namespace brogueHd::component;
 
 namespace brogueHd::backend::model
 {
@@ -23,23 +26,23 @@ namespace brogueHd::backend::model
 		//brogueGrid* _grid;
 
 		// All contents
-		grid<brogueObject*> _contentGrid;
+		grid<brogueObject*>* _contentGrid;
 
 		// Content Collections:  Sub-groupings of contents kept in parallel to the grid
-		std::vector<brogueCreature*> _enemies;
-		std::vector<brogueCreature*> _friendlies;
-		std::vector<brogueCreature*> _dormantEnemies;
+		simpleList<brogueCreature*>* _enemies;
+		simpleList<brogueCreature*>* _friendlies;
+		simpleList<brogueCreature*>* _dormantEnemies;
 
-		std::vector<brogueItem*> _keys;
-		std::vector<brogueItem*> _food;
-		std::vector<brogueItem*> _potions;
-		std::vector<brogueItem*> _weapons;
-		std::vector<brogueItem*> _armor;
-		std::vector<brogueItem*> _wands;
-		std::vector<brogueItem*> _staves;
-		std::vector<brogueItem*> _rings;
-		std::vector<brogueItem*> _charms;
-		std::vector<brogueItem*> _scrolls;
+		simpleList<brogueItem*>* _keys;
+		simpleList<brogueItem*>* _food;
+		simpleList<brogueItem*>* _potions;
+		simpleList<brogueItem*>* _weapons;
+		simpleList<brogueItem*>* _armor;
+		simpleList<brogueItem*>* _wands;
+		simpleList<brogueItem*>* _staves;
+		simpleList<brogueItem*>* _rings;
+		simpleList<brogueItem*>* _charms;
+		simpleList<brogueItem*>* _scrolls;
 	};
 }
 

@@ -59,14 +59,12 @@ namespace brogueHd::component
         simpleBST<K, T>::simpleBST();
         simpleBST<K, T>::~simpleBST();
 
-        void simpleBST<K, T>::set(K key, T value);
+        void simpleBST<K, T>::insert(K key, T value);
         bool simpleBST<K, T>::remove(K key);
         bool simpleBST<K, T>::containsKey(K key);
 
-        simpleBSTNode<K, T>* simpleBST<K, T>::get(K key);
-        simpleBSTNode<K, T>* simpleBST<K, T>::search(K key);
-        simpleBSTNode<K, T>* simpleBST<K, T>::successor(K searchKey);
-        simpleBSTNode<K, T>* simpleBST<K, T>::predecessor(K searchKey);
+        T simpleBST<K, T>::get(K key);
+        T simpleBST<K, T>::search(K key);
 
         T simpleBST<K, T>::min();
         K simpleBST<K, T>::minKey();
@@ -79,6 +77,9 @@ namespace brogueHd::component
         {
             return (key1 > key2) - (key1 < key2);
         }
+
+        simpleBSTNode<K, T>* simpleBST<K, T>::successor(K searchKey);
+        simpleBSTNode<K, T>* simpleBST<K, T>::predecessor(K searchKey);
 
         simpleBSTNode<K, T>* simpleBST<K, T>::insertImpl(simpleBSTNode<K, T>* node, K key, T value);
         simpleBSTNode<K, T>* simpleBST<K, T>::removalImpl(simpleBSTNode<K, T>* node, K key);

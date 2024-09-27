@@ -1,6 +1,6 @@
 #pragma once
 
-#include "simpleIteration.h"
+#include "simple.h"
 #include "simpleArray.h"
 #include "simpleList.h"
 #include <functional>
@@ -60,7 +60,9 @@ namespace brogueHd::component
 		V operator[](K key) const;
 
 		V get(K key);
-		void set(K key, V value);
+		void add(K key, V value);
+
+		simplePair<K,V> getAt(int index);
 
 		bool contains(K key) const;
 		int count() const;
@@ -81,6 +83,7 @@ namespace brogueHd::component
 		void forEach(simpleHashDelegates<K, V>::callback callback);
 		K firstKey(simpleHashDelegates<K, V>::predicate predicate);
 		K firstOrDefaultKey(simpleHashDelegates<K, V>::predicate predicate);
+		simpleList<simplePair<K, V>> removeWhere(simpleHashDelegates<K, V>::predicate predicate);
 		
 		template<typename VResult>
 		simpleList<VResult> selectFromValues(simpleHashDelegates<K, V>::selector selector);
@@ -94,6 +97,9 @@ namespace brogueHd::component
 
 		// Static Hash Table (with dynamic buckets)
 		simpleArray<simpleList<simplePair<K, V>>*>* _table;
+
+		// List follower for the primary table - for index lookup
+		simpleList<simplePair<K, V>>* _list;
 
 		// Bucket Sizes (prevents iteration of bucket lists during set(..))
 		int _maxBucketSize;

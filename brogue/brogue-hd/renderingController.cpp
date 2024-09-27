@@ -1,6 +1,7 @@
 #include "renderingController.h"
 #include "gameConstants.h"
 
+using namespace brogueHd::frontend::opengl;
 using namespace brogueHd::backend::modelConstant;
 
 namespace brogueHd::backend::controller

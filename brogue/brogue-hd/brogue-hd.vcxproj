@@ -245,6 +245,7 @@
     <ClInclude Include="itemTemplate.h" />
     <ClInclude Include="linearGenerationParameters.h" />
     <ClInclude Include="machineTemplate.h" />
+    <ClInclude Include="randomRange.h" />
     <ClInclude Include="simpleArray.h" />
     <ClInclude Include="simpleBST.h" />
     <ClInclude Include="blueprintDeclaration.h" />
@@ -292,7 +293,6 @@
     <ClInclude Include="light.h" />
     <ClInclude Include="lightConstants.h" />
     <ClInclude Include="machineConstants.h" />
-    <ClInclude Include="mathdef.h" />
     <ClInclude Include="messageData.h" />
     <ClInclude Include="noiseGenerator.h" />
     <ClInclude Include="openglRenderer.h" />

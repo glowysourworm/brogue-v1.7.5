@@ -2,11 +2,13 @@
 
 #include "broguedef.h"
 #include "gameConstants.h"
+#include "simpleList.h"
 #include <iostream>
-#include <vector>
 #include <time.h>
 
 using namespace std;
+
+using namespace brogueHd::component;
 
 namespace brogueHd::backend::model::io
 {
@@ -104,7 +106,7 @@ namespace brogueHd::backend::model::io
 	struct brogueEventFile 
 	{
 		unsigned long eventCount;
-		std::vector<brogueEvent> eventList;
+		simpleList<brogueEvent> eventList;
 
 		void serialize(std::ostream& stream)
 		{
@@ -128,7 +130,7 @@ namespace brogueHd::backend::model::io
 			// Event List
 			for (int index = 0; index < result.eventCount; index++)
 			{
-				result.eventList.push_back(brogueEvent::deserialize(stream));
+				result.eventList.add(brogueEvent::deserialize(stream));
 			}
 		}
 	};
@@ -137,7 +139,7 @@ namespace brogueHd::backend::model::io
 	{
 
 		unsigned long scoreCount;
-		std::vector<brogueScoreEntry> scoreList;
+		simpleList<brogueScoreEntry> scoreList;
 
 		brogueScoresFile()
 		{
@@ -150,7 +152,7 @@ namespace brogueHd::backend::model::io
 
 		void add(brogueScoreEntry entry)
 		{
-			scoreList.push_back(entry);
+			scoreList.add(entry);
 		}
 
 		void serialize(std::ostream& stream)
@@ -175,7 +177,7 @@ namespace brogueHd::backend::model::io
 			// Event List
 			for (int index = 0; index < result->scoreCount; index++)
 			{
-				result->scoreList.push_back(brogueScoreEntry::deserialize(stream));
+				result->scoreList.add(brogueScoreEntry::deserialize(stream));
 			}
 
 			return result;

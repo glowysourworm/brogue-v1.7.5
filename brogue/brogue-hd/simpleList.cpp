@@ -14,6 +14,16 @@ namespace brogueHd::component
 		_sizeAlloc = 0;
 	}
 	template<typename T>
+	simpleList<T>::simpleList(T* anArray)
+	{
+		_list = NULL;
+		_size = 0;
+		_sizeAlloc = 0;
+
+		for (int index = 0; index < SIZEOF(anArray); index++)
+			this->add(anArray[index]);
+	}
+	template<typename T>
 	simpleList<T>::~simpleList()
 	{
 		if (_list != NULL)
@@ -85,6 +95,15 @@ namespace brogueHd::component
 		}
 
 		_size--;
+	}
+
+	template<typename T>
+	void simpleList<T>::clear()
+	{
+		delete [] _list;
+
+		_size = 0;
+		_sizeAlloc = 0;
 	}
 
 	template<typename T>
