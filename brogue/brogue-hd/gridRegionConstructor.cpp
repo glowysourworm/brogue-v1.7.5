@@ -1,6 +1,5 @@
 #pragma once
 
-#include "gridExtension.h"
 #include "gridRect.h"
 #include "gridDefinitions.h"
 #include "gridRegionConstructor.h"
@@ -10,7 +9,7 @@
 using namespace std;
 
 using namespace brogueHd::backend::math;
-using namespace brogueHd::backend::extension;
+using namespace brogueHd::component;
 using namespace brogueHd::backend::model::layout;
 
 namespace brogueHd::backend::model::construction
@@ -50,29 +49,28 @@ namespace brogueHd::backend::model::construction
 
         gridRect largestSubRegionRect = calculateLargestRectangle();
 
-        return new gridRegion<TResult>(getKeys(_locations),
-                                        getKeys(_edgeLocations),
-                                        getKeys(_westEdges),
-                                        getKeys(_northEdges),
-                                        getKeys(_eastEdges),
-                                        getKeys(_southEdges),
-                                        getKeys(_nwCorners),
-                                        getKeys(_neCorners),
-                                        getKeys(_seCorners),
-                                        getKeys(_swCorners),
-                                        centroids.ToArray(),
-                                        _grid->getBoundary(),
-                                        _calculatedBoundary,
-                                        largestSubRectangle);
+        return new gridRegion<T>(getKeys(_locations),
+                                    getKeys(_edgeLocations),
+                                    getKeys(_westEdges),
+                                    getKeys(_northEdges),
+                                    getKeys(_eastEdges),
+                                    getKeys(_southEdges),
+                                    getKeys(_nwCorners),
+                                    getKeys(_neCorners),
+                                    getKeys(_seCorners),
+                                    getKeys(_swCorners),
+                                    _grid->getParentBoundary(),
+                                    _calculatedBoundary,
+                                    largestSubRectangle);
     }
 
     template<isGridLocator T>
-    void gridRegionConstructor<T>::add(short column, short row, T item)
+    void gridRegionConstructor<T>::add(short column, short row, T location)
     {
         if (_completed)
             brogueException::show("Trying to add location to a completed region constructor:  gridRegionConstructor.addCell");
 
-        else if (_locations->containsKey(item))
+        else if (_locations->containsKey(location))
             return;
 
         else
@@ -81,7 +79,7 @@ namespace brogueHd::backend::model::construction
                 brogueException::show("Trying to add un-connected cell to the region:  gridRegionConstructor.addCell");
 
             // Keep locations up to date
-            _grid[location] = location;
+            _grid->set(column, row, location);
             _locations->add(location, location);
 
             // Expand the boundary
@@ -94,10 +92,12 @@ namespace brogueHd::backend::model::construction
     {
         gridRegionCosntructor<T>* that = this;
 
-        gridExtension<T>::iterate(grid, [&that](short column, short row, T item)
+        grid.iterate([&that](short column, short row, T item)
         {
             if (item != NULL)
                 that->add(column, row, item);
+
+            return iterationCallback::iterate;
         });
     }
 
@@ -125,6 +125,18 @@ namespace brogueHd::backend::model::construction
         });
 
         _completed = true;
+    }
+
+    template<isGridLocator T>
+    bool gridRegionConstructor<T>::isDefined(short column, short row)
+    {
+        return _grid->isDefined(column, row);
+    }
+
+    template<isGridLocator T>
+    bool gridRegionConstructor<T>::contains(T item)
+    {
+        return _grid->isDefined(item.column, item.row) && (_grid->get(item.column, item.row) == item);
     }
 
     template<isGridLocator T>

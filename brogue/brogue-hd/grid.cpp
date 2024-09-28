@@ -2,7 +2,6 @@
 #include "brogueMath.h"
 #include "gridRegion.h"
 #include "gridDefinitions.h"
-#include "gridExtension.h"
 #include "exceptionHandler.h"
 #include <exception>
 
@@ -216,10 +215,7 @@ namespace brogueHd::backend::model::layout
     template<typename T>
     void grid<T>::set(short column, short row, T value)
     {
-        if (column < 0 ||
-            row < 0 ||
-            column > _columns - 1 ||
-            row > _rows - 1)
+        if (!_relativeBoundary.contains(column, row))
             brogueException::show("Grid out of bounds:  grid.cpp");
 
         if (this->isDefined(column, row))
@@ -229,7 +225,8 @@ namespace brogueHd::backend::model::layout
     }
 
     template<typename T>
-    void grid<T>::setFromRegion(gridRegion<T>* region)
+    template<isGridLocator TLocator>
+    void grid<T>::setFromRegion(gridRegion<TLocator>* region)
     {
         region->iterateLocations([](short column, short row, T item)
         {
@@ -392,6 +389,143 @@ namespace brogueHd::backend::model::layout
             return false;
 
         return true;
+    }
+
+    template<typename T>
+    void grid<T>::iterate(gridDelegates<T>::callback callback)
+    {
+        bool userBreak = false;
+
+        gridRect boundary = this->getRelativeBoundary();
+
+        for (short i = boundary.left(); i <= boundary.right() && !userBreak; i++)
+        {
+            for (short j = boundary.top(); j <= boundary.bottom() && !userBreak; j++)
+            {
+                if (callback(i, j, this->get(i, j)) == iterationCallback::breakAndReturn)
+                    userBreak = true;
+            }
+        }
+    }
+
+    template<typename T>
+    void grid<T>::iterateOutward(short centerColumn,
+                                 short centerRow,
+                                 short distance,
+                                 gridDelegates<T>::callback callback)
+    {
+        bool userBreak = false;
+
+        gridRect boundary = this->getRelativeBoundary();
+
+        short left = brogueMath<short>::clamp(centerColumn - distance, boundary.left(), boundary.right());
+        short right = brogueMath<short>::clamp(centerColumn + distance, boundary.left(), boundary.right());
+        short top = brogueMath<short>::clamp(centerRow - distance, boundary.top(), boundary.bottom());
+        short bottom = brogueMath<short>::clamp(centerColumn + distance, boundary.top(), boundary.bottom());
+
+        for (short i = left; i <= right && !userBreak; i++)
+        {
+            for (short j = top; j <= bottom && !userBreak; j++)
+            {
+                if (callback(i, j, this->get(i, j)) == iterationCallback::breakAndReturn)
+                    userBreak = true;
+            }
+        }
+    }
+
+    template<typename T>
+    void grid<T>::iterateIn(gridRect boundary, gridDelegates<T>::callback callback)
+    {
+        bool userBreak = false;
+
+        gridRect gridBoundary = this->getRelativeBoundary();
+
+        short safeRight = brogueMath<short>::clamp(boundary.right(), gridBoundary.left(), gridBoundary.right());
+        short safeBottom = brogueMath<short>::clamp(boundary.bottom(), gridBoundary.top(), gridBoundary.bottom());
+
+        for (short i = boundary.left(); i <= safeRight && !userBreak; i++)
+        {
+            for (short j = boundary.top(); j <= safeBottom && !userBreak; j++)
+            {
+                if (callback(i, j, this->get(i, j)) == iterationCallback::breakAndReturn)
+                    userBreak = true;
+            }
+        }
+    }
+
+    template<typename T>
+    void grid<T>::iterateAround(short column, short row, bool withinBounds, gridDelegates<T>::callback callback)
+    {
+        short newX, newY;
+
+        bool userBreak = false;
+
+        for (short i = column - 1; i < column + 1 && !userBreak; i++)
+        {
+            for (short j = row - 1; j < row + 1 && !userBreak; j++)
+            {
+                if (withinBounds)
+                {
+                    if (this->isInBounds(i, j))
+                        userBreak = callback(i, j, this->get(i, j));
+                }
+                else
+                {
+                    userBreak = callback(i, j, this->get(i, j));
+                }
+            }
+        }
+    }
+
+    template<typename T>
+    void grid<T>::iterateAroundCardinal(short column, short row, bool withinBounds, gridDelegates<T>::callback callback)
+    {
+        iterationCallback response = iterationCallback::iterate;
+
+        // North
+        T north = grid->getAdjacentUnsafe(column, row - 1);
+
+        if (this->isInBounds(column, row - 1))
+            response = callback(column, row - 1, north);
+
+        else if (!withinBounds)
+            response = callback(column, row - 1, north);
+
+        if (response == iterationCallback::breakAndReturn)
+            return;
+
+        // South
+        T south = this->getAdjacentUnsafe(column, row + 1);
+
+        if (this->isInBounds(column, row + 1))
+            response = callback(column, row + 1, south);
+
+        else if (!withinBounds)
+            response = callback(column, row + 1, south);
+
+        if (response == iterationCallback::breakAndReturn)
+            return;
+
+        // East
+        T east = this->getAdjacentUnsafe(column + 1, row);
+
+        if (this->isInBounds(column + 1, row))
+            response = callback(column + 1, row, east);
+
+        else if (!withinBounds)
+            response = callback(column + 1, row, east);
+
+        if (response == iterationCallback::breakAndReturn)
+            return;
+
+        // West
+        T west = this->getAdjacentUnsafe(column - 1, row);
+
+        if (this->isInBounds(column - 1, row))
+            response = callback(column - 1, row, west);
+
+        else if (!withinBounds)
+            response = callback(column - 1, row, west);
     }
 
     ///// <summary>

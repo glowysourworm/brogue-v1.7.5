@@ -2,7 +2,6 @@
 
 #include "graphNode.h"
 #include "graphEdge.h"
-#include "gridLocatorNode.h"
 #include "gridLocatorEdge.h"
 #include <functional>
 
@@ -17,17 +16,18 @@ namespace brogueHd::backend::math
 		{ a } -> std::convertible_to<graphNode>;
 	};
 
-	template<typename TEdge>
-	concept graphEdgeType = requires(TEdge a)
+	template<typename TEdge, typename TNode>
+	concept graphEdgeType = requires(TEdge a, TNode b)
 	{
-		{ a } -> std::convertible_to<graphEdge>;
+		{ a } -> std::convertible_to<graphEdge<TNode>>;
+		{ b } -> std::convertible_to<graphNode>;
 	};
 
 	// Grid specific graph constraints
 	template<typename TNode>
 	concept isGridLocatorNode = requires(TNode a)
 	{
-		{ a } -> std::convertible_to<gridLocatorNode>;
+		{ a } -> std::convertible_to<gridLocator>;
 	};
 
 	template<typename TEdge>
@@ -37,7 +37,7 @@ namespace brogueHd::backend::math
 	};
 
 	// Graph Delegates
-	template<typename TNode, typename TEdge>
+	template<graphNodeType TNode, graphEdgeType<TNode> TEdge>
 	struct graphDelegates
 	{
 		typedef function<TEdge(TNode node1, TNode node2)> edgeConstructor;

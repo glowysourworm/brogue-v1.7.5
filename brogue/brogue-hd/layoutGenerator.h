@@ -8,9 +8,12 @@
 #include "brogueLevelProfile.h"
 #include "roomGenerator.h"
 #include "randomGenerator.h"
+#include "gridLocatorEdge.h"
+#include "gridLocatorNode.h"
 
 using namespace brogueHd::component;
 using namespace brogueHd::backend::model;
+using namespace brogueHd::backend::model::layout;
 
 namespace brogueHd::backend::generator
 {

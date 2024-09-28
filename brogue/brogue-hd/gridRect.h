@@ -1,5 +1,10 @@
 #pragma once
 
+#include "simple.h"
+#include "gridDefinitions.h"
+
+using namespace brogueHd::component;
+
 namespace brogueHd::backend::model::layout
 {
 	struct gridRect
@@ -135,6 +140,38 @@ namespace brogueHd::backend::model::layout
 		{
 			column += columnOffset;
 			row += rowOffset;
+		}
+
+		void iterate(gridRectDelegates::callback callback) const
+		{
+			bool userBreak = false;
+
+			for (short i = left(); i <= right() && !userBreak; i++)
+			{
+				for (short j = top(); j <= bottom() && !userBreak; j++)
+				{
+					if (callback(i, j) == iterationCallback::breakAndReturn)
+						userBreak = true;
+				}
+			}
+		}
+		void iterateInCircle(gridRectDelegates::callback callback) const
+		{
+			bool userBreak = false;
+
+			for (short i = left(); i <= right() && !userBreak; i++)
+			{
+				for (short j = top(); j <= bottom() && !userBreak; j++)
+				{
+					short dx = centerX() - i;
+					short dy = centerY() - j;
+
+					if (((dx * dx) + (dy * dy) <= (width * width)))
+					{
+						userBreak = callback(i, j);
+					}
+				}
+			}
 		}
 	};
 }

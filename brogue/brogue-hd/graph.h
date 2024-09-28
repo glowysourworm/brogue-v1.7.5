@@ -15,7 +15,7 @@ namespace brogueHd::backend::math
     /// <typeparam name="TWeight">Type for the node weight</typeparam>
     //template<GraphTemplate>
 
-    template<graphNodeType TNode, graphEdgeType TEdge>
+    template<graphNodeType TNode, graphEdgeType<TNode> TEdge>
     class graph
     {
     public:

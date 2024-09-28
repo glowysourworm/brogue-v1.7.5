@@ -37,11 +37,11 @@ namespace brogueHd::backend::controller
 		/// <summary>
 		/// Loads game data from file
 		/// </summary>
-		gameData* loadGame(char* path);
+		gameData* loadGame(const char* path);
 
 		/// <summary>
 		/// Loads playback data from file
 		/// </summary>
-		playbackData* loadPlayback(char* path);
+		playbackData* loadPlayback(const char* path);
 	};
 }

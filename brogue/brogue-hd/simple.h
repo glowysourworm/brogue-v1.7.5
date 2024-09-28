@@ -1,5 +1,9 @@
 #pragma once
 
+#include <concepts>
+
+using namespace std;
+
 namespace brogueHd::component
 {
 	/// <summary>
@@ -20,5 +24,17 @@ namespace brogueHd::component
 		{ a > b }  -> std::convertible_to<bool>;
 		{ a >= b } -> std::convertible_to<bool>;
 		{ a == b } -> std::convertible_to<bool>;
+	};
+
+	template<typename T>
+	concept isNumber = requires(T a)
+	{
+		std::same_as<T, double>;
+		std::same_as<T, float>;
+		std::same_as<T, unsigned long>;
+		std::same_as<T, long>;
+		std::same_as<T, int>;
+		std::same_as<T, short>;
+		std::same_as<T, bool>;
 	};
 }

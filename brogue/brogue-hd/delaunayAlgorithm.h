@@ -3,7 +3,6 @@
 #include "graph.h"
 #include "graphAlgorithm.h"
 #include "gridLocatorEdge.h"
-#include "gridLocatorNode.h"
 #include "simpleList.h"
 #include "exceptionHandler.h"
 

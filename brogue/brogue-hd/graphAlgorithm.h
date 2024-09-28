@@ -13,7 +13,7 @@ namespace brogueHd::backend::math
 		graphAlgorithm(graphDelegates<TNode, TEdge>::edgeConstructor graphEdgeConstructor);
 		~graphAlgorithm();
 
-		virtual graph<TNode, TEdge> run(const std::vector<TNode>& vertices);
+		virtual graph<TNode, TEdge>* run(const simpleList<TNode>& vertices);
 
 	protected:
 

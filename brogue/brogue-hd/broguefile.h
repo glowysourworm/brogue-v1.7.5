@@ -132,6 +132,8 @@ namespace brogueHd::backend::model::io
 			//{
 			//	result.eventList.add(brogueEvent::deserialize(stream));
 			//}
+
+			return result;
 		}
 	};
 

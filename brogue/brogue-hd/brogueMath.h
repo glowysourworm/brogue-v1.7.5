@@ -1,5 +1,7 @@
 #pragma once
 
+#include "exceptionHandler.h"
+#include <concepts>
 #include <functional>
 
 using namespace std;
@@ -55,6 +57,20 @@ namespace brogueHd::backend::math
 				return max(x, z);
 
 			return max(y, z);
+		}
+		static TMath sqrt(TMath x)
+		{
+			if (std::is_same<TMath, double>())
+				return sqrt(static_cast<double>(x));
+
+			else if (std::is_same<TMath, float>())
+				return sqrtf(static_cast<float>(x));
+
+			else if (std::is_convertible<TMath, int>())
+				return sqrtl(x);
+
+			else
+				brogueException::show("Unknown sqrt type brogueMath.h");
 		}
 		static TMath clamp(TMath x, TMath low, TMath high)
 		{

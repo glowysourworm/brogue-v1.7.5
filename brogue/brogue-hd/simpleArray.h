@@ -40,8 +40,8 @@ namespace brogueHd::component
 		int size() const;
 
 		T get(int index);
-		T operator[](int index) const override;
-		T& operator[](int index) override;
+		T operator[](int index) const;
+		T& operator[](int index);
 
 		void set(int index, T value);		
 		bool contains(T item);

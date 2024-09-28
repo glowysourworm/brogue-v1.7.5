@@ -3,6 +3,7 @@
 #include "broguePlayer.h"
 #include "brogueItem.h"
 #include "brogueCreature.h"
+#include "brogueObject.h"
 #include "simpleList.h"
 
 using namespace brogueHd::component;

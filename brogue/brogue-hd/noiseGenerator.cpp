@@ -2,7 +2,6 @@
 
 #include "noiseGenerator.h"
 #include "brogueMath.h"
-#include "gridExtension.h"
 
 using namespace brogueHd::backend::math;
 using namespace brogueHd::backend::model;
@@ -40,10 +39,12 @@ namespace brogueHd::backend::generator
 
         // Generate white noise inside the chosen rectangle
         //
-        gridRectExtension::iterate(parameters.boundary, [&rand, &parameters, &resultGrid](short x, short y)
+        parameters.boundary.iterate([&rand, &parameters, &resultGrid](short x, short y)
         {
             if (rand->next() <= parameters.fillRatio)
                 resultGrid.set(x, y, true);
+
+            return iterationCallback::iterate;
         });
 
         // Run smoothing iterations
@@ -54,9 +55,11 @@ namespace brogueHd::backend::generator
         }
 
         // Callback
-        gridRectExtension::iterate(parameters.boundary, [&rand, &parameters, &resultGrid, &userCallback](short x, short y)
+        parameters.boundary.iterate([&rand, &parameters, &resultGrid, &userCallback](short x, short y)
         {
             userCallback(x, y, resultGrid.get(x, y));
+
+            return iterationCallback::iterate;
         });
     }
 
@@ -64,16 +67,18 @@ namespace brogueHd::backend::generator
     {
         short count = 0;
 
-        gridExtension<bool>::iterate(&resultGrid, [&resultGrid, &parameters, &count](short columnRect, short rowRect, bool item)
+        resultGrid.iterate([&resultGrid, &parameters, &count](short columnRect, short rowRect, bool item)
         {
             count = 0;
 
-            gridExtension<bool>::iterateAround(&resultGrid, columnRect, rowRect, true, [&resultGrid, &count](short i, short j, bool item)
+            resultGrid.iterateAround(columnRect, rowRect, true, [&resultGrid, &count](short i, short j, bool item)
             {
                 // Count number of alive cells
                 //
                 if (resultGrid.isDefined(i, j))
                     count++;
+
+                return iterationCallback::iterate;
             });
 
             // Birth
@@ -93,6 +98,8 @@ namespace brogueHd::backend::generator
             {
                 resultGrid.set(columnRect, rowRect, false);
             }
+
+            return iterationCallback::iterate;
         });
     }
 }

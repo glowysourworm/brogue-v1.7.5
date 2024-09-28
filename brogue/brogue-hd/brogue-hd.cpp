@@ -9,7 +9,7 @@
 
 using namespace std;
 using namespace brogueHd::console;
-using namespace brogueHd::backend::extension;
+using namespace brogueHd::component;
 using namespace brogueHd::backend::controller;
 
 namespace brogueHd

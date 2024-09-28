@@ -62,12 +62,12 @@ namespace brogueHd::backend::math
         /// </summary>
         /// <param name="mapCostPredicate">Delegate used to fetch a cost for the specified column / row of the grid</param>
         /// <param name="mapPredicate">Delegate used to mask off areas of the map from the entire algorithm. Set to TRUE to ALLOW use of the location for the algorithm.</param>
-		dijkstra<T>::dijkstra(gridRect parentBoundary,
-							  gridRect relativeBoundary,
-						      bool obeyCardinalMovement,
-							  dijkstraDelegates<T>::predicate mapPredicate,
-							  dijkstraDelegates<T>::costPredicate mapCostPredicate,
-							  dijkstraDelegates<T>::locatorCallback locatorCallback);
+		dijkstra(gridRect parentBoundary,
+				 gridRect relativeBoundary,
+				 bool obeyCardinalMovement,
+				 dijkstraDelegates<T>::predicate mapPredicate,
+				 dijkstraDelegates<T>::costPredicate mapCostPredicate,
+				 dijkstraDelegates<T>::locatorCallback locatorCallback);
 
         ~dijkstra();
 
@@ -136,7 +136,7 @@ namespace brogueHd::backend::math
 														// limit usage of the grid.
 
 		T _sourceLocation;
-		T[] _targetLocations;
+		simpleArray<T> _targetLocations;
 
         grid<short>* _outputMap;
 

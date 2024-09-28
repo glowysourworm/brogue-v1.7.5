@@ -8,15 +8,15 @@ using namespace brogueHd::backend::math;
 
 namespace brogueHd::backend::model::layout
 {
-	struct gridLocatorEdge : graphEdge
+	struct gridLocatorEdge : public graphEdge<gridLocator>
 	{
-		gridLocatorNode node1;
-		gridLocatorNode node2;
+		gridLocator node1;
+		gridLocator node2;
 
 		gridLocatorEdge()
 		{}
 
-		gridLocatorEdge(gridLocatorNode anode1, gridLocatorNode anode2)
+		gridLocatorEdge(gridLocator anode1, gridLocator anode2)
 		{
 			node1 = anode1;
 			node2 = anode2;
@@ -27,20 +27,20 @@ namespace brogueHd::backend::model::layout
 		/// </summary>
 		short weight()
 		{
-			return node1.calculateDistance(node2);
+			return node1.distance(node2);
 		}
 
 		template<typename T>
 		bool isEquivalent(point<T> point1, point<T> point2)
 		{
-			return (node1.locator.column == point1.x &&
-				    node1.locator.row == point1.y &&
-				    node2.locator.column == point2.x &&
-				    node2.locator.row == point2.y) ||
-				   (node1.locator.column == point2.x &&
-					node1.locator.row == point2.y &&
-					node2.locator.column == point1.x &&
-					node2.locator.row == point1.y);
+			return (node1.column == point1.x &&
+				    node1.row == point1.y &&
+				    node2.column == point2.x &&
+				    node2.row == point2.y) ||
+				   (node1.column == point2.x &&
+					node1.row == point2.y &&
+					node2.column == point1.x &&
+					node2.row == point1.y);
 		}
 	};
 }

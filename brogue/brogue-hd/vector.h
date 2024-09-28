@@ -28,7 +28,6 @@ namespace brogueHd::backend::math
         /// crossing two difference vectors that order points 1,2, and 3 in that order). The sign of the determinant
         /// returned shows the orientation of the ordering (clockwise, counter-clockwise, or collinear)
         /// </summary>
-        template<typename T>
         static T orientation(point<T> point1, point<T> point2, point<T> point3)
         {
             // 1 -> 2 -> 3 (Results from crossing the vectors 12 X 23 - where subtracting the points gives you the vector)

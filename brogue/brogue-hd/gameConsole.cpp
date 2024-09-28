@@ -9,7 +9,7 @@
 using namespace std;
 
 using namespace brogueHd::backend::controller;
-using namespace brogueHd::backend::extension;
+using namespace brogueHd::component;
 
 namespace brogueHd::console
 {
@@ -56,8 +56,8 @@ namespace brogueHd::console
 	{
 		std::string* cmd = stringExtension::split(input, " ");
 
-		char* gamePath = NULL;
-		char* viewPath = NULL;
+		std::string gamePath = "";
+		std::string viewPath = "";
 		unsigned long gameSeed = 0;
 
 		bool noMenu = false;
@@ -102,7 +102,7 @@ namespace brogueHd::console
 		// New Game w/ Seed
 		if (hasArgument(cmd, "--seed") || hasArgument(cmd, "-s"))
 		{
-			unsigned long seed = getArgument<unsigned long>(cmd, "--seed");
+			unsigned long seed = getArgumentInt(cmd, "--seed");
 
 			_gameController->initNewGame(seed);
 			_gameController->setMode(BrogueGameMode::Game);
@@ -129,12 +129,12 @@ namespace brogueHd::console
 		// Open
 		if (hasArgument(cmd, "--open") || hasArgument(cmd, "-o"))
 		{
-			gamePath = getArgument<char*>(cmd, "--open");
+			gamePath = getArgument(cmd, "--open");
 
-			if (gamePath == NULL)
-				gamePath = getArgument<char*>(cmd, "-o");
+			if (gamePath == "")
+				gamePath = getArgument(cmd, "-o");
 			
-			gameData* data = _resourceController->loadGame(gamePath);
+			gameData* data = _resourceController->loadGame(gamePath.c_str());
 
 			_gameController->initGame(data);
 			_gameController->setMode(BrogueGameMode::Game);

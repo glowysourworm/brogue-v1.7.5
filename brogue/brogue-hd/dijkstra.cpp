@@ -27,9 +27,9 @@ namespace brogueHd::backend::math
 		_locatorCallback = locatorCallback;
 
 		// Set these to be the full size of the parent
-		_outputMap = new grid<short>(parentBoundary);
-		_visitedMap = new grid<bool>(parentBoundary);
-		_locationMap = new grid<bool>(parentBoundary);
+		_outputMap = new grid<short>(parentBoundary, relativeBoundary);
+		_visitedMap = new grid<bool>(parentBoundary, relativeBoundary);
+		_locationMap = new grid<bool>(parentBoundary, relativeBoundary);
 
 		_frontier = new simpleBST<float, simpleHash<T, T>*>();
 	}
@@ -53,8 +53,8 @@ namespace brogueHd::backend::math
 	template<isGridLocator T>
 	void dijkstra<T>::initialize(T source, T targets[])
 	{
-		_sourceLocation = sourceLocation;
-		_targetLocations = targetLocations;
+		_sourceLocation = source;
+		_targetLocations = new simpleArray<T>(&targets);
 
 		// Clear out the frontier
 		_frontier->clear();
@@ -100,7 +100,7 @@ namespace brogueHd::backend::math
 		simpleHash<T, bool> goalDict;
 
 		// Not sure about hashing
-		for (int index = 0; index < SIZEOF(_targetLocations); index++)
+		for (int index = 0; index < _targetLocations->size(); index++)
 			goalDict.set(_targetLocations[index], _targetLocations[index]);
 
 		// Process the first element
@@ -251,7 +251,7 @@ namespace brogueHd::backend::math
 		}
 
 		// GENERATE PATHS
-		for (int index = 0; index < SIZEOF(_targetLocations); index++)
+		for (int index = 0; index < _targetLocations->size(); index++)
 		{
 			simpleArray<T> completedPath = generatePath(_targetLocations[index]);
 
@@ -273,7 +273,7 @@ namespace brogueHd::backend::math
 	template<isGridLocator T>
 	simpleArray<T> dijkstra<T>::generatePath(T targetLocation)
 	{
-		if (!contains(_targetLocations, targetLocation))
+		if (!_targetLocations->contains(targetLocation))
 			brogueException::show("Requested target location not specified by the constructor dijkstra.h");
 
 		// Reverse ordered - starting with target

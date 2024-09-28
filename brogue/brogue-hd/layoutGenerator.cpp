@@ -7,6 +7,8 @@
 #include "primsAlgorithm.h"
 #include "exceptionHandler.h"
 
+using namespace brogueHd::backend::model::layout;
+
 namespace brogueHd::backend::generator
 {
 	layoutGenerator::layoutGenerator(randomGenerator* randomGenerator)
@@ -418,7 +420,9 @@ namespace brogueHd::backend::generator
         // Create delaunay triangulator with graph edge constructor
         delaunayAlgorithm<gridLocatorNode, gridLocatorEdge> triangulator([](gridLocatorNode node1, gridLocatorNode node2)
         {
-            return gridLocatorEdge(node1, node2);
+            gridLocatorEdge edge(node1, node2);
+
+            return edge;
         });
 
         // Create connection point vertices

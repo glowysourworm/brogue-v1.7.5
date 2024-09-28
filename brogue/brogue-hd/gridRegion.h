@@ -2,13 +2,13 @@
 
 #include "grid.h"
 #include "gridDefinitions.h"
-#include "gridExtension.h"
 #include "gridRect.h"
 #include "dijkstra.h"
 #include "simpleArray.h"
 #include <functional>
 
 using namespace std;
+using namespace brogueHd::component;
 using namespace brogueHd::component;
 using namespace brogueHd::backend::math;
 

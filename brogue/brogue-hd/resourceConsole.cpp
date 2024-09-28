@@ -8,7 +8,7 @@ using namespace std;
 
 using namespace brogueHd::backend::modelConstant;
 using namespace brogueHd::backend::model;
-using namespace brogueHd::backend::extension;
+using namespace brogueHd::component;
 
 namespace brogueHd::console
 {

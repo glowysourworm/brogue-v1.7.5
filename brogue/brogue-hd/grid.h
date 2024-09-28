@@ -6,7 +6,7 @@
 #include "gridDefinitions.h"
 #include "gridRegion.h"
 
-using namespace brogueHd::backend::extension;
+using namespace brogueHd::component;
 
 namespace brogueHd::backend::model::layout
 {
@@ -15,6 +15,7 @@ namespace brogueHd::backend::model::layout
 	{
 	public:
 
+		grid(){};
 		grid(gridRect parentBoundary, gridRect relativeBoundary);
 		~grid();
 
@@ -66,7 +67,8 @@ namespace brogueHd::backend::model::layout
 		/// <summary>
 		/// Sets instances from the supplied region to the grid
 		/// </summary>
-		void setFromRegion(gridRegion<T>* region);
+		template<isGridLocator TLocator>
+		void setFromRegion(gridRegion<TLocator>* region);
 
 		/// <summary>
 		/// Sets the value to the grid, clipping it to the max and min values, and handling exceptions
@@ -105,6 +107,12 @@ namespace brogueHd::backend::model::layout
 		/// </summary>
 		/// <param name="direction">Compass direction treated with DIRECT EQUALITY! (DOESN'T USE FLAGS)</param>
 		bool isExposedCorner(int column, int row, brogueCompass direction, gridDelegates<T>::predicate predicate) const;
+
+		void iterateAroundCardinal(short column, short row, bool withinBounds, gridDelegates<T>::callback callback);
+		void iterateAround(short column, short row, bool withinBounds, gridDelegates<T>::callback callback);
+		void iterateIn(gridRect boundary, gridDelegates<T>::callback callback);
+		void iterateOutward(short centerColumn, short centerRow, short distance, gridDelegates<T>::callback callback);
+		void iterate(gridDelegates<T>::callback callback);
 
 	private:
 

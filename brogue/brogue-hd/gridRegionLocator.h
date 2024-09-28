@@ -3,7 +3,6 @@
 #include "grid.h"
 #include "gridRegion.h"
 #include "gridDefinitions.h"
-#include "gridExtension.h"
 #include "gridRegionConstructor.h"
 #include "simpleList.h"
 #include <functional>
@@ -41,7 +40,7 @@ namespace brogueHd::backend::model::construction
 
 	private:
 
-		gridRegionConstructor<T>* runFloodFill(const grid<T>& grid, short column, short row, gridDelegates<T>::predicate inclusionPredicate);
+		gridRegionConstructor<T> runFloodFill(const grid<T>& grid, short column, short row, gridDelegates<T>::predicate inclusionPredicate);
 	};
 }
 

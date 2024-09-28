@@ -5,7 +5,7 @@
 #include "simpleList.h"
 
 using namespace brogueHd::component;
-using namespace brogueHd::backend::extension;
+using namespace brogueHd::component;
 
 namespace brogueHd::backend::math
 {

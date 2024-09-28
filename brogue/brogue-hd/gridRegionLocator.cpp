@@ -1,31 +1,28 @@
 #include "gridRegionLocator.h"
 #include "gridRegionConstructor.h"
-#include "mathdef.h"
 #include "grid.h"
 #include "exceptionHandler.h"
 #include "gridDefinitions.h"
-#include "extensionDefinitions.h"
-#include <vector>
+#include "simpleList.h"
 
-using namespace std;
-
+using namespace brogueHd::component;
 using namespace brogueHd::backend::model::layout;
 
 namespace brogueHd::backend::model::construction
 {
-    template<gridCellConstraint T>
+    template<isGridLocator T>
     gridRegionLocator<T>::gridRegionLocator()
     {
     }
 
-    template<gridCellConstraint T>
+    template<isGridLocator T>
     gridRegionLocator<T>::~gridRegionLocator()
     {
         
     }
 
-    template<gridCellConstraint T>
-    std::vector<gridRegion<T>*> gridRegionLocator<T>::locateRegions(const grid<T>& grid)
+    template<isGridLocator T>
+    simpleList<gridRegion<T>*> gridRegionLocator<T>::locateRegions(const grid<T>& grid)
     {
         return locateRegions(grid, [](short column, short row, T value)
         {
@@ -33,10 +30,10 @@ namespace brogueHd::backend::model::construction
         });
     }
 
-    template<gridCellConstraint T>
-    std::vector<gridRegion<T>*> gridRegionLocator<T>::locateRegions(const grid<T>& grid, extensionDelegates<T>::simplePredicate inclusionPredicate)
+    template<isGridLocator T>
+    simpleList<gridRegion<T>*> gridRegionLocator<T>::locateRegions(const grid<T>& grid, gridDelegates<T>::predicate inclusionPredicate)
     {
-        std::vector<gridRegion<T>> result;
+        simpleList<gridRegion<T>*> result;
 
         // Procedure
         //
@@ -44,159 +41,136 @@ namespace brogueHd::backend::model::construction
         //      -> Callback (over history) to see if this location is in predicate
         //      -> Be sure we have not already visited this (new) region
         //
-        iterate(grid, [](short column, short row)
+        grid.iterate([&inclusionPredicate, &result, &grid](short column, short row, T item)
         {
-            // Check history
+            // Check history (to see if we're still inside the previous region)
             for (int index = 0; index < result.size(); index++)
             {
-                // Return from iterator (only)
-                if (inclusionPredicate(result[i]->get(column, row)))
+                // Conditions:
+                //
+                // 1) Previously identified this location with another region
+                // 2) This location is not included by the user's predicate
+                //
+                if (result[index]->isDefined(column, row) ||
+                   !inclusionPredicate(column, row, grid.get(column, row)))
                     return iterationCallback::iterate;
             }
 
-            // Check to see if we're at a valid location
-            if (inclusionPredicate(grid[column, row]))
+            // Check to see if we're at a valid location (that has not been processed)
+            if (inclusionPredicate(column, row, grid.get(column, row)))
             {
-                // Start a new region
-                grid<T>* regionGrid = new grid<T>(_columns, _rows);
-
-                // Keep track of the boundary (starts empty and expands)
-                gridRect boundary(column, row, 0, 0);
-
-                // Set initial value
-                regionGrid->set(column, row, new T(column, row));
-
                 // Recurse to fill out the grid
-                gridRegionConstructor<T>* constructor = runFloodFill(regionGrid, column, row, inclusionPredicate);
+                gridRegionConstructor<T> constructor = runFloodFill(grid, column, row, inclusionPredicate);
 
                 // Validate / Complete the region
                 gridRegion<T>* region = constructor->complete();
 
                 // Set result
-                result.push_back(region);
+                result.add(region);
             }
+
+            return iterationCallback::iterate;
         });
 
         return result;
     }
 
-    template<gridCellConstraint T>
-    gridRegion<T>* gridRegionLocator<T>::identifyRegion(const grid<T>& grid, short column, short row, extensionDelegates<T>::simplePredicate inclusionPredicate)
+    template<isGridLocator T>
+    gridRegion<T>* gridRegionLocator<T>::identifyRegion(const grid<T>& grid, short column, short row, gridDelegates<T>::predicate inclusionPredicate)
     {
-        if (!grid->isDefined(column, row))
+        if (!grid.isDefined(column, row))
             return NULL;
 
         // Create the constructor
-        gridRegionConstructor<T>* constructor = this->runFloodFill(column, row, inclusionPredicate);
+        gridRegionConstructor<T> constructor = this->runFloodFill(grid, column, row, inclusionPredicate);
 
-        // Validate -> Setup Region
-        gridRegion<T>* finalRegion = constructor->complete();
-
-        // MEMORY!
-        delete constructor;
+        // (MEMORY!) Validate -> Setup Region
+        gridRegion<T>* finalRegion = constructor.complete();
 
         return finalRegion;
     }
 
-    template<gridCellConstraint T>
-    gridRegionConstructor<T>* gridRegionLocator<T>::runFloodFill(const grid<T>& grid, short column, short row, extensionDelegates<T>::simplePredicate inclusionPredicate)
+    template<isGridLocator T>
+    gridRegionConstructor<T> gridRegionLocator<T>::runFloodFill(const grid<T>& grid, short column, short row, gridDelegates<T>::predicate inclusionPredicate)
     {
-        if (!_grid->isDefined(column, row) || !predicate(column, row, _grid->get(column, row)))
+        if (!grid.isDefined(column, row) || !inclusionPredicate(column, row, grid.get(column, row)))
             brogueException::show("Trying to start FloodFill in non-region location");
 
-        // Region Data (use array2D to help calculate the region. The relative boundary must be calculated)
-        array2D<T> regionGrid(parentBoundary, relativeBoundary);
-
-        std::map<T, T> regionLocations;
+        // Collect the region data in a constructor
+        gridRegionConstructor<T> regionConstructor(gridRect(column, row, 0, 0), inclusionPredicate);
 
         // Use queue to know what locations have been verified. Starting with test location - continue 
         // until all connected cells have been added to the resulting region using the predicate.
-        std::list<T> resultQueue;
+        simpleList<T> resultQueue;
 
         // Process the first location
-        T firstElement = grid->get(column, row);
+        T firstElement = grid.get(column, row);
 
-        resultQueue.push_back(firstElement);
-        regionGrid[column, row] = firstElement;
-
-        // Collect the region data in a constructor
-        gridRegionConstructor<T>* regionConstructor = new gridRegionConstructor(gridRect(column, row, 0, 0), inclusionPredicate);
+        regionConstructor.add(column, row, firstElement);
+        resultQueue.add(firstElement);
 
         while (resultQueue.count() > 0)
         {
             // Centered Location
-            T regionLocation = resultQueue.pop_front();
+            T regionLocation = resultQueue.removeAt(0);
 
-            if (regionLocations.find(regionLocation))
+            if (regionConstructor.contains(regionLocation))
                 brogueException::show("Trying to add location duplicate:  gridRegionLocator.runFloodFill");
 
-            // Locations
-            regionLocations.insert(regionLocation, regionLocation);
-
-            // Add to region constructor
-            regionConstructor.addCell(regionLocation);
+            // Add to region constructor (also prevents requeueing)
+            regionConstructor.add(regionLocation);
 
             // Search cardinally adjacent cells (N,S,E,W)
-            T north = grid->get(regionLocation.column, regionLocation.row - 1);
-            T south = grid->get(regionLocation.column, regionLocation.row + 1);
-            T east = grid->get(regionLocation.column + 1, regionLocation.row);
-            T west = grid->get(regionLocation.column - 1, regionLocation.row);
+            T north = grid.get(regionLocation.column, regionLocation.row - 1);
+            T south = grid.get(regionLocation.column, regionLocation.row + 1);
+            T east = grid.get(regionLocation.column + 1, regionLocation.row);
+            T west = grid.get(regionLocation.column - 1, regionLocation.row);
 
             // Procedure: DON'T SET RESULT ARRAYS HERE
             //
-            // 1) Add location to the region grid to prevent re-queueing
+            // 1) Add location to the region constructor to prevent re-queueing
             // 2) Expand the region boundary
             // 3) Queue this adjacent location
+            // 
+            // Result Arrays are built by the region constructor afterwards
             //
 
             // Find Connected Cells
 
             // N
-            if (north != null &&
-                regionGrid[north.column][north.row] == NULL &&
+            if (north != NULL &&
+                !regionConstructor.isDefined(north.column,north.row) &&
                 inclusionPredicate(north.column, north.row, north))
             {
-                // Add location to region grid
-                regionGrid[north.column][north.row] = north;
-
                 // Push cell onto the queue to be iterated
-                resultQueue.push_back(north);
+                resultQueue.add(north);
             }
 
             // S
-            if (south != null &&
-                regionGrid[south.column][south.row] == NULL &&
+            if (south != NULL &&
+                !regionConstructor.isDefined(south.column, south.row) &&
                 inclusionPredicate(south.column, south.row, south))
             {
-                // Add location to region grid
-                regionGrid[south.column][south.row] = south;
-
                 // Push cell onto the queue to be iterated
-                resultQueue.push_back(south);
+                resultQueue.add(south);
             }
 
             // E
-            if (east != null &&
-                regionGrid[east.column][east.row] == NULL &&
+            if (east != NULL &&
+                !regionConstructor.isDefined(east.column, east.row) &&
                 inclusionPredicate(east.column, east.row, east))
             {
-                // Add location to region grid
-                regionGrid[east.column][east.row] = east;
-
                 // Push cell onto the queue to be iterated
-                resultQueue.push_back(east);
+                resultQueue.add(east);
             }
 
             // W
-            if (west != null &&
-                regionGrid[west.column][west.row] == NULL &&
+            if (west != NULL &&
+                !regionConstructor.isDefined(west.column, west.row) &&
                 inclusionPredicate(west.column, west.row, west))
             {
-                // Add location to region grid
-                regionGrid[west.column][west.row] = west;
-
                 // Push cell onto the queue to be iterated
-                resultQueue.push_back(west);
+                resultQueue.add(west);
             }
         }
 

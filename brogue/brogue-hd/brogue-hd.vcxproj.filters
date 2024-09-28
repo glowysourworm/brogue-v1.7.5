@@ -88,9 +88,6 @@
     <Filter Include="Header Files\backend\math">
       <UniqueIdentifier>{7ef00c19-f2cc-40de-adeb-1ccaafce3b1b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\backend\extension">
-      <UniqueIdentifier>{f2f7f77b-b324-40fa-9971-0eefe7d426dd}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\backend\math">
       <UniqueIdentifier>{220ffa64-55f0-4bcd-a3ca-df530f00bd73}</UniqueIdentifier>
     </Filter>
@@ -470,9 +467,6 @@
     <ClInclude Include="terrainGenerator.h">
       <Filter>Header Files\backend\generator</Filter>
     </ClInclude>
-    <ClInclude Include="gridExtension.h">
-      <Filter>Header Files\backend\extension</Filter>
-    </ClInclude>
     <ClInclude Include="brogueGameProfile.h">
       <Filter>Header Files\backend\model</Filter>
     </ClInclude>
@@ -490,9 +484,6 @@
     </ClInclude>
     <ClInclude Include="delaunayAlgorithm.h">
       <Filter>Header Files\backend\math</Filter>
-    </ClInclude>
-    <ClInclude Include="gridLocatorNode.h">
-      <Filter>Header Files\backend\model\layout</Filter>
     </ClInclude>
     <ClInclude Include="gridLocatorEdge.h">
       <Filter>Header Files\backend\model\layout</Filter>
@@ -529,9 +520,6 @@
     </ClInclude>
     <ClInclude Include="resourceController.h">
       <Filter>Header Files\backend\controller</Filter>
-    </ClInclude>
-    <ClInclude Include="stringExtension.h">
-      <Filter>Header Files\backend\extension</Filter>
     </ClInclude>
     <ClInclude Include="brogueColorMap.h">
       <Filter>Header Files\backend\model</Filter>
@@ -643,6 +631,9 @@
     </ClInclude>
     <ClInclude Include="exceptionHandler.h">
       <Filter>Header Files\global</Filter>
+    </ClInclude>
+    <ClInclude Include="stringExtension.h">
+      <Filter>Header Files\component</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

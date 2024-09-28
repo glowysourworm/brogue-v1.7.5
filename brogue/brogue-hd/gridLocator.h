@@ -3,15 +3,18 @@
 #include <string>
 #include <format>
 #include <iostream>
+#include "graphNode.h"
 #include "stringExtension.h"
 #include "typeConverter.h"
+#include "brogueMath.h"
 
 using namespace std;
+using namespace brogueHd::backend::math;
 using namespace brogueHd::component;
 
 namespace brogueHd::backend::model::layout
 {
-	struct gridLocator
+	struct gridLocator : graphNode
 	{
 		short column;
 		short row;
@@ -46,6 +49,14 @@ namespace brogueHd::backend::model::layout
 		gridLocator subtract(const gridLocator& cell)
 		{
 			return gridLocator(column - cell.column, row - cell.row);
+		}
+		
+		double distance(const gridLocator& location)
+		{
+			double dx = location.column - column;
+			double dy = location.row - row;
+
+			return brogueMath<double>::sqrt((dx * dx) + (dy * dy));
 		}
 
 		bool isEmpty()

@@ -3,7 +3,7 @@
 #include "graphAlgorithm.h"
 #include "exceptionHandler.h"
 
-using namespace brogueHd::backend::extension;
+using namespace brogueHd::component;
 
 namespace brogueHd::backend::math
 {
@@ -20,7 +20,7 @@ namespace brogueHd::backend::math
     }
 
     template<isGridLocatorNode TNode, isGridLocatorEdge TEdge>
-    graph<TNode, TEdge>* run(const std::vector<TNode>& vertices)
+    graph<TNode, TEdge>* run(const simpleList<TNode>& vertices)
     {
         // Overridden in child class
     }

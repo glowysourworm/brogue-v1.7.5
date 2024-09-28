@@ -4,9 +4,10 @@
 
 namespace brogueHd::backend::math
 {
+	template<typename TNode>
 	struct graphEdge
 	{
-		graphNode node1;
-		graphNode node2;
+		TNode node1;
+		TNode node2;
 	};
 }

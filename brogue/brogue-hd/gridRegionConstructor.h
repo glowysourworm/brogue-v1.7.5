@@ -38,6 +38,16 @@ namespace brogueHd::backend::model::construction
         /// </summary>
         void add(T* itemArray);
 
+        /// <summary>
+        /// Checks to see whether or not the region constructor contains the specified item
+        /// </summary>
+        bool contains(T item);
+
+        /// <summary>
+        /// Checks to see whether the constructor is defined at the specified coordinates
+        /// </summary>
+        bool isDefined(short column, short row);
+
     private:
 
         void completeImpl();

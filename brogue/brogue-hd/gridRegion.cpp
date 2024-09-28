@@ -5,7 +5,7 @@
 #include "gridRect.h"
 #include "exceptionHandler.h"
 
-using namespace brogueHd::backend::extension;
+using namespace brogueHd::component;
 using namespace brogueHd::backend::math;
 using namespace brogueHd::backend::model::construction;
 
@@ -263,19 +263,15 @@ namespace brogueHd::backend::model::layout
 			return true;
 		});
 
-		_locations->forEach([&constructor, &translation, &isLocator](T item)
+		_locations->forEach([&constructor, &translation](T item)
 		{
 			short newColumn = item.column + translation.column;
 			short newRow = item.row + translation.row;
 
-			// Locators
-			if (isLocator)
-			{
-				gridLocator locator = (gridLocator)(item);
+			gridLocator locator = (gridLocator)(item);
 
-				locator.column = newColumn;
-				locator.row = newRow;
-			}
+			locator.column = newColumn;
+			locator.row = newRow;
 
 			constructor.add(newColumn, newRow, locator);
 

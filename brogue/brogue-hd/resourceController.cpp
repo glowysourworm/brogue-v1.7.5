@@ -6,12 +6,13 @@
 #include "gameData.h"
 #include "stringExtension.h"
 #include "brogueColorMap.h"
+#include "typeConverter.h"
 #include <string>
 #include <fstream>
 #include <format>
 
 using namespace std;
-using namespace brogueHd::backend::extension;
+using namespace brogueHd::component;
 using namespace brogueHd::backend::model;
 using namespace brogueHd::backend::model::game;
 using namespace brogueHd::backend::processor;
@@ -77,7 +78,9 @@ namespace brogueHd::backend::controller
 	{
 		try
 		{
-			FILE* file = fopen("keymap", "r");
+			FILE** file;
+			fopen_s(file, "keymap", "r");
+
 			char buffer[512];
 
 			if (file == NULL)
@@ -90,7 +93,7 @@ namespace brogueHd::backend::controller
 				throw;
 			}
 
-			while (fgets(buffer, 512, file) != NULL)
+			while (fgets(buffer, 512, *file) != NULL)
 			{
 				// split it in two (destructively)
 				int mode = 1;
@@ -127,7 +130,7 @@ namespace brogueHd::backend::controller
 				}
 			}
 
-			fclose(file);
+			fclose(*file);
 		}
 		catch (std::exception& ex)
 		{
@@ -166,14 +169,14 @@ namespace brogueHd::backend::controller
 				
 				EnumString<colorCollections>::To(collection, strings[0]);
 
-				nextColor.red = stringExtension::convert<short>(strings[2]);
-				nextColor.green = stringExtension::convert<short>(strings[3]);
-				nextColor.blue = stringExtension::convert<short>(strings[4]);
-				nextColor.redRand = stringExtension::convert<short>(strings[5]);
-				nextColor.greenRand = stringExtension::convert<short>(strings[6]);
-				nextColor.blueRand = stringExtension::convert<short>(strings[7]);
-				nextColor.rand = stringExtension::convert<short>(strings[8]);
-				nextColor.colorDances = stringExtension::convert<bool>(strings[9]);
+				nextColor.red = typeConverter::stringToshort(strings[2]);
+				nextColor.green = typeConverter::stringToshort(strings[3]);
+				nextColor.blue = typeConverter::stringToshort(strings[4]);
+				nextColor.redRand = typeConverter::stringToshort(strings[5]);
+				nextColor.greenRand = typeConverter::stringToshort(strings[6]);
+				nextColor.blueRand = typeConverter::stringToshort(strings[7]);
+				nextColor.rand = typeConverter::stringToshort(strings[8]);
+				nextColor.colorDances = typeConverter::stringToBool(strings[9]);
 
 				switch (collection)
 				{
@@ -244,12 +247,12 @@ namespace brogueHd::backend::controller
 		return NULL;
 	}
 
-	gameData* loadGame(char* path)
+	gameData* loadGame(const char* path)
 	{
 		return NULL;
 	}
 
-	playbackData* loadPlayback(char* path)
+	playbackData* loadPlayback(const char* path)
 	{
 		return NULL;
 	}

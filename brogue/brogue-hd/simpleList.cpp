@@ -135,10 +135,12 @@ namespace brogueHd::component
 	}
 
 	template<typename T>
-	void simpleList<T>::removeAt(int index)
+	T simpleList<T>::removeAt(int index)
 	{
 		if (index >= _size)
 			brogueException::show("Index is outside the bounds of the array");
+
+		T item = this->get(index);
 
 		for (int i = index; i < _size - 1; i++)
 		{
@@ -146,6 +148,8 @@ namespace brogueHd::component
 		}
 
 		_size--;
+
+		return item;
 	}
 
 	template<typename T>

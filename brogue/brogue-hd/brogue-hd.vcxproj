@@ -238,7 +238,6 @@
     <ClInclude Include="graphNode.h" />
     <ClInclude Include="gridLocator.h" />
     <ClInclude Include="gridLocatorEdge.h" />
-    <ClInclude Include="gridLocatorNode.h" />
     <ClInclude Include="gridRegionConstructor.h" />
     <ClInclude Include="gridRegionLocator.h" />
     <ClInclude Include="hashGenerator.h" />
@@ -281,7 +280,6 @@
     <ClInclude Include="gameData.h" />
     <ClInclude Include="grid.h" />
     <ClInclude Include="gridDefinitions.h" />
-    <ClInclude Include="gridExtension.h" />
     <ClInclude Include="gridRect.h" />
     <ClInclude Include="brogueLevelMethods.h" />
     <ClInclude Include="brogueItem.h" />

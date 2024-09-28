@@ -12,49 +12,19 @@
 #include <format>
 
 using namespace std;
-using namespace brogueHd::component;
 
-namespace brogueHd::backend::extension
+namespace brogueHd::component
 {
 	struct stringExtension
 	{
-		template<typename T>
-		static T convert(std::string input)
-		{
-			if (std::is_convertible<std::string>())
-				return dynamic_cast<T>(input);
-
-			else if (std::is_convertible<int>())
-				return dynamic_cast<T>(atoi(input.c_str()));
-
-			else if (std::is_convertible<short>())
-				return dynamic_cast<T>(atoi(input.c_str()));
-
-			else if (std::is_convertible<float>())
-				return dynamic_cast<T>(atof(input.c_str()));
-
-			else if (std::is_convertible<bool>())
-				return dynamic_cast<T>(convertBool(input));
-
-			else
-				brogueException::show("Unhandled type:  stringExtension::convert  {}" + std::string(typeid(T).name));
-				
-		}
-		static bool convertBool(const std::string& input)
-		{
-			if (toUpper(input) == "TRUE")
-				return true;
-
-			return false;
-		}
 		static std::string formatDate(time_t time)
 		{
 			char buffer[80];
-			tm* timeValue;
+			tm timeValue;
 
-			localtime_s(timeValue, &time);
+			localtime_s(&timeValue, &time);
 
-			std::strftime(buffer, 80, "%Y-%m-%d-%H:%M:%S", timeValue);
+			std::strftime(buffer, 80, "%Y-%m-%d-%H:%M:%S", &timeValue);
 			std::string result(buffer);
 
 			return result;

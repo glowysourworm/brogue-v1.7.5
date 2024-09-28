@@ -27,8 +27,9 @@ namespace brogueHd::console
 
 		bool hasArgument(const std::string args[], const char* argumentName);
 
-		template<typename T>
-		T getArgument(const std::string args[], const char* argumentName);
+		int getArgumentInt(const std::string args[], const char* argumentName);
+		bool getArgumentBool(const std::string args[], const char* argumentName);
+		std::string getArgument(const std::string args[], const char* argumentName);
 	};
 }
 

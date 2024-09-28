@@ -65,7 +65,7 @@ namespace brogueHd::component
 		void addRange(const simpleList<T>& list);
 		void insert(int index, T item);
 		void remove(T item);
-		void removeAt(int index);
+		T removeAt(int index);
 		void clear();
 
 	protected:

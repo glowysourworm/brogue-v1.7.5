@@ -63,8 +63,8 @@ namespace brogueHd::backend::processor
 		//{
 
 		// Select location for player
-		px = player.xLoc;
-		py = player.yLoc;
+		//px = player.xLoc;
+		//py = player.yLoc;
 
 		// Check for auto-descent
 		//if (isAutoDescent(_level, _player->xLoc, _player->yLoc))

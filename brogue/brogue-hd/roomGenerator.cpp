@@ -5,12 +5,10 @@
 #include "gridRegion.h"
 #include "brogueMath.h"
 #include "brogueCell.h"
-#include "gridExtension.h"
 #include "simpleList.h"
 
 using namespace brogueHd::component;
 using namespace brogueHd::backend::math;
-using namespace brogueHd::backend::extension;
 using namespace brogueHd::backend::model::layout;
 
 namespace brogueHd::backend::generator
@@ -52,6 +50,8 @@ namespace brogueHd::backend::generator
 		{			
 			if (result)
 				designGrid.set(column, row, brogueCell(column, row));
+
+			return iterationCallback::iterate;
 		});
 
 		// Locate regions using flood fill method:  Find the max area region
@@ -89,15 +89,19 @@ namespace brogueHd::backend::generator
 		maxRegion->translate(translation);
 		
 		// ...and copy it to the master grid.
-		maxRegion->iterateLocations([&regionConstructor](short column, short row, T cell)
+		maxRegion->iterateLocations([&regionConstructor](short column, short row, gridLocator cell)
 		{
 			regionConstructor.add(column, row, cell);
+
+			return iterationCallback::iterate;
 		});
 
 		// (MEMORY) Don't need the region containers. Data is alive in the regionConstructor
 		regions.forEach([](gridRegion<gridLocator>* region)
 		{
 			delete region;
+
+			return iterationCallback::iterate;
 		});
 	}
 
@@ -118,15 +122,19 @@ namespace brogueHd::backend::generator
 		gridRect room2(roomX2, roomY2, roomWidth2, roomHeight2);
 
 		// Add Room 1
-		gridRectExtension::iterate(room1, [&regionConstructor](short column, short row)
+		room1.iterate([&regionConstructor](short column, short row)
 		{
 			regionConstructor.add(column, row, gridLocator(column, row));
+
+			return iterationCallback::iterate;
 		});
 
 		// Add Room 2
-		gridRectExtension::iterate(room2, [&regionConstructor](short column, short row)
+		room2.iterate([&regionConstructor](short column, short row)
 		{
 			regionConstructor.add(column, row, gridLocator(column, row));
+
+			return iterationCallback::iterate;
 		});
 	}
 
@@ -149,15 +157,19 @@ namespace brogueHd::backend::generator
 		gridRect room2(roomX2 - 5, roomY2 + 5, roomWidth2, roomHeight2);
 
 		// Add Room 1
-		gridRectExtension::iterate(room1, [&regionConstructor](short column, short row)
+		room1.iterate([&regionConstructor](short column, short row)
 		{
 			regionConstructor.add(column, row, gridLocator(column, row));
+
+			return iterationCallback::iterate;
 		});
 
 		// Add Room 2
-		gridRectExtension::iterate(room2, [&regionConstructor](short column, short row)
+		room2.iterate([&regionConstructor](short column, short row)
 		{
 			regionConstructor.add(column, row, gridLocator(column, row));
+
+			return iterationCallback::iterate;
 		});
 	}
 
@@ -181,15 +193,19 @@ namespace brogueHd::backend::generator
 		gridRect room2((DCOLS - minorWidth) / 2, (DROWS - majorHeight) / 2, minorWidth, majorHeight);
 
 		// Add Room 1
-		gridRectExtension::iterate(room1, [&regionConstructor](short column, short row)
+		room1.iterate([&regionConstructor](short column, short row)
 		{
 			regionConstructor.add(column, row, gridLocator(column, row));
+
+			return iterationCallback::iterate;
 		});
 
 		// Add Room 2
-		gridRectExtension::iterate(room2, [&regionConstructor](short column, short row)
+		room2.iterate([&regionConstructor](short column, short row)
 		{
 			regionConstructor.add(column, row, gridLocator(column, row));
+
+			return iterationCallback::iterate;
 		});
 	}
 
@@ -203,9 +219,11 @@ namespace brogueHd::backend::generator
 		gridRect room((DCOLS - width) / 2, (DROWS - height) / 2, width, height);
 
 		// Add Room
-		gridRectExtension::iterate(room, [&regionConstructor](short column, short row)
+		room.iterate([&regionConstructor](short column, short row)
 		{
 			regionConstructor.add(column, row, gridLocator(column, row));
+
+			return iterationCallback::iterate;
 		});
 	}
 
@@ -228,9 +246,11 @@ namespace brogueHd::backend::generator
 
 		gridRect setRect = gridRect::fromCircle(DCOLS / 2, DROWS / 2, radius, radius);
 
-		gridRectExtension::iterateInCircle(setRect, [&setGrid](short column, short row)
+		setRect.iterateInCircle([& setGrid](short column, short row)
 		{
 			setGrid.set(column, row, true);
+
+			return iterationCallback::iterate;
 		});
 
 		//if (radius > 6
@@ -246,9 +266,11 @@ namespace brogueHd::backend::generator
 			short removeRadius = _randomGenerator->rand_range(3, radius - 3);
 			gridRect removeRect = gridRect::fromCircle(DCOLS / 2 - removeRadius, DCOLS / 2 - removeRadius, removeRadius, removeRadius);
 
-			gridRectExtension::iterateInCircle(setRect, [&setGrid](short column, short row)
+			setRect.iterateInCircle([&setGrid](short column, short row)
 			{
 				setGrid.set(column, row, false);
+
+				return iterationCallback::iterate;
 			});
 		}
 	}
@@ -262,10 +284,11 @@ namespace brogueHd::backend::generator
 		grid<bool> setGrid(parentBoundary, parentBoundary);
 
 		// Set small room
-		gridRectExtension::iterateInCircle(gridRect(0, 0, 2, 2), [&setGrid, &regionConstructor](short column, short row)
+		gridRect(0, 0, 2, 2).iterateInCircle([&setGrid, &regionConstructor](short column, short row)
 		{
 			setGrid.set(column, row, true);
 			regionConstructor.add(column, row, gridLocator(column, row));
+			return iterationCallback::iterate;
 		});
 
 		minX = DCOLS / 2 - 3;
@@ -283,10 +306,11 @@ namespace brogueHd::backend::generator
 				//            colorOverDungeon(&darkGray);
 				//            hiliteGrid(grid, &white, 100);
 
-				gridRectExtension::iterateInCircle(gridRect(x, y, 2, 2), [&setGrid, &regionConstructor](short column, short row)
+				gridRect(x, y, 2, 2).iterateInCircle([&setGrid, &regionConstructor](short column, short row)
 				{
 					setGrid.set(column, row, true);
 					regionConstructor.add(column, row, gridLocator(column, row));
+					return iterationCallback::iterate;
 				});
 
 				minX = brogueMath<short>::max(1, brogueMath<short>::min(x - 3, minX));
