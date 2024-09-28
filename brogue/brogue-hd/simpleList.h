@@ -43,7 +43,7 @@ namespace brogueHd::component
 		/// <summary>
 		/// Definition of selector for a value V from an item T.
 		/// </summary>
-		static typedef std::function<TResult(T item)> selector;
+		typedef std::function<TResult(T item)> selector;
 	};
 
 	template<typename T>

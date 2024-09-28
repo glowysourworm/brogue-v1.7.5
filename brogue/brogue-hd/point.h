@@ -10,7 +10,11 @@ namespace brogueHd::backend::math
 		T x;
 		T y;
 
-		point(){}
+		point()
+		{
+			x = -1;
+			y = -1;
+		}
 		point(const point<T>& copy)
 		{
 			x = copy.x;

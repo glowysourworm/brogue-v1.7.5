@@ -12,8 +12,8 @@ namespace brogueHd::backend::model
 		// TODO: get these from catalogs
 		color whiteBrogue(255, 255, 255, 0,0, 0, 0, false);
 
-		_messages = new simpleList<messageData*>();
-		_flavorMessage = new messageData("You are here...", whiteBrogue, true);
+		_messages = new simpleList<messageData>();
+		_flavorMessage = messageData("You are here...", whiteBrogue, true);
 	}
 
 	brogueMessageQueue::~brogueMessageQueue()
@@ -34,15 +34,15 @@ namespace brogueHd::backend::model
 			_messages->removeAt(_messages->count() - 1);
 
 		// Insert message at the front
-		_messages->insert(0, new messageData(message, textColor, !needsConfirmation));
+		_messages->insert(0, messageData(message, textColor, !needsConfirmation));
 
 		// Check confirmation before auto-advancing
 		if (!needsConfirmation)
 		{
 			// Auto-confirm all messages
-			_messages->forEach([](messageData* amessage)
+			_messages->forEach([](messageData amessage)
 			{
-				amessage->confirmed = true;
+				amessage.confirmed = true;
 			});
 
 			// Reset the message index
@@ -55,7 +55,7 @@ namespace brogueHd::backend::model
 			for (short index = _messages->count(); index >= 0; index--)
 			{
 				// Update current index
-				if (!_messages->get(index)->confirmed)
+				if (!_messages->get(index).confirmed)
 				{
 					_currentMessageIndex = index;
 					break;
@@ -70,7 +70,7 @@ namespace brogueHd::backend::model
 
 		for (index = _currentMessageIndex; index >= (_currentMessageIndex - count) && index >= 0; index--)
 		{
-			_messages->get(index)->confirmed = true;
+			_messages->get(index).confirmed = true;
 		}
 
 		_currentMessageIndex = index;
@@ -78,6 +78,6 @@ namespace brogueHd::backend::model
 
 	void brogueMessageQueue::updateFlavorText(char* message, color foreColor)
 	{
-		_flavorMessage->update(message, foreColor, true);
+		_flavorMessage.update(message, foreColor, true);
 	}
 }

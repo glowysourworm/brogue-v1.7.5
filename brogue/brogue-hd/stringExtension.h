@@ -1,5 +1,6 @@
 #pragma once
 
+#include "simpleList.h"
 #include "broguedef.h"
 #include "exceptionHandler.h"
 #include <stdio.h>
@@ -11,6 +12,7 @@
 #include <format>
 
 using namespace std;
+using namespace brogueHd::component;
 
 namespace brogueHd::backend::extension
 {
@@ -87,6 +89,8 @@ namespace brogueHd::backend::extension
 			{
 				result += strings[index];
 			}
+
+			return result;
 		}
 		static bool isWhitespace(const std::string& s)
 		{

@@ -34,21 +34,14 @@ namespace brogueHd::backend::extension
 		typedef std::function<iterationCallback(short column, short row, T item)> callback;
 
 		/// <summary>
-		/// Simple predicate decision making function
+		/// Simple predicate decision making function that includes the item coordinates
 		/// </summary>
 		typedef std::function<bool(short column, short row, T item)> predicate;
 
 		/// <summary>
-		/// Selector of a value from the current item that includes the grid coordinates
+		/// Simple predicate decision making function
 		/// </summary>
-		template<typename TResult>
-		typedef std::function<TResult(short column, short row, T item)> selector;
-
-		/// <summary>
-		/// Definition of function to select a value from the grid cell type.
-		/// </summary>
-		template<typename TResult>
-		typedef std::function<TResult(T item)> simpleSelector;
+		typedef std::function<bool(T item)> simplePredicate;
 
 		/// <summary>
 		/// Searches grid for requested value based on comparison. Each truthy aggregateComparator result will store
@@ -63,6 +56,20 @@ namespace brogueHd::backend::extension
 		typedef std::function<T(short, short)> constructor;
 	};
 
+	template<typename T, typename TResult>
+	struct gridSelectorDelegates
+	{
+		/// <summary>
+		/// Selector of a value from the current item that includes the grid coordinates
+		/// </summary>
+		typedef std::function<TResult(short column, short row, T item)> selector;
+
+		/// <summary>
+		/// Definition of function to select a value from the grid type.
+		/// </summary>
+		typedef std::function<TResult(T item)> simpleSelector;
+	};
+
 	struct gridRectDelegates
 	{
 		/// <summary>
@@ -74,6 +81,7 @@ namespace brogueHd::backend::extension
 	template<typename T>
 	struct gridExtension
 	{
+		template<typename T>
 		static void iterate(const grid<T>& grid, gridDelegates<T>::callback callback)
 		{
 			bool userBreak = false;
@@ -90,6 +98,7 @@ namespace brogueHd::backend::extension
 			}
 		}
 
+		template<typename T>
 		static void iterateOutward(const grid<T>& grid,
 								   short centerColumn,
 								   short centerRow,
@@ -115,6 +124,7 @@ namespace brogueHd::backend::extension
 			}
 		}
 
+		template<typename T>
 		static void iterateIn(const grid<T>& grid, gridRect boundary, gridDelegates<T>::callback callback)
 		{
 			bool userBreak = false;
@@ -134,6 +144,7 @@ namespace brogueHd::backend::extension
 			}
 		}
 
+		template<typename T>
 		static void iterateAround(const grid<T>& grid, short column, short row, bool withinBounds, gridDelegates<T>::callback callback)
 		{
 			short newX, newY;
@@ -157,6 +168,7 @@ namespace brogueHd::backend::extension
 			}
 		}
 
+		template<typename T>
 		static void iterateAroundCardinal(const grid<T>& grid, short column, short row, bool withinBounds, gridDelegates<T>::callback callback)
 		{
 			iterationCallback response = iterationCallback::iterate;

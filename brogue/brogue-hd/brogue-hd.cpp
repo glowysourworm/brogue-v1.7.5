@@ -47,7 +47,7 @@ namespace brogueHd
 				currentConsole = developerConsole();
 				break;
 			case brogueConsoleReturn::Completed_SetMode_Resource:
-				currentConsole = resourceConsole();
+				currentConsole = resourceConsole(brogueResourceController);
 				break;
 			case brogueConsoleReturn::CompletedWithError:
 				break;

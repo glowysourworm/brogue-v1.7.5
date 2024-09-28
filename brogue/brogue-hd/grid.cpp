@@ -308,7 +308,7 @@ namespace brogueHd::backend::model::layout
     /// the provided predicate.
     /// </summary>
     template<typename T>
-    bool grid<T>::isEdgeWhere(short column, short row, gridDelegates<T>::simplePredicate predicate) const
+    bool grid<T>::isEdgeWhere(short column, short row, gridDelegates<T>::predicate predicate) const
     {
         T north = this->getOrNull(column, row - 1);
         T south = this->getOrNull((column, row + 1);
@@ -330,7 +330,7 @@ namespace brogueHd::backend::model::layout
     }
 
     template<typename T>
-    bool grid<T>::isExposedEdge(int column, int row, brogueCompass direction, gridDelegates<T>::simplePredicate predicate) const
+    bool grid<T>::isExposedEdge(int column, int row, brogueCompass direction, gridDelegates<T>::predicate predicate) const
     {
         T north = this->getOrNull(column, row - 1);
         T south = this->getOrNull((column, row + 1);
@@ -354,7 +354,7 @@ namespace brogueHd::backend::model::layout
     }
 
     template<typename T>
-    bool grid<T>::isExposedCorner(int column, int row, brogueCompass direction, gridExtension<T>::simplePredicate predicate) const
+    bool grid<T>::isExposedCorner(int column, int row, brogueCompass direction, gridDelegates<T>::predicate predicate) const
     {
         if (direction == brogueCompass::NW)
             return isExposedEdge(grid, column, row, Compass.N, predicate) &&

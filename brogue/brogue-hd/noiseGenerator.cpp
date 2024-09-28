@@ -64,11 +64,11 @@ namespace brogueHd::backend::generator
     {
         short count = 0;
 
-        gridExtension<bool>::iterate(&resultGrid, [&resultGrid, &parameters, &count](short columnRect, short rowRect)
+        gridExtension<bool>::iterate(&resultGrid, [&resultGrid, &parameters, &count](short columnRect, short rowRect, bool item)
         {
             count = 0;
 
-            gridExtension<bool>::iterateAround(&resultGrid, columnRect, rowRect, true, [&resultGrid, &count](short i, short j)
+            gridExtension<bool>::iterateAround(&resultGrid, columnRect, rowRect, true, [&resultGrid, &count](short i, short j, bool item)
             {
                 // Count number of alive cells
                 //

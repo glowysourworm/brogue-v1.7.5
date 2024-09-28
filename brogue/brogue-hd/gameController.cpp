@@ -238,17 +238,17 @@ namespace brogueHd::backend::controller
 
 	bool gameController::runMenu()
 	{
-
+		return false;
 	}
 
 	bool gameController::runGame()
 	{
-
+		return false;
 	}
 
 	bool gameController::runSetSeed()
 	{
-
+		return false;
 	}
 
 	bool gameController::runOpenGame()
@@ -273,6 +273,8 @@ namespace brogueHd::backend::controller
 		//}
 		//rogue.playbackMode = false;
 		//rogue.playbackOOS = false;
+
+		return false;
 	}
 
 	bool gameController::runPlayback()
@@ -320,17 +322,23 @@ namespace brogueHd::backend::controller
 		//}
 		//rogue.playbackMode = false;
 		//rogue.playbackOOS = false;
+
+		return false;
 	}
 
 	bool gameController::runHighScores()
 	{
 		//rogue.nextGame = NG_NOTHING;
 		//printHighScores(false);
+
+		return false;
 	}
 
 	bool gameController::runScum()
 	{
 		//rogue.nextGame = NG_NOTHING;
 		//scum(1, 1000, 5);
+
+		return false;
 	}
 }

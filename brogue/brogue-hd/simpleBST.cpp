@@ -173,7 +173,7 @@ namespace brogueHd::component
 
         // Set the height
         node->height = brogueMath<int>::max((node->left != NULL) ? node->left->height : -1, 
-                                            (node->right != null) ? node->right->height : -1) + 1;
+                                            (node->right != NULL) ? node->right->height : -1) + 1;
 
         return this->balance(node);
     }
@@ -214,7 +214,7 @@ namespace brogueHd::component
 
         // Set the height
         node->height = brogueMath<int>::max((node->left != NULL) ? node->left->height : -1,
-                                            (node->right != null) ? node->right->height : -1) + 1;
+                                            (node->right != NULL) ? node->right->height : -1) + 1;
 
         return this->balance(node);
     }
@@ -229,7 +229,7 @@ namespace brogueHd::component
 
         // Set the height
         node->height = brogueMath<int>::max((node->left != NULL) ? node->left->height : -1,
-                                            (node->right != null) ? node->right->height : -1) + 1;
+                                            (node->right != NULL) ? node->right->height : -1) + 1;
 
         return this->balance(node);
     }
@@ -240,7 +240,7 @@ namespace brogueHd::component
         if (node == NULL)
             return NULL;
 
-        return this->minImpl(node->left) ?? node;
+        return this->minImpl(node->left) != NULL ? node : NULL;
     }
 
     template<isComparable K, typename T>
@@ -249,7 +249,7 @@ namespace brogueHd::component
         if (node == NULL)
             return NULL;
 
-        return this->maxImpl(node->right) ?? node;
+        return this->maxImpl(node->right) != NULL ? node : NULL;
     }
 
     template<isComparable K, typename T>
@@ -282,7 +282,7 @@ namespace brogueHd::component
         if (node == NULL)
             return NULL;
 
-        var comparison = keyCompare(key, node.Key);
+        int comparison = keyCompare(key, node.Key);
 
         if (comparison < 0 && node->left != NULL)
         {
@@ -399,17 +399,17 @@ namespace brogueHd::component
         // Refering to variables from Wikipedia entry
         simpleBSTNode<K, T>* X = subTree;
         simpleBSTNode<K, T>* Z = subTree->right;
-        simpleBSTNode<K, T>* T = subTree->right->left ?? NULL;
+        simpleBSTNode<K, T>* W = subTree->right == NULL ? NULL : subTree->right->left;
 
         // Node's left child becomes node's parent's right child:  X -> T
-        X->right = T;
+        X->right = W;
 
         // Node's parent becomes the left child of node:  X <- Z
         Z->left = X;
 
         // Set up height of nodes
-        X->height = brogueMath<int>::max((X->left != NULL) ? X->left->height ?? -1, (X->right != NULL) ? X->right->height ?? -1) + 1;
-        Z->height = brogueMath<int>::max((Z->left != NULL) ? Z->left->height ?? -1, (Z->right != NULL) ? Z->right->height ?? -1) + 1;
+        X->height = brogueMath<int>::max((X->left != NULL) ? X->left->height : -1, (X->right != NULL) ? X->right->height : -1) + 1;
+        Z->height = brogueMath<int>::max((Z->left != NULL) ? Z->left->height : -1, (Z->right != NULL) ? Z->right->height : -1) + 1;
 
         // Return node of the new sub-tree
         return Z;
@@ -434,17 +434,17 @@ namespace brogueHd::component
         // Refering to variables from Wikipedia entry
         simpleBSTNode<K, T>* X = node;
         simpleBSTNode<K, T>* Z = node->left;
-        simpleBSTNode<K, T>* T = node->left->right ?? NULL;
+        simpleBSTNode<K, T>* W = node->left == NULL ? NULL : node->left->right;
 
         // Node's right child becomes node's parent's left child:  T <- X
-        X->left = T;
+        X->left = W;
 
         // Node's parent becomes the right child of node:  Z -> X
         Z->right = X;
 
         // Set up height of nodes
-        X->height = brogueMath<int>::max((X->left != NULL) ? X->left->height ? ? -1, (X->right != NULL) ? X->right->height ? ? -1) + 1;
-        Z->height = brogueMath<int>::max((Z->left != NULL) ? Z->left->height ? ? -1, (Z->right != NULL) ? Z->right->height ? ? -1) + 1;
+        X->height = brogueMath<int>::max((X->left != NULL) ? X->left->height : - 1, (X->right != NULL) ? X->right->height : -1) + 1;
+        Z->height = brogueMath<int>::max((Z->left != NULL) ? Z->left->height : -1, (Z->right != NULL) ? Z->right->height : -1) + 1;
 
         // Return node of the new sub-tree
         return Z;

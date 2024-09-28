@@ -37,9 +37,9 @@ namespace brogueHd::backend::model
 
 		short _currentMessageIndex;
 
-		simpleList<messageData*>* _messages;
+		simpleList<messageData>* _messages;
 
-		messageData* _flavorMessage;
+		messageData _flavorMessage;
 
 		//messageData messageArchive[MESSAGE_ARCHIVE_LINES];
 

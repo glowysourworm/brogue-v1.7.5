@@ -1,6 +1,8 @@
 #pragma once
 
 #include "point.h"
+#include "vector.h"
+#include "exceptionHandler.h"
 
 namespace brogueHd::backend::math
 {
@@ -23,11 +25,11 @@ namespace brogueHd::backend::math
         {
             int pointsShared = 0;
 
-            pointsShared += ((point1 == vertex1) || point1 == vertex2)) ? 1 : 0;
+            pointsShared += ((point1 == vertex1) || (point1 == vertex2)) ? 1 : 0;
 
-            pointsShared += ((point2 == vertex1) || point2 == vertex2)) ? 1 : 0;
+            pointsShared += ((point2 == vertex1) || (point2 == vertex2)) ? 1 : 0;
 
-            pointsShared += ((point3 == vertex1) || point3 == vertex2)) ? 1 : 0;
+            pointsShared += ((point3 == vertex1) || (point3 == vertex2)) ? 1 : 0;
 
             return pointsShared > 1;
         }
@@ -89,7 +91,7 @@ namespace brogueHd::backend::math
                 p3 = point2;
             }
             else
-                throw new Exception("Improper use of circum-circle algorithm");
+                brogueException::show("Improper use of circum-circle algorithm");
 
             // 3) Solve the circum-circle interior determinant
             //

@@ -14,6 +14,11 @@ namespace brogueHd::backend::model::game
 		colorString message;
 		bool confirmed;
 
+		messageData()
+		{
+			message = colorString("No Message", color(255,255,255,0, 0, 0, 0, false));
+			confirmed = false;
+		}
 		messageData(const char* amessage, color textColor, bool aconfirmed)
 		{
 			// Check message length

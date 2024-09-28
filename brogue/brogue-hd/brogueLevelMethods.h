@@ -1,13 +1,12 @@
 #pragma once
 
+#include "broguedef.h"
 #include "brogueLevel.h"
 #include "terrainDeclaration.h"
 #include "floorTileType.h"
-#include "machineFeature.h"
 #include "dungeonConstants.h"
 
 using namespace brogueHd::backend::model::game;
-using namespace brogueHd::backend::model::machine;
 using namespace brogueHd::backend::model::layout;
 
 namespace brogueHd::backend::methods

@@ -128,27 +128,27 @@ namespace brogueHd::backend::generator
         for (short index = 0; index < maxAttempts; index++)
         {
             // MEMORY!
-            gridRegion<gridLocator>* nextRegion = index == 0 ? this->createRoom(_profile->getEntranceRoom()) :
-                                                               this->createRoom(_profile->getRandomRoomInfo());
+            gridRegion<gridLocator>* nextRegion = index == 0 ? this->createRoom(_grid->getParentBoundary(), _grid->getRelativeBoundary(), _profile->getEntranceRoom()) :
+                                                               this->createRoom(_grid->getParentBoundary(), _grid->getRelativeBoundary(), _profile->getRandomRoomInfo());
 
             // Connection Points
-            simpleList<gridLocator> northEdge = nextRegion->getBoundaryEdges(brogueCompass::N);
-            simpleList<gridLocator> southEdge = nextRegion->getBoundaryEdges(brogueCompass::S);
-            simpleList<gridLocator> eastEdge = nextRegion->getBoundaryEdges(brogueCompass::E);
-            simpleList<gridLocator> westEdge = nextRegion->getBoundaryEdges(brogueCompass::W);
+            simpleArray<gridLocator>* northEdge = nextRegion->getBoundaryEdges(brogueCompass::N);
+            simpleArray<gridLocator>* southEdge = nextRegion->getBoundaryEdges(brogueCompass::S);
+            simpleArray<gridLocator>* eastEdge = nextRegion->getBoundaryEdges(brogueCompass::E);
+            simpleArray<gridLocator>* westEdge = nextRegion->getBoundaryEdges(brogueCompass::W);
 
-            int randN = _randomGenerator->rand_range(0, northEdge.count());
-            int randS = _randomGenerator->rand_range(0, southEdge.count());
-            int randE = _randomGenerator->rand_range(0, eastEdge.count());
-            int randW = _randomGenerator->rand_range(0, westEdge.count());
+            int randN = _randomGenerator->rand_range(0, northEdge->size());
+            int randS = _randomGenerator->rand_range(0, southEdge->size());
+            int randE = _randomGenerator->rand_range(0, eastEdge->size());
+            int randW = _randomGenerator->rand_range(0, westEdge->size());
 
             accretionTile nextRoom;
 
             nextRoom.region = nextRegion;
-            nextRoom.connectionPointN = northEdge[randN];
-            nextRoom.connectionPointS = southEdge[randS];
-            nextRoom.connectionPointE = eastEdge[randE];
-            nextRoom.connectionPointW = westEdge[randW];
+            nextRoom.connectionPointN = northEdge->get(randN);
+            nextRoom.connectionPointS = southEdge->get(randS);
+            nextRoom.connectionPointE = eastEdge->get(randE);
+            nextRoom.connectionPointW = westEdge->get(randW);
 
             attemptRegions.add(nextRoom);
         }
@@ -156,6 +156,8 @@ namespace brogueHd::backend::generator
         // Bolt-on
         for (int index = 0; index < attemptRegions.count(); index++)
         {
+            accretionTile attemptRegion = attemptRegions[index];
+
             // First Room
             if (index == 0)
             {
@@ -163,19 +165,19 @@ namespace brogueHd::backend::generator
                 //        have been by design (Brogue v1.7.5); but probably only matters for
                 //        the first level.
                 //
-                _roomTiles->add(attemptRegions[index]);
+                _roomTiles->add(attemptRegion);
 
                 // Set final room locations
-                _grid->setFromRegion(attemptRegions[index].region);
+                _grid->setFromRegion(attemptRegion.region);
             }
 
             // Accrete rooms - translating the attempt room into place (modifies attempt region)
-            else if (attemptConnection(attemptRegions[index], _grid->getParentBoundary(), interRoomPadding))
+            else if (attemptConnection(attemptRegion, _grid->getParentBoundary(), interRoomPadding))
             {
-                _roomTiles->add(attemptRegions[index]);
+                _roomTiles->add(attemptRegion);
 
                 // Set final room locations
-                _grid->setFromRegion(attemptRegions[index].region);
+                _grid->setFromRegion(attemptRegion.region);
             }
         }
 
@@ -285,7 +287,7 @@ namespace brogueHd::backend::generator
                     grid<gridLocator>* grid = _grid;
 
                     // Double check the already-set rooms
-                    translatedRegion->iterateLocations([&grid, &gridOverlaps](gridLocator item)
+                    translatedRegion->iterateLocations([&grid, &gridOverlaps](short column, short row, gridLocator item)
                     {
                         if (grid->isDefined(item.column, item.row))
                         {
@@ -435,6 +437,8 @@ namespace brogueHd::backend::generator
 
             if (item.hasWestConnection)
                 connectionNodes.add(gridLocatorNode(item.connectionPointW));
+
+            return iterationCallback::iterate;
         });
 
         _delaunayGraph = triangulator.run(connectionNodes);
@@ -495,6 +499,8 @@ namespace brogueHd::backend::generator
 
             if (isCorridorEdge)
                 corridorEdges.add(edge);
+
+            return iterationCallback::iterate;
         });
 
         grid<gridLocator> grid = *_grid;
@@ -539,7 +545,11 @@ namespace brogueHd::backend::generator
             resultPath.forEach([&grid](gridLocator locator)
             {
                 grid.set(locator.column, locator.row, locator);
+
+                return iterationCallback::iterate;
             });
+
+            return iterationCallback::iterate;
         });
     }
 }

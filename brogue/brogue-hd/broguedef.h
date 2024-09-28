@@ -491,4 +491,17 @@ namespace brogueHd
 
 	//typedef struct pdsLink pdsLink;
 	//typedef struct pdsMap pdsMap;			
+	
+
+	// Default Template Value: Override these for default struct / class values
+	//						   to use for returning default values instead of NULL.
+
+	/// <summary>
+	/// Try using this to generate default values (return values) for templated functions
+	/// </summary>
+	template<typename T>
+	struct default_value
+	{
+		static constexpr T value = T();
+	};
 }

@@ -240,7 +240,7 @@ namespace brogueHd::backend::model::layout
 	{
 		_locations->forEach([](T item)
 		{
-			callback(item.column, item.row, item);
+			return callback(item.column, item.row, item);
 		});
 	}
 
@@ -249,7 +249,7 @@ namespace brogueHd::backend::model::layout
 	{
 		_edgeLocations->forEach([](T item)
 		{
-			callback(item.column, item.row, item);
+			return callback(item.column, item.row, item);
 		});
 	}
 
@@ -278,6 +278,8 @@ namespace brogueHd::backend::model::layout
 			}
 
 			constructor.add(newColumn, newRow, locator);
+
+			return iterationCallback::iterate;
 		});
 
 		// Commit the translated region to memory - calculating the rest of the data

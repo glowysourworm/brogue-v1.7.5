@@ -1,5 +1,7 @@
 #pragma once
 
+#include "point.h"
+
 namespace brogueHd::backend::math
 {
 	template<typename T>

@@ -2,6 +2,7 @@
 #include "command.h"
 #include "exceptionHandler.h"
 #include "stringExtension.h"
+#include "typeConverter.h"
 
 using namespace brogueHd::backend::extension;
 
@@ -67,17 +68,17 @@ namespace brogueHd::console
 					return (T)std::string(args[index + 1]);
 
 				else if (std::is_convertible<T, int>())
-					return (T)atoi(args[index + 1].c_str());
+					return (T)stringExtension::convert<int>(args[index + 1]);
 
 				else if (std::is_convertible<T, unsigned long>())
-					return (T)atol(args[index + 1].c_str());
+					return (T)stringExtension::convert<unsigned long>(args[index + 1]);
 
 				else
 					brogueException::show("Unhandled console command type:  " + std::string(typeid(T).name));
 			}
 		}
 
-		return NULL;
+		return default_value<T>::value;
 	}
 }
 

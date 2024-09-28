@@ -1,7 +1,7 @@
 #pragma once
 
+#include "randomRange.h"
 #include <random>
-#include "mathdef.h"
 
 using namespace brogueHd::backend::math;
 

@@ -17,7 +17,7 @@ namespace brogueHd::backend::model::gameTemplate
 		// What spawns:
 		tileType terrain;
 
-		machineFeature feature;	// TODO:  I added this for the enum refactoring
+		//machineFeature feature;	// TODO:  I added this for the enum refactoring
 		//dungeonLayers layer;
 
 		//dungeonFeatureTypes DFType;

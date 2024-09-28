@@ -20,10 +20,10 @@ namespace brogueHd::component
         
         int balanceFactor()
         {
-            return ((left == NULL) ? left->height ? -1) - ((right == NULL) ? right->height ?? -1);
+            return ((left == NULL) ? left->height : -1) - ((right == NULL) ? right->height : -1);
         }
 
-        public simpleBSTNode(K akey, T avalue)
+        simpleBSTNode(K akey, T avalue)
         {
             key = akey;
             value = avalue;

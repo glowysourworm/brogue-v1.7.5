@@ -72,17 +72,17 @@ namespace brogueHd::backend::model::construction
         if (_completed)
             brogueException::show("Trying to add location to a completed region constructor:  gridRegionConstructor.addCell");
 
-        else if (_locations.find(location) != NULL)
+        else if (_locations->containsKey(item))
             return;
 
         else
         {
-            if (_locations.count() > 0 && !isConnected(location))
+            if (_locations->count() > 0 && !isConnected(location))
                 brogueException::show("Trying to add un-connected cell to the region:  gridRegionConstructor.addCell");
 
             // Keep locations up to date
             _grid[location] = location;
-            _locations.insert(location, location);
+            _locations->add(location, location);
 
             // Expand the boundary
             addBoundary(location);
@@ -152,7 +152,7 @@ namespace brogueHd::backend::model::construction
     }
 
     template<isGridLocator T>
-    void gridRegionConstructor<T>::addEdges(short column, short row, T item)
+    void gridRegionConstructor<T>::addEdges(short column, short row, T location)
     {
         // Edges and Corners
         if (_grid->isEdge(column, row, _predicate))
@@ -196,7 +196,7 @@ namespace brogueHd::backend::model::construction
     }
 
     template<isGridLocator T>
-    void gridRegionConstructor<T>::addBoundary(short column, short row, T item)
+    void gridRegionConstructor<T>::addBoundary(short column, short row, T location)
     {
         if (column < _left)
             _left = location.Column;
@@ -284,7 +284,7 @@ namespace brogueHd::backend::model::construction
 
                 for (short index2 = index1; index2 < rowCountersLength && minHeight > 0; index2++)
                 {
-                    minHeight = brogueMath<short, short>::min(minHeight, rowCounters[index1], rowCounters[index2]);
+                    minHeight = brogueMath<short>::min(minHeight, rowCounters[index1], rowCounters[index2]);
 
                     // Current column against previous
                     if (rowCounters[index1] > bestArea)

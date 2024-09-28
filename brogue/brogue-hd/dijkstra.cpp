@@ -63,24 +63,25 @@ namespace brogueHd::backend::math
 		_completedPaths.clear();
 		_validPaths.clear();
 
-		gridRectExtension::iterate(_relativeBoundary, [](short column, short row)
+		for (int column = _relativeBoundary.left(); column <= _relativeBoundary.right(); column++)
 		{
-			// CHECK PREDICATE TO SET MAP COST OFF LIMITS
-			var passesPredicate = _predicate(column, row);
+			for (int row = _relativeBoundary.top(); row <= _relativeBoundary.bottom(); row++)
+			{
+				// CHECK PREDICATE TO SET MAP COST OFF LIMITS
+				bool passesPredicate = _predicate(column, row);
 
-			// Initialize output map (set to infinity for initialization
-			short outputValue = ((column == _sourceLocation->column) && (row == _sourceLocation->row) && passesPredicate) ? 0 : SHRT_MAX;
-			
-			_outputMap->set(column, row, outputValue);
+				// Initialize output map (set to infinity for initialization
+				short outputValue = ((column == _sourceLocation->column) && (row == _sourceLocation->row) && passesPredicate) ? 0 : std::numeric_limits<short>::max();
 
-			// Initialize visited map
-			_visitedMap->set(column, row, false);
+				_outputMap->set(column, row, outputValue);
 
-			// Initialize location map
-			_locationMap->set(column, row, false);
+				// Initialize visited map
+				_visitedMap->set(column, row, false);
 
-			return iterationCallback::iterate;
-		});
+				// Initialize location map
+				_locationMap->set(column, row, false);
+			}
+		}
 
 		_initialized = true;
 		_finished = false;

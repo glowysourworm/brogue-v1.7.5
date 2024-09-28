@@ -37,5 +37,5 @@ namespace brogueHd::backend::math
         simpleList<TNode>* _nodes;
 
         graphEdgeCollection<TNode, TEdge>* _edgeCollection;
-    }
+    };
 }
