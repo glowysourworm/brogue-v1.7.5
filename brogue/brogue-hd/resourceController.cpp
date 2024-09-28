@@ -1,12 +1,14 @@
 #pragma once
 
 #include "resourceController.h"
-#include "exceptionHandler.h"
 #include "playbackData.h"
 #include "gameData.h"
-#include "stringExtension.h"
 #include "brogueColorMap.h"
 #include "typeConverter.h"
+
+#include <exceptionHandler.h>
+#include <stringExtension.h>
+
 #include <string>
 #include <fstream>
 #include <format>
@@ -74,63 +76,31 @@ namespace brogueHd::backend::controller
 		}
 	}
 
-	void resourceController::loadKeymap(const keyProcessor& processor)
+	void resourceController::loadKeymap(keyProcessor& processor)
 	{
 		try
 		{
-			FILE** file;
-			fopen_s(file, "keymap", "r");
+			std::ifstream stream("keymap", fstream::in);
 
-			char buffer[512];
-
-			if (file == NULL)
+			if (!stream.is_open())
 			{
-				// Output Default Keymap
-
-				// Close / Reopen
-
-				// TODO
-				throw;
+				brogueException::show("Error opening keymap file:  either missing, or locked");
+				return;
 			}
 
-			while (fgets(buffer, 512, *file) != NULL)
+			std::string line;
+
+			while (getline(stream, line))
 			{
-				// split it in two (destructively)
-				int mode = 1;
-				char* input_name = NULL;
-				char* output_name = NULL;
+				std::string* linePieces = stringExtension::split(line, " ");
 
-				for (int i = 0; buffer[i]; i++)
-				{
-					if (isspace(buffer[i]))
-					{
-						buffer[i] = '\0';
-						mode = 1;
-					}
-					else
-					{
-						if (mode)
-						{
-							if (input_name == NULL)
-								input_name = buffer + i;
+				if (SIZEOF(linePieces) != 2)
+					brogueException::show("Invalid keymap file:  looking for two character split by only whitespace");
 
-							else if (output_name == NULL)
-								output_name = buffer + i;
-						}
-						mode = 0;
-					}
-				}
-				if (input_name != NULL && output_name != NULL)
-				{
-					// Comment
-					if (input_name[0] == '#')
-						continue;
-
-					processor.addKeyMap(input_name, output_name);
-				}
+				processor.addKeyMap(linePieces[0].c_str(), linePieces[1].c_str());
 			}
 
-			fclose(*file);
+			stream.close();
 		}
 		catch (std::exception& ex)
 		{

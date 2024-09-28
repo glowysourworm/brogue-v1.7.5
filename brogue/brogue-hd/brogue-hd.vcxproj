@@ -78,9 +78,23 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\Backup\_Source\Git\brogue-v1.7.5\brogue\brogue-hd.component;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Backup\_Source\Git\brogue-v1.7.5\brogue\x64\Debug;C:\Backup\_Source\Git\brogue-v1.7.5\brogue\brogue-hd.component\x64\Debug;$(LibraryPath)</LibraryPath>
+    <CopyLocalDeploymentContent>false</CopyLocalDeploymentContent>
+    <CopyLocalProjectReference>false</CopyLocalProjectReference>
+    <CopyLocalDebugSymbols>false</CopyLocalDebugSymbols>
+    <CopyCppRuntimeToOutputDir>false</CopyCppRuntimeToOutputDir>
+    <PublicIncludeDirectories>$(PublicIncludeDirectories)</PublicIncludeDirectories>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\Backup\_Source\Git\brogue-v1.7.5\brogue\brogue-hd.component;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Backup\_Source\Git\brogue-v1.7.5\brogue\brogue-hd.component\x64\Debug;C:\Backup\_Source\Git\brogue-v1.7.5\brogue\x64\Debug;$(LibraryPath)</LibraryPath>
+    <CopyLocalDeploymentContent>false</CopyLocalDeploymentContent>
+    <CopyLocalProjectReference>false</CopyLocalProjectReference>
+    <CopyLocalDebugSymbols>false</CopyLocalDebugSymbols>
+    <CopyCppRuntimeToOutputDir>false</CopyCppRuntimeToOutputDir>
+    <PublicIncludeDirectories>C:\Backup\_Source\Git\brogue-v1.7.5\brogue\brogue-hd.component;$(PublicIncludeDirectories)</PublicIncludeDirectories>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -117,12 +131,18 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <LanguageStandard_C>Default</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>C:\Backup\_Source\Git\brogue-v1.7.5\brogue\x64\Debug;C:\Backup\_Source\Git\brogue-v1.7.5\brogue\brogue-hd.component\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>C:\Backup\_Source\Git\brogue-v1.7.5\brogue\x64\Debug\brogue-hd.component.lib;brogue-hd.component.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <ProjectReference>
+      <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -133,18 +153,21 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <LanguageStandard_C>Default</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>C:\Backup\_Source\Git\brogue-v1.7.5\brogue\brogue-hd.component\x64\Debug;C:\Backup\_Source\Git\brogue-v1.7.5\brogue\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>C:\Backup\_Source\Git\brogue-v1.7.5\brogue\x64\Debug\brogue-hd.component.lib;brogue-hd.component.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <ProjectReference>
+      <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
+    </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="simpleArray.cpp" />
-    <ClCompile Include="simpleBST.cpp" />
     <ClCompile Include="brogue-hd.cpp" />
     <ClCompile Include="brogueCell.cpp" />
     <ClCompile Include="brogueColorMap.cpp" />
@@ -166,19 +189,11 @@
     <ClCompile Include="brogueView.cpp" />
     <ClCompile Include="contentGenerator.cpp" />
     <ClCompile Include="creature.cpp" />
-    <ClCompile Include="delaunayAlgorithm.cpp" />
     <ClCompile Include="developerConsole.cpp" />
-    <ClCompile Include="dijkstra.cpp" />
     <ClCompile Include="flare.cpp" />
     <ClCompile Include="gameConsole.cpp" />
     <ClCompile Include="gameController.cpp" />
     <ClCompile Include="gameData.cpp" />
-    <ClCompile Include="graph.cpp" />
-    <ClCompile Include="graphAlgorithm.cpp" />
-    <ClCompile Include="graphEdgeCollection.cpp" />
-    <ClCompile Include="grid.cpp" />
-    <ClCompile Include="gridRegionConstructor.cpp" />
-    <ClCompile Include="gridRegionLocator.cpp" />
     <ClCompile Include="item.cpp" />
     <ClCompile Include="keyProcessor.cpp" />
     <ClCompile Include="layoutGenerator.cpp" />
@@ -191,15 +206,11 @@
     <ClCompile Include="openglRenderer.cpp" />
     <ClCompile Include="playbackProcessor.cpp" />
     <ClCompile Include="playerCharacter.cpp" />
-    <ClCompile Include="primsAlgorithm.cpp" />
     <ClCompile Include="randomGenerator.cpp" />
-    <ClCompile Include="gridRegion.cpp" />
     <ClCompile Include="resourceConsole.cpp" />
     <ClCompile Include="resourceController.cpp" />
     <ClCompile Include="roomGenerator.cpp" />
     <ClCompile Include="renderingController.cpp" />
-    <ClCompile Include="simpleHash.cpp" />
-    <ClCompile Include="simpleList.cpp" />
     <ClCompile Include="terrainGenerator.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -210,10 +221,10 @@
     <ClInclude Include="brogueContentGrid.h" />
     <ClInclude Include="brogueCreature.h" />
     <ClInclude Include="brogueCreatureHorde.h" />
+    <ClInclude Include="brogueMacros.h" />
     <ClInclude Include="brogueGameProfile.h" />
     <ClInclude Include="brogueLevelProfile.h" />
     <ClInclude Include="brogueMachine.h" />
-    <ClInclude Include="brogueMath.h" />
     <ClInclude Include="brogueObject.h" />
     <ClInclude Include="broguePlayer.h" />
     <ClInclude Include="brogueRoom.h" />
@@ -222,36 +233,19 @@
     <ClInclude Include="creatureBehavior.h" />
     <ClInclude Include="creatureBehaviorMap.h" />
     <ClInclude Include="creatureConstants.h" />
-    <ClInclude Include="delaunayAlgorithm.h" />
     <ClInclude Include="developerConsole.h" />
     <ClInclude Include="dungeonFeature.h" />
     <ClInclude Include="dungeonFeatureConstants.h" />
     <ClInclude Include="dungeonTemplate.h" />
-    <ClInclude Include="EnumString.h" />
-    <ClInclude Include="exceptionHandler.h" />
     <ClInclude Include="gameConsole.h" />
-    <ClInclude Include="graph.h" />
-    <ClInclude Include="graphAlgorithm.h" />
-    <ClInclude Include="graphDefinitions.h" />
-    <ClInclude Include="graphEdge.h" />
-    <ClInclude Include="graphEdgeCollection.h" />
-    <ClInclude Include="graphNode.h" />
-    <ClInclude Include="gridLocator.h" />
-    <ClInclude Include="gridLocatorEdge.h" />
-    <ClInclude Include="gridRegionConstructor.h" />
-    <ClInclude Include="gridRegionLocator.h" />
     <ClInclude Include="hashGenerator.h" />
     <ClInclude Include="item.h" />
     <ClInclude Include="itemTemplate.h" />
     <ClInclude Include="linearGenerationParameters.h" />
     <ClInclude Include="machineTemplate.h" />
-    <ClInclude Include="randomRange.h" />
-    <ClInclude Include="simpleArray.h" />
-    <ClInclude Include="simpleBST.h" />
     <ClInclude Include="blueprintDeclaration.h" />
     <ClInclude Include="bolt.h" />
     <ClInclude Include="brogueCell.h" />
-    <ClInclude Include="broguedef.h" />
     <ClInclude Include="broguefile.h" />
     <ClInclude Include="brogueGame.h" />
     <ClInclude Include="brogueLayout.h" />
@@ -268,7 +262,6 @@
     <ClInclude Include="command.h" />
     <ClInclude Include="contentGenerator.h" />
     <ClInclude Include="creature.h" />
-    <ClInclude Include="dijkstra.h" />
     <ClInclude Include="dungeonConstants.h" />
     <ClInclude Include="dungeon.h" />
     <ClInclude Include="feat.h" />
@@ -278,9 +271,6 @@
     <ClInclude Include="gameConstants.h" />
     <ClInclude Include="gameController.h" />
     <ClInclude Include="gameData.h" />
-    <ClInclude Include="grid.h" />
-    <ClInclude Include="gridDefinitions.h" />
-    <ClInclude Include="gridRect.h" />
     <ClInclude Include="brogueLevelMethods.h" />
     <ClInclude Include="brogueItem.h" />
     <ClInclude Include="itemConstants.h" />
@@ -297,27 +287,17 @@
     <ClInclude Include="openglRenderer.h" />
     <ClInclude Include="playbackProcessor.h" />
     <ClInclude Include="playerCharacter.h" />
-    <ClInclude Include="point.h" />
     <ClInclude Include="powerTables.h" />
-    <ClInclude Include="primsAlgorithm.h" />
     <ClInclude Include="randomGenerator.h" />
     <ClInclude Include="playbackData.h" />
-    <ClInclude Include="gridRegion.h" />
     <ClInclude Include="resourceConsole.h" />
     <ClInclude Include="resourceController.h" />
     <ClInclude Include="roomGenerator.h" />
     <ClInclude Include="renderingController.h" />
-    <ClInclude Include="simpleHash.h" />
-    <ClInclude Include="simple.h" />
-    <ClInclude Include="simpleList.h" />
     <ClInclude Include="statusEffectConstants.h" />
     <ClInclude Include="statusEffect.h" />
-    <ClInclude Include="stringExtension.h" />
     <ClInclude Include="terrainDeclaration.h" />
     <ClInclude Include="terrainGenerator.h" />
-    <ClInclude Include="triangle.h" />
-    <ClInclude Include="typeConverter.h" />
-    <ClInclude Include="vector.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\resources\armor.csv" />
@@ -352,6 +332,11 @@
     <None Include="..\resources\wands.csv" />
     <None Include="..\resources\weaponRunicNames.csv" />
     <None Include="..\resources\weapons.csv" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\brogue-hd.component\brogue-hd.component.vcxproj">
+      <Project>{e94509ad-19a8-4440-b05f-6defe21da01f}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

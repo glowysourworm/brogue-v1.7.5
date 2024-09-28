@@ -1,8 +1,8 @@
 #include "gameConsole.h"
-#include "broguedef.h"
+#include "brogueMacros.h"
 #include "gameController.h"
-#include "stringExtension.h"
-#include "exceptionHandler.h"
+#include <stringExtension.h>
+#include <exceptionHandler.h>
 #include "broguefile.h"
 #include <format>
 
@@ -143,12 +143,12 @@ namespace brogueHd::console
 		// View
 		if (hasArgument(cmd, "--view") || hasArgument(cmd, "-v"))
 		{
-			viewPath = getArgument<char*>(cmd, "--view");
+			viewPath = getArgument(cmd, "--view");
 
-			if (viewPath == NULL)
-				viewPath = getArgument<char*>(cmd, "-v");
+			if (viewPath == "")
+				viewPath = getArgument(cmd, "-v");
 
-			_gameController->initPlayback(viewPath);
+			_gameController->initPlayback(viewPath.c_str());
 			_gameController->setMode(BrogueGameMode::Playback);
 		}
 

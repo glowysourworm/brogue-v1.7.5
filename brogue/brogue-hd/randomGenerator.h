@@ -1,9 +1,9 @@
 #pragma once
 
-#include "randomRange.h"
+#include <randomRange.h>
 #include <random>
 
-using namespace brogueHd::backend::math;
+using namespace brogueHd::component::math;
 
 namespace brogueHd::backend::generator
 {

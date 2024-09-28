@@ -171,7 +171,7 @@ namespace brogueHd::backend::controller
 		//rogue.playbackOOS = false;
 	}
 
-	void gameController::initPlayback(char* recordingPath)
+	void gameController::initPlayback(const char* recordingPath)
 	{
 		if (_gameData != NULL)
 			brogueException::show("Trying to initialize playback while a current one is loaded:  call closeGame() first");

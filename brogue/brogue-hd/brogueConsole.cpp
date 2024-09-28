@@ -63,6 +63,8 @@ namespace brogueHd::console
 				return args[index + 1];
 			}
 		}
+
+		return "";
 	}
 
 	int brogueConsole::getArgumentInt(const std::string args[], const char* argumentName)
@@ -75,6 +77,8 @@ namespace brogueHd::console
 				return typeConverter::stringToint(args[index + 1]);
 			}
 		}
+
+		return 0;
 	}
 
 	bool brogueConsole::getArgumentBool(const std::string args[], const char* argumentName)
@@ -87,6 +91,8 @@ namespace brogueHd::console
 				return typeConverter::stringToBool(args[index + 1]);
 			}
 		}
+
+		return false;
 	}
 }
 

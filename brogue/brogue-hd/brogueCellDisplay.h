@@ -2,7 +2,7 @@
 
 #include "light.h"
 #include "color.h"
-#include "broguedef.h"
+#include "brogueMacros.h"
 
 using namespace brogueHd::backend::model::game;
 

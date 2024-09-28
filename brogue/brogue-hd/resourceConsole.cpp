@@ -1,7 +1,9 @@
 #include "resourceConsole.h"
-#include "stringExtension.h"
 #include "brogueColorMap.h"
 #include "colorConstants.h"
+
+#include <stringExtension.h>
+
 #include <format>
 
 using namespace std;
@@ -24,11 +26,11 @@ namespace brogueHd::console
 
 		if (hasArgument(cmd, "--loadColors"))
 		{
-			char* path = getArgument<char*>(cmd, "--loadColors");
+			std::string path = getArgument(cmd, "--loadColors");
 
 			stream << "Loading Color Definitions:  " << path << std::endl;
 
-			brogueColorMap* colorMap = _resourceController->loadColors(path);
+			brogueColorMap* colorMap = _resourceController->loadColors(path.c_str());
 
 			if (colorMap != NULL)
 			{

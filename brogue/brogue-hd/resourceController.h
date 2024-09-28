@@ -7,6 +7,7 @@
 #include "playbackData.h"
 
 using namespace brogueHd::backend::processor;
+using namespace brogueHd::backend::model;
 using namespace brogueHd::backend::model::io;
 using namespace brogueHd::backend::model::game;
 
@@ -32,7 +33,7 @@ namespace brogueHd::backend::controller
 		/// <summary>
 		/// Loads key map from file
 		/// </summary>
-		void loadKeymap(const keyProcessor& keyProcessor);
+		void loadKeymap(keyProcessor& keyProcessor);
 
 		/// <summary>
 		/// Loads game data from file

@@ -1,9 +1,12 @@
 #pragma once
 
 #include "noiseGenerator.h"
-#include "brogueMath.h"
+#include <grid.h>
+#include <gridRect.h>
+#include <brogueMath.h>
 
-using namespace brogueHd::backend::math;
+using namespace brogueHd::component;
+using namespace brogueHd::component::math;
 using namespace brogueHd::backend::model;
 using namespace brogueHd::backend::model::layout;
 

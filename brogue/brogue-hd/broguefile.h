@@ -1,8 +1,9 @@
 #pragma once
 
-#include "broguedef.h"
+#include "brogueMacros.h"
+#include <componentMacros.h>
 #include "gameConstants.h"
-#include "simpleList.h"
+#include <simpleList.h>
 #include <iostream>
 #include <time.h>
 

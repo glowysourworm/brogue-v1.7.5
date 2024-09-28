@@ -7,7 +7,6 @@
 #include "randomGenerator.h"
 
 using namespace brogueHd::backend::model::layout;
-using namespace brogueHd::backend::model::game;
 
 namespace brogueHd::backend::generator
 {

@@ -4,6 +4,7 @@
 #include "brogueMessageQueue.h"
 #include "openglRenderer.h"
 #include "brogueView.h"
+#include "randomGenerator.h"
 
 using namespace brogueHd::backend::model;
 using namespace brogueHd::backend::generator;

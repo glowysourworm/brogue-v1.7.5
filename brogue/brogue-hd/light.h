@@ -1,9 +1,9 @@
 #pragma once
 
 #include "color.h"
-#include "randomRange.h"
+#include <randomRange.h>
 
-using namespace brogueHd::backend::math;
+using namespace brogueHd::component::math;
 
 namespace brogueHd::backend::model::game
 {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "broguedef.h"
+#include "brogueMacros.h"
 #include "messageData.h"
 #include "color.h"
 #include "simpleList.h"

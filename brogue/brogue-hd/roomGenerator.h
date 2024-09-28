@@ -1,12 +1,12 @@
 #pragma once
 
-#include "grid.h"
-#include "gridDefinitions.h"
+#include <grid.h>
+#include <gridDefinitions.h>
+#include <gridRegionLocator.h>
 #include "noiseGenerator.h"
-#include "gridRegionLocator.h"
 #include "cellularAutomataParameters.h"
 
-using namespace brogueHd::backend::model::construction;
+using namespace brogueHd::component;
 using namespace brogueHd::backend::model::layout;
 
 namespace brogueHd::backend::generator

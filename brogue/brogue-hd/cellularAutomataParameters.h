@@ -1,7 +1,9 @@
 #pragma once
 
-#include "gridRect.h"
-#include "broguedef.h"
+#include <gridRect.h>
+#include "brogueMacros.h"
+
+using namespace brogueHd::component;
 
 namespace brogueHd::backend::model::layout
 {
@@ -16,7 +18,7 @@ namespace brogueHd::backend::model::layout
 		cellularAutomataParameters()
 		{
 			boundary = gridRect(0, 0, DCOLS, DROWS);
-			fillRatio = 0.55;
+			fillRatio = 0.55f;
 			birthCount = 3;
 			survivalCount = 5;
 			smoothingIterations = 5;

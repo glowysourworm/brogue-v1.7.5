@@ -1,9 +1,9 @@
-#include "broguedef.h"
+#include "brogueMacros.h"
 #include "gameConsole.h"
 #include "developerConsole.h"
 #include "resourceConsole.h"
 #include "resourceController.h"
-#include "stringExtension.h"
+#include <stringExtension.h>
 #include <iostream>
 #include <string>
 

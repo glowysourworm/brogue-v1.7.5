@@ -1,11 +1,12 @@
 #pragma once
 
 #include "brogueLevelProfile.h"
-#include "brogueMath.h"
-#include "exceptionHandler.h"
-#include "simpleList.h"
+#include <simpleList.h>
+#include <brogueMath.h>
+#include <exceptionHandler.h>
 
-using namespace brogueHd::backend::math;
+using namespace brogueHd::component;
+using namespace brogueHd::component::math;
 using namespace brogueHd::backend::model::game;
 
 namespace brogueHd::backend::model

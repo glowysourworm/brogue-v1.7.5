@@ -1,7 +1,7 @@
 #pragma once
 
 #include "color.h"
-#include "EnumString.h"
+#include <EnumString.h>
 
 namespace brogueHd::backend::modelConstant
 {

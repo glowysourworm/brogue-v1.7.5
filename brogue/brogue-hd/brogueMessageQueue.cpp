@@ -1,7 +1,8 @@
 #include "brogueMessageQueue.h"
-#include "broguedef.h"
+#include "brogueMacros.h"
 #include "color.h"
 #include "colorConstants.h"
+#include <simpleList.h>
 
 using namespace brogueHd::component;
 
@@ -18,11 +19,6 @@ namespace brogueHd::backend::model
 
 	brogueMessageQueue::~brogueMessageQueue()
 	{
-		_messages->forEach([](messageData* message)
-		{
-			delete message;
-		});
-
 		_messages->clear();
 		_currentMessageIndex = -1;
 	}
@@ -43,6 +39,8 @@ namespace brogueHd::backend::model
 			_messages->forEach([](messageData amessage)
 			{
 				amessage.confirmed = true;
+
+				return iterationCallback::iterate;
 			});
 
 			// Reset the message index
@@ -70,10 +68,14 @@ namespace brogueHd::backend::model
 
 		for (index = _currentMessageIndex; index >= (_currentMessageIndex - count) && index >= 0; index--)
 		{
-			_messages->get(index).confirmed = true;
+			messageData data = _messages->get(index);
+
+			data.confirmed = true;
 		}
 
 		_currentMessageIndex = index;
+
+		return true;
 	}
 
 	void brogueMessageQueue::updateFlavorText(char* message, color foreColor)

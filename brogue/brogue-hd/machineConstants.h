@@ -1,6 +1,6 @@
 #pragma once
 
-#include "broguedef.h"
+#include "brogueMacros.h"
 
 namespace brogueHd::backend::model::machine
 {

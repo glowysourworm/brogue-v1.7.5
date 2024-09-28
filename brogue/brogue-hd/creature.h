@@ -6,9 +6,9 @@
 #include "creatureConstants.h"
 #include "creatureBehaviorConstants.h"
 #include "boltConstants.h"
-#include "randomRange.h"
+#include <randomRange.h>
 
-using namespace brogueHd::backend::math;
+using namespace brogueHd::component::math;
 using namespace brogueHd::backend::modelConstant;
 using namespace brogueHd::backend::model::game;
 

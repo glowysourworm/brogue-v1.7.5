@@ -1,9 +1,11 @@
 #pragma once
 
-#include "grid.h"
 #include "brogueRoom.h"
 #include "dungeonConstants.h"
-#include "simpleList.h"
+
+#include <grid.h>
+#include <simpleList.h>
+
 #include <functional>
 
 using namespace std;
@@ -40,17 +42,17 @@ namespace brogueHd::backend::model
 
 		simpleList<brogueRoom*>* _rooms;
 
-		// May need to break into separate grids
-		grid<brogueCell*>* _mainGrid;
+		//// May need to break into separate grids
+		//grid<brogueCell*>* _mainGrid;
 
-		// Grid containing permanent dungeon layers
-		grid<permanentDungeonLayers>* _permanentGrid;
+		//// Grid containing permanent dungeon layers
+		//grid<permanentDungeonLayers>* _permanentGrid;
 
-		// Grid containing temporary dungeon layers
-		grid<temporaryDungeonLayers>* _temporaryGrid;
+		//// Grid containing temporary dungeon layers
+		//grid<temporaryDungeonLayers>* _temporaryGrid;
 
-		// Grid containing flag-enum for categories of features:  TODO
-		grid<dungeonFeatureCategories>* _featureCategoriesGrid;
+		//// Grid containing flag-enum for categories of features:  TODO
+		//grid<dungeonFeatureCategories>* _featureCategoriesGrid;
 
 		//short cost;
 

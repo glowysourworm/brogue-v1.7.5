@@ -1,6 +1,6 @@
 #pragma once
 
-#include "broguedef.h"
+#include "brogueMacros.h"
 #include "brogueObject.h"
 #include "brogueItem.h"
 #include "creature.h"

@@ -1,9 +1,9 @@
 #pragma once
 
 #include "terrainGenerator.h"
-#include "brogueMath.h"
+#include <brogueMath.h>
 
-using namespace brogueHd::backend::math;
+using namespace brogueHd::component::math;
 
 namespace brogueHd::backend::generator
 {

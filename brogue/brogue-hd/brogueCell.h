@@ -1,7 +1,9 @@
 #pragma once
 
-#include "gridLocator.h"
+#include <gridLocator.h>
 #include "brogueCellDisplay.h"
+
+using namespace brogueHd::component;
 
 namespace brogueHd::backend::model::layout
 {

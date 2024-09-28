@@ -15,7 +15,7 @@ namespace brogueHd::backend::processor
 		delete _playbackData;
 	}
 
-	void playbackProcessor::initialize(char* filePath)
+	void playbackProcessor::initialize(const char* filePath)
 	{
 		// Procedure
 		//

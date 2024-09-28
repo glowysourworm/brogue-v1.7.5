@@ -1,31 +1,30 @@
 #include "levelRenderer.h"
 #include "brogueLevel.h"
 #include "brogueMessageQueue.h"
-#include "gridMethods.h"
 #include "brogueView.h"
 #include "color.h"
 #include "colorConstants.h"
 
-namespace brogueHd
+namespace brogueHd::frontend::renderer
 {
 	levelRenderer::levelRenderer(brogueLevel* level, brogueMessageQueue* messageQueue, randomGenerator* randomGenerator)
 	{
-		brogueAssert(randomGenerator->checkId(RANDOM_GENERATOR_COSMETIC))
+		//brogueAssert(randomGenerator->checkId(RANDOM_GENERATOR_COSMETIC))
 
 		_level = level;
 		_messageQueue = messageQueue;
 		_randomGenerator = randomGenerator;
 
-		_levelView = new brogueView(level->levelGrid->getBoundary());
-		_rememberedView = new brogueView(level->levelGrid->getBoundary());
+		//_levelView = new brogueView(level->contentGrid->getParentBoundary());
+		//_rememberedView = new brogueView(level->contentGrid->getBoundary());
 
-		// TODO: Figure out where penderprime hid the boundaries for each of the view segments
-		//
-		_sidebarView = new brogueView(level->levelGrid->getBoundary());
-		_footerMenuView = new brogueView(level->levelGrid->getBoundary());
-		_inventoryView = new brogueView(level->levelGrid->getBoundary());
-		_messageView = new brogueView(level->levelGrid->getBoundary());
-		_flavorMessageView = new brogueView(level->levelGrid->getBoundary());
+		//// TODO: Figure out where penderprime hid the boundaries for each of the view segments
+		////
+		//_sidebarView = new brogueView(level->levelGrid->getBoundary());
+		//_footerMenuView = new brogueView(level->levelGrid->getBoundary());
+		//_inventoryView = new brogueView(level->levelGrid->getBoundary());
+		//_messageView = new brogueView(level->levelGrid->getBoundary());
+		//_flavorMessageView = new brogueView(level->levelGrid->getBoundary());
 	}
 
 	levelRenderer::~levelRenderer()
@@ -257,7 +256,7 @@ namespace brogueHd
 	// Clears the message area and prints the given message in the area.
 	// It will disappear when messages are refreshed and will not be archived.
 	// This is primarily used to display prompts.
-	void temporaryMessage(char* msg, boolean requireAcknowledgment) 
+	void temporaryMessage(char* msg, bool requireAcknowledgment) 
 	{
 		//char message[COLS];
 		//short i, j;

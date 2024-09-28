@@ -15,7 +15,7 @@ namespace brogueHd::backend::processor
 		playbackProcessor();
 		~playbackProcessor();
 
-		void initialize(char* filePath);
+		void initialize(const char* filePath);
 
 	private:
 

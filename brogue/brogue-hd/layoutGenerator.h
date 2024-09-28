@@ -1,15 +1,16 @@
 #pragma once
 
-#include "broguedef.h"
-#include "simpleList.h"
+#include "brogueMacros.h"
 #include "accretionTile.h"
 #include "brogueLayout.h"
 #include "brogueLevel.h"
 #include "brogueLevelProfile.h"
 #include "roomGenerator.h"
 #include "randomGenerator.h"
-#include "gridLocatorEdge.h"
-#include "gridLocatorNode.h"
+
+#include <simpleList.h>
+#include <gridLocatorEdge.h>
+#include <graph.h>
 
 using namespace brogueHd::component;
 using namespace brogueHd::backend::model;
@@ -59,7 +60,7 @@ namespace brogueHd::backend::generator
 
 		simpleList<accretionTile>* _roomTiles;
 
-		graph<gridLocatorNode, gridLocatorEdge>* _delaunayGraph;
+		graph<gridLocator, gridLocatorEdge>* _delaunayGraph;
 
 		brogueLevelProfile* _profile;
 

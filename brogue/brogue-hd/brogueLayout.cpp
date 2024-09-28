@@ -31,16 +31,21 @@ namespace brogueHd::backend::model
 	gridRect brogueLayout::getBoundary() const
 	{
 		//return _grid->getBoundary();
+		return gridRect();
 	}
 
 	bool brogueLayout::isDefined(short column, short row) const
 	{
 		//return !_grid->isZeroValue(column, row);
+
+		return false;
 	}
 
 	brogueCell* brogueLayout::getCell(short column, short row) const
 	{
 		//return _grid->get(column, row);
+
+		return NULL;
 	}
 
 	void brogueLayout::iterateAdjacentCells(short column, short row, function<bool(short, short, brogueCell*)> callback)
@@ -71,5 +76,6 @@ namespace brogueHd::backend::model
 		//});
 
 		//return result;
+		return NULL;
 	}
 }

@@ -13,9 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Source Files\component">
-      <UniqueIdentifier>{9dff32ee-2025-4834-b541-947a6937b7fe}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\backend">
       <UniqueIdentifier>{5ada263d-1c9f-4a45-9616-de3491f49f05}</UniqueIdentifier>
     </Filter>
@@ -42,9 +39,6 @@
     </Filter>
     <Filter Include="Header Files\backend\model\layout">
       <UniqueIdentifier>{dacca4eb-ea81-4b09-8674-cc98a9df6fd3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\component">
-      <UniqueIdentifier>{6c7e316a-d152-4b1e-907d-661d7cfd4353}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\backend">
       <UniqueIdentifier>{76c3f37c-f040-4976-971f-dd79a3d39a34}</UniqueIdentifier>
@@ -84,12 +78,6 @@
     </Filter>
     <Filter Include="Header Files\backend\model\io">
       <UniqueIdentifier>{d535729d-24d4-4195-a5c1-5f3aa2922602}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\backend\math">
-      <UniqueIdentifier>{7ef00c19-f2cc-40de-adeb-1ccaafce3b1b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\backend\math">
-      <UniqueIdentifier>{220ffa64-55f0-4bcd-a3ca-df530f00bd73}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\backend\model\construction">
       <UniqueIdentifier>{4cf08ea0-1b5a-4aa1-bd85-35d32b4b2d85}</UniqueIdentifier>
@@ -138,12 +126,6 @@
     <ClCompile Include="flare.cpp">
       <Filter>Source Files\backend\model</Filter>
     </ClCompile>
-    <ClCompile Include="grid.cpp">
-      <Filter>Source Files\backend\model\layout</Filter>
-    </ClCompile>
-    <ClCompile Include="gridRegion.cpp">
-      <Filter>Source Files\backend\model\layout</Filter>
-    </ClCompile>
     <ClCompile Include="brogueCell.cpp">
       <Filter>Source Files\backend\model\layout</Filter>
     </ClCompile>
@@ -186,9 +168,6 @@
     <ClCompile Include="keyProcessor.cpp">
       <Filter>Source Files\backend\processor</Filter>
     </ClCompile>
-    <ClCompile Include="simpleBST.cpp">
-      <Filter>Source Files\component</Filter>
-    </ClCompile>
     <ClCompile Include="levelProcessor.cpp">
       <Filter>Source Files\backend\processor</Filter>
     </ClCompile>
@@ -219,23 +198,8 @@
     <ClCompile Include="brogueCreatureHorde.cpp">
       <Filter>Source Files\backend\model</Filter>
     </ClCompile>
-    <ClCompile Include="dijkstra.cpp">
-      <Filter>Source Files\backend\math</Filter>
-    </ClCompile>
     <ClCompile Include="roomGenerator.cpp">
       <Filter>Source Files\backend\generator</Filter>
-    </ClCompile>
-    <ClCompile Include="gridRegionLocator.cpp">
-      <Filter>Source Files\backend\model\construction</Filter>
-    </ClCompile>
-    <ClCompile Include="gridRegionConstructor.cpp">
-      <Filter>Source Files\backend\model\construction</Filter>
-    </ClCompile>
-    <ClCompile Include="graph.cpp">
-      <Filter>Source Files\backend\math</Filter>
-    </ClCompile>
-    <ClCompile Include="graphEdgeCollection.cpp">
-      <Filter>Source Files\backend\math</Filter>
     </ClCompile>
     <ClCompile Include="brogueLayout.cpp">
       <Filter>Source Files\backend\model</Filter>
@@ -251,15 +215,6 @@
     </ClCompile>
     <ClCompile Include="noiseGenerator.cpp">
       <Filter>Source Files\backend\generator</Filter>
-    </ClCompile>
-    <ClCompile Include="delaunayAlgorithm.cpp">
-      <Filter>Source Files\backend\math</Filter>
-    </ClCompile>
-    <ClCompile Include="primsAlgorithm.cpp">
-      <Filter>Source Files\backend\math</Filter>
-    </ClCompile>
-    <ClCompile Include="graphAlgorithm.cpp">
-      <Filter>Source Files\backend\math</Filter>
     </ClCompile>
     <ClCompile Include="brogueConsole.cpp">
       <Filter>Source Files\console</Filter>
@@ -279,15 +234,6 @@
     <ClCompile Include="brogueColorMap.cpp">
       <Filter>Source Files\backend\model</Filter>
     </ClCompile>
-    <ClCompile Include="simpleList.cpp">
-      <Filter>Source Files\component</Filter>
-    </ClCompile>
-    <ClCompile Include="simpleHash.cpp">
-      <Filter>Source Files\component</Filter>
-    </ClCompile>
-    <ClCompile Include="simpleArray.cpp">
-      <Filter>Source Files\component</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="brogueCellDisplay.h">
@@ -296,22 +242,13 @@
     <ClInclude Include="brogueItem.h">
       <Filter>Header Files\backend\model</Filter>
     </ClInclude>
-    <ClInclude Include="grid.h">
-      <Filter>Header Files\backend\model\layout</Filter>
-    </ClInclude>
     <ClInclude Include="brogueCell.h">
-      <Filter>Header Files\backend\model\layout</Filter>
-    </ClInclude>
-    <ClInclude Include="gridRegion.h">
       <Filter>Header Files\backend\model\layout</Filter>
     </ClInclude>
     <ClInclude Include="brogueLevel.h">
       <Filter>Header Files\backend\model</Filter>
     </ClInclude>
     <ClInclude Include="gridCell.h">
-      <Filter>Header Files\backend\model\layout</Filter>
-    </ClInclude>
-    <ClInclude Include="gridRect.h">
       <Filter>Header Files\backend\model\layout</Filter>
     </ClInclude>
     <ClInclude Include="brogueGame.h">
@@ -346,9 +283,6 @@
     </ClInclude>
     <ClInclude Include="openglRenderer.h">
       <Filter>Header Files\frontend\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="simpleBST.h">
-      <Filter>Header Files\component</Filter>
     </ClInclude>
     <ClInclude Include="levelProcessor.h">
       <Filter>Header Files\backend\processor</Filter>
@@ -413,9 +347,6 @@
     <ClInclude Include="fileio.h">
       <Filter>Header Files\backend\model\io</Filter>
     </ClInclude>
-    <ClInclude Include="gridDefinitions.h">
-      <Filter>Header Files\backend\model\layout</Filter>
-    </ClInclude>
     <ClInclude Include="playbackData.h">
       <Filter>Header Files\backend\model\io</Filter>
     </ClInclude>
@@ -425,9 +356,6 @@
     <ClInclude Include="powerTables.h">
       <Filter>Header Files\backend\model\game</Filter>
     </ClInclude>
-    <ClInclude Include="dijkstra.h">
-      <Filter>Header Files\backend\math</Filter>
-    </ClInclude>
     <ClInclude Include="hashGenerator.h">
       <Filter>Header Files\backend\generator</Filter>
     </ClInclude>
@@ -436,30 +364,6 @@
     </ClInclude>
     <ClInclude Include="cellularAutomataParameters.h">
       <Filter>Header Files\backend\model\layout</Filter>
-    </ClInclude>
-    <ClInclude Include="gridRegionLocator.h">
-      <Filter>Header Files\backend\model\construction</Filter>
-    </ClInclude>
-    <ClInclude Include="gridRegionConstructor.h">
-      <Filter>Header Files\backend\model\construction</Filter>
-    </ClInclude>
-    <ClInclude Include="brogueMath.h">
-      <Filter>Header Files\backend\math</Filter>
-    </ClInclude>
-    <ClInclude Include="graph.h">
-      <Filter>Header Files\backend\math</Filter>
-    </ClInclude>
-    <ClInclude Include="graphEdgeCollection.h">
-      <Filter>Header Files\backend\math</Filter>
-    </ClInclude>
-    <ClInclude Include="graphEdge.h">
-      <Filter>Header Files\backend\math</Filter>
-    </ClInclude>
-    <ClInclude Include="graphDefinitions.h">
-      <Filter>Header Files\backend\math</Filter>
-    </ClInclude>
-    <ClInclude Include="graphNode.h">
-      <Filter>Header Files\backend\math</Filter>
     </ClInclude>
     <ClInclude Include="brogueLayout.h">
       <Filter>Header Files\backend\model</Filter>
@@ -478,30 +382,6 @@
     </ClInclude>
     <ClInclude Include="noiseGenerator.h">
       <Filter>Header Files\backend\generator</Filter>
-    </ClInclude>
-    <ClInclude Include="gridLocator.h">
-      <Filter>Header Files\backend\model\layout</Filter>
-    </ClInclude>
-    <ClInclude Include="delaunayAlgorithm.h">
-      <Filter>Header Files\backend\math</Filter>
-    </ClInclude>
-    <ClInclude Include="gridLocatorEdge.h">
-      <Filter>Header Files\backend\model\layout</Filter>
-    </ClInclude>
-    <ClInclude Include="triangle.h">
-      <Filter>Header Files\backend\math</Filter>
-    </ClInclude>
-    <ClInclude Include="point.h">
-      <Filter>Header Files\backend\math</Filter>
-    </ClInclude>
-    <ClInclude Include="vector.h">
-      <Filter>Header Files\backend\math</Filter>
-    </ClInclude>
-    <ClInclude Include="primsAlgorithm.h">
-      <Filter>Header Files\backend\math</Filter>
-    </ClInclude>
-    <ClInclude Include="graphAlgorithm.h">
-      <Filter>Header Files\backend\math</Filter>
     </ClInclude>
     <ClInclude Include="brogueRoom.h">
       <Filter>Header Files\backend\model</Filter>
@@ -602,38 +482,11 @@
     <ClInclude Include="machineTemplate.h">
       <Filter>Header Files\backend\model\gameTemplate</Filter>
     </ClInclude>
-    <ClInclude Include="typeConverter.h">
-      <Filter>Header Files\component</Filter>
-    </ClInclude>
-    <ClInclude Include="simpleList.h">
-      <Filter>Header Files\component</Filter>
-    </ClInclude>
-    <ClInclude Include="simpleHash.h">
-      <Filter>Header Files\component</Filter>
-    </ClInclude>
-    <ClInclude Include="simpleArray.h">
-      <Filter>Header Files\component</Filter>
-    </ClInclude>
-    <ClInclude Include="simple.h">
-      <Filter>Header Files\component</Filter>
-    </ClInclude>
-    <ClInclude Include="randomRange.h">
-      <Filter>Header Files\backend\math</Filter>
-    </ClInclude>
-    <ClInclude Include="EnumString.h">
-      <Filter>Header Files\global</Filter>
-    </ClInclude>
-    <ClInclude Include="broguedef.h">
-      <Filter>Header Files\global</Filter>
-    </ClInclude>
     <ClInclude Include="command.h">
       <Filter>Header Files\global</Filter>
     </ClInclude>
-    <ClInclude Include="exceptionHandler.h">
+    <ClInclude Include="brogueMacros.h">
       <Filter>Header Files\global</Filter>
-    </ClInclude>
-    <ClInclude Include="stringExtension.h">
-      <Filter>Header Files\component</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

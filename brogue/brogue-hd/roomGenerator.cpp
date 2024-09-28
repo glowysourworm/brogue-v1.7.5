@@ -1,14 +1,16 @@
 #pragma once
 
 #include "roomGenerator.h"
-#include "gridDefinitions.h"
-#include "gridRegion.h"
-#include "brogueMath.h"
 #include "brogueCell.h"
-#include "simpleList.h"
+
+#include <brogueMath.h>
+#include <gridDefinitions.h>
+#include <gridRegion.h>
+#include <gridRegionConstructor.h>
+#include <simpleList.h>
 
 using namespace brogueHd::component;
-using namespace brogueHd::backend::math;
+using namespace brogueHd::component::math;
 using namespace brogueHd::backend::model::layout;
 
 namespace brogueHd::backend::generator
@@ -22,7 +24,7 @@ namespace brogueHd::backend::generator
 		gridRect paddedBoundary = gridRect(1, 1, DCOLS - 1, DROWS - 1);
 
 		// Brogue v1.7.5
-		float fillRatio = 0.55;
+		float fillRatio = 0.55f;
 		short birthCount = 6;
 		short survivalCount = 4;
 		short smoothingIterations = 5;	// This was a change:  Probably can get away with fewer iterations (was >= 10)
@@ -56,6 +58,7 @@ namespace brogueHd::backend::generator
 
 		// Locate regions using flood fill method:  Find the max area region
 		gridRegion<gridLocator>* maxRegion;
+		gridRegion<gridLocator>* translatedRegion;
 		simpleList<gridRegion<gridLocator>*> validRegions;
 
 		// (MEMORY) Locate Regions
@@ -85,24 +88,27 @@ namespace brogueHd::backend::generator
 
 		gridLocator translation(caveBoundary.column - blobBoundary.column, caveBoundary.row - blobBoundary.row);
 
-		// Mutator
-		maxRegion->translate(translation);
+		// Translates the region to a NEW REGION (MEMORY!)
+		translatedRegion = gridRegionConstructor<gridLocator>::translate(*maxRegion, translation);
 		
 		// ...and copy it to the master grid.
-		maxRegion->iterateLocations([&regionConstructor](short column, short row, gridLocator cell)
+		translatedRegion->iterateLocations([&regionConstructor](short column, short row, gridLocator cell)
 		{
 			regionConstructor.add(column, row, cell);
 
 			return iterationCallback::iterate;
 		});
 
-		// (MEMORY) Don't need the region containers. Data is alive in the regionConstructor
+		// (MEMORY) Don't need the region containers. Data for locators is alive in the regionConstructor.
 		regions.forEach([](gridRegion<gridLocator>* region)
 		{
 			delete region;
 
 			return iterationCallback::iterate;
 		});
+
+		// (MEMORY) Don't forget the region created by the translation!
+		delete translatedRegion;
 	}
 
 	void roomGenerator::designEntranceRoom(gridRegionConstructor<gridLocator>& regionConstructor)

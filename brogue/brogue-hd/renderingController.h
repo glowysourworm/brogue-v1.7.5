@@ -3,6 +3,8 @@
 #include "command.h"
 #include "openglRenderer.h"
 
+using namespace brogueHd::frontend::opengl;
+
 namespace brogueHd::backend::controller
 {
 	class renderingController

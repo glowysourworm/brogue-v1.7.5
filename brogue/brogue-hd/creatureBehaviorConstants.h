@@ -1,7 +1,7 @@
 #pragma once
 
-#include "broguedef.h"
-#include "EnumString.h"
+#include "brogueMacros.h"
+#include <EnumString.h>
 
 namespace brogueHd::backend::modelConstant
 {

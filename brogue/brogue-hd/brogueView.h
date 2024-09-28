@@ -1,8 +1,9 @@
 #pragma once
 
-#include "grid.h"
+#include <grid.h>
 #include "brogueCellDisplay.h"
 
+using namespace brogueHd::component;
 using namespace brogueHd::backend::model::layout;
 
 namespace brogueHd::backend::model

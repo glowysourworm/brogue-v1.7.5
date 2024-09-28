@@ -1,5 +1,5 @@
 #include "keyProcessor.h"
-#include "broguedef.h"
+#include "brogueMacros.h"
 #include "broguefile.h"
 
 using namespace std;

@@ -1,12 +1,16 @@
 #include "layoutGenerator.h"
 #include "randomGenerator.h"
-#include "gridDefinitions.h"
 #include "dungeonConstants.h"
 #include "dungeon.h"
-#include "delaunayAlgorithm.h"
-#include "primsAlgorithm.h"
-#include "exceptionHandler.h"
 
+#include <dijkstra.h>
+#include <delaunayAlgorithm.h>
+#include <gridDefinitions.h>
+#include <gridRegionConstructor.h>
+#include <primsAlgorithm.h>
+#include <exceptionHandler.h>
+
+using namespace brogueHd::component;
 using namespace brogueHd::backend::model::layout;
 
 namespace brogueHd::backend::generator
@@ -114,6 +118,8 @@ namespace brogueHd::backend::generator
         // Connect Rooms:  Create cells in the grid for the delaunay triangulation of the 
         //                 connection points of the room tiles
         this->connectRooms();
+
+        return NULL;
 	}
 
     void layoutGenerator::createRooms()
@@ -170,7 +176,7 @@ namespace brogueHd::backend::generator
                 _roomTiles->add(attemptRegion);
 
                 // Set final room locations
-                _grid->setFromRegion(attemptRegion.region);
+                attemptRegion.region->copyTo(*_grid);
             }
 
             // Accrete rooms - translating the attempt room into place (modifies attempt region)
@@ -179,7 +185,7 @@ namespace brogueHd::backend::generator
                 _roomTiles->add(attemptRegion);
 
                 // Set final room locations
-                _grid->setFromRegion(attemptRegion.region);
+                attemptRegion.region->copyTo(*_grid);
             }
         }
 
@@ -270,11 +276,8 @@ namespace brogueHd::backend::generator
                 else
                     break;
 
-                // Create copy to translate (USE HEAP IN CASE IT WORKS)
-                gridRegion<gridLocator>* translatedRegion = new gridRegion(*roomTile.region);
-
-                // Translate the region into position
-                translatedRegion->translate(translation);
+                // Translate the region into position (HEAP ALLOCATED! ALSO CHANGES LOCATOR INSTANCES)
+                gridRegion<gridLocator>* translatedRegion = gridRegionConstructor<gridLocator>::translate(*roomTile.region, translation);
 
                 // Check the boundary:  1) outer gridRect first to reduce iteration, and 2) the grid overlap per cell
                 if (attemptRect.contains(translatedRegion->getBoundary()))
@@ -296,6 +299,8 @@ namespace brogueHd::backend::generator
                             gridOverlaps = true;
                             return iterationCallback::breakAndReturn;
                         }
+
+                        return iterationCallback::iterate;
                     });
 
                     if (gridOverlaps)
@@ -332,6 +337,8 @@ namespace brogueHd::backend::generator
                 }
             }
         }
+
+        return false;
     }
 
     gridRegion<gridLocator>* layoutGenerator::createRoom(gridRect levelBoundary, gridRect levelPaddedBoundary, const brogueRoomInfo& roomInfo)
@@ -418,7 +425,7 @@ namespace brogueHd::backend::generator
     void layoutGenerator::triangulateRooms()
     {
         // Create delaunay triangulator with graph edge constructor
-        delaunayAlgorithm<gridLocatorNode, gridLocatorEdge> triangulator([](gridLocatorNode node1, gridLocatorNode node2)
+        delaunayAlgorithm<gridLocator, gridLocatorEdge> triangulator([](gridLocator node1, gridLocator node2)
         {
             gridLocatorEdge edge(node1, node2);
 
@@ -426,21 +433,21 @@ namespace brogueHd::backend::generator
         });
 
         // Create connection point vertices
-        simpleList<gridLocatorNode> connectionNodes;
+        simpleList<gridLocator> connectionNodes;
         
         _roomTiles->forEach([&connectionNodes](accretionTile item)
         {
             if (item.hasEastConnection)
-                connectionNodes.add(gridLocatorNode(item.connectionPointE));
+                connectionNodes.add(gridLocator(item.connectionPointE));
 
             if (item.hasNorthConnection)
-                connectionNodes.add(gridLocatorNode(item.connectionPointN));
+                connectionNodes.add(gridLocator(item.connectionPointN));
 
             if (item.hasSouthConnection)
-                connectionNodes.add(gridLocatorNode(item.connectionPointS));
+                connectionNodes.add(gridLocator(item.connectionPointS));
 
             if (item.hasWestConnection)
-                connectionNodes.add(gridLocatorNode(item.connectionPointW));
+                connectionNodes.add(gridLocator(item.connectionPointW));
 
             return iterationCallback::iterate;
         });
@@ -472,26 +479,26 @@ namespace brogueHd::backend::generator
 
                 // North
                 if (tile.hasNorthConnection && 
-                   (tile.connectionPointN == edge.node1.locator ||
-                    tile.connectionPointN == edge.node2.locator))
+                   (tile.connectionPointN == edge.node1 ||
+                    tile.connectionPointN == edge.node2))
                     connectionCount++;
 
                 // South
                 if (tile.hasSouthConnection &&
-                   (tile.connectionPointS == edge.node1.locator ||
-                    tile.connectionPointS == edge.node2.locator))
+                   (tile.connectionPointS == edge.node1 ||
+                    tile.connectionPointS == edge.node2))
                     connectionCount++;
 
                 // East
                 if (tile.hasEastConnection &&
-                   (tile.connectionPointE == edge.node1.locator ||
-                    tile.connectionPointE == edge.node2.locator))
+                   (tile.connectionPointE == edge.node1 ||
+                    tile.connectionPointE == edge.node2))
                     connectionCount++;
 
                 // West
                 if (tile.hasWestConnection &&
-                   (tile.connectionPointW == edge.node1.locator ||
-                    tile.connectionPointW == edge.node2.locator))
+                   (tile.connectionPointW == edge.node1 ||
+                    tile.connectionPointW == edge.node2))
                     connectionCount++;
 
                 if (connectionCount == 1)
@@ -499,6 +506,8 @@ namespace brogueHd::backend::generator
                     isCorridorEdge = true;
                     return iterationCallback::breakAndReturn;
                 }
+
+                return iterationCallback::iterate;
             });
 
             if (isCorridorEdge)
@@ -536,8 +545,8 @@ namespace brogueHd::backend::generator
         // Iterate each corridor edge and run dijkstra to finalize the connection
         corridorEdges.forEach([&algorithm, &grid](gridLocatorEdge edge)
         {
-            gridLocator source = edge.node1.locator;
-            gridLocator targets[1] = { edge.node2.locator };
+            gridLocator source = edge.node1;
+            gridLocator targets[1] = { edge.node2 };
             
             // Run Dijkstra
             algorithm.initialize(source, targets);

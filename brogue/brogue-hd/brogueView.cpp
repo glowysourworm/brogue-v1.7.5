@@ -1,9 +1,11 @@
 #include "brogueView.h"
-#include "gridRect.h"
-#include "grid.h"
 #include "brogueCellDisplay.h"
 
-using namespace brogueHd::backend::model::layout;
+#include <gridRect.h>
+#include <grid.h>
+
+
+using namespace brogueHd::component;
 
 namespace brogueHd::backend::model
 {

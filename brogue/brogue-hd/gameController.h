@@ -26,7 +26,7 @@ namespace brogueHd::backend::controller
 		/// </summary>
 		void loadKeymap();
 
-		void initPlayback(char* recordingPath);
+		void initPlayback(const char* recordingPath);
 
 		/// <summary>
 		/// Initializes a new game with random seed, and default file name

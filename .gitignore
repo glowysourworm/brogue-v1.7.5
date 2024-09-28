@@ -36,3 +36,5 @@
 /brogue/brogue/x64
 *.bak
 /graveyard/brogue-old-refactored/.vs
+/brogue/brogue-hd.component/x64
+/brogue/x64

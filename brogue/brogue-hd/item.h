@@ -1,14 +1,16 @@
 #pragma once
 
 #include "color.h"
-#include "randomRange.h"
 #include "itemConstants.h"
 #include "creatureConstants.h"
+
+#include <randomRange.h>
+
 #include <string>
 
 using namespace std;
 
-using namespace brogueHd::backend::math;
+using namespace brogueHd::component::math;
 using namespace brogueHd::backend::modelConstant;
 
 namespace brogueHd::backend::model::game
