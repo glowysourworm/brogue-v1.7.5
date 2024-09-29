@@ -132,6 +132,9 @@
     <ClInclude Include="gridRegionConstructor.h">
       <Filter>Header Files\grid</Filter>
     </ClInclude>
+    <ClInclude Include="simpleListExtension.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="simpleArray.cpp">

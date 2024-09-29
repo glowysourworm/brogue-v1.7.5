@@ -1,11 +1,11 @@
 #include "brogueConsole.h"
 #include "command.h"
 //#include <exceptionHandler.h>
-//#include <stringExtension.h>
+#include <stringExtension.h>
 //#include <componentMacros.h>
 //#include <typeConverter.h>
 
-//using namespace brogueHd::component;
+using namespace brogueHd::component;
 
 namespace brogueHd::console
 {
@@ -14,7 +14,7 @@ namespace brogueHd::console
 
 	brogueConsoleReturn brogueConsole::command(std::string input, ostream& stream)
 	{
-		//std::string* cmd = stringExtension::split(input, " ");
+		std::string* cmd = stringExtension::split(input, " ");
 
 		//if (hasArgument(cmd, "--mode"))
 		//{

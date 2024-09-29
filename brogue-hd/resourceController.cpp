@@ -74,6 +74,8 @@ namespace brogueHd::backend::controller
 			//brogueException::show("Failed to read high scores file.");
 			//throw ex;
 		}
+
+		return NULL;
 	}
 
 	gameData* resourceController::loadGame(const char* path)

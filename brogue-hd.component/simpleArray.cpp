@@ -8,6 +8,13 @@
 namespace brogueHd::component
 {
 	template<typename T>
+	simpleArray<T>::simpleArray()
+	{
+		_array = new T[0];
+		_size = 0;
+	}
+
+	template<typename T>
 	simpleArray<T>::simpleArray(int size)
 	{
 		_array = new T[size];
@@ -81,7 +88,7 @@ namespace brogueHd::component
 				result.add(_array[index]);
 		}
 
-		return result.toArray();
+		return simpleArray<T>(result.getArray());
 	}
 
 	template<typename T>

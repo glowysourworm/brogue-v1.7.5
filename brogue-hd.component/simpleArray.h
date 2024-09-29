@@ -33,6 +33,7 @@ namespace brogueHd::component
 	{
 	public:
 
+		simpleArray();
 		simpleArray(int size);
 		simpleArray(T* anArray);
 		~simpleArray();

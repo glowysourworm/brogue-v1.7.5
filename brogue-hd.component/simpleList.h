@@ -1,7 +1,6 @@
 #pragma once
 
 #include "simple.h"
-#include "simpleArray.h"
 #include <functional>
 
 using namespace std;
@@ -76,7 +75,6 @@ namespace brogueHd::component
 
 		// Container Selectors
 		T* getArray();
-		simpleArray<T> toArray();
 
 		bool contains(T item);
 
@@ -90,10 +88,6 @@ namespace brogueHd::component
 		void forEach(simpleListDelegates<T>::callback callback);
 		simpleList<T> where(simpleListDelegates<T>::predicate predicate);
 		
-		// Static Methods
-
-		static void distinctPairs(const simpleList<T>& collection1,const simpleList<T>& collection2,simpleListDelegates<T>::pairs callback);
-
 		// Selectors
 
 		template<typename TResult>

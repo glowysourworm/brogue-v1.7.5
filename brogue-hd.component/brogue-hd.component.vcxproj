@@ -48,6 +48,7 @@
     <ClInclude Include="simpleBST.h" />
     <ClInclude Include="simpleHash.h" />
     <ClInclude Include="simpleList.h" />
+    <ClInclude Include="simpleListExtension.h" />
     <ClInclude Include="stringExtension.h" />
     <ClInclude Include="triangle.h" />
     <ClInclude Include="typeConverter.h" />
@@ -129,7 +130,6 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <PublicIncludeDirectories>C:\Backup\_Source\Git\brogue-v1.7.5\brogue-hd.component;$(PublicIncludeDirectories)</PublicIncludeDirectories>
     <AllProjectIncludesArePublic>true</AllProjectIncludesArePublic>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -183,6 +183,7 @@
     </ProjectReference>
     <Lib>
       <Verbose>false</Verbose>
+      <SubSystem>Windows</SubSystem>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
