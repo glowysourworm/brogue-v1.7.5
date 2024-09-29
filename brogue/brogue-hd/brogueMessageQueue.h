@@ -3,7 +3,7 @@
 #include "brogueMacros.h"
 #include "messageData.h"
 #include "color.h"
-#include "simpleList.h"
+#include <simpleList.h>
 #include <string>
 
 using namespace std;

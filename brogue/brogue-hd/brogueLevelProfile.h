@@ -2,7 +2,7 @@
 
 #include "dungeon.h"
 #include "randomGenerator.h"
-#include "simpleHash.h"
+#include <simpleHash.h>
 
 using namespace brogueHd::component;
 using namespace brogueHd::backend::generator;

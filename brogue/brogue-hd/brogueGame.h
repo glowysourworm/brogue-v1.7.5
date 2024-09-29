@@ -7,7 +7,7 @@
 #include "brogueCellDisplay.h"
 #include "brogueMessageQueue.h"
 #include "playerCharacter.h"
-#include "simpleList.h"
+#include <simpleList.h>
 
 using namespace brogueHd::component;
 using namespace brogueHd::backend::model::creature;

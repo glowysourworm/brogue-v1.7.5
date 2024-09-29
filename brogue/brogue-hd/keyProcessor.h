@@ -1,7 +1,7 @@
 #pragma once
 
 #include "broguefile.h"
-#include "simpleHash.h"
+#include <simpleHash.h>
 
 using namespace brogueHd::component;
 

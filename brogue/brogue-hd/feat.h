@@ -1,6 +1,6 @@
 #pragma once
 
-#include "EnumString.h"
+#include <EnumString.h>
 #include <string>
 
 using namespace std;

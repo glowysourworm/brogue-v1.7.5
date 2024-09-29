@@ -1,12 +1,12 @@
 #pragma once
 
-#include "randomRange.h"
+#include <randomRange.h>
 #include "dungeonTemplate.h"
 #include <string>
 
 using namespace std;
 
-using namespace brogueHd::backend::math;
+using namespace brogueHd::component::math;
 
 namespace brogueHd::backend::model::gameTemplate
 {

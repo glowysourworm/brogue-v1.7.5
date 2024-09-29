@@ -1,7 +1,7 @@
 #pragma once
 
 #include "playbackData.h"
-#include "simpleList.h"
+#include <simpleList.h>
 
 using namespace brogueHd::component;
 using namespace brogueHd::backend::model::io;

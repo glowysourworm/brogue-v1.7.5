@@ -1,7 +1,7 @@
 #include "brogueConsole.h"
 #include "command.h"
-#include "exceptionHandler.h"
-#include "stringExtension.h"
+#include <exceptionHandler.h>
+#include <stringExtension.h>
 #include "typeConverter.h"
 
 using namespace brogueHd::component;

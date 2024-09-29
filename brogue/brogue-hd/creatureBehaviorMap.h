@@ -4,7 +4,7 @@
 #include "brogueCell.h"
 #include "brogueObject.h"
 #include "creatureBehavior.h"
-#include "simpleList.h"
+#include <simpleList.h>
 
 using namespace brogueHd::component;
 using namespace brogueHd::backend::model::layout;
