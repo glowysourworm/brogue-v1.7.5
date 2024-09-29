@@ -29,42 +29,42 @@ namespace brogueHd::backend::generator
 		layoutGenerator(randomGenerator* randomGenerator);
 		~layoutGenerator();
 
-		void initialize(brogueLevelProfile* profile);
-		void clear();
+		//void initialize(brogueLevelProfile* profile);
+		//void clear();
 
-		brogueLayout* generateLayout();
+		//brogueLayout* generateLayout();
 
 	private:
 
-		void createRooms();
+		//void createRooms();
 
-		// (MEMORY!) Creates a new room according to the specified room info
-		gridRegion<gridLocator>* createRoom(gridRect levelBoundary, gridRect levelPaddedBoundary, const brogueRoomInfo& roomInfo);
+		//// (MEMORY!) Creates a new room according to the specified room info
+		//gridRegion<gridLocator>* createRoom(gridRect levelBoundary, gridRect levelPaddedBoundary, const brogueRoomInfo& roomInfo);
 
-		bool attemptConnection(accretionTile& roomTile, const gridRect& attemptRect, short interRoomPadding) const;
+		//bool attemptConnection(accretionTile& roomTile, const gridRect& attemptRect, short interRoomPadding) const;
 
-		void designateMachineRooms();
-		void triangulateRooms();
-		void connectRooms();
-		void createTerrain();
+		////void designateMachineRooms();
+		//void triangulateRooms();
+		//void connectRooms();
+		////void createTerrain();
 
-		/// <summary>
-		/// Returns the Brogue level boundary with padding
-		/// </summary>
-		gridRect getPaddedBoundary(short padding) const;
+		///// <summary>
+		///// Returns the Brogue level boundary with padding
+		///// </summary>
+		//gridRect getPaddedBoundary(short padding) const;
 
 	// Managed On: clear(), initialize(...)
 	private:
 
-		grid<gridLocator>* _grid;
+		//grid<gridLocator>* _grid;
 
-		simpleList<accretionTile>* _roomTiles;
+		//simpleList<accretionTile>* _roomTiles;
 
-		graph<gridLocator, gridLocatorEdge>* _delaunayGraph;
+		//graph<gridLocator, gridLocatorEdge>* _delaunayGraph;
 
-		brogueLevelProfile* _profile;
+		//brogueLevelProfile* _profile;
 
-		bool _initialized;
+		//bool _initialized;
 
 	private:
 

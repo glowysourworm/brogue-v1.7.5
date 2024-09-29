@@ -24,7 +24,7 @@ namespace brogueHd::backend::model
 			_connectionPointW = connectionPointW;
 		}
 
-		~brogueRoom();
+		~brogueRoom(){};
 
 	private:
 

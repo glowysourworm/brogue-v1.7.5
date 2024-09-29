@@ -67,6 +67,11 @@ namespace brogueHd::frontend::renderer
 		return _flavorMessageView;
 	}
 
+	void levelRenderer::update() const
+	{
+
+	}
+
 	//void levelRenderer::plotCharWithColor(uchar inputChar, short xLoc, short yLoc, const color* cellForeColor, const color* cellBackColor) 
 	//{
 	//	short oldRNG;

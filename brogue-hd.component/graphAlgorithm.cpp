@@ -39,7 +39,7 @@ namespace brogueHd::component
             simpleList<TEdge> edges;
             graphAlgorithm<TNode, TEdge>* that = this;
 
-            vectorExtension<TNode>::distinctPairs(vertices, vertices, [&edges, &that](TNode node1, TNode node2)
+            simpleList<TNode>::distinctPairs(vertices, vertices, [&edges, &that](TNode node1, TNode node2)
             {
                 edges.add(that->graphEdgeConstructor(node1, node2));
             });

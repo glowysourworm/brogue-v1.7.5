@@ -29,13 +29,13 @@ namespace brogueHd::backend::model
 
 		randomGenerator* _randomGenerator;
 
-		simpleHash<roomTypes, brogueRoomInfo>* _roomInfo;
+		//simpleHash<roomTypes, brogueRoomInfo>* _roomInfo;
 
-		// Room Frequency static data
-		simpleHash<levelTypes, simpleHash<roomTypes, short>*>* _roomFrequencyMap;
+		//// Room Frequency static data
+		//simpleHash<levelTypes, simpleHash<roomTypes, short>*>* _roomFrequencyMap;
 
-		// Corridor static data
-		simpleHash<levelTypes, short>* _corridorFrequencyMap;
+		//// Corridor static data
+		//simpleHash<levelTypes, short>* _corridorFrequencyMap;
 
 		short _depth;
 		levelTypes _levelType;

@@ -28,27 +28,27 @@ namespace brogueHd::backend::model
 		void setColor(gasColors colorSelector, color value);
 		void setColor(interfaceColors colorSelector, color value);
 
-		color getColor(gameColors colorSelector) const;
-		color getColor(boltColors colorSelector) const;
-		color getColor(tileColors colorSelector) const;
-		color getColor(creatureColors colorSelector) const;
-		color getColor(lightColors colorSelector) const;
-		color getColor(flareColors colorSelector) const;
-		color getColor(colorMultipliers colorSelector) const;
-		color getColor(bloodColors colorSelector) const;
-		color getColor(gasColors colorSelector) const;
-		color getColor(interfaceColors colorSelector) const;
+		//color getColor(gameColors colorSelector) const;
+		//color getColor(boltColors colorSelector) const;
+		//color getColor(tileColors colorSelector) const;
+		//color getColor(creatureColors colorSelector) const;
+		//color getColor(lightColors colorSelector) const;
+		//color getColor(flareColors colorSelector) const;
+		//color getColor(colorMultipliers colorSelector) const;
+		//color getColor(bloodColors colorSelector) const;
+		//color getColor(gasColors colorSelector) const;
+		//color getColor(interfaceColors colorSelector) const;
 
 	private:
-		simpleHash<gameColors, color>* _gameColors;
-		simpleHash<boltColors, color>* _boltColors;
-		simpleHash<tileColors, color>* _tileColors;
-		simpleHash<creatureColors, color>* _creatureColors;
-		simpleHash<lightColors, color>* _lightColors;
-		simpleHash<flareColors, color>* _flareColors;
-		simpleHash<colorMultipliers, color>* _colorMultipliers;
-		simpleHash<bloodColors, color>* _bloodColors;
-		simpleHash<gasColors, color>* _gasColors;
-		simpleHash<interfaceColors, color>* _interfaceColors;
+		//simpleHash<gameColors, color>* _gameColors;
+		//simpleHash<boltColors, color>* _boltColors;
+		//simpleHash<tileColors, color>* _tileColors;
+		//simpleHash<creatureColors, color>* _creatureColors;
+		//simpleHash<lightColors, color>* _lightColors;
+		//simpleHash<flareColors, color>* _flareColors;
+		//simpleHash<colorMultipliers, color>* _colorMultipliers;
+		//simpleHash<bloodColors, color>* _bloodColors;
+		//simpleHash<gasColors, color>* _gasColors;
+		//simpleHash<interfaceColors, color>* _interfaceColors;
 	};
 }

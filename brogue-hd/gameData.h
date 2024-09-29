@@ -4,6 +4,9 @@
 #include "creature.h"
 #include "brogueCellDisplay.h"
 #include "playerCharacter.h"
+#include <string>
+
+using namespace std;
 
 namespace brogueHd::backend::model
 {

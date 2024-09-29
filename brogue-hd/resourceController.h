@@ -2,7 +2,7 @@
 
 #include "broguefile.h"
 #include "keyProcessor.h"
-#include "brogueColorMap.h"
+//#include "brogueColorMap.h"
 #include "gameData.h"
 #include "playbackData.h"
 
@@ -28,7 +28,7 @@ namespace brogueHd::backend::controller
 		/// <summary>
 		/// Loads colors.csv file
 		/// </summary>
-		brogueColorMap* loadColors(const char* path);
+		//brogueColorMap* loadColors(const char* path);
 
 		/// <summary>
 		/// Loads key map from file

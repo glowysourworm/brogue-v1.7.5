@@ -107,7 +107,7 @@ namespace brogueHd::backend::model::io
 	struct brogueEventFile 
 	{
 		unsigned long eventCount;
-		simpleList<brogueEvent> eventList;
+		//simpleList<brogueEvent> eventList;
 
 		void serialize(std::ostream& stream)
 		{
@@ -142,7 +142,7 @@ namespace brogueHd::backend::model::io
 	{
 
 		unsigned long scoreCount;
-		simpleList<brogueScoreEntry> scoreList;
+		//simpleList<brogueScoreEntry> scoreList;
 
 		brogueScoresFile()
 		{
@@ -155,7 +155,7 @@ namespace brogueHd::backend::model::io
 
 		void add(brogueScoreEntry entry)
 		{
-			scoreList.add(entry);
+			//scoreList.add(entry);
 		}
 
 		void serialize(std::ostream& stream)

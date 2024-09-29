@@ -16,7 +16,7 @@ namespace brogueHd::backend::processor
 
 		void initialize();
 
-		color messageColorFromVictim(creatureInfo* monst);
+		//color messageColorFromVictim(creatureInfo* monst);
 
 	private:
 

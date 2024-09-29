@@ -12,8 +12,8 @@ namespace brogueHd::backend::model
 	{
 	public:
 
-		brogueCreatureHorde();
-		~brogueCreatureHorde();
+		brogueCreatureHorde(){};
+		~brogueCreatureHorde(){};
 
 	private:
 

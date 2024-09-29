@@ -302,7 +302,7 @@ namespace brogueHd::component
 
 
 	template<typename T>
-	void simpleList<T>::distinctPairs(const simpleList<T>& collection1, const simpleList<T>& collection2, simpleListDelegates<T>::pairs callback)
+	static void simpleList<T>::distinctPairs(const simpleList<T>& collection1, const simpleList<T>& collection2, simpleListDelegates<T>::pairs callback)
 	{
 		simpleHash<T, simpleHash<T, T>> lookup;
 

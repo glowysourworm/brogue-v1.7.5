@@ -22,6 +22,20 @@ namespace brogueHd::component::math
             point3 = apoint3;
         }
 
+        bool operator==(const triangle<T>& triangle)
+        {
+            return point1 == triangle.point1 &&
+                   point2 == triangle.point2 &&
+                   point3 == triangle.point3;
+        }
+
+        bool operator!=(const triangle<T>& triangle)
+        {
+            return point1 != triangle.point1 ||
+                   point2 != triangle.point2 ||
+                   point3 != triangle.point3;
+        }
+
         bool containsEqualEdge(mathPoint<T> vertex1, mathPoint<T> vertex2)
         {
             int pointsShared = 0;

@@ -12,7 +12,7 @@ namespace brogueHd::backend::model::layout
 	/// Accretion tile is used to help design the layout. The connection points are desired
 	/// locations for doors - which may or may not be on the edge of the region
 	/// </summary>
-	struct accretionTile : public gridRect
+	struct accretionTile : gridRect
 	{
 		// Tile has been connected to another tile
 		bool hasNorthConnection;

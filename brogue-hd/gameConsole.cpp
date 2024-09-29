@@ -38,23 +38,25 @@ namespace brogueHd::console
 	{
 		short mostRecent = 0;
 
-		brogueScoresFile* scoreFile = _resourceController->getHighScores(mostRecent);
+		//brogueScoresFile* scoreFile = _resourceController->getHighScores(mostRecent);
 
-		for (int i = 0; i < scoreFile->scoreCount; i++)
-		{
-			// Convert file time to readable string
-			std::string dateStr = stringExtension::formatDate(scoreFile->scoreList[i].dateTime);
+		//for (int i = 0; i < scoreFile->scoreCount; i++)
+		//{
+		//	// Convert file time to readable string
+		//	std::string dateStr = stringExtension::formatDate(scoreFile->scoreList[i].dateTime);
 
-			// Output to stream (console)
-			stream << std::format("{}\t{}\t{}", (int)scoreFile->scoreList[i].score, dateStr, scoreFile->scoreList[i].description) << std::endl;
-		}
+		//	// Output to stream (console)
+		//	stream << std::format("{}\t{}\t{}", (int)scoreFile->scoreList[i].score, dateStr, scoreFile->scoreList[i].description) << std::endl;
+		//}
 
-		delete scoreFile;
+		//delete scoreFile;
 	}
 
 	brogueConsoleReturn gameConsole::command(std::string input, ostream& stream)
 	{
-		std::string* cmd = stringExtension::split(input, " ");
+		//std::string* cmd = stringExtension::split(input, " ");
+
+		std::string* cmd = NULL;
 
 		std::string gamePath = "";
 		std::string viewPath = "";
@@ -186,7 +188,7 @@ namespace brogueHd::console
 			{
 				// Primary Exception Handler. Should show a popup if there is an error.
 				//
-				brogueException::show(std::string(std::string("Brogue Error:  ") + ex.what()).c_str());
+				//brogueException::show(std::string(std::string("Brogue Error:  ") + ex.what()).c_str());
 			}
 
 

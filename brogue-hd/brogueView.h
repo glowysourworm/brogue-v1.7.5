@@ -19,7 +19,7 @@ namespace brogueHd::backend::model
 
 	private:
 
-		grid<brogueCellDisplay*>* _view;
+		//grid<brogueCellDisplay*>* _view;
 	};
 }
 

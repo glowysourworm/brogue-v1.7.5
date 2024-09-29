@@ -3,6 +3,9 @@
 #include "brogueConsole.h"
 #include "command.h"
 #include "resourceController.h"
+#include <iostream>
+
+using namespace std;
 
 using namespace brogueHd::backend::controller;
 

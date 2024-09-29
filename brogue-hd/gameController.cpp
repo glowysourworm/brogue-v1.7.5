@@ -39,6 +39,11 @@ namespace brogueHd::backend::controller
 		delete _playbackProcessor;
 	}
 
+	void gameController::loadKeymap()
+	{
+
+	}
+
 	void gameController::setMode(BrogueGameMode gameMode)
 	{
 		switch (gameMode)
@@ -323,6 +328,16 @@ namespace brogueHd::backend::controller
 		//rogue.playbackMode = false;
 		//rogue.playbackOOS = false;
 
+		return false;
+	}
+
+	BrogueGameMode gameController::getMode()
+	{
+		return BrogueGameMode::Game;
+	}
+
+	bool gameController::run()
+	{
 		return false;
 	}
 

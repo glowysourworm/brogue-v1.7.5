@@ -15,13 +15,13 @@ namespace brogueHd::backend::model::creature
 	{
 	public:
 
-		creatureBehaviorMap();
-		~creatureBehaviorMap();
+		creatureBehaviorMap(){};
+		~creatureBehaviorMap(){};
 
 		/// <summary>
 		/// Updates creature behavior maps based on gloabl maps. Should be run each turn.
 		/// </summary>
-		void update(grid<brogueCell>* layoutGrid, grid<brogueObject>* contentGrid);
+		void update(grid<brogueCell>* layoutGrid, grid<brogueObject>* contentGrid){};
 
 	private:
 
