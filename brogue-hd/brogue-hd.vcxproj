@@ -79,14 +79,14 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Backup\_Source\Git\brogue-v1.7.5\brogue\brogue-hd.component;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Backup\_Source\Git\brogue-v1.7.5\brogue\x64\Debug;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Backup\_Source\Git\brogue-v1.7.5\brogue-hd.component;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Backup\_Source\Git\brogue-v1.7.5\x64\Debug;$(LibraryPath)</LibraryPath>
     <CopyLocalDeploymentContent>false</CopyLocalDeploymentContent>
     <CopyLocalProjectReference>false</CopyLocalProjectReference>
     <CopyLocalDebugSymbols>false</CopyLocalDebugSymbols>
     <CopyCppRuntimeToOutputDir>false</CopyCppRuntimeToOutputDir>
     <PublicIncludeDirectories>$(PublicIncludeDirectories)</PublicIncludeDirectories>
-    <ReferencePath>C:\Backup\_Source\Git\brogue-v1.7.5\brogue\x64\Debug;$(ReferencePath)</ReferencePath>
+    <ReferencePath>C:\Backup\_Source\Git\brogue-v1.7.5\x64\Debug;$(ReferencePath)</ReferencePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -134,12 +134,12 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>Default</LanguageStandard_C>
-      <AdditionalIncludeDirectories>C:\Backup\_Source\Git\brogue-v1.7.5\brogue\brogue-hd.component;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Backup\_Source\Git\brogue-v1.7.5\brogue-hd.component;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Backup\_Source\Git\brogue-v1.7.5\brogue\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Backup\_Source\Git\brogue-v1.7.5\brogue-hd.component\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>brogue-hd.component.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ProjectReference>
