@@ -25,26 +25,20 @@ namespace brogueHd::component
 	//};
 
 	/// <summary>
-	/// Delegate definitions for working with dijkstra's map
+	/// Decision making predicate for dijkstra's algorithm
 	/// </summary>
-	template<isGridLocator T>
-	struct dijkstraDelegates
-	{
-		/// <summary>
-		/// Decision predicate: calls user code to make a decision on the map
-		/// </summary>
-		typedef std::function<bool(short column, short row)> predicate;
+	using dijkstraPredicate = std::function<bool(short column, short row)>;
 
-		/// <summary>
-		/// Cost predicate:  calls user code to provide a movement cost to the map
-		/// </summary>
-		typedef std::function<short(short column, short row)> costPredicate;
+	/// <summary>
+	/// Cost predicate:  calls user code to provide a movement cost to the map
+	/// </summary>
+	using dijkstraCostCallback = std::function<short(short column, short row)>;
 
-		/// <summary>
-		/// Locator Callback:  Provides locator instances to the algorithm
-		/// </summary>
-		typedef std::function<T(short column, short row)> locatorCallback;
-	};
+	/// <summary>
+	/// Locator Callback:  Provides locator instances to the algorithm
+	/// </summary>
+	template<typename T>
+	using dijkstraLocatorCallback = std::function<T(short column, short row)>;
 
     template<isGridLocator T>
 	class dijkstra
@@ -60,9 +54,9 @@ namespace brogueHd::component
 		dijkstra(gridRect parentBoundary,
 				 gridRect relativeBoundary,
 				 bool obeyCardinalMovement,
-				 dijkstraDelegates<T>::predicate mapPredicate,
-				 dijkstraDelegates<T>::costPredicate mapCostPredicate,
-				 dijkstraDelegates<T>::locatorCallback locatorCallback);
+				 dijkstraPredicate mapPredicate,
+				 dijkstraCostCallback mapCostPredicate,
+				 dijkstraLocatorCallback<T> locatorCallback);
 
         ~dijkstra();
 
@@ -122,9 +116,9 @@ namespace brogueHd::component
 
 	private:
 
-		dijkstraDelegates<T>::locatorCallback _locatorCallback;
-		dijkstraDelegates<T>::predicate _mapPredicate;
-		dijkstraDelegates<T>::costPredicate _mapCostPredicate;
+		dijkstraLocatorCallback<T> _locatorCallback;
+		dijkstraPredicate _mapPredicate;
+		dijkstraCostCallback _mapCostPredicate;
 
 		gridRect _parentBoundary;						// The larger of the two boundaries. Each grid<> instance should
 		gridRect _relativeBoundary;						// use the larger parent boundary. Relative boundary is used to 

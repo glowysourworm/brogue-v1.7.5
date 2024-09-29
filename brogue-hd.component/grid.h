@@ -72,7 +72,7 @@ namespace brogueHd::component
 		/// The second argument will be the current grid value.
 		/// </summary>
 		/// <returns>The aggregated search value (not summed, aggregated!)</returns>
-		T search(gridDelegates<T>::aggregateComparer aggregateComparator) const;
+		T search(gridAggregateComparer<T> aggregateComparator) const;
 
 		/// <summary>
 		/// Returns true if the location is at the edge of the grid (using NULL comparison).
@@ -83,46 +83,46 @@ namespace brogueHd::component
 		/// Returns true if the location is at the edge of the grid (using NULL comparison), or 
 		/// the provided predicate.
 		/// </summary>
-		bool isEdgeWhere(short column, short row, gridDelegates<T>::predicate predicate) const;
+		bool isEdgeWhere(short column, short row, gridPredicate<T> predicate) const;
 
 		/// <summary>
 		/// Returns true if the adjacent element is positive with respect to the provided predicate OR is
 		/// out of bounds OR is null FOR the provided direction.
 		/// </summary>
 		/// <param name="direction">Compass direction treated with DIRECT EQUALITY! (DOESN'T USE FLAGS)</param>
-		bool isExposedEdge(int column, int row, brogueCompass direction, gridDelegates<T>::predicate predicate) const;
+		bool isExposedEdge(int column, int row, brogueCompass direction, gridPredicate<T> predicate) const;
 
 		/// <summary>
 		/// Returns true if the adjacent element is positive with respect to the provided predicate OR is
 		/// out of bounds OR is null FOR the provided NON-CARDINAL direction.
 		/// </summary>
 		/// <param name="direction">Compass direction treated with DIRECT EQUALITY! (DOESN'T USE FLAGS)</param>
-		bool isExposedCorner(int column, int row, brogueCompass direction, gridDelegates<T>::predicate predicate) const;
+		bool isExposedCorner(int column, int row, brogueCompass direction, gridPredicate<T> predicate) const;
 
 		/// <summary>
 		/// Iterates entire grid and calls user callback
 		/// </summary>
-		void iterate(gridDelegates<T>::callback callback);
+		void iterate(gridCallback<T> callback);
 
 		/// <summary>
 		/// Iterates around a specific point by one-cell in the 4 cardinal directions
 		/// </summary>
-		void iterateAroundCardinal(short column, short row, bool withinBounds, gridDelegates<T>::callback callback);
+		void iterateAroundCardinal(short column, short row, bool withinBounds, gridCallback<T> callback);
 
 		/// <summary>
 		/// Iterates around a specific point by one-cell in all 8 directions
 		/// </summary>
-		void iterateAround(short column, short row, bool withinBounds, gridDelegates<T>::callback callback);
+		void iterateAround(short column, short row, bool withinBounds, gridCallback<T> callback);
 
 		/// <summary>
 		/// Iterates grid within specific boundary constraint
 		/// </summary>
-		void iterateIn(gridRect boundary, gridDelegates<T>::callback callback);
+		void iterateIn(gridRect boundary, gridCallback<T> callback);
 
 		/// <summary>
 		/// Iterates outward from center location to specified distance
 		/// </summary>
-		void iterateOutward(short centerColumn, short centerRow, short distance, gridDelegates<T>::callback callback);
+		void iterateOutward(short centerColumn, short centerRow, short distance, gridCallback<T> callback);
 
 	private:
 

@@ -28,7 +28,7 @@ namespace brogueHd::component
     }
 
     template<isGridLocator T>
-    simpleList<gridRegion<T>*> gridRegionLocator<T>::locateRegions(const grid<T>& grid, gridDelegates<T>::predicate inclusionPredicate)
+    simpleList<gridRegion<T>*> gridRegionLocator<T>::locateRegions(const grid<T>& grid, gridPredicate<T> inclusionPredicate)
     {
         simpleList<gridRegion<T>*> result;
 
@@ -73,7 +73,7 @@ namespace brogueHd::component
     }
 
     template<isGridLocator T>
-    gridRegion<T>* gridRegionLocator<T>::identifyRegion(const grid<T>& grid, short column, short row, gridDelegates<T>::predicate inclusionPredicate)
+    gridRegion<T>* gridRegionLocator<T>::identifyRegion(const grid<T>& grid, short column, short row, gridPredicate<T> inclusionPredicate)
     {
         if (!grid.isDefined(column, row))
             return NULL;
@@ -88,7 +88,7 @@ namespace brogueHd::component
     }
 
     template<isGridLocator T>
-    gridRegionConstructor<T> gridRegionLocator<T>::runFloodFill(const grid<T>& grid, short column, short row, gridDelegates<T>::predicate inclusionPredicate)
+    gridRegionConstructor<T> gridRegionLocator<T>::runFloodFill(const grid<T>& grid, short column, short row, gridPredicate<T> inclusionPredicate)
     {
         if (!grid.isDefined(column, row) || !inclusionPredicate(column, row, grid.get(column, row)))
             brogueException::show("Trying to start FloodFill in non-region location");

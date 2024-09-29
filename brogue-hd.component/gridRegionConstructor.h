@@ -13,7 +13,7 @@ namespace brogueHd::component
     {
     public:
 
-        gridRegionConstructor(gridRect parentBoundary, gridDelegates<T>::predicate inclusionPredicate);
+        gridRegionConstructor(gridRect parentBoundary, gridPredicate<T> inclusionPredicate);
         ~gridRegionConstructor();
 
         /// <summary>
@@ -89,7 +89,7 @@ namespace brogueHd::component
 
         bool _completed;
 
-        gridDelegates<T>::predicate _predicate;
+        gridPredicate<T> _predicate;
     };
 }
 

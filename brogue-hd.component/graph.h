@@ -27,8 +27,8 @@ namespace brogueHd::component
         simpleList<TEdge> getAdjacentEdges(TNode node);
         TEdge findEdge(TNode node1, TNode node2);
 
-        void iterateNodes(simpleListDelegates<TNode>::callback callback);
-        void iterateEdges(simpleListDelegates<TEdge>::callback callback);
+        void iterateNodes(simpleListCallback<TNode> callback);
+        void iterateEdges(simpleListCallback<TEdge> callback);
 
     private:
 

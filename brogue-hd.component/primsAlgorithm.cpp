@@ -7,7 +7,7 @@
 namespace brogueHd::component
 {
     template<isGridLocatorNode TNode, isGridLocatorEdge TEdge>
-    primsAlgorithm<TNode, TEdge>::primsAlgorithm(graphDelegates<TNode, TEdge>::edgeConstructor graphEdgeConstructor)
+    primsAlgorithm<TNode, TEdge>::primsAlgorithm(graphEdgeConstructor<TNode, TEdge> graphEdgeConstructor)
     {
 
     }

@@ -233,7 +233,7 @@ namespace brogueHd::component
 	}
 
 	template<isGridLocator T>
-	void gridRegion<T>::iterateLocations(gridDelegates<T>::callback callback)
+	void gridRegion<T>::iterateLocations(gridCallback<T> callback)
 	{
 		_locations->forEach([](T item)
 		{
@@ -242,7 +242,7 @@ namespace brogueHd::component
 	}
 
 	template<isGridLocator T>
-	void gridRegion<T>::iterateEdges(gridDelegates<T>::callback callback)
+	void gridRegion<T>::iterateEdges(gridCallback<T> callback)
 	{
 		_edgeLocations->forEach([](T item)
 		{

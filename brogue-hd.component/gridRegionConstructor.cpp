@@ -11,7 +11,7 @@ using namespace brogueHd::component::math;
 namespace brogueHd::component
 {
     template<isGridLocator T>
-    gridRegionConstructor<T>::gridRegionConstructor(gridRect parentBoundary, gridDelegates<T>::predicate inclusionPredicate)
+    gridRegionConstructor<T>::gridRegionConstructor(gridRect parentBoundary, gridPredicate<T> inclusionPredicate)
     {
         // This component is pretty much free-standing
         // _regionCentroidCalculator = IocContainer.Get<IRegionCentroidCalculator>();

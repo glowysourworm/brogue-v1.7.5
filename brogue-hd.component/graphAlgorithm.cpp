@@ -1,14 +1,16 @@
 #pragma once
 
+#include "graphDefinitions.h"
 #include "graphAlgorithm.h"
 #include "exceptionHandler.h"
+#include "simpleListExtension.h"
 
 namespace brogueHd::component
 {
     template<isGridLocatorNode TNode, isGridLocatorEdge TEdge>
-    graphAlgorithm<TNode, TEdge>::graphAlgorithm(graphDelegates<TNode, TEdge>::edgeConstructor graphEdgeConstructor)
+    graphAlgorithm<TNode, TEdge>::graphAlgorithm(graphEdgeConstructor<TNode, TEdge> edgeConstructor)
     {
-        this->graphEdgeConstructor = graphEdgeConstructor;
+        this->edgeConstructor = edgeConstructor;
     }
 
     template<isGridLocatorNode TNode, isGridLocatorEdge TEdge>
@@ -39,9 +41,9 @@ namespace brogueHd::component
             simpleList<TEdge> edges;
             graphAlgorithm<TNode, TEdge>* that = this;
 
-            simpleList<TNode>::distinctPairs(vertices, vertices, [&edges, &that](TNode node1, TNode node2)
+            simpleListExtension<TNode>::distinctPairs(vertices, vertices, [&edges, &that](TNode node1, TNode node2)
             {
-                edges.add(that->graphEdgeConstructor(node1, node2));
+                edges.add(that->edgeConstructor(node1, node2));
             });
 
             return new graph<TNode, TEdge>(vertices, edges.data());

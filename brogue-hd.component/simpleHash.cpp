@@ -153,7 +153,7 @@ namespace brogueHd::component
 	}
 
 	template<typename K, typename V>
-	void simpleHash<K, V>::iterate(simpleHashDelegates<K, V>::callback callback)
+	void simpleHash<K, V>::iterate(simpleHashCallback<K, V> callback)
 	{
 		for (int index = 0; index < _table->count; index++)
 		{
@@ -214,7 +214,7 @@ namespace brogueHd::component
 	}
 
 	template<typename K, typename V>
-	bool simpleHash<K, V>::any(simpleHashDelegates<K, V>::predicate predicate)
+	bool simpleHash<K, V>::any(simpleHashPredicate<K, V> predicate)
 	{
 		bool result = false;
 
@@ -231,7 +231,7 @@ namespace brogueHd::component
 	}
 
 	template<typename K, typename V>
-	simpleList<simplePair<K, V>> simpleHash<K, V>::removeWhere(simpleHashDelegates<K, V>::predicate predicate)
+	simpleList<simplePair<K, V>> simpleHash<K, V>::removeWhere(simpleHashPredicate<K, V> predicate)
 	{
 		simpleList<simplePair<K, V>> result;
 
@@ -250,7 +250,7 @@ namespace brogueHd::component
 	}
 
 	template<typename K, typename V>
-	K simpleHash<K, V>::firstKey(simpleHashDelegates<K, V>::predicate predicate)
+	K simpleHash<K, V>::firstKey(simpleHashPredicate<K, V> predicate)
 	{
 		K result = NULL;
 
@@ -267,7 +267,7 @@ namespace brogueHd::component
 	}
 
 	template<typename K, typename V>
-	void simpleHash<K, V>::forEach(simpleHashDelegates<K, V>::callback callback)
+	void simpleHash<K, V>::forEach(simpleHashCallback<K, V> callback)
 	{
 		this->iterate([](K key, V value)
 		{
@@ -276,7 +276,7 @@ namespace brogueHd::component
 	}
 
 	template<typename K, typename V>
-	K simpleHash<K, V>::firstOrDefaultKey(simpleHashDelegates<K, V>::predicate predicate)
+	K simpleHash<K, V>::firstOrDefaultKey(simpleHashPredicate<K, V> predicate)
 	{
 		K result = NULL;
 
@@ -294,7 +294,7 @@ namespace brogueHd::component
 
 	template<typename K, typename V>
 	template<typename VResult>
-	simpleList<VResult> simpleHash<K, V>::selectFromValues(simpleHashSelectorDelegates<K, V, VResult>::selector selector)
+	simpleList<VResult> simpleHash<K, V>::selectFromValues(simpleHashSelector<K, V, VResult> selector)
 	{
 		simpleList<VResult> result;
 

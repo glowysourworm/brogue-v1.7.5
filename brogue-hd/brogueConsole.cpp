@@ -1,9 +1,9 @@
 #include "brogueConsole.h"
 #include "command.h"
-//#include <exceptionHandler.h>
+#include <exceptionHandler.h>
 #include <stringExtension.h>
-//#include <componentMacros.h>
-//#include <typeConverter.h>
+#include <componentMacros.h>
+#include <typeConverter.h>
 
 using namespace brogueHd::component;
 
@@ -16,22 +16,22 @@ namespace brogueHd::console
 	{
 		std::string* cmd = stringExtension::split(input, " ");
 
-		//if (hasArgument(cmd, "--mode"))
-		//{
-		//	std::string mode = getArgument(cmd, "--mode");
+		if (hasArgument(cmd, "--mode"))
+		{
+			std::string mode = getArgument(cmd, "--mode");
 
-		//	if (stringExtension::toUpper(mode) == "GAME")
-		//		return brogueConsoleReturn::Completed_SetMode_Game;
+			if (stringExtension::toUpper(mode) == "GAME")
+				return brogueConsoleReturn::Completed_SetMode_Game;
 
-		//	if (stringExtension::toUpper(mode) == "DEV")
-		//		return brogueConsoleReturn::Completed_SetMode_Dev;
+			if (stringExtension::toUpper(mode) == "DEV")
+				return brogueConsoleReturn::Completed_SetMode_Dev;
 
-		//	if (stringExtension::toUpper(mode) == "RESOURCE")
-		//		return brogueConsoleReturn::Completed_SetMode_Resource;
-		//}
+			if (stringExtension::toUpper(mode) == "RESOURCE")
+				return brogueConsoleReturn::Completed_SetMode_Resource;
+		}
 
-		//else if (hasArgument(cmd, "--help"))
-		//	printHelp(stream);
+		else if (hasArgument(cmd, "--help"))
+			printHelp(stream);
 
 		return brogueConsoleReturn::Completed;
 	}
@@ -45,11 +45,11 @@ namespace brogueHd::console
 
 	bool brogueConsole::hasArgument(const std::string args[], const char* argumentName)
 	{
-		//for (int index = 0; index < SIZEOF(args); index++)
-		//{
-		//	if (args[index] == std::string(argumentName))
-		//		return true;
-		//}
+		for (int index = 0; index < SIZEOF(args); index++)
+		{
+			if (args[index] == std::string(argumentName))
+				return true;
+		}
 
 		return false;
 	}
@@ -70,28 +70,28 @@ namespace brogueHd::console
 
 	int brogueConsole::getArgumentInt(const std::string args[], const char* argumentName)
 	{
-		//for (int index = 0; index < SIZEOF(args); index++)
-		//{
-		//	if (std::string(args[index]) == std::string(argumentName) &&
-		//		index < SIZEOF(args) + 1)
-		//	{
-		//		return typeConverter::stringToint(args[index + 1]);
-		//	}
-		//}
+		for (int index = 0; index < SIZEOF(args); index++)
+		{
+			if (std::string(args[index]) == std::string(argumentName) &&
+				index < SIZEOF(args) + 1)
+			{
+				return typeConverter::stringToint(args[index + 1]);
+			}
+		}
 
 		return 0;
 	}
 
 	bool brogueConsole::getArgumentBool(const std::string args[], const char* argumentName)
 	{
-		//for (int index = 0; index < SIZEOF(args); index++)
-		//{
-		//	if (std::string(args[index]) == std::string(argumentName) &&
-		//		index < SIZEOF(args) + 1)
-		//	{
-		//		return typeConverter::stringToBool(args[index + 1]);
-		//	}
-		//}
+		for (int index = 0; index < SIZEOF(args); index++)
+		{
+			if (std::string(args[index]) == std::string(argumentName) &&
+				index < SIZEOF(args) + 1)
+			{
+				return typeConverter::stringToBool(args[index + 1]);
+			}
+		}
 
 		return false;
 	}

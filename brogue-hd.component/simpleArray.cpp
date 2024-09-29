@@ -68,7 +68,7 @@ namespace brogueHd::component
 	}
 
 	template<typename T>
-	void simpleArray<T>::forEach(simpleArrayDelegates<T>::callback callback)
+	void simpleArray<T>::forEach(simpleArrayCallback<T> callback)
 	{
 		for (int index = 0; index < _size; index++)
 		{
@@ -78,7 +78,7 @@ namespace brogueHd::component
 	}
 
 	template<typename T>
-	simpleArray<T> simpleArray<T>::where(simpleArrayDelegates<T>::predicate predicate)
+	simpleArray<T> simpleArray<T>::where(simpleArrayPredicate<T> predicate)
 	{
 		simpleList<T> result;
 

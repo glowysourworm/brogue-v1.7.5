@@ -8,42 +8,30 @@ using namespace std;
 namespace brogueHd::component
 {
 	/// <summary>
-	/// Definitions for most of the basic delegates in the extensions namespace
+	/// Definition of function to provide callback: 1) user can return iterationCallback 
+	/// value to either break, or continue the loop.
+	/// </summary>
+	/// <param name="value">callback (current) value</param>
+	template<typename T>
+	using simpleListCallback = std::function<iterationCallback(T item)>;
+
+	/// <summary>
+	/// Definition of simple predicate (decision making function) for most collection types
 	/// </summary>
 	template<typename T>
-	struct simpleListDelegates
-	{
-	public:
+	using simpleListPredicate = std::function<bool(T item)>;
 
-		/// <summary>
-		/// Definition of function to provide callback: 1) user can return iterationCallback 
-		/// value to either break, or continue the loop.
-		/// </summary>
-		/// <param name="value">callback (current) value</param>
-		typedef std::function<iterationCallback(T item)> callback;
+	/// <summary>
+	/// Defines a pair of items for use with a user callback
+	/// </summary>
+	template<typename T>
+	using simpleListPairDelegate = std::function<void(T item1, T item2)>;
 
-		/// <summary>
-		/// Definition of simple predicate (decision making function) for most collection types
-		/// </summary>
-		typedef std::function<bool(T item)> predicate;
-
-		/// <summary>
-		/// Defines a pair of items for use with a user callback
-		/// </summary>
-		typedef std::function<void(T item1, T item2)> pairs;
-	};
-
+	/// <summary>
+	/// Definition of selector for a value V from an item T.
 	/// </summary>
 	template<typename T, typename TResult>
-	struct simpleListSelectorDelegates
-	{
-	public:
-
-		/// <summary>
-		/// Definition of selector for a value V from an item T.
-		/// </summary>
-		typedef std::function<TResult(T item)> selector;
-	};
+	using simpleListSelector = std::function<TResult(T item)>;
 
 	template<typename T>
 	class simpleList
@@ -80,30 +68,30 @@ namespace brogueHd::component
 
 		// Queries
 
-		simpleList<T> remove(simpleListDelegates<T>::predicate predicate);
-		simpleList<T> except(simpleListDelegates<T>::predicate predicate);
+		simpleList<T> remove(simpleListPredicate<T> predicate);
+		simpleList<T> except(simpleListPredicate<T> predicate);
 
-		T first(simpleListDelegates<T>::predicate predicate);
-		bool any(simpleListDelegates<T>::predicate predicate);
-		void forEach(simpleListDelegates<T>::callback callback);
-		simpleList<T> where(simpleListDelegates<T>::predicate predicate);
+		T first(simpleListPredicate<T> predicate);
+		bool any(simpleListPredicate<T> predicate);
+		void forEach(simpleListCallback<T> callback);
+		simpleList<T> where(simpleListPredicate<T> predicate);
 		
 		// Selectors
 
 		template<typename TResult>
-		simpleList<TResult> select(simpleListSelectorDelegates<T, TResult>::selector selector);
+		simpleList<TResult> select(simpleListSelector<T, TResult> selector);
 
 		template<typename TResult>
-		TResult max(simpleListSelectorDelegates<T, TResult>::selector selector);
+		TResult max(simpleListSelector<T, TResult> selector);
 
 		template<typename TResult>
-		TResult min(simpleListSelectorDelegates<T, TResult>::selector selector);
+		TResult min(simpleListSelector<T, TResult> selector);
 
 		template<typename TResult>
-		T withMin(simpleListSelectorDelegates<T, TResult>::selector selector);
+		T withMin(simpleListSelector<T, TResult> selector);
 
 		template<typename TResult>
-		T withMax(simpleListSelectorDelegates<T, TResult>::selector selector);
+		T withMax(simpleListSelector<T, TResult> selector);
 
 	private:
 

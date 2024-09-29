@@ -5,6 +5,8 @@
 #include "gridLocatorEdge.h"
 #include <functional>
 
+using namespace std;
+
 namespace brogueHd::component
 {
 	// Abstract graph constraints
@@ -36,8 +38,5 @@ namespace brogueHd::component
 
 	// Graph Delegates
 	template<graphNodeType TNode, graphEdgeType<TNode> TEdge>
-	struct graphDelegates
-	{
-		typedef function<TEdge(TNode node1, TNode node2)> edgeConstructor;
-	};
+	using graphEdgeConstructor = std::function<TEdge(TNode node1, TNode node2)>;
 }

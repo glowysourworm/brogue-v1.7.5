@@ -267,7 +267,7 @@ namespace brogueHd::component
     //}
 
     template<typename T>
-    T grid<T>::search(gridDelegates<T>::aggregateComparer aggregateComparator) const
+    T grid<T>::search(gridAggregateComparer<T> aggregateComparator) const
     {
         T searchValue;
         
@@ -294,7 +294,7 @@ namespace brogueHd::component
     /// the provided predicate.
     /// </summary>
     template<typename T>
-    bool grid<T>::isEdgeWhere(short column, short row, gridDelegates<T>::predicate predicate) const
+    bool grid<T>::isEdgeWhere(short column, short row, gridPredicate<T> predicate) const
     {
         T north = this->get(column, row - 1);
         T south = this->get(column, row + 1);
@@ -316,7 +316,7 @@ namespace brogueHd::component
     }
 
     template<typename T>
-    bool grid<T>::isExposedEdge(int column, int row, brogueCompass direction, gridDelegates<T>::predicate predicate) const
+    bool grid<T>::isExposedEdge(int column, int row, brogueCompass direction, gridPredicate<T> predicate) const
     {
         T north = this->get(column, row - 1);
         T south = this->get(column, row + 1);
@@ -340,7 +340,7 @@ namespace brogueHd::component
     }
 
     template<typename T>
-    bool grid<T>::isExposedCorner(int column, int row, brogueCompass direction, gridDelegates<T>::predicate predicate) const
+    bool grid<T>::isExposedCorner(int column, int row, brogueCompass direction, gridPredicate<T> predicate) const
     {
         if (direction == brogueCompass::NW)
             return isExposedEdge(grid, column, row, brogueCompass::N, predicate) &&
@@ -381,7 +381,7 @@ namespace brogueHd::component
     }
 
     template<typename T>
-    void grid<T>::iterate(gridDelegates<T>::callback callback)
+    void grid<T>::iterate(gridCallback<T> callback)
     {
         bool userBreak = false;
 
@@ -401,7 +401,7 @@ namespace brogueHd::component
     void grid<T>::iterateOutward(short centerColumn,
                                  short centerRow,
                                  short distance,
-                                 gridDelegates<T>::callback callback)
+                                 gridCallback<T> callback)
     {
         bool userBreak = false;
 
@@ -423,7 +423,7 @@ namespace brogueHd::component
     }
 
     template<typename T>
-    void grid<T>::iterateIn(gridRect boundary, gridDelegates<T>::callback callback)
+    void grid<T>::iterateIn(gridRect boundary, gridCallback<T> callback)
     {
         bool userBreak = false;
 
@@ -443,7 +443,7 @@ namespace brogueHd::component
     }
 
     template<typename T>
-    void grid<T>::iterateAround(short column, short row, bool withinBounds, gridDelegates<T>::callback callback)
+    void grid<T>::iterateAround(short column, short row, bool withinBounds, gridCallback<T> callback)
     {
         short newX, newY;
 
@@ -467,7 +467,7 @@ namespace brogueHd::component
     }
 
     template<typename T>
-    void grid<T>::iterateAroundCardinal(short column, short row, bool withinBounds, gridDelegates<T>::callback callback)
+    void grid<T>::iterateAroundCardinal(short column, short row, bool withinBounds, gridCallback<T> callback)
     {
         iterationCallback response = iterationCallback::iterate;
 

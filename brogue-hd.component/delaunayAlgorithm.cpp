@@ -10,7 +10,7 @@ using namespace brogueHd::component::math;
 namespace brogueHd::component
 {
     template<isGridLocatorNode TNode, isGridLocatorEdge TEdge>
-    delaunayAlgorithm<TNode, TEdge>::delaunayAlgorithm(graphDelegates<TNode, TEdge>::edgeConstructor edgeConstructor)
+    delaunayAlgorithm<TNode, TEdge>::delaunayAlgorithm(graphEdgeConstructor<TNode, TEdge> edgeConstructor)
     {
     }
 

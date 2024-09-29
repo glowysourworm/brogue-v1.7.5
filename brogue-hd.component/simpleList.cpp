@@ -201,7 +201,7 @@ namespace brogueHd::component
 	
 	template<typename T>
 	template<typename TResult>
-	simpleList<TResult> simpleList<T>::select(simpleListSelectorDelegates<T, TResult>::selector selector)
+	simpleList<TResult> simpleList<T>::select(simpleListSelector<T, TResult> selector)
 	{
 		simpleList<TResult> result;
 
@@ -214,7 +214,7 @@ namespace brogueHd::component
 	}
 
 	template<typename T>
-	simpleList<T> simpleList<T>::remove(simpleListDelegates<T>::predicate predicate)
+	simpleList<T> simpleList<T>::remove(simpleListPredicate<T> predicate)
 	{
 		simpleList<T> result;
 
@@ -232,7 +232,7 @@ namespace brogueHd::component
 	}
 
 	template<typename T>
-	simpleList<T> simpleList<T>::except(simpleListDelegates<T>::predicate predicate)
+	simpleList<T> simpleList<T>::except(simpleListPredicate<T> predicate)
 	{
 		simpleList<T> result;
 
@@ -246,7 +246,7 @@ namespace brogueHd::component
 	}
 
 	template<typename T>
-	void simpleList<T>::forEach(simpleListDelegates<T>::callback callback)
+	void simpleList<T>::forEach(simpleListCallback<T> callback)
 	{
 		for (int index = 0; index < _size; index++)
 		{
@@ -256,7 +256,7 @@ namespace brogueHd::component
 	}
 
 	template<typename T>
-	T simpleList<T>::first(simpleListDelegates<T>::predicate predicate)
+	T simpleList<T>::first(simpleListPredicate<T> predicate)
 	{
 		for (int index = 0; index < _size; index++)
 		{
@@ -268,7 +268,7 @@ namespace brogueHd::component
 	}
 
 	template<typename T>
-	bool simpleList<T>::any(simpleListDelegates<T>::predicate predicate)
+	bool simpleList<T>::any(simpleListPredicate<T> predicate)
 	{
 		for (int index = 0; index < _size; index++)
 		{
@@ -280,7 +280,7 @@ namespace brogueHd::component
 	}
 
 	template<typename T>
-	simpleList<T> simpleList<T>::where(simpleListDelegates<T>::predicate predicate)
+	simpleList<T> simpleList<T>::where(simpleListPredicate<T> predicate)
 	{
 		simpleList<T> result;
 
@@ -295,7 +295,7 @@ namespace brogueHd::component
 
 	template<typename T>
 	template<typename TResult>
-	TResult simpleList<T>::max(simpleListSelectorDelegates<T, TResult>::selector selector)
+	TResult simpleList<T>::max(simpleListSelector<T, TResult> selector)
 	{
 		TResult max = NULL;
 		int maxIndex = -1;
@@ -322,7 +322,7 @@ namespace brogueHd::component
 
 	template<typename T>
 	template<typename TResult>
-	TResult simpleList<T>::min(simpleListSelectorDelegates<T, TResult>::selector selector)
+	TResult simpleList<T>::min(simpleListSelector<T, TResult> selector)
 	{
 		TResult min = NULL;
 		int minIndex = -1;
@@ -349,7 +349,7 @@ namespace brogueHd::component
 
 	template<typename T>
 	template<typename TResult>
-	T simpleList<T>::withMin(simpleListSelectorDelegates<T, TResult>::selector selector)
+	T simpleList<T>::withMin(simpleListSelector<T, TResult> selector)
 	{
 		TResult min = NULL;
 		int minIndex = -1;
@@ -376,7 +376,7 @@ namespace brogueHd::component
 
 	template<typename T>
 	template<typename TResult>
-	T simpleList<T>::withMax(simpleListSelectorDelegates<T, TResult>::selector selector)
+	T simpleList<T>::withMax(simpleListSelector<T, TResult> selector)
 	{
 		TResult max = NULL;
 		int maxIndex = -1;

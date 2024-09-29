@@ -13,7 +13,7 @@ namespace brogueHd::component
 	{
     public:
 
-        delaunayAlgorithm(graphDelegates<TNode, TEdge>::edgeConstructor graphEdgeConstructor);
+        delaunayAlgorithm(graphEdgeConstructor<TNode, TEdge> graphEdgeConstructor);
         ~delaunayAlgorithm();
 
         graph<TNode, TEdge>* run(const simpleList<TNode>& vertices) override;

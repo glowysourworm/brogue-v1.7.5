@@ -34,64 +34,59 @@ namespace brogueHd::component
 	};
 
 	/// <summary>
-	/// Delegate definitions for most of the grid classes to share. This should
-	/// facilitate iterators on these classes - apart from array2D, and std collections.
+	/// Simple iteration callback. Set the return value to either continue / break.
 	/// </summary>
 	template<typename T>
-	struct gridDelegates
-	{
-		/// <summary>
-		/// Simple iteration callback. Set the return value to either continue / break.
-		/// </summary>
-		typedef std::function<iterationCallback(T)> simpleCallback;
+	using gridSimpleCallback = std::function<iterationCallback(T)>;
 
-		/// <summary>
-		/// Iteration callback that includes the indices. Set the return value to either continue / break.
-		/// </summary>
-		typedef std::function<iterationCallback(short, short, T)> callback;
+	/// <summary>
+	/// Iteration callback that includes the indices. Set the return value to either continue / break.
+	/// </summary>
+	template<typename T>
+	using gridCallback = std::function<iterationCallback(short, short, T)>;
 
-		/// <summary>
-		/// Simple predicate decision making function that includes the item coordinates
-		/// </summary>
-		typedef std::function<bool(short, short, T)> predicate;
+	/// <summary>
+	/// Simple predicate decision making function that includes the item coordinates
+	/// </summary>
+	template<typename T>
+	using gridPredicate = std::function<bool(short, short, T)>;
 
-		/// <summary>
-		/// Simple predicate decision making function
-		/// </summary>
-		typedef std::function<bool(T)> simplePredicate;
+	/// <summary>
+	/// Simple predicate decision making function
+	/// </summary>
+	template<typename T>
+	using gridSimplePredicate = std::function<bool(T)>;
 
-		/// <summary>
-		/// Searches grid for requested value based on comparison. Each truthy aggregateComparator result will store
-		/// the next value as the going compare-ee. This compare-ee will be passed as the first argument of the comparator.
-		/// The second argument will be the current grid value.
-		/// </summary>
-		typedef std::function<bool(T, T)> aggregateComparer;
+	/// <summary>
+	/// Searches grid for requested value based on comparison. Each truthy aggregateComparator result will store
+	/// the next value as the going compare-ee. This compare-ee will be passed as the first argument of the comparator.
+	/// The second argument will be the current grid value.
+	/// </summary>
+	template<typename T>
+	using gridAggregateComparer = std::function<bool(T, T)>;
 
-		/// <summary>
-		/// Defines a constructor (or getter) method for grid cells
-		/// </summary>
-		typedef std::function<T(short, short)> constructor;
-	};
+	/// <summary>
+	/// Defines a constructor (or getter) method for grid cells
+	/// </summary>
+	template<typename T>
+	using gridElementConstructor = std::function<T(short, short)>;
 
+
+	/// <summary>
+	/// Selector of a value from the current item that includes the grid coordinates
+	/// </summary>
 	template<typename T, typename TResult>
-	struct gridSelectorDelegates
-	{
-		/// <summary>
-		/// Selector of a value from the current item that includes the grid coordinates
-		/// </summary>
-		typedef std::function<TResult(short, short, T)> selector;
+	using gridSelector = std::function<TResult(short, short, T)>;
 
-		/// <summary>
-		/// Definition of function to select a value from the grid type.
-		/// </summary>
-		typedef std::function<TResult(T)> simpleSelector;
-	};
+	/// <summary>
+	/// Definition of function to select a value from the grid type.
+	/// </summary>
+	template<typename T, typename TResult>
+	using gridSimpleSelectlr = std::function<TResult(T)>;
 
-	struct gridRectDelegates
-	{
-		/// <summary>
-		/// Simple iteration callback. Set the return value to either continue / break.
-		/// </summary>
-		typedef std::function<iterationCallback(short, short)> callback;
-	};
+	/// <summary>
+	/// Simple iteration callback. Set the return value to either continue / break.
+	/// </summary>
+	template<typename T>
+	using gridIterator = std::function<iterationCallback(short, short)>;
 }

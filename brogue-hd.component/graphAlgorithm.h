@@ -10,7 +10,7 @@ namespace brogueHd::component
 	{
 	public:
 
-		graphAlgorithm(graphDelegates<TNode, TEdge>::edgeConstructor graphEdgeConstructor);
+		graphAlgorithm(graphEdgeConstructor<TNode, TEdge> graphEdgeConstructor);
 		~graphAlgorithm();
 
 		virtual graph<TNode, TEdge>* run(const simpleList<TNode>& vertices)
@@ -28,6 +28,6 @@ namespace brogueHd::component
 		/// <summary>
 		/// Delegate that constructs the proper edge type
 		/// </summary>
-		graphDelegates<TNode, TEdge>::edgeConstructor graphEdgeConstructor;
+		graphEdgeConstructor<TNode, TEdge> edgeConstructor;
 	};
 }

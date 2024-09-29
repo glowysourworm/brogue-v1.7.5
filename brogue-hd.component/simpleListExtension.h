@@ -8,7 +8,7 @@ namespace brogueHd::component
 	template<typename T>
 	class simpleListExtension
 	{
-		static void distinctPairs(const simpleList<T>& collection1, const simpleList<T>& collection2, simpleListDelegates<T>::pairs callback)
+		static void distinctPairs(const simpleList<T>& collection1, const simpleList<T>& collection2, simpleListPairDelegate<T> callback)
 		{
 			simpleHash<T, simpleHash<T, T>> lookup;
 

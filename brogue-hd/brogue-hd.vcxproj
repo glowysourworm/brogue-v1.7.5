@@ -44,7 +44,6 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
-    <UseOfMfc>Static</UseOfMfc>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -78,12 +77,16 @@
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\Backup\_Source\Git\brogue-v1.7.5\brogue-hd.component;$(IncludePath)</IncludePath>
     <CopyLocalDeploymentContent>false</CopyLocalDeploymentContent>
     <CopyLocalProjectReference>false</CopyLocalProjectReference>
     <CopyLocalDebugSymbols>false</CopyLocalDebugSymbols>
     <CopyCppRuntimeToOutputDir>false</CopyCppRuntimeToOutputDir>
     <PublicIncludeDirectories>$(PublicIncludeDirectories)</PublicIncludeDirectories>
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\Backup\_Source\Git\brogue-v1.7.5\brogue-hd.component;$(IncludePath)</IncludePath>
+    <ReferencePath>C:\Backup\_Source\Git\brogue-v1.7.5\x64\Debug;$(ReferencePath)</ReferencePath>
+    <SourcePath>C:\Backup\_Source\Git\brogue-v1.7.5\brogue-hd.component;$(SourcePath)</SourcePath>
+    <LibraryPath>C:\Backup\_Source\Git\brogue-v1.7.5\x64\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -134,15 +137,18 @@
       <AdditionalIncludeDirectories>C:\Backup\_Source\Git\brogue-v1.7.5\brogue-hd.component;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <TreatAngleIncludeAsExternal>true</TreatAngleIncludeAsExternal>
+      <ExternalTemplatesDiagnostics>true</ExternalTemplatesDiagnostics>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Backup\_Source\Git\brogue-v1.7.5\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>brogue-hd.component.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ImportLibrary>
+      </ImportLibrary>
+      <AdditionalLibraryDirectories>C:\Backup\_Source\Git\brogue-v1.7.5\brogue-hd\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SubSystem>Console</SubSystem>
     </Link>
     <ProjectReference>
-      <UseLibraryDependencyInputs>true</UseLibraryDependencyInputs>
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
   </ItemDefinitionGroup>
@@ -338,6 +344,8 @@
   <ItemGroup>
     <ProjectReference Include="..\brogue-hd.component\brogue-hd.component.vcxproj">
       <Project>{e94509ad-19a8-4440-b05f-6defe21da01f}</Project>
+      <UseLibraryDependencyInputs>true</UseLibraryDependencyInputs>
+      <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

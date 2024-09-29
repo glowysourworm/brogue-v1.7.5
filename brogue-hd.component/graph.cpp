@@ -73,13 +73,13 @@ namespace brogueHd::component
     }
 
     template<graphNodeType TNode, graphEdgeType<TNode> TEdge>
-    void graph<TNode, TEdge>::iterateNodes(simpleListDelegates<TNode>::callback callback)
+    void graph<TNode, TEdge>::iterateNodes(simpleListCallback<TNode> callback)
     {
         _nodes->forEach(callback);
     }
 
     template<graphNodeType TNode, graphEdgeType<TNode> TEdge>
-    void graph<TNode, TEdge>::iterateEdges(simpleListDelegates<TEdge>::callback callback)
+    void graph<TNode, TEdge>::iterateEdges(simpleListCallback<TEdge> callback)
     {
         _edgeCollection->getEdges()->forEach(callback);
     }

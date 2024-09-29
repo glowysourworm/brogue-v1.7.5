@@ -18,17 +18,17 @@ namespace brogueHd::backend::model
 		~brogueColorMap();
 		
 		void setColor(gameColors colorSelector, color value);
-		void setColor(boltColors colorSelector, color value);
-		void setColor(tileColors colorSelector, color value);
-		void setColor(creatureColors colorSelector, color value);
-		void setColor(lightColors colorSelector, color value);
-		void setColor(flareColors colorSelector, color value);
-		void setColor(colorMultipliers colorSelector, color value);
-		void setColor(bloodColors colorSelector, color value);
-		void setColor(gasColors colorSelector, color value);
-		void setColor(interfaceColors colorSelector, color value);
+		//void setColor(boltColors colorSelector, color value);
+		//void setColor(tileColors colorSelector, color value);
+		//void setColor(creatureColors colorSelector, color value);
+		//void setColor(lightColors colorSelector, color value);
+		//void setColor(flareColors colorSelector, color value);
+		//void setColor(colorMultipliers colorSelector, color value);
+		//void setColor(bloodColors colorSelector, color value);
+		//void setColor(gasColors colorSelector, color value);
+		//void setColor(interfaceColors colorSelector, color value);
 
-		//color getColor(gameColors colorSelector) const;
+		color getColor(gameColors colorSelector) const;
 		//color getColor(boltColors colorSelector) const;
 		//color getColor(tileColors colorSelector) const;
 		//color getColor(creatureColors colorSelector) const;
@@ -40,7 +40,7 @@ namespace brogueHd::backend::model
 		//color getColor(interfaceColors colorSelector) const;
 
 	private:
-		//simpleHash<gameColors, color>* _gameColors;
+		//simpleHash<int, bool>* _gameColors;
 		//simpleHash<boltColors, color>* _boltColors;
 		//simpleHash<tileColors, color>* _tileColors;
 		//simpleHash<creatureColors, color>* _creatureColors;

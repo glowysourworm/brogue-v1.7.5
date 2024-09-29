@@ -13,7 +13,7 @@ namespace brogueHd::component
 	{
     public:
 
-        primsAlgorithm(graphDelegates<TNode, TEdge>::edgeConstructor graphEdgeConstructor);
+        primsAlgorithm(graphEdgeConstructor<TNode, TEdge> graphEdgeConstructor);
         ~primsAlgorithm();
 
         graph<TNode, TEdge>* run(const simpleList<TNode>& vertices) override;

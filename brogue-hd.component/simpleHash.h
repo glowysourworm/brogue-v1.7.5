@@ -9,29 +9,23 @@ using namespace std;
 
 namespace brogueHd::component
 {
+	/// <summary>
+	/// Definition of simple predicate for any key-value map
+	/// </summary>
 	template<typename K, typename V>
-	struct simpleHashDelegates
-	{
-		/// <summary>
-		/// Definition of simple predicate for any key-value map
-		/// </summary>
-		typedef std::function<bool(K key, V value)> predicate;
+	using simpleHashPredicate = std::function<bool(K key, V value)>;
 
-		/// <summary>
-		/// Definition of function to provide callback: 1) user can return iterationCallback 
-		/// value to either break, or continue the loop.
-		/// </summary>
-		typedef std::function<iterationCallback(K key, V value)> callback;
-	};
+	/// <summary>
+	/// Definition of simple predicate for any key-value map
+	/// </summary>
+	template<typename K, typename V>
+	using simpleHashCallback = std::function<iterationCallback(K key, V value)>;
 
+	/// <summary>
+	/// Definition of selector for the value type
+	/// </summary>
 	template<typename K, typename V, typename VResult>
-	struct simpleHashSelectorDelegates
-	{
-		/// <summary>
-		/// Definition of selector for the value type
-		/// </summary>
-		typedef std::function<VResult(V value)> selector;
-	};
+	using simpleHashSelector = std::function<VResult(V value)>;
 
 	template<typename K, typename V>
 	struct simplePair
@@ -66,7 +60,7 @@ namespace brogueHd::component
 
 		bool remove(K key);
 
-		void iterate(simpleHashDelegates<K,V>::callback callback);
+		void iterate(simpleHashCallback<K, V> callback);
 
 	private:
 
@@ -76,14 +70,14 @@ namespace brogueHd::component
 
 	public:	// Extension Methods:  mostly queries
 
-		bool any(simpleHashDelegates<K, V>::predicate predicate);
-		void forEach(simpleHashDelegates<K, V>::callback callback);
-		K firstKey(simpleHashDelegates<K, V>::predicate predicate);
-		K firstOrDefaultKey(simpleHashDelegates<K, V>::predicate predicate);
-		simpleList<simplePair<K, V>> removeWhere(simpleHashDelegates<K, V>::predicate predicate);
+		bool any(simpleHashPredicate<K, V> predicate);
+		void forEach(simpleHashCallback<K, V> callback);
+		K firstKey(simpleHashPredicate<K, V> predicate);
+		K firstOrDefaultKey(simpleHashPredicate<K, V> predicate);
+		simpleList<simplePair<K, V>> removeWhere(simpleHashPredicate<K, V> predicate);
 		
 		template<typename VResult>
-		simpleList<VResult> selectFromValues(simpleHashSelectorDelegates<K, V, VResult>::selector selector);
+		simpleList<VResult> selectFromValues(simpleHashSelector<K, V, VResult> selector);
 
 		//K getKeyAt(int index);
 		//V getValueAt(const std::map<K, V>& map, int index);

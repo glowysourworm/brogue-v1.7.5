@@ -76,12 +76,12 @@ namespace brogueHd::component
 		/// <summary>
 		/// Iterates the locations of the region and calls the user method
 		/// </summary>
-		void iterateLocations(gridDelegates<T>::callback callback);
+		void iterateLocations(gridCallback<T> callback);
 
 		/// <summary>
 		/// Iterates the edge locations of the region and calls the user method
 		/// </summary>
-		void iterateEdges(gridDelegates<T>::callback callback);
+		void iterateEdges(gridCallback<T> callback);
 
 		/// <summary>
 		/// Gets locations with an exposed edge in the specified direction

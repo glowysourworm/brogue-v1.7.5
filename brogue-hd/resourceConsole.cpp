@@ -1,5 +1,5 @@
 #include "resourceConsole.h"
-//#include "brogueColorMap.h"
+#include "brogueColorMap.h"
 #include "colorConstants.h"
 
 #include <stringExtension.h>
@@ -22,28 +22,28 @@ namespace brogueHd::console
 
 	brogueConsoleReturn resourceConsole::command(std::string input, ostream& stream)
 	{
-		//std::string* cmd = stringExtension::split(input, " ");
+		std::string* cmd = stringExtension::split(input, " ");
 
-		//if (hasArgument(cmd, "--loadColors"))
-		//{
-		//	std::string path = getArgument(cmd, "--loadColors");
+		if (hasArgument(cmd, "--loadColors"))
+		{
+			std::string path = getArgument(cmd, "--loadColors");
 
-		//	stream << "Loading Color Definitions:  " << path << std::endl;
+			stream << "Loading Color Definitions:  " << path << std::endl;
 
-		//	//brogueColorMap* colorMap = _resourceController->loadColors(path.c_str());
+			brogueColorMap* colorMap = _resourceController->loadColors(path.c_str());
 
-		//	if (colorMap != NULL)
-		//	{
-		//		stream << "Loading Successful! Printing Results..." << std::endl;
+			if (colorMap != NULL)
+			{
+				stream << "Loading Successful! Printing Results..." << std::endl;
 
-		//		color white = colorMap->getColor(gameColors::white);
+				color white = colorMap->getColor(gameColors::white);
 
-		//		//stream << std::format("Color (.csv):  color({}, {}, {}, {}, {}, {})", 
-		//		//					   white.red, white.green, white.blue, white.redRand, white.greenRand, white.blueRand) << std::endl;
-		//	}
-		//	else
-		//		stream << "Loading Failed..." << std::endl;
-		//}
+				//stream << std::format("Color (.csv):  color({}, {}, {}, {}, {}, {})", 
+				//					   white.red, white.green, white.blue, white.redRand, white.greenRand, white.blueRand) << std::endl;
+			}
+			else
+				stream << "Loading Failed..." << std::endl;
+		}
 
 		return brogueConsoleReturn::Completed;
 	}

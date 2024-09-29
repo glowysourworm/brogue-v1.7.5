@@ -24,16 +24,16 @@ namespace brogueHd::component
 		/// Creates regions from the grid using flood fill iteration. The region predicate is used to select
 		/// whether a particular cell is in / out of the region.
 		/// </summary>
-		simpleList<gridRegion<T>*> locateRegions(const grid<T>& grid, gridDelegates<T>::predicate inclusionPredicate);
+		simpleList<gridRegion<T>*> locateRegions(const grid<T>& grid, gridPredicate<T> inclusionPredicate);
 
 		/// <summary>
 		/// Creates region at the specified point (or NULL)
 		/// </summary>
-		gridRegion<T>* identifyRegion(const grid<T>& grid, short column, short row, gridDelegates<T>::predicate inclusionPredicate);
+		gridRegion<T>* identifyRegion(const grid<T>& grid, short column, short row, gridPredicate<T> inclusionPredicate);
 
 	private:
 
-		gridRegionConstructor<T> runFloodFill(const grid<T>& grid, short column, short row, gridDelegates<T>::predicate inclusionPredicate);
+		gridRegionConstructor<T> runFloodFill(const grid<T>& grid, short column, short row, gridPredicate<T> inclusionPredicate);
 	};
 }
 

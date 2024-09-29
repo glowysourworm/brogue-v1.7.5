@@ -5,6 +5,11 @@
 
 namespace brogueHd::component
 {
+	/// <summary>
+	/// Iterator delegate for providing feedback to/from gridRect iterator functions.
+	/// </summary>
+	using gridRectIterator = std::function<iterationCallback(short column, short row)>;
+
 	struct gridRect
 	{
 	public:
@@ -140,7 +145,7 @@ namespace brogueHd::component
 			row += rowOffset;
 		}
 
-		void iterate(gridRectDelegates::callback callback) const
+		void iterate(gridRectIterator callback) const
 		{
 			bool userBreak = false;
 
@@ -153,7 +158,7 @@ namespace brogueHd::component
 				}
 			}
 		}
-		void iterateInCircle(gridRectDelegates::callback callback) const
+		void iterateInCircle(gridRectIterator callback) const
 		{
 			bool userBreak = false;
 

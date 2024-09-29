@@ -3,9 +3,12 @@
 #include "developerConsole.h"
 #include "resourceConsole.h"
 #include "resourceController.h"
+#include <simpleHash.h>
 #include <stringExtension.h>
 #include <iostream>
 #include <string>
+
+#include <functional>
 
 using namespace std;
 using namespace brogueHd;
@@ -15,6 +18,18 @@ using namespace brogueHd::backend::controller;
 
 int main(int argc, char* argv[])
 {
+	simpleHash<int, bool>* hash = new simpleHash<int, bool>();
+
+	//hash->add(2, true);
+
+	//simpleArray<int> a();
+	//simpleArray<gameColors> b();
+	//simpleArray<bool> c(3);
+
+
+	
+
+
 	brogueConsole defaultConsole;
 	brogueConsole currentConsole = defaultConsole;
 	brogueConsoleReturn returnValue = brogueConsoleReturn::Continue;

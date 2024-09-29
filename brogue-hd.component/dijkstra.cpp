@@ -14,9 +14,9 @@ namespace brogueHd::component
 	dijkstra<T>::dijkstra(gridRect parentBoundary,
 						  gridRect relativeBoundary,
 						  bool obeyCardinalMovement,
-						  dijkstraDelegates<T>::predicate mapPredicate,
-						  dijkstraDelegates<T>::costPredicate mapCostPredicate,
-						  dijkstraDelegates<T>::locatorCallback locatorCallback)
+						  dijkstraPredicate mapPredicate,
+						  dijkstraCostCallback mapCostPredicate,
+						  dijkstraLocatorCallback<T> locatorCallback)
 	{
 		_parentBoundary = parentBoundary;
 		_relativeBoundary = relativeBoundary;
