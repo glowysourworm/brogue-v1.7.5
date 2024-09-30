@@ -4,8 +4,8 @@
 #include "brogueItem.h"
 #include "brogueCreature.h"
 #include "brogueObject.h"
-#include <simpleList.h>
-#include <grid.h>
+#include "simpleList.h"
+#include "grid.h"
 
 using namespace brogueHd::component;
 

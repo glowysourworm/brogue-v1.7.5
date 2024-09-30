@@ -1,72 +1,202 @@
-#include "gridRegion.h"
-#include "gridDefinitions.h"
-#include "grid.h"
-#include "gridRect.h"
-#include "exceptionHandler.h"
+#pragma once
 
+#include "grid.h"
+#include "gridDefinitions.h"
+#include "gridRect.h"
+#include "simpleArray.h"
+#include <functional>
+
+using namespace std;
 using namespace brogueHd::component::math;
 
 namespace brogueHd::component
 {
+	/// <summary>
+	/// Grid component that creates a subgrid, using the same coordinate space, from a parent grid. This
+	/// means the result will have the same width and height; but will be a subgrid on a specified gridRect
+	/// of the parent grid. Each function and call will be protected to utilize only this region. No grid
+	/// offsets are required for use.
+	/// </summary>
+	template<isGridLocator T>
+	class gridRegion
+	{
+	public:
+		gridRegion(){}
+		gridRegion(const gridRegion& copy);
+		gridRegion(T* locations,
+				   T* edgeLocations,
+				   T* westExposedLocations,
+				   T* northExposedLocations,
+				   T* eastExposedLocations,
+				   T* southExposedLocations,
+				   T* northWestCornerLocations,
+				   T* northEastCornerLocations,
+				   T* southEastCornerLocations,
+				   T* southWestCornerLocations,
+				   gridRect parentBoundary,
+				   gridRect relativeBoundary,
+				   gridRect largestRectangularSubRegion);
+
+
+		~gridRegion();
+
+		gridRect getBoundary() const;
+		gridRect getParentBoundary() const;
+		gridRect getLargestSubRectangle() const;
+		simpleArray<T>* getLocations();
+		simpleArray<T>* getEdgeLocations();
+
+		/// <summary>
+		/// Checks for location overlap
+		/// </summary>
+		bool overlaps(const gridRegion<T>& region);
+
+		/// <summary>
+		/// Copies grid region to another grid
+		/// </summary>
+		void copyTo(grid<T>& grid);
+
+	public:
+
+		/// <summary>
+		/// Returns value from the underlying grid. This is the index space of the parent grid.
+		/// </summary>
+		T get(short column, short row) const;
+
+		/// <summary>
+		/// Returns true if a cell is defined for the region
+		/// </summary>
+		bool isDefined(short column, short row) const;
+
+		/// <summary>
+		/// Returns true if an edge cell is defined
+		/// </summary>
+		bool isEdge(short column, short row) const;
+
+		/// <summary>
+		/// Iterates the locations of the region and calls the user method
+		/// </summary>
+		void iterateLocations(gridCallback<T> callback);
+
+		/// <summary>
+		/// Iterates the edge locations of the region and calls the user method
+		/// </summary>
+		void iterateEdges(gridCallback<T> callback);
+
+		/// <summary>
+		/// Gets locations with an exposed edge in the specified direction
+		/// </summary>
+		simpleArray<T>* getEdges(brogueCompass direction);
+
+		/// <summary>
+		/// Gets the locations that are also along the bounding rectangle
+		/// </summary>
+		simpleArray<T>* getBoundaryEdges(brogueCompass direction);
+
+		/// <summary>
+		/// Gets locations with exposed corner
+		/// </summary>
+		simpleArray<T>* getCorners(brogueCompass nonCardinalDirection);
+
+	private:
+
+		// Needed a mutator for the translate() function
+		void initialize(T* locations,
+						T* edgeLocations,
+						T* westExposedLocations,
+						T* northExposedLocations,
+						T* eastExposedLocations,
+						T* southExposedLocations,
+						T* northWestCornerLocations,
+						T* northEastCornerLocations,
+						T* southEastCornerLocations,
+						T* southWestCornerLocations,
+						gridRect parentBoundary,
+						gridRect relativeBoundary,
+						gridRect largestRectangularSubRegion);
+
+	private:
+
+		grid<T>* _grid;
+		grid<T>* _edgeGrid;
+
+		gridRect _largestRectangularSubRegion;
+
+		simpleArray<T>* _locations;
+		simpleArray<T>* _edgeLocations;
+
+		// Exposed Edge Faces
+		simpleArray<T>* _northExposedLocations;
+		simpleArray<T>* _southExposedLocations;
+		simpleArray<T>* _westExposedLocations;
+		simpleArray<T>* _eastExposedLocations;
+		
+		// Corners
+		simpleArray<T>* _northEastCornerLocations;
+		simpleArray<T>* _northWestCornerLocations;
+		simpleArray<T>* _southEastCornerLocations;
+		simpleArray<T>* _southWestCornerLocations;
+	};
+
 	template<isGridLocator T>
 	gridRegion<T>::gridRegion(T* locations,
-								T* edgeLocations,
-								T* northExposedLocations,
-								T* southExposedLocations,
-								T* eastExposedLocations,	
-								T* westExposedLocations,
-								T* northEastCornerLocations,
-								T* northWestCornerLocations,
-								T* southEastCornerLocations,
-								T* southWestCornerLocations,
-								gridRect parentBoundary,
-								gridRect relativeBoundary,
-								gridRect largestRectangularSubRegion)
+		T* edgeLocations,
+		T* northExposedLocations,
+		T* southExposedLocations,
+		T* eastExposedLocations,
+		T* westExposedLocations,
+		T* northEastCornerLocations,
+		T* northWestCornerLocations,
+		T* southEastCornerLocations,
+		T* southWestCornerLocations,
+		gridRect parentBoundary,
+		gridRect relativeBoundary,
+		gridRect largestRectangularSubRegion)
 	{
-		this->initialize(locations, edgeLocations, 
-						 northExposedLocations, 
-						 southExposedLocations, 
-						 eastExposedLocations, 
-						 westExposedLocations,
-						 northEastCornerLocations, 
-						 northWestCornerLocations, 
-						 southEastCornerLocations, 
-						 southWestCornerLocations, 
-						 parentBoundary, 
-						 relativeBoundary, 
-						 largestRectangularSubRegion);
+		this->initialize(locations, edgeLocations,
+			northExposedLocations,
+			southExposedLocations,
+			eastExposedLocations,
+			westExposedLocations,
+			northEastCornerLocations,
+			northWestCornerLocations,
+			southEastCornerLocations,
+			southWestCornerLocations,
+			parentBoundary,
+			relativeBoundary,
+			largestRectangularSubRegion);
 	}
 	template<isGridLocator T>
 	gridRegion<T>::gridRegion(const gridRegion& copy)
 	{
 		this->initialize(copy.getLocations(), copy.getEdgeLocations(),
-						 copy.getEdges(brogueCompass::N),
-						 copy.getEdges(brogueCompass::S),
-						 copy.getEdges(brogueCompass::E),
-						 copy.getEdges(brogueCompass::W),
-						 copy.getCorners(brogueCompass::NE),
-						 copy.getCorners(brogueCompass::NW),
-						 copy.getCorners(brogueCompass::SE),
-						 copy.getCorners(brogueCompass::SW),
-						 copy.getParentBoundary(),
-						 copy.getBoundary(),
-						 copy.getLargestSubRectangle());
+			copy.getEdges(brogueCompass::N),
+			copy.getEdges(brogueCompass::S),
+			copy.getEdges(brogueCompass::E),
+			copy.getEdges(brogueCompass::W),
+			copy.getCorners(brogueCompass::NE),
+			copy.getCorners(brogueCompass::NW),
+			copy.getCorners(brogueCompass::SE),
+			copy.getCorners(brogueCompass::SW),
+			copy.getParentBoundary(),
+			copy.getBoundary(),
+			copy.getLargestSubRectangle());
 	}
 
 	template<isGridLocator T>
 	void gridRegion<T>::initialize(T* locations,
-									T* edgeLocations,
-									T* northExposedLocations,
-									T* southExposedLocations,
-									T* eastExposedLocations,
-									T* westExposedLocations,
-									T* northEastCornerLocations,
-									T* northWestCornerLocations,
-									T* southEastCornerLocations,
-									T* southWestCornerLocations,
-									gridRect parentBoundary,
-									gridRect relativeBoundary,
-									gridRect largestRectangularSubRegion)
+		T* edgeLocations,
+		T* northExposedLocations,
+		T* southExposedLocations,
+		T* eastExposedLocations,
+		T* westExposedLocations,
+		T* northEastCornerLocations,
+		T* northWestCornerLocations,
+		T* southEastCornerLocations,
+		T* southWestCornerLocations,
+		gridRect parentBoundary,
+		gridRect relativeBoundary,
+		gridRect largestRectangularSubRegion)
 	{
 		if (_grid != NULL) delete _grid;
 		if (_edgeGrid != NULL) delete _edgeGrid;
@@ -106,10 +236,11 @@ namespace brogueHd::component
 		// MEMORY!  gridRegionConstructor (new T) -> gridRegion(...)
 		//			gridRegion.translate  (new T)
 
-		for (int index = 0; index < _locations.size(); index++)
-		{
-			delete _locations[index];  // ~gridCell, ~brogueCell
-		}
+		// MEMORY!  HAVE TO DELETE gridCell instances...
+		//for (int index = 0; index < _locations->size(); index++)
+		//{
+		//	delete (gridCell)_locations->get(index);  // ~gridCell, ~brogueCell
+		//}
 
 		delete _grid;
 		delete _edgeGrid;
@@ -131,7 +262,7 @@ namespace brogueHd::component
 	template<isGridLocator T>
 	T gridRegion<T>::get(short column, short row) const
 	{
-		return _grid->get(column,row);
+		return _grid->get(column, row);
 	}
 
 	template<isGridLocator T>
@@ -236,18 +367,18 @@ namespace brogueHd::component
 	void gridRegion<T>::iterateLocations(gridCallback<T> callback)
 	{
 		_locations->forEach([](T item)
-		{
-			return callback(item.column, item.row, item);
-		});
+			{
+				return callback(item.column, item.row, item);
+			});
 	}
 
 	template<isGridLocator T>
 	void gridRegion<T>::iterateEdges(gridCallback<T> callback)
 	{
 		_edgeLocations->forEach([](T item)
-		{
-			return callback(item.column, item.row, item);
-		});
+			{
+				return callback(item.column, item.row, item);
+			});
 	}
 
 	template<isGridLocator T>
@@ -256,10 +387,10 @@ namespace brogueHd::component
 		bool overlap = false;
 
 		this->iterateLocations([&region, &overlap](short column, short row, T item)
-		{
-			if (region.isDefined(column, row))
-				return iterationCallback::breakAndReturn;
-		});
+			{
+				if (region.isDefined(column, row))
+					return iterationCallback::breakAndReturn;
+			});
 
 		return overlap;
 	}
@@ -268,8 +399,9 @@ namespace brogueHd::component
 	void gridRegion<T>::copyTo(grid<T>& grid)
 	{
 		this->iterateLocations([&grid](short column, short row, T item)
-		{
-			grid.set(column, row, item);
-		});
+			{
+				grid.set(column, row, item);
+			});
 	}
 }
+

@@ -1,8 +1,8 @@
 #pragma once
 
 #include "brogueGameProfile.h"
-#include <brogueMath.h>
-#include "brogueMacros.h"
+#include "brogueMath.h"
+#include "brogueGlobal.h"
 
 using namespace brogueHd::component::math;
 

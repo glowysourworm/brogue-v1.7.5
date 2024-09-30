@@ -1,7 +1,6 @@
 #pragma once
 
-#include "brogueMacros.h"
-#include "command.h"
+#include "brogueGlobal.h"
 #include <iostream>
 
 using namespace std;

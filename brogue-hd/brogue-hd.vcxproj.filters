@@ -100,6 +100,12 @@
     <Filter Include="Header Files\global">
       <UniqueIdentifier>{521d8daf-d249-4afa-af4f-54259bf512b1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\component">
+      <UniqueIdentifier>{40a45b12-d99d-469f-bf31-009ce66f16a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\component\math">
+      <UniqueIdentifier>{0140bb82-f2d8-4816-b663-87b4b909552c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="brogue-hd.cpp">
@@ -356,9 +362,6 @@
     <ClInclude Include="powerTables.h">
       <Filter>Header Files\backend\model\game</Filter>
     </ClInclude>
-    <ClInclude Include="hashGenerator.h">
-      <Filter>Header Files\backend\generator</Filter>
-    </ClInclude>
     <ClInclude Include="roomGenerator.h">
       <Filter>Header Files\backend\generator</Filter>
     </ClInclude>
@@ -485,7 +488,109 @@
     <ClInclude Include="command.h">
       <Filter>Header Files\global</Filter>
     </ClInclude>
-    <ClInclude Include="brogueMacros.h">
+    <ClInclude Include="brogueGlobal.h">
+      <Filter>Header Files\global</Filter>
+    </ClInclude>
+    <ClInclude Include="delaunayAlgorithm.h">
+      <Filter>Header Files\component</Filter>
+    </ClInclude>
+    <ClInclude Include="dijkstra.h">
+      <Filter>Header Files\component</Filter>
+    </ClInclude>
+    <ClInclude Include="graph.h">
+      <Filter>Header Files\component</Filter>
+    </ClInclude>
+    <ClInclude Include="graphAlgorithm.h">
+      <Filter>Header Files\component</Filter>
+    </ClInclude>
+    <ClInclude Include="graphDefinitions.h">
+      <Filter>Header Files\component</Filter>
+    </ClInclude>
+    <ClInclude Include="graphEdge.h">
+      <Filter>Header Files\component</Filter>
+    </ClInclude>
+    <ClInclude Include="graphEdgeCollection.h">
+      <Filter>Header Files\component</Filter>
+    </ClInclude>
+    <ClInclude Include="graphNode.h">
+      <Filter>Header Files\component</Filter>
+    </ClInclude>
+    <ClInclude Include="grid.h">
+      <Filter>Header Files\component</Filter>
+    </ClInclude>
+    <ClInclude Include="gridDefinitions.h">
+      <Filter>Header Files\component</Filter>
+    </ClInclude>
+    <ClInclude Include="gridLocator.h">
+      <Filter>Header Files\component</Filter>
+    </ClInclude>
+    <ClInclude Include="gridLocatorEdge.h">
+      <Filter>Header Files\component</Filter>
+    </ClInclude>
+    <ClInclude Include="gridRect.h">
+      <Filter>Header Files\component</Filter>
+    </ClInclude>
+    <ClInclude Include="gridRegion.h">
+      <Filter>Header Files\component</Filter>
+    </ClInclude>
+    <ClInclude Include="gridRegionConstructor.h">
+      <Filter>Header Files\component</Filter>
+    </ClInclude>
+    <ClInclude Include="gridRegionLocator.h">
+      <Filter>Header Files\component</Filter>
+    </ClInclude>
+    <ClInclude Include="simple.h">
+      <Filter>Header Files\component</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleArray.h">
+      <Filter>Header Files\component</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleBST.h">
+      <Filter>Header Files\component</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleHash.h">
+      <Filter>Header Files\component</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleList.h">
+      <Filter>Header Files\component</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleListExtension.h">
+      <Filter>Header Files\component</Filter>
+    </ClInclude>
+    <ClInclude Include="typeConverter.h">
+      <Filter>Header Files\component</Filter>
+    </ClInclude>
+    <ClInclude Include="componentMacros.h">
+      <Filter>Header Files\global</Filter>
+    </ClInclude>
+    <ClInclude Include="exceptionHandler.h">
+      <Filter>Header Files\global</Filter>
+    </ClInclude>
+    <ClInclude Include="EnumString.h">
+      <Filter>Header Files\global</Filter>
+    </ClInclude>
+    <ClInclude Include="triangle.h">
+      <Filter>Header Files\component\math</Filter>
+    </ClInclude>
+    <ClInclude Include="mathPoint.h">
+      <Filter>Header Files\component\math</Filter>
+    </ClInclude>
+    <ClInclude Include="mathVector.h">
+      <Filter>Header Files\component\math</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueMath.h">
+      <Filter>Header Files\component\math</Filter>
+    </ClInclude>
+    <ClInclude Include="stringExtension.h">
+      <Filter>Header Files\component</Filter>
+    </ClInclude>
+    <ClInclude Include="primsAlgorithm.h">
+      <Filter>Header Files\component</Filter>
+    </ClInclude>
+    <ClInclude Include="randomRange.h">
+      <Filter>Header Files\component\math</Filter>
+    </ClInclude>
+    <ClInclude Include="hashExtension.h">
       <Filter>Header Files\global</Filter>
     </ClInclude>
   </ItemGroup>

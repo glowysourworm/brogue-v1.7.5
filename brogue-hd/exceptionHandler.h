@@ -6,7 +6,7 @@
 
 using namespace std;
 
-namespace brogueHd::component
+namespace brogueHd
 {
 	class brogueException
 	{

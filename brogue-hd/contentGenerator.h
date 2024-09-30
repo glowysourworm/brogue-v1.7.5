@@ -1,7 +1,7 @@
 #pragma once
 
 #include "brogueLevel.h"
-#include <grid.h>
+#include "grid.h"
 
 using namespace brogueHd::component;
 using namespace brogueHd::backend::model;

@@ -1,8 +1,7 @@
 #include "gameConsole.h"
-#include "brogueMacros.h"
+#include "brogueGlobal.h"
 #include "gameController.h"
-#include <stringExtension.h>
-#include <exceptionHandler.h>
+#include "stringExtension.h"
 #include "broguefile.h"
 #include <format>
 
@@ -38,18 +37,18 @@ namespace brogueHd::console
 	{
 		short mostRecent = 0;
 
-		//brogueScoresFile* scoreFile = _resourceController->getHighScores(mostRecent);
+		brogueScoresFile* scoreFile = _resourceController->getHighScores(mostRecent);
 
-		//for (int i = 0; i < scoreFile->scoreCount; i++)
-		//{
-		//	// Convert file time to readable string
-		//	std::string dateStr = stringExtension::formatDate(scoreFile->scoreList[i].dateTime);
+		for (int i = 0; i < scoreFile->scoreCount; i++)
+		{
+			// Convert file time to readable string
+			std::string dateStr = stringExtension::formatDate(scoreFile->scoreList.get(i).dateTime);
 
-		//	// Output to stream (console)
-		//	stream << std::format("{}\t{}\t{}", (int)scoreFile->scoreList[i].score, dateStr, scoreFile->scoreList[i].description) << std::endl;
-		//}
+			// Output to stream (console)
+			stream << std::format("{}\t{}\t{}", (int)scoreFile->scoreList.get(i).score, dateStr, scoreFile->scoreList.get(i).description) << std::endl;
+		}
 
-		//delete scoreFile;
+		delete scoreFile;
 	}
 
 	brogueConsoleReturn gameConsole::command(std::string input, ostream& stream)

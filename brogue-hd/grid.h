@@ -1,19 +1,141 @@
-#include "grid.h"
-#include "brogueMath.h"
-#include "gridDefinitions.h"
-#include "exceptionHandler.h"
-#include <exception>
+#pragma once
 
-using namespace std;
+#include "gridRect.h"
+#include "gridDefinitions.h"
 
 using namespace brogueHd::component::math;
 
 namespace brogueHd::component
 {
+	template<typename T>
+	class grid
+	{
+	public:
+
+		grid(){};
+		grid(gridRect parentBoundary, gridRect relativeBoundary);
+		~grid();
+
+		/// <summary>
+		/// Returns value from the grid
+		/// </summary>
+		T get(short column, short row) const;
+
+		/// <summary>
+		/// Gets adjacent element from the grid
+		/// </summary>
+		T getAdjacent(short column, short row, brogueCompass direction) const;
+
+		/// <summary>
+		/// Gets adjacent element from the grid (OR NULL)
+		/// </summary>
+		T getAdjacentUnsafe(short column, short row, brogueCompass direction) const;
+
+		/// <summary>
+		/// Gets adjacent as cell's locator (or NULL if out of bounds)
+		/// </summary>
+		gridLocator getAdjacentLocator(short column, short row, brogueCompass direction) const;
+
+		/// <summary>
+		/// Returns true if grid cell locations are adjacent
+		/// </summary>
+		bool areAdjacent(T location, T otherLocation) const;
+
+		/// <summary>
+		/// Returns the relative boundary of the grid (parent boundary contains this boundary)
+		/// </summary>
+		gridRect getRelativeBoundary() const;
+
+		/// <summary>
+		/// Returns parent boundary of the grid
+		/// </summary>
+		gridRect getParentBoundary() const;
+
+		/// <summary>
+		/// Returns true if the (column, row) correspond to the grid's zero value
+		/// </summary>
+		bool isDefined(short column, short row) const;
+
+		/// <summary>
+		/// Returns true if the (column, row) are in bounds
+		/// </summary>
+		bool isInBounds(short column, short row) const;
+
+		/// <summary>
+		/// Sets the value to the grid, clipping it to the max and min values, and handling exceptions
+		/// </summary>
+		void set(short column, short row, T setValue);
+
+		/// <summary>
+		/// Searches grid for requested value based on comparison. Each truthy aggregateComparator result will store
+		/// the next value as the going compare-ee. This compare-ee will be passed as the first argument of the comparator.
+		/// The second argument will be the current grid value.
+		/// </summary>
+		/// <returns>The aggregated search value (not summed, aggregated!)</returns>
+		T search(gridAggregateComparer<T> aggregateComparator) const;
+
+		/// <summary>
+		/// Returns true if the location is at the edge of the grid (using NULL comparison).
+		/// </summary>
+		bool isEdge(short column, short row) const;
+
+		/// <summary>
+		/// Returns true if the location is at the edge of the grid (using NULL comparison), or 
+		/// the provided predicate.
+		/// </summary>
+		bool isEdgeWhere(short column, short row, gridPredicate<T> predicate) const;
+
+		/// <summary>
+		/// Returns true if the adjacent element is positive with respect to the provided predicate OR is
+		/// out of bounds OR is null FOR the provided direction.
+		/// </summary>
+		/// <param name="direction">Compass direction treated with DIRECT EQUALITY! (DOESN'T USE FLAGS)</param>
+		bool isExposedEdge(int column, int row, brogueCompass direction, gridPredicate<T> predicate) const;
+
+		/// <summary>
+		/// Returns true if the adjacent element is positive with respect to the provided predicate OR is
+		/// out of bounds OR is null FOR the provided NON-CARDINAL direction.
+		/// </summary>
+		/// <param name="direction">Compass direction treated with DIRECT EQUALITY! (DOESN'T USE FLAGS)</param>
+		bool isExposedCorner(int column, int row, brogueCompass direction, gridPredicate<T> predicate) const;
+
+		/// <summary>
+		/// Iterates entire grid and calls user callback
+		/// </summary>
+		void iterate(gridCallback<T> callback);
+
+		/// <summary>
+		/// Iterates around a specific point by one-cell in the 4 cardinal directions
+		/// </summary>
+		void iterateAroundCardinal(short column, short row, bool withinBounds, gridCallback<T> callback);
+
+		/// <summary>
+		/// Iterates around a specific point by one-cell in all 8 directions
+		/// </summary>
+		void iterateAround(short column, short row, bool withinBounds, gridCallback<T> callback);
+
+		/// <summary>
+		/// Iterates grid within specific boundary constraint
+		/// </summary>
+		void iterateIn(gridRect boundary, gridCallback<T> callback);
+
+		/// <summary>
+		/// Iterates outward from center location to specified distance
+		/// </summary>
+		void iterateOutward(short centerColumn, short centerRow, short distance, gridCallback<T> callback);
+
+	private:
+
+		T** _grid;
+
+		gridRect _parentBoundary;
+		gridRect _relativeBoundary;
+	};
+
     template<typename T>
     grid<T>::grid(gridRect parentBoundary, gridRect relativeBoundary)
     {
-        _grid = new T*[relativeBoundary.width];
+        _grid = new T * [relativeBoundary.width];
 
         for (int index = 0; index < relativeBoundary.height; index++)
             _grid[index] = new T[relativeBoundary.height];
@@ -219,7 +341,7 @@ namespace brogueHd::component
 
         if (this->isDefined(column, row))
             brogueException::show("Trying to overwrite grid value:  grid.cpp (use remove first)");
-            
+
         _grid[column][row] = value;
     }
 
@@ -270,12 +392,12 @@ namespace brogueHd::component
     T grid<T>::search(gridAggregateComparer<T> aggregateComparator) const
     {
         T searchValue;
-        
+
         iterate(this, [](short column, short row)
-        {
-            if (aggregateComparator(searchValue, _grid[column, row]))
-                searchValue = _grid[column][row];
-        });
+            {
+                if (aggregateComparator(searchValue, _grid[column, row]))
+                    searchValue = _grid[column][row];
+            });
 
         return searchValue;
     }
@@ -283,10 +405,10 @@ namespace brogueHd::component
     template<typename T>
     bool grid<T>::isEdge(short column, short row) const
     {
-        return isEdge(column, row, [](short, short, T value) 
-        {
-            return value != NULL;
-        });
+        return isEdge(column, row, [](short, short, T value)
+            {
+                return value != NULL;
+            });
     }
 
     /// <summary>
@@ -306,13 +428,13 @@ namespace brogueHd::component
         T southWest = this->get(column - 1, row + 1);
 
         return (north == NULL || (north != NULL && !predicate(column, row - 1, north))) ||
-                (south == NULL || (south != NULL && !predicate(column, row + 1, south))) ||
-                (east == NULL || (east != NULL && !predicate(column + 1, row, east))) ||
-                (west == NULL || (west != NULL && !predicate(column - 1, row, west))) ||
-                (northEast == NULL || (northEast != NULL && !predicate(column + 1, row - 1, northEast))) ||
-                (northWest == NULL || (northWest != NULL && !predicate(column - 1, row - 1, northWest))) ||
-                (southEast == NULL || (southEast != NULL && !predicate(column + 1, row + 1, southEast))) ||
-                (southWest == NULL || (southWest != NULL && !predicate(column - 1, row + 1, southWest)));
+            (south == NULL || (south != NULL && !predicate(column, row + 1, south))) ||
+            (east == NULL || (east != NULL && !predicate(column + 1, row, east))) ||
+            (west == NULL || (west != NULL && !predicate(column - 1, row, west))) ||
+            (northEast == NULL || (northEast != NULL && !predicate(column + 1, row - 1, northEast))) ||
+            (northWest == NULL || (northWest != NULL && !predicate(column - 1, row - 1, northWest))) ||
+            (southEast == NULL || (southEast != NULL && !predicate(column + 1, row + 1, southEast))) ||
+            (southWest == NULL || (southWest != NULL && !predicate(column - 1, row + 1, southWest)));
     }
 
     template<typename T>
@@ -344,19 +466,19 @@ namespace brogueHd::component
     {
         if (direction == brogueCompass::NW)
             return isExposedEdge(grid, column, row, brogueCompass::N, predicate) &&
-                   isExposedEdge(grid, column, row, brogueCompass::W, predicate);
+            isExposedEdge(grid, column, row, brogueCompass::W, predicate);
 
         else if (direction == brogueCompass::NE)
             return isExposedEdge(grid, column, row, brogueCompass::N, predicate) &&
-                   isExposedEdge(grid, column, row, brogueCompass::E, predicate);
+            isExposedEdge(grid, column, row, brogueCompass::E, predicate);
 
         else if (direction == brogueCompass::SE)
             return isExposedEdge(grid, column, row, brogueCompass::S, predicate) &&
-                   isExposedEdge(grid, column, row, brogueCompass::E, predicate);
+            isExposedEdge(grid, column, row, brogueCompass::E, predicate);
 
         else if (direction == brogueCompass::SW)
             return isExposedEdge(grid, column, row, brogueCompass::S, predicate) &&
-                   isExposedEdge(grid, column, row, brogueCompass::W, predicate);
+            isExposedEdge(grid, column, row, brogueCompass::W, predicate);
 
         else
             brogueException::show("Invalid use of direction parameter:  grid.isExposedCorner");
@@ -399,9 +521,9 @@ namespace brogueHd::component
 
     template<typename T>
     void grid<T>::iterateOutward(short centerColumn,
-                                 short centerRow,
-                                 short distance,
-                                 gridCallback<T> callback)
+        short centerRow,
+        short distance,
+        gridCallback<T> callback)
     {
         bool userBreak = false;
 
@@ -791,3 +913,4 @@ namespace brogueHd::component
     //    });
     //}
 }
+

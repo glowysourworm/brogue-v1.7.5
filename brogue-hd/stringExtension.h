@@ -1,9 +1,8 @@
 #pragma once
 
-//#include <simpleList.h>
-#include <simpleArray.h>
-#include <componentMacros.h>
-#include <exceptionHandler.h>
+#include "simpleList.h"
+#include "simpleArray.h"
+#include "brogueGlobal.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

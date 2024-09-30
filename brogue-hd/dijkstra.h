@@ -1,22 +1,156 @@
-#include "dijkstra.h"
-#include "gridRect.h"
-#include "brogueMath.h"
-#include "exceptionHandler.h"
+#pragma once
+
+#include "grid.h"
+#include "gridDefinitions.h"
+#include "simpleBST.h"
+#include "simpleHash.h"
+#include "simpleArray.h"
 #include <functional>
 
 using namespace std;
-using namespace brogueHd::component::math;
 
 namespace brogueHd::component
 {
+	//struct pdsLink {
+	//	short distance;
+	//	short cost;
+	//	pdsLink* left, * right;
+	//};
+
+	//struct pdsMap {
+	//	boolean eightWays;
+
+	//	pdsLink front;
+	//	pdsLink links[DCOLS * DROWS];
+	//};
+
+	/// <summary>
+	/// Decision making predicate for dijkstra's algorithm
+	/// </summary>
+	using dijkstraPredicate = std::function<bool(short column, short row)>;
+
+	/// <summary>
+	/// Cost predicate:  calls user code to provide a movement cost to the map
+	/// </summary>
+	using dijkstraCostCallback = std::function<short(short column, short row)>;
+
+	/// <summary>
+	/// Locator Callback:  Provides locator instances to the algorithm
+	/// </summary>
+	template<typename T>
+	using dijkstraLocatorCallback = std::function<T(short column, short row)>;
+
+    template<isGridLocator T>
+	class dijkstra
+	{
+
+	public:
+
+        /// <summary>
+        /// Creates an instance of dijkstra's map component with the specified, declarative, delegates and constraints.
+        /// </summary>
+        /// <param name="mapCostPredicate">Delegate used to fetch a cost for the specified column / row of the grid</param>
+        /// <param name="mapPredicate">Delegate used to mask off areas of the map from the entire algorithm. Set to TRUE to ALLOW use of the location for the algorithm.</param>
+		dijkstra(gridRect parentBoundary,
+				 gridRect relativeBoundary,
+				 bool obeyCardinalMovement,
+				 dijkstraPredicate mapPredicate,
+				 dijkstraCostCallback mapCostPredicate,
+				 dijkstraLocatorCallback<T> locatorCallback);
+
+        ~dijkstra();
+
+        void initialize(T source, T targets[]);
+
+		/// <summary>
+		/// Runs Dijkstra's algorithm ONCE. WILL NOT RE-RUN.
+		/// </summary>
+		void run();
+
+		/// <summary>
+		/// Returns one of the result paths from dijkstra's algorithm
+		/// </summary>
+		simpleArray<T> getResultPath(T targetLocation);
+
+		//void pdsUpdate(pdsMap* map);
+
+		//void pdsClear(pdsMap* map, short maxDistance, boolean eightWays);
+
+		//short pdsGetDistance(pdsMap* map, short x, short y);
+
+		//void pdsSetDistance(pdsMap* map, short x, short y, short distance);
+
+		//void pdsSetCosts(pdsMap* map, short** costMap);
+
+		//void pdsBatchInput(pdsMap* map, short** distanceMap, short** costMap, short maxDistance, boolean eightWays);
+
+		//void pdsBatchOutput(pdsMap* map, short** distanceMap);
+
+		//void pdsInvalidate(pdsMap* map, short maxDistance);
+
+		//void dijkstraScan(short** distanceMap, short** costMap, boolean useDiagonals);
+
+		//void calculateDistances(short** distanceMap,
+		//						short destinationX, 
+		//						short destinationY,
+		//						unsigned long blockingTerrainFlags,
+		//						creature* traveler,
+		//						boolean canUseSecretDoors,
+		//						boolean eightWays);
+
+		//short pathingDistance(short x1, short y1, short x2, short y2, unsigned long blockingTerrainFlags);
+
+	private:
+
+		/// <summary>
+		/// Generates path from completed run
+		/// </summary>
+		simpleArray<T> generatePath(T targetLocation);
+
+
+		/// <summary>
+		/// Updates the output map which contains the calculated path steps
+		/// </summary>
+		/// <param name="currentWeight">Weight of current location</param>
+		void updateOutputMap(float currentWeight, int destColumn, int destRow, int sourceColumn, int sourceRow);
+
+	private:
+
+		dijkstraLocatorCallback<T> _locatorCallback;
+		dijkstraPredicate _mapPredicate;
+		dijkstraCostCallback _mapCostPredicate;
+
+		gridRect _parentBoundary;						// The larger of the two boundaries. Each grid<> instance should
+		gridRect _relativeBoundary;						// use the larger parent boundary. Relative boundary is used to 
+														// limit usage of the grid.
+
+		T _sourceLocation;
+		simpleArray<T> _targetLocations;
+
+        grid<short>* _outputMap;
+
+		grid<bool>* _visitedMap;                        // Visited locations on the map
+		grid<bool>* _locationMap;                       // Locations that have been added to the frontier
+
+        // Frontier BST for the map
+		simpleBST<float, simpleHash<T, T>*>* _frontier;
+
+		// These maps are stored per target location
+		simpleHash<T, simpleArray<T>>* _completedPaths;	// Stack allocated arrays
+		simpleHash<T, bool>* _validPaths;
+
+        bool _initialized = false;
+        bool _finished = false;
+		bool _obeyCardinalMovement = false;
+	};
 
 	template<isGridLocator T>
 	dijkstra<T>::dijkstra(gridRect parentBoundary,
-						  gridRect relativeBoundary,
-						  bool obeyCardinalMovement,
-						  dijkstraPredicate mapPredicate,
-						  dijkstraCostCallback mapCostPredicate,
-						  dijkstraLocatorCallback<T> locatorCallback)
+		gridRect relativeBoundary,
+		bool obeyCardinalMovement,
+		dijkstraPredicate mapPredicate,
+		dijkstraCostCallback mapCostPredicate,
+		dijkstraLocatorCallback<T> locatorCallback)
 	{
 		_parentBoundary = parentBoundary;
 		_relativeBoundary = relativeBoundary;
@@ -42,9 +176,9 @@ namespace brogueHd::component
 
 		// Must delete the allocated hash table memory
 		_frontier->iterate([](float key, simpleHash<T, T>* value)
-		{
-			delete value; // -> ~simpleBSTNode()
-		});
+			{
+				delete value; // -> ~simpleBSTNode()
+			});
 
 		delete _frontier;
 	}
@@ -110,7 +244,7 @@ namespace brogueHd::component
 
 		// Iterate while any target not reached (AND) not visited
 		while (!_visitedMap->get(column, row) &&
-				goalDict.any([](T key, T value)
+			goalDict.any([](T key, T value)
 				{
 					return !value;
 				}))
@@ -184,9 +318,9 @@ namespace brogueHd::component
 
 			// Get locator from the goal dictionary
 			T goalLocator = goalDict.firstOrDefaultKey([](T key, bool value)
-			{
-				return key.column == lastLocator.column && key.row == lastLocator.row;
-			});
+				{
+					return key.column == lastLocator.column && key.row == lastLocator.row;
+				});
 
 			// O(1)
 			if (goalLocator != NULL)
@@ -206,19 +340,19 @@ namespace brogueHd::component
 
 				// CHECK FOR GOAL LOCATION!
 				goalDict.forEach([](T location, bool value)
-				{
-					if (!value)
 					{
-						nextNode = nextCostDict->firstOrDefaultKey([&location](T ckey, T cvalue)
+						if (!value)
 						{
-							return ckey.column == location.column &&
-								   ckey.row == location.row;
-						});
+							nextNode = nextCostDict->firstOrDefaultKey([&location](T ckey, T cvalue)
+								{
+									return ckey.column == location.column &&
+										ckey.row == location.row;
+								});
 
-						if (nextNode != NULL)
-							return iterationCallback::breakAndReturn;
-					}
-				});
+							if (nextNode != NULL)
+								return iterationCallback::breakAndReturn;
+						}
+					});
 
 				// Otherwise, set to the next location (should be first dictionary key)
 				if (nextNode == NULL)
@@ -242,9 +376,9 @@ namespace brogueHd::component
 				return key.column == lastLocator.column && key.row == lastLocator.row;
 			}) ||
 			goalDict.any([](T key, bool value)
-			{
-				return !value;
-			}))
+				{
+					return !value;
+				}))
 		{
 			brogueException::show("Dijkstra's Map was unable to find the current goal location");
 		}
@@ -360,9 +494,9 @@ namespace brogueHd::component
 
 			// Add this to the path
 			if (!result.any([&lowestWeightLocation](T alocation)
-			{
-				return alocation == lowestWeightLocation;
-			}))
+				{
+					return alocation == lowestWeightLocation;
+				}))
 			{
 				result.add(lowestWeightLocation);
 
@@ -389,7 +523,7 @@ namespace brogueHd::component
 
 		for (int index = result.size() - 1; index >= 0; index--)
 			resultArray[result.size() - 1 - index] = result[index];
-		
+
 		return resultArray;
 	}
 
@@ -441,7 +575,7 @@ namespace brogueHd::component
 				weightList->add(newLocator, newLocator);
 				_frontier->insert(newWeight, weightList);
 			}
-				
+
 
 			// Mark location map
 			_locationMap->set(destColumn, destRow, true);
@@ -469,7 +603,7 @@ namespace brogueHd::component
 
 		// Old weight list exists; New weight list is absent
 		else if (_frontier->containsKey(oldWeight) &&
-				!_frontier->containsKey(newWeight))
+			!_frontier->containsKey(newWeight))
 		{
 			simpleHash<T, T>* oldList = _frontier->search(oldWeight);
 			simpleHash<T, T>* newList = new simpleHash<T, T>();
@@ -490,13 +624,13 @@ namespace brogueHd::component
 
 		// Old weight is absent; New weight exists
 		else if (!_frontier->containsKey(oldWeight) &&
-				  _frontier->containsKey(newWeight))
+			_frontier->containsKey(newWeight))
 		{
 			simpleHash<T, T>* newList = _frontier->search(newWeight);
 
 			// Locator doesn't exist in list
 			if (!newList->contains(destLocator))
-				 newList->insert(destLocator, destLocator);
+				newList->insert(destLocator, destLocator);
 		}
 
 		// Both old and new weight lists exist
@@ -517,7 +651,7 @@ namespace brogueHd::component
 
 				// Check that new weight list has element added
 				if (!newList->containsKey(destLocator))
-					 newList->insert(destLocator, destLocator);
+					newList->insert(destLocator, destLocator);
 			}
 		}
 	}
@@ -834,3 +968,4 @@ namespace brogueHd::component
 	//	return retval;
 	//}
 }
+

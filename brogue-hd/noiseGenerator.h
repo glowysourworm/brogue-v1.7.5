@@ -1,9 +1,9 @@
 #pragma once
 
 #include "cellularAutomataParameters.h"
-#include <gridRect.h>
-#include <grid.h>
-#include <gridDefinitions.h>
+#include "gridRect.h"
+#include "grid.h"
+#include "gridDefinitions.h"
 #include "randomGenerator.h"
 
 using namespace brogueHd::component;

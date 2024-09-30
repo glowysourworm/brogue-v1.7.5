@@ -1,5 +1,5 @@
 #include "brogueLayout.h"
-#include <gridDefinitions.h>
+#include "gridDefinitions.h"
 #include "brogueCell.h"
 
 using namespace brogueHd::component;

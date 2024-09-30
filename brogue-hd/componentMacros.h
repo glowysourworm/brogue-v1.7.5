@@ -6,7 +6,7 @@
 #include <string.h>
 #include <stdint.h>
 
-namespace brogueHd::component
+namespace brogueHd
 {
 	// STD Library / substitutions
 	#define SIZEOF(x)						sizeof(x)			// Size of an array

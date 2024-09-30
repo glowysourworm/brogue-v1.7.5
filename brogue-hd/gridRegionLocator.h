@@ -1,12 +1,41 @@
-#include "gridRegionLocator.h"
-#include "exceptionHandler.h"
-#include "gridDefinitions.h"
-#include "simpleList.h"
+#pragma once
 
-using namespace brogueHd::component;
+#include "gridRegionConstructor.h"
+#include "simpleList.h"
+#include <functional>
 
 namespace brogueHd::component
 {
+	template<isGridLocator T>
+	class gridRegionLocator
+	{
+	public:
+
+		gridRegionLocator();
+		~gridRegionLocator();
+
+		/// <summary>
+		/// Runs flood fill on the grid; and creates grid region instances.
+		/// </summary>
+		/// <returns>Completed region instanc vector for the grid</returns>
+		simpleList<gridRegion<T>*> locateRegions(const grid<T>& grid);
+
+		/// <summary>
+		/// Creates regions from the grid using flood fill iteration. The region predicate is used to select
+		/// whether a particular cell is in / out of the region.
+		/// </summary>
+		simpleList<gridRegion<T>*> locateRegions(const grid<T>& grid, gridPredicate<T> inclusionPredicate);
+
+		/// <summary>
+		/// Creates region at the specified point (or NULL)
+		/// </summary>
+		gridRegion<T>* identifyRegion(const grid<T>& grid, short column, short row, gridPredicate<T> inclusionPredicate);
+
+	private:
+
+		gridRegionConstructor<T> runFloodFill(const grid<T>& grid, short column, short row, gridPredicate<T> inclusionPredicate);
+	};
+
     template<isGridLocator T>
     gridRegionLocator<T>::gridRegionLocator()
     {
@@ -15,16 +44,16 @@ namespace brogueHd::component
     template<isGridLocator T>
     gridRegionLocator<T>::~gridRegionLocator()
     {
-        
+
     }
 
     template<isGridLocator T>
     simpleList<gridRegion<T>*> gridRegionLocator<T>::locateRegions(const grid<T>& grid)
     {
         return locateRegions(grid, [](short column, short row, T value)
-        {
-            return value != NULL;
-        });
+            {
+                return value != NULL;
+            });
     }
 
     template<isGridLocator T>
@@ -39,35 +68,35 @@ namespace brogueHd::component
         //      -> Be sure we have not already visited this (new) region
         //
         grid.iterate([&inclusionPredicate, &result, &grid](short column, short row, T item)
-        {
-            // Check history (to see if we're still inside the previous region)
-            for (int index = 0; index < result.size(); index++)
             {
-                // Conditions:
-                //
-                // 1) Previously identified this location with another region
-                // 2) This location is not included by the user's predicate
-                //
-                if (result[index]->isDefined(column, row) ||
-                   !inclusionPredicate(column, row, grid.get(column, row)))
-                    return iterationCallback::iterate;
-            }
+                // Check history (to see if we're still inside the previous region)
+                for (int index = 0; index < result.size(); index++)
+                {
+                    // Conditions:
+                    //
+                    // 1) Previously identified this location with another region
+                    // 2) This location is not included by the user's predicate
+                    //
+                    if (result[index]->isDefined(column, row) ||
+                        !inclusionPredicate(column, row, grid.get(column, row)))
+                        return iterationCallback::iterate;
+                }
 
-            // Check to see if we're at a valid location (that has not been processed)
-            if (inclusionPredicate(column, row, grid.get(column, row)))
-            {
-                // Recurse to fill out the grid
-                gridRegionConstructor<T> constructor = runFloodFill(grid, column, row, inclusionPredicate);
+                // Check to see if we're at a valid location (that has not been processed)
+                if (inclusionPredicate(column, row, grid.get(column, row)))
+                {
+                    // Recurse to fill out the grid
+                    gridRegionConstructor<T> constructor = runFloodFill(grid, column, row, inclusionPredicate);
 
-                // Validate / Complete the region
-                gridRegion<T>* region = constructor->complete();
+                    // Validate / Complete the region
+                    gridRegion<T>* region = constructor->complete();
 
-                // Set result
-                result.add(region);
-            }
+                    // Set result
+                    result.add(region);
+                }
 
-            return iterationCallback::iterate;
-        });
+                return iterationCallback::iterate;
+            });
 
         return result;
     }
@@ -136,7 +165,7 @@ namespace brogueHd::component
 
             // N
             if (north != NULL &&
-                !regionConstructor.isDefined(north.column,north.row) &&
+                !regionConstructor.isDefined(north.column, north.row) &&
                 inclusionPredicate(north.column, north.row, north))
             {
                 // Push cell onto the queue to be iterated
@@ -174,3 +203,4 @@ namespace brogueHd::component
         return regionConstructor;
     }
 }
+

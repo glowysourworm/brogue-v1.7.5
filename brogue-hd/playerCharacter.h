@@ -1,6 +1,6 @@
 #pragma once
 
-#include "brogueMacros.h"
+#include "brogueGlobal.h"
 
 namespace brogueHd::backend::model::game
 {

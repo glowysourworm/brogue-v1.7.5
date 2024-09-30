@@ -1,7 +1,7 @@
 #pragma once
 
 #include "terrainGenerator.h"
-#include <brogueMath.h>
+#include "brogueMath.h"
 
 using namespace brogueHd::component::math;
 

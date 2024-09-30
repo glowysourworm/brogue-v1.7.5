@@ -1,11 +1,9 @@
 #include "randomGenerator.h"
-#include "brogueMacros.h"
+#include "brogueGlobal.h"
 
-#include <brogueMath.h>
-#include <exceptionHandler.h>
-#include <componentMacros.h>
-#include <randomRange.h>
-#include <simpleList.h>
+#include "brogueMath.h"
+#include "randomRange.h"
+#include "simpleList.h"
 
 #include <random>
 

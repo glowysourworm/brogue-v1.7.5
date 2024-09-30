@@ -2,7 +2,7 @@
 
 #include "color.h"
 #include "colorConstants.h"
-#include <simpleHash.h>
+#include "simpleHash.h"
 
 using namespace brogueHd::component;
 using namespace brogueHd::backend::modelConstant;

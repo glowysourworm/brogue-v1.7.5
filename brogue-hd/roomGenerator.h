@@ -1,8 +1,8 @@
 #pragma once
 
-#include <grid.h>
-#include <gridDefinitions.h>
-#include <gridRegionLocator.h>
+#include "grid.h"
+#include "gridDefinitions.h"
+#include "gridRegionLocator.h"
 #include "noiseGenerator.h"
 #include "cellularAutomataParameters.h"
 

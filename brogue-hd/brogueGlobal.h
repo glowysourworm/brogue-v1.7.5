@@ -1,10 +1,14 @@
 #pragma once
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
+
+#include "hashExtension.h"
+#include "componentMacros.h"
+#include "EnumString.h"
+#include "exceptionHandler.h"
+#include "command.h"
 
 namespace brogueHd
 {

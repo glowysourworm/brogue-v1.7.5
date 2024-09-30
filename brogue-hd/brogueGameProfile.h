@@ -1,7 +1,7 @@
 #pragma once
 
 #include "brogueLevelProfile.h"
-#include <simpleList.h>
+#include "simpleList.h"
 
 using namespace brogueHd::component;
 

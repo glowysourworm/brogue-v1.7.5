@@ -1,6 +1,6 @@
 #include "contentGenerator.h"
 #include "brogueLevel.h"
-#include "brogueMacros.h"
+#include "brogueGlobal.h"
 #include "item.h"
 #include "dungeonConstants.h"
 #include "brogueLevelMethods.h"

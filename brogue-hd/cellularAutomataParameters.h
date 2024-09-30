@@ -1,7 +1,7 @@
 #pragma once
 
-#include <gridRect.h>
-#include "brogueMacros.h"
+#include "gridRect.h"
+#include "brogueGlobal.h"
 
 using namespace brogueHd::component;
 

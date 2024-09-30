@@ -1,9 +1,7 @@
 #include "brogueConsole.h"
-#include "command.h"
-#include <exceptionHandler.h>
-#include <stringExtension.h>
-#include <componentMacros.h>
-#include <typeConverter.h>
+#include "stringExtension.h"
+#include "brogueGlobal.h"
+#include "typeConverter.h"
 
 using namespace brogueHd::component;
 
@@ -56,14 +54,14 @@ namespace brogueHd::console
 
 	std::string brogueConsole::getArgument(const std::string args[], const char* argumentName)
 	{
-		//for (int index = 0; index < SIZEOF(args); index++)
-		//{
-		//	if (std::string(args[index]) == std::string(argumentName) &&
-		//		index < SIZEOF(args) + 1)
-		//	{
-		//		return args[index + 1];
-		//	}
-		//}
+		for (int index = 0; index < SIZEOF(args); index++)
+		{
+			if (std::string(args[index]) == std::string(argumentName) &&
+				index < SIZEOF(args) + 1)
+			{
+				return args[index + 1];
+			}
+		}
 
 		return "";
 	}

@@ -3,12 +3,12 @@
 #include "dungeonConstants.h"
 #include "dungeon.h"
 
-#include <dijkstra.h>
-#include <delaunayAlgorithm.h>
-#include <gridDefinitions.h>
-#include <gridRegionConstructor.h>
-#include <primsAlgorithm.h>
-#include <exceptionHandler.h>
+#include "dijkstra.h"
+#include "delaunayAlgorithm.h"
+#include "gridDefinitions.h"
+#include "gridRegionConstructor.h"
+#include "primsAlgorithm.h"
+#include "brogueGlobal.h"
 
 using namespace brogueHd::component;
 using namespace brogueHd::backend::model::layout;

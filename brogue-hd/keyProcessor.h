@@ -1,8 +1,10 @@
 #pragma once
 
 #include "broguefile.h"
-#include <simpleHash.h>
+#include "simpleHash.h"
+#include <string>
 
+using namespace std;
 using namespace brogueHd::component;
 
 namespace brogueHd::backend::processor
@@ -21,7 +23,7 @@ namespace brogueHd::backend::processor
 
 	private:
 
-		//simpleHash<std::string, std::string>* _keyMap;
+		simpleHash<std::string, std::string>* _keyMap;
 	};
 }
 

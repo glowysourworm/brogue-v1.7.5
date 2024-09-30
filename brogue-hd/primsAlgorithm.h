@@ -1,11 +1,32 @@
 #pragma once
 
-#include "primsAlgorithm.h"
-#include "exceptionHandler.h"
+#include "graphAlgorithm.h"
 #include "simpleList.h"
 
 namespace brogueHd::component
 {
+    /// <summary>
+    /// Defines the Minimum Spanning Tree (MST) algorithm Prim's Algorithm
+    /// </summary>
+    template<isGridLocatorNode TNode, isGridLocatorEdge TEdge>
+	class primsAlgorithm : public graphAlgorithm<TNode, TEdge>
+	{
+    public:
+
+        primsAlgorithm(graphEdgeConstructor<TNode, TEdge> graphEdgeConstructor);
+        ~primsAlgorithm();
+
+        graph<TNode, TEdge>* run(const simpleList<TNode>& vertices) override;
+
+    protected:
+
+        /// <summary>
+        /// Creates MST using Prim's Algorithm - which takes O(n log n)
+        /// </summary>
+        graph<TNode, TEdge>* createMST(const simpleList<TNode>& vertices);
+        
+	};
+
     template<isGridLocatorNode TNode, isGridLocatorEdge TEdge>
     primsAlgorithm<TNode, TEdge>::primsAlgorithm(graphEdgeConstructor<TNode, TEdge> graphEdgeConstructor)
     {
@@ -64,9 +85,9 @@ namespace brogueHd::component
                 usedVertices.add(firstVertex);
 
                 nextVertex = unusedVertices.withMin<short>([&firstVertex](TNode vertex)
-                {
-                    return firstVertex.calculateDistance(vertex);
-                });
+                    {
+                        return firstVertex.calculateDistance(vertex);
+                    });
 
                 nextEdge = this->graphEdgeConstructor(firstVertex, nextVertex);
             }
@@ -75,37 +96,37 @@ namespace brogueHd::component
             {
                 // Get the next edge that connects an UNUSED vertex to a USED vertex
                 unusedVertices.forEach([&treeEdges, &that](TNode vertex)
-                {
-                    // Edges in the current tree
-                    short potentialEdgeWeight = std::numeric_limits<short>::max();
-                    TNode potentialNode = NULL;
-
-                    treeEdges.forEach([&vertex, &potentialEdgeWeight, &that](TEdge edge)
                     {
-                        short distance = edge.node1.calculateDistance(vertex);
+                        // Edges in the current tree
+                        short potentialEdgeWeight = std::numeric_limits<short>::max();
+                        TNode potentialNode = NULL;
 
-                        if (distance < potentialEdgeWeight)
+                        treeEdges.forEach([&vertex, &potentialEdgeWeight, &that](TEdge edge)
+                            {
+                                short distance = edge.node1.calculateDistance(vertex);
+
+                                if (distance < potentialEdgeWeight)
+                                {
+                                    potentialEdgeWeight = distance;
+                                    potentialNode = edge.node1;
+                                }
+
+                                distance = edge.node2.calculateDistance(vertex);
+
+                                if (distance < potentialEdgeWeight)
+                                {
+                                    potentialEdgeWeight = distance;
+                                    potentialNode = edge.node2;
+                                }
+                            });
+
+                        // Check both potential edges for the least distant choice
+                        if (nextEdge == NULL || potentialEdgeWeight < nextEdge.weight())
                         {
-                            potentialEdgeWeight = distance;
-                            potentialNode = edge.node1;
-                        }
-
-                        distance = edge.node2.calculateDistance(vertex);
-
-                        if (distance < potentialEdgeWeight)
-                        {
-                            potentialEdgeWeight = distance;
-                            potentialNode = edge.node2;
+                            nextEdge = that->graphEdgeConstructor(potentialNode, vertex);
+                            nextVertex = vertex;
                         }
                     });
-
-                    // Check both potential edges for the least distant choice
-                    if (nextEdge == NULL || potentialEdgeWeight < nextEdge.weight())
-                    {
-                        nextEdge = that->graphEdgeConstructor(potentialNode, vertex);
-                        nextVertex = vertex;
-                    }
-                });
             }
 
             if (nextEdge == NULL)

@@ -2,7 +2,7 @@
 #include "brogueColorMap.h"
 #include "colorConstants.h"
 
-#include <stringExtension.h>
+#include "stringExtension.h"
 
 #include <format>
 

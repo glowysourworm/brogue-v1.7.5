@@ -3,11 +3,11 @@
 #include "roomGenerator.h"
 #include "brogueCell.h"
 
-#include <brogueMath.h>
-#include <gridDefinitions.h>
-#include <gridRegion.h>
-#include <gridRegionConstructor.h>
-#include <simpleList.h>
+#include "brogueMath.h"
+#include "gridDefinitions.h"
+#include "gridRegion.h"
+#include "gridRegionConstructor.h"
+#include "simpleList.h"
 
 using namespace brogueHd::component;
 using namespace brogueHd::component::math;

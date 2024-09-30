@@ -1,7 +1,7 @@
 #pragma once
 
-#include <gridLocator.h>
-#include <gridRegion.h>
+#include "gridLocator.h"
+#include "gridRegion.h"
 #include "brogueCell.h"
 
 using namespace brogueHd::component;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "brogueMacros.h"
+#include "brogueGlobal.h"
 #include "accretionTile.h"
 #include "brogueLayout.h"
 #include "brogueLevel.h"
@@ -8,9 +8,9 @@
 #include "roomGenerator.h"
 #include "randomGenerator.h"
 
-#include <simpleList.h>
-#include <gridLocatorEdge.h>
-#include <graph.h>
+#include "simpleList.h"
+#include "gridLocatorEdge.h"
+#include "graph.h"
 
 using namespace brogueHd::component;
 using namespace brogueHd::backend::model;

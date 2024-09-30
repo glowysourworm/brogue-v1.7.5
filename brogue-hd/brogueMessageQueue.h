@@ -1,9 +1,9 @@
 #pragma once
 
-#include "brogueMacros.h"
+#include "brogueGlobal.h"
 #include "messageData.h"
 #include "color.h"
-#include <simpleList.h>
+#include "simpleList.h"
 #include <string>
 
 using namespace std;
@@ -38,7 +38,7 @@ namespace brogueHd::backend::model
 
 		short _currentMessageIndex;
 
-		//simpleList<messageData>* _messages;
+		simpleList<messageData>* _messages;
 
 		messageData _flavorMessage;
 

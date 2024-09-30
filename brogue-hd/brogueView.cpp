@@ -1,8 +1,8 @@
 #include "brogueView.h"
 #include "brogueCellDisplay.h"
 
-#include <gridRect.h>
-#include <grid.h>
+#include "gridRect.h"
+#include "grid.h"
 
 
 using namespace brogueHd::component;

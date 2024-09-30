@@ -1,10 +1,10 @@
-#include "brogueMacros.h"
+#include "brogueGlobal.h"
 #include "gameConsole.h"
 #include "developerConsole.h"
 #include "resourceConsole.h"
 #include "resourceController.h"
-#include <simpleHash.h>
-#include <stringExtension.h>
+#include "simpleHash.h"
+#include "stringExtension.h"
 #include <iostream>
 #include <string>
 
@@ -15,21 +15,10 @@ using namespace brogueHd;
 using namespace brogueHd::console;
 using namespace brogueHd::component;
 using namespace brogueHd::backend::controller;
+using namespace brogueHd::backend::model;
 
 int main(int argc, char* argv[])
 {
-	simpleHash<int, bool>* hash = new simpleHash<int, bool>();
-
-	//hash->add(2, true);
-
-	//simpleArray<int> a();
-	//simpleArray<gameColors> b();
-	//simpleArray<bool> c(3);
-
-
-	
-
-
 	brogueConsole defaultConsole;
 	brogueConsole currentConsole = defaultConsole;
 	brogueConsoleReturn returnValue = brogueConsoleReturn::Continue;

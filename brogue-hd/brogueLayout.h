@@ -3,8 +3,8 @@
 #include "brogueRoom.h"
 #include "dungeonConstants.h"
 
-#include <grid.h>
-#include <simpleList.h>
+#include "grid.h"
+#include "simpleList.h"
 
 #include <functional>
 

@@ -1,10 +1,57 @@
 #pragma once
 
-#include "graphEdgeCollection.h"
-#include "exceptionHandler.h"
+#include "graphDefinitions.h"
+#include "graphNode.h"
+#include "graphEdge.h"
+#include "simpleList.h"
+#include "simpleHash.h"
 
 namespace brogueHd::component
 {
+	/// <summary>
+	/// Defines an edge collection for a graph. Type definitions are similar to the graph.
+	/// </summary>
+    template<graphNodeType TNode, graphEdgeType<TNode> TEdge>
+	class graphEdgeCollection
+	{
+	public:
+
+        graphEdgeCollection(TEdge* edges);
+		graphEdgeCollection(TEdge* edges, TNode* nodes);
+		~graphEdgeCollection();
+
+        short edgeCount() const;
+        short nodeCount() const;
+
+        void addEdge(const TEdge& edge);
+        void addNode(const TNode& node);
+
+        void removeEdge(const TEdge& edge);
+
+        bool containsNode(const TNode& node);
+        bool containsEdge(const TEdge& edge);
+        bool containsEdge(const TNode& node1, const TNode& node2);
+        TEdge findEdge(const TNode& node1, const TNode& node2);
+
+        simpleList<TEdge> getAdjacentEdges(const TNode& node);
+        simpleList<TEdge> getEdges() const;
+        simpleList<TNode> getNodes() const;
+
+        void clear();
+        void clearEdges();
+        void clearNodes();
+
+    private:
+
+        void initialize(TEdge* edges, TNode* nodes);
+
+    private:
+
+        simpleHash<TNode, TNode>* _nodes;
+        simpleHash<TEdge, TEdge>* _edges;
+        simpleHash<TNode, simpleHash<TEdge, TEdge>*>* _nodeAdjacentEdges;
+	};
+
     template<graphNodeType TNode, graphEdgeType<TNode> TEdge>
     graphEdgeCollection<TNode, TEdge>::graphEdgeCollection(TEdge* edges)
     {
@@ -40,20 +87,20 @@ namespace brogueHd::component
 
         // Initialize for edges and adjacent vertex lookup
         edges->forEach([&that](TEdge* edge)
-        {
-            that->addEdge(edge);
+            {
+                that->addEdge(edge);
 
-            return iterationCallback::iterate;
-        });
+                return iterationCallback::iterate;
+            });
 
         // Look for any nodes not yet in the collections - add these
         nodes->forEach([&that](TNode* node)
-        {
-            if (!that->hasNode(node))
-                that->addNode(node);
+            {
+                if (!that->hasNode(node))
+                    that->addNode(node);
 
-            return iterationCallback::iterate;
-        });
+                return iterationCallback::iterate;
+            });
     }
 
     template<graphNodeType TNode, graphEdgeType<TNode> TEdge>
@@ -95,7 +142,7 @@ namespace brogueHd::component
             simpleHash<TEdge, TEdge>* adjacentEdges;
 
             adjacentEdges->add(edge, edge);
-            
+
             _nodeAdjacentEdges->add(edge.node1, adjacentEdges);
         }
 
@@ -172,16 +219,16 @@ namespace brogueHd::component
     TEdge graphEdgeCollection<TNode, TEdge>::findEdge(const TNode& node1, const TNode& node2)
     {
         return _edges->firstKey([&node1, &node2](TEdge key, TEdge value)
-        {
-            if (key.node1 == node1 && key.node2 == node2)
             {
-                return key;
-            }
-            else if (key.node2 == node1 && key.node1 == node2)
-            {
-                return key;
-            }
-        });
+                if (key.node1 == node1 && key.node2 == node2)
+                {
+                    return key;
+                }
+                else if (key.node2 == node1 && key.node1 == node2)
+                {
+                    return key;
+                }
+            });
     }
 
     template<graphNodeType TNode, graphEdgeType<TNode> TEdge>
@@ -213,9 +260,9 @@ namespace brogueHd::component
 
         // Have to delete what was new'd
         _nodeAdjacentEdges->forEach([](TNode node, simpleHash<TEdge, TEdge>* adjacentEdges)
-        {
-            delete adjacentEdges;
-        });
+            {
+                delete adjacentEdges;
+            });
 
         _nodeAdjacentEdges->clear();
     }
@@ -227,9 +274,9 @@ namespace brogueHd::component
 
         // Have to delete what was new'd
         _nodeAdjacentEdges->forEach([](TNode node, simpleHash<TEdge, TEdge>* adjacentEdges)
-        {
-            delete adjacentEdges;
-        });
+            {
+                delete adjacentEdges;
+            });
 
         _nodeAdjacentEdges->clear();
     }
@@ -241,9 +288,9 @@ namespace brogueHd::component
 
         // Have to delete what was new'd
         _nodeAdjacentEdges->forEach([](TNode* node, simpleHash<TEdge, TEdge>* adjacentEdges)
-        {
-            delete adjacentEdges;
-        });
+            {
+                delete adjacentEdges;
+            });
 
         _nodeAdjacentEdges->clear();
     }

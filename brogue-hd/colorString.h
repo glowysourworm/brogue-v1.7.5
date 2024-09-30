@@ -1,11 +1,7 @@
 #pragma once
 
-#include "brogueMacros.h"
 #include "color.h"
-
-#include <componentMacros.h>
-
-using namespace brogueHd::component;
+#include "brogueGlobal.h"
 
 namespace brogueHd::backend::model::game
 {

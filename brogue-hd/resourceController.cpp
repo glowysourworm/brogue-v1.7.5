@@ -6,9 +6,8 @@
 #include "brogueColorMap.h"
 #include "typeConverter.h"
 
-#include <EnumString.h>
-#include <exceptionHandler.h>
-#include <stringExtension.h>
+#include "brogueGlobal.h"
+#include "stringExtension.h"
 
 #include <string>
 #include <fstream>

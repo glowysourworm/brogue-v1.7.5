@@ -1,12 +1,10 @@
 #pragma once
 
-#include "brogueMacros.h"
+#include "brogueGlobal.h"
 #include "colorString.h"
 #include <string>
-#include <exceptionHandler.h>
 
 using namespace std;
-using namespace brogueHd::component;
 
 namespace brogueHd::backend::model::game
 {

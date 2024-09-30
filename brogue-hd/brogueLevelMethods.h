@@ -1,6 +1,6 @@
 #pragma once
 
-#include "brogueMacros.h"
+#include "brogueGlobal.h"
 #include "brogueLevel.h"
 #include "terrainDeclaration.h"
 #include "floorTileType.h"
