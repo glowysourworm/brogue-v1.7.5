@@ -157,7 +157,7 @@ namespace brogueHd::component
     template<typename T>
     T grid<T>::get(short column, short row) const
     {
-        return _grid->get(column, row);
+        return _grid[column][row];
     }
 
     template<typename T>
@@ -324,7 +324,7 @@ namespace brogueHd::component
     template<typename T>
     bool grid<T>::isDefined(short column, short row) const
     {
-        return _grid->get(column, row) != NULL;
+        return this->get(column, row) != NULL;
     }
 
     template<typename T>

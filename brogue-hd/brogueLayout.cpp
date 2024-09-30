@@ -8,14 +8,7 @@ namespace brogueHd::backend::model
 {
 	brogueLayout::brogueLayout()
 	{
-		//// TODO: Find better way to handle the brogueCell
-		//brogueCell* maxCell = new brogueCell();
-		//brogueCell* zeroCell = new brogueCell();
-
-		//maxCell->cost = 1;
-		//zeroCell->cost = 0;
-
-		//_grid = new grid<brogueCell*>(DCOLS, DROWS, zeroCell, maxCell);
+		_mainGrid = new grid<brogueCell*>(gridRect(0, 0, DCOLS, DROWS), gridRect(0, 0, DCOLS, DROWS));
 		//_scentMap = new grid<short>(DCOLS, DROWS, 0, 1);
 		//_safetyMap = new grid<short>(DCOLS, DROWS, 0, 1);
 		//_allySafetyMap = new grid<short>(DCOLS, DROWS, 0, 1);
@@ -24,6 +17,8 @@ namespace brogueHd::backend::model
 
 	brogueLayout::~brogueLayout()
 	{
+		delete _mainGrid;
+
 		//delete _scentMap;
 		//delete _safetyMap;
 		//delete _allySafetyMap;
@@ -32,52 +27,42 @@ namespace brogueHd::backend::model
 
 	gridRect brogueLayout::getBoundary() const
 	{
-		//return _grid->getBoundary();
-		return gridRect();
+		return _mainGrid->getRelativeBoundary();
 	}
 
 	bool brogueLayout::isDefined(short column, short row) const
 	{
-		//return !_grid->isZeroValue(column, row);
-
-		return false;
+		return _mainGrid->isDefined(column, row);
 	}
 
 	brogueCell* brogueLayout::getCell(short column, short row) const
 	{
-		//return _grid->get(column, row);
-
-		return NULL;
+		return _mainGrid->get(column, row);
 	}
 
-	void brogueLayout::iterateAdjacentCells(short column, short row, function<bool(short, short, brogueCell*)> callback)
+	void brogueLayout::iterateAdjacentCells(short column, short row, gridCallback<brogueCell*> callback)
 	{
-		//grid<brogueCell*>* grid = _grid;
-
-		//iterateAround(_grid, column, row, true, [&grid, &callback](short column, short row)
-		//{
-		//	callback(column, row, grid->get(column, row));
-		//});
+		_mainGrid->iterateAround(column, row, true, [&callback](short column, short row, brogueCell* item)
+		{
+			return callback(column, row, item);
+		});
 	}
 
-	brogueCell* brogueLayout::checkAdjacentCells(short& column, short& row, function<bool(brogueCell*)> callback)
+	brogueCell* brogueLayout::firstAdjacent(short column, short row, gridPredicate<brogueCell*> predicate)
 	{
-		//grid<brogueCell*>* grid = _grid;
-		//brogueCell* result;
-		//short resultColumn = column;
-		//short resultRow = row;
+		brogueCell* result;
 
-		//iterateAround(_grid, column, row, true, [&grid, &callback, &result, &resultColumn, &resultRow](short column, short row)
-		//{
-		//	if (callback(grid->get(column, row)))
-		//	{
-		//		result = grid->get(column, row);
-		//		resultColumn = column;
-		//		resultRow = row;
-		//	}
-		//});
+		_mainGrid->iterateAround(column, row, true, [&predicate, &result](short acolumn, short arow, brogueCell* cell)
+		{
+			if (predicate(acolumn, arow, cell))
+			{
+				result = cell;
+				return iterationCallback::breakAndReturn;
+			}
 
-		//return result;
-		return NULL;
+			return iterationCallback::iterate;
+		});
+
+		return result;
 	}
 }

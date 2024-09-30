@@ -10,6 +10,7 @@
 
 using namespace std;
 using namespace brogueHd::component;
+using namespace brogueHd::backend::modelConstant;
 
 namespace brogueHd::backend::model
 {
@@ -31,28 +32,28 @@ namespace brogueHd::backend::model
 		/// Iterates adjacent cells to satisfy the user predicate. Returns the result cell, (or null), and 
 		/// will have updated the column and row, (or -1's).
 		/// </summary>
-		brogueCell* checkAdjacentCells(short& column, short& row, function<bool(brogueCell*)> predicate);
+		brogueCell* firstAdjacent(short column, short row, gridPredicate<brogueCell*> predicate);
 
 		/// <summary>
 		/// Iterates adjacent cells and calls the user callback
 		/// </summary>
-		void iterateAdjacentCells(short column, short row, function<bool(short, short, brogueCell*)> callback);
+		void iterateAdjacentCells(short column, short row, gridCallback<brogueCell*> callback);
 
 	private:
 
 		simpleList<brogueRoom*>* _rooms;
 
-		//// May need to break into separate grids
-		//grid<brogueCell*>* _mainGrid;
+		// May need to break into separate grids
+		grid<brogueCell*>* _mainGrid;
 
-		//// Grid containing permanent dungeon layers
-		//grid<permanentDungeonLayers>* _permanentGrid;
+		// Grid containing permanent dungeon layers
+		grid<permanentDungeonLayers>* _permanentGrid;
 
-		//// Grid containing temporary dungeon layers
-		//grid<temporaryDungeonLayers>* _temporaryGrid;
+		// Grid containing temporary dungeon layers
+		grid<temporaryDungeonLayers>* _temporaryGrid;
 
-		//// Grid containing flag-enum for categories of features:  TODO
-		//grid<dungeonFeatureCategories>* _featureCategoriesGrid;
+		// Grid containing flag-enum for categories of features:  TODO
+		grid<dungeonFeatureCategories>* _featureCategoriesGrid;
 
 		//short cost;
 
