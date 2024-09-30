@@ -34,7 +34,7 @@ namespace brogueHd::backend::model
 
 		randomGenerator* _randomGenerator;
 
-		//simpleList<brogueLevelProfile*>* _levelProfiles;
+		simpleList<brogueLevelProfile*>* _levelProfiles;
 
 	};
 }

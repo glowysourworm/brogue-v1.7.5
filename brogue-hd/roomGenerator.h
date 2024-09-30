@@ -18,23 +18,23 @@ namespace brogueHd::backend::generator
 		roomGenerator(noiseGenerator* noiseGenerator, randomGenerator* randomGenerator);
 		~roomGenerator();
 
-		//void designCavern(gridRegionConstructor<gridLocator>& regionConstructor, 
-		//					const gridRect& parentBoundary, 
-		//					const gridRect& relativeBoundary, 
-		//					const gridRect& minSize, 
-		//					const gridRect& maxSize);
+		void designCavern(gridRegionConstructor<gridLocator>& regionConstructor, 
+							const gridRect& parentBoundary, 
+							const gridRect& relativeBoundary, 
+							const gridRect& minSize, 
+							const gridRect& maxSize);
 
-		//void designEntranceRoom(gridRegionConstructor<gridLocator>& regionConstructor);
+		void designEntranceRoom(gridRegionConstructor<gridLocator>& regionConstructor);
 
-		//void designCrossRoom(gridRegionConstructor<gridLocator>& regionConstructor);
+		void designCrossRoom(gridRegionConstructor<gridLocator>& regionConstructor);
 
-		//void designSymmetricalCrossRoom(gridRegionConstructor<gridLocator>& regionConstructor);
+		void designSymmetricalCrossRoom(gridRegionConstructor<gridLocator>& regionConstructor);
 
-		//void designSmallRoom(gridRegionConstructor<gridLocator>& regionConstructor);
+		void designSmallRoom(gridRegionConstructor<gridLocator>& regionConstructor);
 
-		//void designCircularRoom(gridRegionConstructor<gridLocator>& regionConstructor, const gridRect& parentBoundary, const gridRect& relativeBoundary);
+		void designCircularRoom(gridRegionConstructor<gridLocator>& regionConstructor, const gridRect& parentBoundary, const gridRect& relativeBoundary);
 
-		//void designChunkyRoom(gridRegionConstructor<gridLocator>& regionConstructor, const gridRect& parentBoundary, const gridRect& relativeBoundary);
+		void designChunkyRoom(gridRegionConstructor<gridLocator>& regionConstructor, const gridRect& parentBoundary, const gridRect& relativeBoundary);
 
 	private:
 

@@ -387,7 +387,7 @@ namespace brogueHd::component
 		for (int index = 0; index < _size; index++)
 		{
 			if (predicate(_list[index]))
-				return result.add(_list[index]);
+				result.add(_list[index]);
 		}
 
 		return result;

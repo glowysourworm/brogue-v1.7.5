@@ -1,5 +1,6 @@
 #pragma once
 
+#include "brogueGlobal.h"
 #include "gridRect.h"
 #include "gridDefinitions.h"
 
@@ -102,27 +103,27 @@ namespace brogueHd::component
 		/// <summary>
 		/// Iterates entire grid and calls user callback
 		/// </summary>
-		void iterate(gridCallback<T> callback);
+		void iterate(gridCallback<T> callback) const;
 
 		/// <summary>
 		/// Iterates around a specific point by one-cell in the 4 cardinal directions
 		/// </summary>
-		void iterateAroundCardinal(short column, short row, bool withinBounds, gridCallback<T> callback);
+		void iterateAroundCardinal(short column, short row, bool withinBounds, gridCallback<T> callback) const;
 
 		/// <summary>
 		/// Iterates around a specific point by one-cell in all 8 directions
 		/// </summary>
-		void iterateAround(short column, short row, bool withinBounds, gridCallback<T> callback);
+		void iterateAround(short column, short row, bool withinBounds, gridCallback<T> callback) const;
 
 		/// <summary>
 		/// Iterates grid within specific boundary constraint
 		/// </summary>
-		void iterateIn(gridRect boundary, gridCallback<T> callback);
+		void iterateIn(gridRect boundary, gridCallback<T> callback) const;
 
 		/// <summary>
 		/// Iterates outward from center location to specified distance
 		/// </summary>
-		void iterateOutward(short centerColumn, short centerRow, short distance, gridCallback<T> callback);
+		void iterateOutward(short centerColumn, short centerRow, short distance, gridCallback<T> callback) const;
 
 	private:
 
@@ -199,10 +200,10 @@ namespace brogueHd::component
     template<typename T>
     T grid<T>::getAdjacent(short column, short row, brogueCompass direction) const
     {
-        switch (brogueCompass)
+        switch (direction)
         {
         case brogueCompass::None:
-            return NULL;
+            return default_value<T>::value;
 
         case brogueCompass::N:
             if (!this->isInBounds(column, row - 1))
@@ -245,7 +246,7 @@ namespace brogueHd::component
 
             return this->get(column + 1, row + 1);
         default:
-            return NULL;
+            return default_value<T>::value;
         }
     }
 
@@ -324,7 +325,7 @@ namespace brogueHd::component
     template<typename T>
     bool grid<T>::isDefined(short column, short row) const
     {
-        return this->get(column, row) != NULL;
+        return this->get(column, row) != default_value<T>::value;
     }
 
     template<typename T>
@@ -405,10 +406,10 @@ namespace brogueHd::component
     template<typename T>
     bool grid<T>::isEdge(short column, short row) const
     {
-        return isEdge(column, row, [](short, short, T value)
-            {
-                return value != NULL;
-            });
+        return this->isEdgeWhere(column, row, [](short acolumn, short arow, T item)
+        {
+            return item != default_value<T>::value;
+        });
     }
 
     /// <summary>
@@ -427,14 +428,14 @@ namespace brogueHd::component
         T southEast = this->get(column + 1, row + 1);
         T southWest = this->get(column - 1, row + 1);
 
-        return (north == NULL || (north != NULL && !predicate(column, row - 1, north))) ||
-            (south == NULL || (south != NULL && !predicate(column, row + 1, south))) ||
-            (east == NULL || (east != NULL && !predicate(column + 1, row, east))) ||
-            (west == NULL || (west != NULL && !predicate(column - 1, row, west))) ||
-            (northEast == NULL || (northEast != NULL && !predicate(column + 1, row - 1, northEast))) ||
-            (northWest == NULL || (northWest != NULL && !predicate(column - 1, row - 1, northWest))) ||
-            (southEast == NULL || (southEast != NULL && !predicate(column + 1, row + 1, southEast))) ||
-            (southWest == NULL || (southWest != NULL && !predicate(column - 1, row + 1, southWest)));
+        return (north == default_value<T>::value || (north != default_value<T>::value && !predicate(column, row - 1, north))) ||
+                (south == default_value<T>::value || (south != default_value<T>::value && !predicate(column, row + 1, south))) ||
+                (east == default_value<T>::value || (east != default_value<T>::value && !predicate(column + 1, row, east))) ||
+                (west == default_value<T>::value || (west != default_value<T>::value && !predicate(column - 1, row, west))) ||
+                (northEast == default_value<T>::value || (northEast != default_value<T>::value && !predicate(column + 1, row - 1, northEast))) ||
+                (northWest == default_value<T>::value || (northWest != default_value<T>::value && !predicate(column - 1, row - 1, northWest))) ||
+                (southEast == default_value<T>::value || (southEast != default_value<T>::value && !predicate(column + 1, row + 1, southEast))) ||
+                (southWest == default_value<T>::value || (southWest != default_value<T>::value && !predicate(column - 1, row + 1, southWest)));
     }
 
     template<typename T>
@@ -446,16 +447,16 @@ namespace brogueHd::component
         T west = this->get(column - 1, row);
 
         if (direction == brogueCompass::N)
-            return north == NULL || (north != NULL && !predicate(column, row - 1, north));
+            return north == default_value<T>::value || (north != default_value<T>::value && !predicate(column, row - 1, north));
 
         else if (direction == brogueCompass::S)
-            return south == NULL || (south != NULL && !predicate(column, row + 1, south));
+            return south == default_value<T>::value || (south != default_value<T>::value && !predicate(column, row + 1, south));
 
         else if (direction == brogueCompass::E)
-            return east == NULL || (east != NULL && !predicate(column + 1, row, east));
+            return east == default_value<T>::value || (east != default_value<T>::value && !predicate(column + 1, row, east));
 
         else if (direction == brogueCompass::W)
-            return west == NULL || (west != NULL && !predicate(column - 1, row, west));
+            return west == default_value<T>::value || (west != default_value<T>::value && !predicate(column - 1, row, west));
 
         else
             brogueException::show("Invalid use of direction parameter:  grid.isExposedEdge");
@@ -465,20 +466,20 @@ namespace brogueHd::component
     bool grid<T>::isExposedCorner(int column, int row, brogueCompass direction, gridPredicate<T> predicate) const
     {
         if (direction == brogueCompass::NW)
-            return isExposedEdge(grid, column, row, brogueCompass::N, predicate) &&
-            isExposedEdge(grid, column, row, brogueCompass::W, predicate);
+            return isExposedEdge(column, row, brogueCompass::N, predicate) &&
+            isExposedEdge(column, row, brogueCompass::W, predicate);
 
         else if (direction == brogueCompass::NE)
-            return isExposedEdge(grid, column, row, brogueCompass::N, predicate) &&
-            isExposedEdge(grid, column, row, brogueCompass::E, predicate);
+            return isExposedEdge(column, row, brogueCompass::N, predicate) &&
+            isExposedEdge(column, row, brogueCompass::E, predicate);
 
         else if (direction == brogueCompass::SE)
-            return isExposedEdge(grid, column, row, brogueCompass::S, predicate) &&
-            isExposedEdge(grid, column, row, brogueCompass::E, predicate);
+            return isExposedEdge(column, row, brogueCompass::S, predicate) &&
+            isExposedEdge(column, row, brogueCompass::E, predicate);
 
         else if (direction == brogueCompass::SW)
-            return isExposedEdge(grid, column, row, brogueCompass::S, predicate) &&
-            isExposedEdge(grid, column, row, brogueCompass::W, predicate);
+            return isExposedEdge(column, row, brogueCompass::S, predicate) &&
+            isExposedEdge(column, row, brogueCompass::W, predicate);
 
         else
             brogueException::show("Invalid use of direction parameter:  grid.isExposedCorner");
@@ -503,7 +504,7 @@ namespace brogueHd::component
     }
 
     template<typename T>
-    void grid<T>::iterate(gridCallback<T> callback)
+    void grid<T>::iterate(gridCallback<T> callback) const
     {
         bool userBreak = false;
 
@@ -523,7 +524,7 @@ namespace brogueHd::component
     void grid<T>::iterateOutward(short centerColumn,
         short centerRow,
         short distance,
-        gridCallback<T> callback)
+        gridCallback<T> callback) const
     {
         bool userBreak = false;
 
@@ -545,7 +546,7 @@ namespace brogueHd::component
     }
 
     template<typename T>
-    void grid<T>::iterateIn(gridRect boundary, gridCallback<T> callback)
+    void grid<T>::iterateIn(gridRect boundary, gridCallback<T> callback) const
     {
         bool userBreak = false;
 
@@ -565,7 +566,7 @@ namespace brogueHd::component
     }
 
     template<typename T>
-    void grid<T>::iterateAround(short column, short row, bool withinBounds, gridCallback<T> callback)
+    void grid<T>::iterateAround(short column, short row, bool withinBounds, gridCallback<T> callback) const
     {
         short newX, newY;
 
@@ -589,7 +590,7 @@ namespace brogueHd::component
     }
 
     template<typename T>
-    void grid<T>::iterateAroundCardinal(short column, short row, bool withinBounds, gridCallback<T> callback)
+    void grid<T>::iterateAroundCardinal(short column, short row, bool withinBounds, gridCallback<T> callback) const
     {
         iterationCallback response = iterationCallback::iterate;
 

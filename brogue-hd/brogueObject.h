@@ -13,9 +13,12 @@ namespace brogueHd::backend::model
 	/// </summary>
 	class brogueObject : public hashableObject
 	{
-
 	public:
 
+		brogueObject(){}
+
+	public:
+		
 		size_t getHash() const override 
 		{
 			return hashGenerator::generateHash(character, opacity);
@@ -29,5 +32,4 @@ namespace brogueHd::backend::model
 		char opacity;
 	};
 }
-
 MAKE_HASHABLE_CLASS(brogueHd::backend::model::brogueObject)

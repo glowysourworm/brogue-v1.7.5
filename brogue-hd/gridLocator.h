@@ -5,6 +5,7 @@
 #include <iostream>
 #include "graphNode.h"
 #include "brogueMath.h"
+#include "brogueGlobal.h"
 
 using namespace std;
 using namespace brogueHd::component::math;
@@ -71,5 +72,12 @@ namespace brogueHd::component
 			//return std::format("(Col={}, Row={})", typeConverter::shortToString(column), typeConverter::shortToString(row));
 			return std::string("TODO");
 		}
+
+		size_t getHash() const override
+		{
+			return hashGenerator::generateHash(column, row);
+		}
 	};
 }
+
+MAKE_HASHABLE_STRUCT(brogueHd::component::gridLocator)

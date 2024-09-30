@@ -60,7 +60,7 @@ namespace brogueHd::component
 
 		bool remove(K key);
 
-		void iterate(simpleHashCallback<K, V> callback);
+		void iterate(simpleHashCallback<K, V> callback) const;
 
 	private:
 
@@ -242,7 +242,7 @@ namespace brogueHd::component
 	}
 
 	template<typename K, typename V>
-	void simpleHash<K, V>::iterate(simpleHashCallback<K, V> callback)
+	void simpleHash<K, V>::iterate(simpleHashCallback<K, V> callback) const
 	{
 		for (int index = 0; index < _table->size(); index++)
 		{
@@ -402,11 +402,11 @@ namespace brogueHd::component
 		simpleList<K> result;
 
 		this->iterate([&result](K key, V value)
-			{
-				result.add(key);
+		{
+			result.add(key);
 
-				return iterationCallback::iterate;
-			});
+			return iterationCallback::iterate;
+		});
 
 		return result;
 	}

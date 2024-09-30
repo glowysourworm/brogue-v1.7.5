@@ -74,12 +74,12 @@ struct hashable
         };                                                          \
     }                                                               \
 
-#define MAKE_HASHABLE_STRUCT(hashableStruct, ...)                   \
+#define MAKE_HASHABLE_STRUCT(type, ...)                             \
     namespace std                                                   \
     {                                                               \
-        template<> struct hash<hashable>                            \
+        template<> struct hash<type>                                \
         {                                                           \
-            size_t operator()(const hashable &theObject) const      \
+            size_t operator()(const type &theObject) const          \
             {                                                       \
                 return theObject.getHash();                         \
             }                                                       \

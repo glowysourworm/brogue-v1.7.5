@@ -18,11 +18,11 @@ namespace brogueHd::backend::generator
 		noiseGenerator(randomGenerator* randomGenerator);
 		~noiseGenerator();
 
-	//	void cellularAutomata(const cellularAutomataParameters& parameters, gridDelegates<bool>::callback callback);
+		void cellularAutomata(const cellularAutomataParameters& parameters, gridCallback<bool> callback);
 
-	//private:
+	private:
 
-	//	void cellularAutomataIteration(grid<bool>& resultGrid, const cellularAutomataParameters& parameters);
+		void cellularAutomataIteration(grid<bool>& resultGrid, const cellularAutomataParameters& parameters);
 
 	private:
 

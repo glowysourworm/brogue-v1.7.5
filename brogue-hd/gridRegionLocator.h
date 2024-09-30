@@ -1,5 +1,6 @@
 #pragma once
 
+#include "brogueGlobal.h"
 #include "gridRegionConstructor.h"
 #include "simpleList.h"
 #include <functional>
@@ -51,9 +52,9 @@ namespace brogueHd::component
     simpleList<gridRegion<T>*> gridRegionLocator<T>::locateRegions(const grid<T>& grid)
     {
         return locateRegions(grid, [](short column, short row, T value)
-            {
-                return value != NULL;
-            });
+        {
+            return value != default_value<T>::value;
+        });
     }
 
     template<isGridLocator T>
@@ -67,36 +68,39 @@ namespace brogueHd::component
         //      -> Callback (over history) to see if this location is in predicate
         //      -> Be sure we have not already visited this (new) region
         //
-        grid.iterate([&inclusionPredicate, &result, &grid](short column, short row, T item)
+
+        gridRegionLocator<T>* that = this;
+
+        grid.iterate([&inclusionPredicate, &result, &grid, &that](short column, short row, T item)
+        {
+            // Check history (to see if we're still inside the previous region)
+            for (int index = 0; index < result.count(); index++)
             {
-                // Check history (to see if we're still inside the previous region)
-                for (int index = 0; index < result.size(); index++)
-                {
-                    // Conditions:
-                    //
-                    // 1) Previously identified this location with another region
-                    // 2) This location is not included by the user's predicate
-                    //
-                    if (result[index]->isDefined(column, row) ||
-                        !inclusionPredicate(column, row, grid.get(column, row)))
-                        return iterationCallback::iterate;
-                }
+                // Conditions:
+                //
+                // 1) Previously identified this location with another region
+                // 2) This location is not included by the user's predicate
+                //
+                if (result[index]->isDefined(column, row) ||
+                    !inclusionPredicate(column, row, grid.get(column, row)))
+                    return iterationCallback::iterate;
+            }
 
-                // Check to see if we're at a valid location (that has not been processed)
-                if (inclusionPredicate(column, row, grid.get(column, row)))
-                {
-                    // Recurse to fill out the grid
-                    gridRegionConstructor<T> constructor = runFloodFill(grid, column, row, inclusionPredicate);
+            // Check to see if we're at a valid location (that has not been processed)
+            if (inclusionPredicate(column, row, grid.get(column, row)))
+            {
+                // Recurse to fill out the grid
+                gridRegionConstructor<T> constructor = that->runFloodFill(grid, column, row, inclusionPredicate);
 
-                    // Validate / Complete the region
-                    gridRegion<T>* region = constructor->complete();
+                // Validate / Complete the region
+                gridRegion<T>* region = constructor.complete();
 
-                    // Set result
-                    result.add(region);
-                }
+                // Set result
+                result.add(region);
+            }
 
-                return iterationCallback::iterate;
-            });
+            return iterationCallback::iterate;
+        });
 
         return result;
     }
@@ -144,7 +148,7 @@ namespace brogueHd::component
                 brogueException::show("Trying to add location duplicate:  gridRegionLocator.runFloodFill");
 
             // Add to region constructor (also prevents requeueing)
-            regionConstructor.add(regionLocation);
+            regionConstructor.add(regionLocation.column, regionLocation.row, regionLocation);
 
             // Search cardinally adjacent cells (N,S,E,W)
             T north = grid.get(regionLocation.column, regionLocation.row - 1);
@@ -164,7 +168,7 @@ namespace brogueHd::component
             // Find Connected Cells
 
             // N
-            if (north != NULL &&
+            if (north != default_value<T>::value &&
                 !regionConstructor.isDefined(north.column, north.row) &&
                 inclusionPredicate(north.column, north.row, north))
             {
@@ -173,7 +177,7 @@ namespace brogueHd::component
             }
 
             // S
-            if (south != NULL &&
+            if (south != default_value<T>::value &&
                 !regionConstructor.isDefined(south.column, south.row) &&
                 inclusionPredicate(south.column, south.row, south))
             {
@@ -182,7 +186,7 @@ namespace brogueHd::component
             }
 
             // E
-            if (east != NULL &&
+            if (east != default_value<T>::value &&
                 !regionConstructor.isDefined(east.column, east.row) &&
                 inclusionPredicate(east.column, east.row, east))
             {
@@ -191,7 +195,7 @@ namespace brogueHd::component
             }
 
             // W
-            if (west != NULL &&
+            if (west != default_value<T>::value &&
                 !regionConstructor.isDefined(west.column, west.row) &&
                 inclusionPredicate(west.column, west.row, west))
             {
