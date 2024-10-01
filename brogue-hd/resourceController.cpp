@@ -71,8 +71,8 @@ namespace brogueHd::backend::controller
 		}
 		catch (std::exception& ex)
 		{
-			//brogueException::show("Failed to read high scores file.");
-			//throw ex;
+			brogueException::show("Failed to read high scores file.");
+			throw ex;
 		}
 
 		return NULL;
@@ -90,35 +90,35 @@ namespace brogueHd::backend::controller
 
 	void resourceController::loadKeymap(keyProcessor& processor)
 	{
-		//try
-		//{
-		//	std::ifstream stream("keymap", fstream::in);
+		try
+		{
+			std::ifstream stream("keymap", fstream::in);
 
-		//	if (!stream.is_open())
-		//	{
-		//		brogueException::show("Error opening keymap file:  either missing, or locked");
-		//		return;
-		//	}
+			if (!stream.is_open())
+			{
+				brogueException::show("Error opening keymap file:  either missing, or locked");
+				return;
+			}
 
-		//	std::string line;
+			std::string line;
 
-		//	while (getline(stream, line))
-		//	{
-		//		std::string* linePieces = stringExtension::split(line, " ");
+			while (getline(stream, line))
+			{
+				std::string* linePieces = stringExtension::split(line, " ");
 
-		//		if (SIZEOF(linePieces) != 2)
-		//			brogueException::show("Invalid keymap file:  looking for two character split by only whitespace");
+				if (SIZEOF(linePieces) != 2)
+					brogueException::show("Invalid keymap file:  looking for two character split by only whitespace");
 
-		//		processor.addKeyMap(linePieces[0].c_str(), linePieces[1].c_str());
-		//	}
+				processor.addKeyMap(linePieces[0].c_str(), linePieces[1].c_str());
+			}
 
-		//	stream.close();
-		//}
-		//catch (std::exception& ex)
-		//{
-		//	brogueException::show(std::string("gameController::loadKeyMap:  ") + ex.what());
-		//	throw ex;
-		//}
+			stream.close();
+		}
+		catch (std::exception& ex)
+		{
+			brogueException::show(std::string("gameController::loadKeyMap:  ") + ex.what());
+			throw ex;
+		}
 	}
 
 	brogueColorMap* resourceController::loadColors(const char* path)
@@ -167,51 +167,51 @@ namespace brogueHd::backend::controller
 					EnumString<gameColors>::To(gameSelector, strings[1]);
 					result->setColor(gameSelector, nextColor);
 					break;
-				//case colorCollections::bolt:
-				//	boltColors boltSelector;
-				//	EnumString<boltColors>::To(boltSelector, strings[1]);
-				//	result->setColor(boltSelector, nextColor);
-				//	break;
-				//case colorCollections::tile:
-				//	tileColors tileSelector;
-				//	EnumString<tileColors>::To(tileSelector, strings[1]);
-				//	result->setColor(tileSelector, nextColor);
-				//	break;
-				//case colorCollections::creature:
-				//	creatureColors creatureSelector;
-				//	EnumString<creatureColors>::To(creatureSelector, strings[1]);
-				//	result->setColor(creatureSelector, nextColor);
-				//	break;
-				//case colorCollections::light:
-				//	lightColors lightSelector;
-				//	EnumString<lightColors>::To(lightSelector, strings[1]);
-				//	result->setColor(lightSelector, nextColor);
-				//	break;
-				//case colorCollections::flare:
-				//	flareColors flareSelector;
-				//	EnumString<flareColors>::To(flareSelector, strings[1]);
-				//	result->setColor(flareSelector, nextColor);
-				//	break;
-				//case colorCollections::multipliers:
-				//	colorMultipliers multiplierSelector;
-				//	EnumString<colorMultipliers>::To(multiplierSelector, strings[1]);
-				//	result->setColor(multiplierSelector, nextColor);
-				//	break;
-				//case colorCollections::blood:
-				//	bloodColors bloodSelector;
-				//	EnumString<bloodColors>::To(bloodSelector, strings[1]);
-				//	result->setColor(bloodSelector, nextColor);
-				//	break;
-				//case colorCollections::gas:
-				//	gasColors gasSelector;
-				//	EnumString<gasColors>::To(gasSelector, strings[1]);
-				//	result->setColor(gasSelector, nextColor);
-				//	break;
-				//case colorCollections::interface:
-				//	interfaceColors interfaceSelector;
-				//	EnumString<interfaceColors>::To(interfaceSelector, strings[1]);
-				//	result->setColor(interfaceSelector, nextColor);
-				//	break;
+				case colorCollections::bolt:
+					boltColors boltSelector;
+					EnumString<boltColors>::To(boltSelector, strings[1]);
+					result->setColor(boltSelector, nextColor);
+					break;
+				case colorCollections::tile:
+					tileColors tileSelector;
+					EnumString<tileColors>::To(tileSelector, strings[1]);
+					result->setColor(tileSelector, nextColor);
+					break;
+				case colorCollections::creature:
+					creatureColors creatureSelector;
+					EnumString<creatureColors>::To(creatureSelector, strings[1]);
+					result->setColor(creatureSelector, nextColor);
+					break;
+				case colorCollections::light:
+					lightColors lightSelector;
+					EnumString<lightColors>::To(lightSelector, strings[1]);
+					result->setColor(lightSelector, nextColor);
+					break;
+				case colorCollections::flare:
+					flareColors flareSelector;
+					EnumString<flareColors>::To(flareSelector, strings[1]);
+					result->setColor(flareSelector, nextColor);
+					break;
+				case colorCollections::multipliers:
+					colorMultipliers multiplierSelector;
+					EnumString<colorMultipliers>::To(multiplierSelector, strings[1]);
+					result->setColor(multiplierSelector, nextColor);
+					break;
+				case colorCollections::blood:
+					bloodColors bloodSelector;
+					EnumString<bloodColors>::To(bloodSelector, strings[1]);
+					result->setColor(bloodSelector, nextColor);
+					break;
+				case colorCollections::gas:
+					gasColors gasSelector;
+					EnumString<gasColors>::To(gasSelector, strings[1]);
+					result->setColor(gasSelector, nextColor);
+					break;
+				case colorCollections::interface:
+					interfaceColors interfaceSelector;
+					EnumString<interfaceColors>::To(interfaceSelector, strings[1]);
+					result->setColor(interfaceSelector, nextColor);
+					break;
 				default:
 					break;
 				}

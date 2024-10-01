@@ -58,7 +58,6 @@ namespace brogueHd::component
 		~simpleHash();
 
 		V operator[](K key) const;
-		void operator=(V value);
 
 		V get(K key) const;
 		void add(K key, V value);

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <EnumString.h>
+#include "brogueGlobal.h"
 #include "creatureBehaviorConstants.h"
 
 using namespace brogueHd::component;

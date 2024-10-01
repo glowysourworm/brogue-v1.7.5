@@ -74,52 +74,50 @@ namespace brogueHd::component
 		}
 		static std::string* split(const std::string& input, const char* tokens)
 		{	
-			//simpleArray<std::string> sdf();
-			//simpleList<std::string> result;
-			return NULL;
-			//simpleList<std::string> list;
-			//
-			//list.add(input);
+			simpleList<std::string> result;
+			simpleList<std::string> list;
+			
+			list.add(input);
 
-			//for (int index = 0; index < SIZEOF(tokens); index++)
-			//{
-			//	for (int listIndex = 0; listIndex < list.count(); listIndex++)
-			//	{
-			//		int lastIndex = -1;
+			for (int index = 0; index < SIZEOF(tokens); index++)
+			{
+				for (int listIndex = 0; listIndex < list.count(); listIndex++)
+				{
+					int lastIndex = -1;
 
-			//		// Scan the string for the next token
-			//		for (int strIndex = 0; strIndex < list[listIndex].size(); strIndex++)
-			//		{
-			//			// Found token!
-			//			if (list[listIndex].at(strIndex) == tokens[index])
-			//			{
-			//				std::string subString = (lastIndex == -1) ? list[listIndex].substr(0, strIndex) : 
-			//															list[listIndex].substr(lastIndex, strIndex - lastIndex);
+					// Scan the string for the next token
+					for (int strIndex = 0; strIndex < list[listIndex].size(); strIndex++)
+					{
+						// Found token!
+						if (list[listIndex].at(strIndex) == tokens[index])
+						{
+							std::string subString = (lastIndex == -1) ? list[listIndex].substr(0, strIndex) : 
+																		list[listIndex].substr(lastIndex, strIndex - lastIndex);
 
-			//				// Remove white space
-			//				if (!isWhitespace(subString))
-			//					result.add(subString);
+							// Remove white space
+							if (!isWhitespace(subString))
+								result.add(subString);
 
-			//				lastIndex = strIndex;
-			//			}
-			//		}
+							lastIndex = strIndex;
+						}
+					}
 
-			//		// No match found
-			//		if (lastIndex == -1)
-			//			result.add(list[listIndex]);
-			//	}
+					// No match found
+					if (lastIndex == -1)
+						result.add(list[listIndex]);
+				}
 
-			//	// Setup results for next iteration
-			//	if (index < SIZEOF(tokens) - 1)
-			//	{
-			//		list.clear();
-			//		list.addRange(result);
+				// Setup results for next iteration
+				if (index < SIZEOF(tokens) - 1)
+				{
+					list.clear();
+					list.addRange(result);
 
-			//		result.clear();			// Search for smaller splits
-			//	}
-			//}
-			//
-			//return result.getArray();
+					result.clear();			// Search for smaller splits
+				}
+			}
+			
+			return result.getArray();
 		}
 	};
 }

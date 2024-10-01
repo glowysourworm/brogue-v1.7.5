@@ -8,7 +8,7 @@ namespace brogueHd::component
     /// <summary>
     /// Defines the Minimum Spanning Tree (MST) algorithm Prim's Algorithm
     /// </summary>
-    template<isGridLocatorNode TNode, isGridLocatorEdge TEdge>
+    template<isGridLocatorNode TNode, isGridLocatorEdge<TNode> TEdge>
 	class primsAlgorithm : public graphAlgorithm<TNode, TEdge>
 	{
     public:
@@ -27,19 +27,19 @@ namespace brogueHd::component
         
 	};
 
-    template<isGridLocatorNode TNode, isGridLocatorEdge TEdge>
+    template<isGridLocatorNode TNode, isGridLocatorEdge<TNode> TEdge>
     primsAlgorithm<TNode, TEdge>::primsAlgorithm(graphEdgeConstructor<TNode, TEdge> graphEdgeConstructor)
     {
 
     }
 
-    template<isGridLocatorNode TNode, isGridLocatorEdge TEdge>
+    template<isGridLocatorNode TNode, isGridLocatorEdge<TNode> TEdge>
     primsAlgorithm<TNode, TEdge>::~primsAlgorithm()
     {
 
     }
 
-    template<isGridLocatorNode TNode, isGridLocatorEdge TEdge>
+    template<isGridLocatorNode TNode, isGridLocatorEdge<TNode> TEdge>
     graph<TNode, TEdge>* primsAlgorithm<TNode, TEdge>::run(const simpleList<TNode>& vertices)
     {
         if (vertices.count() < 3)
@@ -48,7 +48,7 @@ namespace brogueHd::component
         return this->createMST(vertices);
     }
 
-    template<isGridLocatorNode TNode, isGridLocatorEdge TEdge>
+    template<isGridLocatorNode TNode, isGridLocatorEdge<TNode> TEdge>
     graph<TNode, TEdge>* primsAlgorithm<TNode, TEdge>::createMST(const simpleList<TNode>& vertices)
     {
         // NOTE*** The MST is being created on a graph of REGIONS. This will behave differently than a
@@ -102,23 +102,23 @@ namespace brogueHd::component
                         TNode potentialNode = NULL;
 
                         treeEdges.forEach([&vertex, &potentialEdgeWeight, &that](TEdge edge)
+                        {
+                            short distance = edge.node1.calculateDistance(vertex);
+
+                            if (distance < potentialEdgeWeight)
                             {
-                                short distance = edge.node1.calculateDistance(vertex);
+                                potentialEdgeWeight = distance;
+                                potentialNode = edge.node1;
+                            }
 
-                                if (distance < potentialEdgeWeight)
-                                {
-                                    potentialEdgeWeight = distance;
-                                    potentialNode = edge.node1;
-                                }
+                            distance = edge.node2.calculateDistance(vertex);
 
-                                distance = edge.node2.calculateDistance(vertex);
-
-                                if (distance < potentialEdgeWeight)
-                                {
-                                    potentialEdgeWeight = distance;
-                                    potentialNode = edge.node2;
-                                }
-                            });
+                            if (distance < potentialEdgeWeight)
+                            {
+                                potentialEdgeWeight = distance;
+                                potentialNode = edge.node2;
+                            }
+                        });
 
                         // Check both potential edges for the least distant choice
                         if (nextEdge == NULL || potentialEdgeWeight < nextEdge.weight())

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "color.h"
-#include "brogueMacros.h"
+#include "brogueGlobal.h"
 #include <string>
 
 using namespace std;
