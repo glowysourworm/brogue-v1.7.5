@@ -160,6 +160,10 @@ namespace brogueHd::component
 	template<typename T>
 	void simpleList<T>::add(T item)
 	{
+		// Constructor was the default
+		if (_array == NULL)
+			this->reAllocate();
+
 		// Reached capacity
 		//
 		if (_count == _array->count())
@@ -207,7 +211,7 @@ namespace brogueHd::component
 	template<typename T>
 	void simpleList<T>::reAllocate()
 	{
-		if (_count != _array->count())
+		if (_array != NULL && _count != _array->count())
 			brogueException::show("Trying to re-allocate memory for simple list before capacity is reached");
 
 		// Use doubling method: Always multiply size by 2 until {MaxElementIncrement} is reached
@@ -219,12 +223,15 @@ namespace brogueHd::component
 		// Copy over the data
 		simpleArray<T>* newArray = new simpleArray<T>(newSize);
 
-		for (int index = 0; index < _array->count(); index++)
+		if (_array != NULL)
 		{
-			newArray->set(index, _array->get(index));
-		}
+			for (int index = 0; index < _array->count(); index++)
+			{
+				newArray->set(index, _array->get(index));
+			}
 
-		delete _array;
+			delete _array;
+		}
 
 		_array = newArray;
 	}
@@ -271,8 +278,8 @@ namespace brogueHd::component
 	template<typename T>
 	void simpleList<T>::clear()
 	{
-		delete _array;
-
+		// Soft Delete
+		//
 		_count = 0;
 	}
 
