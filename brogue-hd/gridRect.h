@@ -42,6 +42,22 @@ namespace brogueHd::component
 			height = aheight;
 		}
 
+		bool operator==(const gridRect& rect) const
+		{
+			return column == rect.column &&
+				   row == rect.row &&
+				   width == rect.width &&
+				   height == rect.height;
+		}
+
+		bool operator!=(const gridRect& rect) const
+		{
+			return column != rect.column ||
+				   row != rect.row ||
+				   width != rect.width ||
+				   height != rect.height;
+		}
+
 		static gridRect fromCircle(short centerColumn, short centerRow, short radiusX, short radiusY)
 		{
 			gridRect result;

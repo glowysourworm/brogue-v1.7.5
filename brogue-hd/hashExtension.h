@@ -56,6 +56,15 @@ class hashableObject
 /// </summary>
 struct hashable
 {
+public:
+    virtual bool operator==(const hashable& other) const
+    {
+        return false;
+    }
+    virtual bool operator!=(const hashable& other) const
+    {
+        return false;
+    }
     virtual size_t getHash() const
     {
         return 0;

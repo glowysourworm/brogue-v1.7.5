@@ -60,7 +60,7 @@ namespace brogueHd::component
         ~simpleBST();
 
         void insert(K key, T value);
-        bool remove(K key);
+        T remove(K key);
         bool containsKey(K key);
         int count() const;
 
@@ -141,14 +141,14 @@ namespace brogueHd::component
         _root = this->insertImpl(_root, key, value);
 
         // Take the O(n log n) hit to find the node and hash it
-        simpleBST<K, T>* node = this->search(key);
+        simpleBSTNode<K, T>* node = this->searchImpl(key, _root);
 
         // Track the values for debugging and a fast retrieval using the key
         _nodeMap->set(key, node);
     }
 
     template<isComparable K, typename T>
-    bool simpleBST<K, T>::remove(K key)
+    T simpleBST<K, T>::remove(K key)
     {
         if (!_nodeMap->contains(key))
             brogueException::show("Trying to remove non-existing key from binary search tree");
@@ -156,8 +156,13 @@ namespace brogueHd::component
         // Remove the specified key -> Rebalance the tree
         _root = this->removalImpl(_root, key);
 
-        // Track the values for debugging
-        return _nodeMap->remove(key);
+        // Item to return to user
+        T item = _nodeMap->get(key)->value;
+
+        // Track the values for debugging and fast retrieval using the key
+        _nodeMap->remove(key);
+
+        return item;
     }
 
     template<isComparable K, typename T>
@@ -329,13 +334,13 @@ namespace brogueHd::component
 
                 node = this->minImpl(temp->right);
                 node->right = this->deleteMin(temp->right);
-                node->left = temp.left;
+                node->left = temp->left;
             }
         }
 
         // Set the height
         node->height = brogueMath<int>::max((node->left != NULL) ? node->left->height : -1,
-            (node->right != NULL) ? node->right->height : -1) + 1;
+                                            (node->right != NULL) ? node->right->height : -1) + 1;
 
         return this->balance(node);
     }
@@ -379,7 +384,7 @@ namespace brogueHd::component
         if (node == NULL)
             return NULL;
 
-        int comparison = keyCompare(key, node.Key);
+        int comparison = keyCompare(key, node->key);
 
         if (comparison < 0 && node->left != NULL)
             return this->searchImpl(key, node->left);

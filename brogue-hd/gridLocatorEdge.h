@@ -8,7 +8,7 @@ using namespace brogueHd::component::math;
 
 namespace brogueHd::component
 {
-	struct gridLocatorEdge : public graphEdge<gridLocator>
+	struct gridLocatorEdge : graphEdge<gridLocator>
 	{
 		gridLocator node1;
 		gridLocator node2;
@@ -20,6 +20,18 @@ namespace brogueHd::component
 		{
 			node1 = anode1;
 			node2 = anode2;
+		}
+
+		bool operator==(const gridLocatorEdge& edge) const
+		{
+			return node1 == edge.node1 &&
+				   node2 == edge.node2;
+		}
+
+		bool operator!=(const gridLocatorEdge& edge) const
+		{
+			return node1 != edge.node1 ||
+				   node2 != edge.node2;
 		}
 		
 		/// <summary>
@@ -42,5 +54,12 @@ namespace brogueHd::component
 					node2.column == point1.x &&
 					node2.row == point1.y);
 		}
+
+		virtual size_t getHash() const
+		{
+			return 0;
+		}
 	};
 }
+
+MAKE_HASHABLE_STRUCT(brogueHd::component::gridLocatorEdge)

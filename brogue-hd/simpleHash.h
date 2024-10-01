@@ -107,9 +107,6 @@ namespace brogueHd::component
 
 		// Bucket Sizes (prevents iteration of bucket lists during set(..))
 		int _maxBucketSize;
-
-		// Used to have a set indexer (e.g. hash[key] = newVal;)
-		K _indexerKey;
 	};
 
 	template<typename K, typename V>
@@ -161,17 +158,7 @@ namespace brogueHd::component
 	template<typename K, typename V>
 	V simpleHash<K, V>::operator[](K key) const
 	{
-		// Setup for the = operator
-		_indexerKey = key;
-
-		return this->get(key).value;
-	}
-
-	template<typename K, typename V>
-	void simpleHash<K, V>::operator=(V value)
-	{
-		if (_indexerKey != default_value<K>::value)
-			this->set(_indexerKey, value);
+		return this->get(key);
 	}
 
 	template<typename K, typename V>

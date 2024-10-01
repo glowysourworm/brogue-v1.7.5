@@ -193,6 +193,14 @@ namespace brogueHd::component
 		_targetLocations = new simpleArray<T>(targets);
 
 		// Clear out the frontier
+		_frontier->iterate([](float key, simpleHash<T, T>* value)
+		{
+			// MEMORY!
+			delete value;
+
+			return iterationCallback::iterate;
+		});
+
 		_frontier->clear();
 
 		// Clear the result
@@ -366,8 +374,14 @@ namespace brogueHd::component
 				// Maintain frontier hash
 				nextCostDict->remove(nextNode);
 
+				// Remove the frontier node
 				if (nextCostDict->count() == 0)
+				{
 					_frontier->remove(nextCost);
+
+					// MEMORY
+					delete nextCostDict;
+				}
 
 				// Move to next location
 				column = nextNode.column;
@@ -568,7 +582,7 @@ namespace brogueHd::component
 			T newLocator = _locatorCallback(destColumn, destRow);
 
 			// Check for existing weight list
-			simpleHash<T, T>* weightList;
+			simpleHash<T, T>* weightList = new simpleHash<T, T>();
 
 			// Initialize the new locator on the frontier
 			if (_frontier->containsKey(newWeight))
@@ -622,7 +636,12 @@ namespace brogueHd::component
 
 			// Remove unused node
 			if (oldList->count() == 0)
+			{
 				_frontier->remove(oldWeight);
+
+				// MEMORY
+				delete oldList;
+			}
 
 			// Insert new node in the frontier
 			_frontier->insert(newWeight, newList);
@@ -653,7 +672,12 @@ namespace brogueHd::component
 					oldList->remove(destLocator);
 
 				if (oldList->count() == 0)
+				{
 					_frontier->remove(oldWeight);
+
+					// MEMORY!
+					delete oldList;
+				}
 
 				// Check that new weight list has element added
 				if (!newList->contains(destLocator))

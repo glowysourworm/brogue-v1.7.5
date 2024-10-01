@@ -17,7 +17,7 @@ namespace brogueHd::component
 	public:
 
         graphEdgeCollection(const TEdge* edges);
-		graphEdgeCollection(const TEdge* edges, const TNode* nodes);
+		graphEdgeCollection(const TNode* nodes, const TEdge* edges);
 		~graphEdgeCollection();
 
         short edgeCount() const;
@@ -43,7 +43,7 @@ namespace brogueHd::component
 
     private:
 
-        void initialize(TEdge* edges, TNode* nodes);
+        void initialize(const TNode* nodes, const TEdge* edges);
 
     private:
 
@@ -63,44 +63,40 @@ namespace brogueHd::component
     }
 
     template<graphNodeType TNode, graphEdgeType<TNode> TEdge>
-    graphEdgeCollection<TNode, TEdge>::graphEdgeCollection(const TEdge* edges, const TNode* nodes)
+    graphEdgeCollection<TNode, TEdge>::graphEdgeCollection(const TNode* nodes, const TEdge* edges)
     {
         _nodes = new simpleHash<TNode, TNode>();
         _edges = new simpleHash<TEdge, TEdge>();
         _nodeAdjacentEdges = new simpleHash<TNode, simpleHash<TEdge, TEdge>*>();
 
-        initialize(edges, nodes);
+        initialize(nodes, edges);
     }
 
     template<graphNodeType TNode, graphEdgeType<TNode> TEdge>
     graphEdgeCollection<TNode, TEdge>::~graphEdgeCollection()
     {
+        this->clear(); // ~simpleHash<...>  (our adjacent edges hash tables)
+
         delete _nodes;
         delete _edges;
         delete _nodeAdjacentEdges;
     }
 
     template<graphNodeType TNode, graphEdgeType<TNode> TEdge>
-    void graphEdgeCollection<TNode, TEdge>::initialize(TEdge* edges, TNode* nodes)
+    void graphEdgeCollection<TNode, TEdge>::initialize(const TNode* nodes, const TEdge* edges)
     {
-        graphEdgeCollection<TNode, TEdge>* that = this;
-
         // Initialize for edges and adjacent vertex lookup
-        edges->forEach([&that](TEdge edge)
+        for (int index = 0; index < SIZEOF(edges); index++)
         {
-            that->addEdge(edge);
-
-            return iterationCallback::iterate;
-        });
+            this->addEdge(edges[index]);
+        }
 
         // Look for any nodes not yet in the collections - add these
-        nodes->forEach([&that](TNode node)
+        for (int index = 0; index < SIZEOF(nodes); index++)
         {
-            if (!that->hasNode(node))
-                that->addNode(node);
-
-            return iterationCallback::iterate;
-        });
+            if (!this->containsNode(nodes[index]))
+                this->addNode(nodes[index]);
+        }
     }
 
     template<graphNodeType TNode, graphEdgeType<TNode> TEdge>
@@ -130,16 +126,16 @@ namespace brogueHd::component
         if (!_nodes->contains(edge.node1))
             _nodes->add(edge.node1, edge.node1);
 
-        if (!_nodes->contains(edge->node2))
+        if (!_nodes->contains(edge.node2))
             _nodes->add(edge.node2, edge.node2);
 
         // Forward entry
         if (_nodeAdjacentEdges->contains(edge.node1))
-            _nodeAdjacentEdges[edge.node1]->add(edge, edge);
+            _nodeAdjacentEdges->get(edge.node1)->add(edge, edge);
 
         else
         {
-            simpleHash<TEdge, TEdge>* adjacentEdges;
+            simpleHash<TEdge, TEdge>* adjacentEdges = new simpleHash<TEdge, TEdge>();
 
             adjacentEdges->add(edge, edge);
 
@@ -148,7 +144,7 @@ namespace brogueHd::component
 
         // Reverse entry
         if (_nodeAdjacentEdges->contains(edge.node2))
-            _nodeAdjacentEdges[edge.node2]->add(edge, edge);
+            _nodeAdjacentEdges->get(edge.node2)->add(edge, edge);
 
         else
         {
@@ -164,7 +160,7 @@ namespace brogueHd::component
     void graphEdgeCollection<TNode, TEdge>::addNode(const TNode& node)
     {
         if (!_nodes->contains(node))
-            _nodes->insert(node, node);
+            _nodes->add(node, node);
 
         // Adjacent edges map
         if (!_nodeAdjacentEdges->contains(node))
@@ -212,7 +208,7 @@ namespace brogueHd::component
     template<graphNodeType TNode, graphEdgeType<TNode> TEdge>
     bool graphEdgeCollection<TNode, TEdge>::containsEdge(const TNode& node1, const TNode& node2)
     {
-        return findEdge(node1, node2) != NULL;
+        return findEdge(node1, node2) != default_value<TEdge>::value;
     }
 
     template<graphNodeType TNode, graphEdgeType<TNode> TEdge>

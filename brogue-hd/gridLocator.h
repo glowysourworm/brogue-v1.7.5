@@ -28,13 +28,13 @@ namespace brogueHd::component
 			row = arow;
 		}
 
-		bool operator==(const gridLocator& cell)
+		bool operator==(const gridLocator& cell) const
 		{
 			return column == cell.column &&
 				   row == cell.row;
 		}
 
-		bool operator!=(const gridLocator& cell)
+		bool operator!=(const gridLocator& cell) const
 		{
 			return column != cell.column ||
 				   row != cell.row;
