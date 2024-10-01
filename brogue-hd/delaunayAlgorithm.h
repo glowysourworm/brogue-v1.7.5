@@ -9,11 +9,12 @@
 
 namespace brogueHd::component
 {
-    template<isGridLocatorNode TNode, isGridLocatorEdge TEdge>
+    template<isGridLocatorNode TNode, isGridLocatorEdge<TNode> TEdge>
 	class delaunayAlgorithm : public graphAlgorithm<TNode, TEdge>
 	{
     public:
 
+        delaunayAlgorithm(){};
         delaunayAlgorithm(graphEdgeConstructor<TNode, TEdge> graphEdgeConstructor);
         ~delaunayAlgorithm();
 
@@ -27,18 +28,18 @@ namespace brogueHd::component
         graph<TNode, TEdge>* bowyerWatson(const simpleList<TNode>& vertices);
 	};
 
-    template<isGridLocatorNode TNode, isGridLocatorEdge TEdge>
+    template<isGridLocatorNode TNode, isGridLocatorEdge<TNode> TEdge>
     delaunayAlgorithm<TNode, TEdge>::delaunayAlgorithm(graphEdgeConstructor<TNode, TEdge> edgeConstructor)
     {
     }
 
-    template<isGridLocatorNode TNode, isGridLocatorEdge TEdge>
+    template<isGridLocatorNode TNode, isGridLocatorEdge<TNode> TEdge>
     delaunayAlgorithm<TNode, TEdge>::~delaunayAlgorithm()
     {
 
     }
 
-    template<isGridLocatorNode TNode, isGridLocatorEdge TEdge>
+    template<isGridLocatorNode TNode, isGridLocatorEdge<TNode> TEdge>
     graph<TNode, TEdge>* delaunayAlgorithm<TNode, TEdge>::run(const simpleList<TNode>& vertices)
     {
         if (vertices.count() < 3)
@@ -47,12 +48,12 @@ namespace brogueHd::component
         return this->bowyerWatson(vertices);
     }
 
-    template<isGridLocatorNode TNode, isGridLocatorEdge TEdge>
+    template<isGridLocatorNode TNode, isGridLocatorEdge<TNode> TEdge>
     graph<TNode, TEdge>* delaunayAlgorithm<TNode, TEdge>::bowyerWatson(const simpleList<TNode>& vertices)
     {
         if (vertices.count() < 3)
         {
-            return createDefaultGraph(vertices);
+            return this->createDefaultGraph(vertices);
         }
 
         // NOTE*** The graph of regions is over the VERTICES of edge connections between two regions (NOT THE 
@@ -94,20 +95,32 @@ namespace brogueHd::component
         short left = std::numeric_limits<short>::max();
         short right = std::numeric_limits<short>::min();
 
-        vertices.forEach([](TNode vertex)
-            {
-                if (vertex.locator.row < top)
-                    top = vertex.locator.row;
+        // Create a lookup to convert from gridLocator to mathPoint
+        simpleHash<TNode, mathPoint<short>> vertexLookup;
+        simpleHash<mathPoint<short>, TNode> nodeLookup;
 
-                if (vertex.locator.row > bottom)
-                    bottom = vertex.locator.row;
+        vertices.forEach([&top, &bottom, &left, &right, &vertexLookup, &nodeLookup](TNode vertex)
+        {
+            if (vertex.row < top)
+                top = vertex.row;
 
-                if (vertex.locator.column < left)
-                    left = vertex.locator.column;
+            if (vertex.row > bottom)
+                bottom = vertex.row;
 
-                if (vertex.locator.column > right)
-                    right = vertex.locator.column;
-            });
+            if (vertex.column < left)
+                left = vertex.column;
+
+            if (vertex.column > right)
+                right = vertex.column;
+
+            // Store these to use later on when creating edges
+            mathPoint<short> point = mathPoint<short>(vertex.column, vertex.row);
+
+            vertexLookup.add(vertex, point);
+            nodeLookup.add(point, vertex);
+
+            return iterationCallback::iterate;
+        });
 
         // NOTE*** NULL VERTEX REFERENCE USED TO IDENTIFY SUPER TRIANGLE
         mathPoint<short> point1(0, 0);
@@ -126,124 +139,138 @@ namespace brogueHd::component
 
         // Add points: one-at-a-time
         //
-        vertices.forEach([&triangles, &badTriangles, &otherBadTriangles](TNode graphVertex)
+        vertices.forEach([&triangles, &badTriangles, &otherBadTriangles, &vertexLookup](TNode graphVertex)
+        {
+            mathPoint<short> vertexPoint = vertexLookup[graphVertex];
+
+            // Find triangles in the mesh whose circum-circle contains the new point
+            //
+            // Remove those triangles from the mesh and return them
+            //
+            badTriangles = triangles.remove([&vertexPoint](triangle<short> triangle)
             {
-                mathPoint<short> vertexPoint(graphVertex.locator.column, graphVertex.locator.row);
-
-                // Find triangles in the mesh whose circum-circle contains the new point
-                //
-                // Remove those triangles from the mesh and return them
-                //
-                badTriangles = triangles.remove([&vertexPoint](triangle<short> triangle)
-                    {
-                        return triangle.circumCircleContains(vertexPoint);
-                    });
-
-                // Use edges from the polygon hole to create new triangles. This should be an "outline" of
-                // the bad triangles. So, use all edges from the bad triangles except for shared edges.
-                //
-                badTriangles.forEach([&otherBadTriangles, &vertexPoint](triangle<short> badTriangle)
-                {
-                    otherBadTriangles = badTriangles.except([](triangle<short> triangle)
-                    {
-                        return triangle == badTriangle;
-                    });
-
-                    bool edge12 = otherBadTriangles.any([&badTriangle](triangle<short> triangle)
-                    {
-                        return triangle.containsEqualEdge(triangle.point1, triangle.point2);
-                    });
-
-                    bool edge23 = otherBadTriangles.any([&badTriangle](triangle<short> triangle)
-                    {
-                        return triangle.containsEqualEdge(triangle.point2, triangle.point3);
-                    });
-
-                    bool edge31 = otherBadTriangles.any([&badTriangle](triangle<short> triangle)
-                    {
-                        return triangle.containsEqualEdge(triangle.point3, triangle.point1);
-                    });
-
-                    // Check Shared Edges 1 -> 2
-                    if (!edge12)
-                        triangles.add(triangle<short>(badTriangle.point1, badTriangle.point2, vertexPoint));
-
-                    // 2 -> 3
-                    if (!edge23)
-                        triangles.add(triangle<short>(badTriangle.point2, badTriangle.point3, vertexPoint));
-
-                    // 3 -> 1
-                    if (!edge31)
-                        triangles.add(triangle<short>(badTriangle.point3, badTriangle.point1, vertexPoint));
-                });
+                return triangle.circumCircleContains(vertexPoint);
             });
 
-        // Create the delaunay graph using distinct edges
-        simpleList<TEdge> delaunayEdges;
-
-        triangles.forEach([&delaunayEdges, &point1, &point2, &point3](triangle<short> triangle)
+            // Use edges from the polygon hole to create new triangles. This should be an "outline" of
+            // the bad triangles. So, use all edges from the bad triangles except for shared edges.
+            //
+            badTriangles.forEach([&otherBadTriangles, &vertexPoint, &badTriangles, &triangles, &vertexLookup](triangle<short> badTriangle)
             {
-                // (Cleaning Up) Remove any edges shared with the "super-triangle" vertices
-                //
-
-                // 1 -> 2
-                if (triangle.point1 != point1 &&
-                    triangle.point2 != point1 &&
-                    triangle.point1 != point2 &&
-                    triangle.point2 != point2 &&
-                    triangle.point1 != point3 &&
-                    triangle.point2 != point3)
+                otherBadTriangles = badTriangles.except([&badTriangle](triangle<short> triangle)
                 {
-                    // Check for equivalent edge
-                    if (!delaunayEdges.any([&triangle](TEdge edge)
-                        {
-                            return edge.isEquivalent(triangle.point1, triangle.point2);
-                        }))
-                    {
-                        delaunayEdges.add(this->graphEdgeConstructor(triangle.point1, triangle.point2));
-                    }
-                }
+                    return triangle == badTriangle;
+                });
+
+                bool edge12 = otherBadTriangles.any([&badTriangle](triangle<short> triangle)
+                {
+                    return triangle.containsEqualEdge(triangle.point1, triangle.point2);
+                });
+
+                bool edge23 = otherBadTriangles.any([&badTriangle](triangle<short> triangle)
+                {
+                    return triangle.containsEqualEdge(triangle.point2, triangle.point3);
+                });
+
+                bool edge31 = otherBadTriangles.any([&badTriangle](triangle<short> triangle)
+                {
+                    return triangle.containsEqualEdge(triangle.point3, triangle.point1);
+                });
+
+                // Check Shared Edges 1 -> 2
+                if (!edge12)
+                    triangles.add(triangle<short>(badTriangle.point1, badTriangle.point2, vertexPoint));
 
                 // 2 -> 3
-                if (triangle.point2 != point1 &&
-                    triangle.point3 != point1 &&
-                    triangle.point2 != point2 &&
-                    triangle.point3 != point2 &&
-                    triangle.point2 != point3 &&
-                    triangle.point3 != point3)
-                {
-                    // Check for equivalent edge
-                    if (!delaunayEdges.any([&triangle](TEdge edge)
-                        {
-                            return edge.isEquivalent(triangle.point2, triangle.point3);
-                        }))
-                    {
-                        delaunayEdges.add(this->graphEdgeConstructor(triangle.point2, triangle.point3));
-                    }
-                }
+                if (!edge23)
+                    triangles.add(triangle<short>(badTriangle.point2, badTriangle.point3, vertexPoint));
 
                 // 3 -> 1
-                if (triangle.point3 != point1 &&
-                    triangle.point1 != point1 &&
-                    triangle.point3 != point2 &&
-                    triangle.point1 != point2 &&
-                    triangle.point3 != point3 &&
-                    triangle.point1 != point3)
-                {
-                    // Check for equivalent edge
-                    if (!delaunayEdges.any([&triangle](TEdge edge)
-                        {
-                            return edge.isEquivalent(triangle.point3, triangle.point1);
-                        }))
-                    {
-                        delaunayEdges.add(this->graphEdgeConstructor(triangle.point3, triangle.point1));
-                    }
-                }
+                if (!edge31)
+                    triangles.add(triangle<short>(badTriangle.point3, badTriangle.point1, vertexPoint));
 
                 return iterationCallback::iterate;
             });
 
+            return iterationCallback::iterate;
+        });
+
+        // Create the delaunay graph using distinct edges
+        simpleList<TEdge> delaunayEdges;
+        delaunayAlgorithm<TNode, TEdge>* that = this;
+
+        triangles.forEach([&delaunayEdges, &point1, &point2, &point3, &that, &nodeLookup](triangle<short> triangle)
+        {
+            // (Cleaning Up) Remove any edges shared with the "super-triangle" vertices
+            //
+
+            // 1 -> 2
+            if (triangle.point1 != point1 &&
+                triangle.point2 != point1 &&
+                triangle.point1 != point2 &&
+                triangle.point2 != point2 &&
+                triangle.point1 != point3 &&
+                triangle.point2 != point3)
+            {
+                // Check for equivalent edge
+                if (!delaunayEdges.any([&triangle](TEdge edge)
+                    {
+                        return edge.isEquivalent(triangle.point1, triangle.point2);
+                    }))
+                {
+                    TNode node1 = nodeLookup[triangle.point1];
+                    TNode node2 = nodeLookup[triangle.point2];
+
+                    delaunayEdges.add(that->edgeConstructor(node1, node2));
+                }
+            }
+
+            // 2 -> 3
+            if (triangle.point2 != point1 &&
+                triangle.point3 != point1 &&
+                triangle.point2 != point2 &&
+                triangle.point3 != point2 &&
+                triangle.point2 != point3 &&
+                triangle.point3 != point3)
+            {
+                // Check for equivalent edge
+                if (!delaunayEdges.any([&triangle](TEdge edge)
+                    {
+                        return edge.isEquivalent(triangle.point2, triangle.point3);
+                    }))
+                {
+                    TNode node2 = nodeLookup[triangle.point2];
+                    TNode node3 = nodeLookup[triangle.point3];
+
+                    delaunayEdges.add(that->edgeConstructor(node2, node3));
+                }
+            }
+
+            // 3 -> 1
+            if (triangle.point3 != point1 &&
+                triangle.point1 != point1 &&
+                triangle.point3 != point2 &&
+                triangle.point1 != point2 &&
+                triangle.point3 != point3 &&
+                triangle.point1 != point3)
+            {
+                // Check for equivalent edge
+                if (!delaunayEdges.any([&triangle](TEdge edge)
+                    {
+                        return edge.isEquivalent(triangle.point3, triangle.point1);
+                    }))
+                {
+                    TNode node3 = nodeLookup[triangle.point3];
+                    TNode node1 = nodeLookup[triangle.point1];
+
+                    delaunayEdges.add(that->edgeConstructor(node3, node1));
+                }
+            }
+
+            return iterationCallback::iterate;
+        });
+
         // Return a new graph with Delaunay edges
-        return new graph<TNode, TEdge>(vertices, delaunayEdges);
+        return new graph<TNode, TEdge>(vertices.getArray(), delaunayEdges.getArray());
     }
 }

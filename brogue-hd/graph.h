@@ -52,10 +52,10 @@ namespace brogueHd::component
     template<graphNodeType TNode, graphEdgeType<TNode> TEdge>
     graph<TNode, TEdge>::graph(const TNode* nodes)
     {
-        TEdge edges[0];
+        TEdge* edges = NULL;
 
-        _nodes = new simpleList<TNode*>(nodes);
-        _edgeCollection = new graphEdgeCollection(nodes, &edges);
+        _nodes = new simpleList<TNode>(nodes);
+        _edgeCollection = new graphEdgeCollection<TNode, TEdge>(nodes, edges);
     }
 
     template<graphNodeType TNode, graphEdgeType<TNode> TEdge>
@@ -113,6 +113,6 @@ namespace brogueHd::component
     template<graphNodeType TNode, graphEdgeType<TNode> TEdge>
     void graph<TNode, TEdge>::iterateEdges(simpleListCallback<TEdge> callback)
     {
-        _edgeCollection->getEdges()->forEach(callback);
+        _edgeCollection->getEdges().forEach(callback);
     }
 }

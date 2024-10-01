@@ -1,5 +1,6 @@
 #pragma once
 
+#include "brogueGlobal.h"
 #include "grid.h"
 #include "gridDefinitions.h"
 #include "simpleBST.h"
@@ -60,7 +61,7 @@ namespace brogueHd::component
 
         ~dijkstra();
 
-        void initialize(T source, T targets[]);
+        void initialize(T source, T* targets);
 
 		/// <summary>
 		/// Runs Dijkstra's algorithm ONCE. WILL NOT RE-RUN.
@@ -125,7 +126,7 @@ namespace brogueHd::component
 														// limit usage of the grid.
 
 		T _sourceLocation;
-		simpleArray<T> _targetLocations;
+		simpleArray<T>* _targetLocations;
 
         grid<short>* _outputMap;
 
@@ -176,35 +177,37 @@ namespace brogueHd::component
 
 		// Must delete the allocated hash table memory
 		_frontier->iterate([](float key, simpleHash<T, T>* value)
-			{
-				delete value; // -> ~simpleBSTNode()
-			});
+		{
+			delete value; // -> ~simpleBSTNode()
+
+			return iterationCallback::iterate;
+		});
 
 		delete _frontier;
 	}
 
 	template<isGridLocator T>
-	void dijkstra<T>::initialize(T source, T targets[])
+	void dijkstra<T>::initialize(T source, T* targets)
 	{
 		_sourceLocation = source;
-		_targetLocations = new simpleArray<T>(&targets);
+		_targetLocations = new simpleArray<T>(targets);
 
 		// Clear out the frontier
 		_frontier->clear();
 
 		// Clear the result
-		_completedPaths.clear();
-		_validPaths.clear();
+		_completedPaths->clear();
+		_validPaths->clear();
 
 		for (int column = _relativeBoundary.left(); column <= _relativeBoundary.right(); column++)
 		{
 			for (int row = _relativeBoundary.top(); row <= _relativeBoundary.bottom(); row++)
 			{
 				// CHECK PREDICATE TO SET MAP COST OFF LIMITS
-				bool passesPredicate = _predicate(column, row);
+				bool passesPredicate = _mapPredicate(column, row);
 
 				// Initialize output map (set to infinity for initialization
-				short outputValue = ((column == _sourceLocation->column) && (row == _sourceLocation->row) && passesPredicate) ? 0 : std::numeric_limits<short>::max();
+				short outputValue = ((column == _sourceLocation.column) && (row == _sourceLocation.row) && passesPredicate) ? 0 : std::numeric_limits<short>::max();
 
 				_outputMap->set(column, row, outputValue);
 
@@ -232,19 +235,19 @@ namespace brogueHd::component
 		// Track goal progress
 		simpleHash<T, bool> goalDict;
 
-		// Not sure about hashing
+		// Initialize goals to false
 		for (int index = 0; index < _targetLocations->size(); index++)
-			goalDict.set(_targetLocations[index], _targetLocations[index]);
+			goalDict.add(_targetLocations->get(index), false);
 
 		// Process the first element
-		short column = _sourceLocation->column;
-		short row = _sourceLocation->row;
+		short column = _sourceLocation.column;
+		short row = _sourceLocation.row;
 
-		T lastLocator = NULL;
+		T lastLocator = default_value<T>::value;
 
 		// Iterate while any target not reached (AND) not visited
 		while (!_visitedMap->get(column, row) &&
-			goalDict.any([](T key, T value)
+				goalDict.any([](T key, bool value)
 				{
 					return !value;
 				}))
@@ -272,43 +275,43 @@ namespace brogueHd::component
 			//
 
 			// CARDINAL LOCATIONS
-			if (north && !_visitedMap->get(column, row - 1) && _predicate(column, row - 1))
+			if (north && !_visitedMap->get(column, row - 1) && _mapPredicate(column, row - 1))
 			{
 				updateOutputMap(currentWeight, column, row - 1, column, row);
 			}
 
-			if (south && !_visitedMap->get(column, row + 1) && _predicate(column, row + 1))
+			if (south && !_visitedMap->get(column, row + 1) && _mapPredicate(column, row + 1))
 			{
 				updateOutputMap(currentWeight, column, row + 1, column, row);
 			}
 
-			if (east && !_visitedMap->get(column + 1, row) && _predicate(column + 1, row))
+			if (east && !_visitedMap->get(column + 1, row) && _mapPredicate(column + 1, row))
 			{
 				updateOutputMap(currentWeight, column + 1, row, column, row);
 			}
 
-			if (west && !_visitedMap->get(column - 1, row) && _predicate(column - 1, row))
+			if (west && !_visitedMap->get(column - 1, row) && _mapPredicate(column - 1, row))
 			{
 				updateOutputMap(currentWeight, column - 1, row, column, row);
 			}
 
 			// NON-CARDINAL LOCATIONS
-			if (!this.ObeyCardinalMovement && north && east && !_visitedMap->get(column + 1, row - 1) && _predicate(column + 1, row - 1))
+			if (!_obeyCardinalMovement && north && east && !_visitedMap->get(column + 1, row - 1) && _mapPredicate(column + 1, row - 1))
 			{
 				updateOutputMap(currentWeight, column + 1, row - 1, column, row);
 			}
 
-			if (!this.ObeyCardinalMovement && north && west && !_visitedMap->get(column - 1, row - 1) && _predicate(column - 1, row - 1))
+			if (!_obeyCardinalMovement && north && west && !_visitedMap->get(column - 1, row - 1) && _mapPredicate(column - 1, row - 1))
 			{
 				updateOutputMap(currentWeight, column - 1, row - 1, column, row);
 			}
 
-			if (!this.ObeyCardinalMovement && south && east && !_visitedMap->get(column + 1, row + 1) && _predicate(column + 1, row + 1))
+			if (!_obeyCardinalMovement && south && east && !_visitedMap->get(column + 1, row + 1) && _mapPredicate(column + 1, row + 1))
 			{
 				updateOutputMap(currentWeight, column + 1, row + 1, column, row);
 			}
 
-			if (!this.ObeyCardinalMovement && south && west && !_visitedMap->get(column - 1, row + 1) && _predicate(column - 1, row + 1))
+			if (!_obeyCardinalMovement && south && west && !_visitedMap->get(column - 1, row + 1) && _mapPredicate(column - 1, row + 1))
 			{
 				updateOutputMap(currentWeight, column - 1, row + 1, column, row);
 			}
@@ -317,14 +320,14 @@ namespace brogueHd::component
 			lastLocator = _locatorCallback(column, row);
 
 			// Get locator from the goal dictionary
-			T goalLocator = goalDict.firstOrDefaultKey([](T key, bool value)
-				{
-					return key.column == lastLocator.column && key.row == lastLocator.row;
-				});
+			T goalLocator = goalDict.firstOrDefaultKey([&lastLocator](T key, bool value)
+			{
+				return key.column == lastLocator.column && key.row == lastLocator.row;
+			});
 
 			// O(1)
-			if (goalLocator != NULL)
-				goalDict[goalLocator] = true;
+			if (goalLocator != default_value<T>::value)
+				goalDict.set(goalLocator, true);
 
 			// Select next location from frontier queue - using the smallest weight
 			if (_frontier->count() > 0)
@@ -336,26 +339,28 @@ namespace brogueHd::component
 				// Get the first from the dictionary
 				// var nextNode = nextCostDict.First();
 
-				T nextNode = NULL;
+				T nextNode = default_value<T>::value;
 
 				// CHECK FOR GOAL LOCATION!
-				goalDict.forEach([](T location, bool value)
+				goalDict.forEach([&nextNode, &nextCostDict](T location, bool value)
+				{
+					if (!value)
 					{
-						if (!value)
+						nextNode = nextCostDict->firstOrDefaultKey([&location](T ckey, T cvalue)
 						{
-							nextNode = nextCostDict->firstOrDefaultKey([&location](T ckey, T cvalue)
-								{
-									return ckey.column == location.column &&
-										ckey.row == location.row;
-								});
+							return ckey.column == location.column &&
+									ckey.row == location.row;
+						});
 
-							if (nextNode != NULL)
-								return iterationCallback::breakAndReturn;
-						}
-					});
+						if (nextNode != default_value<T>::value)
+							return iterationCallback::breakAndReturn;
+					}
+
+					return iterationCallback::iterate;
+				});
 
 				// Otherwise, set to the next location (should be first dictionary key)
-				if (nextNode == NULL)
+				if (nextNode == default_value<T>::value)
 					nextNode = nextCostDict->getAt(0).key;
 
 				// Maintain frontier hash
@@ -374,11 +379,12 @@ namespace brogueHd::component
 		if (!goalDict.any([&lastLocator](T key, bool value)
 			{
 				return key.column == lastLocator.column && key.row == lastLocator.row;
+
 			}) ||
 			goalDict.any([](T key, bool value)
-				{
-					return !value;
-				}))
+			{
+				return !value;
+			}))
 		{
 			brogueException::show("Dijkstra's Map was unable to find the current goal location");
 		}
@@ -386,9 +392,9 @@ namespace brogueHd::component
 		// GENERATE PATHS
 		for (int index = 0; index < _targetLocations->size(); index++)
 		{
-			simpleArray<T> completedPath = generatePath(_targetLocations[index]);
+			simpleArray<T> completedPath = this->generatePath(_targetLocations->get(index));
 
-			_completedPaths->add(_targetLocations[index], completedPath);
+			_completedPaths->add(_targetLocations->get(index), completedPath);
 		}
 
 		_finished = true;
@@ -415,7 +421,7 @@ namespace brogueHd::component
 		result.add(targetLocation);
 
 		// Validate
-		bool valid = _predicate(targetLocation.column, targetLocation.row);
+		bool valid = _mapPredicate(targetLocation.column, targetLocation.row);
 
 		if (!valid)
 			brogueException::show("Invalid target location:  dijkstra<T>::generatePath(...)");
@@ -501,7 +507,7 @@ namespace brogueHd::component
 				result.add(lowestWeightLocation);
 
 				// VAILDATE
-				valid &= _predicate(lowestWeightLocation.column, lowestWeightLocation.row);
+				valid &= _mapPredicate(lowestWeightLocation.column, lowestWeightLocation.row);
 
 				if (!valid)
 					brogueException::show("Invalid path found:  dijkstra.generatePath");
@@ -514,15 +520,15 @@ namespace brogueHd::component
 		}
 
 		// VAILDATE
-		valid &= _predicate(goalLocation.column, goalLocation.row);
+		valid &= _mapPredicate(goalLocation.column, goalLocation.row);
 
 		// NOTE:  ADD SOURCE LOCATION FOR INCLUSIVE PATH (not needed)
 
 		// Reverse the path to build a result array
-		simpleArray<T> resultArray(result.size());
+		simpleArray<T> resultArray(result.count());
 
-		for (int index = result.size() - 1; index >= 0; index--)
-			resultArray[result.size() - 1 - index] = result[index];
+		for (int index = result.count() - 1; index >= 0; index--)
+			resultArray[result.count() - 1 - index] = result[index];
 
 		return resultArray;
 	}
@@ -608,7 +614,7 @@ namespace brogueHd::component
 			simpleHash<T, T>* oldList = _frontier->search(oldWeight);
 			simpleHash<T, T>* newList = new simpleHash<T, T>();
 
-			newList->insert(destLocator, destLocator);
+			newList->add(destLocator, destLocator);
 
 			// Check for existing locator
 			if (oldList->contains(destLocator))
@@ -630,7 +636,7 @@ namespace brogueHd::component
 
 			// Locator doesn't exist in list
 			if (!newList->contains(destLocator))
-				newList->insert(destLocator, destLocator);
+				newList->add(destLocator, destLocator);
 		}
 
 		// Both old and new weight lists exist
@@ -643,15 +649,15 @@ namespace brogueHd::component
 			if (oldList != newList)
 			{
 				// Check that old weight list has element removed
-				if (oldList->containsKey(destLocator))
+				if (oldList->contains(destLocator))
 					oldList->remove(destLocator);
 
 				if (oldList->count() == 0)
 					_frontier->remove(oldWeight);
 
 				// Check that new weight list has element added
-				if (!newList->containsKey(destLocator))
-					newList->insert(destLocator, destLocator);
+				if (!newList->contains(destLocator))
+					newList->add(destLocator, destLocator);
 			}
 		}
 	}

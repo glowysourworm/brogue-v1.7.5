@@ -38,11 +38,11 @@ namespace brogueHd::component
 	{
 	public:
 		simpleList();
-		simpleList(T* anArray);
+		simpleList(const T* anArray);
 		simpleList(const simpleList<T>& copy);
 		~simpleList();
 
-		T operator[](int index);
+		T operator[](int index) const;
 
 		T get(int index) const;
 		int count() const;
@@ -62,36 +62,36 @@ namespace brogueHd::component
 	public:
 
 		// Container Selectors
-		T* getArray();
+		T* getArray() const;
 
-		bool contains(T item);
+		bool contains(T item) const;
 
 		// Queries
 
 		simpleList<T> remove(simpleListPredicate<T> predicate);
-		simpleList<T> except(simpleListPredicate<T> predicate);
+		simpleList<T> except(simpleListPredicate<T> predicate) const;
 
-		T first(simpleListPredicate<T> predicate);
-		bool any(simpleListPredicate<T> predicate);
-		void forEach(simpleListCallback<T> callback);
-		simpleList<T> where(simpleListPredicate<T> predicate);
+		T first(simpleListPredicate<T> predicate) const;
+		bool any(simpleListPredicate<T> predicate) const;
+		void forEach(simpleListCallback<T> callback) const;
+		simpleList<T> where(simpleListPredicate<T> predicate) const;
 		
 		// Selectors
 
 		template<typename TResult>
-		simpleList<TResult> select(simpleListSelector<T, TResult> selector);
+		simpleList<TResult> select(simpleListSelector<T, TResult> selector) const;
 
 		template<typename TResult>
-		TResult max(simpleListSelector<T, TResult> selector);
+		TResult max(simpleListSelector<T, TResult> selector) const;
 
 		template<typename TResult>
-		TResult min(simpleListSelector<T, TResult> selector);
+		TResult min(simpleListSelector<T, TResult> selector) const;
 
 		template<typename TResult>
-		T withMin(simpleListSelector<T, TResult> selector);
+		T withMin(simpleListSelector<T, TResult> selector) const;
 
 		template<typename TResult>
-		T withMax(simpleListSelector<T, TResult> selector);
+		T withMax(simpleListSelector<T, TResult> selector) const;
 
 	private:
 
@@ -113,7 +113,7 @@ namespace brogueHd::component
 		_sizeAlloc = 0;
 	}
 	template<typename T>
-	simpleList<T>::simpleList(T* anArray)
+	simpleList<T>::simpleList(const T* anArray)
 	{
 		_list = NULL;
 		_size = 0;
@@ -146,7 +146,7 @@ namespace brogueHd::component
 	}
 
 	template<typename T>
-	T simpleList<T>::operator[](int index)
+	T simpleList<T>::operator[](int index) const
 	{
 		return _list[index];
 	}
@@ -282,7 +282,7 @@ namespace brogueHd::component
 	}
 
 	template<typename T>
-	bool simpleList<T>::contains(T item)
+	bool simpleList<T>::contains(T item) const
 	{
 		for (int index = 0; index < _size; index++)
 		{
@@ -294,14 +294,14 @@ namespace brogueHd::component
 	}
 
 	template<typename T>
-	T* simpleList<T>::getArray()
+	T* simpleList<T>::getArray() const
 	{
 		return _list;
 	}
 
 	template<typename T>
 	template<typename TResult>
-	simpleList<TResult> simpleList<T>::select(simpleListSelector<T, TResult> selector)
+	simpleList<TResult> simpleList<T>::select(simpleListSelector<T, TResult> selector) const
 	{
 		simpleList<TResult> result;
 
@@ -332,7 +332,7 @@ namespace brogueHd::component
 	}
 
 	template<typename T>
-	simpleList<T> simpleList<T>::except(simpleListPredicate<T> predicate)
+	simpleList<T> simpleList<T>::except(simpleListPredicate<T> predicate) const
 	{
 		simpleList<T> result;
 
@@ -346,7 +346,7 @@ namespace brogueHd::component
 	}
 
 	template<typename T>
-	void simpleList<T>::forEach(simpleListCallback<T> callback)
+	void simpleList<T>::forEach(simpleListCallback<T> callback) const
 	{
 		for (int index = 0; index < _size; index++)
 		{
@@ -356,7 +356,7 @@ namespace brogueHd::component
 	}
 
 	template<typename T>
-	T simpleList<T>::first(simpleListPredicate<T> predicate)
+	T simpleList<T>::first(simpleListPredicate<T> predicate) const
 	{
 		for (int index = 0; index < _size; index++)
 		{
@@ -364,11 +364,11 @@ namespace brogueHd::component
 				return _list[index];
 		}
 
-		return NULL;
+		return default_value<T>::value;
 	}
 
 	template<typename T>
-	bool simpleList<T>::any(simpleListPredicate<T> predicate)
+	bool simpleList<T>::any(simpleListPredicate<T> predicate) const
 	{
 		for (int index = 0; index < _size; index++)
 		{
@@ -380,7 +380,7 @@ namespace brogueHd::component
 	}
 
 	template<typename T>
-	simpleList<T> simpleList<T>::where(simpleListPredicate<T> predicate)
+	simpleList<T> simpleList<T>::where(simpleListPredicate<T> predicate) const
 	{
 		simpleList<T> result;
 
@@ -395,16 +395,16 @@ namespace brogueHd::component
 
 	template<typename T>
 	template<typename TResult>
-	TResult simpleList<T>::max(simpleListSelector<T, TResult> selector)
+	TResult simpleList<T>::max(simpleListSelector<T, TResult> selector) const
 	{
-		TResult max = NULL;
+		TResult max = default_value<T>::value;
 		int maxIndex = -1;
 
 		for (int index = 0; index < _size; index++)
 		{
 			TResult current = selector(_list[index]);
 
-			if (max == NULL)
+			if (max == default_value<T>::value)
 			{
 				max = current;
 				maxIndex = index;
@@ -422,16 +422,16 @@ namespace brogueHd::component
 
 	template<typename T>
 	template<typename TResult>
-	TResult simpleList<T>::min(simpleListSelector<T, TResult> selector)
+	TResult simpleList<T>::min(simpleListSelector<T, TResult> selector) const
 	{
-		TResult min = NULL;
+		TResult min = default_value<T>::value;
 		int minIndex = -1;
 
 		for (int index = 0; index < _size; index++)
 		{
 			TResult current = selector(_list[index]);
 
-			if (min == NULL)
+			if (min == default_value<T>::value)
 			{
 				min = current;
 				minIndex = index;
@@ -449,16 +449,16 @@ namespace brogueHd::component
 
 	template<typename T>
 	template<typename TResult>
-	T simpleList<T>::withMin(simpleListSelector<T, TResult> selector)
+	T simpleList<T>::withMin(simpleListSelector<T, TResult> selector) const
 	{
-		TResult min = NULL;
+		TResult min = default_value<T>::value;
 		int minIndex = -1;
 
 		for (int index = 0; index < _size; index++)
 		{
 			TResult value = selector(_list[index]);
 
-			if (min == NULL)
+			if (min == default_value<T>::value)
 			{
 				min = value;
 				minIndex = index;
@@ -471,21 +471,21 @@ namespace brogueHd::component
 			}
 		}
 
-		return min == NULL ? NULL : _list[minIndex];
+		return min == default_value<T>::value ? default_value<T>::value : _list[minIndex];
 	}
 
 	template<typename T>
 	template<typename TResult>
-	T simpleList<T>::withMax(simpleListSelector<T, TResult> selector)
+	T simpleList<T>::withMax(simpleListSelector<T, TResult> selector) const
 	{
-		TResult max = NULL;
+		TResult max = default_value<TResult>::value;
 		int maxIndex = -1;
 
 		for (int index = 0; index < _size; index++)
 		{
 			TResult current = selector(_list[index]);
 
-			if (max == NULL)
+			if (max == default_value<TResult>::value)
 			{
 				max = current;
 				maxIndex = index;
@@ -498,6 +498,10 @@ namespace brogueHd::component
 			}
 		}
 
-		return max == NULL ? NULL : _list[maxIndex];
+		if (max == default_value<TResult>::value)
+			return default_value<T>::ctor();
+
+		else
+			return _list[maxIndex];
 	}
 }

@@ -66,6 +66,15 @@ namespace brogueHd::backend::model::game
 					rand == color.rand &&
 					colorDances == color.colorDances;
 		}
+		bool operator ==(const color& color)
+		{
+			return compare(color);
+		}
+		bool operator !=(const color& color)
+		{
+			return !compare(color);
+		}
+
 		size_t getHash() const override
 		{
 			return 0;

@@ -46,5 +46,18 @@ namespace brogueHd::backend::model::game
 			frequency = afrequency;
 			corridorChance = acorridorChance;
 		}
+
+		bool operator==(const brogueRoomInfo& info)
+		{
+			return type == info.type &&
+				   frequency == info.frequency &&
+				   corridorChance == info.corridorChance;
+		}
+		bool operator!=(const brogueRoomInfo& info)
+		{
+			return type != info.type ||
+				   frequency != info.frequency ||
+				   corridorChance != info.corridorChance;
+		}
 	};
 }

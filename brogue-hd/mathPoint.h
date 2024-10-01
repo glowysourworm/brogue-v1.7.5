@@ -1,9 +1,11 @@
 #pragma once
 
+#include "brogueGlobal.h"
+
 namespace brogueHd::component::math
 {
 	template<typename T>
-	struct mathPoint
+	struct mathPoint : hashable
 	{
 		T x;
 		T y;
@@ -24,12 +26,10 @@ namespace brogueHd::component::math
 			y = ay;
 		}
 
-		mathPoint<T>& operator =(const mathPoint<T>& copy)
+		void operator =(const mathPoint<T>& copy)
 		{
 			x = copy.x;
 			y = copy.y;
-
-			return this;
 		}
 
 		bool operator != (const mathPoint<T>& point)
@@ -40,5 +40,12 @@ namespace brogueHd::component::math
 		{
 			return x == point.x && y == point.y;
 		}
+
+		size_t getHash() const override
+		{
+			return hashGenerator::generateHash(x, y);
+		}
 	};
 }
+
+MAKE_HASHABLE_STRUCT(brogueHd::component::math::mathPoint<short>);

@@ -39,6 +39,15 @@ namespace brogueHd::component
 			key = akey;
 			value = avalue;
 		}
+
+		bool operator==(const simplePair& pair)
+		{
+			return pair.key == key && pair.value == value;
+		}
+		bool operator!=(const simplePair& pair)
+		{
+			return pair.key != key || pair.value != value;
+		}
 	};
 
 	template<typename K, typename V>
@@ -49,9 +58,11 @@ namespace brogueHd::component
 		~simpleHash();
 
 		V operator[](K key) const;
+		void operator=(V value);
 
-		V get(K key);
+		V get(K key) const;
 		void add(K key, V value);
+		void set(K key, V value);
 
 		simplePair<K,V> getAt(int index);
 
@@ -59,6 +70,7 @@ namespace brogueHd::component
 		int count() const;
 
 		bool remove(K key);
+		void clear();
 
 		void iterate(simpleHashCallback<K, V> callback) const;
 
@@ -83,6 +95,7 @@ namespace brogueHd::component
 		//V getValueAt(const std::map<K, V>& map, int index);
 
 		simpleList<K> getKeys() const;
+		simpleList<V> getValues() const;
 
 	private:
 
@@ -94,6 +107,9 @@ namespace brogueHd::component
 
 		// Bucket Sizes (prevents iteration of bucket lists during set(..))
 		int _maxBucketSize;
+
+		// Used to have a set indexer (e.g. hash[key] = newVal;)
+		K _indexerKey;
 	};
 
 	template<typename K, typename V>
@@ -112,7 +128,16 @@ namespace brogueHd::component
 	}
 
 	template<typename K, typename V>
-	V simpleHash<K, V>::get(K key)
+	void simpleHash<K, V>::clear()
+	{
+		simpleList<K> keys = this->getKeys();
+
+		for (int index = 0; index < keys.count(); index++)
+			this->remove(keys[index]);
+	}
+
+	template<typename K, typename V>
+	V simpleHash<K, V>::get(K key) const
 	{
 		int hashCode = this->calculateHashCode(key);
 		int bucketIndex = this->calculateBucketIndex(hashCode);
@@ -136,12 +161,25 @@ namespace brogueHd::component
 	template<typename K, typename V>
 	V simpleHash<K, V>::operator[](K key) const
 	{
+		// Setup for the = operator
+		_indexerKey = key;
+
 		return this->get(key).value;
+	}
+
+	template<typename K, typename V>
+	void simpleHash<K, V>::operator=(V value)
+	{
+		if (_indexerKey != default_value<K>::value)
+			this->set(_indexerKey, value);
 	}
 
 	template<typename K, typename V>
 	void simpleHash<K, V>::add(K key, V value)
 	{
+		if (this->contains(key))
+			brogueException::show("Trying to add duplicate value to simpleHash table. Use set(...)");
+
 		// First rehash will give 100 buckets
 		if (_table->size() == 0)
 			rehash(100);
@@ -171,6 +209,31 @@ namespace brogueHd::component
 
 		_table->get(bucketIndex)->add(pair);
 		_list->add(pair);
+	}
+
+	template<typename K, typename V>
+	void simpleHash<K, V>::set(K key, V value)
+	{
+		if (!this->contains(key))
+			brogueException::show("Trying to set value for a key-value pair that doesn't exist. Use add(...)");
+
+		V oldValue = this->get(key);
+
+		// Iterate to find the location in the ith bucket
+		int hashCode = this->calculateHashCode(key);
+		int bucketIndex = this->calculateBucketIndex(hashCode);
+
+		// Iterate to set the item value
+		for (int index = 0; index < _table->get(bucketIndex)->count(); index++)
+		{
+			if (_table->get(bucketIndex)->get(index).value == oldValue)
+			{
+				simplePair<K,V> pair = _table->get(bucketIndex)->get(index);
+
+				pair.value = value;
+				break;
+			}
+		}
 	}
 
 	template<typename K, typename V>
@@ -359,15 +422,15 @@ namespace brogueHd::component
 	void simpleHash<K, V>::forEach(simpleHashCallback<K, V> callback)
 	{
 		this->iterate([&callback](K key, V value)
-			{
-				return callback(key, value);
-			});
+		{
+			return callback(key, value);
+		});
 	}
 
 	template<typename K, typename V>
 	K simpleHash<K, V>::firstOrDefaultKey(simpleHashPredicate<K, V> predicate)
 	{
-		K result = NULL;
+		K result = default_value<K>::value;
 
 		this->iterate([&result, &predicate](K key, V value)
 			{
@@ -404,6 +467,21 @@ namespace brogueHd::component
 		this->iterate([&result](K key, V value)
 		{
 			result.add(key);
+
+			return iterationCallback::iterate;
+		});
+
+		return result;
+	}
+
+	template<typename K, typename V>
+	simpleList<V> simpleHash<K, V>::getValues() const
+	{
+		simpleList<V> result;
+
+		this->iterate([&result](K key, V value)
+		{
+			result.add(value);
 
 			return iterationCallback::iterate;
 		});

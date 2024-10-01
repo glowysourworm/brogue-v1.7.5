@@ -6,11 +6,11 @@
 
 namespace brogueHd::component
 {
-	template<isGridLocatorNode TNode, isGridLocatorEdge TEdge>
+	template<isGridLocatorNode TNode, isGridLocatorEdge<TNode> TEdge>
 	class graphAlgorithm
 	{
 	public:
-
+        graphAlgorithm(){};
 		graphAlgorithm(graphEdgeConstructor<TNode, TEdge> graphEdgeConstructor);
 		~graphAlgorithm();
 
@@ -26,31 +26,36 @@ namespace brogueHd::component
 		/// </summary>
 		graph<TNode, TEdge>* createDefaultGraph(const simpleList<TNode>& vertices);
 
+        /// <summary>
+        /// Delegate that constructs the proper node type
+        /// </summary>
+        //graphNodeConstructor<TNode, TEdge> nodeConstructor;
+
 		/// <summary>
 		/// Delegate that constructs the proper edge type
 		/// </summary>
 		graphEdgeConstructor<TNode, TEdge> edgeConstructor;
 	};
 
-    template<isGridLocatorNode TNode, isGridLocatorEdge TEdge>
+    template<isGridLocatorNode TNode, isGridLocatorEdge<TNode> TEdge>
     graphAlgorithm<TNode, TEdge>::graphAlgorithm(graphEdgeConstructor<TNode, TEdge> edgeConstructor)
     {
         this->edgeConstructor = edgeConstructor;
     }
 
-    template<isGridLocatorNode TNode, isGridLocatorEdge TEdge>
+    template<isGridLocatorNode TNode, isGridLocatorEdge<TNode> TEdge>
     graphAlgorithm<TNode, TEdge>::~graphAlgorithm()
     {
 
     }
 
-    template<isGridLocatorNode TNode, isGridLocatorEdge TEdge>
+    template<isGridLocatorNode TNode, isGridLocatorEdge<TNode> TEdge>
     graph<TNode, TEdge>* run(const simpleList<TNode>& vertices)
     {
         // Overridden in child class
     }
 
-    template<isGridLocatorNode TNode, isGridLocatorEdge TEdge>
+    template<isGridLocatorNode TNode, isGridLocatorEdge<TNode> TEdge>
     graph<TNode, TEdge>* graphAlgorithm<TNode, TEdge>::createDefaultGraph(const simpleList<TNode>& vertices)
     {
         if (vertices.count() == 0)
@@ -58,7 +63,7 @@ namespace brogueHd::component
 
         else if (vertices.count() == 1)
         {
-            return new graph<TNode, TEdge>(vertices);
+            return new graph<TNode, TEdge>(vertices.getArray());
         }
 
         else
@@ -71,7 +76,7 @@ namespace brogueHd::component
                 edges.add(that->edgeConstructor(node1, node2));
             });
 
-            return new graph<TNode, TEdge>(vertices, edges.data());
+            return new graph<TNode, TEdge>(vertices.getArray(), edges.getArray());
         }
     }
 }

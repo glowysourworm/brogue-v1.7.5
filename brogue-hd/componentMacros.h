@@ -17,6 +17,18 @@ namespace brogueHd
     template<typename T> struct default_value
     {
         inline static const T value = T();
+        inline static T ctor()
+        {
+            return T();
+        }
+
+        /// <summary>
+        /// Calls default constructor for new value of type T
+        /// </summary>
+        //inline static T ctor()
+        //{
+        //    return T();
+        //}
     };
 
     //#define MAKE_DEFAULT_VALUE(type)							\

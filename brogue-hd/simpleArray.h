@@ -36,7 +36,10 @@ namespace brogueHd::component
 
 		T get(int index);
 		T operator[](int index) const;
-		T& operator[](int index);
+		T& operator[](int index);		
+
+		// This may be required for simpleHash->set
+		//void operator=(const simpleArray<T>& other);
 
 		void set(int index, T value);		
 		bool contains(T item);
@@ -78,6 +81,8 @@ namespace brogueHd::component
 	simpleArray<T>::~simpleArray()
 	{
 		delete[] _array;
+
+		_size = 0;
 	}
 
 	template<typename T>

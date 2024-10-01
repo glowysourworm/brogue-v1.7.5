@@ -43,18 +43,18 @@ namespace brogueHd::component
 		gridRect getBoundary() const;
 		gridRect getParentBoundary() const;
 		gridRect getLargestSubRectangle() const;
-		simpleArray<T>* getLocations();
-		simpleArray<T>* getEdgeLocations();
+		simpleArray<T> getLocations();
+		simpleArray<T> getEdgeLocations();
 
 		/// <summary>
 		/// Checks for location overlap
 		/// </summary>
-		bool overlaps(const gridRegion<T>& region);
+		bool overlaps(const gridRegion<T>& region) const;
 
 		/// <summary>
 		/// Copies grid region to another grid
 		/// </summary>
-		void copyTo(grid<T>& grid);
+		void copyTo(grid<T>& grid) const;
 
 	public:
 
@@ -81,22 +81,22 @@ namespace brogueHd::component
 		/// <summary>
 		/// Iterates the edge locations of the region and calls the user method
 		/// </summary>
-		void iterateEdges(gridCallback<T> callback);
+		void iterateEdges(gridCallback<T> callback) const;
 
 		/// <summary>
 		/// Gets locations with an exposed edge in the specified direction
 		/// </summary>
-		simpleArray<T>* getEdges(brogueCompass direction);
+		simpleArray<T> getEdges(brogueCompass direction);
 
 		/// <summary>
 		/// Gets the locations that are also along the bounding rectangle
 		/// </summary>
-		simpleArray<T>* getBoundaryEdges(brogueCompass direction);
+		simpleArray<T> getBoundaryEdges(brogueCompass direction);
 
 		/// <summary>
 		/// Gets locations with exposed corner
 		/// </summary>
-		simpleArray<T>* getCorners(brogueCompass nonCardinalDirection);
+		simpleArray<T> getCorners(brogueCompass nonCardinalDirection);
 
 	private:
 
@@ -278,68 +278,80 @@ namespace brogueHd::component
 	}
 
 	template<isGridLocator T>
-	simpleArray<T>* gridRegion<T>::getLocations()
+	simpleArray<T> gridRegion<T>::getLocations()
 	{
-		return _locations;
+		return *_locations;
 	}
 
 	template<isGridLocator T>
-	simpleArray<T>* gridRegion<T>::getEdgeLocations()
+	simpleArray<T> gridRegion<T>::getEdgeLocations()
 	{
-		return _edgeLocations;
+		return *_edgeLocations;
 	}
 
 	template<isGridLocator T>
-	simpleArray<T>* gridRegion<T>::getEdges(brogueCompass direction)
+	simpleArray<T> gridRegion<T>::getEdges(brogueCompass direction)
 	{
 		switch (direction)
 		{
 		case brogueCompass::N:
-			return _northExposedLocations;
+			return *_northExposedLocations;
 		case brogueCompass::S:
-			return _southExposedLocations;
+			return *_southExposedLocations;
 		case brogueCompass::E:
-			return _eastExposedLocations;
+			return *_eastExposedLocations;
 		case brogueCompass::W:
-			return _westExposedLocations;
+			return *_westExposedLocations;
 		default:
 			brogueException::show("Must use cardinal direction for gridRegion<>::getEdges");
 		}
 	}
 
 	template<isGridLocator T>
-	simpleArray<T>* gridRegion<T>::getBoundaryEdges(brogueCompass direction)
+	simpleArray<T> gridRegion<T>::getBoundaryEdges(brogueCompass direction)
 	{
 		gridRect boundary = this->getBoundary();
 
 		switch (direction)
 		{
 		case brogueCompass::N:
-			return _northExposedLocations->where([&boundary](T item) { return item.row == boundary.top(); });
+			return _northExposedLocations->where([&boundary](T item) 
+			{ 
+				return item.column == boundary.top(); 
+			});
 		case brogueCompass::S:
-			return _southExposedLocations->where([&boundary](T item) { return item.row == boundary.bottom(); });
+			return _southExposedLocations->where([&boundary](T item) 
+			{ 
+				return item.column == boundary.bottom(); 
+			});
 		case brogueCompass::E:
-			return _eastExposedLocations->where([&boundary](T item) { return item.row == boundary.right(); });
+			return _eastExposedLocations->where([&boundary](T item) 
+			{ 
+				return item.row == boundary.right(); 
+			});
 		case brogueCompass::W:
-			return _westExposedLocations->where([&boundary](T item) { return item.row == boundary.left(); });
+			return _westExposedLocations->where([&boundary](T item) 
+			{ 
+				return item.row == boundary.left(); 
+			});
 		default:
 			brogueException::show("Must use cardinal direction for gridRegion<>::getEdges");
 		}
 	}
 
 	template<isGridLocator T>
-	simpleArray<T>* gridRegion<T>::getCorners(brogueCompass nonCardinalDirection)
+	simpleArray<T> gridRegion<T>::getCorners(brogueCompass nonCardinalDirection)
 	{
 		switch (nonCardinalDirection)
 		{
 		case brogueCompass::NE:
-			return _northEastCornerLocations;
+			return *_northEastCornerLocations;
 		case brogueCompass::NW:
-			return _northWestCornerLocations;
+			return *_northWestCornerLocations;
 		case brogueCompass::SE:
-			return _southEastCornerLocations;
+			return *_southEastCornerLocations;
 		case brogueCompass::SW:
-			return _southWestCornerLocations;
+			return *_southWestCornerLocations;
 		default:
 			brogueException::show("Must use non cardinal direction for gridRegion<>::getCorners");
 		}
@@ -373,7 +385,7 @@ namespace brogueHd::component
 	}
 
 	template<isGridLocator T>
-	void gridRegion<T>::iterateEdges(gridCallback<T> callback)
+	void gridRegion<T>::iterateEdges(gridCallback<T> callback) const
 	{
 		_edgeLocations->forEach([&callback](T item)
 		{
@@ -382,26 +394,28 @@ namespace brogueHd::component
 	}
 
 	template<isGridLocator T>
-	bool gridRegion<T>::overlaps(const gridRegion<T>& region)
+	bool gridRegion<T>::overlaps(const gridRegion<T>& region) const
 	{
 		bool overlap = false;
 
 		this->iterateLocations([&region, &overlap](short column, short row, T item)
-			{
-				if (region.isDefined(column, row))
-					return iterationCallback::breakAndReturn;
-			});
+		{
+			if (region.isDefined(column, row))
+				return iterationCallback::breakAndReturn;
+		});
 
 		return overlap;
 	}
 
 	template<isGridLocator T>
-	void gridRegion<T>::copyTo(grid<T>& grid)
+	void gridRegion<T>::copyTo(grid<T>& grid) const
 	{
 		this->iterateLocations([&grid](short column, short row, T item)
-			{
-				grid.set(column, row, item);
-			});
+		{
+			grid.set(column, row, item);
+
+			return iterationCallback::iterate;
+		});
 	}
 }
 

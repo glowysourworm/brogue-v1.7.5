@@ -62,6 +62,9 @@ namespace brogueHd::component
         void insert(K key, T value);
         bool remove(K key);
         bool containsKey(K key);
+        int count() const;
+
+        void iterate(simpleHashCallback<K, T> callback) const;
 
         T get(K key);
         T search(K key);
@@ -70,6 +73,8 @@ namespace brogueHd::component
         K minKey();
         T max();
         K maxKey();
+
+        void clear();
 
     private:
 
@@ -99,14 +104,14 @@ namespace brogueHd::component
         simpleBSTNode<K, T>* _root;
 
         // Map for boosting performance for direct key lookup
-        simpleHash<K, T>* _nodeMap;
+        simpleHash<K, simpleBSTNode<K, T>*>* _nodeMap;
     };
 
     template<isComparable K, typename T>
     simpleBST<K, T>::simpleBST()
     {
         // Track values to boost performance for direct lookups
-        _nodeMap = new simpleHash<K, simpleBSTNode<K, T>>();
+        _nodeMap = new simpleHash<K, simpleBSTNode<K, T>*>();
 
         _root = NULL;
     }
@@ -114,11 +119,19 @@ namespace brogueHd::component
     template<isComparable K, typename T>
     simpleBST<K, T>::~simpleBST()
     {
-        // Delete nodes recursively
-        if (_root != NULL)
-            _root = this->remove(_root);
+        this->clear();
 
         delete _nodeMap;
+    }
+
+    template<isComparable K, typename T>
+    void simpleBST<K, T>::clear()
+    {
+        // Delete nodes recursively
+        if (_root != NULL)
+            this->remove(_root->key);
+
+        _nodeMap->clear();
     }
 
     template<isComparable K, typename T>
@@ -148,9 +161,24 @@ namespace brogueHd::component
     }
 
     template<isComparable K, typename T>
+    int simpleBST<K, T>::count() const
+    {
+        return _nodeMap->count();
+    }
+
+    template<isComparable K, typename T>
     bool simpleBST<K, T>::containsKey(K key)
     {
         return _nodeMap->contains(key);
+    }
+
+    template<isComparable K, typename T>
+    void simpleBST<K, T>::iterate(simpleHashCallback<K, T> callback) const
+    {
+        _nodeMap->iterate([&callback](K key, simpleBSTNode<K, T>* node)
+        {
+            return callback(key, node->value);
+        });
     }
 
     template<isComparable K, typename T>
