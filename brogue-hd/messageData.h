@@ -23,7 +23,7 @@ namespace brogueHd::backend::model::game
 			// Check message length
 			//brogueAssert(SIZEOF(amessage) <= COLS * 2);
 
-			if (SIZEOF(amessage) > COLS * 2)
+			if (sizeof(amessage) > COLS * 2)
 				brogueException::show("Message is outside the bounds of the display:  messageData.h");
 
 			message = colorString(amessage, textColor);

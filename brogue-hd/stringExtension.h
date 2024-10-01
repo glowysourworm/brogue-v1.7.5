@@ -44,18 +44,19 @@ namespace brogueHd::component
 		{
 			std::vector<std::string> result;
 
-			for (int index = 0; index < SIZEOF(strings); index++)
+			for (int index = 0; index < sizeof(strings); index++)
 			{
 				result.push_back(std::string(strings[index]));
 			}
 
 			return result;
 		}
-		static std::string join(char** strings)
+		static std::string join(char* strings[], int arrayLength)
 		{
 			std::string result;
+			
 
-			for (int index = 0; index < SIZEOF(strings); index++)
+			for (int index = 0; index < arrayLength; index++)
 			{
 				result += strings[index];
 			}
@@ -72,27 +73,27 @@ namespace brogueHd::component
 
 			return true;
 		}
-		static std::string* split(const std::string& input, const char* tokens)
+		static simpleArray<std::string> split(const std::string& input, const char* tokens)
 		{	
 			simpleList<std::string> result;
 			simpleList<std::string> list;
 			
 			list.add(input);
 
-			for (int index = 0; index < SIZEOF(tokens); index++)
+			for (int index = 0; index < sizeof(tokens); index++)
 			{
 				for (int listIndex = 0; listIndex < list.count(); listIndex++)
 				{
 					int lastIndex = -1;
 
 					// Scan the string for the next token
-					for (int strIndex = 0; strIndex < list[listIndex].size(); strIndex++)
+					for (int strIndex = 0; strIndex < list.get(listIndex).size(); strIndex++)
 					{
 						// Found token!
-						if (list[listIndex].at(strIndex) == tokens[index])
+						if (list.get(listIndex).at(strIndex) == tokens[index])
 						{
-							std::string subString = (lastIndex == -1) ? list[listIndex].substr(0, strIndex) : 
-																		list[listIndex].substr(lastIndex, strIndex - lastIndex);
+							std::string subString = (lastIndex == -1) ? list.get(listIndex).substr(0, strIndex) : 
+																		list.get(listIndex).substr(lastIndex, strIndex - lastIndex);
 
 							// Remove white space
 							if (!isWhitespace(subString))
@@ -104,11 +105,11 @@ namespace brogueHd::component
 
 					// No match found
 					if (lastIndex == -1)
-						result.add(list[listIndex]);
+						result.add(list.get(listIndex));
 				}
 
 				// Setup results for next iteration
-				if (index < SIZEOF(tokens) - 1)
+				if (index < sizeof(tokens) - 1)
 				{
 					list.clear();
 					list.addRange(result);
@@ -117,7 +118,7 @@ namespace brogueHd::component
 				}
 			}
 			
-			return result.getArray();
+			return result.toArray();
 		}
 	};
 }

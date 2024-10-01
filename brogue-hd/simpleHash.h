@@ -129,7 +129,7 @@ namespace brogueHd::component
 		simpleList<K> keys = this->getKeys();
 
 		for (int index = 0; index < keys.count(); index++)
-			this->remove(keys[index]);
+			this->remove(keys.get(index));
 	}
 
 	template<typename K, typename V>
@@ -167,7 +167,7 @@ namespace brogueHd::component
 			brogueException::show("Trying to add duplicate value to simpleHash table. Use set(...)");
 
 		// First rehash will give 100 buckets
-		if (_table->size() == 0)
+		if (_table->count() == 0)
 			rehash(100);
 
 		// Decision to rehash:
@@ -177,11 +177,11 @@ namespace brogueHd::component
 		//  3) Log_e  -> Ln -> (~6.9, 1000); (~13.8, 1000000). That's much less aggressive.
 		//
 
-		if (_maxBucketSize > log(_table->size()))
+		if (_maxBucketSize > log(_table->count()))
 		{
 			// Multiply the bucket size by e ~ 2.718281828
 			//
-			rehash(_table->size() * (int)exp(1));
+			rehash(_table->count() * (int)exp(1));
 		}
 
 		// If there's still overflow, the max size will be set for the next call to set(..)
@@ -265,7 +265,7 @@ namespace brogueHd::component
 	template<typename K, typename V>
 	int simpleHash<K, V>::calculateBucketIndex(int hashCode) const
 	{
-		return hashCode % _table->size();
+		return hashCode % _table->count();
 	}
 
 	template<typename K, typename V>
@@ -293,7 +293,7 @@ namespace brogueHd::component
 	template<typename K, typename V>
 	void simpleHash<K, V>::iterate(simpleHashCallback<K, V> callback) const
 	{
-		for (int index = 0; index < _table->size(); index++)
+		for (int index = 0; index < _table->count(); index++)
 		{
 			for (int bucketIndex = 0; bucketIndex < _table->get(index)->count(); bucketIndex++)
 			{
@@ -317,7 +317,7 @@ namespace brogueHd::component
 		// Reset the max bucket size tracker
 		_maxBucketSize = 0;
 
-		for (int index = 0; index < _table->size(); index++)
+		for (int index = 0; index < _table->count(); index++)
 		{
 			for (int bucketIndex = 0; bucketIndex < _table->get(index)->count(); bucketIndex++)
 			{

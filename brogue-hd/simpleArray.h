@@ -1,7 +1,6 @@
 #pragma once
 
 #include "simple.h"
-#include "simpleList.h"
 #include <functional>
 
 using namespace std;
@@ -28,15 +27,14 @@ namespace brogueHd::component
 	public:
 
 		simpleArray();
-		simpleArray(int size);
-		simpleArray(T* anArray);
+		simpleArray(int count);
+		simpleArray(const T* anArray);
+		simpleArray(const simpleArray<T>& copy);
 		~simpleArray();
 
-		int size() const;
+		int count() const;
 
-		T get(int index);
-		T operator[](int index) const;
-		T& operator[](int index);		
+		T get(int index) const;
 
 		// This may be required for simpleHash->set
 		//void operator=(const simpleArray<T>& other);
@@ -45,36 +43,50 @@ namespace brogueHd::component
 		bool contains(T item);
 
 		void forEach(simpleArrayCallback<T> callback);
-		simpleArray<T> where(simpleArrayPredicate<T> predicate);
 
 	private:
 
 		T* _array;
 		int _size;
+		int _count;
 	};
 
 	template<typename T>
 	simpleArray<T>::simpleArray()
 	{
-		_array = new T[0];
+		_array = NULL;
 		_size = 0;
+		_count = 0;
 	}
 
 	template<typename T>
-	simpleArray<T>::simpleArray(int size)
+	simpleArray<T>::simpleArray(int count)
 	{
-		_array = new T[size];
-		_size = size;
+		_array = new T[count * sizeof(T)];
+		_size = count * sizeof(T);
+		_count = count;
 	}
 
 	template<typename T>
-	simpleArray<T>::simpleArray(T* anArray)
+	simpleArray<T>::simpleArray(const T* anArray)
 	{
-		_array = new T[SIZEOF(anArray)];
-		_size = SIZEOF(anArray);
+		_array = new T[sizeof(anArray)];
+		_size = sizeof(anArray);
+		_count = sizeof(anArray) / sizeof(T);
 
-		for (int index = 0; index < _size; index++)
+		for (int index = 0; index < _count; index++)
 			_array[index] = anArray[index];
+	}
+
+	template<typename T>
+	simpleArray<T>::simpleArray(const simpleArray<T>& copy)
+	{
+		_array = new T[copy.count() * sizeof(T)];
+		_size = copy.count() * sizeof(T);
+		_count = copy.count();
+
+		for (int index = 0; index < _count; index++)
+			_array[index] = copy.get(index);
 	}
 
 	template<typename T>
@@ -83,28 +95,17 @@ namespace brogueHd::component
 		delete[] _array;
 
 		_size = 0;
+		_count = 0;
 	}
 
 	template<typename T>
-	int simpleArray<T>::size() const
+	int simpleArray<T>::count() const
 	{
-		return _size;
+		return _count;
 	}
 
 	template<typename T>
-	T simpleArray<T>::get(int index)
-	{
-		return _array[index];
-	}
-
-	template<typename T>
-	T simpleArray<T>::operator[](int index) const
-	{
-		return _array[index];
-	}
-
-	template<typename T>
-	T& simpleArray<T>::operator[](int index)
+	T simpleArray<T>::get(int index) const
 	{
 		return _array[index];
 	}
@@ -118,7 +119,7 @@ namespace brogueHd::component
 	template<typename T>
 	void simpleArray<T>::forEach(simpleArrayCallback<T> callback)
 	{
-		for (int index = 0; index < _size; index++)
+		for (int index = 0; index < _count; index++)
 		{
 			if (callback(_array[index]) == iterationCallback::breakAndReturn)
 				return;
@@ -126,23 +127,9 @@ namespace brogueHd::component
 	}
 
 	template<typename T>
-	simpleArray<T> simpleArray<T>::where(simpleArrayPredicate<T> predicate)
-	{
-		simpleList<T> result;
-
-		for (int index = 0; index < _size; index++)
-		{
-			if (predicate(_array[index]))
-				result.add(_array[index]);
-		}
-
-		return simpleArray<T>(result.getArray());
-	}
-
-	template<typename T>
 	bool simpleArray<T>::contains(T item)
 	{
-		for (int index = 0; index < _size; index++)
+		for (int index = 0; index < _count; index++)
 		{
 			// Comparable T
 			if (item == _array[index])

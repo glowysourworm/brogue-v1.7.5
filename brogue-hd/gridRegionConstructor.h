@@ -127,16 +127,16 @@ namespace brogueHd::component
 
         gridRect largestSubRegionRect = calculateLargestRectangle();
 
-        return new gridRegion<T>(_locations->getKeys().getArray(),
-                                _edgeLocations->getKeys().getArray(),
-                                _westEdges->getKeys().getArray(),
-                                _northEdges->getKeys().getArray(),
-                                _eastEdges->getKeys().getArray(),
-                                _southEdges->getKeys().getArray(),
-                                _nwCorners->getKeys().getArray(),
-                                _neCorners->getKeys().getArray(),
-                                _seCorners->getKeys().getArray(),
-                                _swCorners->getKeys().getArray(),
+        return new gridRegion<T>(_locations->getKeys().toArray(),
+                                _edgeLocations->getKeys().toArray(),
+                                _westEdges->getKeys().toArray(),
+                                _northEdges->getKeys().toArray(),
+                                _eastEdges->getKeys().toArray(),
+                                _southEdges->getKeys().toArray(),
+                                _nwCorners->getKeys().toArray(),
+                                _neCorners->getKeys().toArray(),
+                                _seCorners->getKeys().toArray(),
+                                _swCorners->getKeys().toArray(),
                                 _grid->getParentBoundary(),
                                 _calculatedBoundary,
                                 largestSubRegionRect);
@@ -182,7 +182,7 @@ namespace brogueHd::component
     template<isGridLocator T>
     void gridRegionConstructor<T>::add(T* locators)
     {
-        for (int index = 0; index < SIZEOF(locators); index++)
+        for (int index = 0; index < sizeof(locators); index++)
         {
             this->add(locators[index].column, locators[index].row, locators[index]);
         }
@@ -372,9 +372,9 @@ namespace brogueHd::component
 
                 // FIRST, CHECK ROW INDEX TRACKING
                 if (_grid->isDefined(column, row))
-                    rowCounters[index]++;
+                    rowCounters.set(index, rowCounters.get(index) + 1);
                 else
-                    rowCounters[index] = 0;
+                    rowCounters.set(index, 0);
             }
 
 
@@ -382,32 +382,32 @@ namespace brogueHd::component
             for (short index1 = 0; index1 < rowCountersLength; index1++)
             {
                 // Initialize min-height for the next sweep
-                short minHeight = rowCounters[index1];
+                short minHeight = rowCounters.get(index1);
 
                 for (short index2 = index1; index2 < rowCountersLength && minHeight > 0; index2++)
                 {
-                    minHeight = brogueMath<short>::min(minHeight, rowCounters[index1], rowCounters[index2]);
+                    minHeight = brogueMath<short>::min(minHeight, rowCounters.get(index1), rowCounters.get(index2));
 
                     // Current column against previous
-                    if (rowCounters[index1] > bestArea)
+                    if (rowCounters.get(index1) > bestArea)
                     {
                         bestStartColumn = index1 + regionBoundary.left();
                         bestEndColumn = index1 + regionBoundary.left();
-                        bestStartRow = row - rowCounters[index1] + 1;
+                        bestStartRow = row - rowCounters.get(index1) + 1;
                         bestEndRow = row;
 
-                        bestArea = rowCounters[index1];
+                        bestArea = rowCounters.get(index1);
                     }
 
                     // Current column check
-                    if (rowCounters[index2] > bestArea)
+                    if (rowCounters.get(index2) > bestArea)
                     {
                         bestStartColumn = index2 + regionBoundary.left();
                         bestEndColumn = index2 + regionBoundary.left();
-                        bestStartRow = row - rowCounters[index2] + 1;
+                        bestStartRow = row - rowCounters.get(index2) + 1;
                         bestEndRow = row;
 
-                        bestArea = rowCounters[index2];
+                        bestArea = rowCounters.get(index2);
                     }
 
                     // Current min-block check

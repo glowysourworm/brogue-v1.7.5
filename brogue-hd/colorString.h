@@ -28,7 +28,7 @@ namespace brogueHd::backend::model::game
 
 		void updateAll(const char* message, color foreColor)
 		{
-			for (short index = 0; index < COLS * 2 && index < SIZEOF(message); index++)
+			for (short index = 0; index < COLS * 2 && index < sizeof(message); index++)
 			{
 				theString[index] = message[index];
 				theColors[index] = foreColor;

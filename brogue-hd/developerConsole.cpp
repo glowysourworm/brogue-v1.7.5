@@ -12,7 +12,7 @@ namespace brogueHd::console
 
 	void developerConsole::printHelp(ostream& stream)
 	{
-
+		stream << "TODO: developer console" << std::endl;
 	}
 }
 

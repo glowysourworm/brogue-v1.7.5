@@ -314,6 +314,7 @@
     <ClInclude Include="renderingController.h" />
     <ClInclude Include="simple.h" />
     <ClInclude Include="simpleArray.h" />
+    <ClInclude Include="simpleArrayExtension.h" />
     <ClInclude Include="simpleBST.h" />
     <ClInclude Include="simpleHash.h" />
     <ClInclude Include="simpleList.h" />

@@ -2,6 +2,7 @@
 #include "stringExtension.h"
 #include "brogueGlobal.h"
 #include "typeConverter.h"
+#include "simpleArray.h"
 
 using namespace brogueHd::component;
 
@@ -12,7 +13,7 @@ namespace brogueHd::console
 
 	brogueConsoleReturn brogueConsole::command(std::string input, ostream& stream)
 	{
-		std::string* cmd = stringExtension::split(input, " ");
+		simpleArray<std::string> cmd = stringExtension::split(input, " ");
 
 		if (hasArgument(cmd, "--mode"))
 		{
@@ -41,53 +42,53 @@ namespace brogueHd::console
 		stream << "\t\t--mode\t[GAME, DEV, RESOURCE] (GAME is set by default)" << std::endl;
 	}
 
-	bool brogueConsole::hasArgument(const std::string args[], const char* argumentName)
+	bool brogueConsole::hasArgument(const simpleArray<std::string>& args, const char* argumentName)
 	{
-		for (int index = 0; index < SIZEOF(args); index++)
-		{
-			if (args[index] == std::string(argumentName))
+		for (int index = 0; index < args.count(); index++)
+		{	
+			if (args.get(index) == std::string(argumentName))
 				return true;
 		}
 
 		return false;
 	}
 
-	std::string brogueConsole::getArgument(const std::string args[], const char* argumentName)
+	std::string brogueConsole::getArgument(const simpleArray<std::string>& args, const char* argumentName)
 	{
-		for (int index = 0; index < SIZEOF(args); index++)
+		for (int index = 0; index < args.count(); index++)
 		{
-			if (std::string(args[index]) == std::string(argumentName) &&
-				index < SIZEOF(args) + 1)
+			if (args.get(index) == std::string(argumentName) &&
+				index < sizeof(args) + 1)
 			{
-				return args[index + 1];
+				return args.get(index + 1);
 			}
 		}
 
 		return "";
 	}
 
-	int brogueConsole::getArgumentInt(const std::string args[], const char* argumentName)
+	int brogueConsole::getArgumentInt(const simpleArray<std::string>& args, const char* argumentName)
 	{
-		for (int index = 0; index < SIZEOF(args); index++)
+		for (int index = 0; index < sizeof(args); index++)
 		{
-			if (std::string(args[index]) == std::string(argumentName) &&
-				index < SIZEOF(args) + 1)
+			if (args.get(index) == std::string(argumentName) &&
+				index < sizeof(args) + 1)
 			{
-				return typeConverter::stringToint(args[index + 1]);
+				return typeConverter::stringToint(args.get(index + 1));
 			}
 		}
 
 		return 0;
 	}
 
-	bool brogueConsole::getArgumentBool(const std::string args[], const char* argumentName)
+	bool brogueConsole::getArgumentBool(const simpleArray<std::string>& args, const char* argumentName)
 	{
-		for (int index = 0; index < SIZEOF(args); index++)
+		for (int index = 0; index < sizeof(args); index++)
 		{
-			if (std::string(args[index]) == std::string(argumentName) &&
-				index < SIZEOF(args) + 1)
+			if (args.get(index) == std::string(argumentName) &&
+				index < sizeof(args) + 1)
 			{
-				return typeConverter::stringToBool(args[index + 1]);
+				return typeConverter::stringToBool(args.get(index + 1));
 			}
 		}
 

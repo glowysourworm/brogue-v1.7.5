@@ -63,7 +63,7 @@ namespace brogueHd::component
 
         else if (vertices.count() == 1)
         {
-            return new graph<TNode, TEdge>(vertices.getArray());
+            return new graph<TNode, TEdge>(vertices.toArray());
         }
 
         else
@@ -76,7 +76,7 @@ namespace brogueHd::component
                 edges.add(that->edgeConstructor(node1, node2));
             });
 
-            return new graph<TNode, TEdge>(vertices.getArray(), edges.getArray());
+            return new graph<TNode, TEdge>(vertices.toArray(), edges.toArray());
         }
     }
 }

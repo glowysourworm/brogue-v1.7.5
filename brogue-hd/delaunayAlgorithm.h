@@ -271,6 +271,6 @@ namespace brogueHd::component
         });
 
         // Return a new graph with Delaunay edges
-        return new graph<TNode, TEdge>(vertices.getArray(), delaunayEdges.getArray());
+        return new graph<TNode, TEdge>(vertices.toArray(), delaunayEdges.toArray());
     }
 }

@@ -4,6 +4,7 @@
 #include "brogueMath.h"
 #include "randomRange.h"
 #include "simpleList.h"
+#include "simpleArray.h"
 
 #include <random>
 
@@ -77,28 +78,28 @@ namespace brogueHd::backend::generator
 		return lowerBound + range(upperBound - lowerBound + 1);
 	}
 
-	short randomGenerator::randWeighted(const short weights[])
+	short randomGenerator::randWeighted(const simpleArray<short>& weights)
 	{
-		int sum = 0;
+		short sum = 0;
 
-		for (int index = 0; index < SIZEOF(weights); index++)
+		for (int index = 0; index < weights.count(); index++)
 		{
-			sum += weights[index];
+			sum += weights.get(index);
 		}
 
 		double nextDouble = next() * sum;
 
 		sum = 0;
 
-		for (int index = 0; index < SIZEOF(weights); index++)
+		for (int index = 0; index < weights.count(); index++)
 		{
-			sum += weights[index];
+			sum += weights.get(index);
 
 			if (sum >= nextDouble)
 				return index;
 		}
 
-		return SIZEOF(weights) - 1;
+		return weights.count() - 1;
 	}
 
 	short randomGenerator::randClump(randomRange theRange) 

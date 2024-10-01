@@ -175,7 +175,7 @@ namespace brogueHd::backend::model
 			return info.frequency;
 		});
 
-		short randomIndex = _randomGenerator->randWeighted(weights.getArray());
+		short randomIndex = _randomGenerator->randWeighted(weights.toArray());
 
 		return _roomInfo->getAt(randomIndex).value;
 

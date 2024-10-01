@@ -3,6 +3,7 @@
 #include "graphDefinitions.h"
 #include "graphNode.h"
 #include "graphEdge.h"
+#include "simpleArray.h"
 #include "simpleList.h"
 #include "simpleHash.h"
 
@@ -16,8 +17,8 @@ namespace brogueHd::component
 	{
 	public:
 
-        graphEdgeCollection(const TEdge* edges);
-		graphEdgeCollection(const TNode* nodes, const TEdge* edges);
+        graphEdgeCollection(const simpleArray<TEdge>& edges);
+		graphEdgeCollection(const simpleArray<TNode>& nodes, const simpleArray<TEdge>& edges);
 		~graphEdgeCollection();
 
         short edgeCount() const;
@@ -43,7 +44,7 @@ namespace brogueHd::component
 
     private:
 
-        void initialize(const TNode* nodes, const TEdge* edges);
+        void initialize(const simpleArray<TNode>& nodes, const simpleArray<TEdge>& edges);
 
     private:
 
@@ -53,7 +54,7 @@ namespace brogueHd::component
 	};
 
     template<graphNodeType TNode, graphEdgeType<TNode> TEdge>
-    graphEdgeCollection<TNode, TEdge>::graphEdgeCollection(const TEdge* edges)
+    graphEdgeCollection<TNode, TEdge>::graphEdgeCollection(const simpleArray<TEdge>& edges)
     {
         _nodes = new simpleHash<TNode, TNode>();
         _edges = new simpleHash<TEdge, TEdge>();
@@ -63,7 +64,7 @@ namespace brogueHd::component
     }
 
     template<graphNodeType TNode, graphEdgeType<TNode> TEdge>
-    graphEdgeCollection<TNode, TEdge>::graphEdgeCollection(const TNode* nodes, const TEdge* edges)
+    graphEdgeCollection<TNode, TEdge>::graphEdgeCollection(const simpleArray<TNode>& nodes, const simpleArray<TEdge>& edges)
     {
         _nodes = new simpleHash<TNode, TNode>();
         _edges = new simpleHash<TEdge, TEdge>();
@@ -83,19 +84,19 @@ namespace brogueHd::component
     }
 
     template<graphNodeType TNode, graphEdgeType<TNode> TEdge>
-    void graphEdgeCollection<TNode, TEdge>::initialize(const TNode* nodes, const TEdge* edges)
+    void graphEdgeCollection<TNode, TEdge>::initialize(const simpleArray<TNode>& nodes, const simpleArray<TEdge>& edges)
     {
         // Initialize for edges and adjacent vertex lookup
-        for (int index = 0; index < SIZEOF(edges); index++)
+        for (int index = 0; index < edges.count(); index++)
         {
-            this->addEdge(edges[index]);
+            this->addEdge(edges.get(index));
         }
 
         // Look for any nodes not yet in the collections - add these
-        for (int index = 0; index < SIZEOF(nodes); index++)
+        for (int index = 0; index < nodes.count(); index++)
         {
-            if (!this->containsNode(nodes[index]))
-                this->addNode(nodes[index]);
+            if (!this->containsNode(nodes.get(index)))
+                this->addNode(nodes.get(index));
         }
     }
 

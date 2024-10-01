@@ -3,6 +3,7 @@
 #include "graphDefinitions.h"
 #include "graphEdgeCollection.h"
 #include "simpleList.h"
+#include "simpleArray.h"
 
 namespace brogueHd::component
 {
@@ -18,8 +19,8 @@ namespace brogueHd::component
     {
     public:
 
-        graph(const TNode* nodes, const TEdge* edges);
-        graph(const TNode* nodes);
+        graph(const simpleArray<TNode>& nodes, const simpleArray<TEdge>& edges);
+        graph(const simpleArray<TNode>& nodes);
         ~graph();
 
         void addEdge(TEdge edge);
@@ -38,7 +39,7 @@ namespace brogueHd::component
     };
 
     template<graphNodeType TNode, graphEdgeType<TNode> TEdge>
-    graph<TNode, TEdge>::graph(const TNode* nodes, const TEdge* edges)
+    graph<TNode, TEdge>::graph(const simpleArray<TNode>& nodes, const simpleArray<TEdge>& edges)
     {
         _nodes = new simpleList<TNode>(nodes);
         _edgeCollection = new graphEdgeCollection<TNode, TEdge>(nodes, edges);
@@ -50,7 +51,7 @@ namespace brogueHd::component
     }
 
     template<graphNodeType TNode, graphEdgeType<TNode> TEdge>
-    graph<TNode, TEdge>::graph(const TNode* nodes)
+    graph<TNode, TEdge>::graph(const simpleArray<TNode>& nodes)
     {
         TEdge* edges = NULL;
 

@@ -1,8 +1,10 @@
 #pragma once
 
+#include "simpleArray.h"
 #include "randomRange.h"
 #include <random>
 
+using namespace brogueHd::component;
 using namespace brogueHd::component::math;
 
 namespace brogueHd::backend::generator
@@ -28,7 +30,7 @@ namespace brogueHd::backend::generator
 		/// <summary>
 		/// Returns random index from array based on its weights
 		/// </summary>
-		short randWeighted(const short weights[]);
+		short randWeighted(const simpleArray<short>& weights);
 
 		/// <summary>
 		/// Returns random from the provided range, using the clumping factor

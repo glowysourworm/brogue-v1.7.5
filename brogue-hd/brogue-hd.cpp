@@ -19,23 +19,20 @@ using namespace brogueHd::backend::model;
 
 int main(int argc, char* argv[])
 {
-	brogueConsole defaultConsole;
-	brogueConsole currentConsole = defaultConsole;
+	brogueConsole* defaultConsole = new brogueConsole();
+	brogueConsole* currentConsole = defaultConsole;
 	brogueConsoleReturn returnValue = brogueConsoleReturn::Continue;
 	bool iterate = true;
 
 	// Backend Components
 	resourceController* brogueResourceController = new resourceController();
 
-	std::string cmd = stringExtension::join(argv);
+	std::string cmd = stringExtension::join(argv, argc);
 
 	while (returnValue != brogueConsoleReturn::Exit && iterate)
 	{
-		// Read console line
-		std::getline(std::cin, cmd);
-
 		// Pass command to the console component
-		returnValue = currentConsole.command(cmd, std::cout);
+		returnValue = currentConsole->command(cmd, std::cout);
 
 		switch (returnValue)
 		{
@@ -44,14 +41,29 @@ int main(int argc, char* argv[])
 			currentConsole = defaultConsole;
 			break;
 		case brogueConsoleReturn::Completed_SetMode_Game:
-			currentConsole = gameConsole(brogueResourceController);
-			break;
+		{
+			if (currentConsole != defaultConsole)
+				delete currentConsole;
+
+			currentConsole = new gameConsole(brogueResourceController);
+		}
+		break;
 		case brogueConsoleReturn::Completed_SetMode_Dev:
-			currentConsole = developerConsole();
-			break;
+		{
+			if (currentConsole != defaultConsole)
+				delete currentConsole;
+
+			currentConsole = new developerConsole();
+		}
+		break;
 		case brogueConsoleReturn::Completed_SetMode_Resource:
-			currentConsole = resourceConsole(brogueResourceController);
-			break;
+		{
+			if (currentConsole != defaultConsole)
+				delete currentConsole;
+
+			currentConsole = new resourceConsole(brogueResourceController);
+		}
+		break;
 		case brogueConsoleReturn::CompletedWithError:
 			break;
 		case brogueConsoleReturn::Exit:
@@ -62,10 +74,15 @@ int main(int argc, char* argv[])
 
 		// Print Help for the menu loop
 		if (iterate)
-			currentConsole.printHelp(std::cout);
+			currentConsole->printHelp(std::cout);
+
+		// Read console line
+		std::getline(std::cin, cmd);
 	}
 
 	delete brogueResourceController;
+	delete currentConsole;
+	delete defaultConsole;
 
 	return 0;
 }

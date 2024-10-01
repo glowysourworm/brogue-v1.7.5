@@ -8,11 +8,6 @@
 
 namespace brogueHd
 {
-	// STD Library / substitutions
-	#define SIZEOF(x)						sizeof(x)			// Size of an array
-	#define STRCMP(x, y)					strcmp(x,y)			// String compare
-	#define STRCPY(dest, src, count)		strncpy_s(dest, src, count)
-
     // Create default values for types
     template<typename T> struct default_value
     {

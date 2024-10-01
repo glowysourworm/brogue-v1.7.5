@@ -593,6 +593,9 @@
     <ClInclude Include="hashExtension.h">
       <Filter>Header Files\global</Filter>
     </ClInclude>
+    <ClInclude Include="simpleArrayExtension.h">
+      <Filter>Header Files\component</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\resources\colors.csv">

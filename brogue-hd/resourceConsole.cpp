@@ -22,7 +22,7 @@ namespace brogueHd::console
 
 	brogueConsoleReturn resourceConsole::command(std::string input, ostream& stream)
 	{
-		std::string* cmd = stringExtension::split(input, " ");
+		simpleArray<std::string> cmd = stringExtension::split(input, " ");
 
 		if (hasArgument(cmd, "--loadColors"))
 		{

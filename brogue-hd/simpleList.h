@@ -1,6 +1,7 @@
 #pragma once
 
 #include "simple.h"
+#include "simpleArray.h"
 #include <functional>
 
 using namespace std;
@@ -39,10 +40,9 @@ namespace brogueHd::component
 	public:
 		simpleList();
 		simpleList(const T* anArray);
+		simpleList(const simpleArray<T>& anArray);
 		simpleList(const simpleList<T>& copy);
 		~simpleList();
-
-		T operator[](int index) const;
 
 		T get(int index) const;
 		int count() const;
@@ -57,12 +57,12 @@ namespace brogueHd::component
 
 	protected:
 
-		int MaxIncrementalCapacity = 1000;
+		int ArrayIncrement = 100;
 
 	public:
 
 		// Container Selectors
-		T* getArray() const;
+		simpleArray<T> toArray() const;
 
 		bool contains(T item) const;
 
@@ -99,35 +99,36 @@ namespace brogueHd::component
 
 	private:
 
-		T* _list;
+		simpleArray<T>* _array;
 
-		int _size;
-		int _sizeAlloc;
+		int _count;
 	};
 
 	template<typename T>
 	simpleList<T>::simpleList()
 	{
-		_list = NULL;
-		_size = 0;
-		_sizeAlloc = 0;
+		_array = NULL;
+		_count = 0;
 	}
 	template<typename T>
 	simpleList<T>::simpleList(const T* anArray)
 	{
-		_list = NULL;
-		_size = 0;
-		_sizeAlloc = 0;
-
-		for (int index = 0; index < SIZEOF(anArray); index++)
-			this->add(anArray[index]);
+		_array = new simpleArray<T>(anArray);
+		_count = 0;
 	}
+
+	template<typename T>
+	simpleList<T>::simpleList(const simpleArray<T>& anArray)
+	{
+		_array = new simpleArray<T>(anArray);
+		_count = _array->count();
+	}
+
 	template<typename T>
 	simpleList<T>::simpleList(const simpleList<T>& copy)
 	{
-		_list = NULL;
-		_size = 0;
-		_sizeAlloc = 0;
+		_array = new simpleArray<T>(copy.count());
+		_count = 0;
 
 		for (int index = 0; index < copy.count(); index++)
 			this->add(copy.get(index));
@@ -135,32 +136,25 @@ namespace brogueHd::component
 	template<typename T>
 	simpleList<T>::~simpleList()
 	{
-		if (_list != NULL)
+		if (_array != NULL)
 		{
-			delete[] _list;
+			delete _array;
 
-			_list = NULL;
-			_size = 0;
-			_sizeAlloc = 0;
+			_array = NULL;
+			_count = 0;
 		}
-	}
-
-	template<typename T>
-	T simpleList<T>::operator[](int index) const
-	{
-		return _list[index];
 	}
 
 	template<typename T>
 	T simpleList<T>::get(int index) const
 	{
-		return _list[index];
+		return _array->get(index);
 	}
 
 	template<typename T>
 	int simpleList<T>::count() const
 	{
-		return _size;
+		return _array->count();
 	}
 
 	template<typename T>
@@ -168,17 +162,19 @@ namespace brogueHd::component
 	{
 		// Reached capacity
 		//
-		if (_size == _sizeAlloc)
+		if (_count == _array->count())
 			this->reAllocate();
 
 		// Add the next item
-		_list[_size++] = item;
+		_array->set(_count++, item);
 	}
 
 	template<typename T>
 	void simpleList<T>::addRange(T* list)
 	{
-		for (int index = 0; index < SIZEOF(list); index++)
+		int count = sizeof(list) / sizeof(T);
+
+		for (int index = 0; index < count; index++)
 			this->add(list[index]);
 	}
 
@@ -186,67 +182,67 @@ namespace brogueHd::component
 	void simpleList<T>::addRange(const simpleList<T>& list)
 	{
 		for (int index = 0; index < list.count(); index++)
-			this->add(list[index]);
+			this->add(list.get(index));
 	}
 
 	template<typename T>
 	void simpleList<T>::insert(int insertIndex, T item)
 	{
 		// Check capacity before using extra "swap space"
-		if (_size == _sizeAlloc)
+		if (_count == _array->count())
 			this->reAllocate();
 
 		// Start at back + 1  ->  insertion index
-		for (int index = _size; index >= insertIndex; index--)
+		for (int index = _count; index >= insertIndex; index--)
 		{
-			_list[index] = _list[index - 1];
+			_array->set(index, _array->get(index - 1));
 		}
 
 		// Have space for the next item
-		_list[insertIndex] = item;
+		_array->set(insertIndex, item);
 
-		_size++;
+		_count++;
 	}
 
 	template<typename T>
 	void simpleList<T>::reAllocate()
 	{
-		if (_size != _sizeAlloc)
+		if (_count != _array->count())
 			brogueException::show("Trying to re-allocate memory for simple list before capacity is reached");
 
-		// Use doubling method: Always multiply size by 2 until {MaxIncrementalCapacity} is reached
+		// Use doubling method: Always multiply size by 2 until {MaxElementIncrement} is reached
 		//
-		int newSize = (_sizeAlloc == 0) ? 100 :
-			(_sizeAlloc >= this->MaxIncrementalCapacity) ? (_sizeAlloc + this->MaxIncrementalCapacity) :
-			_sizeAlloc * 2;
+		int newSize = (_array == NULL) ? 10 :
+					  (_array->count() >= this->ArrayIncrement) ? (_array->count() + this->ArrayIncrement) :
+					   _array->count() * 2;
 
 		// Copy over the data
-		T* newList = new T[newSize];
+		simpleArray<T>* newArray = new simpleArray<T>(newSize);
 
-		for (int index = 0; index < _size; index++)
+		for (int index = 0; index < _array->count(); index++)
 		{
-			newList[index] = _list[index];
+			newArray->set(index, _array->get(index));
 		}
 
-		delete[] _list;
+		delete _array;
 
-		_sizeAlloc = newSize;
+		_array = newArray;
 	}
 
 	template<typename T>
 	T simpleList<T>::removeAt(int index)
 	{
-		if (index >= _size)
+		if (index >= _count)
 			brogueException::show("Index is outside the bounds of the array");
 
 		T item = this->get(index);
 
-		for (int i = index; i < _size - 1; i++)
+		for (int i = index; i < _count - 1; i++)
 		{
-			_list[i] = _list[i + 1];
+			_array->set(i, _array->get(i + 1));
 		}
 
-		_size--;
+		_count--;
 
 		return item;
 	}
@@ -256,9 +252,9 @@ namespace brogueHd::component
 	{
 		int itemIndex = -1;
 
-		for (int index = 0; index < _size; index++)
+		for (int index = 0; index < _count; index++)
 		{
-			if (item == _list[index])
+			if (item == _array->get(index))
 			{
 				itemIndex = index;
 				break;
@@ -275,18 +271,17 @@ namespace brogueHd::component
 	template<typename T>
 	void simpleList<T>::clear()
 	{
-		delete[] _list;
+		delete _array;
 
-		_size = 0;
-		_sizeAlloc = 0;
+		_count = 0;
 	}
 
 	template<typename T>
 	bool simpleList<T>::contains(T item) const
 	{
-		for (int index = 0; index < _size; index++)
+		for (int index = 0; index < _count; index++)
 		{
-			if (_list[index] == item)
+			if (_array->get(index) == item)
 				return true;
 		}
 
@@ -294,9 +289,9 @@ namespace brogueHd::component
 	}
 
 	template<typename T>
-	T* simpleList<T>::getArray() const
+	simpleArray<T> simpleList<T>::toArray() const
 	{
-		return _list;
+		return *_array;
 	}
 
 	template<typename T>
@@ -305,9 +300,9 @@ namespace brogueHd::component
 	{
 		simpleList<TResult> result;
 
-		for (int index = 0; index < _size; index++)
+		for (int index = 0; index < _count; index++)
 		{
-			result.add(selector(_list[index]));
+			result.add(selector(_array->get(index)));
 		}
 
 		return result;
@@ -318,11 +313,11 @@ namespace brogueHd::component
 	{
 		simpleList<T> result;
 
-		for (int index = _size - 1; index >= 0; index--)
+		for (int index = _count - 1; index >= 0; index--)
 		{
-			if (predicate(_list[index]))
+			if (predicate(_array->get(index)))
 			{
-				result.add(_list[index]);
+				result.add(_array->get(index));
 
 				this->removeAt(index);
 			}
@@ -336,10 +331,10 @@ namespace brogueHd::component
 	{
 		simpleList<T> result;
 
-		for (int index = 0; index < _size; index++)
+		for (int index = 0; index < _count; index++)
 		{
-			if (!predicate(_list[index]))
-				result.add(_list[index]);
+			if (!predicate(_array->get(index)))
+				result.add(_array->get(index));
 		}
 
 		return result;
@@ -348,9 +343,9 @@ namespace brogueHd::component
 	template<typename T>
 	void simpleList<T>::forEach(simpleListCallback<T> callback) const
 	{
-		for (int index = 0; index < _size; index++)
+		for (int index = 0; index < _count; index++)
 		{
-			if (callback(_list[index]) == iterationCallback::breakAndReturn)
+			if (callback(_array->get(index)) == iterationCallback::breakAndReturn)
 				return;
 		}
 	}
@@ -358,10 +353,10 @@ namespace brogueHd::component
 	template<typename T>
 	T simpleList<T>::first(simpleListPredicate<T> predicate) const
 	{
-		for (int index = 0; index < _size; index++)
+		for (int index = 0; index < _count; index++)
 		{
-			if (predicate(_list[index]))
-				return _list[index];
+			if (predicate(_array->get(index)))
+				return _array->get(index);
 		}
 
 		return default_value<T>::value;
@@ -370,9 +365,9 @@ namespace brogueHd::component
 	template<typename T>
 	bool simpleList<T>::any(simpleListPredicate<T> predicate) const
 	{
-		for (int index = 0; index < _size; index++)
+		for (int index = 0; index < _count; index++)
 		{
-			if (predicate(_list[index]))
+			if (predicate(_array->get(index)))
 				return true;
 		}
 
@@ -384,10 +379,10 @@ namespace brogueHd::component
 	{
 		simpleList<T> result;
 
-		for (int index = 0; index < _size; index++)
+		for (int index = 0; index < _count; index++)
 		{
-			if (predicate(_list[index]))
-				result.add(_list[index]);
+			if (predicate(_array->get(index)))
+				result.add(_array->get(index));
 		}
 
 		return result;
@@ -400,9 +395,9 @@ namespace brogueHd::component
 		TResult max = default_value<T>::value;
 		int maxIndex = -1;
 
-		for (int index = 0; index < _size; index++)
+		for (int index = 0; index < _count; index++)
 		{
-			TResult current = selector(_list[index]);
+			TResult current = selector(_array->get(index));
 
 			if (max == default_value<T>::value)
 			{
@@ -427,9 +422,9 @@ namespace brogueHd::component
 		TResult min = default_value<T>::value;
 		int minIndex = -1;
 
-		for (int index = 0; index < _size; index++)
+		for (int index = 0; index < _count; index++)
 		{
-			TResult current = selector(_list[index]);
+			TResult current = selector(_array->get(index));
 
 			if (min == default_value<T>::value)
 			{
@@ -454,9 +449,9 @@ namespace brogueHd::component
 		TResult min = default_value<T>::value;
 		int minIndex = -1;
 
-		for (int index = 0; index < _size; index++)
+		for (int index = 0; index < _count; index++)
 		{
-			TResult value = selector(_list[index]);
+			TResult value = selector(_array->get(index));
 
 			if (min == default_value<T>::value)
 			{
@@ -471,7 +466,7 @@ namespace brogueHd::component
 			}
 		}
 
-		return min == default_value<T>::value ? default_value<T>::value : _list[minIndex];
+		return min == default_value<T>::value ? default_value<T>::value : _array->get(minIndex);
 	}
 
 	template<typename T>
@@ -481,9 +476,9 @@ namespace brogueHd::component
 		TResult max = default_value<TResult>::value;
 		int maxIndex = -1;
 
-		for (int index = 0; index < _size; index++)
+		for (int index = 0; index < _count; index++)
 		{
-			TResult current = selector(_list[index]);
+			TResult current = selector(_array->get(index));
 
 			if (max == default_value<TResult>::value)
 			{
@@ -502,6 +497,6 @@ namespace brogueHd::component
 			return default_value<T>::ctor();
 
 		else
-			return _list[maxIndex];
+			return _array->get(maxIndex);
 	}
 }

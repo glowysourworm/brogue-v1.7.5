@@ -244,7 +244,7 @@ namespace brogueHd::component
 		simpleHash<T, bool> goalDict;
 
 		// Initialize goals to false
-		for (int index = 0; index < _targetLocations->size(); index++)
+		for (int index = 0; index < _targetLocations->count(); index++)
 			goalDict.add(_targetLocations->get(index), false);
 
 		// Process the first element
@@ -404,7 +404,7 @@ namespace brogueHd::component
 		}
 
 		// GENERATE PATHS
-		for (int index = 0; index < _targetLocations->size(); index++)
+		for (int index = 0; index < _targetLocations->count(); index++)
 		{
 			simpleArray<T> completedPath = this->generatePath(_targetLocations->get(index));
 
@@ -542,7 +542,7 @@ namespace brogueHd::component
 		simpleArray<T> resultArray(result.count());
 
 		for (int index = result.count() - 1; index >= 0; index--)
-			resultArray[result.count() - 1 - index] = result[index];
+			resultArray.set(result.count() - 1 - index, result.get(index));
 
 		return resultArray;
 	}

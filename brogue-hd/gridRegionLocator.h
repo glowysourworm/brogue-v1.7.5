@@ -81,7 +81,7 @@ namespace brogueHd::component
                 // 1) Previously identified this location with another region
                 // 2) This location is not included by the user's predicate
                 //
-                if (result[index]->isDefined(column, row) ||
+                if (result.get(index)->isDefined(column, row) ||
                     !inclusionPredicate(column, row, grid.get(column, row)))
                     return iterationCallback::iterate;
             }

@@ -18,47 +18,50 @@ namespace brogueHd::component
 			{
 				for (int index2 = 0; index2 < collection2.count(); index2++)
 				{
+					T key1 = collection1.get(index1);
+					T key2 = collection2.get(index2);
+
 					// Ignore equal items
-					if (collection1[index1] == collection2[index2])
+					if (key1 == key2)
 						continue;
 
 					// Ignore duplicate pairs (item1, item2)
-					if (lookup.contains(collection1[index1]) &&
-						lookup[collection1[index1]].contains(collection2[index2]))
+					if (lookup.contains(key1) &&
+						lookup.get(key1).contains(key2))
 						continue;
 
 					// Ignore duplicate pairs (item2, item1)
-					if (lookup.contains(collection2[index2]) &&
-						lookup[collection2[index2]].contains(collection1[index1]))
+					if (lookup.contains(key2) &&
+						lookup.get(key2).contains(key1))
 						continue;
 
 					else
 					{
 						// RESULT
-						callback(collection1[index1], collection2[index2]);
+						callback(key1, key2);
 
 						// Store lookup 1 -> 2
-						if (lookup.contains(collection1[index1]))
-							lookup[collection1[index1]].add(collection2[index2], collection2[index2]);
+						if (lookup.contains(key1))
+							lookup.get(key1).add(key2, key2);
 
 						else
 						{
 							simpleHash<T, T> hash;
-							hash.add(collection2[index2], collection2[index2]);
+							hash.add(key2, key2);
 
-							lookup.add(collection1[index1], hash);
+							lookup.add(key1, hash);
 						}
 
 						// Store lookup 2 -> 1
-						if (lookup.contains(collection2[index2]))
-							lookup[collection2[index2]].add(collection1[index1], collection1[index1]);
+						if (lookup.contains(key2))
+							lookup.get(key2).add(key1, key1);
 
 						else
 						{
 							simpleHash<T, T> hash;
-							hash.add(collection1[index1], collection1[index1]);
+							hash.add(key1, key1);
 
-							lookup.add(collection2[index2], hash);;
+							lookup.add(key2, hash);;
 						}
 					}
 				}

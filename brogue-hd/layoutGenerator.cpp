@@ -146,10 +146,10 @@ namespace brogueHd::backend::generator
             simpleArray<gridLocator> eastEdge = nextRegion->getBoundaryEdges(brogueCompass::E);
             simpleArray<gridLocator> westEdge = nextRegion->getBoundaryEdges(brogueCompass::W);
 
-            int randN = _randomGenerator->rand_range(0, northEdge.size());
-            int randS = _randomGenerator->rand_range(0, southEdge.size());
-            int randE = _randomGenerator->rand_range(0, eastEdge.size());
-            int randW = _randomGenerator->rand_range(0, westEdge.size());
+            int randN = _randomGenerator->rand_range(0, northEdge.count());
+            int randS = _randomGenerator->rand_range(0, southEdge.count());
+            int randE = _randomGenerator->rand_range(0, eastEdge.count());
+            int randW = _randomGenerator->rand_range(0, westEdge.count());
 
             accretionTile nextRoom;
 
@@ -165,7 +165,7 @@ namespace brogueHd::backend::generator
         // Bolt-on
         for (int index = 0; index < attemptRegions.count(); index++)
         {
-            accretionTile attemptRegion = attemptRegions[index];
+            accretionTile attemptRegion = attemptRegions.get(index);
 
             // First Room
             if (index == 0)

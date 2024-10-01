@@ -30,7 +30,7 @@ namespace brogueHd::backend::model::io
 			this->score = score;
 			this->dateTime = dateTime;
 
-			STRCPY(this->description, description, COLS);
+			//STRCPY(this->description, description, COLS);
 		}
 		~brogueScoreEntry()
 		{
