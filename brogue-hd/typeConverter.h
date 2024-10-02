@@ -30,9 +30,22 @@ namespace brogueHd::component
 			return toString(in).at(0);
 		}
 
-		static int stringToint(const std::string& input)
+		static int stringToInt(const std::string& input)
 		{
 			return std::stoi(input);
+		}
+		static bool tryStringToInt(const std::string& input, int& result)
+		{
+			try
+			{
+				result = std::stoi(input);
+
+				return true;
+			}
+			catch (std::exception ex)
+			{
+				return false;
+			}
 		}
 		static long stringTolong(const std::string& input)
 		{

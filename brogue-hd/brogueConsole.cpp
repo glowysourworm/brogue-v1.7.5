@@ -12,45 +12,33 @@ namespace brogueHd::console
 	{
 		this->consoleName = "Brogue";
 	}
-	brogueConsole::~brogueConsole(){}
+	brogueConsole::~brogueConsole()
+	{
+	}
 
 	brogueConsoleReturn brogueConsole::command(std::string input, ostream& stream)
 	{
-		simpleArray<std::string> cmd = stringExtension::split(input, " ");
+		int choice = 0;
 
-		// Echo the command (DEBUG)
-		cmd.forEach([&stream](std::string str)
+		if (!typeConverter::tryStringToInt(input, choice))
+			return brogueConsoleReturn::CompletedWithError;
+
+		switch (choice)
 		{
-			brogueLogger::output(str);
-
-			return iterationCallback::iterate;
-		});
-
-		if (hasArgument(cmd, "--mode"))
-		{
-			std::string mode = getArgument(cmd, "--mode");
-
-			if (stringExtension::toUpper(mode) == "GAME")
-				return brogueConsoleReturn::Completed_SetMode_Game;
-
-			if (stringExtension::toUpper(mode) == "DEV")
-				return brogueConsoleReturn::Completed_SetMode_Dev;
-
-			if (stringExtension::toUpper(mode) == "RESOURCE")
-				return brogueConsoleReturn::Completed_SetMode_Resource;
+			case 1: return brogueConsoleReturn::Completed_SetMode_Game;
+			case 2: return brogueConsoleReturn::Completed_SetMode_Dev;
+			case 3: return brogueConsoleReturn::Completed_SetMode_Resource;
+			default:
+				return brogueConsoleReturn::Exit;
 		}
-
-		else if (hasArgument(cmd, "--help"))
-			printHelp(stream);
-
-		return brogueConsoleReturn::Completed;
 	}
 	void brogueConsole::printHelp(ostream& stream)
 	{
 		stream << "Brogue Command Line:  Welcome to the Brogue command terminal!" << std::endl << std::endl;
-		stream << "Options:" << std::endl;
-		stream << "\t\t--help\tPrints this help menu" << std::endl;
-		stream << "\t\t--mode\t[GAME, DEV, RESOURCE] (GAME is set by default)" << std::endl;
+		stream << "\t1) Game Console (start, open, .. game files)" << std::endl;
+		stream << "\t2) Developer Console (run unit tests, debug)" << std::endl;
+		stream << "\t3) Resources Console (compile, import, export resource files)" << std::endl;
+		stream << "\tElse) Exit" << std::endl;
 	}
 
 	bool brogueConsole::hasArgument(const simpleArray<std::string>& args, const char* argumentName)
@@ -85,7 +73,7 @@ namespace brogueHd::console
 			if (args.get(index) == std::string(argumentName) &&
 				index < sizeof(args) + 1)
 			{
-				return typeConverter::stringToint(args.get(index + 1));
+				return typeConverter::stringToInt(args.get(index + 1));
 			}
 		}
 

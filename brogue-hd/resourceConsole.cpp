@@ -1,15 +1,8 @@
 #include "resourceConsole.h"
-#include "brogueColorMap.h"
-#include "colorConstants.h"
-
-#include "stringExtension.h"
-
-#include <format>
+#include "typeConverter.h"
 
 using namespace std;
 
-using namespace brogueHd::backend::modelConstant;
-using namespace brogueHd::backend::model;
 using namespace brogueHd::component;
 
 namespace brogueHd::console
@@ -24,33 +17,29 @@ namespace brogueHd::console
 
 	brogueConsoleReturn resourceConsole::command(std::string input, ostream& stream)
 	{
-		simpleArray<std::string> cmd = stringExtension::split(input, " ");
+		int choice = 0;
 
-		if (hasArgument(cmd, "--loadColors"))
+		if (!typeConverter::tryStringToInt(input, choice))
+			return brogueConsoleReturn::CompletedWithError;
+
+		switch (choice)
 		{
-			std::string path = getArgument(cmd, "--loadColors");
-
-			stream << "Loading Color Definitions:  " << path << std::endl;
-
-			brogueColorMap* colorMap = _resourceController->loadColors(path.c_str());
-
-			if (colorMap != NULL)
-			{
-				stream << "Loading Successful! Printing Results..." << std::endl;
-
-				color white = colorMap->getColor(gameColors::white);
-
-				//stream << std::format("Color (.csv):  color({}, {}, {}, {}, {}, {})", 
-				//					   white.red, white.green, white.blue, white.redRand, white.greenRand, white.blueRand) << std::endl;
-			}
-			else
-				stream << "Loading Failed..." << std::endl;
+		case 1:
+		{
+			stream << "Running unit tests..." << std::endl;
+			return brogueConsoleReturn::Completed;
+		}
+		break;
+		default:
+			return brogueConsoleReturn::Exit;
 		}
 
 		return brogueConsoleReturn::Completed;
 	}
 	void resourceConsole::printHelp(ostream& stream)
 	{
-
+		stream << "Brogue Resource Console:" << std::endl << std::endl;
+		stream << "\t1) Load Colors File" << std::endl;
+		stream << "\tElse) Exit" << std::endl;
 	}
 }

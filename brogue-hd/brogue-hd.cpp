@@ -75,14 +75,25 @@ int main(int argc, char* argv[])
 		// Print Help for the menu loop
 		if (iterate)
 			currentConsole->printHelp(std::cout);
+		else
+		{
+			if (currentConsole != defaultConsole)
+				delete currentConsole;
+
+			delete brogueResourceController;
+			delete defaultConsole;
+			return 0;
+		}
 
 		// Read console line
 		std::cout << std::endl << currentConsole->consoleName << " @> ";
 		std::getline(std::cin, cmd);
 	}
 
+	if (currentConsole != defaultConsole)
+		delete currentConsole;
+
 	delete brogueResourceController;
-	delete currentConsole;
 	delete defaultConsole;
 
 	return 0;

@@ -129,14 +129,6 @@ namespace brogueHd::component
 			else
 				result.add(input);
 
-			// Echo the command (DEBUG)
-			result.forEach([](std::string str)
-			{
-				brogueLogger::output(str);
-
-				return iterationCallback::iterate;
-			});
-
 			return result.toArray();
 		}
 	};

@@ -1,4 +1,5 @@
 #include "developerConsole.h"
+#include "typeConverter.h"
 
 namespace brogueHd::console
 {
@@ -10,12 +11,29 @@ namespace brogueHd::console
 
 	brogueConsoleReturn developerConsole::command(std::string input, ostream& stream)
 	{
-		return brogueConsoleReturn::Completed;	
+		int choice = 0;
+		
+		if (!typeConverter::tryStringToInt(input, choice))
+			return brogueConsoleReturn::CompletedWithError;
+
+		switch (choice)
+		{
+		case 1:
+		{
+			stream << "Running unit tests..." << std::endl;
+			return brogueConsoleReturn::Completed;
+		}
+		break;
+		default:
+			return brogueConsoleReturn::Completed;
+		}
 	}
 
 	void developerConsole::printHelp(ostream& stream)
 	{
-		stream << "TODO: developer console" << std::endl;
+		stream << "Brogue Developer Console:" << std::endl << std::endl;
+		stream << "\t1) Run Unit Tests" << std::endl;
+		stream << "\tElse) Exit" << std::endl;
 	}
 }
 

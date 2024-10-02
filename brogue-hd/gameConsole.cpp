@@ -1,5 +1,6 @@
 #include "gameConsole.h"
 #include "brogueGlobal.h"
+#include "typeConverter.h"
 #include "gameController.h"
 #include "stringExtension.h"
 #include "broguefile.h"
@@ -29,13 +30,21 @@ namespace brogueHd::console
 
 	void gameConsole::printHelp(ostream& stream)
 	{
-		stream << "--help         -h          print this help message" << std::endl;
-		stream << "--version      -V          print the version (i.e., " + std::string(this->BrogueVersion) + ")" << std::endl;
-		stream << "--scores                   dump scores to output and exit immediately" << std::endl;
-		stream << "-n                         start a new game, skipping the menu" << std::endl;
-		stream << "-s seed                    start a new game with the specified numerical seed" << std::endl;
-		stream << "-o filename[.broguesave]   open a save file (extension optional)" << std::endl;
-		stream << "-v recording[.broguerec]   view a recording (extension optional)" << std::endl;
+		stream << "Brogue Game Console:" << std::endl << std::endl;
+		stream << "\t1) New Game	   [options]" << std::endl;
+		stream << "\t2) Open Game	   [options]" << std::endl;
+		stream << "\t3) High Scores" << std::endl;
+		stream << "\t4) Run Playback   [options]" << std::endl;
+		stream << "\t5) Help (more options help)" << std::endl;
+		stream << "\tElse) Exit" << std::endl;
+
+		//stream << "--help         -h          print this help message" << std::endl;
+		//stream << "--version      -V          print the version (i.e., " + std::string(this->BrogueVersion) + ")" << std::endl;
+		//stream << "--scores                   dump scores to output and exit immediately" << std::endl;
+		//stream << "-n                         start a new game, skipping the menu" << std::endl;
+		//stream << "-s seed                    start a new game with the specified numerical seed" << std::endl;
+		//stream << "-o filename[.broguesave]   open a save file (extension optional)" << std::endl;
+		//stream << "-v recording[.broguerec]   view a recording (extension optional)" << std::endl;
 	}
 	void gameConsole::printScores(ostream& stream)
 	{
@@ -57,7 +66,46 @@ namespace brogueHd::console
 
 	brogueConsoleReturn gameConsole::command(std::string input, ostream& stream)
 	{
-		//std::string* cmd = stringExtension::split(input, " ");
+		int choice = 0;
+
+		if (!typeConverter::tryStringToInt(input, choice))
+			return brogueConsoleReturn::CompletedWithError;
+
+		switch (choice)
+		{
+		case 1:
+		{
+			stream << "New Game..." << std::endl;
+			return brogueConsoleReturn::Completed;
+		}
+		break;
+		case 2:
+		{
+			stream << "Open Game..." << std::endl;
+			return brogueConsoleReturn::Completed;
+		}
+		break;
+		case 3:
+		{
+			stream << "High Scores..." << std::endl;
+			return brogueConsoleReturn::Completed;
+		}
+		break;
+		case 4:
+		{
+			stream << "Run Playback..." << std::endl;
+			return brogueConsoleReturn::Completed;
+		}
+		break;
+		case 5:
+		{
+			stream << "Help (about options)..." << std::endl;
+			return brogueConsoleReturn::Completed;
+		}
+		break;
+		default:
+			return brogueConsoleReturn::Completed;
+		}
 
 		std::string* cmd = NULL;
 
