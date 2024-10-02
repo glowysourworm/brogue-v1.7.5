@@ -54,8 +54,8 @@ namespace brogueHd::component
 	template<typename T>
 	simpleArray<T>::simpleArray()
 	{
-		_array = NULL;
-		_count = 0;
+		_array = new T[sizeof(T)];
+		_count = 1;
 	}
 
 	template<typename T>

@@ -7,7 +7,6 @@
 #include "hashExtension.h"
 #include "componentMacros.h"
 #include "EnumString.h"
-#include "brogueLogger.h"
 #include "brogueException.h"
 #include "command.h"
 

@@ -106,6 +106,12 @@
     <Filter Include="Header Files\component\math">
       <UniqueIdentifier>{0140bb82-f2d8-4816-b663-87b4b909552c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\unit-test">
+      <UniqueIdentifier>{1f590ab0-d252-4222-bd33-0db49b360e64}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\unit-test">
+      <UniqueIdentifier>{aed2c6b1-7399-461e-82ad-bb19186ee711}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="brogue-hd.cpp">
@@ -596,8 +602,20 @@
     <ClInclude Include="simpleArrayExtension.h">
       <Filter>Header Files\component</Filter>
     </ClInclude>
+    <ClInclude Include="simpleComponentTests.h">
+      <Filter>Header Files\unit-test</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueTestPackage.h">
+      <Filter>Header Files\unit-test</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleArrayTests.h">
+      <Filter>Header Files\unit-test</Filter>
+    </ClInclude>
     <ClInclude Include="brogueLogger.h">
       <Filter>Header Files\global</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleHashTests.h">
+      <Filter>Header Files\unit-test</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -75,9 +75,9 @@ namespace brogueHd::component
 
 	private:
 
-		int calculateHashCode(K key) const;
-		int calculateBucketIndex(int hashCode) const;
-		void rehash(int newSize);
+		size_t calculateHashCode(K key) const;
+		size_t calculateBucketIndex(int hashCode) const;
+		void rehash(size_t newSize);
 
 	public:	// Extension Methods:  mostly queries
 
@@ -111,14 +111,26 @@ namespace brogueHd::component
 	template<typename K, typename V>
 	simpleHash<K, V>::simpleHash()
 	{
-		_table = new simpleArray<simpleList<simplePair<K, V>>*>(0);
+		_table = new simpleArray<simpleList<simplePair<K, V>>*>(100);
 		_list = new simpleList<simplePair<K, V>>();
 		_maxBucketSize = 0;
+
+		// (MEMORY!)
+		for (int index = 0; index < _table->count(); index++)
+		{
+			_table->set(index, new simpleList<simplePair<K, V>>());
+		}
 	}
 
 	template<typename K, typename V>
 	simpleHash<K, V>::~simpleHash()
 	{
+		// (MEMORY!)
+		for (int index = 0; index < _table->count(); index++)
+		{
+			delete _table->get(index);
+		}
+
 		delete _table;
 		delete _list;
 	}
@@ -135,8 +147,8 @@ namespace brogueHd::component
 	template<typename K, typename V>
 	V simpleHash<K, V>::get(K key) const
 	{
-		int hashCode = this->calculateHashCode(key);
-		int bucketIndex = this->calculateBucketIndex(hashCode);
+		size_t hashCode = this->calculateHashCode(key);
+		size_t bucketIndex = this->calculateBucketIndex(hashCode);
 
 		// TODO: Use Ordered List
 		for (int index = 0; index < _table->get(bucketIndex)->count(); index++)
@@ -186,8 +198,8 @@ namespace brogueHd::component
 
 		// If there's still overflow, the max size will be set for the next call to set(..)
 		//
-		int hashCode = this->calculateHashCode(key);
-		int bucketIndex = this->calculateBucketIndex(hashCode);
+		size_t hashCode = this->calculateHashCode(key);
+		size_t bucketIndex = this->calculateBucketIndex(hashCode);
 
 		// Add to the i-th bucket
 		//
@@ -206,8 +218,8 @@ namespace brogueHd::component
 		V oldValue = this->get(key);
 
 		// Iterate to find the location in the ith bucket
-		int hashCode = this->calculateHashCode(key);
-		int bucketIndex = this->calculateBucketIndex(hashCode);
+		size_t hashCode = this->calculateHashCode(key);
+		size_t bucketIndex = this->calculateBucketIndex(hashCode);
 
 		// Iterate to set the item value
 		for (int index = 0; index < _table->get(bucketIndex)->count(); index++)
@@ -225,8 +237,8 @@ namespace brogueHd::component
 	template<typename K, typename V>
 	bool simpleHash<K, V>::remove(K key)
 	{
-		int hashCode = this->calculateHashCode(key);
-		int bucketIndex = this->calculateBucketIndex(hashCode);
+		size_t hashCode = this->calculateHashCode(key);
+		size_t bucketIndex = this->calculateBucketIndex(hashCode);
 
 		// TODO: Use Ordered List
 		for (int index = 0; index < _table->get(bucketIndex)->count(); index++)
@@ -257,22 +269,22 @@ namespace brogueHd::component
 	}
 
 	template<typename K, typename V>
-	int simpleHash<K, V>::calculateHashCode(K key) const
+	size_t simpleHash<K, V>::calculateHashCode(K key) const
 	{
-		return (int)std::hash<K>{}(key);
+		return std::hash<K>{}(key);
 	}
 
 	template<typename K, typename V>
-	int simpleHash<K, V>::calculateBucketIndex(int hashCode) const
+	size_t simpleHash<K, V>::calculateBucketIndex(int hashCode) const
 	{
-		return hashCode % _table->count();
+		return hashCode % (size_t)_table->count();
 	}
 
 	template<typename K, typename V>
 	bool simpleHash<K, V>::contains(K key) const
 	{
-		int hashCode = this->calculateHashCode(key);
-		int bucketIndex = this->calculateBucketIndex(hashCode);
+		size_t hashCode = this->calculateHashCode(key);
+		size_t bucketIndex = this->calculateBucketIndex(hashCode);
 
 		// TODO: Use Ordered List
 		for (int index = 0; index < _table->get(bucketIndex)->count(); index++)
@@ -297,7 +309,7 @@ namespace brogueHd::component
 		{
 			for (int bucketIndex = 0; bucketIndex < _table->get(index)->count(); bucketIndex++)
 			{
-				simplePair<K, V> pair = _table->get(index)->get(index);
+				simplePair<K, V> pair = _table->get(index)->get(bucketIndex);
 
 				if (callback(pair.key, pair.value) == iterationCallback::breakAndReturn)
 					return;
@@ -306,7 +318,7 @@ namespace brogueHd::component
 	}
 
 	template<typename K, typename V>
-	void simpleHash<K, V>::rehash(int newSize)
+	void simpleHash<K, V>::rehash(size_t newSize)
 	{
 		// Setup new hash table with the specified size limit
 		simpleArray<simpleList<simplePair<K, V>>*>* newTable = new simpleArray<simpleList<simplePair<K, V>>*>(newSize);
@@ -325,8 +337,8 @@ namespace brogueHd::component
 				K key = _table->get(index)->get(bucketIndex).key;
 				V value = _table->get(index)->get(bucketIndex).value;
 
-				int hashCode = this->calculateHashCode(key);
-				int newBucketIndex = hashCode % newSize;		// Find a bucket for the data
+				size_t hashCode = this->calculateHashCode(key);
+				size_t newBucketIndex = hashCode % newSize;		// Find a bucket for the data
 
 				if (newTable->get(newBucketIndex) == NULL)
 					newTable->set(newBucketIndex, new simpleList<simplePair<K, V>>());

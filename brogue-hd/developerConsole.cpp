@@ -1,5 +1,9 @@
 #include "developerConsole.h"
 #include "typeConverter.h"
+#include "simpleArrayTests.h"
+#include "simpleHashTests.h"
+
+using namespace brogueHd::test;
 
 namespace brogueHd::console
 {
@@ -20,8 +24,11 @@ namespace brogueHd::console
 		{
 		case 1:
 		{
-			stream << "Running unit tests..." << std::endl;
-			return brogueConsoleReturn::Completed;
+			if (this->runUnitTests())
+				return brogueConsoleReturn::Completed;
+
+			else
+				return brogueConsoleReturn::CompletedWithError;
 		}
 		break;
 		default:
@@ -34,6 +41,18 @@ namespace brogueHd::console
 		stream << "Brogue Developer Console:" << std::endl << std::endl;
 		stream << "\t1) Run Unit Tests" << std::endl;
 		stream << "\tElse) Exit" << std::endl;
+	}
+
+	bool developerConsole::runUnitTests()
+	{
+		// Brogue Tests map output to the console using brogueLogger
+		simpleArrayTests arrayTests;
+		simpleHashTests hashTests;
+
+		bool result = arrayTests.run();
+		result &= hashTests.run();
+		
+		return result;
 	}
 }
 

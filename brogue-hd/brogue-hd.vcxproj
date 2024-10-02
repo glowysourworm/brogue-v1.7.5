@@ -224,8 +224,11 @@
     <ClInclude Include="brogueObject.h" />
     <ClInclude Include="broguePlayer.h" />
     <ClInclude Include="brogueRoom.h" />
+    <ClInclude Include="brogueTestPackage.h" />
     <ClInclude Include="cellularAutomataParameters.h" />
     <ClInclude Include="componentMacros.h" />
+    <ClInclude Include="simpleArrayTests.h" />
+    <ClInclude Include="simpleComponentTests.h" />
     <ClInclude Include="creatureBehaviorConstants.h" />
     <ClInclude Include="creatureBehavior.h" />
     <ClInclude Include="creatureBehaviorMap.h" />
@@ -318,6 +321,7 @@
     <ClInclude Include="simpleArrayExtension.h" />
     <ClInclude Include="simpleBST.h" />
     <ClInclude Include="simpleHash.h" />
+    <ClInclude Include="simpleHashTests.h" />
     <ClInclude Include="simpleList.h" />
     <ClInclude Include="simpleListExtension.h" />
     <ClInclude Include="statusEffectConstants.h" />
