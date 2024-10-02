@@ -2,6 +2,9 @@
 
 #include "simple.h"
 #include "simpleHash.h"
+#include "brogueMath.h"
+
+using namespace brogueHd::component::math;
 
 namespace brogueHd::component
 {

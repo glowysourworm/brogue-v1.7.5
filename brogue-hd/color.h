@@ -55,7 +55,7 @@ namespace brogueHd::backend::model::game
 			rand = rrand;
 			colorDances = acolorDances;
 		}
-		bool compare(const color& color)
+		bool compare(const color& color) const
 		{
 			return red == color.red &&
 					green == color.green &&
@@ -66,13 +66,13 @@ namespace brogueHd::backend::model::game
 					rand == color.rand &&
 					colorDances == color.colorDances;
 		}
-		bool operator ==(const color& color)
+		bool operator ==(const color& other) const
 		{
-			return compare(color);
+			return compare(other);
 		}
-		bool operator !=(const color& color)
+		bool operator !=(const color& other) const
 		{
-			return !compare(color);
+			return !compare(other);
 		}
 
 		size_t getHash() const override

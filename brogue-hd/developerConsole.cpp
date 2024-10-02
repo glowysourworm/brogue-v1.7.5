@@ -2,6 +2,7 @@
 #include "typeConverter.h"
 #include "simpleArrayTests.h"
 #include "simpleHashTests.h"
+#include "simpleComponentTests.h"
 
 using namespace brogueHd::test;
 
@@ -48,9 +49,11 @@ namespace brogueHd::console
 		// Brogue Tests map output to the console using brogueLogger
 		simpleArrayTests arrayTests;
 		simpleHashTests hashTests;
+		simpleComponentTests componentTests;
 
 		bool result = arrayTests.run();
 		result &= hashTests.run();
+		result &= componentTests.run();
 		
 		return result;
 	}

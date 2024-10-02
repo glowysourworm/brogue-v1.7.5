@@ -19,6 +19,21 @@ namespace brogueHd::backend::model
 
 	public:
 		
+		bool operator==(const brogueObject& other) const
+		{
+			return character == other.character &&
+				   foreColor == other.foreColor &&
+				   backColor == other.backColor &&
+				   opacity == other.opacity;
+		}
+
+		bool operator!=(const brogueObject& other) const
+		{
+			return character != other.character ||
+				   foreColor != other.foreColor ||
+				   backColor != other.backColor ||
+				   opacity != other.opacity;
+		}
 		size_t getHash() const override 
 		{
 			return hashGenerator::generateHash(character, opacity);
