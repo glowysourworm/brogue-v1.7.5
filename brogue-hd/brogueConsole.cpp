@@ -8,12 +8,23 @@ using namespace brogueHd::component;
 
 namespace brogueHd::console
 {
-	brogueConsole::brogueConsole(){}
+	brogueConsole::brogueConsole()
+	{
+		this->consoleName = "Brogue";
+	}
 	brogueConsole::~brogueConsole(){}
 
 	brogueConsoleReturn brogueConsole::command(std::string input, ostream& stream)
 	{
 		simpleArray<std::string> cmd = stringExtension::split(input, " ");
+
+		// Echo the command (DEBUG)
+		cmd.forEach([&stream](std::string str)
+		{
+			brogueLogger::output(str);
+
+			return iterationCallback::iterate;
+		});
 
 		if (hasArgument(cmd, "--mode"))
 		{

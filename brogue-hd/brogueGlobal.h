@@ -7,7 +7,8 @@
 #include "hashExtension.h"
 #include "componentMacros.h"
 #include "EnumString.h"
-#include "exceptionHandler.h"
+#include "brogueLogger.h"
+#include "brogueException.h"
 #include "command.h"
 
 namespace brogueHd

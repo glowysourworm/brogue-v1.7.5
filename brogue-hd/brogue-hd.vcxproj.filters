@@ -563,7 +563,7 @@
     <ClInclude Include="componentMacros.h">
       <Filter>Header Files\global</Filter>
     </ClInclude>
-    <ClInclude Include="exceptionHandler.h">
+    <ClInclude Include="brogueException.h">
       <Filter>Header Files\global</Filter>
     </ClInclude>
     <ClInclude Include="EnumString.h">
@@ -595,6 +595,9 @@
     </ClInclude>
     <ClInclude Include="simpleArrayExtension.h">
       <Filter>Header Files\component</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueLogger.h">
+      <Filter>Header Files\global</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

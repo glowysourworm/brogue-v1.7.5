@@ -2,7 +2,7 @@
 
 #include "mathPoint.h"
 #include "mathVector.h"
-#include "exceptionHandler.h"
+#include "brogueGlobal.h"
 #include <concepts>
 #include <functional>
 

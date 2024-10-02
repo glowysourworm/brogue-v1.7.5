@@ -2,7 +2,10 @@
 
 namespace brogueHd::console
 {
-	developerConsole::developerConsole() {}
+	developerConsole::developerConsole() 
+	{
+		this->consoleName = "Brogue Developer Console";
+	}
 	developerConsole::~developerConsole() {}
 
 	brogueConsoleReturn developerConsole::command(std::string input, ostream& stream)

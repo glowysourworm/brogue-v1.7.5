@@ -148,13 +148,16 @@ namespace brogueHd::component
 	template<typename T>
 	T simpleList<T>::get(int index) const
 	{
+		if (index >= _count)
+			brogueException::show("Index is outside the bounds of the list:  simpleList.h");
+
 		return _array->get(index);
 	}
 
 	template<typename T>
 	int simpleList<T>::count() const
 	{
-		return _array->count();
+		return _count;
 	}
 
 	template<typename T>
@@ -298,7 +301,12 @@ namespace brogueHd::component
 	template<typename T>
 	simpleArray<T> simpleList<T>::toArray() const
 	{
-		return *_array;
+		simpleArray<T> result(_count);
+
+		for (int index = 0; index < _count; index++)
+			result.set(index, this->get(index));
+
+		return result;
 	}
 
 	template<typename T>

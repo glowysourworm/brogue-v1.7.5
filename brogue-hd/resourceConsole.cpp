@@ -17,6 +17,8 @@ namespace brogueHd::console
 	resourceConsole::resourceConsole(resourceController* resourceController)
 	{
 		_resourceController = resourceController;
+
+		this->consoleName = "Brogue Resource Console";
 	}
 	resourceConsole::~resourceConsole() {}
 

@@ -4,8 +4,7 @@
 #include "randomGenerator.h"
 #include "broguefile.h"
 #include "randomGenerator.h"
-#include "command.h"
-#include "exceptionHandler.h"
+#include "brogueGlobal.h"
 #include <time.h>
 #include <fstream>
 

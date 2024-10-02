@@ -18,6 +18,8 @@ namespace brogueHd::console
 
 		const char* BrogueVersion = BROGUE_VERSION_STRING;
 
+		std::string consoleName;
+
 	public:
 
 		brogueConsole();

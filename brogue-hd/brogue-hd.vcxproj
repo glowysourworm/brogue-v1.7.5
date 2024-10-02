@@ -218,6 +218,7 @@
     <ClInclude Include="brogueGlobal.h" />
     <ClInclude Include="brogueGameProfile.h" />
     <ClInclude Include="brogueLevelProfile.h" />
+    <ClInclude Include="brogueLogger.h" />
     <ClInclude Include="brogueMachine.h" />
     <ClInclude Include="brogueMath.h" />
     <ClInclude Include="brogueObject.h" />
@@ -236,7 +237,7 @@
     <ClInclude Include="dungeonFeatureConstants.h" />
     <ClInclude Include="dungeonTemplate.h" />
     <ClInclude Include="EnumString.h" />
-    <ClInclude Include="exceptionHandler.h" />
+    <ClInclude Include="brogueException.h" />
     <ClInclude Include="gameConsole.h" />
     <ClInclude Include="graph.h" />
     <ClInclude Include="graphAlgorithm.h" />

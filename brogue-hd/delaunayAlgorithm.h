@@ -5,7 +5,7 @@
 #include "graphAlgorithm.h"
 #include "gridLocatorEdge.h"
 #include "simpleList.h"
-#include "exceptionHandler.h"
+#include "brogueGlobal.h"
 
 namespace brogueHd::component
 {

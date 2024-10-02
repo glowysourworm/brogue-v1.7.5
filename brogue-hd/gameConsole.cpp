@@ -12,11 +12,15 @@ using namespace brogueHd::component;
 
 namespace brogueHd::console
 {
-	gameConsole::gameConsole() {}
+	gameConsole::gameConsole() 
+	{
+		this->consoleName = "Brogue Game Console";
+	}
 	gameConsole::gameConsole(resourceController* resourceController) 
 	{
 		_resourceController = resourceController;
 		_gameController = new gameController();
+		this->consoleName = "Brogue GAME";
 	}
 	gameConsole::~gameConsole() 
 	{

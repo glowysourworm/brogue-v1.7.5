@@ -77,6 +77,7 @@ int main(int argc, char* argv[])
 			currentConsole->printHelp(std::cout);
 
 		// Read console line
+		std::cout << std::endl << currentConsole->consoleName << " @> ";
 		std::getline(std::cin, cmd);
 	}
 

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "brogueGlobal.h"
 #include "simple.h"
 #include <functional>
 
@@ -47,7 +48,6 @@ namespace brogueHd::component
 	private:
 
 		T* _array;
-		int _size;
 		int _count;
 	};
 
@@ -55,7 +55,6 @@ namespace brogueHd::component
 	simpleArray<T>::simpleArray()
 	{
 		_array = NULL;
-		_size = 0;
 		_count = 0;
 	}
 
@@ -63,16 +62,19 @@ namespace brogueHd::component
 	simpleArray<T>::simpleArray(int count)
 	{
 		_array = new T[count * sizeof(T)];
-		_size = count * sizeof(T);
 		_count = count;
 	}
 
 	template<typename T>
 	simpleArray<T>::simpleArray(const T* anArray)
 	{
-		_array = new T[sizeof(anArray)];
-		_size = sizeof(anArray);
-		_count = sizeof(anArray) / sizeof(T);
+		if (anArray == NULL)
+			brogueException::show("Trying to allocate an array with a null array:  simpleArray.h");
+
+		// TODO: Better way to calculate sizeof
+
+		_array = new T[sizeof(*anArray)];
+		_count = sizeof(*anArray) / sizeof(anArray[0]);
 
 		for (int index = 0; index < _count; index++)
 			_array[index] = anArray[index];
@@ -82,7 +84,6 @@ namespace brogueHd::component
 	simpleArray<T>::simpleArray(const simpleArray<T>& copy)
 	{
 		_array = new T[copy.count() * sizeof(T)];
-		_size = copy.count() * sizeof(T);
 		_count = copy.count();
 
 		for (int index = 0; index < _count; index++)
@@ -94,7 +95,6 @@ namespace brogueHd::component
 	{
 		delete[] _array;
 
-		_size = 0;
 		_count = 0;
 	}
 

@@ -3,7 +3,7 @@
 #include "mathPoint.h"
 #include "mathVector.h"
 #include "brogueMath.h"
-#include "exceptionHandler.h"
+#include "brogueGlobal.h"
 
 namespace brogueHd::component::math
 {

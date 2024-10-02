@@ -73,51 +73,70 @@ namespace brogueHd::component
 
 			return true;
 		}
-		static simpleArray<std::string> split(const std::string& input, const char* tokens)
-		{	
+		static simpleArray<std::string> split(const std::string& input, const simpleArray<char>& tokens)
+		{
 			simpleList<std::string> result;
 			simpleList<std::string> list;
-			
-			list.add(input);
 
-			for (int index = 0; index < sizeof(tokens); index++)
+			result.add(input);
+
+			for (int index = 0; index < tokens.count(); index++)
 			{
-				for (int listIndex = 0; listIndex < list.count(); listIndex++)
+				char token = tokens.get(index);
+
+				list.clear();
+
+				// Iterate the result list, swap back to list
+				result.forEach([&token, &list](std::string str)
 				{
-					int lastIndex = -1;
+					simpleArray<std::string> strings = split(str, token);
 
-					// Scan the string for the next token
-					for (int strIndex = 0; strIndex < list.get(listIndex).size(); strIndex++)
-					{
-						// Found token!
-						if (list.get(listIndex).at(strIndex) == tokens[index])
-						{
-							std::string subString = (lastIndex == -1) ? list.get(listIndex).substr(0, strIndex) : 
-																		list.get(listIndex).substr(lastIndex, strIndex - lastIndex);
+					list.addRange(strings);
 
-							// Remove white space
-							if (!isWhitespace(subString))
-								result.add(subString);
+					return iterationCallback::iterate;
+				});
 
-							lastIndex = strIndex;
-						}
-					}
+				result.clear();
+				result.addRange(list);
+				list.clear();
+			}
 
-					// No match found
-					if (lastIndex == -1)
-						result.add(list.get(listIndex));
-				}
+			return result.toArray();
+		}
+		static simpleArray<std::string> split(const std::string& input, const char token)
+		{	
+			simpleList<std::string> result;
+			
+			int lastIndex = -1;
 
-				// Setup results for next iteration
-				if (index < sizeof(tokens) - 1)
+			for (int strIndex = 0; strIndex < input.size(); strIndex++)
+			{
+				// Found token!
+				if (input[strIndex] == token)
 				{
-					list.clear();
-					list.addRange(result);
+					std::string subString = (lastIndex == -1) ? input.substr(0, strIndex) : input.substr(lastIndex + 1, strIndex - lastIndex - 1);
 
-					result.clear();			// Search for smaller splits
+					result.add(subString);
+
+					lastIndex = strIndex;
 				}
 			}
-			
+
+			// Add the last sub-string
+			if (lastIndex != -1)
+				result.add(input.substr(lastIndex + 1, input.size() - lastIndex - 1));
+
+			else
+				result.add(input);
+
+			// Echo the command (DEBUG)
+			result.forEach([](std::string str)
+			{
+				brogueLogger::output(str);
+
+				return iterationCallback::iterate;
+			});
+
 			return result.toArray();
 		}
 	};
