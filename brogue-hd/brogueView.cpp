@@ -17,7 +17,10 @@ namespace brogueHd::frontend::ui
 	{
 		delete _view;
 	}
-
+	brogueCellDisplay brogueView::get(short column, short row) const
+	{
+		return _view->get(column, row);
+	}
 	void brogueView::update(const brogueCellDisplay& display, short column, short row)
 	{
 		_view->get(column,row).update(display);

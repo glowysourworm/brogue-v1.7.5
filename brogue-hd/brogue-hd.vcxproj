@@ -237,6 +237,9 @@
     <ClInclude Include="cellularAutomataParameters.h" />
     <ClInclude Include="componentMacros.h" />
     <ClInclude Include="gl.h" />
+    <ClInclude Include="simpleDataStream.h" />
+    <ClInclude Include="simpleFrameBuffer.h" />
+    <ClInclude Include="simplePrimitive.h" />
     <ClInclude Include="khrplatform.h" />
     <ClInclude Include="simpleArrayTests.h" />
     <ClInclude Include="simpleComponentTests.h" />
@@ -335,6 +338,12 @@
     <ClInclude Include="simpleHashTests.h" />
     <ClInclude Include="simpleList.h" />
     <ClInclude Include="simpleListExtension.h" />
+    <ClInclude Include="simpleShaderProgram.h" />
+    <ClInclude Include="simpleTexture.h" />
+    <ClInclude Include="simpleUniform.h" />
+    <ClInclude Include="simpleVertexArray.h" />
+    <ClInclude Include="simpleVertexAttribute.h" />
+    <ClInclude Include="simpleVertexBuffer.h" />
     <ClInclude Include="statusEffectConstants.h" />
     <ClInclude Include="statusEffect.h" />
     <ClInclude Include="stringExtension.h" />

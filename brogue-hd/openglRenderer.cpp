@@ -2,6 +2,7 @@
 #include "brogueGlobal.h"
 #include "brogueLogger.h"
 #include "typeConverter.h"
+#include <mutex>
 
 #include <thread>
 #include <chrono>
@@ -92,6 +93,9 @@ namespace brogueHd::frontend::opengl
 
 	void openglRenderer::thread_start()
 	{
+		// Create Lock Mechanism
+		std::mutex threadLock;
+
 		// Full Screen Mode, Primary Monitor
 		//window = glfwCreateWindow(mode->width, mode->height, "Brogue v1.7.5", monitor, NULL);
 
@@ -127,7 +131,11 @@ namespace brogueHd::frontend::opengl
 		// Main Rendering Loop
 		while (!glfwWindowShouldClose(window))
 		{
-			//glClear();
+			// Update from main thread's brogueView*
+			threadLock.lock();
+
+			threadLock.unlock();
+
 			glfwSwapBuffers(window);
 			glfwPollEvents();
 

@@ -395,10 +395,10 @@ namespace brogueHd::component
         T searchValue;
 
         iterate(this, [](short column, short row)
-            {
-                if (aggregateComparator(searchValue, _grid[column, row]))
-                    searchValue = _grid[column][row];
-            });
+        {
+            if (aggregateComparator(searchValue, _grid[column, row]))
+                searchValue = _grid[column][row];
+        });
 
         return searchValue;
     }

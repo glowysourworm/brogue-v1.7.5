@@ -11,13 +11,18 @@ namespace brogueHd::frontend::ui
 	class brogueView
 	{
 	public:
-
+		
+		brogueView(){};
 		brogueView(gridRect boundary);
 		~brogueView();
 
-		void update(const brogueCellDisplay& display, short column, short row);
+		brogueCellDisplay get(short column, short row) const;
 
 		void iterate(gridCallback<brogueCellDisplay> callback) const;
+
+	protected:
+
+		void update(const brogueCellDisplay& cell, short column, short row);
 
 	private:
 

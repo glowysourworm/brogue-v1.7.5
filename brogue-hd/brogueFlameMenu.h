@@ -1,15 +1,18 @@
 #pragma once
 
+#include "brogueGlobal.h"
 #include "brogueView.h"
+#include "brogueCellDisplay.h"
 
 using namespace brogueHd::backend::model;
+using namespace brogueHd::backend::model::layout;
 
 namespace brogueHd::frontend::ui
 {
 	class brogueFlameMenu : public brogueView
 	{
 	public:
-
+		brogueFlameMenu(){};
 		brogueFlameMenu(int padding, 
 						int precision, 
 						int riseSpeed, 
@@ -19,8 +22,61 @@ namespace brogueHd::frontend::ui
 						int updateDelay);
 		~brogueFlameMenu();
 
+	public:
 
+		//
+		// Brogue v1.7.5 (Brian Walker a.k.a. penderprime)
+		//
+
+		const char Title[MENU_TITLE_HEIGHT][MENU_TITLE_WIDTH + 1] = {
+			"########   ########       ######         #######   ####     ###  #########",
+			" ##   ###   ##   ###    ##     ###     ##      ##   ##       #    ##     #",
+			" ##    ##   ##    ##   ##       ###   ##        #   ##       #    ##     #",
+			" ##    ##   ##    ##   #    #    ##   #         #   ##       #    ##      ",
+			" ##    ##   ##    ##  ##   ##     ## ##             ##       #    ##    # ",
+			" ##   ##    ##   ##   ##   ###    ## ##             ##       #    ##    # ",
+			" ######     ## ###    ##   ####   ## ##             ##       #    ####### ",
+			" ##    ##   ##  ##    ##   ####   ## ##             ##       #    ##    # ",
+			" ##     ##  ##   ##   ##    ###   ## ##      #####  ##       #    ##    # ",
+			" ##     ##  ##   ##   ###    ##   ## ###       ##   ##       #    ##      ",
+			" ##     ##  ##    ##   ##    #    #   ##       ##   ##       #    ##      ",
+			" ##     ##  ##    ##   ###       ##   ###      ##   ###      #    ##     #",
+			" ##    ##   ##     ##   ###     ##     ###    ###    ###    #     ##     #",
+			"########   ####    ###    ######         #####        ######     #########",
+			"                            ##                                            ",
+			"                        ##########                                        ",
+			"                            ##                                            ",
+			"                            ##                                            ",
+			"                           ####                                           ",
+		};
 	};
+
+	brogueFlameMenu::brogueFlameMenu(int padding,
+										int precision,
+										int riseSpeed,
+										int spreadSpeed,
+										int colorDriftSpeed,
+										int fadeSpeed,
+										int updateDelay)
+	{
+		// Transfer rendering to the primary view grid
+		for (int column = 0; column < MENU_TITLE_WIDTH; column++)
+		{
+			for (int row = 0; row < MENU_TITLE_HEIGHT; row++)
+			{
+				brogueCellDisplay cell = this->get(column, row);
+
+				cell.character = this->Title[column][row];
+				cell.foreColor = color(500, 500, 500, 0, 0, 0, 0, false);
+
+				this->update(cell, column, row);
+			}
+		}
+	}
+	brogueFlameMenu::~brogueFlameMenu()
+	{
+
+	}
 }
 
 /*

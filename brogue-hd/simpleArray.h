@@ -20,6 +20,13 @@ namespace brogueHd::component
 	template<typename T>
 	using simpleArrayPredicate = std::function<bool(T item)>;
 
+	/// <summary>
+	/// Aggregate uses a callback with the current value of iteration. Setting the return 
+	/// value will forward the aggregate. (e.g. aggregate = simpleArrayAggregate(aggregate, currentValue))
+	/// </summary>
+	template<typename T, typename TResult>
+	using simpleArrayAggregate = std::function<TResult(TResult, T)>;
+
 	template<typename T>
 	class simpleArray
 	{
@@ -34,6 +41,7 @@ namespace brogueHd::component
 		int count() const;
 
 		T get(int index) const;
+		T* getArray() const;
 
 		// This may be required for simpleHash->set
 		//void operator=(const simpleArray<T>& other);
@@ -42,6 +50,9 @@ namespace brogueHd::component
 		bool contains(T item);
 
 		void forEach(simpleArrayCallback<T> callback);
+
+		template<typename TResult>
+		TResult aggregate(TResult& seedValue, simpleArrayAggregate<T, TResult> aggregator);
 
 	private:
 
@@ -109,6 +120,12 @@ namespace brogueHd::component
 	}
 
 	template<typename T>
+	T* simpleArray<T>::getArray() const
+	{
+		return _array;
+	}
+
+	template<typename T>
 	void simpleArray<T>::set(int index, T value)
 	{
 		_array[index] = value;
@@ -135,5 +152,15 @@ namespace brogueHd::component
 		}
 
 		return false;
+	}
+
+	template<typename T>
+	template<typename TResult>
+	TResult simpleArray<T>::aggregate(TResult& seedValue, simpleArrayAggregate<T, TResult> aggregator)
+	{
+		for (int index = 0; index < _count; index++)
+		{
+			seedValue = aggregator(result, _array[index]);
+		}
 	}
 }
