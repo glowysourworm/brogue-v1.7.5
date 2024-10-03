@@ -5,6 +5,7 @@
 #include "broguefile.h"
 #include "brogueGlobal.h"
 
+#include <thread>
 #include <time.h>
 #include <fstream>
 
@@ -143,6 +144,10 @@ namespace brogueHd::backend::controller
 
 		if (glfwInit() == GLFW_TRUE)
 		{
+			glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+			glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+			glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
 			glfwSetErrorCallback([](int error, const char* messasge)
 			{
 				// log error
@@ -157,10 +162,19 @@ namespace brogueHd::backend::controller
 			// https://www.glfw.org/docs/latest/quick.html#quick_steps
 
 
-			//while (!glfwWindowShouldClose(window))
-			//{
-			//	// Keep running
-			//}
+			glfwMakeContextCurrent(_gameWindow);
+			glfwSwapInterval(100);
+
+			while (glfwGetKey(_gameWindow, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
+				   glfwWindowShouldClose(_gameWindow) == GLFW_FALSE)
+			{
+				// Keep running
+
+				//std::this_thread::sleep_for(100ms);
+
+				glfwSwapBuffers(_gameWindow);
+				glfwPollEvents();
+			}
 
 			// Also:   glfwSetWindowCloseCallback
 
@@ -182,6 +196,9 @@ namespace brogueHd::backend::controller
 				glViewport(0, 0, width, height);
 				glfwSetFramebufferSizeCallback
 			*/
+
+			glfwDestroyWindow(_gameWindow);
+			glfwTerminate();
 
 		}
 		else
