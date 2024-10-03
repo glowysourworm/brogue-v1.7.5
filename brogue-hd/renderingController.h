@@ -1,7 +1,10 @@
 #pragma once
 
-#include "command.h"
+#include "brogueGlobal.h"
 #include "openglRenderer.h"
+#include "gameConstants.h"
+#include <functional>
+#include <stdlib.h>
 
 using namespace brogueHd::frontend::opengl;
 
@@ -36,7 +39,7 @@ namespace brogueHd::backend::controller
 
 		BrogueGameMode _mode;
 
-		openglRenderer* _renderer;
+		openglRenderer* _openglRenderer;
 
 	};
 }

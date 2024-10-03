@@ -30,33 +30,33 @@ namespace brogueHd::component::math
 
 			return x;
 		}
-		static TMath min(TMath x, TMath y)
+		static TMath minOf(TMath x, TMath y)
 		{
 			if (x <= y)
 				return x;
 
 			return y;
 		}
-		static TMath min(TMath x, TMath y, TMath z)
+		static TMath minOf(TMath x, TMath y, TMath z)
 		{
 			if (x <= y)
-				return min(x, z);
+				return minOf(x, z);
 
-			return min(y, z);
+			return minOf(y, z);
 		}
-		static TMath max(TMath x, TMath y)
+		static TMath maxOf(TMath x, TMath y)
 		{
 			if (x > y)
 				return x;
 
 			return y;
 		}
-		static TMath max(TMath x, TMath y, TMath z)
+		static TMath maxOf(TMath x, TMath y, TMath z)
 		{
 			if (x > y)
-				return max(x, z);
+				return maxOf(x, z);
 
-			return max(y, z);
+			return maxOf(y, z);
 		}
 		static TMath sqrt(TMath x)
 		{

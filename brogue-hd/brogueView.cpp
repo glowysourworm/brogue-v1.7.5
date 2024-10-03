@@ -7,7 +7,7 @@
 
 using namespace brogueHd::component;
 
-namespace brogueHd::backend::model
+namespace brogueHd::frontend::ui
 {
 	brogueView::brogueView(gridRect boundary)
 	{

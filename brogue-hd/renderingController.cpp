@@ -1,7 +1,4 @@
 #include "renderingController.h"
-#include "gameConstants.h"
-#include <functional>
-#include <stdlib.h>
 
 using namespace brogueHd::frontend::opengl;
 using namespace brogueHd::backend::modelConstant;
@@ -10,11 +7,11 @@ namespace brogueHd::backend::controller
 {
 	renderingController::renderingController()
 	{
-		_renderer = new openglRenderer();
+		_openglRenderer = new openglRenderer();
 	}
 	renderingController::~renderingController()
 	{
-		delete _renderer;
+		delete _openglRenderer;
 	}
 
 	void renderingController::setViewMode(BrogueGameMode mode)
@@ -30,13 +27,13 @@ namespace brogueHd::backend::controller
 		case BrogueGameMode::Game:
 		case BrogueGameMode::Playback:
 		{
-			_renderer->openWindow();
+			_openglRenderer->openWindow(NULL);
 		}
 		break;
 		case BrogueGameMode::Scum:
 		case BrogueGameMode::Quit:
 		{
-			_renderer->closeWindow();
+			_openglRenderer->closeWindow();
 		}
 			break;
 		default:

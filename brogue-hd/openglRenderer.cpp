@@ -38,11 +38,13 @@ namespace brogueHd::frontend::opengl
 		glfwPollEvents();
 	}
 
-	void openglRenderer::openWindow()
+	void openglRenderer::openWindow(brogueView* view)
 	{
 		if (_windowOpen)
 			return;
 
+		// Shared View Pointer
+		_view = view;
 		_windowOpen = true;
 
 		// GLFW Errors
@@ -67,50 +69,9 @@ namespace brogueHd::frontend::opengl
 			glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
 			glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
 
-			// Full Screen Mode, Primary Monitor
-			//_static_gameWindow = glfwCreateWindow(mode->width, mode->height, "Brogue v1.7.5", monitor, NULL);
-
-			// Windowed Mode
-			GLFWwindow* window = glfwCreateWindow(640, 480, "Brogue v1.7.5", NULL, NULL);
-
-			// Open GL Context
-			glfwMakeContextCurrent(window);
-			
-			if (!gladLoadGL(glfwGetProcAddress))
-			{
-				brogueLogger::logRed("Error calling gladLoadGL");
-
-				glfwDestroyWindow(window);
-				glfwTerminate();
-				return;
-			}
-
-			glfwSwapInterval(1);
-
-			// Keyboard Handler
-			glfwSetKeyCallback(window, &openglRenderer::keyCallback);
-
-			// Window Resize Callback
-			glfwSetFramebufferSizeCallback(window, &openglRenderer::resizeCallback);
-
-			//// Window Refresh Callback
-			//glfwSetWindowRefreshCallback(window, &openglRenderer::refreshCallback);
-
-			// Window Close Callback (NOT NEEDED! This is a callback to perform before window closes)
-			//glfwSetWindowCloseCallback(window, &openglRenderer::windowCloseCallback);
-
-			// Main Rendering Loop
-			while (!glfwWindowShouldClose(window))
-			{
-				//glClear();
-				glfwSwapBuffers(window);
-				glfwPollEvents();
-
-				std::this_thread::sleep_for(std::chrono::milliseconds(1));
-			}
-
-			glfwDestroyWindow(window);
-			glfwTerminate();
+			// Hook anything specific to the window on the other thread
+			//
+			_thread = new std::thread(&openglRenderer::thread_start, this);
 		}
 		else
 		{
@@ -128,14 +89,62 @@ namespace brogueHd::frontend::opengl
 		//glClear(GL_COLOR_BUFFER_BIT);
 		//glutSwapBuffers();
 	}
+
+	void openglRenderer::thread_start()
+	{
+		// Full Screen Mode, Primary Monitor
+		//window = glfwCreateWindow(mode->width, mode->height, "Brogue v1.7.5", monitor, NULL);
+
+		// Windowed Mode
+		GLFWwindow* window = glfwCreateWindow(640, 480, "Brogue v1.7.5", NULL, NULL);
+
+		// Open GL Context
+		glfwMakeContextCurrent(window);
+
+		if (!gladLoadGL(glfwGetProcAddress))
+		{
+			brogueLogger::logRed("Error calling gladLoadGL");
+
+			glfwDestroyWindow(window);
+			glfwTerminate();
+			return;
+		}
+
+		glfwSwapInterval(1);
+
+		// Keyboard Handler
+		glfwSetKeyCallback(window, &openglRenderer::keyCallback);
+
+		// Window Resize Callback
+		glfwSetFramebufferSizeCallback(window, &openglRenderer::resizeCallback);
+
+		//// Window Refresh Callback
+		//glfwSetWindowRefreshCallback(window, &openglRenderer::refreshCallback);
+
+		// Window Close Callback (NOT NEEDED! This is a callback to perform before window closes)
+		//glfwSetWindowCloseCallback(window, &openglRenderer::windowCloseCallback);
+
+		// Main Rendering Loop
+		while (!glfwWindowShouldClose(window))
+		{
+			//glClear();
+			glfwSwapBuffers(window);
+			glfwPollEvents();
+
+			std::this_thread::sleep_for(std::chrono::milliseconds(1));
+		}
+	}
+	void openglRenderer::thread_terminate()
+	{
+
+	}
+
 	void openglRenderer::closeWindow()
 	{
-		//glfwSetWindowShouldClose(window, GLFW_TRUE);
-
-		//openglRenderer::terminate();
+		
 	}
 	void openglRenderer::renderWindow()
 	{
-
+		
 	}
 }

@@ -569,7 +569,7 @@ namespace brogueHd::component
 		short cost = _mapCostPredicate(destColumn, destRow);
 
 		// Update the output map
-		_outputMap->set(destColumn, destRow, brogueMath<short>::min(_outputMap->get(destColumn, destRow), currentWeight + cost));
+		_outputMap->set(destColumn, destRow, brogueMath<short>::minOf(_outputMap->get(destColumn, destRow), currentWeight + cost));
 
 		// Update the frontier
 		short newWeight = _outputMap->get(destColumn, destRow);

@@ -6,7 +6,7 @@
 using namespace brogueHd::component;
 using namespace brogueHd::backend::model::layout;
 
-namespace brogueHd::backend::model
+namespace brogueHd::frontend::ui
 {
 	class brogueView
 	{

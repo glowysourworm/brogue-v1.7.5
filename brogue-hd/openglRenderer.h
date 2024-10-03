@@ -7,6 +7,12 @@
 #include <GLFW/glfw3.h>
 #endif
 
+#include <thread>
+
+#include "brogueView.h"
+
+using namespace brogueHd::frontend::ui;
+
 namespace brogueHd::frontend::opengl
 {
 	class openglRenderer
@@ -17,7 +23,7 @@ namespace brogueHd::frontend::opengl
 
 		// Making OpenGL / Window calls static to work with rendering controller.
 
-		void openWindow();
+		void openWindow(brogueView* view);
 		void closeWindow();
 		void renderWindow();
 
@@ -34,6 +40,13 @@ namespace brogueHd::frontend::opengl
 
 	private:
 
+		void thread_start();
+		void thread_terminate();
+
+	private:
+
+		std::thread* _thread;
+		brogueView* _view;
 		bool _windowOpen;
 	};
 }

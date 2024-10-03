@@ -386,7 +386,7 @@ namespace brogueHd::component
 
                 for (short index2 = index1; index2 < rowCountersLength && minHeight > 0; index2++)
                 {
-                    minHeight = brogueMath<short>::min(minHeight, rowCounters.get(index1), rowCounters.get(index2));
+                    minHeight = brogueMath<short>::minOf(minHeight, rowCounters.get(index1), rowCounters.get(index2));
 
                     // Current column against previous
                     if (rowCounters.get(index1) > bestArea)
