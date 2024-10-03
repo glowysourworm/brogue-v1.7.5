@@ -2,8 +2,6 @@
 
 #include <concepts>
 
-using namespace std;
-
 namespace brogueHd::component
 {
 	/// <summary>

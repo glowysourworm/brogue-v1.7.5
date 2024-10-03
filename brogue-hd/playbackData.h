@@ -3,8 +3,6 @@
 #include "brogueGlobal.h"
 #include "broguefile.h"
 
-using namespace std;
-
 namespace brogueHd::backend::model::io
 {
 	/// <summary>

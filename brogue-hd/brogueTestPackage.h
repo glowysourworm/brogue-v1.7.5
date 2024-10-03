@@ -6,8 +6,6 @@
 
 using namespace brogueHd::component;
 
-using namespace std;
-
 namespace brogueHd::test
 {
 	typedef std::function<bool(void)> brogueTestDelegate;
@@ -47,7 +45,7 @@ namespace brogueHd::test
 				{
 					 result = value();
 				}
-				catch (const exception& ex)
+				catch (const std::exception& ex)
 				{
 					brogueLogger::logRed("Exception: " + std::string(ex.what()));
 

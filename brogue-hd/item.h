@@ -8,8 +8,6 @@
 
 #include <string>
 
-using namespace std;
-
 using namespace brogueHd::component::math;
 using namespace brogueHd::backend::modelConstant;
 

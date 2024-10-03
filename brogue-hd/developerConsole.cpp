@@ -14,7 +14,7 @@ namespace brogueHd::console
 	}
 	developerConsole::~developerConsole() {}
 
-	brogueConsoleReturn developerConsole::command(std::string input, ostream& stream)
+	brogueConsoleReturn developerConsole::command(std::string input, std::ostream& stream)
 	{
 		int choice = 0;
 		
@@ -37,7 +37,7 @@ namespace brogueHd::console
 		}
 	}
 
-	void developerConsole::printHelp(ostream& stream)
+	void developerConsole::printHelp(std::ostream& stream)
 	{
 		stream << "Brogue Developer Console:" << std::endl << std::endl;
 		stream << "\t1) Run Unit Tests" << std::endl;

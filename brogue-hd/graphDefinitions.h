@@ -5,8 +5,6 @@
 #include "gridLocatorEdge.h"
 #include <functional>
 
-using namespace std;
-
 namespace brogueHd::component
 {
 	// Abstract graph constraints

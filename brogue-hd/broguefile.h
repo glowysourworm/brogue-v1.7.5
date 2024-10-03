@@ -6,8 +6,6 @@
 #include <iostream>
 #include <time.h>
 
-using namespace std;
-
 using namespace brogueHd::component;
 
 namespace brogueHd::backend::model::io
@@ -37,7 +35,7 @@ namespace brogueHd::backend::model::io
 
 		}
 
-		void serialize(ostream& stream)
+		void serialize(std::ostream& stream)
 		{
 			// Fields (IN ORDER)
 			//stream.write(reinterpret_cast<char*>(this->score), SIZEOF(long int));
@@ -45,7 +43,7 @@ namespace brogueHd::backend::model::io
 			//stream.write(reinterpret_cast<char*>(this->description), SIZEOF(char) * COLS);
 		}
 
-		static brogueScoreEntry deserialize(istream& stream)
+		static brogueScoreEntry deserialize(std::istream& stream)
 		{
 			brogueScoreEntry result;
 

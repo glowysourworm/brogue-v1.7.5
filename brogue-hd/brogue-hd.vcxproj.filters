@@ -118,6 +118,12 @@
     <Filter Include="Header Files\frontend\ui">
       <UniqueIdentifier>{d58c08d5-7216-4bfc-be43-301d5bc1744b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\vendor">
+      <UniqueIdentifier>{613dfa8c-5563-49ce-8cb7-05bd6e3ef94a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\vendor">
+      <UniqueIdentifier>{b2a62e31-8d2a-40ba-8995-bf6a92c350f9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="brogue-hd.cpp">
@@ -251,6 +257,9 @@
     </ClCompile>
     <ClCompile Include="brogueView.cpp">
       <Filter>Source Files\frontend\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="gl.c">
+      <Filter>Source Files\vendor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -625,6 +634,12 @@
     </ClInclude>
     <ClInclude Include="brogueView.h">
       <Filter>Header Files\frontend\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="gl.h">
+      <Filter>Header Files\vendor</Filter>
+    </ClInclude>
+    <ClInclude Include="khrplatform.h">
+      <Filter>Header Files\vendor</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

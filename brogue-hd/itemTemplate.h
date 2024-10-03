@@ -4,8 +4,6 @@
 #include "dungeonTemplate.h"
 #include <string>
 
-using namespace std;
-
 using namespace brogueHd::component::math;
 
 namespace brogueHd::backend::model::gameTemplate

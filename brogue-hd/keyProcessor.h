@@ -4,7 +4,6 @@
 #include "simpleHash.h"
 #include <string>
 
-using namespace std;
 using namespace brogueHd::component;
 
 namespace brogueHd::backend::processor

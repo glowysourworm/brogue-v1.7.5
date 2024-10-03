@@ -1,8 +1,6 @@
 #include "playbackProcessor.h"
 #include <fstream>
 
-using namespace std;
-
 namespace brogueHd::backend::processor
 {
 	playbackProcessor::playbackProcessor()
@@ -25,7 +23,7 @@ namespace brogueHd::backend::processor
 
 		try
 		{
-			fstream fileStream;
+			std::fstream fileStream;
 
 			fileStream.open(filePath);
 

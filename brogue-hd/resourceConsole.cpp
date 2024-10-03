@@ -1,8 +1,6 @@
 #include "resourceConsole.h"
 #include "typeConverter.h"
 
-using namespace std;
-
 using namespace brogueHd::component;
 
 namespace brogueHd::console
@@ -15,7 +13,7 @@ namespace brogueHd::console
 	}
 	resourceConsole::~resourceConsole() {}
 
-	brogueConsoleReturn resourceConsole::command(std::string input, ostream& stream)
+	brogueConsoleReturn resourceConsole::command(std::string input, std::ostream& stream)
 	{
 		int choice = 0;
 
@@ -36,7 +34,7 @@ namespace brogueHd::console
 
 		return brogueConsoleReturn::Completed;
 	}
-	void resourceConsole::printHelp(ostream& stream)
+	void resourceConsole::printHelp(std::ostream& stream)
 	{
 		stream << "Brogue Resource Console:" << std::endl << std::endl;
 		stream << "\t1) Load Colors File" << std::endl;

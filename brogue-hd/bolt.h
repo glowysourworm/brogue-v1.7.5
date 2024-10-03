@@ -4,8 +4,6 @@
 #include "brogueGlobal.h"
 #include <string>
 
-using namespace std;
-
 using namespace brogueHd::backend::model::game;
 
 namespace brogueHd::backend::model::effect

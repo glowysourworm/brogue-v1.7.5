@@ -8,7 +8,6 @@
 #include "simpleBST.h"
 #include "brogueObject.h"
 
-using namespace std;
 using namespace brogueHd::backend::model;
 using namespace brogueHd::component;
 

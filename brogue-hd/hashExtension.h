@@ -14,9 +14,6 @@
 
 */
 
-using namespace std;
-
-
 class hashGenerator
 {
 private:

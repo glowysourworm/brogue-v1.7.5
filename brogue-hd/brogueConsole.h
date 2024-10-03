@@ -4,7 +4,6 @@
 #include "simpleArray.h"
 #include <iostream>
 
-using namespace std;
 using namespace brogueHd::component;
 
 namespace brogueHd::console
@@ -25,8 +24,8 @@ namespace brogueHd::console
 		brogueConsole();
 		~brogueConsole();
 
-		virtual brogueConsoleReturn command(std::string input, ostream& stream);
-		virtual void printHelp(ostream& stream);
+		virtual brogueConsoleReturn command(std::string input, std::ostream& stream);
+		virtual void printHelp(std::ostream& stream);
 
 		bool hasArgument(const simpleArray<std::string>& args, const char* argumentName);
 		int getArgumentInt(const simpleArray<std::string>& args, const char* argumentName);

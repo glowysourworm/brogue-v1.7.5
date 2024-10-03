@@ -16,7 +16,7 @@ namespace brogueHd::console
 	{
 	}
 
-	brogueConsoleReturn brogueConsole::command(std::string input, ostream& stream)
+	brogueConsoleReturn brogueConsole::command(std::string input, std::ostream& stream)
 	{
 		int choice = 0;
 
@@ -32,7 +32,7 @@ namespace brogueHd::console
 				return brogueConsoleReturn::Exit;
 		}
 	}
-	void brogueConsole::printHelp(ostream& stream)
+	void brogueConsole::printHelp(std::ostream& stream)
 	{
 		stream << "Brogue Command Line:  Welcome to the Brogue command terminal!" << std::endl << std::endl;
 		stream << "\t1) Game Console (start, open, .. game files)" << std::endl;

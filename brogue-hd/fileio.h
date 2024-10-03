@@ -3,8 +3,6 @@
 #include "brogueGlobal.h"
 #include <exception>
 
-using namespace std;
-
 namespace brogueHd::backend::model::io
 {
 	static class fileio

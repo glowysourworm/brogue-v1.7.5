@@ -6,13 +6,10 @@
 #include "randomGenerator.h"
 #include "playbackProcessor.h"
 #include "renderingController.h"
-#include <GLFW/glfw3.h>
 
 using namespace brogueHd::backend::generator;
 using namespace brogueHd::backend::processor;
 using namespace brogueHd::backend::model;
-
-using namespace std;
 
 namespace brogueHd::backend::controller
 {
@@ -65,12 +62,6 @@ namespace brogueHd::backend::controller
 
 	private:
 
-		// Making OpenGL / Window calls static to work with rendering controller.
-
-		void openWindow();
-		void closeWindow();
-		void renderWindow();
-
 	private:
 
 		bool runMenu();
@@ -82,8 +73,6 @@ namespace brogueHd::backend::controller
 		bool runScum();
 
 	private:
-
-		GLFWwindow* _gameWindow;
 
 		renderingController* _renderingController;
 		BrogueGameMode _gameMode;	

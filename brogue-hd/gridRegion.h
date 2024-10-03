@@ -7,7 +7,6 @@
 #include "simpleArrayExtension.h"
 #include <functional>
 
-using namespace std;
 using namespace brogueHd::component;
 using namespace brogueHd::component::math;
 

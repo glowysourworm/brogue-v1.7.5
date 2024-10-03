@@ -4,8 +4,6 @@
 #include "colorString.h"
 #include <string>
 
-using namespace std;
-
 namespace brogueHd::backend::model::game
 {
 	struct messageData

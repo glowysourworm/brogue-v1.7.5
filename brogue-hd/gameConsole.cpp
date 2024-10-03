@@ -27,7 +27,7 @@ namespace brogueHd::console
 		delete _gameController;
 	}
 
-	void gameConsole::printHelp(ostream& stream)
+	void gameConsole::printHelp(std::ostream& stream)
 	{
 		stream << "Brogue Game Console:" << std::endl << std::endl;
 		stream << "\t1) New Game	   [options]" << std::endl;
@@ -45,7 +45,7 @@ namespace brogueHd::console
 		//stream << "-o filename[.broguesave]   open a save file (extension optional)" << std::endl;
 		//stream << "-v recording[.broguerec]   view a recording (extension optional)" << std::endl;
 	}
-	void gameConsole::printScores(ostream& stream)
+	void gameConsole::printScores(std::ostream& stream)
 	{
 		short mostRecent = 0;
 
@@ -63,7 +63,7 @@ namespace brogueHd::console
 		delete scoreFile;
 	}
 
-	brogueConsoleReturn gameConsole::command(std::string input, ostream& stream)
+	brogueConsoleReturn gameConsole::command(std::string input, std::ostream& stream)
 	{
 		int choice = 0;
 
@@ -208,6 +208,7 @@ namespace brogueHd::console
 
 		// Prepare Game Window
 		_gameController->initNewGame(1234);
+		_gameController->setMode(BrogueGameMode::Game);
 
 		// MAIN LOOP:  Leave 1ms thread sleep -> Grab key input -> send to game controller.
 		//
@@ -243,6 +244,8 @@ namespace brogueHd::console
 						case BrogueGameMode::Quit:
 						default:
 
+							_gameController->setMode(BrogueGameMode::Quit);
+
 							// Currently nothing to do until there is more feedback from
 							// game components. This will be apparent when completed.
 
@@ -250,9 +253,6 @@ namespace brogueHd::console
 						}
 					}
 				}
-
-				// "Frame Rate"
-				std::this_thread::sleep_for(100ms);
 			}
 			catch (std::exception& ex)
 			{

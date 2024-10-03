@@ -3,8 +3,6 @@
 #include "brogueGlobal.h"
 #include <string>
 
-using namespace std;
-
 namespace brogueHd::backend::model::game
 {
     enum featTypes 

@@ -16,7 +16,7 @@ namespace brogueHd::backend::modelConstant
 		multipliers = 6,
 		blood = 7,
 		gas = 8,
-		interface = 9
+		bInterface = 9
 	};
 
 	enum gameColors
@@ -304,7 +304,7 @@ namespace brogueHd::backend::modelConstant
 		Enum_String(multipliers);
 		Enum_String(blood);
 		Enum_String(gas);
-		Enum_String(interface);
+		Enum_String(bInterface);
 	}
 	End_Enum_String;
 

@@ -3,8 +3,6 @@
 #include <string>
 #include <iostream>
 
-using namespace std;
-
 namespace brogueHd
 {
 	class brogueLogger

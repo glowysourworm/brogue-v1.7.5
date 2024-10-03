@@ -5,8 +5,6 @@
 #include "resourceController.h"
 #include <iostream>
 
-using namespace std;
-
 using namespace brogueHd::backend::controller;
 
 namespace brogueHd::console
@@ -17,8 +15,8 @@ namespace brogueHd::console
 		resourceConsole(resourceController* resourceController);
 		~resourceConsole();
 
-		brogueConsoleReturn command(std::string input, ostream& stream) override;
-		void printHelp(ostream& stream) override;
+		brogueConsoleReturn command(std::string input, std::ostream& stream) override;
+		void printHelp(std::ostream& stream) override;
 
 	private:
 

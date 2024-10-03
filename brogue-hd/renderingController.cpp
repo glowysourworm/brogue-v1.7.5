@@ -3,7 +3,6 @@
 #include <functional>
 #include <stdlib.h>
 
-using namespace std;
 using namespace brogueHd::frontend::opengl;
 using namespace brogueHd::backend::modelConstant;
 
@@ -21,6 +20,28 @@ namespace brogueHd::backend::controller
 	void renderingController::setViewMode(BrogueGameMode mode)
 	{
 		_mode = mode;
+
+		switch (_mode)
+		{
+		case BrogueGameMode::Menu:
+		case BrogueGameMode::MenuHighScores:
+		case BrogueGameMode::MenuOpenGame:
+		case BrogueGameMode::MenuSetSeed:
+		case BrogueGameMode::Game:
+		case BrogueGameMode::Playback:
+		{
+			_renderer->openWindow();
+		}
+		break;
+		case BrogueGameMode::Scum:
+		case BrogueGameMode::Quit:
+		{
+			_renderer->closeWindow();
+		}
+			break;
+		default:
+			break;
+		}
 	}
 
 

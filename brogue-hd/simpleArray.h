@@ -4,8 +4,6 @@
 #include "simple.h"
 #include <functional>
 
-using namespace std;
-
 namespace brogueHd::component
 {	
 	/// <summary>

@@ -6,8 +6,6 @@
 #include "simpleList.h"
 #include <string>
 
-using namespace std;
-
 using namespace brogueHd::component;
 using namespace brogueHd::backend::model::game;
 

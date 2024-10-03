@@ -8,8 +8,6 @@
 #include "simpleArray.h"
 #include <functional>
 
-using namespace std;
-
 namespace brogueHd::component
 {
 	//struct pdsLink {

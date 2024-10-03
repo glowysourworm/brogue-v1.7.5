@@ -4,8 +4,6 @@
 #include "brogueContentGrid.h"
 #include "gridCell.h"
 
-using namespace std;
-
 using namespace brogueHd::backend::model::layout;
 
 namespace brogueHd::backend::model

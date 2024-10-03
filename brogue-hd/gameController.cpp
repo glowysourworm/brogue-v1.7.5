@@ -9,10 +9,6 @@
 #include <time.h>
 #include <fstream>
 
-#include <GLFW/glfw3.h>
-
-using namespace std;
-
 using namespace brogueHd::backend::model::game;
 
 namespace brogueHd::backend::controller
@@ -51,6 +47,8 @@ namespace brogueHd::backend::controller
 	void gameController::setMode(BrogueGameMode gameMode)
 	{
 		_gameMode = gameMode;
+
+		_renderingController->setViewMode(gameMode);
 
 		//if (SDL_Init(SDL_INIT_VIDEO)) 
 		//{
@@ -102,7 +100,7 @@ namespace brogueHd::backend::controller
 		//	_gameData = NULL;
 		//}
 
-		gameController::closeWindow();
+		//gameController::closeWindow();
 	}
 
 	void gameController::initNewGame(unsigned long seed)
@@ -120,102 +118,7 @@ namespace brogueHd::backend::controller
 
 		//_gameData = new gameData();
 
-		gameController::openWindow();
-	}
-
-	void gameController::renderWindow()
-	{
-		// RENDERING CODE:  Using static renderingController
-	}
-
-	void gameController::closeWindow()
-	{
-		glfwDestroyWindow(_gameWindow);
-		glfwTerminate();
-	}
-
-	/// <summary>
-	/// Opens game window for rendering target
-	/// </summary>
-	void gameController::openWindow()
-	{
-		if (_gameWindow != NULL)
-			brogueException::show("Trying to reopen game window:  gameController.cpp");
-
-		if (glfwInit() == GLFW_TRUE)
-		{
-			glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-			glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-			glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-			glfwSetErrorCallback([](int error, const char* messasge)
-			{
-				// log error
-			});
-
-			_gameWindow = glfwCreateWindow(640, 480, "My Title", NULL, NULL);
-
-			glfwMakeContextCurrent(_gameWindow);
-
-			// GLFW Event for user wanting to close the window
-			//
-			// https://www.glfw.org/docs/latest/quick.html#quick_steps
-
-
-			glfwMakeContextCurrent(_gameWindow);
-			glfwSwapInterval(100);
-
-			while (glfwGetKey(_gameWindow, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
-				   glfwWindowShouldClose(_gameWindow) == GLFW_FALSE)
-			{
-				// Keep running
-
-				//std::this_thread::sleep_for(100ms);
-
-				glfwSwapBuffers(_gameWindow);
-				glfwPollEvents();
-			}
-
-			// Also:   glfwSetWindowCloseCallback
-
-			/*
-				static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
-				{
-					if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-						glfwSetWindowShouldClose(window, GLFW_TRUE);
-				}
-
-				glfwSetKeyCallback(window, key_callback);
-			*/
-
-			/*
-				OpenGL Rendering
-
-				int width, height;
-				glfwGetFramebufferSize(window, &width, &height);
-				glViewport(0, 0, width, height);
-				glfwSetFramebufferSizeCallback
-			*/
-
-			glfwDestroyWindow(_gameWindow);
-			glfwTerminate();
-
-		}
-		else
-		{
-			// error
-		}
-
-		//glutInit(0, NULL);
-		//glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
-		//glutInitWindowSize(1024, 768);
-		//glutInitWindowPosition(100, 100);
-		//glutCreateWindow("Brogue Game Window");
-		//glutDisplayFunc(&gameController::renderWindow);
-		//glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-		//glutMainLoop();
-		//glClear(GL_COLOR_BUFFER_BIT);
-		//glutSwapBuffers();
+		//gameController::openWindow();
 	}
 
 	void gameController::initGame(gameData* data)

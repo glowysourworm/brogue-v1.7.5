@@ -13,7 +13,6 @@
 #include <fstream>
 #include <format>
 
-using namespace std;
 using namespace brogueHd::component;
 using namespace brogueHd::backend::model;
 using namespace brogueHd::backend::model::game;
@@ -31,13 +30,13 @@ namespace brogueHd::backend::controller
 			brogueScoresFile* scoresFile;
 			std::fstream stream;
 
-			stream.open("BrogueHighScores.txt", fstream::in);
+			stream.open("BrogueHighScores.txt", std::fstream::in);
 
 
 			// Initialize Scores (EMPTY FILE)
 			if (!stream.good())
 			{
-				stream.open("BrogueHighScores.txt", fstream::out);
+				stream.open("BrogueHighScores.txt", std::fstream::out);
 
 				// Initialize
 				scoresFile = new brogueScoresFile();
@@ -92,7 +91,7 @@ namespace brogueHd::backend::controller
 	{
 		try
 		{
-			std::ifstream stream("keymap", fstream::in);
+			std::ifstream stream("keymap", std::fstream::in);
 
 			if (!stream.is_open())
 			{
@@ -127,7 +126,7 @@ namespace brogueHd::backend::controller
 
 		try
 		{
-			ifstream stream(path);
+			std::ifstream stream(path);
 
 			// collection,name,red,green,blue,redRand,greenRand,blueRand,rand,colorDances
 
@@ -207,7 +206,7 @@ namespace brogueHd::backend::controller
 					EnumString<gasColors>::To(gasSelector, strings.get(1));
 					result->setColor(gasSelector, nextColor);
 					break;
-				case colorCollections::interface:
+				case colorCollections::bInterface:
 					interfaceColors interfaceSelector;
 					EnumString<interfaceColors>::To(interfaceSelector, strings.get(1));
 					result->setColor(interfaceSelector, nextColor);

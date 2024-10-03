@@ -7,7 +7,6 @@
 #include "brogueMath.h"
 #include "brogueGlobal.h"
 
-using namespace std;
 using namespace brogueHd::component::math;
 
 namespace brogueHd::component

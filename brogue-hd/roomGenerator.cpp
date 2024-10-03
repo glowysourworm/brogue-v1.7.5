@@ -149,7 +149,7 @@ namespace brogueHd::backend::generator
 		short roomWidth, roomHeight, roomWidth2, roomHeight2, roomX, roomY, roomX2, roomY2;
 
 		roomWidth = _randomGenerator->rand_range(3, 12);
-		roomX = _randomGenerator->rand_range(max(0, DCOLS / 2 - (roomWidth - 1)), min(DCOLS, DCOLS / 2));
+		roomX = _randomGenerator->rand_range(brogueMath<short>::max(0, DCOLS / 2 - (roomWidth - 1)), brogueMath<short>::min(DCOLS, DCOLS / 2));
 		roomWidth2 = _randomGenerator->rand_range(4, 20);
 		roomX2 = (roomX + (roomWidth / 2) + _randomGenerator->rand_range(0, 2) + _randomGenerator->rand_range(0, 2) - 3) - (roomWidth2 / 2);
 

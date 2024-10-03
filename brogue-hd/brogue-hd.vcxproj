@@ -79,7 +79,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <AllProjectIncludesArePublic>true</AllProjectIncludesArePublic>
-    <IncludePath>C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glad\include;C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\include;C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glad\src;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\include;$(IncludePath)</IncludePath>
     <ReferencePath>C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\lib-vc2022;$(ReferencePath)</ReferencePath>
     <SourcePath>C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\include;$(SourcePath)</SourcePath>
     <LibraryPath>C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\lib-vc2022;$(LibraryPath)</LibraryPath>
@@ -130,7 +130,6 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;GLFW_INCLUDE_NONE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AdditionalIncludeDirectories>C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
@@ -196,6 +195,7 @@
     <ClCompile Include="gameConsole.cpp" />
     <ClCompile Include="gameController.cpp" />
     <ClCompile Include="gameData.cpp" />
+    <ClCompile Include="gl.c" />
     <ClCompile Include="item.cpp" />
     <ClCompile Include="keyProcessor.cpp" />
     <ClCompile Include="layoutGenerator.cpp" />
@@ -236,6 +236,8 @@
     <ClInclude Include="brogueTestPackage.h" />
     <ClInclude Include="cellularAutomataParameters.h" />
     <ClInclude Include="componentMacros.h" />
+    <ClInclude Include="gl.h" />
+    <ClInclude Include="khrplatform.h" />
     <ClInclude Include="simpleArrayTests.h" />
     <ClInclude Include="simpleComponentTests.h" />
     <ClInclude Include="creatureBehaviorConstants.h" />

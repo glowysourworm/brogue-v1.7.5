@@ -4,8 +4,6 @@
 #include "simpleArray.h"
 #include <functional>
 
-using namespace std;
-
 namespace brogueHd::component
 {
 	/// <summary>
@@ -82,10 +80,10 @@ namespace brogueHd::component
 		simpleList<TResult> select(simpleListSelector<T, TResult> selector) const;
 
 		template<typename TResult>
-		TResult max(simpleListSelector<T, TResult> selector) const;
+		TResult maxOf(simpleListSelector<T, TResult> selector) const;
 
 		template<typename TResult>
-		TResult min(simpleListSelector<T, TResult> selector) const;
+		TResult minOf(simpleListSelector<T, TResult> selector) const;
 
 		template<typename TResult>
 		T withMin(simpleListSelector<T, TResult> selector) const;
@@ -405,7 +403,7 @@ namespace brogueHd::component
 
 	template<typename T>
 	template<typename TResult>
-	TResult simpleList<T>::max(simpleListSelector<T, TResult> selector) const
+	TResult simpleList<T>::maxOf(simpleListSelector<T, TResult> selector) const
 	{
 		TResult max = default_value<T>::value;
 		int maxIndex = -1;
@@ -432,7 +430,7 @@ namespace brogueHd::component
 
 	template<typename T>
 	template<typename TResult>
-	TResult simpleList<T>::min(simpleListSelector<T, TResult> selector) const
+	TResult simpleList<T>::minOf(simpleListSelector<T, TResult> selector) const
 	{
 		TResult min = default_value<T>::value;
 		int minIndex = -1;

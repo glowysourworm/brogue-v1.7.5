@@ -5,8 +5,6 @@
 #include "item.h"
 #include <functional>
 
-using namespace std;
-
 using namespace brogueHd::backend::model::game;
 
 namespace brogueHd::backend::model

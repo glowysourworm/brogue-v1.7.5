@@ -5,8 +5,6 @@
 #include "resourceController.h"
 #include <iostream>
 
-using namespace std;
-
 using namespace brogueHd::backend::controller;
 
 namespace brogueHd::console
@@ -18,12 +16,12 @@ namespace brogueHd::console
 		gameConsole(resourceController* resourceController);
 		~gameConsole();
 
-		brogueConsoleReturn command(std::string input, ostream& stream);
-		void printHelp(ostream& stream) override;
+		brogueConsoleReturn command(std::string input, std::ostream& stream);
+		void printHelp(std::ostream& stream) override;
 
 	private:
 
-		void printScores(ostream& stream);
+		void printScores(std::ostream& stream);
 
 	private:
 

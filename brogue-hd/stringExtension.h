@@ -11,8 +11,6 @@
 #include <vector>
 #include <format>
 
-using namespace std;
-
 namespace brogueHd::component
 {
 	struct stringExtension
@@ -29,7 +27,7 @@ namespace brogueHd::component
 
 			return result;
 		}
-		static std::string toUpper(const string& str) 
+		static std::string toUpper(const std::string& str) 
 		{
 			std::string result;
 

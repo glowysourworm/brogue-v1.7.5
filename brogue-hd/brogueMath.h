@@ -6,8 +6,6 @@
 #include <concepts>
 #include <functional>
 
-using namespace std;
-
 namespace brogueHd::component::math
 {
 	template<typename T>

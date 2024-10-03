@@ -11,8 +11,8 @@ namespace brogueHd::console
 		developerConsole();
 		~developerConsole();
 
-		brogueConsoleReturn command(std::string input, ostream& stream) override;
-		void printHelp(ostream& stream) override;
+		brogueConsoleReturn command(std::string input, std::ostream& stream) override;
+		void printHelp(std::ostream& stream) override;
 
 		bool runUnitTests();
 	};

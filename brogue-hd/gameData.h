@@ -6,8 +6,6 @@
 #include "playerCharacter.h"
 #include <string>
 
-using namespace std;
-
 namespace brogueHd::backend::model
 {
 	class gameData
