@@ -45,6 +45,14 @@ public:
 class hashableObject
 {
     public:
+    virtual bool operator==(const hashableObject& other) const
+    {
+        return false;
+    }
+    virtual bool operator!=(const hashableObject& other) const
+    {
+        return false;
+    }
     virtual size_t getHash() const
     {
         return 0;

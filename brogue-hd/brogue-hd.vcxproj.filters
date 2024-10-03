@@ -112,6 +112,12 @@
     <Filter Include="Source Files\unit-test">
       <UniqueIdentifier>{aed2c6b1-7399-461e-82ad-bb19186ee711}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\frontend\ui">
+      <UniqueIdentifier>{f95ad6d9-fe89-4b74-8f6e-12b1e4a41284}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\frontend\ui">
+      <UniqueIdentifier>{d58c08d5-7216-4bfc-be43-301d5bc1744b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="brogue-hd.cpp">
@@ -151,9 +157,6 @@
       <Filter>Source Files\backend\model</Filter>
     </ClCompile>
     <ClCompile Include="brogueMessageQueue.cpp">
-      <Filter>Source Files\backend\model</Filter>
-    </ClCompile>
-    <ClCompile Include="brogueView.cpp">
       <Filter>Source Files\backend\model</Filter>
     </ClCompile>
     <ClCompile Include="gameController.cpp">
@@ -246,6 +249,9 @@
     <ClCompile Include="brogueColorMap.cpp">
       <Filter>Source Files\backend\model</Filter>
     </ClCompile>
+    <ClCompile Include="brogueView.cpp">
+      <Filter>Source Files\frontend\ui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="brogueCellDisplay.h">
@@ -267,9 +273,6 @@
       <Filter>Header Files\backend\model</Filter>
     </ClInclude>
     <ClInclude Include="brogueMessageQueue.h">
-      <Filter>Header Files\backend\model</Filter>
-    </ClInclude>
-    <ClInclude Include="brogueView.h">
       <Filter>Header Files\backend\model</Filter>
     </ClInclude>
     <ClInclude Include="gameController.h">
@@ -616,6 +619,12 @@
     </ClInclude>
     <ClInclude Include="simpleHashTests.h">
       <Filter>Header Files\unit-test</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueFlameMenu.h">
+      <Filter>Header Files\frontend\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueView.h">
+      <Filter>Header Files\frontend\ui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

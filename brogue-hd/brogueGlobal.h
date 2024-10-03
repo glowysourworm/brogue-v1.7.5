@@ -19,6 +19,10 @@ namespace brogueHd
 
 	*/
 
+	// <windows.h> has a conflict with std::byte. That was rather frustrating. Please use char* or
+	//			   std unless you have to deal with windows libraries. 
+	//				
+
 
 	// unicode: comment this line to revert to ASCII
 

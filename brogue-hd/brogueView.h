@@ -17,9 +17,11 @@ namespace brogueHd::backend::model
 
 		void update(const brogueCellDisplay& display, short column, short row);
 
+		void iterate(gridCallback<brogueCellDisplay> callback) const;
+
 	private:
 
-		//grid<brogueCellDisplay*>* _view;
+		grid<brogueCellDisplay>* _view;
 	};
 }
 

@@ -5,8 +5,7 @@
 #include "stringExtension.h"
 #include "broguefile.h"
 #include <format>
-
-using namespace std;
+#include <thread>
 
 using namespace brogueHd::backend::controller;
 using namespace brogueHd::component;
@@ -71,169 +70,189 @@ namespace brogueHd::console
 		if (!typeConverter::tryStringToInt(input, choice))
 			return brogueConsoleReturn::CompletedWithError;
 
-		switch (choice)
-		{
-		case 1:
-		{
-			stream << "New Game..." << std::endl;
-			return brogueConsoleReturn::Completed;
-		}
-		break;
-		case 2:
-		{
-			stream << "Open Game..." << std::endl;
-			return brogueConsoleReturn::Completed;
-		}
-		break;
-		case 3:
-		{
-			stream << "High Scores..." << std::endl;
-			return brogueConsoleReturn::Completed;
-		}
-		break;
-		case 4:
-		{
-			stream << "Run Playback..." << std::endl;
-			return brogueConsoleReturn::Completed;
-		}
-		break;
-		case 5:
-		{
-			stream << "Help (about options)..." << std::endl;
-			return brogueConsoleReturn::Completed;
-		}
-		break;
-		default:
-			return brogueConsoleReturn::Completed;
-		}
+		//switch (choice)
+		//{
+		//case 1:
+		//{
+		//	stream << "New Game..." << std::endl;
+		//	return brogueConsoleReturn::Completed;
+		//}
+		//break;
+		//case 2:
+		//{
+		//	stream << "Open Game..." << std::endl;
+		//	return brogueConsoleReturn::Completed;
+		//}
+		//break;
+		//case 3:
+		//{
+		//	stream << "High Scores..." << std::endl;
+		//	return brogueConsoleReturn::Completed;
+		//}
+		//break;
+		//case 4:
+		//{
+		//	stream << "Run Playback..." << std::endl;
+		//	return brogueConsoleReturn::Completed;
+		//}
+		//break;
+		//case 5:
+		//{
+		//	stream << "Help (about options)..." << std::endl;
+		//	return brogueConsoleReturn::Completed;
+		//}
+		//break;
+		//default:
+		//	return brogueConsoleReturn::Completed;
+		//}
 
-		std::string* cmd = NULL;
+		//std::string* cmd = NULL;
 
-		std::string gamePath = "";
-		std::string viewPath = "";
-		unsigned long gameSeed = 0;
+		//std::string gamePath = "";
+		//std::string viewPath = "";
+		//unsigned long gameSeed = 0;
 
-		bool noMenu = false;
-		bool serverMode = false;
+		//bool noMenu = false;
+		//bool serverMode = false;
 
-		brogueEvent theEvent;
-		char path[4096], buf[100], seedDefault[100];
-		char maxSeed[40];
+		//brogueEvent theEvent;
+		//char path[4096], buf[100], seedDefault[100];
+		//char maxSeed[40];
 
-		// Initialize Game Controller (some arguments are sent to controller)
-		//
-		_gameController->loadKeymap();
+		//// Initialize Game Controller (some arguments are sent to controller)
+		////
+		//_gameController->loadKeymap();
 
-		// Dump Scores
-		if (hasArgument(cmd, "--scores"))
-		{
-			printScores(stream);
-			return brogueConsoleReturn::Completed;
-		}
+		//// Dump Scores
+		//if (hasArgument(cmd, "--scores"))
+		//{
+		//	printScores(stream);
+		//	return brogueConsoleReturn::Completed;
+		//}
 
-		// Version
-		if (hasArgument(cmd, "--version") || hasArgument(cmd, "-V"))
-		{
-			stream << this->BrogueVersion << std::endl;
-			return brogueConsoleReturn::Completed;
-		}
+		//// Version
+		//if (hasArgument(cmd, "--version") || hasArgument(cmd, "-V"))
+		//{
+		//	stream << this->BrogueVersion << std::endl;
+		//	return brogueConsoleReturn::Completed;
+		//}
 
-		// Help
-		if (hasArgument(cmd, "--help") || hasArgument(cmd, "-h") || hasArgument(cmd, "-?"))
-		{
-			printHelp(stream);
-			return brogueConsoleReturn::Completed;
-		}
+		//// Help
+		//if (hasArgument(cmd, "--help") || hasArgument(cmd, "-h") || hasArgument(cmd, "-?"))
+		//{
+		//	printHelp(stream);
+		//	return brogueConsoleReturn::Completed;
+		//}
 
-		// New Game
-		if (hasArgument(cmd, "-n"))
-		{
-			_gameController->initNewGame(0);
-			_gameController->setMode(BrogueGameMode::Game);
-		}
+		//// New Game
+		//if (hasArgument(cmd, "-n"))
+		//{
+		//	_gameController->initNewGame(0);
+		//	_gameController->setMode(BrogueGameMode::Game);
+		//}
 
-		// New Game w/ Seed
-		if (hasArgument(cmd, "--seed") || hasArgument(cmd, "-s"))
-		{
-			unsigned long seed = getArgumentInt(cmd, "--seed");
+		//// New Game w/ Seed
+		//if (hasArgument(cmd, "--seed") || hasArgument(cmd, "-s"))
+		//{
+		//	unsigned long seed = getArgumentInt(cmd, "--seed");
 
-			_gameController->initNewGame(seed);
-			_gameController->setMode(BrogueGameMode::Game);
-		}
+		//	_gameController->initNewGame(seed);
+		//	_gameController->setMode(BrogueGameMode::Game);
+		//}
 
-		// No Menu
-		if (hasArgument(cmd, "--no-menu") || hasArgument(cmd, "-M"))
-		{
-			noMenu = true;
+		//// No Menu
+		//if (hasArgument(cmd, "--no-menu") || hasArgument(cmd, "-M"))
+		//{
+		//	noMenu = true;
 
-			// TODO:
-			return brogueConsoleReturn::CompletedWithError;
-		}
+		//	// TODO:
+		//	return brogueConsoleReturn::CompletedWithError;
+		//}
 
-		// Not Eye Hack
-		if (hasArgument(cmd, "--noteye-hack"))
-		{
-			serverMode = true;
+		//// Not Eye Hack
+		//if (hasArgument(cmd, "--noteye-hack"))
+		//{
+		//	serverMode = true;
 
-			// TODO:
-			return brogueConsoleReturn::CompletedWithError;
-		}
+		//	// TODO:
+		//	return brogueConsoleReturn::CompletedWithError;
+		//}
 
-		// Open
-		if (hasArgument(cmd, "--open") || hasArgument(cmd, "-o"))
-		{
-			gamePath = getArgument(cmd, "--open");
+		//// Open
+		//if (hasArgument(cmd, "--open") || hasArgument(cmd, "-o"))
+		//{
+		//	gamePath = getArgument(cmd, "--open");
 
-			if (gamePath == "")
-				gamePath = getArgument(cmd, "-o");
-			
-			gameData* data = _resourceController->loadGame(gamePath.c_str());
+		//	if (gamePath == "")
+		//		gamePath = getArgument(cmd, "-o");
+		//	
+		//	gameData* data = _resourceController->loadGame(gamePath.c_str());
 
-			_gameController->initGame(data);
-			_gameController->setMode(BrogueGameMode::Game);
-		}
+		//	_gameController->initGame(data);
+		//	_gameController->setMode(BrogueGameMode::Game);
+		//}
 
-		// View
-		if (hasArgument(cmd, "--view") || hasArgument(cmd, "-v"))
-		{
-			viewPath = getArgument(cmd, "--view");
+		//// View
+		//if (hasArgument(cmd, "--view") || hasArgument(cmd, "-v"))
+		//{
+		//	viewPath = getArgument(cmd, "--view");
 
-			if (viewPath == "")
-				viewPath = getArgument(cmd, "-v");
+		//	if (viewPath == "")
+		//		viewPath = getArgument(cmd, "-v");
 
-			_gameController->initPlayback(viewPath.c_str());
-			_gameController->setMode(BrogueGameMode::Playback);
-		}
+		//	_gameController->initPlayback(viewPath.c_str());
+		//	_gameController->setMode(BrogueGameMode::Playback);
+		//}
 
 		bool result = true;
 
+		// Prepare Game Window
+		_gameController->initNewGame(1234);
+
+		// MAIN LOOP:  Leave 1ms thread sleep -> Grab key input -> send to game controller.
+		//
 		do
 		{
 			try
 			{
-				// Operates the current game mode loop to completion
-				//
-				result = _gameController->run();
+				unsigned char key;
 
-				// Switch to next game mode
-				//
-				switch (_gameController->getMode())
+				if (std::cin >> key)
 				{
-				case BrogueGameMode::Menu:
-				case BrogueGameMode::MenuHighScores:
-				case BrogueGameMode::MenuOpenGame:
-				case BrogueGameMode::MenuSetSeed:
-				case BrogueGameMode::Game:
-				case BrogueGameMode::Playback:
-				case BrogueGameMode::Scum:
-				case BrogueGameMode::Quit:
-				default:
+					// Exit Game Loop
+					if (key == 27)
+						result = false;
 
-					// Currently nothing to do until there is more feedback from
-					// game components. This will be apparent when completed.
+					else
+					{
+						// Operates the current game mode loop to completion
+						//
+						result = _gameController->run();
 
-					break;
+						// Switch to next game mode
+						//
+						switch (_gameController->getMode())
+						{
+						case BrogueGameMode::Menu:
+						case BrogueGameMode::MenuHighScores:
+						case BrogueGameMode::MenuOpenGame:
+						case BrogueGameMode::MenuSetSeed:
+						case BrogueGameMode::Game:
+						case BrogueGameMode::Playback:
+						case BrogueGameMode::Scum:
+						case BrogueGameMode::Quit:
+						default:
+
+							// Currently nothing to do until there is more feedback from
+							// game components. This will be apparent when completed.
+
+							break;
+						}
+					}
 				}
+
+				// "Frame Rate"
+				std::this_thread::sleep_for(100ms);
 			}
 			catch (std::exception& ex)
 			{
@@ -241,9 +260,9 @@ namespace brogueHd::console
 				//
 				//brogueException::show(std::string(std::string("Brogue Error:  ") + ex.what()).c_str());
 			}
-
-
 		} while (result == true);
+
+		_gameController->closeGame();
 
 		// MEMORY! 
 		delete _gameController;

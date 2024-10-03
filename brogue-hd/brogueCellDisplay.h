@@ -8,7 +8,7 @@ using namespace brogueHd::backend::model::game;
 
 namespace brogueHd::backend::model::layout
 {
-	struct brogueCellDisplay
+	struct brogueCellDisplay : hashable
 	{
 		char character;
 		color foreColor;
@@ -45,6 +45,10 @@ namespace brogueHd::backend::model::layout
 		//light light;									// RGB components of lighting
 		//light oldLight;									// compare with subsequent lighting to determine whether to refresh cell
 
+		brogueCellDisplay()
+		{
+
+		}
 		brogueCellDisplay(const brogueCellDisplay& copy)
 		{
 			update(copy);
@@ -60,7 +64,7 @@ namespace brogueHd::backend::model::layout
 			//lighting = copy.lighting;											// Careful with instances. These are non-unique
 		}
 
-		bool compare(const brogueCellDisplay& display)
+		bool compare(const brogueCellDisplay& display) const
 		{
 			return character == display.character &&
 				   foreColor.compare(display.foreColor) &&
@@ -69,6 +73,20 @@ namespace brogueHd::backend::model::layout
 				   needsUpdate == display.needsUpdate;// &&
 					//lighting.compare(display.lighting);
 		}
+
+		bool operator==(const brogueCellDisplay& other) const
+		{
+			return compare(other);
+		}
+		bool operator!=(const brogueCellDisplay& other) const
+		{
+			return !compare(other);
+		}
+		size_t getHash() const override
+		{
+			return 0;
+		}
 	};
 }
 
+MAKE_HASHABLE_STRUCT(brogueHd::backend::model::layout::brogueCellDisplay)
