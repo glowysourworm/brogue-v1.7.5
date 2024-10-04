@@ -15,7 +15,7 @@ namespace brogueHd::frontend::opengl
     {
     public:
 
-        simpleShaderProgram(simplePrimitive* vertexShader, simplePrimitive* fragmentShader);
+        simpleShaderProgram(const simplePrimitive& vertexShader, const simplePrimitive& fragmentShader);
         ~simpleShaderProgram();
 
         void compile();
@@ -38,11 +38,11 @@ namespace brogueHd::frontend::opengl
 
         simpleList<simplePrimitive>* _programVAOs;
 
-        simplePrimitive* _vertexShader;
-        simplePrimitive* _fragmentShader;
+        simplePrimitive _vertexShader;
+        simplePrimitive _fragmentShader;
     };
 
-    simpleShaderProgram::simpleShaderProgram(simplePrimitive* vertexShader, simplePrimitive* fragmentShader)
+    simpleShaderProgram::simpleShaderProgram(const simplePrimitive& vertexShader, const simplePrimitive& fragmentShader)
     {
         _vertexShader = vertexShader;
         _fragmentShader = fragmentShader;
@@ -72,12 +72,12 @@ namespace brogueHd::frontend::opengl
         _handle = glCreateProgram();
 
         // Creates shader on the backend
-        _vertexShader->glCreate(_handle);
-        _fragmentShader->glCreate(_handle);
+        _vertexShader.glCreate(_handle);
+        _fragmentShader.glCreate(_handle);
 
         // Attach shaders in the order they were declared
-        glAttachShader(_handle, _vertexShader->getHandle());
-        glAttachShader(_handle, _fragmentShader->getHandle());
+        glAttachShader(_handle, _vertexShader.getHandle());
+        glAttachShader(_handle, _fragmentShader.getHandle());
 
         // Link the program
         glLinkProgram(_handle);
@@ -197,12 +197,12 @@ namespace brogueHd::frontend::opengl
         //
 
         // Detach the shaders
-        glDetachShader(_handle, _vertexShader->getHandle());
-        glDetachShader(_handle, _fragmentShader->getHandle());
+        glDetachShader(_handle, _vertexShader.getHandle());
+        glDetachShader(_handle, _fragmentShader.getHandle());
 
         // Teardown all shader entities
-        _vertexShader->teardown();
-        _fragmentShader->teardown();
+        _vertexShader.teardown();
+        _fragmentShader.teardown();
 
         // Teardown the VAO
         _programVAOs->forEach([](simplePrimitive vao)

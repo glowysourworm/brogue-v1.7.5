@@ -12,6 +12,19 @@
 
 namespace brogueHd
 {
+	/*	
+		Embedded Resources: These are compiled into the executable; and must be read from
+							there using the resourceController		
+	*/
+
+	enum shaderResource
+	{
+		brogueBaseVert = 0,
+		brogueBaseFrag = 1,
+		brogueFrameVert = 2,
+		brogueFrameFrag = 3
+	};
+
 
 	/*
 

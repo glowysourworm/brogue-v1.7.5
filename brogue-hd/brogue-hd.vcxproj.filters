@@ -124,6 +124,12 @@
     <Filter Include="Source Files\vendor">
       <UniqueIdentifier>{b2a62e31-8d2a-40ba-8995-bf6a92c350f9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\opengl">
+      <UniqueIdentifier>{b6bf1ddb-ecb5-4505-8e1e-ca3a5722f3b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\model">
+      <UniqueIdentifier>{98d455ff-7ca8-4858-8854-a2055c70503f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="brogue-hd.cpp">
@@ -349,9 +355,6 @@
     </ClInclude>
     <ClInclude Include="terrainDeclaration.h">
       <Filter>Header Files\backend\model\layout</Filter>
-    </ClInclude>
-    <ClInclude Include="button.h">
-      <Filter>Header Files\frontend</Filter>
     </ClInclude>
     <ClInclude Include="color.h">
       <Filter>Header Files\backend\model\game</Filter>
@@ -668,103 +671,136 @@
     <ClInclude Include="simpleFrameBuffer.h">
       <Filter>Header Files\frontend\opengl</Filter>
     </ClInclude>
+    <ClInclude Include="simpleShader.h">
+      <Filter>Header Files\frontend\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="boudingBox2D.h">
+      <Filter>Header Files\frontend\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleGlData.h">
+      <Filter>Header Files\frontend\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="coordinateConverter.h">
+      <Filter>Header Files\frontend\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueSceneBuilder.h">
+      <Filter>Header Files\frontend\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="button.h">
+      <Filter>Header Files\frontend\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="shaderData.h">
+      <Filter>Header Files\frontend\opengl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\resources\colors.csv">
-      <Filter>Resource Files</Filter>
+    <None Include="brogueBase.frag">
+      <Filter>Resource Files\opengl</Filter>
     </None>
-    <None Include="..\resources\creature.csv">
-      <Filter>Resource Files</Filter>
+    <None Include="brogueFrame.frag">
+      <Filter>Resource Files\opengl</Filter>
     </None>
-    <None Include="..\resources\creatureClass.csv">
-      <Filter>Resource Files</Filter>
+    <None Include="brogueBase.vert">
+      <Filter>Resource Files\opengl</Filter>
     </None>
-    <None Include="..\resources\horde.csv">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="..\resources\mutation.csv">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="..\resources\machineGenerator.csv">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="..\resources\floorTileType.csv">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="..\resources\dungeonFeature.csv">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="..\resources\light.csv">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="..\resources\creatureWords.csv">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="..\resources\feat.csv">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="..\resources\itemColors.csv">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="..\resources\itemGems.csv">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="..\resources\itemMetals.csv">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="..\resources\itemWoods.csv">
-      <Filter>Resource Files</Filter>
+    <None Include="brogueFrame.vert">
+      <Filter>Resource Files\opengl</Filter>
     </None>
     <None Include="..\resources\armor.csv">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\model</Filter>
     </None>
     <None Include="..\resources\armorRunicNames.csv">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="..\resources\bolt.csv">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="..\resources\charms.csv">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="..\resources\creatureBehaviorDescription.csv">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="..\resources\food.csv">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="..\resources\keys.csv">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="..\resources\potions.csv">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="..\resources\rings.csv">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="..\resources\scrolls.csv">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="..\resources\staves.csv">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="..\resources\titlePhonemes.csv">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="..\resources\wands.csv">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="..\resources\weaponRunicNames.csv">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="..\resources\weapons.csv">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\model</Filter>
     </None>
     <None Include="..\resources\blueprint.csv">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\model</Filter>
+    </None>
+    <None Include="..\resources\bolt.csv">
+      <Filter>Resource Files\model</Filter>
+    </None>
+    <None Include="..\resources\charms.csv">
+      <Filter>Resource Files\model</Filter>
+    </None>
+    <None Include="..\resources\colors.csv">
+      <Filter>Resource Files\model</Filter>
+    </None>
+    <None Include="..\resources\creature.csv">
+      <Filter>Resource Files\model</Filter>
+    </None>
+    <None Include="..\resources\creatureBehaviorDescription.csv">
+      <Filter>Resource Files\model</Filter>
+    </None>
+    <None Include="..\resources\creatureClass.csv">
+      <Filter>Resource Files\model</Filter>
+    </None>
+    <None Include="..\resources\creatureWords.csv">
+      <Filter>Resource Files\model</Filter>
+    </None>
+    <None Include="..\resources\dungeonFeature.csv">
+      <Filter>Resource Files\model</Filter>
+    </None>
+    <None Include="..\resources\feat.csv">
+      <Filter>Resource Files\model</Filter>
     </None>
     <None Include="..\resources\features.csv">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\model</Filter>
+    </None>
+    <None Include="..\resources\floorTileType.csv">
+      <Filter>Resource Files\model</Filter>
+    </None>
+    <None Include="..\resources\food.csv">
+      <Filter>Resource Files\model</Filter>
+    </None>
+    <None Include="..\resources\horde.csv">
+      <Filter>Resource Files\model</Filter>
+    </None>
+    <None Include="..\resources\itemColors.csv">
+      <Filter>Resource Files\model</Filter>
+    </None>
+    <None Include="..\resources\itemGems.csv">
+      <Filter>Resource Files\model</Filter>
+    </None>
+    <None Include="..\resources\itemMetals.csv">
+      <Filter>Resource Files\model</Filter>
+    </None>
+    <None Include="..\resources\itemWoods.csv">
+      <Filter>Resource Files\model</Filter>
+    </None>
+    <None Include="..\resources\keys.csv">
+      <Filter>Resource Files\model</Filter>
+    </None>
+    <None Include="..\resources\light.csv">
+      <Filter>Resource Files\model</Filter>
+    </None>
+    <None Include="..\resources\machineGenerator.csv">
+      <Filter>Resource Files\model</Filter>
+    </None>
+    <None Include="..\resources\mutation.csv">
+      <Filter>Resource Files\model</Filter>
+    </None>
+    <None Include="..\resources\potions.csv">
+      <Filter>Resource Files\model</Filter>
+    </None>
+    <None Include="..\resources\rings.csv">
+      <Filter>Resource Files\model</Filter>
+    </None>
+    <None Include="..\resources\scrolls.csv">
+      <Filter>Resource Files\model</Filter>
+    </None>
+    <None Include="..\resources\staves.csv">
+      <Filter>Resource Files\model</Filter>
+    </None>
+    <None Include="..\resources\titlePhonemes.csv">
+      <Filter>Resource Files\model</Filter>
+    </None>
+    <None Include="..\resources\wands.csv">
+      <Filter>Resource Files\model</Filter>
+    </None>
+    <None Include="..\resources\weaponRunicNames.csv">
+      <Filter>Resource Files\model</Filter>
+    </None>
+    <None Include="..\resources\weapons.csv">
+      <Filter>Resource Files\model</Filter>
     </None>
   </ItemGroup>
 </Project>

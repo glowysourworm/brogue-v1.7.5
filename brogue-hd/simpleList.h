@@ -70,6 +70,7 @@ namespace brogueHd::component
 		simpleList<T> except(simpleListPredicate<T> predicate) const;
 
 		T first(simpleListPredicate<T> predicate) const;
+		T first() const;
 		bool any(simpleListPredicate<T> predicate) const;
 		void forEach(simpleListCallback<T> callback) const;
 		simpleList<T> where(simpleListPredicate<T> predicate) const;
@@ -373,6 +374,15 @@ namespace brogueHd::component
 		}
 
 		return default_value<T>::value;
+	}
+
+	template<typename T>
+	T simpleList<T>::first() const
+	{
+		if (this->count() == 0)
+			brogueException::show("Trying to get element from an empty list:  simpleList::first()");
+
+		return this->get(0);
 	}
 
 	template<typename T>

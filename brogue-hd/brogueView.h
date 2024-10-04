@@ -13,10 +13,13 @@ namespace brogueHd::frontend::ui
 	public:
 		
 		brogueView(){};
-		brogueView(gridRect boundary);
+		brogueView(gridRect sceneBoundary, gridRect viewBoundary);
 		~brogueView();
 
 		brogueCellDisplay get(short column, short row) const;
+
+		gridRect getSceneBoundary() const;
+		gridRect getViewBoundary() const;
 
 		void iterate(gridCallback<brogueCellDisplay> callback) const;
 

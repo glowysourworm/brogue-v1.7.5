@@ -9,9 +9,9 @@ using namespace brogueHd::component;
 
 namespace brogueHd::frontend::ui
 {
-	brogueView::brogueView(gridRect boundary)
+	brogueView::brogueView(gridRect sceneBoundary, gridRect viewBoundary)
 	{
-		_view = new grid<brogueCellDisplay>(boundary, boundary);
+		_view = new grid<brogueCellDisplay>(sceneBoundary, viewBoundary);
 	}
 	brogueView::~brogueView()
 	{
@@ -20,6 +20,14 @@ namespace brogueHd::frontend::ui
 	brogueCellDisplay brogueView::get(short column, short row) const
 	{
 		return _view->get(column, row);
+	}
+	gridRect brogueView::getSceneBoundary() const
+	{
+		return _view->getParentBoundary();
+	}
+	gridRect brogueView::getViewBoundary() const
+	{
+		return _view->getRelativeBoundary();
 	}
 	void brogueView::update(const brogueCellDisplay& display, short column, short row)
 	{

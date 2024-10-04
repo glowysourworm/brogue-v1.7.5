@@ -1,6 +1,6 @@
 #pragma once
 
-#include "brogueMacros.h"
+#include "brogueGlobal.h"
 #include "color.h"
 #include "brogueCellDisplay.h"
 

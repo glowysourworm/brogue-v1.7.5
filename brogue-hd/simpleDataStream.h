@@ -12,13 +12,15 @@ namespace brogueHd::frontend::opengl
     template<typename T>
 	class simpleDataStream
 	{
+    public:
+
         /// <summary>
         /// Creates a data stream with storage for N number of elements
         /// </summary>
         /// <param name="vectorElementNumberVertices">Size of a single element IN # VERTICES</param>
         /// <param name="vectorStreamSize">Total size of a single stream (BYTES)</param>
         /// <param name="capacity">Total capacity IN TERMS OF element INSTANCES!</param>
-        public DataStream(int capacity, int vectorElementNumberVertices, int vectorStreamSize)
+        simpleDataStream(int capacity, int vectorElementNumberVertices, int vectorStreamSize)
         {
             _streamNumberVertices = capacity * vectorElementNumberVertices;
 
@@ -37,7 +39,7 @@ namespace brogueHd::frontend::opengl
 
         void write(T primitive)
         {
-            _array[_cursor++] = primitive;
+            _array->set(_cursor++, primitive);
         }
 
         public T* getData()

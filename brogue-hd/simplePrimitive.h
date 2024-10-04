@@ -8,6 +8,7 @@ namespace brogueHd::frontend::opengl
 	{
 
     public:
+
         simplePrimitive()
         {
             handle = NULL;

@@ -57,9 +57,7 @@ namespace brogueHd::frontend::opengl
 
         // https://learnopengl.com/Advanced-OpenGL/Framebuffers
 
-        GLuint hndle;
-        glGenFramebuffers(1, &hndle);
-        this->handle = hndle;
+        glGenFramebuffers(1, &this->handle);
 
         // *This option sets up the frame buffer for READ (AND) WRITE
         glBindFramebuffer(GL_FRAMEBUFFER, this->handle);

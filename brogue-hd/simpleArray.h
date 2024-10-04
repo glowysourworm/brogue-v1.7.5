@@ -27,6 +27,12 @@ namespace brogueHd::component
 	template<typename T, typename TResult>
 	using simpleArrayAggregate = std::function<TResult(TResult, T)>;
 
+	/// <summary>
+	/// Selector delegate that transforms T->TResult by use of user function
+	/// </summary>
+	template<typename T, typename TResult>
+	using simpleArraySelector = std::function<TResult(T)>;
+
 	template<typename T>
 	class simpleArray
 	{
@@ -49,10 +55,15 @@ namespace brogueHd::component
 		void set(int index, T value);		
 		bool contains(T item);
 
+	public:
+
 		void forEach(simpleArrayCallback<T> callback);
 
 		template<typename TResult>
 		TResult aggregate(TResult& seedValue, simpleArrayAggregate<T, TResult> aggregator);
+
+		template<typename TResult>
+		simpleArray<TResult> select(simpleArraySelector<T, TResult> selector)
 
 	private:
 
@@ -139,6 +150,20 @@ namespace brogueHd::component
 			if (callback(_array[index]) == iterationCallback::breakAndReturn)
 				return;
 		}
+	}
+
+	template<typename T>
+	template<typename TResult>
+	simpleArray<TResult> simpleArray<T>::select(simpleArraySelector<T, TResult> selector)
+	{
+		simpleArray<TResult> result(this->count());
+
+		for (int index = 0; index < _count; index++)
+		{
+			result.set(index, selector(index));
+		}
+
+		return result;
 	}
 
 	template<typename T>
