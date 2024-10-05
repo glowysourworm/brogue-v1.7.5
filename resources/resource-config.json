@@ -1,0 +1,6 @@
+{
+	"baseVertexShader" : "opengl\\brogueBase.vert",
+	"baseFragmentShader" : "opengl\\brogueBase.frag",
+	"frameVertexShader" : "opengl\\brogueFrame.vert",
+	"frameFragmentShader" : "opengl\\brogueFrame.frag"
+}

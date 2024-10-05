@@ -241,7 +241,7 @@
     <ClInclude Include="componentMacros.h" />
     <ClInclude Include="coordinateConverter.h" />
     <ClInclude Include="gl.h" />
-    <ClInclude Include="resource.h" />
+    <ClInclude Include="json.hpp" />
     <ClInclude Include="shaderData.h" />
     <ClInclude Include="simpleDataStream.h" />
     <ClInclude Include="simpleFrameBuffer.h" />
@@ -397,9 +397,7 @@
     <None Include="..\resources\opengl\brogueBase.vert" />
     <None Include="..\resources\opengl\brogueFrame.frag" />
     <None Include="..\resources\opengl\brogueFrame.vert" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="brogue-hd.rc" />
+    <None Include="..\resources\resource-config.json" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

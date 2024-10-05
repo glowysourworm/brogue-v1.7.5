@@ -1,7 +1,5 @@
 #pragma once
 
-#include <Windows.h>
-#include "resource.h"
 #include "resourceController.h"
 #include "playbackData.h"
 #include "gameData.h"
@@ -11,6 +9,8 @@
 #include "brogueGlobal.h"
 #include "stringExtension.h"
 #include "shaderData.h"
+
+#include "json.hpp"
 
 #include <string>
 #include <fstream>
@@ -24,8 +24,14 @@ using namespace brogueHd::backend::processor;
 
 namespace brogueHd::backend::controller
 {
-	resourceController::resourceController(){}
-	resourceController::~resourceController(){}
+	resourceController::resourceController(const char* resourceConfigFile)
+	{
+		_resourceConfigFile = std::string(resourceConfigFile);
+	}
+	resourceController::~resourceController()
+	{
+
+	}
 
 	brogueScoresFile* resourceController::getHighScores(short& mostRecentLineNumber)
 	{
@@ -233,73 +239,38 @@ namespace brogueHd::backend::controller
 	}
 	shaderData resourceController::loadShader(shaderResource resource)
 	{
-		std::string source = "";
+		std::ifstream stream("C:\\Backup\\_Source\\Git\\brogue-v1.7.5\\resources\\resource-config.json");
+
+		nlohmann::json jsonConfig = nlohmann::json::parse(stream);
 
 		switch (resource)
 		{
 		case shaderResource::brogueBaseVert:
+		{
+			std::string source = jsonConfig[brogueHd::ConfigBaseVertexShader];
 
-			source = this->loadTextResource(IDR_BROGUE_BASE_VERT);
 			return shaderData(resource, GL_VERTEX_SHADER,  source);
-
+		}
 		case shaderResource::brogueBaseFrag:
+		{
+			std::string source = jsonConfig[brogueHd::ConfigBaseFragmentShader];
 
-			source = this->loadTextResource(IDR_BROGUE_BASE_FRAG);
 			return shaderData(resource, GL_FRAGMENT_SHADER, source);
-
+		}
 		case shaderResource::brogueFrameVert:
+		{
+			std::string source = jsonConfig[brogueHd::ConfigFrameVertexShader];
 
-			source = this->loadTextResource(IDR_BROGUE_FRAME_FRAG);
 			return shaderData(resource, GL_VERTEX_SHADER, source);
-
+		}
 		case shaderResource::brogueFrameFrag:
+		{
+			std::string source = jsonConfig[brogueHd::ConfigFrameFragmentShader];
 
-			source = this->loadTextResource(IDR_BROGUE_FRAME_FRAG);
 			return shaderData(resource, GL_FRAGMENT_SHADER, source);
-
+		}
 		default:
 			brogueException::show("Unhandled Resource Type:  resourceController::loadShader");
 		}
-	}
-
-	std::string resourceController::loadTextResource(int idrHandle)
-	{
-		// Some internet code...
-		HMODULE instance = NULL;
-		HRSRC hresource = FindResource(instance, MAKEINTRESOURCE(idrHandle), L"TEXT");
-
-		if (hresource)
-		{
-			HGLOBAL hLoadedResource = LoadResource(instance, hresource);
-
-			if (hLoadedResource)
-			{
-				LPVOID pLockedResource = LockResource(hLoadedResource);
-
-				if (pLockedResource)
-				{
-					DWORD dwResourceSize = SizeofResource(instance, hresource);
-
-					if (0 != dwResourceSize)
-					{
-						// Use pLockedResource and dwResourceSize however you want
-						char* buffer = new char[dwResourceSize];
-
-						for (int index = 0; index < dwResourceSize; index++)
-						{
-							buffer[index] = ((char*)hLoadedResource)[index];
-						}
-
-						std::string string(buffer);
-
-						delete [] buffer;
-
-						return string;
-					}
-				}
-			}
-		}
-
-		return "";
 	}
 }

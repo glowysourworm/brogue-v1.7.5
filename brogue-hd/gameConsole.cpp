@@ -19,7 +19,7 @@ namespace brogueHd::console
 	gameConsole::gameConsole(resourceController* resourceController) 
 	{
 		_resourceController = resourceController;
-		_gameController = new gameController();
+		_gameController = new gameController(resourceController);
 		this->consoleName = "Brogue GAME";
 	}
 	gameConsole::~gameConsole() 

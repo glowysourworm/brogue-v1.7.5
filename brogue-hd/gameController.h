@@ -17,7 +17,7 @@ namespace brogueHd::backend::controller
 	{
 	public:
 
-		gameController();
+		gameController(resourceController* resourceController);
 		~gameController();
 
 		/// <summary>

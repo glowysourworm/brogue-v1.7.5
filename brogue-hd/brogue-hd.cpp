@@ -23,10 +23,16 @@ int main(int argc, char* argv[])
 	brogueConsoleReturn returnValue = brogueConsoleReturn::Continue;
 	bool iterate = true;
 
-	// Backend Components
-	resourceController* brogueResourceController = new resourceController();
+	if (argc < 2)
+	{
+		std::cout << "Must include the resource-config.json file path in the command line (first parameter)" << std::endl;
+		return 1;
+	}
 
-	std::string cmd = stringExtension::join(argv, argc);
+	// Backend Components
+	resourceController* brogueResourceController = new resourceController(argv[1]);
+
+	std::string cmd = "";
 
 	while (returnValue != brogueConsoleReturn::Exit && iterate)
 	{

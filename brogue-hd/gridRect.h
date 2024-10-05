@@ -110,7 +110,7 @@ namespace brogueHd::component
 			if (arow < top())
 				return false;
 
-			if (arow > top())
+			if (arow > bottom())
 				return false;
 
 			return true;

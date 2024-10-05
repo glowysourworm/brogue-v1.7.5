@@ -695,8 +695,8 @@
     <ClInclude Include="shaderData.h">
       <Filter>Header Files\frontend\opengl</Filter>
     </ClInclude>
-    <ClInclude Include="resource.h">
-      <Filter>Resource Files</Filter>
+    <ClInclude Include="json.hpp">
+      <Filter>Header Files\vendor</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -808,10 +808,8 @@
     <None Include="..\resources\opengl\brogueFrame.vert">
       <Filter>Resource Files\opengl</Filter>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="brogue-hd.rc">
+    <None Include="..\resources\resource-config.json">
       <Filter>Resource Files</Filter>
-    </ResourceCompile>
+    </None>
   </ItemGroup>
 </Project>

@@ -20,7 +20,7 @@ namespace brogueHd::backend::controller
 	{
 	public:
 
-		resourceController();
+		resourceController(const char* resourcConfigFile);
 		~resourceController();
 
 		/// <summary>
@@ -55,6 +55,6 @@ namespace brogueHd::backend::controller
 	
 	private:
 
-		std::string loadTextResource(int resourceHandle);
+		std::string _resourceConfigFile;
 	};
 }

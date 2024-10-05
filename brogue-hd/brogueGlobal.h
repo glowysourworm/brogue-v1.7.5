@@ -25,6 +25,10 @@ namespace brogueHd
 		brogueFrameFrag = 3
 	};
 
+	static const char* ConfigBaseVertexShader = "baseVertexShader";
+	static const char* ConfigBaseFragmentShader = "baseFragmentShader";
+	static const char* ConfigFrameVertexShader = "frameVertexShader";
+	static const char* ConfigFrameFragmentShader = "frameFragmentShader";
 
 	/*
 

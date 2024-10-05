@@ -51,7 +51,11 @@ namespace brogueHd::backend::model::layout
 		}
 		brogueCellDisplay(const brogueCellDisplay& copy)
 		{
-			update(copy);
+			character = copy.character;
+			foreColor = copy.foreColor;									// Careful with instances. These are non-unique
+			backColor = copy.backColor;									// Careful with instances. These are non-unique
+			opacity = copy.opacity;
+			needsUpdate = copy.needsUpdate;
 		}
 
 		void update(const brogueCellDisplay& copy)

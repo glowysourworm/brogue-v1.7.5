@@ -52,12 +52,12 @@ namespace brogueHd::frontend::ui
 	};
 
 	brogueFlameMenu::brogueFlameMenu(int padding,
-										int precision,
-										int riseSpeed,
-										int spreadSpeed,
-										int colorDriftSpeed,
-										int fadeSpeed,
-										int updateDelay)
+									 int precision,
+									 int riseSpeed,
+									 int spreadSpeed,
+									 int colorDriftSpeed,
+									 int fadeSpeed,
+									 int updateDelay) : brogueView(gridRect(0, 0, DCOLS, DROWS), gridRect(0, 0, DCOLS, DROWS))
 	{
 		// Transfer rendering to the primary view grid
 		for (int column = 0; column < MENU_TITLE_WIDTH; column++)

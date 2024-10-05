@@ -138,7 +138,7 @@ namespace brogueHd::component
     {
         _grid = new T * [relativeBoundary.width];
 
-        for (int index = 0; index < relativeBoundary.height; index++)
+        for (int index = 0; index < relativeBoundary.width; index++)
             _grid[index] = new T[relativeBoundary.height];
 
         _relativeBoundary = relativeBoundary;
@@ -325,7 +325,7 @@ namespace brogueHd::component
     template<typename T>
     bool grid<T>::isDefined(short column, short row) const
     {
-        return this->get(column, row) != default_value<T>::value;
+        return this->get(column, row) == default_value<T>::value;
     }
 
     template<typename T>

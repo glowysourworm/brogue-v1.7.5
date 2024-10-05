@@ -13,14 +13,14 @@ using namespace brogueHd::backend::model::game;
 
 namespace brogueHd::backend::controller
 {
-	gameController::gameController()
+	gameController::gameController(resourceController* resourceController)
 	{
 		_gameData = NULL;
 		_keyProcessor = new keyProcessor();
 		_playbackProcessor = new playbackProcessor();
 		_randomMain = new randomGenerator(RANDOM_GENERATOR_MAIN);
 		_randomCosmetic = new randomGenerator(RANDOM_GENERATOR_COSMETIC);
-		_renderingController = new renderingController();
+		_renderingController = new renderingController(resourceController);
 	}
 
 	gameController::~gameController()

@@ -11,6 +11,7 @@ namespace brogueHd::backend::controller
 	{
 		_openglRenderer = new openglRenderer();
 		_resourceController = resourceController;
+		_mode = BrogueGameMode::Menu;
 	}
 	renderingController::~renderingController()
 	{
@@ -31,7 +32,8 @@ namespace brogueHd::backend::controller
 		case BrogueGameMode::Playback:
 		{
 			// Prepare pieces of the render program
-			simpleDataStream<float> sceneDataStream = brogueSceneBuilder::prepareSceneDataStream(brogueFlameMenu());
+			brogueFlameMenu mainMenu(0, 1, 1, 1, 1, 1, 1);
+			simpleDataStream<float> sceneDataStream = brogueSceneBuilder::prepareSceneDataStream(mainMenu);
 			shaderData vertexShaderData = _resourceController->loadShader(shaderResource::brogueBaseVert);
 			shaderData fragmentShaderData = _resourceController->loadShader(shaderResource::brogueBaseFrag);
 

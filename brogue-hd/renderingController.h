@@ -16,7 +16,6 @@ namespace brogueHd::backend::controller
 	{
 	public:
 
-		renderingController(){};
 		renderingController(resourceController* resourceController);
 		~renderingController();
 
