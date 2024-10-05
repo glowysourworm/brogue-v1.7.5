@@ -2,7 +2,6 @@
 
 #include <string>
 #include "gl.h"
-#include <gl/GL.h>
 
 namespace brogueHd::frontend::opengl
 {
@@ -12,7 +11,7 @@ namespace brogueHd::frontend::opengl
     struct simpleVertexAttribute
     {
     public:
-
+        simpleVertexAttribute(){}
         simpleVertexAttribute(GLuint index, std::string name, int glActiveUniformType)
         {
             _index = index;

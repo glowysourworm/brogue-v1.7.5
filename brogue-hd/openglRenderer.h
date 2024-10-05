@@ -9,9 +9,7 @@
 
 #include <thread>
 
-#include "brogueView.h"
-
-using namespace brogueHd::frontend::ui;
+#include "simpleShaderProgram.h"
 
 namespace brogueHd::frontend::opengl
 {
@@ -23,7 +21,7 @@ namespace brogueHd::frontend::opengl
 
 		// Making OpenGL / Window calls static to work with rendering controller.
 
-		void openWindow(brogueView* view);
+		void openWindow(simpleShaderProgram* program);
 		void closeWindow();
 		void renderWindow();
 
@@ -46,7 +44,7 @@ namespace brogueHd::frontend::opengl
 	private:
 
 		std::thread* _thread;
-		brogueView* _view;
+		simpleShaderProgram* _glProgram;
 		bool _windowOpen;
 	};
 }

@@ -3,9 +3,11 @@
 #include "brogueGlobal.h"
 #include "openglRenderer.h"
 #include "gameConstants.h"
+#include "resourceController.h"
 #include <functional>
 #include <stdlib.h>
 
+using namespace brogueHd::backend::controller;
 using namespace brogueHd::frontend::opengl;
 
 namespace brogueHd::backend::controller
@@ -14,7 +16,8 @@ namespace brogueHd::backend::controller
 	{
 	public:
 
-		renderingController();
+		renderingController(){};
+		renderingController(resourceController* resourceController);
 		~renderingController();
 
 		/// <summary>
@@ -39,6 +42,7 @@ namespace brogueHd::backend::controller
 
 		BrogueGameMode _mode;
 
+		resourceController* _resourceController;
 		openglRenderer* _openglRenderer;
 
 	};

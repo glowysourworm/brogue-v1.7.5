@@ -2,7 +2,6 @@
 
 #include "brogueGlobal.h"
 #include "simplePrimitive.h"
-#include "simpleVertexBuffer.h"
 #include "simpleList.h"
 #include "gl.h"
 
@@ -34,6 +33,9 @@ namespace brogueHd::frontend::opengl
         this->handle = NULL;
         this->isCreated = false;
         this->isBound = false;
+
+        _shaderType = NULL;
+        _source = "";
     }
     simpleShader::simpleShader(std::string source)
     {
@@ -42,6 +44,7 @@ namespace brogueHd::frontend::opengl
         this->isBound = false;
 
         _source = source;
+        _shaderType = NULL;
     }
 
     void simpleShader::teardown()

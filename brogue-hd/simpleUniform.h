@@ -5,8 +5,12 @@
 namespace brogueHd::frontend::opengl
 {
     template<typename T>
-    struct simpleUniform : simplePrimitive
+    class simpleUniform : simplePrimitive
     {
+    public:
+
+        simpleUniform(){}
+
         /// <summary>
         /// Data to be passed as a uniform to the shader code
         /// </summary>

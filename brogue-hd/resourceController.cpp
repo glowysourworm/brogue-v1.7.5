@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Windows.h>
+#include "resource.h"
 #include "resourceController.h"
 #include "playbackData.h"
 #include "gameData.h"
@@ -8,12 +10,14 @@
 
 #include "brogueGlobal.h"
 #include "stringExtension.h"
+#include "shaderData.h"
 
 #include <string>
 #include <fstream>
 #include <format>
 
 using namespace brogueHd::component;
+using namespace brogueHd::frontend::opengl;
 using namespace brogueHd::backend::model;
 using namespace brogueHd::backend::model::game;
 using namespace brogueHd::backend::processor;
@@ -227,14 +231,75 @@ namespace brogueHd::backend::controller
 
 		return NULL;
 	}
-
-	gameData* loadGame(const char* path)
+	shaderData resourceController::loadShader(shaderResource resource)
 	{
-		return NULL;
+		std::string source = "";
+
+		switch (resource)
+		{
+		case shaderResource::brogueBaseVert:
+
+			source = this->loadTextResource(IDR_BROGUE_BASE_VERT);
+			return shaderData(resource, GL_VERTEX_SHADER,  source);
+
+		case shaderResource::brogueBaseFrag:
+
+			source = this->loadTextResource(IDR_BROGUE_BASE_FRAG);
+			return shaderData(resource, GL_FRAGMENT_SHADER, source);
+
+		case shaderResource::brogueFrameVert:
+
+			source = this->loadTextResource(IDR_BROGUE_FRAME_FRAG);
+			return shaderData(resource, GL_VERTEX_SHADER, source);
+
+		case shaderResource::brogueFrameFrag:
+
+			source = this->loadTextResource(IDR_BROGUE_FRAME_FRAG);
+			return shaderData(resource, GL_FRAGMENT_SHADER, source);
+
+		default:
+			brogueException::show("Unhandled Resource Type:  resourceController::loadShader");
+		}
 	}
 
-	playbackData* loadPlayback(const char* path)
+	std::string resourceController::loadTextResource(int idrHandle)
 	{
-		return NULL;
+		// Some internet code...
+		HMODULE instance = NULL;
+		HRSRC hresource = FindResource(instance, MAKEINTRESOURCE(idrHandle), L"TEXT");
+
+		if (hresource)
+		{
+			HGLOBAL hLoadedResource = LoadResource(instance, hresource);
+
+			if (hLoadedResource)
+			{
+				LPVOID pLockedResource = LockResource(hLoadedResource);
+
+				if (pLockedResource)
+				{
+					DWORD dwResourceSize = SizeofResource(instance, hresource);
+
+					if (0 != dwResourceSize)
+					{
+						// Use pLockedResource and dwResourceSize however you want
+						char* buffer = new char[dwResourceSize];
+
+						for (int index = 0; index < dwResourceSize; index++)
+						{
+							buffer[index] = ((char*)hLoadedResource)[index];
+						}
+
+						std::string string(buffer);
+
+						delete [] buffer;
+
+						return string;
+					}
+				}
+			}
+		}
+
+		return "";
 	}
 }

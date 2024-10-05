@@ -1,11 +1,14 @@
 #pragma once
 
+#include "brogueGlobal.h"
 #include "broguefile.h"
 #include "keyProcessor.h"
 #include "brogueColorMap.h"
 #include "gameData.h"
 #include "playbackData.h"
+#include "shaderData.h"
 
+using namespace brogueHd::frontend::opengl;
 using namespace brogueHd::backend::processor;
 using namespace brogueHd::backend::model;
 using namespace brogueHd::backend::model::io;
@@ -44,5 +47,14 @@ namespace brogueHd::backend::controller
 		/// Loads playback data from file
 		/// </summary>
 		playbackData* loadPlayback(const char* path);
+
+		/// <summary>
+		/// Loads embedded resource file for shader
+		/// </summary>
+		shaderData loadShader(shaderResource resource);
+	
+	private:
+
+		std::string loadTextResource(int resourceHandle);
 	};
 }

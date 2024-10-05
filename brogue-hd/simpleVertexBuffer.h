@@ -1,11 +1,13 @@
 #pragma once
 
 #include "brogueGlobal.h"
+#include "simpleArray.h"
 #include "simplePrimitive.h"
 #include "simpleDataStream.h"
-#include "simpleArray.h"
 #include "simpleVertexAttribute.h"
 #include "typeConverter.h"
+
+using namespace brogueHd::component;
 
 namespace brogueHd::frontend::opengl
 {
@@ -54,8 +56,8 @@ namespace brogueHd::frontend::opengl
     template<typename T>
     void simpleVertexBuffer<T>::glCreate(GLuint programHandle)
     {
-        if (this->isCreated())
-            brogueException::show("GLVertexBuffer already created in the backend");
+        if (this->isCreated)
+            brogueException::show("simpleVertexBuffer already created in the backend");
 
         // Procedure
         //
@@ -67,10 +69,7 @@ namespace brogueHd::frontend::opengl
         //
 
         // Create buffer for vertices in the GPU memory space
-        GLuint bufferHandle;
-        glGenBuffers(1, bufferHandle);
-
-        this->handle = bufferHandle;
+        glGenBuffers(1, &this->handle);
 
         // Bind to array buffer type in OpenGL
         glBindBuffer(GL_ARRAY_BUFFER, this->handle);
@@ -93,7 +92,7 @@ namespace brogueHd::frontend::opengl
         int offsetBytes = 0;
         int strideBytes = calculateAttributeStride();
 
-        _vertexAttributes->forEach([&programHandle](simpleVertexAttribute attribute)
+        _vertexAttributes.forEach([&programHandle, &offsetBytes, &strideBytes](simpleVertexAttribute attribute)
         {
             // Get the attribute handle for the input variable
             GLuint attributeHandle = glGetAttribLocation(programHandle, attribute.getName().c_str());
@@ -122,15 +121,16 @@ namespace brogueHd::frontend::opengl
             }
             break;
             default:
-                brogueException::show("Unhandled vertex array attribute data type:  ", typeConverter::intToString(attribute.getUniformType()));
+                brogueException::show("Unhandled vertex array attribute data type:  " + typeConverter::intToString(attribute.getUniformType()));
             }
 
             // Declare the attribute array configuration
             glVertexAttribPointer(attribute.getIndex(),
-                                    attributeSize,
-                                    glType, glNormalized,
-                                    strideBytes,
-                                    offsetBytes);           // SEE RogueCreator for the function call. Not sure about void* (!!)
+                                  attributeSize,
+                                  glType, 
+                                  glNormalized,
+                                  strideBytes,
+                                  (void*)offsetBytes);           // SEE RogueCreator for the function call. Not sure about void* (!!)
 
             // Enable the vertex attribute
             glEnableVertexAttribArray(attributeHandle);
@@ -139,7 +139,7 @@ namespace brogueHd::frontend::opengl
             offsetBytes += currentOffset;
 
             return iterationCallback::iterate;
-        }
+        });
 
         this->isCreated = true;
     }
@@ -147,8 +147,8 @@ namespace brogueHd::frontend::opengl
     template<typename T>
     void simpleVertexBuffer<T>::teardown()
     {
-        if (!this.IsCreated)
-            throw new Exception("GLVertexBuffer already deleted from the backend");
+        if (!this->isCreated)
+            brogueException::show("simpleVertexBuffer already deleted from the backend");
 
         // Bind the CURRENT buffer to a null pointer to detach the buffer from the GL
         glBindBuffer(GL_ARRAY_BUFFER, NULL);
@@ -157,7 +157,7 @@ namespace brogueHd::frontend::opengl
         glDisableVertexAttribArray(_bufferIndex);
 
         // Now, delete THIS buffer
-        glDeleteBuffers(1, this->handle);
+        glDeleteBuffers(1, &this->handle);
 
         this->handle = NULL;
         this->isCreated = false;
@@ -171,7 +171,7 @@ namespace brogueHd::frontend::opengl
         //
 
         // THIS MUST PRODUCE A WHOLE NUMBER
-        return _stream->getStreamSize();        // Apparently Byte Length
+        return _stream.getStreamSize();        // Apparently Byte Length
         //return _stream.GetStreamSize() / 4;
     }
 
@@ -180,13 +180,13 @@ namespace brogueHd::frontend::opengl
     {
         int seed = 0;
 
-        return _vertexAttributes->aggregate(seed, (int stride, simpleVertexAttribute attribute)
+        return _vertexAttributes.aggregate<int>(seed, [](int stride, simpleVertexAttribute attribute)
         {
             // HANDLE ATTRIBUTES BY DATA TYPE
             if (attribute.getUniformType() == GL_FLOAT_VEC2)
                 return (stride + 2) * sizeof(float);
             else
-                brogueException::show("Unhandled vertex array attribute data type:  ", typeConverter::intToString(attribute.getUniformType()));
+                brogueException::show("Unhandled vertex array attribute data type:  " + typeConverter::intToString(attribute.getUniformType()));
         });
     }
 

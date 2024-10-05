@@ -1,16 +1,17 @@
 #pragma once
 
 #include "gridDefinitions.h"
+#include "simpleArrayExtension.h"
 #include "brogueCellDisplay.h"
 #include "brogueView.h"
+
 #include "coordinateConverter.h"
-#include "simpleGlData.h"
 #include "simpleShader.h"
 #include "shaderData.h"
 #include "simpleShaderProgram.h"
-#include "simpleVertexBuffer.h"
 #include "simpleVertexArray.h"
 
+using namespace brogueHd::component;
 using namespace brogueHd::backend::model::layout;
 using namespace brogueHd::frontend::ui;
 
@@ -18,12 +19,12 @@ namespace brogueHd::frontend::opengl
 {
 	class brogueSceneBuilder
 	{
+	public:
+
 		/// <summary>
 		/// The scene data is the data from a brogueView. Using quads, this data is streamed out to our simpleDataStream
 		/// object to hold for the GL backend calls.
 		/// </summary>
-		/// <param name="view"></param>
-		/// <returns></returns>
 		static simpleDataStream<float> prepareSceneDataStream(const brogueView& view)
 		{
 			// Starting with the raw data, build a simpleQuad data vector to pass to the simpleDataStream<float>
@@ -102,14 +103,17 @@ namespace brogueHd::frontend::opengl
 
 			// These are very similar data structures; but please leave this transfer until the GL backend is better understood
 			//
-			simpleArray<simpleVertexAttribute> frameVertexAttributes = vertexData.attributes->select<simpleVertexAttribute>([](vertexAttributeData data)
-			{
-				return simpleVertexAttribute(data.index, data.name, data.type);
-			});
-			simpleArray<simpleVertexAttribute> frameFragmentAttributes = fragmentData.attributes->select<simpleVertexAttribute>([](vertexAttributeData data)
-			{
-				return simpleVertexAttribute(data.index, data.name, data.type);
-			});
+			simpleArray<simpleVertexAttribute> frameVertexAttributes = simpleArrayExtension::select<vertexAttributeData, simpleVertexAttribute>(
+				*vertexData.attributes, [](vertexAttributeData data)
+				{
+					return simpleVertexAttribute(data.index, data.name, data.type);
+				});
+
+			simpleArray<simpleVertexAttribute> frameFragmentAttributes = simpleArrayExtension::select<vertexAttributeData, simpleVertexAttribute>(
+				*fragmentData.attributes, [](vertexAttributeData data) 
+				{
+					return simpleVertexAttribute(data.index, data.name, data.type);
+				});
 
 
 			simpleVertexBuffer<float> frameVBO(vertexBufferIndex++, frameDataStream, frameVertexAttributes);
@@ -140,14 +144,17 @@ namespace brogueHd::frontend::opengl
 
 			// These are very similar data structures; but please leave this transfer until the GL backend is better understood
 			//
-			simpleArray<simpleVertexAttribute> vertexAttributes = vertexData.attributes->select<simpleVertexAttribute>([](vertexAttributeData data)
-			{
-				return simpleVertexAttribute(data.index, data.name, data.type);
-			});
-			simpleArray<simpleVertexAttribute> fragmentAttributes = fragmentData.attributes->select<simpleVertexAttribute>([](vertexAttributeData data)
-			{
-				return simpleVertexAttribute(data.index, data.name, data.type);
-			});
+			simpleArray<simpleVertexAttribute> vertexAttributes = simpleArrayExtension::select<vertexAttributeData, simpleVertexAttribute>(
+				*vertexData.attributes, [](vertexAttributeData data)
+				{
+					return simpleVertexAttribute(data.index, data.name, data.type);
+				});
+
+			simpleArray<simpleVertexAttribute> fragmentAttributes = simpleArrayExtension::select<vertexAttributeData, simpleVertexAttribute>(
+				*fragmentData.attributes, [](vertexAttributeData data)
+				{
+					return simpleVertexAttribute(data.index, data.name, data.type);
+				});
 
 			simpleVertexBuffer<float> sceneVBO(vertexBufferIndex++, sceneDataStream, vertexAttributes);
 			simpleVertexArray<float> sceneVAO(GL_QUADS, sceneVBO);

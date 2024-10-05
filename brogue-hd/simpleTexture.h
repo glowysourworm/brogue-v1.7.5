@@ -2,7 +2,6 @@
 
 #include "brogueGlobal.h"
 #include "simplePrimitive.h"
-#include "simpleVertexBuffer.h"
 #include "gl.h"
 
 namespace brogueHd::frontend::opengl

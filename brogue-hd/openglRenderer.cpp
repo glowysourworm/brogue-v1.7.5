@@ -39,13 +39,13 @@ namespace brogueHd::frontend::opengl
 		glfwPollEvents();
 	}
 
-	void openglRenderer::openWindow(brogueView* view)
+	void openglRenderer::openWindow(simpleShaderProgram* program)
 	{
 		if (_windowOpen)
 			return;
 
-		// Shared View Pointer
-		_view = view;
+		// Shared Program Pointer (the program is acutally built, separating it from the brogueView)
+		_glProgram = program;
 		_windowOpen = true;
 
 		// GLFW Errors
@@ -128,11 +128,18 @@ namespace brogueHd::frontend::opengl
 		// Window Close Callback (NOT NEEDED! This is a callback to perform before window closes)
 		//glfwSetWindowCloseCallback(window, &openglRenderer::windowCloseCallback);
 
+		// *** Compile our program for the main loop:
+
+		_glProgram->compile();		// Declares program and program pieces on GL backend
+		_glProgram->bind(true);		// Activates program and program pieces on GL backend
+
 		// Main Rendering Loop
 		while (!glfwWindowShouldClose(window))
 		{
 			// Update from main thread's brogueView*
 			threadLock.lock();
+
+			_glProgram->drawAll();
 
 			threadLock.unlock();
 

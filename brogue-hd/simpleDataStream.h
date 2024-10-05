@@ -14,6 +14,13 @@ namespace brogueHd::frontend::opengl
 	{
     public:
 
+        simpleDataStream()
+        {
+            _streamNumberVertices = 0;
+            _array = NULL;
+            _cursor = 0;
+        }
+
         /// <summary>
         /// Creates a data stream with storage for N number of elements
         /// </summary>
@@ -23,9 +30,7 @@ namespace brogueHd::frontend::opengl
         simpleDataStream(int capacity, int vectorElementNumberVertices, int vectorStreamSize)
         {
             _streamNumberVertices = capacity * vectorElementNumberVertices;
-
             _array = new simpleArray<T>(capacity);
-
             _cursor = 0;
         }
 
@@ -34,7 +39,7 @@ namespace brogueHd::frontend::opengl
         /// </summary>
         int getStreamSize()
         {
-            return _array.Length * sizeof(T);
+            return _array->count() * sizeof(T);
         }
 
         void write(T primitive)
@@ -42,7 +47,7 @@ namespace brogueHd::frontend::opengl
             _array->set(_cursor++, primitive);
         }
 
-        public T* getData()
+        T* getData()
         {
             return _array->getArray();
         }

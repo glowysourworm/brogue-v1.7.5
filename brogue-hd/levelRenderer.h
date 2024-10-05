@@ -9,6 +9,7 @@
 using namespace brogueHd::backend::model;
 using namespace brogueHd::backend::generator;
 using namespace brogueHd::frontend::opengl;
+using namespace brogueHd::frontend::ui;
 
 namespace brogueHd::frontend::renderer
 {

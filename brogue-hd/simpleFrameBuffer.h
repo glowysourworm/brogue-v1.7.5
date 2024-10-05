@@ -8,7 +8,7 @@
 
 namespace brogueHd::frontend::opengl
 {
-    class simpleFrameBuffer : simplePrimitive
+    class simpleFrameBuffer : public simplePrimitive
     {
     public:
 

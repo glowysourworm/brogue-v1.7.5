@@ -213,6 +213,7 @@
     <ClCompile Include="resourceController.cpp" />
     <ClCompile Include="roomGenerator.cpp" />
     <ClCompile Include="renderingController.cpp" />
+    <ClCompile Include="simpleShaderProgram.cpp" />
     <ClCompile Include="terrainGenerator.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -240,6 +241,7 @@
     <ClInclude Include="componentMacros.h" />
     <ClInclude Include="coordinateConverter.h" />
     <ClInclude Include="gl.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="shaderData.h" />
     <ClInclude Include="simpleDataStream.h" />
     <ClInclude Include="simpleFrameBuffer.h" />
@@ -359,42 +361,45 @@
     <ClInclude Include="simpleGlData.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\resources\armor.csv" />
-    <None Include="..\resources\armorRunicNames.csv" />
-    <None Include="..\resources\blueprint.csv" />
-    <None Include="..\resources\bolt.csv" />
-    <None Include="..\resources\charms.csv" />
-    <None Include="..\resources\creatureBehaviorDescription.csv" />
-    <None Include="..\resources\creatureWords.csv" />
-    <None Include="..\resources\dungeonFeature.csv" />
-    <None Include="..\resources\feat.csv" />
-    <None Include="..\resources\features.csv" />
-    <None Include="..\resources\floorTileType.csv" />
-    <None Include="..\resources\food.csv" />
-    <None Include="..\resources\itemColors.csv" />
-    <None Include="..\resources\itemGems.csv" />
-    <None Include="..\resources\itemMetals.csv" />
-    <None Include="..\resources\itemWoods.csv" />
-    <None Include="..\resources\keys.csv" />
-    <None Include="..\resources\light.csv" />
-    <None Include="..\resources\machineGenerator.csv" />
-    <None Include="..\resources\colors.csv" />
-    <None Include="..\resources\creature.csv" />
-    <None Include="..\resources\creatureClass.csv" />
-    <None Include="..\resources\horde.csv" />
-    <None Include="..\resources\mutation.csv" />
-    <None Include="..\resources\potions.csv" />
-    <None Include="..\resources\rings.csv" />
-    <None Include="..\resources\scrolls.csv" />
-    <None Include="..\resources\staves.csv" />
-    <None Include="..\resources\titlePhonemes.csv" />
-    <None Include="..\resources\wands.csv" />
-    <None Include="..\resources\weaponRunicNames.csv" />
-    <None Include="..\resources\weapons.csv" />
-    <None Include="brogueBase.vert" />
-    <None Include="brogueFrame.frag" />
-    <None Include="brogueBase.frag" />
-    <None Include="brogueFrame.vert" />
+    <None Include="..\resources\model\armor.csv" />
+    <None Include="..\resources\model\armorRunicNames.csv" />
+    <None Include="..\resources\model\blueprint.csv" />
+    <None Include="..\resources\model\bolt.csv" />
+    <None Include="..\resources\model\charms.csv" />
+    <None Include="..\resources\model\colors.csv" />
+    <None Include="..\resources\model\creature.csv" />
+    <None Include="..\resources\model\creatureBehaviorDescription.csv" />
+    <None Include="..\resources\model\creatureClass.csv" />
+    <None Include="..\resources\model\creatureWords.csv" />
+    <None Include="..\resources\model\dungeonFeature.csv" />
+    <None Include="..\resources\model\feat.csv" />
+    <None Include="..\resources\model\features.csv" />
+    <None Include="..\resources\model\floorTileType.csv" />
+    <None Include="..\resources\model\food.csv" />
+    <None Include="..\resources\model\horde.csv" />
+    <None Include="..\resources\model\itemColors.csv" />
+    <None Include="..\resources\model\itemGems.csv" />
+    <None Include="..\resources\model\itemMetals.csv" />
+    <None Include="..\resources\model\itemWoods.csv" />
+    <None Include="..\resources\model\keys.csv" />
+    <None Include="..\resources\model\light.csv" />
+    <None Include="..\resources\model\machineGenerator.csv" />
+    <None Include="..\resources\model\mutation.csv" />
+    <None Include="..\resources\model\potions.csv" />
+    <None Include="..\resources\model\rings.csv" />
+    <None Include="..\resources\model\scrolls.csv" />
+    <None Include="..\resources\model\staves.csv" />
+    <None Include="..\resources\model\titlePhonemes.csv" />
+    <None Include="..\resources\model\wands.csv" />
+    <None Include="..\resources\model\weaponRunicNames.csv" />
+    <None Include="..\resources\model\weapons.csv" />
+    <None Include="..\resources\opengl\brogueBase.frag" />
+    <None Include="..\resources\opengl\brogueBase.vert" />
+    <None Include="..\resources\opengl\brogueFrame.frag" />
+    <None Include="..\resources\opengl\brogueFrame.vert" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="brogue-hd.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

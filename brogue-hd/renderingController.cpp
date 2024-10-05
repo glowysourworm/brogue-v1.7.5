@@ -1,13 +1,16 @@
 #include "renderingController.h"
+#include "brogueSceneBuilder.h"
+#include "brogueFlameMenu.h"
 
 using namespace brogueHd::frontend::opengl;
 using namespace brogueHd::backend::modelConstant;
 
 namespace brogueHd::backend::controller
 {
-	renderingController::renderingController()
+	renderingController::renderingController(resourceController* resourceController)
 	{
 		_openglRenderer = new openglRenderer();
+		_resourceController = resourceController;
 	}
 	renderingController::~renderingController()
 	{
@@ -27,7 +30,15 @@ namespace brogueHd::backend::controller
 		case BrogueGameMode::Game:
 		case BrogueGameMode::Playback:
 		{
-			_openglRenderer->openWindow(NULL);
+			// Prepare pieces of the render program
+			simpleDataStream<float> sceneDataStream = brogueSceneBuilder::prepareSceneDataStream(brogueFlameMenu());
+			shaderData vertexShaderData = _resourceController->loadShader(shaderResource::brogueBaseVert);
+			shaderData fragmentShaderData = _resourceController->loadShader(shaderResource::brogueBaseFrag);
+
+			// Create view for the renderer as shader program
+			simpleShaderProgram* program = brogueSceneBuilder::createSceneShaderProgram(sceneDataStream, vertexShaderData, fragmentShaderData);
+
+			_openglRenderer->openWindow(program);
 		}
 		break;
 		case BrogueGameMode::Scum:

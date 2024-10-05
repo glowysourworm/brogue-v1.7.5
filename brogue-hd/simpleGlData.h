@@ -7,7 +7,6 @@
 
 #include "brogueGlobal.h"
 #include "simpleDataStream.h"
-#include "simplePrimitive.h"
 #include "simpleArray.h"
 #include "gl.h"
 #include "typeConverter.h"
@@ -20,10 +19,22 @@ namespace brogueHd::frontend::opengl
 	{
 	public:
 
-		virtual float* getBuffer();
-		virtual int getElementSize(GLenum primitiveType);
-		virtual int getStreamSize();
-		virtual void streamBuffer(simpleDataStream<float>& outputStream);
+		virtual float* getBuffer()
+		{
+			return NULL;
+		}
+		virtual int getElementSize(GLenum primitiveType)
+		{
+			return NULL;
+		}
+		virtual int getStreamSize()
+		{
+			return 0;
+		}
+		virtual void streamBuffer(simpleDataStream<float>& outputStream)
+		{
+
+		}
 	};
 
 	struct vec2
@@ -31,6 +42,7 @@ namespace brogueHd::frontend::opengl
 		float x;
 		float y;
 
+		vec2(){}
 		vec2(float ax, float ay)
 		{
 			x = ax;
@@ -45,6 +57,7 @@ namespace brogueHd::frontend::opengl
 		float z;
 		float w;
 
+		vec4(){}
 		vec4(float ax, float ay, float az, float aw)
 		{
 			x = ax;
@@ -65,6 +78,7 @@ namespace brogueHd::frontend::opengl
 		float right;
 		float bottom;
 
+		simpleQuad(){}
 		simpleQuad(float aleft, float atop, float aright, float abottom)
 		{
 			left = aleft;
@@ -114,6 +128,7 @@ namespace brogueHd::frontend::opengl
 	template<typename T>
 	struct uniformData
 	{
+		uniformData(){}
 		uniformData(std::string aname, GLenum atype)
 		{
 			name = aname;
@@ -132,6 +147,7 @@ namespace brogueHd::frontend::opengl
 
 	struct vertexAttributeData
 	{
+		vertexAttributeData(){}
 		vertexAttributeData(int aindex, std::string aname, GLenum atype)
 		{
 			index = aindex;

@@ -62,8 +62,7 @@ namespace brogueHd::component
 		template<typename TResult>
 		TResult aggregate(TResult& seedValue, simpleArrayAggregate<T, TResult> aggregator);
 
-		template<typename TResult>
-		simpleArray<TResult> select(simpleArraySelector<T, TResult> selector)
+
 
 	private:
 
@@ -153,20 +152,6 @@ namespace brogueHd::component
 	}
 
 	template<typename T>
-	template<typename TResult>
-	simpleArray<TResult> simpleArray<T>::select(simpleArraySelector<T, TResult> selector)
-	{
-		simpleArray<TResult> result(this->count());
-
-		for (int index = 0; index < _count; index++)
-		{
-			result.set(index, selector(index));
-		}
-
-		return result;
-	}
-
-	template<typename T>
 	bool simpleArray<T>::contains(T item)
 	{
 		for (int index = 0; index < _count; index++)
@@ -185,7 +170,9 @@ namespace brogueHd::component
 	{
 		for (int index = 0; index < _count; index++)
 		{
-			seedValue = aggregator(result, _array[index]);
+			seedValue = aggregator(seedValue, _array[index]);
 		}
+
+		return seedValue;
 	}
 }

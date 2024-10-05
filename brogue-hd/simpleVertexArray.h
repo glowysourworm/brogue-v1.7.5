@@ -28,7 +28,7 @@ namespace brogueHd::frontend::opengl
 
         // Primary VBO vertex buffer objects indexed by the OpenGL BufferIndex
         GLenum _primitiveType;
-        simpleVertexBuffer _vertexBuffer;
+        simpleVertexBuffer<T> _vertexBuffer;
     };
 
     template<typename T>
@@ -54,10 +54,7 @@ namespace brogueHd::frontend::opengl
         // 2) Calculate the total buffer draw length and store
 
         // Generate the vertex array for THIS instance
-        GLuint hndle;
-        glGenVertexArrays(1, hndle);
-
-        this->handle = hndle;
+        glGenVertexArrays(1, &this->handle);
 
         // BIND THIS INSTANCE TO BE THE CURRENT VERTEX ARRAY
         glBindVertexArray(this->handle);
@@ -76,14 +73,14 @@ namespace brogueHd::frontend::opengl
     template<typename T>
     void simpleVertexArray<T>::teardown()
     {
-        if (!this.IsCreated)
+        if (!this->isCreated)
             brogueException::show("simpleVertexArray already deleted from the backend");
 
         // Teardown vertex buffers
         _vertexBuffer.teardown();
 
         // Delete this vertex array
-        glDeleteVertexArrays(1, this->handle);
+        glDeleteVertexArrays(1, &this->handle);
 
         this->isCreated = false;
         this->isBound = false;
@@ -93,10 +90,10 @@ namespace brogueHd::frontend::opengl
     template<typename T>
     void simpleVertexArray<T>::draw()
     {
-        if (!this.IsCreated)
+        if (!this->isCreated)
             brogueException::show("simpleVertexArray already deleted from the backend");
 
-        if (!this.IsBound)
+        if (!this->isBound)
             brogueException::show("simpleVertexArray must be bound before calling Draw()");
 
         // Draw Buffer

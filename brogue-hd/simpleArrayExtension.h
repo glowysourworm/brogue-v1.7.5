@@ -22,5 +22,19 @@ namespace brogueHd::component
 
 			return simpleArray<T>(result.toArray());
 		}
+
+		template<typename T, typename TResult>
+		static simpleArray<TResult> select(const simpleArray<T>& input, simpleArraySelector<T, TResult> selector)
+		{
+			int count = input.count();
+			simpleArray<TResult> result(count);
+
+			for (int index = 0; index < input.count(); index++)
+			{
+				result.set(index, selector(input.get(index)));
+			}
+
+			return result;
+		}
 	};
 }
