@@ -39,7 +39,7 @@ namespace brogueHd::component
 		if (_array != NULL)
 			delete _array;
 
-		_array = new simpleArray<char>(copy);
+		_array = new simpleArray<char>(copy.c_str());
 	}
 	void simpleString::operator+=(const simpleString& other)
 	{
@@ -97,7 +97,7 @@ namespace brogueHd::component
 		return result;
 	}
 
-	simpleString operator+(const simpleString& left, const simpleString& right)
+	simpleString& operator+(const simpleString& left, const simpleString& right)
 	{
 		simpleString result;
 
@@ -106,7 +106,7 @@ namespace brogueHd::component
 
 		return result;
 	}
-	simpleString operator+(const char* left, const simpleString& right)
+	simpleString& operator+(const char* left, const simpleString& right)
 	{
 		simpleString result;
 
@@ -115,7 +115,7 @@ namespace brogueHd::component
 
 		return result;
 	}
-	simpleString operator+(const simpleString& left, const char* right)
+	simpleString& operator+(const simpleString& left, const char* right)
 	{
 		simpleString result;
 

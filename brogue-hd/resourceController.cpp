@@ -8,6 +8,7 @@
 #include "fileOperations.h"
 
 #include "brogueGlobal.h"
+#include "simpleString.h"
 #include "stringExtension.h"
 #include "shaderData.h"
 
@@ -44,10 +45,12 @@ namespace brogueHd::backend::controller
 			// Parse the JSON file
 			nlohmann::json jsonConfig = nlohmann::json::parse(configuration);
 
-			simpleString baseVertSource = fileOperations::readFile(jsonConfig[brogueHd::ConfigBaseVertexShader]);
-			simpleString baseFragSource = fileOperations::readFile(jsonConfig[brogueHd::ConfigBaseFragmentShader]);
-			simpleString frameVertSource = fileOperations::readFile(jsonConfig[brogueHd::ConfigFrameVertexShader]);
-			simpleString frameFragSource = fileOperations::readFile(jsonConfig[brogueHd::ConfigFrameFragmentShader]);
+			auto thing = jsonConfig["sdf"];
+
+			simpleString baseVertSource = fileOperations::readFile(std::string(jsonConfig[brogueHd::ConfigBaseVertexShader]).c_str());
+			simpleString baseFragSource = fileOperations::readFile(std::string(jsonConfig[brogueHd::ConfigBaseFragmentShader]).c_str());
+			simpleString frameVertSource = fileOperations::readFile(std::string(jsonConfig[brogueHd::ConfigFrameVertexShader]).c_str());
+			simpleString frameFragSource = fileOperations::readFile(std::string(jsonConfig[brogueHd::ConfigFrameFragmentShader]).c_str());
 
 			shaderData* baseVert = new shaderData(shaderResource::brogueBaseVert, GL_VERTEX_SHADER, baseVertSource);
 			shaderData* baseFrag = new shaderData(shaderResource::brogueBaseFrag, GL_FRAGMENT_SHADER, baseFragSource);
@@ -275,7 +278,7 @@ namespace brogueHd::backend::controller
 		}
 		catch (std::exception ex)
 		{
-			brogueException::show(simpleString("Error opening colors.csv:  " + ex.what()));
+			brogueException::show(simpleString("Error opening colors.csv:  ") + ex.what());
 
 			delete result;
 		}

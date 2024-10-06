@@ -593,9 +593,6 @@
     <ClInclude Include="componentMacros.h">
       <Filter>Header Files\global</Filter>
     </ClInclude>
-    <ClInclude Include="brogueException.h">
-      <Filter>Header Files\global</Filter>
-    </ClInclude>
     <ClInclude Include="EnumString.h">
       <Filter>Header Files\global</Filter>
     </ClInclude>
@@ -634,9 +631,6 @@
     </ClInclude>
     <ClInclude Include="simpleArrayTests.h">
       <Filter>Header Files\unit-test</Filter>
-    </ClInclude>
-    <ClInclude Include="brogueLogger.h">
-      <Filter>Header Files\global</Filter>
     </ClInclude>
     <ClInclude Include="simpleHashTests.h">
       <Filter>Header Files\unit-test</Filter>
@@ -708,6 +702,12 @@
       <Filter>Header Files\component</Filter>
     </ClInclude>
     <ClInclude Include="simpleString.h">
+      <Filter>Header Files\component</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueLogger.h">
+      <Filter>Header Files\component</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueException.h">
       <Filter>Header Files\component</Filter>
     </ClInclude>
   </ItemGroup>

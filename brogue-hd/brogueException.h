@@ -5,13 +5,16 @@
 #include <stdexcept>
 #include <iostream>
 
-using namespace brogueHd::component;
-
-namespace brogueHd
+namespace brogueHd::component
 {
 	class brogueException
 	{
 	public:
+
+		static void show(const simpleString& message)
+		{
+			show(message, false);
+		}
 
 		static void show(const simpleString& message, bool halt = false)
 		{

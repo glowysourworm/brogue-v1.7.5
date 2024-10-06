@@ -3,9 +3,7 @@
 #include "simpleString.h"
 #include <iostream>
 
-using namespace brogueHd::component;
-
-namespace brogueHd
+namespace brogueHd::component
 {
 	class brogueLogger
 	{

@@ -44,9 +44,11 @@
 	// w should now be Sunday
 */
 
-#include <string>
+#include "simpleString.h"
 #include <map>
 #include <cassert>
+
+using namespace brogueHd::component;
 
 // Helper macros
 
@@ -73,9 +75,9 @@ class EnumStringBase
     typedef struct MapEntry
     {
         EnumType theValue;
-        std::string theDescription;
+        simpleString theDescription;
 
-        MapEntry(EnumType val, const std::string& descr)
+        MapEntry(EnumType val, const simpleString & descr)
         {
             theValue = val;
             theDescription = descr;
@@ -85,7 +87,7 @@ class EnumStringBase
 
 // Types
 protected:
-    typedef std::map<std::string, MapEntry> AssocMap;
+    typedef std::map<simpleString, MapEntry> AssocMap;
 
 protected:
 // Constructor / Destructor
@@ -104,19 +106,19 @@ private:
 protected:
     // Use this helper function to register each enumerator
     // and its string representation.
-    static void RegisterEnumerator(const EnumType e, const std::string &eStr, const std::string &edStr);
+    static void RegisterEnumerator(const EnumType e, const simpleString &eStr, const simpleString &edStr);
 
 public:
     // Converts from an enumerator to a string.
     // Returns an empty string if the enumerator was not registered.
-    static const std::string &From(const EnumType e);
+    static const simpleString &From(const EnumType e);
 
     // Converts from a string to an enumerator.
     // Returns true if the conversion is successful; false otherwise.
-    static const bool To(EnumType &e, const std::string &str);
+    static const bool To(EnumType &e, const simpleString &str);
 
     // Returns the description for the enum type
-    static const std::string &GetDescription(const EnumType e);
+    static const simpleString& GetDescription(const EnumType e);
 };
 
 // The EnumString class
@@ -149,7 +151,7 @@ typename EnumStringBase<D,E>::AssocMap &EnumStringBase<D,E>::GetMap()
 }
 
 template <class D, class E>
-void EnumStringBase<D,E>::RegisterEnumerator(const E e, const std::string &eStr, const std::string &edStr)
+void EnumStringBase<D,E>::RegisterEnumerator(const E e, const simpleString &eStr, const simpleString &edStr)
 {
     const bool bRegistered = GetMap().insert( typename AssocMap::value_type( eStr, MapEntry(e, edStr) )).second;
     assert( bRegistered );
@@ -157,7 +159,7 @@ void EnumStringBase<D,E>::RegisterEnumerator(const E e, const std::string &eStr,
 }
 
 template <class D, class E>
-const std::string &EnumStringBase<D,E>::From(const E e)
+const simpleString &EnumStringBase<D,E>::From(const E e)
 {
     for(;;) // Code block
     {
@@ -186,12 +188,12 @@ const std::string &EnumStringBase<D,E>::From(const E e)
     }
 
     // We couldn't do this conversion; return an empty string.
-    static const std::string dummy;
+    static const simpleString dummy;
     return dummy;
 }
 
 template <class D, class E>
-const bool EnumStringBase<D,E>::To(E &e, const std::string &str)
+const bool EnumStringBase<D,E>::To(E &e, const simpleString &str)
 {
     // Search for the string in our map.
     const typename AssocMap::const_iterator itr( GetMap().find( str ) );
@@ -208,7 +210,7 @@ const bool EnumStringBase<D,E>::To(E &e, const std::string &str)
 }
 
 template <class D, class E>
-const std::string& EnumStringBase<D, E>::GetDescription(const E e)
+const simpleString& EnumStringBase<D, E>::GetDescription(const E e)
 {
     for (;;) // Code block
     {
@@ -237,7 +239,7 @@ const std::string& EnumStringBase<D, E>::GetDescription(const E e)
     }
 
     // We couldn't do this conversion; return an empty string.
-    static const std::string dummy;
+    static const simpleString dummy;
     return dummy;
 }
 

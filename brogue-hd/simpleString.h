@@ -1,5 +1,6 @@
 #pragma once
 
+#include "brogueException.h"
 #include "simpleArray.h"
 #include "simpleList.h"
 
@@ -51,9 +52,9 @@ namespace brogueHd::component
 
 	public:
 
-		friend simpleString operator+(const simpleString& left, const simpleString& right);
-		friend simpleString operator+(const char* left, const simpleString& right);
-		friend simpleString operator+(const simpleString& left, const char* right);
+		friend simpleString& operator+(const simpleString& left, const simpleString& right);
+		friend simpleString& operator+(const char* left, const simpleString& right);
+		friend simpleString& operator+(const simpleString& left, const char* right);
 
 	private:
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "brogueGlobal.h"
+#include "brogueException.h"
 #include "simple.h"
 #include <functional>
 
