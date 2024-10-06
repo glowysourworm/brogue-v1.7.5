@@ -18,8 +18,8 @@ namespace brogueHd::frontend::opengl
     class simpleVertexBuffer : public simplePrimitive
     {
     public:
-        simpleVertexBuffer(){};
-        simpleVertexBuffer(int bufferIndex, const simpleDataStream<T>& dataStream, const simpleArray<simpleVertexAttribute>& vertexAttributes);
+        simpleVertexBuffer(){}
+        simpleVertexBuffer(int bufferIndex, const simpleDataStream<T>& dataStream, const simpleList<simpleVertexAttribute>& vertexAttributes);
         ~simpleVertexBuffer();
 
         void bind(bool bind) override;
@@ -34,13 +34,13 @@ namespace brogueHd::frontend::opengl
 
         // Primary vertex data for the buffer
         simpleDataStream<T> _stream;
-        simpleArray<simpleVertexAttribute> _vertexAttributes;
+        simpleList<simpleVertexAttribute> _vertexAttributes;
     };
 
     template<typename T>
     simpleVertexBuffer<T>::simpleVertexBuffer(int bufferIndex, 
                                               const simpleDataStream<T>& dataStream, 
-                                              const simpleArray<simpleVertexAttribute>& vertexAttributes)
+                                              const simpleList<simpleVertexAttribute>& vertexAttributes)
     {
         _stream = dataStream;
         _vertexAttributes = vertexAttributes;

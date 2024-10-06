@@ -11,8 +11,17 @@ namespace brogueHd::frontend::opengl
     struct simpleVertexAttribute
     {
     public:
-        simpleVertexAttribute(){}
-        simpleVertexAttribute(GLuint index, std::string name, int glActiveUniformType)
+        simpleVertexAttribute()
+        {
+            _index = 0;
+            _name = default_value<simpleString>::value;
+            _activeUniformType = 0;
+        }
+        simpleVertexAttribute(const simpleVertexAttribute& copy)
+        {
+            copyImpl(copy);
+        }
+        simpleVertexAttribute(GLuint index, const simpleString& name, int glActiveUniformType)
         {
             _index = index;
             _name = name;
@@ -35,7 +44,7 @@ namespace brogueHd::frontend::opengl
         {
             return _index;
         }
-        std::string getName() const
+        simpleString getName() const
         {
             return _name;
         }
@@ -45,9 +54,18 @@ namespace brogueHd::frontend::opengl
         }
 
     private:
+
+        void copyImpl(const simpleVertexAttribute& copy)
+        {
+            _index = copy.getIndex();
+            _name = copy.getName();
+            _activeUniformType = copy.getUniformType();
+        }
+
+    private:
         
         GLuint _index;
-        std::string _name;
+        simpleString _name;
 
         /// <summary>
         /// Type of input data for the shader - this would be some sort of GLSL supported data type.

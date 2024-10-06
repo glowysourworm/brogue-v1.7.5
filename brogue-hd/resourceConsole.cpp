@@ -13,7 +13,7 @@ namespace brogueHd::console
 	}
 	resourceConsole::~resourceConsole() {}
 
-	brogueConsoleReturn resourceConsole::command(std::string input, std::ostream& stream)
+	brogueConsoleReturn resourceConsole::command(simpleString input, std::ostream& stream)
 	{
 		int choice = 0;
 

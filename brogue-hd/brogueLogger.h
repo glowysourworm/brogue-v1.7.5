@@ -1,7 +1,9 @@
 #pragma once
 
-#include <string>
+#include "simpleString.h"
 #include <iostream>
+
+using namespace brogueHd::component;
 
 namespace brogueHd
 {
@@ -30,54 +32,54 @@ namespace brogueHd
 		static const int Red = 91;
 		static const int Blue = 94;
 
-		static void log(const std::string& message, const bool& endline = true)
+		static void log(const simpleString& message, const bool& endline = true)
 		{
 			if (endline)
-				std::cout << message << std::endl;
+				std::cout << message.c_str() << std::endl;
 			else
-				std::cout << message;
+				std::cout << message.c_str();
 		}
-		static void logGreen(const std::string& message, const bool& endline = true)
+		static void logGreen(const simpleString& message, const bool& endline = true)
 		{
 			setColor(Green);
 
 			if (endline)
-				std::cout << message << std::endl;
+				std::cout << message.c_str() << std::endl;
 			else
-				std::cout << message;
+				std::cout << message.c_str();
 
 			setColor(White);
 		}
-		static void logRed(const std::string& message, const bool& endline = true)
+		static void logRed(const simpleString& message, const bool& endline = true)
 		{
 			setColor(Red);
 
 			if (endline)
-				std::cout << message << std::endl;
+				std::cout << message.c_str() << std::endl;
 			else
-				std::cout << message;
+				std::cout << message.c_str();
 
 			setColor(White);
 		}
-		static void logBlue(const std::string& message, const bool& endline = true)
+		static void logBlue(const simpleString& message, const bool& endline = true)
 		{
 			setColor(Blue);
 
 			if (endline)
-				std::cout << message << std::endl;
+				std::cout << message.c_str() << std::endl;
 			else
-				std::cout << message;
+				std::cout << message.c_str();
 
 			setColor(White);
 		}
-		static void logYellow(const std::string& message, const bool& endline = true)
+		static void logYellow(const simpleString& message, const bool& endline = true)
 		{
 			setColor(Yellow);
 
 			if (endline)
-				std::cout << message << std::endl;
+				std::cout << message.c_str() << std::endl;
 			else
-				std::cout << message;
+				std::cout << message.c_str();
 
 			setColor(White);
 		}

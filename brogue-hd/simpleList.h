@@ -1,5 +1,6 @@
 #pragma once
 
+#include "brogueGlobal.h"
 #include "simple.h"
 #include "simpleArray.h"
 #include <functional>
@@ -31,6 +32,12 @@ namespace brogueHd::component
 	/// </summary>
 	template<typename T, typename TResult>
 	using simpleListSelector = std::function<TResult(T item)>;
+
+	/// <summary>
+	/// Delegate used to create a user-defined aggregate of the quantities in the list
+	/// </summary>
+	template<typename T, typename TResult>
+	using simpleListAggregator = std::function<TResult(TResult current, T item)>;
 
 	template<typename T>
 	class simpleList
@@ -85,6 +92,9 @@ namespace brogueHd::component
 
 		template<typename TResult>
 		TResult minOf(simpleListSelector<T, TResult> selector) const;
+
+		template<typename TResult>
+		TResult aggregate(TResult& seed, simpleListAggregator<T, TResult> aggregator);
 
 		template<typename TResult>
 		T withMin(simpleListSelector<T, TResult> selector) const;
@@ -463,6 +473,18 @@ namespace brogueHd::component
 		}
 
 		return min;
+	}
+
+	template<typename T>
+	template<typename TResult>
+	TResult simpleList<T>::aggregate(TResult& seed, simpleListAggregator<T, TResult> aggregator)
+	{
+		for (int index = 0; index < _count; index++)
+		{
+			seed = aggregator(seed, _array->get(index));
+		}
+
+		return seed;
 	}
 
 	template<typename T>

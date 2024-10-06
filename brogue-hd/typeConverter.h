@@ -1,7 +1,7 @@
 #pragma once
 
 #include "stringExtension.h"
-#include <string>
+#include "simpleString.h"
 
 namespace brogueHd::component
 {
@@ -15,30 +15,30 @@ namespace brogueHd::component
 
 		static char intToChar(int in)
 		{
-			return toString(in).at(0);
+			return intToString(in).get(0);
 		}
 		static char shortToChar(short in)
 		{
-			return toString(in).at(0);
+			return shortToString(in).get(0);
 		}
 		static char longToChar(long in)
 		{
-			return toString(in).at(0);
+			return longToString(in).get(0);
 		}
 		static char ulongToChar(unsigned long in)
 		{
-			return toString(in).at(0);
+			return ulongToString(in).get(0);
 		}
 
-		static int stringToInt(const std::string& input)
+		static int stringToInt(const simpleString& input)
 		{
-			return std::stoi(input);
+			return atoi(input.c_str());
 		}
-		static bool tryStringToInt(const std::string& input, int& result)
+		static bool tryStringToInt(const simpleString& input, int& result)
 		{
 			try
 			{
-				result = std::stoi(input);
+				result = atoi(input.c_str());
 
 				return true;
 			}
@@ -47,25 +47,25 @@ namespace brogueHd::component
 				return false;
 			}
 		}
-		static long stringTolong(const std::string& input)
+		static long stringTolong(const simpleString& input)
 		{
-			return std::stol(input);
+			return atol(input.c_str());
 		}
-		static short stringToshort(const std::string& input)
+		static short stringToshort(const simpleString& input)
 		{
-			return (short)std::stoi(input);
+			return (short)atoi(input.c_str());
 		}
-		static float stringTofloat(const std::string& input)
+		static float stringTofloat(const simpleString& input)
 		{
-			return std::stof(input);
+			return atof(input.c_str());
 		}
-		static double stringTodouble(const std::string& input)
-		{
-			return std::stod(input);
+		static double stringTodouble(const simpleString& input)
+		{		
+			return (double)atof(input.c_str());
 		}
-		static bool stringToBool(const std::string& input)
+		static bool stringToBool(const simpleString& input)
 		{
-			std::string upper = stringExtension::toUpper(input);
+			simpleString upper = input.toUpper();
 
 			if (upper == "TRUE")
 				return true;
@@ -73,27 +73,21 @@ namespace brogueHd::component
 			return false;
 		}
 
-		template<isNumber T>
-		static std::string toString(T in)
+		static simpleString intToString(int in)
 		{
-			return std::to_string(in);
+			return std::to_string(in).c_str();
 		}
-
-		static std::string intToString(int in)
+		static simpleString shortToString(short in)
 		{
-			return std::to_string(in);
+			return std::to_string(in).c_str();
 		}
-		static std::string shortToString(short in)
+		static simpleString longToString(long in)
 		{
-			return std::to_string(in);
+			return std::to_string(in).c_str();
 		}
-		static std::string longToString(long in)
+		static simpleString ulongToString(unsigned long in)
 		{
-			return std::to_string(in);
-		}
-		static std::string ulongToString(unsigned long in)
-		{
-			return std::to_string(in);
+			return std::to_string(in).c_str();
 		}
 	};
 }

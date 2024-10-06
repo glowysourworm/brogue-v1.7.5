@@ -21,7 +21,7 @@ namespace brogueHd::test
 			this->addTest("intArray_OnStack_forEach", std::bind(&simpleArrayTests::intArray_OnStack_forEach, this));
 			this->addTest("intArray_OnHeap_forEach", std::bind(&simpleArrayTests::intArray_OnHeap_forEach, this));
 
-			// simpleArray<std::string>
+			// simpleArray<simpleString>
 			this->addTest("instantiate_StringArray_OnStack", std::bind(&simpleArrayTests::instantiate_StringArray_OnStack, this));
 			this->addTest("instantiate_StringArray_OnHeap_And_Delete", std::bind(&simpleArrayTests::instantiate_StringArray_OnHeap_And_Delete, this));
 			this->addTest("stringArray_OnStack_Set_Get", std::bind(&simpleArrayTests::stringArray_OnStack_Set_Get, this));
@@ -108,14 +108,14 @@ namespace brogueHd::test
 
 		bool instantiate_StringArray_OnStack()
 		{
-			simpleArray<std::string> theArray(10);
+			simpleArray<simpleString> theArray(10);
 
 			return true;
 		}
 
 		bool instantiate_StringArray_OnHeap_And_Delete()
 		{
-			simpleArray<std::string>* theArray = new simpleArray<std::string>();
+			simpleArray<simpleString>* theArray = new simpleArray<simpleString>();
 
 			delete theArray;
 
@@ -124,7 +124,7 @@ namespace brogueHd::test
 
 		bool stringArray_OnStack_Set_Get()
 		{
-			simpleArray<std::string> theArray(10);
+			simpleArray<simpleString> theArray(10);
 
 			theArray.set(2, "some string");
 
@@ -138,7 +138,7 @@ namespace brogueHd::test
 
 		bool stringArray_OnHeap_Set_Get_Delete()
 		{
-			simpleArray<std::string>* theArray = new simpleArray<std::string>(3);
+			simpleArray<simpleString>* theArray = new simpleArray<simpleString>(3);
 
 			theArray->set(2, "some string");
 
@@ -154,9 +154,9 @@ namespace brogueHd::test
 
 		bool stringArray_OnStack_forEach()
 		{
-			simpleArray<std::string> theArray(10);
+			simpleArray<simpleString> theArray(10);
 
-			theArray.forEach([](std::string str)
+			theArray.forEach([](simpleString str)
 			{
 				return iterationCallback::iterate;
 			});
@@ -166,9 +166,9 @@ namespace brogueHd::test
 
 		bool stringArray_OnHeap_forEach()
 		{
-			simpleArray<std::string>* theArray = new simpleArray<std::string>(7);
+			simpleArray<simpleString>* theArray = new simpleArray<simpleString>(7);
 
-			theArray->forEach([](std::string str)
+			theArray->forEach([](simpleString str)
 			{
 				return iterationCallback::iterate;
 			});

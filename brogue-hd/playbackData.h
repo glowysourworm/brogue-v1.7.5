@@ -9,7 +9,7 @@ namespace brogueHd::backend::model::io
 	/// Data structure for recording info:  used during playback mode
 	/// </summary>
 	typedef struct playbackData {
-		std::string filePath;				// path to playback file
+		simpleString filePath;				// path to playback file
 		brogueEventFile recordedEvents;		// events from the playback file
 		bool playbackMode;					// whether we're viewing a recording instead of playing
 		unsigned long currentTurnNumber;	// how many turns have elapsed

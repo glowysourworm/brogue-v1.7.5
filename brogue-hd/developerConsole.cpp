@@ -14,7 +14,7 @@ namespace brogueHd::console
 	}
 	developerConsole::~developerConsole() {}
 
-	brogueConsoleReturn developerConsole::command(std::string input, std::ostream& stream)
+	brogueConsoleReturn developerConsole::command(simpleString input, std::ostream& stream)
 	{
 		int choice = 0;
 		

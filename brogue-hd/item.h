@@ -118,15 +118,15 @@ namespace brogueHd::backend::model::game
 
 	struct itemTable
 	{
-		std::string name;
-		std::string flavor;
-		std::string callTitle;
+		simpleString name;
+		simpleString flavor;
+		simpleString callTitle;
 		short frequency;
 		short marketValue;
 		short strengthRequired;
 		randomRange range;
 		bool identified;
 		bool called;
-		std::string description;
+		simpleString description;
 	};
 }

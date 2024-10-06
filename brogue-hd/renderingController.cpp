@@ -34,8 +34,8 @@ namespace brogueHd::backend::controller
 			// Prepare pieces of the render program
 			brogueFlameMenu mainMenu(0, 1, 1, 1, 1, 1, 1);
 			simpleDataStream<float> sceneDataStream = brogueSceneBuilder::prepareSceneDataStream(mainMenu);
-			shaderData vertexShaderData = _resourceController->loadShader(shaderResource::brogueBaseVert);
-			shaderData fragmentShaderData = _resourceController->loadShader(shaderResource::brogueBaseFrag);
+			shaderData vertexShaderData = _resourceController->getShader(shaderResource::brogueBaseVert);
+			shaderData fragmentShaderData = _resourceController->getShader(shaderResource::brogueBaseFrag);
 
 			// Create view for the renderer as shader program
 			simpleShaderProgram* program = brogueSceneBuilder::createSceneShaderProgram(sceneDataStream, vertexShaderData, fragmentShaderData);

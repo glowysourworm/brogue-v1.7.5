@@ -30,9 +30,15 @@ int main(int argc, char* argv[])
 	}
 
 	// Backend Components
-	resourceController* brogueResourceController = new resourceController(argv[1]);
+	resourceController* brogueResourceController = new resourceController();
 
-	std::string cmd = "";
+	if (!brogueResourceController->initialize(argv[1]))
+	{
+		std::cout << "Must include the resource-config.json file path in the command line (first parameter)" << std::endl;
+		return 1;
+	}
+
+	simpleString cmd = "";
 
 	while (returnValue != brogueConsoleReturn::Exit && iterate)
 	{
@@ -92,7 +98,11 @@ int main(int argc, char* argv[])
 
 		// Read console line
 		std::cout << std::endl << currentConsole->consoleName << " @> ";
-		std::getline(std::cin, cmd);
+		std::string cmdStr;
+		std::getline(std::cin, cmdStr);
+
+		// Didn't want to rewrite getline..
+		cmd = cmdStr.c_str();
 	}
 
 	if (currentConsole != defaultConsole)

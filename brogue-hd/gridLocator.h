@@ -66,10 +66,10 @@ namespace brogueHd::component
 			return gridLocator(-1, -1);
 		}
 
-		std::string getString()
+		simpleString getString()
 		{
 			//return std::format("(Col={}, Row={})", typeConverter::shortToString(column), typeConverter::shortToString(row));
-			return std::string("TODO");
+			return simpleString("TODO");
 		}
 
 		size_t getHash() const override

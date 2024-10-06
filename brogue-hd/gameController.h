@@ -83,7 +83,7 @@ namespace brogueHd::backend::controller
 		playbackProcessor* _playbackProcessor;
 
 		// File path for current game
-		std::string _gamePath;
+		simpleString _gamePath;
 
 		gameData* _gameData;
 	};

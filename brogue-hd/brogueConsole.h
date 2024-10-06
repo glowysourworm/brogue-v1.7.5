@@ -17,20 +17,20 @@ namespace brogueHd::console
 
 		const char* BrogueVersion = BROGUE_VERSION_STRING;
 
-		std::string consoleName;
+		simpleString consoleName;
 
 	public:
 
 		brogueConsole();
 		~brogueConsole();
 
-		virtual brogueConsoleReturn command(std::string input, std::ostream& stream);
+		virtual brogueConsoleReturn command(simpleString input, std::ostream& stream);
 		virtual void printHelp(std::ostream& stream);
 
-		bool hasArgument(const simpleArray<std::string>& args, const char* argumentName);
-		int getArgumentInt(const simpleArray<std::string>& args, const char* argumentName);
-		bool getArgumentBool(const simpleArray<std::string>& args, const char* argumentName);
-		std::string getArgument(const simpleArray<std::string>& args, const char* argumentName);
+		bool hasArgument(const simpleArray<simpleString>& args, const char* argumentName);
+		int getArgumentInt(const simpleArray<simpleString>& args, const char* argumentName);
+		bool getArgumentBool(const simpleArray<simpleString>& args, const char* argumentName);
+		simpleString getArgument(const simpleArray<simpleString>& args, const char* argumentName);
 	};
 }
 

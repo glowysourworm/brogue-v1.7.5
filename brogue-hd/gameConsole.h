@@ -16,7 +16,7 @@ namespace brogueHd::console
 		gameConsole(resourceController* resourceController);
 		~gameConsole();
 
-		brogueConsoleReturn command(std::string input, std::ostream& stream);
+		brogueConsoleReturn command(simpleString input, std::ostream& stream);
 		void printHelp(std::ostream& stream) override;
 
 	private:

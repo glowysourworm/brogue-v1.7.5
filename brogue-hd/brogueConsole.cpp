@@ -16,7 +16,7 @@ namespace brogueHd::console
 	{
 	}
 
-	brogueConsoleReturn brogueConsole::command(std::string input, std::ostream& stream)
+	brogueConsoleReturn brogueConsole::command(simpleString input, std::ostream& stream)
 	{
 		int choice = 0;
 
@@ -41,22 +41,22 @@ namespace brogueHd::console
 		stream << "\tElse) Exit" << std::endl;
 	}
 
-	bool brogueConsole::hasArgument(const simpleArray<std::string>& args, const char* argumentName)
+	bool brogueConsole::hasArgument(const simpleArray<simpleString>& args, const char* argumentName)
 	{
 		for (int index = 0; index < args.count(); index++)
 		{	
-			if (args.get(index) == std::string(argumentName))
+			if (args.get(index) == simpleString(argumentName))
 				return true;
 		}
 
 		return false;
 	}
 
-	std::string brogueConsole::getArgument(const simpleArray<std::string>& args, const char* argumentName)
+	simpleString brogueConsole::getArgument(const simpleArray<simpleString>& args, const char* argumentName)
 	{
 		for (int index = 0; index < args.count(); index++)
 		{
-			if (args.get(index) == std::string(argumentName) &&
+			if (args.get(index) == simpleString(argumentName) &&
 				index < sizeof(args) + 1)
 			{
 				return args.get(index + 1);
@@ -66,11 +66,11 @@ namespace brogueHd::console
 		return "";
 	}
 
-	int brogueConsole::getArgumentInt(const simpleArray<std::string>& args, const char* argumentName)
+	int brogueConsole::getArgumentInt(const simpleArray<simpleString>& args, const char* argumentName)
 	{
 		for (int index = 0; index < sizeof(args); index++)
 		{
-			if (args.get(index) == std::string(argumentName) &&
+			if (args.get(index) == simpleString(argumentName) &&
 				index < sizeof(args) + 1)
 			{
 				return typeConverter::stringToInt(args.get(index + 1));
@@ -80,7 +80,7 @@ namespace brogueHd::console
 		return 0;
 	}
 
-	bool brogueConsole::getArgumentBool(const simpleArray<std::string>& args, const char* argumentName)
+	bool brogueConsole::getArgumentBool(const simpleArray<simpleString>& args, const char* argumentName)
 	{
 		for (int index = 0; index < sizeof(args); index++)
 		{

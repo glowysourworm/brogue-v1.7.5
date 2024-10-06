@@ -103,17 +103,15 @@ namespace brogueHd::frontend::opengl
 
 			// These are very similar data structures; but please leave this transfer until the GL backend is better understood
 			//
-			simpleArray<simpleVertexAttribute> frameVertexAttributes = simpleArrayExtension::select<vertexAttributeData, simpleVertexAttribute>(
-				*vertexData.attributes, [](vertexAttributeData data)
-				{
-					return simpleVertexAttribute(data.index, data.name, data.type);
-				});
+			simpleList<simpleVertexAttribute> frameVertexAttributes = vertexData.attributes->select<simpleVertexAttribute>([](vertexAttributeData data)
+			{
+				return simpleVertexAttribute(data.index, data.name, data.type);
+			});
 
-			simpleArray<simpleVertexAttribute> frameFragmentAttributes = simpleArrayExtension::select<vertexAttributeData, simpleVertexAttribute>(
-				*fragmentData.attributes, [](vertexAttributeData data) 
-				{
-					return simpleVertexAttribute(data.index, data.name, data.type);
-				});
+			simpleList<simpleVertexAttribute> frameFragmentAttributes = fragmentData.attributes->select<simpleVertexAttribute>([](vertexAttributeData data)
+			{
+				return simpleVertexAttribute(data.index, data.name, data.type);
+			});
 
 
 			simpleVertexBuffer<float> frameVBO(vertexBufferIndex++, frameDataStream, frameVertexAttributes);
@@ -144,17 +142,15 @@ namespace brogueHd::frontend::opengl
 
 			// These are very similar data structures; but please leave this transfer until the GL backend is better understood
 			//
-			simpleArray<simpleVertexAttribute> vertexAttributes = simpleArrayExtension::select<vertexAttributeData, simpleVertexAttribute>(
-				*vertexData.attributes, [](vertexAttributeData data)
-				{
-					return simpleVertexAttribute(data.index, data.name, data.type);
-				});
+			simpleList<simpleVertexAttribute> vertexAttributes = vertexData.attributes->select<simpleVertexAttribute>([](vertexAttributeData data)
+			{
+				return simpleVertexAttribute(data.index, data.name, data.type);
+			});
 
-			simpleArray<simpleVertexAttribute> fragmentAttributes = simpleArrayExtension::select<vertexAttributeData, simpleVertexAttribute>(
-				*fragmentData.attributes, [](vertexAttributeData data)
-				{
-					return simpleVertexAttribute(data.index, data.name, data.type);
-				});
+			simpleList<simpleVertexAttribute> fragmentAttributes = fragmentData.attributes->select<simpleVertexAttribute>([](vertexAttributeData data)
+			{
+				return simpleVertexAttribute(data.index, data.name, data.type);
+			});
 
 			simpleVertexBuffer<float> sceneVBO(vertexBufferIndex++, sceneDataStream, vertexAttributes);
 			simpleVertexArray<float> sceneVAO(GL_QUADS, sceneVBO);

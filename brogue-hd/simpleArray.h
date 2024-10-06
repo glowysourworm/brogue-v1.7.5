@@ -58,11 +58,11 @@ namespace brogueHd::component
 	public:
 
 		void forEach(simpleArrayCallback<T> callback);
+		bool areAll(T value);
+		bool areAll(simpleArrayPredicate<T> predicate);
 
 		template<typename TResult>
 		TResult aggregate(TResult& seedValue, simpleArrayAggregate<T, TResult> aggregator);
-
-
 
 	private:
 
@@ -73,14 +73,18 @@ namespace brogueHd::component
 	template<typename T>
 	simpleArray<T>::simpleArray()
 	{
-		_array = new T[sizeof(T)];
+		std::allocator<T> alloc;
+
+		_array = alloc.allocate(1);
 		_count = 1;
 	}
 
 	template<typename T>
 	simpleArray<T>::simpleArray(int count)
 	{
-		_array = new T[count * sizeof(T)];
+		std::allocator<T> alloc;
+
+		_array = alloc.allocate(count);
 		_count = count;
 	}
 
@@ -102,7 +106,9 @@ namespace brogueHd::component
 	template<typename T>
 	simpleArray<T>::simpleArray(const simpleArray<T>& copy)
 	{
-		_array = new T[copy.count() * sizeof(T)];
+		std::allocator<T> alloc;
+
+		_array = alloc.allocate(copy.count());
 		_count = copy.count();
 
 		for (int index = 0; index < _count; index++)
@@ -149,6 +155,29 @@ namespace brogueHd::component
 			if (callback(_array[index]) == iterationCallback::breakAndReturn)
 				return;
 		}
+	}
+
+	template<typename T>
+	bool simpleArray<T>::areAll(T value)
+	{
+		for (int index = 0; index < _count; index++)
+		{
+			if (_array->get(index) != value)
+				return false;
+		}
+
+		return true;
+	}
+	template<typename T>
+	bool simpleArray<T>::areAll(simpleArrayPredicate<T> predicate)
+	{
+		for (int index = 0; index < _count; index++)
+		{
+			if (!predicate(_array->get(index)))
+				return false;
+		}
+
+		return true;
 	}
 
 	template<typename T>

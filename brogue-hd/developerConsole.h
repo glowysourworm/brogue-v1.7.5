@@ -1,7 +1,8 @@
 #pragma once
 
+#include "brogueGlobal.h"
 #include "brogueConsole.h"
-#include "command.h"
+#include "simpleString.h"
 
 namespace brogueHd::console
 {
@@ -11,7 +12,7 @@ namespace brogueHd::console
 		developerConsole();
 		~developerConsole();
 
-		brogueConsoleReturn command(std::string input, std::ostream& stream) override;
+		brogueConsoleReturn command(simpleString input, std::ostream& stream) override;
 		void printHelp(std::ostream& stream) override;
 
 		bool runUnitTests();

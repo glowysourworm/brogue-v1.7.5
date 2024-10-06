@@ -15,7 +15,7 @@ namespace brogueHd::frontend::opengl
     {
     public:
         simpleShader();
-        simpleShader(std::string source);
+        simpleShader(simpleString* source);
         ~simpleShader(){};
 
         void glCreate(GLuint programHandle) override;
@@ -25,7 +25,7 @@ namespace brogueHd::frontend::opengl
     private:
 
         GLenum _shaderType;
-        std::string _source;
+        simpleString* _source;
     };
 
     simpleShader::simpleShader()
@@ -35,9 +35,9 @@ namespace brogueHd::frontend::opengl
         this->isBound = false;
 
         _shaderType = NULL;
-        _source = "";
+        _source = NULL;
     }
-    simpleShader::simpleShader(std::string source)
+    simpleShader::simpleShader(simpleString* source)
     {
         this->handle = NULL;
         this->isCreated = false;
@@ -67,8 +67,8 @@ namespace brogueHd::frontend::opengl
         this->handle = glCreateShader(_shaderType);
 
         // (some funny casting)
-        const GLchar* source = _source.c_str();
-        const GLint size = _source.size();
+        const GLchar* source = _source->c_str();
+        const GLint size = _source->count();
 
         // Set the shader source on the GL backend
         glShaderSource(this->handle, 1, &source, &size);

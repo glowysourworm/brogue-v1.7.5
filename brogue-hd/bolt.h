@@ -2,17 +2,18 @@
 
 #include "color.h"
 #include "brogueGlobal.h"
-#include <string>
+#include "simpleString.h"
 
+using namespace brogueHd::component;
 using namespace brogueHd::backend::model::game;
 
 namespace brogueHd::backend::model::effect
 {
     struct bolt 
     {
-        std::string name;
-        std::string description;
-        std::string abilityDescription;
+        simpleString name;
+        simpleString description;
+        simpleString abilityDescription;
         char theChar;
         color foreColor;
         color backColor;

@@ -3,6 +3,7 @@
 #include <functional>
 #include "brogueLogger.h"
 #include "simpleHash.h"
+#include "simpleString.h"
 
 using namespace brogueHd::component;
 
@@ -18,9 +19,9 @@ namespace brogueHd::test
 		
 
 	public:
-		brogueTestPackage(std::string name)
+		brogueTestPackage(simpleString name)
 		{
-			_tests = new simpleHash<std::string, brogueTestDelegate>();
+			_tests = new simpleHash<simpleString, brogueTestDelegate>();
 			_batteryName = name;
 		}
 		~brogueTestPackage()
@@ -33,7 +34,7 @@ namespace brogueHd::test
 			brogueTestPackage* that = this;
 			bool anyErrors = false;
 			
-			_tests->iterate([&that, &anyErrors](std::string key, brogueTestDelegate value)
+			_tests->iterate([&that, &anyErrors](simpleString key, brogueTestDelegate value)
 			{
 				that->setCurrentTest(key);
 
@@ -47,7 +48,7 @@ namespace brogueHd::test
 				}
 				catch (const std::exception& ex)
 				{
-					brogueLogger::logRed("Exception: " + std::string(ex.what()));
+					brogueLogger::logRed("Exception: " + simpleString(ex.what()));
 
 					result = false;
 				}
@@ -65,7 +66,7 @@ namespace brogueHd::test
 			return anyErrors;
 		}
 
-		void testAssert(std::string assertName, brogueTestAssertDelegate assertion)
+		void testAssert(simpleString assertName, brogueTestAssertDelegate assertion)
 		{
 			bool result = false;
 
@@ -75,7 +76,7 @@ namespace brogueHd::test
 			}
 			catch (const std::exception& ex)
 			{
-				brogueLogger::logRed("Unit Test " + _currentTestName + " Assertion Exception" + assertName + ":  " + std::string(ex.what()));
+				brogueLogger::logRed("Unit Test " + _currentTestName + " Assertion Exception" + assertName + ":  " + simpleString(ex.what()));
 				result = false;
 			}
 				
@@ -83,28 +84,28 @@ namespace brogueHd::test
 				brogueLogger::logRed("Unit Test " + _currentTestName + " Assertion " + assertName + " Failed!");
 		}
 
-		std::string getName()
+		simpleString getName()
 		{
 			return _batteryName;
 		}
 
 	protected:
 
-		void addTest(std::string testName, brogueTestDelegate testDelegate)
+		void addTest(simpleString testName, brogueTestDelegate testDelegate)
 		{
 			_tests->add(testName, testDelegate);
 		}
 
-		void setCurrentTest(std::string testName)
+		void setCurrentTest(simpleString testName)
 		{
 			_currentTestName = testName;
 		}
 
 	private:
 
-		simpleHash<std::string, brogueTestDelegate>* _tests;
+		simpleHash<simpleString, brogueTestDelegate>* _tests;
 
-		std::string _currentTestName;
-		std::string _batteryName;
+		simpleString _currentTestName;
+		simpleString _batteryName;
 	};
 }

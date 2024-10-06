@@ -38,7 +38,7 @@ namespace brogueHd::console
 		stream << "\tElse) Exit" << std::endl;
 
 		//stream << "--help         -h          print this help message" << std::endl;
-		//stream << "--version      -V          print the version (i.e., " + std::string(this->BrogueVersion) + ")" << std::endl;
+		//stream << "--version      -V          print the version (i.e., " + simpleString(this->BrogueVersion) + ")" << std::endl;
 		//stream << "--scores                   dump scores to output and exit immediately" << std::endl;
 		//stream << "-n                         start a new game, skipping the menu" << std::endl;
 		//stream << "-s seed                    start a new game with the specified numerical seed" << std::endl;
@@ -54,7 +54,7 @@ namespace brogueHd::console
 		for (int i = 0; i < scoreFile->scoreCount; i++)
 		{
 			// Convert file time to readable string
-			std::string dateStr = stringExtension::formatDate(scoreFile->scoreList.get(i).dateTime);
+			simpleString dateStr = stringExtension::formatDate(scoreFile->scoreList.get(i).dateTime);
 
 			// Output to stream (console)
 			stream << std::format("{}\t{}\t{}", (int)scoreFile->scoreList.get(i).score, dateStr, scoreFile->scoreList.get(i).description) << std::endl;
@@ -63,7 +63,7 @@ namespace brogueHd::console
 		delete scoreFile;
 	}
 
-	brogueConsoleReturn gameConsole::command(std::string input, std::ostream& stream)
+	brogueConsoleReturn gameConsole::command(simpleString input, std::ostream& stream)
 	{
 		int choice = 0;
 

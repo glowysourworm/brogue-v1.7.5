@@ -22,7 +22,7 @@ namespace brogueHd::backend::processor
 
 	private:
 
-		simpleHash<std::string, std::string>* _keyMap;
+		simpleHash<simpleString, simpleString>* _keyMap;
 	};
 }
 

@@ -28,10 +28,10 @@ namespace brogueHd::backend::processor
 			fileStream.open(filePath);
 
 			if (!fileStream.good())
-				throw std::runtime_error(std::string("Error opening file:  ") + filePath);
+				brogueException::show(simpleString("Error opening file:  ") + filePath);
 
 			// Store the path of the playback file
-			_playbackData->filePath.assign(filePath);
+			_playbackData->filePath = filePath;
 
 			// Read the event list from file
 			_playbackData->recordedEvents = brogueEventFile::deserialize(fileStream);
@@ -40,7 +40,7 @@ namespace brogueHd::backend::processor
 		}
 		catch (std::exception& ex)
 		{
-			throw std::runtime_error(std::string("Error opening playback file: ") + ex.what());
+			throw brogueException::show(simpleString("Error opening playback file: ") + ex.what());
 		}
 	}
 }

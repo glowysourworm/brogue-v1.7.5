@@ -7,7 +7,9 @@
 #include "gameData.h"
 #include "playbackData.h"
 #include "shaderData.h"
+#include "simpleHash.h"
 
+using namespace brogueHd::component;
 using namespace brogueHd::frontend::opengl;
 using namespace brogueHd::backend::processor;
 using namespace brogueHd::backend::model;
@@ -20,8 +22,13 @@ namespace brogueHd::backend::controller
 	{
 	public:
 
-		resourceController(const char* resourcConfigFile);
+		resourceController();
 		~resourceController();
+
+		/// <summary>
+		/// Loads file caches and returns any file results
+		/// </summary>
+		bool initialize(const char* resourcConfigFile);
 
 		/// <summary>
 		/// Gets array of high score entries from file
@@ -49,12 +56,12 @@ namespace brogueHd::backend::controller
 		playbackData* loadPlayback(const char* path);
 
 		/// <summary>
-		/// Loads embedded resource file for shader
+		/// Gets shader data from the resource controller
 		/// </summary>
-		shaderData loadShader(shaderResource resource);
+		shaderData getShader(shaderResource resource);
 	
 	private:
 
-		std::string _resourceConfigFile;
+		simpleHash<shaderResource, shaderData*>* _shaderCache;
 	};
 }

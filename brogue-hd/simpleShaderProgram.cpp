@@ -48,10 +48,10 @@ namespace brogueHd::frontend::opengl
         // Declare: VAO -> VBO
         //
         _programVAOs->forEach([&handle](simplePrimitive vao)
-            {
-                vao.glCreate(handle);
-                return iterationCallback::iterate;
-            });
+        {
+            vao.glCreate(handle);
+            return iterationCallback::iterate;
+        });
 
         // "Installs the program object as part of the current rendering state"
         glUseProgram(handle);
@@ -82,11 +82,11 @@ namespace brogueHd::frontend::opengl
             brogueException::show("Must first call Bind to set the program active");
 
         _programVAOs->forEach([](simplePrimitive vao)
-            {
-                vao.bind(true);
-                vao.draw();
-                return iterationCallback::iterate;
-            });
+        {
+            vao.bind(true);
+            vao.draw();
+            return iterationCallback::iterate;
+        });
     }
 
     void simpleShaderProgram::bind(bool bind)
@@ -167,10 +167,10 @@ namespace brogueHd::frontend::opengl
 
         // Teardown the VAO
         _programVAOs->forEach([](simplePrimitive vao)
-            {
-                vao.teardown();
-                return iterationCallback::iterate;
-            });
+        {
+            vao.teardown();
+            return iterationCallback::iterate;
+        });
 
         // Deactivate the program on the backend before deleting
         glUseProgram(NULL);

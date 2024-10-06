@@ -60,7 +60,7 @@ namespace brogueHd::component
         void addEdges(short column, short row, T item);
         void addBoundary(short column, short row, T item);
         void validate();
-        void validateRegionCollection(std::string name, simpleHash<T, T>* collection);
+        void validateRegionCollection(simpleString name, simpleHash<T, T>* collection);
         gridRect calculateLargestRectangle();
 
     private:
@@ -336,7 +336,7 @@ namespace brogueHd::component
     }
 
     template<isGridLocator T>
-    void gridRegionConstructor<T>::validateRegionCollection(std::string name, simpleHash<T, T>* collection)
+    void gridRegionConstructor<T>::validateRegionCollection(simpleString name, simpleHash<T, T>* collection)
     {
         if (collection->count() <= 0)
             brogueException::show("Collection for building regions is not valid:  gridRegionConstructor.validate");

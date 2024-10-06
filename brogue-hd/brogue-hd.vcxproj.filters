@@ -130,6 +130,9 @@
     <Filter Include="Resource Files\model">
       <UniqueIdentifier>{98d455ff-7ca8-4858-8854-a2055c70503f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\component">
+      <UniqueIdentifier>{69432685-08c1-4d6a-bb3b-bf4b2c9c26a6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="brogue-hd.cpp">
@@ -269,6 +272,9 @@
     </ClCompile>
     <ClCompile Include="simpleShaderProgram.cpp">
       <Filter>Source Files\frontend\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="simpleString.cpp">
+      <Filter>Source Files\component</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -697,6 +703,12 @@
     </ClInclude>
     <ClInclude Include="json.hpp">
       <Filter>Header Files\vendor</Filter>
+    </ClInclude>
+    <ClInclude Include="fileOperations.h">
+      <Filter>Header Files\component</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleString.h">
+      <Filter>Header Files\component</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

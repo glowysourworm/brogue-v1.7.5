@@ -30,6 +30,8 @@ namespace brogueHd
 	static const char* ConfigFrameVertexShader = "frameVertexShader";
 	static const char* ConfigFrameFragmentShader = "frameFragmentShader";
 
+	static const char* BrogueHighScoresFile = "BrogueHighScores.txt";
+
 	/*
 
 		Global Macros:  These are preprocessed #define statements for all Rogue macros

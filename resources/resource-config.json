@@ -1,6 +1,6 @@
 {
-	"baseVertexShader" : "opengl\\brogueBase.vert",
-	"baseFragmentShader" : "opengl\\brogueBase.frag",
-	"frameVertexShader" : "opengl\\brogueFrame.vert",
-	"frameFragmentShader" : "opengl\\brogueFrame.frag"
+	"baseVertexShader" : "C:\\Backup\\_Source\\Git\\brogue-v1.7.5\\resources\\opengl\\brogueBase.vert",
+	"baseFragmentShader" : "C:\\Backup\\_Source\\Git\\brogue-v1.7.5\\resources\\opengl\\brogueBase.frag",
+	"frameVertexShader" : "C:\\Backup\\_Source\\Git\\brogue-v1.7.5\\resources\\opengl\\brogueFrame.vert",
+	"frameFragmentShader" : "C:\\Backup\\_Source\\Git\\brogue-v1.7.5\\resources\\opengl\\brogueFrame.frag"
 }

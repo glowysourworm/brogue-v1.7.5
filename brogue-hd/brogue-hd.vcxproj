@@ -214,6 +214,7 @@
     <ClCompile Include="roomGenerator.cpp" />
     <ClCompile Include="renderingController.cpp" />
     <ClCompile Include="simpleShaderProgram.cpp" />
+    <ClCompile Include="simpleString.cpp" />
     <ClCompile Include="terrainGenerator.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -240,6 +241,7 @@
     <ClInclude Include="cellularAutomataParameters.h" />
     <ClInclude Include="componentMacros.h" />
     <ClInclude Include="coordinateConverter.h" />
+    <ClInclude Include="fileOperations.h" />
     <ClInclude Include="gl.h" />
     <ClInclude Include="json.hpp" />
     <ClInclude Include="shaderData.h" />
@@ -346,6 +348,7 @@
     <ClInclude Include="simpleListExtension.h" />
     <ClInclude Include="simpleShader.h" />
     <ClInclude Include="simpleShaderProgram.h" />
+    <ClInclude Include="simpleString.h" />
     <ClInclude Include="simpleTexture.h" />
     <ClInclude Include="simpleUniform.h" />
     <ClInclude Include="simpleVertexArray.h" />

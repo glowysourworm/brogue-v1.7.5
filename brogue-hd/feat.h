@@ -1,7 +1,7 @@
 #pragma once
 
 #include "brogueGlobal.h"
-#include <string>
+#include "simpleString.h"
 
 namespace brogueHd::backend::model::game
 {
@@ -23,8 +23,8 @@ namespace brogueHd::backend::model::game
     struct feat 
     {
         featTypes type;
-        std::string name;
-        std::string description;
+        simpleString name;
+        simpleString description;
         bool initialValue;
     };
 

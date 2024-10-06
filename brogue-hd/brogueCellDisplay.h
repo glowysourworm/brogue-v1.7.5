@@ -13,7 +13,7 @@ namespace brogueHd::backend::model::layout
 		char character;
 		color foreColor;
 		color backColor;
-		char opacity;
+		float opacity;
 		bool needsUpdate;
 
 		//light lighting;
@@ -47,25 +47,33 @@ namespace brogueHd::backend::model::layout
 
 		brogueCellDisplay()
 		{
-
+			character = default_value<char>::value;
+			foreColor = default_value<color>::value;
+			backColor = default_value<color>::value;
+			opacity = 1.0f;
+			needsUpdate = false;
 		}
 		brogueCellDisplay(const brogueCellDisplay& copy)
 		{
-			character = copy.character;
-			foreColor = copy.foreColor;									// Careful with instances. These are non-unique
-			backColor = copy.backColor;									// Careful with instances. These are non-unique
-			opacity = copy.opacity;
-			needsUpdate = copy.needsUpdate;
+			copyImpl(copy);
+		}
+
+		void operator=(const brogueCellDisplay& copy)
+		{
+			copyImpl(copy);
+		}
+		bool operator==(const brogueCellDisplay& other) const
+		{
+			return compare(other);
+		}
+		bool operator!=(const brogueCellDisplay& other) const
+		{
+			return !compare(other);
 		}
 
 		void update(const brogueCellDisplay& copy)
 		{
-			character = copy.character;
-			foreColor = copy.foreColor;									// Careful with instances. These are non-unique
-			backColor = copy.backColor;									// Careful with instances. These are non-unique
-			opacity = copy.opacity;
-			needsUpdate = copy.needsUpdate;
-			//lighting = copy.lighting;											// Careful with instances. These are non-unique
+			copyImpl(copy);
 		}
 
 		bool compare(const brogueCellDisplay& display) const
@@ -77,18 +85,20 @@ namespace brogueHd::backend::model::layout
 				   needsUpdate == display.needsUpdate;// &&
 					//lighting.compare(display.lighting);
 		}
-
-		bool operator==(const brogueCellDisplay& other) const
-		{
-			return compare(other);
-		}
-		bool operator!=(const brogueCellDisplay& other) const
-		{
-			return !compare(other);
-		}
 		size_t getHash() const override
 		{
 			return 0;
+		}
+
+	private:
+
+		void copyImpl(const brogueCellDisplay& copy)
+		{
+			character = copy.character;
+			foreColor = copy.foreColor;									// Careful with instances. These are non-unique
+			backColor = copy.backColor;									// Careful with instances. These are non-unique
+			opacity = copy.opacity;
+			needsUpdate = copy.needsUpdate;
 		}
 	};
 }

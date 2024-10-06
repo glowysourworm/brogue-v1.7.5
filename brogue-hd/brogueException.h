@@ -1,8 +1,11 @@
 #pragma once
 
+#include "brogueLogger.h"
+#include "simpleString.h"
 #include <stdexcept>
-#include <string>
 #include <iostream>
+
+using namespace brogueHd::component;
 
 namespace brogueHd
 {
@@ -10,27 +13,27 @@ namespace brogueHd
 	{
 	public:
 
-		static void show(const std::string& message, bool halt = false)
-		{
-			show(message.c_str(), halt);
-		}
-
-		static void show(const char* message, bool halt = false)
+		static void show(const simpleString& message, bool halt = false)
 		{
 
-#ifdef DEBUG
+#ifdef _DEBUG
 			// Send to the console
-			cout << "Brogue Error Handler:  " << message;
+			brogueLogger::logRed("Brogue Error Handler:  " + message);
 
 			if (halt)
 				//throw std::runtime_error(message);
-				throw std::exception(message);
+				throw std::exception(message.c_str());
 #else
 			// TODO: figure out way to show portable Brogue message box. Then use the halt variable
 
 			// Show the user a message box
 			throw std::runtime_error(message);
 #endif
+		}
+
+		static void show(const char* message, bool halt = false)
+		{
+			show(simpleString(message), halt);
 		}
 	};
 }

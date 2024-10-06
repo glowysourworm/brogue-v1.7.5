@@ -21,7 +21,7 @@ namespace brogueHd::test
 			this->addTest("intInt_OnStack_iterate", std::bind(&simpleHashTests::intInt_OnStack_iterate, this));
 			this->addTest("intInt_OnHeap_iterate", std::bind(&simpleHashTests::intInt_OnHeap_iterate, this));
 
-			// simpleArray<std::string>
+			// simpleArray<simpleString>
 			this->addTest("instantiate_StringString_OnStack", std::bind(&simpleHashTests::instantiate_StringString_OnStack, this));
 			this->addTest("instantiate_StringString_OnHeap_And_Delete", std::bind(&simpleHashTests::instantiate_StringString_OnHeap_And_Delete, this));
 			this->addTest("stringString_OnStack_Set_Get", std::bind(&simpleHashTests::stringString_OnStack_Set_Get, this));
@@ -107,14 +107,14 @@ namespace brogueHd::test
 
 		bool instantiate_StringString_OnStack()
 		{
-			simpleHash<std::string, std::string> theHash();
+			simpleHash<simpleString, simpleString> theHash();
 
 			return true;
 		}
 
 		bool instantiate_StringString_OnHeap_And_Delete()
 		{
-			simpleHash<std::string, std::string>* theArray = new simpleHash<std::string, std::string>();
+			simpleHash<simpleString, simpleString>* theArray = new simpleHash<simpleString, simpleString>();
 
 			delete theArray;
 
@@ -123,7 +123,7 @@ namespace brogueHd::test
 
 		bool stringString_OnStack_Set_Get()
 		{
-			simpleHash<std::string, std::string> theHash;
+			simpleHash<simpleString, simpleString> theHash;
 
 			theHash.add("2", "some string");
 
@@ -137,7 +137,7 @@ namespace brogueHd::test
 
 		bool stringString_OnHeap_Set_Get_Delete()
 		{
-			simpleHash<std::string, std::string>* theHash = new simpleHash<std::string, std::string>();
+			simpleHash<simpleString, simpleString>* theHash = new simpleHash<simpleString, simpleString>();
 
 			theHash->add("2", "some string");
 
@@ -153,11 +153,11 @@ namespace brogueHd::test
 
 		bool stringString_OnStack_iterate()
 		{
-			simpleHash<std::string, std::string> theHash;
+			simpleHash<simpleString, simpleString> theHash;
 
 			theHash.add("sdf", "wefefe");
 
-			theHash.iterate([](std::string key, std::string value)
+			theHash.iterate([](simpleString key, simpleString value)
 			{
 				return iterationCallback::iterate;
 			});
@@ -167,11 +167,11 @@ namespace brogueHd::test
 
 		bool stringString_OnHeap_iterate()
 		{
-			simpleHash<std::string, std::string>* theHash = new simpleHash<std::string, std::string>();
+			simpleHash<simpleString, simpleString>* theHash = new simpleHash<simpleString, simpleString>();
 
 			theHash->add("some string key", "value");
 
-			theHash->forEach([](std::string key, std::string value)
+			theHash->forEach([](simpleString key, simpleString value)
 			{
 				return iterationCallback::iterate;
 			});

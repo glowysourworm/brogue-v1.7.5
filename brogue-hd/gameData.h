@@ -60,7 +60,7 @@ namespace brogueHd::backend::model
 		short messageArchivePosition;
 		char messageArchive[MESSAGE_ARCHIVE_LINES][COLS * 2];
 
-		std::string currentFilePath;
+		simpleString currentFilePath;
 
 		char displayDetail[DCOLS][DROWS];		// used to make certain per-cell data accessible to external code (e.g. terminal adaptations)
 

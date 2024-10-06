@@ -5,6 +5,7 @@
 #include "gameData.h"
 #include "brogueColorMap.h"
 #include "typeConverter.h"
+#include "fileOperations.h"
 
 #include "brogueGlobal.h"
 #include "stringExtension.h"
@@ -24,13 +25,54 @@ using namespace brogueHd::backend::processor;
 
 namespace brogueHd::backend::controller
 {
-	resourceController::resourceController(const char* resourceConfigFile)
+	resourceController::resourceController()
 	{
-		_resourceConfigFile = std::string(resourceConfigFile);
+		_shaderCache = new simpleHash<shaderResource, shaderData*>();
 	}
 	resourceController::~resourceController()
 	{
+		delete _shaderCache;
+	}
 
+	bool resourceController::initialize(const char* resourceConfigFile)
+	{
+		// Read config file contents
+		simpleString configuration = fileOperations::readFile(resourceConfigFile);
+
+		try
+		{
+			// Parse the JSON file
+			nlohmann::json jsonConfig = nlohmann::json::parse(configuration);
+
+			simpleString baseVertSource = fileOperations::readFile(jsonConfig[brogueHd::ConfigBaseVertexShader]);
+			simpleString baseFragSource = fileOperations::readFile(jsonConfig[brogueHd::ConfigBaseFragmentShader]);
+			simpleString frameVertSource = fileOperations::readFile(jsonConfig[brogueHd::ConfigFrameVertexShader]);
+			simpleString frameFragSource = fileOperations::readFile(jsonConfig[brogueHd::ConfigFrameFragmentShader]);
+
+			shaderData* baseVert = new shaderData(shaderResource::brogueBaseVert, GL_VERTEX_SHADER, baseVertSource);
+			shaderData* baseFrag = new shaderData(shaderResource::brogueBaseFrag, GL_FRAGMENT_SHADER, baseFragSource);
+			shaderData* frameVert = new shaderData(shaderResource::brogueFrameVert, GL_VERTEX_SHADER, frameVertSource);
+			shaderData* frameFrag = new shaderData(shaderResource::brogueFrameFrag, GL_FRAGMENT_SHADER, frameFragSource);
+
+			_shaderCache->add(shaderResource::brogueBaseVert, baseVert);
+			_shaderCache->add(shaderResource::brogueBaseFrag, baseFrag);
+			_shaderCache->add(shaderResource::brogueFrameVert, frameVert);
+			_shaderCache->add(shaderResource::brogueFrameFrag, frameFrag);
+
+			return true;
+		}
+		catch (std::exception& ex)
+		{
+			brogueException::show("Error reading resource config JSON file:  " + simpleString(ex.what()));
+			return false;
+		}
+
+		return false;
+	}
+
+	shaderData resourceController::getShader(shaderResource resource)
+	{
+		return *_shaderCache->get(resource);
 	}
 
 	brogueScoresFile* resourceController::getHighScores(short& mostRecentLineNumber)
@@ -40,7 +82,7 @@ namespace brogueHd::backend::controller
 			brogueScoresFile* scoresFile;
 			std::fstream stream;
 
-			stream.open("BrogueHighScores.txt", std::fstream::in);
+			stream.open(brogueHd::BrogueHighScoresFile, std::fstream::in);
 
 
 			// Initialize Scores (EMPTY FILE)
@@ -109,11 +151,12 @@ namespace brogueHd::backend::controller
 				return;
 			}
 
-			std::string line;
+			std::string lineStr;
 
-			while (getline(stream, line))
+			while (getline(stream, lineStr))
 			{
-				simpleArray<std::string> linePieces = stringExtension::split(line, " ");
+				simpleString line(lineStr.c_str());
+				simpleArray<simpleString> linePieces = line.split(' ');
 
 				if (sizeof(linePieces) != 2)
 					brogueException::show("Invalid keymap file:  looking for two character split by only whitespace");
@@ -125,7 +168,7 @@ namespace brogueHd::backend::controller
 		}
 		catch (std::exception& ex)
 		{
-			brogueException::show(std::string("gameController::loadKeyMap:  ") + ex.what());
+			brogueException::show(simpleString("gameController::loadKeyMap:  ") + ex.what());
 			throw ex;
 		}
 	}
@@ -141,16 +184,18 @@ namespace brogueHd::backend::controller
 			// collection,name,red,green,blue,redRand,greenRand,blueRand,rand,colorDances
 
 			
-			std::string nextLine;
+			std::string nextLineStr;
 
-			while (std::getline(stream, nextLine))
+			while (std::getline(stream, nextLineStr))
 			{
 				// Comment
-				if (nextLine.starts_with('#'))
+				if (nextLineStr.starts_with('#'))
 					continue;
 
+				simpleString nextLine(nextLineStr.c_str());
+
 				// Split by comma and white space
-				simpleArray<std::string> strings = stringExtension::split(nextLine, ", ");
+				simpleArray<simpleString> strings = nextLine.split(", ");
 
 				if (sizeof(strings) != 10)
 					continue;
@@ -230,47 +275,11 @@ namespace brogueHd::backend::controller
 		}
 		catch (std::exception ex)
 		{
-			brogueException::show(std::format("Error opening colors.csv:  {}", ex.what()));
+			brogueException::show(simpleString("Error opening colors.csv:  " + ex.what()));
 
 			delete result;
 		}
 
 		return NULL;
-	}
-	shaderData resourceController::loadShader(shaderResource resource)
-	{
-		std::ifstream stream("C:\\Backup\\_Source\\Git\\brogue-v1.7.5\\resources\\resource-config.json");
-
-		nlohmann::json jsonConfig = nlohmann::json::parse(stream);
-
-		switch (resource)
-		{
-		case shaderResource::brogueBaseVert:
-		{
-			std::string source = jsonConfig[brogueHd::ConfigBaseVertexShader];
-
-			return shaderData(resource, GL_VERTEX_SHADER,  source);
-		}
-		case shaderResource::brogueBaseFrag:
-		{
-			std::string source = jsonConfig[brogueHd::ConfigBaseFragmentShader];
-
-			return shaderData(resource, GL_FRAGMENT_SHADER, source);
-		}
-		case shaderResource::brogueFrameVert:
-		{
-			std::string source = jsonConfig[brogueHd::ConfigFrameVertexShader];
-
-			return shaderData(resource, GL_VERTEX_SHADER, source);
-		}
-		case shaderResource::brogueFrameFrag:
-		{
-			std::string source = jsonConfig[brogueHd::ConfigFrameFragmentShader];
-
-			return shaderData(resource, GL_FRAGMENT_SHADER, source);
-		}
-		default:
-			brogueException::show("Unhandled Resource Type:  resourceController::loadShader");
-		}
 	}
 }

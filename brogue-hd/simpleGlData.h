@@ -129,14 +129,14 @@ namespace brogueHd::frontend::opengl
 	struct uniformData
 	{
 		uniformData(){}
-		uniformData(std::string aname, GLenum atype)
+		uniformData(const simpleString& aname, GLenum atype)
 		{
 			name = aname;
 			type = atype;
 			value = default_value<T>::value;
 		}
 
-		std::string name;
+		simpleString name;
 		GLenum type;
 
 		/// <summary>
@@ -147,20 +147,47 @@ namespace brogueHd::frontend::opengl
 
 	struct vertexAttributeData
 	{
-		vertexAttributeData(){}
-		vertexAttributeData(int aindex, std::string aname, GLenum atype)
+		vertexAttributeData()
+		{
+			index = -1;
+			name = default_value<simpleString>::value;
+			type = default_value<GLenum>::value;
+		}
+		vertexAttributeData(const vertexAttributeData& copy)
+		{
+			copyImpl(copy);
+		}
+		vertexAttributeData(int aindex, const simpleString& aname, GLenum atype)
 		{
 			index = aindex;
 			name = aname;
 			type = atype;
 		}
+		~vertexAttributeData()
+		{
+
+		}
+
+		void operator=(const vertexAttributeData& copy)
+		{
+			copyImpl(copy);
+		}
 
 		int index;
-		std::string name;
+		simpleString name;
 
 		/// <summary>
 		/// Type of input data for the shader - this would be some sort of GLSL supported data type.
 		/// </summary>
 		GLenum type;
+
+	private:
+
+		void copyImpl(const vertexAttributeData& copy)
+		{
+			index = copy.index;
+			name = copy.name;
+			type = copy.type;
+		}
 	};
 }

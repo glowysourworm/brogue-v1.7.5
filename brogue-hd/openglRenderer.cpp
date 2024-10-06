@@ -23,7 +23,7 @@ namespace brogueHd::frontend::opengl
 
 	void openglRenderer::errorCallback(int error, const char* message)
 	{
-		brogueLogger::logRed("GLFW Error " + typeConverter::intToString(error) + " " + std::string(message));
+		brogueLogger::logRed("GLFW Error " + typeConverter::intToString(error) + " " + simpleString(message));
 	}
 	void openglRenderer::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 	{
