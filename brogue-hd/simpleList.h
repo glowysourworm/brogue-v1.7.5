@@ -1,12 +1,9 @@
 #pragma once
 
-#include "brogueGlobal.h"
-#include "brogueException.h"
-#include "simple.h"
 #include "simpleArray.h"
 #include <functional>
 
-namespace brogueHd::component
+namespace brogueHd::simple
 {
 	/// <summary>
 	/// Definition of function to provide callback: 1) user can return iterationCallback 
@@ -82,7 +79,7 @@ namespace brogueHd::component
 		bool any(simpleListPredicate<T> predicate) const;
 		void forEach(simpleListCallback<T> callback) const;
 		simpleList<T> where(simpleListPredicate<T> predicate) const;
-		
+
 		// Selectors
 
 		template<typename TResult>
@@ -117,7 +114,7 @@ namespace brogueHd::component
 	template<typename T>
 	simpleList<T>::simpleList()
 	{
-		_array = NULL;
+		_array = new simpleArray<T>(0);
 		_count = 0;
 	}
 	template<typename T>
@@ -146,20 +143,17 @@ namespace brogueHd::component
 	template<typename T>
 	simpleList<T>::~simpleList()
 	{
-		if (_array != NULL)
-		{
-			delete _array;
+		delete _array;
 
-			_array = NULL;
-			_count = 0;
-		}
+		_array = nullptr;
+		_count = 0;
 	}
 
 	template<typename T>
 	T simpleList<T>::get(int index) const
 	{
 		if (index >= _count)
-			brogueException::show("Index is outside the bounds of the list:  simpleList.h");
+			simpleException::show("Index is outside the bounds of the list:  simpleList.h");
 
 		return _array->get(index);
 	}
@@ -173,10 +167,6 @@ namespace brogueHd::component
 	template<typename T>
 	void simpleList<T>::add(T item)
 	{
-		// Constructor was the default
-		if (_array == NULL)
-			this->reAllocate();
-
 		// Reached capacity
 		//
 		if (_count == _array->count())
@@ -224,27 +214,24 @@ namespace brogueHd::component
 	template<typename T>
 	void simpleList<T>::reAllocate()
 	{
-		if (_array != NULL && _count != _array->count())
-			brogueException::show("Trying to re-allocate memory for simple list before capacity is reached");
+		if (_count != _array->count())
+			simpleException::show("Trying to re-allocate memory for simple list before capacity is reached");
 
 		// Use doubling method: Always multiply size by 2 until {MaxElementIncrement} is reached
 		//
-		int newSize = (_array == NULL) ? 10 :
-					  (_array->count() >= this->ArrayIncrement) ? (_array->count() + this->ArrayIncrement) :
-					   _array->count() * 2;
+		int newSize = (_array->count() == 0) ? 10 :
+			(_array->count() >= this->ArrayIncrement) ? (_array->count() + this->ArrayIncrement) :
+			_array->count() * 2;
 
 		// Copy over the data
 		simpleArray<T>* newArray = new simpleArray<T>(newSize);
 
-		if (_array != NULL)
+		for (int index = 0; index < _array->count(); index++)
 		{
-			for (int index = 0; index < _array->count(); index++)
-			{
-				newArray->set(index, _array->get(index));
-			}
-
-			delete _array;
+			newArray->set(index, _array->get(index));
 		}
+
+		delete _array;
 
 		_array = newArray;
 	}
@@ -253,7 +240,7 @@ namespace brogueHd::component
 	T simpleList<T>::removeAt(int index)
 	{
 		if (index >= _count)
-			brogueException::show("Index is outside the bounds of the array");
+			simpleException::show("Index is outside the bounds of the array");
 
 		T item = this->get(index);
 
@@ -285,7 +272,7 @@ namespace brogueHd::component
 			this->removeAt(itemIndex);
 
 		else
-			brogueException::show("Item not found in simpleList::remove");
+			simpleException::show("Item not found in simpleList::remove");
 	}
 
 	template<typename T>
@@ -391,7 +378,7 @@ namespace brogueHd::component
 	T simpleList<T>::first() const
 	{
 		if (this->count() == 0)
-			brogueException::show("Trying to get element from an empty list:  simpleList::first()");
+			simpleException::show("Trying to get element from an empty list:  simpleList::first()");
 
 		return this->get(0);
 	}

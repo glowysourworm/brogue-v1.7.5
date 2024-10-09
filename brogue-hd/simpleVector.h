@@ -1,25 +1,25 @@
 #pragma once
 
-namespace brogueHd::component::math
+namespace brogueHd::simple
 {
-	template<typename T>
-	struct mathVector
-	{
-		T x;
-		T y;
+    template<typename T>
+    struct simpleVector
+    {
+        T x;
+        T y;
 
-        mathVector()
+        simpleVector()
         {
             x = -1;
             y = -1;
         }
-        mathVector(T ax, T ay)
+        simpleVector(T ax, T ay)
         {
             x = ax;
             y = ay;
         }
 
-        T dot(mathVector<T> vector)
+        T dot(simpleVector<T> vector)
         {
             return (x * vector.x) + (y * vector.y);
         }
@@ -27,9 +27,9 @@ namespace brogueHd::component::math
         /// <summary>
         /// Returns the value of the cross product (casted in 3 dimensions)
         /// </summary>
-        T cross(mathVector<T> vector)
+        T cross(simpleVector<T> vector)
         {
             return (x * vector.y) - (vector.x * y);
         }
-	};
+    };
 }

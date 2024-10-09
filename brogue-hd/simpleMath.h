@@ -1,28 +1,12 @@
 #pragma once
 
-#include "mathPoint.h"
-#include "mathVector.h"
-#include "brogueGlobal.h"
-#include <concepts>
-#include <functional>
+#include "simple.h"
 
-namespace brogueHd::component::math
+namespace brogueHd::simple
 {
-	template<typename T>
-	concept brogueMathType = requires(T numberType)
+	template<isNumber TMath>
+	struct simpleMath
 	{
-		{ numberType } -> std::convertible_to<short>;
-		{ numberType } -> std::convertible_to<long>;
-		{ numberType } -> std::convertible_to<int>;
-		{ numberType } -> std::convertible_to<float>;
-		{ numberType } -> std::convertible_to<double>;
-	};
-
-	template<brogueMathType TMath>
-	class brogueMath
-	{
-	public:
-
 		static TMath abs(TMath x)
 		{
 			if (x < 0)
@@ -30,12 +14,17 @@ namespace brogueHd::component::math
 
 			return x;
 		}
-		static TMath minOf(TMath x, TMath y)
-		{
-			if (x <= y)
-				return x;
 
-			return y;
+		template<isNumber...Args>
+		static TMath minOf(TMath x, Args...args)
+		{
+			if (sizeof...(args) > 1)
+				return minOf(x, args...);
+
+			else if (sizeof...(args) > 0)
+				return x < args;
+
+			return x;
 		}
 		static TMath minOf(TMath x, TMath y, TMath z)
 		{
@@ -70,7 +59,7 @@ namespace brogueHd::component::math
 				return sqrtl(x);
 
 			else
-				brogueException::show("Unknown sqrt type brogueMath.h");
+				simpleException::show("Unknown sqrt type brogueMath.h");
 		}
 		static TMath clamp(TMath x, TMath low, TMath high)
 		{
@@ -83,9 +72,9 @@ namespace brogueHd::component::math
 			return x;
 		}
 
-		static mathVector<TMath> subtract(mathPoint<TMath> point2, mathPoint<TMath> point1)
+		static simpleVector<TMath> subtract(simplePoint<TMath> point2, simplePoint<TMath> point1)
 		{
-			return mathVector<TMath>(point2.x - point1.x, point2.y - point1.y);
+			return simpleVector<TMath>(point2.x - point1.x, point2.y - point1.y);
 		}
 
 		/// <summary>
@@ -93,11 +82,11 @@ namespace brogueHd::component::math
 		/// crossing two difference vectors that order points 1,2, and 3 in that order). The sign of the determinant
 		/// returned shows the orientation of the ordering (clockwise, counter-clockwise, or collinear)
 		/// </summary>
-		static TMath orientation(mathPoint<TMath> point1, mathPoint<TMath> point2, mathPoint<TMath> point3)
+		static TMath orientation(simplePoint<TMath> point1, simplePoint<TMath> point2, simplePoint<TMath> point3)
 		{
 			// 1 -> 2 -> 3 (Results from crossing the vectors 12 X 23 - where subtracting the points gives you the vector)
-			mathVector<TMath> vector12 = brogueMath<TMath>::subtract(point2, point1);
-			mathVector<TMath> vector23 = brogueMath<TMath>::subtract(point3, point2);
+			simpleVector<TMath> vector12 = simpleMath<TMath>::subtract(point2, point1);
+			simpleVector<TMath> vector23 = simpleMath<TMath>::subtract(point3, point2);
 
 			return vector12.cross(vector23);
 		}

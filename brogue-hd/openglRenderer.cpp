@@ -23,7 +23,7 @@ namespace brogueHd::frontend::opengl
 
 	void openglRenderer::errorCallback(int error, const char* message)
 	{
-		brogueLogger::logRed("GLFW Error " + typeConverter::intToString(error) + " " + simpleString(message));
+		brogueLogger::log("GLFW Error {} {}", typeConverter::toString<int>(error), message, brogueConsoleColor::Red);
 	}
 	void openglRenderer::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 	{
@@ -107,7 +107,7 @@ namespace brogueHd::frontend::opengl
 
 		if (!gladLoadGL(glfwGetProcAddress))
 		{
-			brogueLogger::logRed("Error calling gladLoadGL");
+			brogueLogger::log("Error calling gladLoadGL", brogueConsoleColor::Red);
 
 			glfwDestroyWindow(window);
 			glfwTerminate();

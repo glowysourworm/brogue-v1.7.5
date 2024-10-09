@@ -103,9 +103,6 @@
     <Filter Include="Header Files\component">
       <UniqueIdentifier>{40a45b12-d99d-469f-bf31-009ce66f16a5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\component\math">
-      <UniqueIdentifier>{0140bb82-f2d8-4816-b663-87b4b909552c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\unit-test">
       <UniqueIdentifier>{1f590ab0-d252-4222-bd33-0db49b360e64}</UniqueIdentifier>
     </Filter>
@@ -132,6 +129,12 @@
     </Filter>
     <Filter Include="Source Files\component">
       <UniqueIdentifier>{69432685-08c1-4d6a-bb3b-bf4b2c9c26a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\simple">
+      <UniqueIdentifier>{27876192-d83a-47bf-a2c2-07eeb972ed3c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\simple">
+      <UniqueIdentifier>{75ccf2d0-cf01-462f-826e-270a8869a997}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -569,59 +572,17 @@
     <ClInclude Include="gridRegionLocator.h">
       <Filter>Header Files\component</Filter>
     </ClInclude>
-    <ClInclude Include="simple.h">
-      <Filter>Header Files\component</Filter>
-    </ClInclude>
-    <ClInclude Include="simpleArray.h">
-      <Filter>Header Files\component</Filter>
-    </ClInclude>
-    <ClInclude Include="simpleBST.h">
-      <Filter>Header Files\component</Filter>
-    </ClInclude>
-    <ClInclude Include="simpleHash.h">
-      <Filter>Header Files\component</Filter>
-    </ClInclude>
-    <ClInclude Include="simpleList.h">
-      <Filter>Header Files\component</Filter>
-    </ClInclude>
-    <ClInclude Include="simpleListExtension.h">
-      <Filter>Header Files\component</Filter>
-    </ClInclude>
-    <ClInclude Include="typeConverter.h">
-      <Filter>Header Files\component</Filter>
-    </ClInclude>
     <ClInclude Include="componentMacros.h">
       <Filter>Header Files\global</Filter>
     </ClInclude>
     <ClInclude Include="EnumString.h">
       <Filter>Header Files\global</Filter>
     </ClInclude>
-    <ClInclude Include="triangle.h">
-      <Filter>Header Files\component\math</Filter>
-    </ClInclude>
-    <ClInclude Include="mathPoint.h">
-      <Filter>Header Files\component\math</Filter>
-    </ClInclude>
-    <ClInclude Include="mathVector.h">
-      <Filter>Header Files\component\math</Filter>
-    </ClInclude>
-    <ClInclude Include="brogueMath.h">
-      <Filter>Header Files\component\math</Filter>
-    </ClInclude>
-    <ClInclude Include="stringExtension.h">
-      <Filter>Header Files\component</Filter>
-    </ClInclude>
     <ClInclude Include="primsAlgorithm.h">
       <Filter>Header Files\component</Filter>
     </ClInclude>
-    <ClInclude Include="randomRange.h">
-      <Filter>Header Files\component\math</Filter>
-    </ClInclude>
     <ClInclude Include="hashExtension.h">
       <Filter>Header Files\global</Filter>
-    </ClInclude>
-    <ClInclude Include="simpleArrayExtension.h">
-      <Filter>Header Files\component</Filter>
     </ClInclude>
     <ClInclude Include="simpleComponentTests.h">
       <Filter>Header Files\unit-test</Filter>
@@ -701,14 +662,53 @@
     <ClInclude Include="fileOperations.h">
       <Filter>Header Files\component</Filter>
     </ClInclude>
+    <ClInclude Include="simple.h">
+      <Filter>Header Files\simple</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleArray.h">
+      <Filter>Header Files\simple</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleArrayExtension.h">
+      <Filter>Header Files\simple</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleBST.h">
+      <Filter>Header Files\simple</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleHash.h">
+      <Filter>Header Files\simple</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleList.h">
+      <Filter>Header Files\simple</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleListExtension.h">
+      <Filter>Header Files\simple</Filter>
+    </ClInclude>
     <ClInclude Include="simpleString.h">
-      <Filter>Header Files\component</Filter>
+      <Filter>Header Files\simple</Filter>
     </ClInclude>
-    <ClInclude Include="brogueLogger.h">
-      <Filter>Header Files\component</Filter>
+    <ClInclude Include="stringExtension.h">
+      <Filter>Header Files\simple</Filter>
     </ClInclude>
-    <ClInclude Include="brogueException.h">
-      <Filter>Header Files\component</Filter>
+    <ClInclude Include="simpleMath.h">
+      <Filter>Header Files\simple</Filter>
+    </ClInclude>
+    <ClInclude Include="simplePoint.h">
+      <Filter>Header Files\simple</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleVector.h">
+      <Filter>Header Files\simple</Filter>
+    </ClInclude>
+    <ClInclude Include="randomRange.h">
+      <Filter>Header Files\simple</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleTriangle.h">
+      <Filter>Header Files\simple</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleException.h">
+      <Filter>Header Files\simple</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleLogger.h">
+      <Filter>Header Files\simple</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

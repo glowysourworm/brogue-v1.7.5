@@ -1,11 +1,9 @@
 #pragma once
 
 #include "simple.h"
-#include "simpleArray.h"
 #include "simpleList.h"
-#include <functional>
 
-namespace brogueHd::component
+namespace brogueHd::simple
 {
 	/// <summary>
 	/// Definition of simple predicate for any key-value map
@@ -26,25 +24,41 @@ namespace brogueHd::component
 	using simpleHashSelector = std::function<VResult(V value)>;
 
 	template<typename K, typename V>
-	struct simplePair
+	struct simplePair : hashable
 	{
 		K key;
 		V value;
 
-		simplePair(){}
+		simplePair() {}
 		simplePair(K akey, V avalue)
 		{
 			key = akey;
 			value = avalue;
 		}
 
-		bool operator==(const simplePair& pair)
+		bool operator==(const simplePair& pair) const
 		{
 			return pair.key == key && pair.value == value;
 		}
-		bool operator!=(const simplePair& pair)
+		bool operator!=(const simplePair& pair) const
 		{
 			return pair.key != key || pair.value != value;
+		}
+		bool operator==(const hashable& pair) const override
+		{
+			simpleException::show("Invalid use of operator overloads:  simplePair<>");
+
+			return false;
+		}
+		bool operator!=(const hashable& pair) const override
+		{
+			simpleException::show("Invalid use of operator overloads:  simplePair<>");
+
+			return false;
+		}
+		size_t getHash() const override
+		{
+			return hashGenerator::generateHash(key, value);
 		}
 	};
 
@@ -61,7 +75,7 @@ namespace brogueHd::component
 		void add(K key, V value);
 		void set(K key, V value);
 
-		simplePair<K,V> getAt(int index);
+		simplePair<K, V> getAt(int index);
 
 		bool contains(K key) const;
 		int count() const;
@@ -84,7 +98,7 @@ namespace brogueHd::component
 		K firstKey(simpleHashPredicate<K, V> predicate);
 		K firstOrDefaultKey(simpleHashPredicate<K, V> predicate);
 		simpleList<simplePair<K, V>> removeWhere(simpleHashPredicate<K, V> predicate);
-		
+
 		template<typename VResult>
 		simpleList<VResult> selectFromValues(simpleHashSelector<K, V, VResult> selector);
 
@@ -155,7 +169,7 @@ namespace brogueHd::component
 				return _table->get(bucketIndex)->get(index).value;
 		}
 
-		brogueException::show("Key not found in hash table:  simpleHash.cpp");
+		simpleException::show("Key not found in hash table:  simpleHash.cpp");
 	}
 
 	template<typename K, typename V>
@@ -174,7 +188,7 @@ namespace brogueHd::component
 	void simpleHash<K, V>::add(K key, V value)
 	{
 		if (this->contains(key))
-			brogueException::show("Trying to add duplicate value to simpleHash table. Use set(...)");
+			simpleException::show("Trying to add duplicate value to simpleHash table. Use set(...)");
 
 		// First rehash will give 100 buckets
 		if (_table->count() == 0)
@@ -211,7 +225,7 @@ namespace brogueHd::component
 	void simpleHash<K, V>::set(K key, V value)
 	{
 		if (!this->contains(key))
-			brogueException::show("Trying to set value for a key-value pair that doesn't exist. Use add(...)");
+			simpleException::show("Trying to set value for a key-value pair that doesn't exist. Use add(...)");
 
 		V oldValue = this->get(key);
 
@@ -224,7 +238,7 @@ namespace brogueHd::component
 		{
 			if (_table->get(bucketIndex)->get(index).value == oldValue)
 			{
-				simplePair<K,V> pair = _table->get(bucketIndex)->get(index);
+				simplePair<K, V> pair = _table->get(bucketIndex)->get(index);
 
 				pair.value = value;
 				break;
@@ -269,7 +283,7 @@ namespace brogueHd::component
 	template<typename K, typename V>
 	size_t simpleHash<K, V>::calculateHashCode(K key) const
 	{
-		return std::hash<K>{}(key);
+		return hashGenerator::generateHash(key);
 	}
 
 	template<typename K, typename V>
@@ -418,9 +432,9 @@ namespace brogueHd::component
 	void simpleHash<K, V>::forEach(simpleHashCallback<K, V> callback)
 	{
 		this->iterate([&callback](K key, V value)
-		{
-			return callback(key, value);
-		});
+			{
+				return callback(key, value);
+			});
 	}
 
 	template<typename K, typename V>
@@ -447,10 +461,10 @@ namespace brogueHd::component
 		simpleList<VResult> result;
 
 		this->iterate([&result, &selector](K key, V value)
-		{
-			result.add(selector(value));
-			return iterationCallback::iterate;
-		});
+			{
+				result.add(selector(value));
+				return iterationCallback::iterate;
+			});
 
 		return result;
 	}
@@ -461,11 +475,11 @@ namespace brogueHd::component
 		simpleList<K> result;
 
 		this->iterate([&result](K key, V value)
-		{
-			result.add(key);
+			{
+				result.add(key);
 
-			return iterationCallback::iterate;
-		});
+				return iterationCallback::iterate;
+			});
 
 		return result;
 	}
@@ -476,11 +490,11 @@ namespace brogueHd::component
 		simpleList<V> result;
 
 		this->iterate([&result](K key, V value)
-		{
-			result.add(value);
+			{
+				result.add(value);
 
-			return iterationCallback::iterate;
-		});
+				return iterationCallback::iterate;
+			});
 
 		return result;
 	}

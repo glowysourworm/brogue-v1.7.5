@@ -3,7 +3,7 @@
 #include "simpleArray.h"
 #include "simpleList.h"
 
-namespace brogueHd::component
+namespace brogueHd::simple
 {
 	class simpleArrayExtension
 	{		

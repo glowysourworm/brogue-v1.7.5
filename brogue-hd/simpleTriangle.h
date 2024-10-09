@@ -1,42 +1,42 @@
 #pragma once
 
-#include "mathPoint.h"
-#include "mathVector.h"
-#include "brogueMath.h"
-#include "brogueGlobal.h"
+#include "simplePoint.h"
+#include "simpleVector.h"
+#include "simpleMath.h"
+#include "simpleException.h"
 
-namespace brogueHd::component::math
+namespace brogueHd::simple
 {
     template<typename T>
-	struct triangle
+	struct simpleTriangle
 	{
-        mathPoint<T> point1;
-        mathPoint<T> point2;
-        mathPoint<T> point3;
+        simplePoint<T> point1;
+        simplePoint<T> point2;
+        simplePoint<T> point3;
 
-        triangle(){}
-        triangle(mathPoint<T> apoint1, mathPoint<T> apoint2, mathPoint<T> apoint3)
+        simpleTriangle(){}
+        simpleTriangle(simplePoint<T> apoint1, simplePoint<T> apoint2, simplePoint<T> apoint3)
         {
             point1 = apoint1;
             point2 = apoint2;
             point3 = apoint3;
         }
 
-        bool operator==(const triangle<T>& triangle)
+        bool operator==(const simpleTriangle<T>& triangle)
         {
             return point1 == triangle.point1 &&
                    point2 == triangle.point2 &&
                    point3 == triangle.point3;
         }
 
-        bool operator!=(const triangle<T>& triangle)
+        bool operator!=(const simpleTriangle<T>& triangle)
         {
             return point1 != triangle.point1 ||
                    point2 != triangle.point2 ||
                    point3 != triangle.point3;
         }
 
-        bool containsEqualEdge(mathPoint<T> vertex1, mathPoint<T> vertex2)
+        bool containsEqualEdge(simplePoint<T> vertex1, simplePoint<T> vertex2)
         {
             int pointsShared = 0;
 
@@ -49,14 +49,14 @@ namespace brogueHd::component::math
             return pointsShared > 1;
         }
 
-        bool containsEqualPoint(mathPoint<T> point)
+        bool containsEqualPoint(simplePoint<T> point)
         {
             return (point == point1) ||
                    (point == point2) ||
                    (point == point3);
         }
 
-        bool circumCircleContains(mathPoint<T> point)
+        bool circumCircleContains(simplePoint<T> point)
         {
             // Procedure
             //
@@ -75,19 +75,19 @@ namespace brogueHd::component::math
             // Double Check:  There are only 2 possible orderings of the points
 
             // 1 -> 2 -> 3 (Results from crossing the vectors 12 X 23 - where subtracting the points gives you the vector)
-            T d123 = brogueMath<T>::orientation(point1, point2, point3);
+            T d123 = simpleMath<T>::orientation(point1, point2, point3);
 
             // 1 -> 3 -> 2
-            T d132 = brogueMath<T>::orientation(point1, point3, point2);
+            T d132 = simpleMath<T>::orientation(point1, point3, point2);
 
             // NOTE*** Must handle collinear case. This may be the incorrect way to handle this.
             if (d123 == 0 || d132 == 0)
                 return false;
 
             // Re-number the vertices to be counter-clockwise (1 -> 2 -> 3)
-            mathPoint<T> p1;
-            mathPoint<T> p2;
-            mathPoint<T> p3;
+            simplePoint<T> p1;
+            simplePoint<T> p2;
+            simplePoint<T> p3;
 
             // NOTE*** Was unsure of sign because of UI coordinates. It appears that UI coordinates
             //         end up following convention. I'm thinking because the "handedness" is the same
@@ -108,7 +108,7 @@ namespace brogueHd::component::math
                 p3 = point2;
             }
             else
-                brogueException::show("Improper use of circum-circle algorithm");
+                simpleException::show("Improper use of circum-circle algorithm");
 
             // 3) Solve the circum-circle interior determinant
             //

@@ -124,6 +124,27 @@ namespace brogueHd::component
 
 		return result;
 	}
+	std::ostream& operator<<(std::ostream& stream, const simpleString& other)
+	{
+		stream << other.c_str();
+	}
+	std::istream& operator>>(std::istream& stream, simpleString& other)
+	{
+		// Compiler will try to build an instance of simpleString on the stack
+		//
+		if (other == default_value<simpleString>::value)
+			stream.setstate(std::ios::failbit);
+
+		// Probably nothing to do. Use breakpoint to make sure data made it 
+		// into the simpleString
+		//
+		if (true)
+		{
+			bool isOtherGood;
+		}
+
+		return stream;
+	}
 
 	bool simpleString::compare(const simpleString& other) const
 	{
@@ -184,6 +205,145 @@ namespace brogueHd::component
 			newArray->set(index, other[index]);
 
 		delete _array;
+	}
+
+	int simpleString::search(const char* search) const
+	{
+		return this->search(simpleString(search));
+	}
+	int simpleString::search(const simpleString& search) const
+	{
+		if (search.count() == 0)
+			brogueException::show("Trying to search for zero-count string simpleString::search");
+
+		return this->searchImpl(0, search);
+	}
+	int simpleString::searchImpl(int startIndex, const simpleString& search) const
+	{
+		int firstIndex = -1;
+
+		// Can optimize by subtracting the search string count from the array count. May
+		// help a little for large strings. (Must add one additional character)
+		//
+		for (int index = startIndex; index < _array->count() - search.count() + 1; index++)
+		{
+			if (firstIndex == -1)
+			{
+				// Found the beginning character
+				if (_array->get(index) == search.get(0))
+					firstIndex = index;
+			}
+
+			// Tracking a possible match
+			else
+			{
+				// Found all characters!
+				if (index - firstIndex >= search.count())
+				{
+					return firstIndex;
+				}
+
+				// Found mismatch (reset)
+				else if (_array->get(index) != search.get(index - firstIndex))
+				{
+					firstIndex = -1;
+				}
+
+				else
+				{
+					// Nothing to do
+				}
+			}
+		}
+
+		return firstIndex;
+	}
+
+	void simpleString::insert(int index, const char* replacement)
+	{
+		this->insert(index, simpleString(replacement));
+	}
+	void simpleString::insert(int index, const simpleString& replacement)
+	{
+		if (index >= _array->count())
+			brogueException::show("Index for insert was outside the bounds of the array:  simpleString.cpp");
+
+		simpleArray<char>* newArray = new simpleArray<char>(_array->count() + replacement.count());
+
+		// Iterate the new array indices
+		for (int i = 0; i < newArray->count(); i++)
+		{
+			// Inside replacement indices
+			if (i >= index && i < index + replacement.count())
+			{
+				newArray->set(i, replacement.get(i - index));
+			}
+			else if (i >= index)
+			{
+				newArray->set(i, _array->get(i - replacement.count()));
+			}
+			else
+				newArray->set(i, _array->get(i));
+		}
+	}
+	void simpleString::remove(int index, int count)
+	{
+		if (index + count >= _array->count())
+			brogueException::show("Index for remove was outside the bounds of the array:  simpleString.cpp");
+
+		simpleArray<char>* newArray = new simpleArray<char>(_array->count() - count);
+
+		// Iterate current array
+		for (int i = 0; i < _array->count(); i++)
+		{
+			// Inside the removed character indices
+			if (i >= index && (i - index) < count)
+			{
+				continue;
+			}
+			else if (i >= index)
+			{
+				newArray->set(i - count, _array->get(i));
+			}
+			else
+				newArray->set(i, _array->get(i));
+		}
+
+		// Replace with the new array
+		delete _array;
+
+		_array = newArray;
+	}
+	void simpleString::replace(const simpleString& string, const simpleString& replacement)
+	{
+		int searchIndex = this->search(string);
+
+		while (searchIndex != -1)
+		{
+			this->remove(searchIndex, string.count());
+			this->insert(searchIndex, replacement);
+
+			if (searchIndex + replacement.count() > _array->count())
+				break;
+
+			// Increment past the last replacement
+			else
+				searchIndex = this->searchImpl(searchIndex + replacement.count(), string);
+		}
+	}
+	void simpleString::replace(const char* string, const char* replacement)
+	{
+		this->replace(simpleString(string), simpleString(replacement));
+	}
+	void simpleString::replaceFirst(const simpleString& string, const simpleString& replacement)
+	{
+		int searchIndex = this->search(string);
+
+		if (searchIndex >= 0)
+		{
+			this->remove(searchIndex, string.count());
+			this->insert(searchIndex, replacement);
+		}
 	}
 
 	char simpleString::get(int index) const

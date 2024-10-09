@@ -9,6 +9,11 @@
 #include "EnumString.h"
 #include "command.h"
 
+#include "simple.h"
+#include "simpleArray.h"
+#include "simpleString.h"
+#include "simpleHash.h"
+
 namespace brogueHd
 {
 	/*	
@@ -518,3 +523,12 @@ namespace brogueHd
 	//typedef struct pdsMap pdsMap;			
 
 }
+
+MAKE_HASHABLE_CLASS(brogueHd::simple::simpleArray<short>);
+MAKE_HASHABLE_CLASS(brogueHd::simple::simpleArray<int>);
+MAKE_HASHABLE_CLASS(brogueHd::simple::simpleArray<char>);
+MAKE_HASHABLE_CLASS(brogueHd::simple::simpleArray<float>);
+MAKE_HASHABLE_CLASS(brogueHd::simple::simpleArray<double>);
+MAKE_HASHABLE_CLASS(brogueHd::simple::simpleArray<brogueHd::simple::simpleString>);
+MAKE_HASHABLE_STRUCT(brogueHd::simple::simplePair<brogueHd::simple::simpleString COMMA brogueHd::simple::simpleString>);
+MAKE_HASHABLE_CLASS(brogueHd::simple::simpleString);

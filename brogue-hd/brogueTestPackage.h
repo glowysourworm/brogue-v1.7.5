@@ -38,7 +38,7 @@ namespace brogueHd::test
 			{
 				that->setCurrentTest(key);
 
-				brogueLogger::log("Running Test:  " + key);
+				brogueLogger::log("Running Test:  {}", key);
 
 				bool result = false;
 
@@ -48,15 +48,15 @@ namespace brogueHd::test
 				}
 				catch (const std::exception& ex)
 				{
-					brogueLogger::logRed("Exception: " + simpleString(ex.what()));
+					brogueLogger::log("Exception: {}", ex.what(), brogueConsoleColor::Red);
 
 					result = false;
 				}
 
 				if (result)
-					brogueLogger::logGreen("Test " + key + " Success!");
+					brogueLogger::log("Test {} Success!", key, brogueConsoleColor::Green);
 				else
-					brogueLogger::logRed("Test " + key + "Fail!");
+					brogueLogger::log("Test {} Fail!", key, brogueConsoleColor::Red);
 
 				anyErrors &= result;
 
@@ -76,12 +76,12 @@ namespace brogueHd::test
 			}
 			catch (const std::exception& ex)
 			{
-				brogueLogger::logRed("Unit Test " + _currentTestName + " Assertion Exception" + assertName + ":  " + simpleString(ex.what()));
+				brogueLogger::log("Unit Test {} Assertion Exception {}:  {}", _currentTestName, assertName, ex.what(), brogueConsoleColor::Red);
 				result = false;
 			}
 				
 			if (!result)
-				brogueLogger::logRed("Unit Test " + _currentTestName + " Assertion " + assertName + " Failed!");
+				brogueLogger::log("Unit Test {} Assertion {} Failed!", _currentTestName, assertName, brogueConsoleColor::Red);
 		}
 
 		simpleString getName()

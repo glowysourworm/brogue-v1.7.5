@@ -66,7 +66,7 @@ namespace brogueHd::backend::controller
 		}
 		catch (std::exception& ex)
 		{
-			brogueException::show("Error reading resource config JSON file:  " + simpleString(ex.what()));
+			brogueException::show(simpleString("Error reading resource config JSON file:  ") + simpleString(ex.what()));
 			return false;
 		}
 

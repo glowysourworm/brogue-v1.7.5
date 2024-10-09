@@ -103,7 +103,7 @@ namespace brogueHd::frontend::opengl
 			case GL_QUADS:
 				return 4;
 			default:
-				brogueException::show("Unhandled primitive type for GLQuad:  " + typeConverter::intToString(primitiveType));
+				brogueException::show(simpleString("Unhandled primitive type for GLQuad:  ") + typeConverter::intToString(primitiveType));
 			}
 		}
 		int getStreamSize() override

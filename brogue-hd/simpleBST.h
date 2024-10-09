@@ -2,17 +2,14 @@
 
 #include "simple.h"
 #include "simpleHash.h"
-#include "brogueMath.h"
 
-using namespace brogueHd::component::math;
-
-namespace brogueHd::component
+namespace brogueHd::simple
 {
     // Stole this implementation:  This should be a balanced BST. The implementation looks
     //                             clean enough; and will be changed if there are any issues.
 
     template<isComparable K, typename T>
-    struct simpleBSTNode    
+    struct simpleBSTNode
     {
         simpleBSTNode<K, T>* left;
         simpleBSTNode<K, T>* right;
@@ -20,7 +17,7 @@ namespace brogueHd::component
         T value;
 
         int height;
-        
+
         int balanceFactor()
         {
             return ((left == NULL) ? left->height : -1) - ((right == NULL) ? right->height : -1);
@@ -184,9 +181,9 @@ namespace brogueHd::component
     void simpleBST<K, T>::iterate(simpleHashCallback<K, T> callback) const
     {
         _nodeMap->iterate([&callback](K key, simpleBSTNode<K, T>* node)
-        {
-            return callback(key, node->value);
-        });
+            {
+                return callback(key, node->value);
+            });
     }
 
     template<isComparable K, typename T>
@@ -302,7 +299,7 @@ namespace brogueHd::component
 
         // Set the height
         node->height = brogueMath<int>::maxOf((node->left != NULL) ? node->left->height : -1,
-                                            (node->right != NULL) ? node->right->height : -1) + 1;
+            (node->right != NULL) ? node->right->height : -1) + 1;
 
         return this->balance(node);
     }
@@ -343,7 +340,7 @@ namespace brogueHd::component
 
         // Set the height
         node->height = brogueMath<int>::maxOf((node->left != NULL) ? node->left->height : -1,
-                                                (node->right != NULL) ? node->right->height : -1) + 1;
+            (node->right != NULL) ? node->right->height : -1) + 1;
 
         return this->balance(node);
     }
@@ -358,7 +355,7 @@ namespace brogueHd::component
 
         // Set the height
         node->height = brogueMath<int>::maxOf((node->left != NULL) ? node->left->height : -1,
-                                                (node->right != NULL) ? node->right->height : -1) + 1;
+            (node->right != NULL) ? node->right->height : -1) + 1;
 
         return this->balance(node);
     }

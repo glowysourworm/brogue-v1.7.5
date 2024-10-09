@@ -1,42 +1,42 @@
 #pragma once
 
-#include "brogueGlobal.h"
+#include "simple.h"
 
-namespace brogueHd::component::math
+namespace brogueHd::simple
 {
 	template<typename T>
-	struct mathPoint : hashable
+	struct simplePoint : hashable
 	{
 		T x;
 		T y;
 
-		mathPoint()
+		simplePoint()
 		{
 			x = -1;
 			y = -1;
 		}
-		mathPoint(const mathPoint<T>& copy)
+		simplePoint(const simplePoint<T>& copy)
 		{
 			x = copy.x;
 			y = copy.y;
 		}
-		mathPoint(T ax, T ay)
+		simplePoint(T ax, T ay)
 		{
 			x = ax;
 			y = ay;
 		}
 
-		void operator =(const mathPoint<T>& copy)
+		void operator =(const simplePoint<T>& copy)
 		{
 			x = copy.x;
 			y = copy.y;
 		}
 
-		bool operator != (const mathPoint<T>& point)
+		bool operator != (const simplePoint<T>& point)
 		{
 			return x != point.x || y != point.y;
 		}
-		bool operator == (const mathPoint<T>& point)
+		bool operator == (const simplePoint<T>& point)
 		{
 			return x == point.x && y == point.y;
 		}
@@ -47,5 +47,3 @@ namespace brogueHd::component::math
 		}
 	};
 }
-
-MAKE_HASHABLE_STRUCT(brogueHd::component::math::mathPoint<short>);

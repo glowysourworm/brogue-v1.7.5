@@ -3,7 +3,7 @@
 #include "simplePrimitive.h"
 #include "simpleUniform.h"
 #include "simpleList.h"
-#include "brogueGlobal.h"
+#include "brogueException.h"
 
 #include "gl.h"
 

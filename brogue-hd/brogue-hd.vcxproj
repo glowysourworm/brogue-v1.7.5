@@ -230,9 +230,9 @@
     <ClInclude Include="brogueGlobal.h" />
     <ClInclude Include="brogueGameProfile.h" />
     <ClInclude Include="brogueLevelProfile.h" />
-    <ClInclude Include="brogueLogger.h" />
+    <ClInclude Include="simpleLogger.h" />
     <ClInclude Include="brogueMachine.h" />
-    <ClInclude Include="brogueMath.h" />
+    <ClInclude Include="simpleMath.h" />
     <ClInclude Include="brogueObject.h" />
     <ClInclude Include="broguePlayer.h" />
     <ClInclude Include="brogueRoom.h" />
@@ -262,7 +262,7 @@
     <ClInclude Include="dungeonFeatureConstants.h" />
     <ClInclude Include="dungeonTemplate.h" />
     <ClInclude Include="EnumString.h" />
-    <ClInclude Include="brogueException.h" />
+    <ClInclude Include="simpleException.h" />
     <ClInclude Include="gameConsole.h" />
     <ClInclude Include="graph.h" />
     <ClInclude Include="graphAlgorithm.h" />
@@ -322,8 +322,8 @@
     <ClInclude Include="light.h" />
     <ClInclude Include="lightConstants.h" />
     <ClInclude Include="machineConstants.h" />
-    <ClInclude Include="mathPoint.h" />
-    <ClInclude Include="mathVector.h" />
+    <ClInclude Include="simplePoint.h" />
+    <ClInclude Include="simpleVector.h" />
     <ClInclude Include="messageData.h" />
     <ClInclude Include="noiseGenerator.h" />
     <ClInclude Include="openglRenderer.h" />
@@ -359,8 +359,7 @@
     <ClInclude Include="stringExtension.h" />
     <ClInclude Include="terrainDeclaration.h" />
     <ClInclude Include="terrainGenerator.h" />
-    <ClInclude Include="triangle.h" />
-    <ClInclude Include="typeConverter.h" />
+    <ClInclude Include="simpleTriangle.h" />
     <ClInclude Include="simpleGlData.h" />
   </ItemGroup>
   <ItemGroup>
