@@ -1,10 +1,9 @@
 #include "brogueConsole.h"
-#include "stringExtension.h"
 #include "brogueGlobal.h"
-#include "typeConverter.h"
 #include "simpleArray.h"
+#include "simpleString.h"
 
-using namespace brogueHd::component;
+using namespace brogueHd::simple;
 
 namespace brogueHd::console
 {
@@ -20,7 +19,7 @@ namespace brogueHd::console
 	{
 		int choice = 0;
 
-		if (!typeConverter::tryStringToInt(input, choice))
+		if (!input.tryToInt(choice))
 			return brogueConsoleReturn::CompletedWithError;
 
 		switch (choice)
@@ -57,7 +56,7 @@ namespace brogueHd::console
 		for (int index = 0; index < args.count(); index++)
 		{
 			if (args.get(index) == simpleString(argumentName) &&
-				index < sizeof(args) + 1)
+				index < args.count() + 1)
 			{
 				return args.get(index + 1);
 			}
@@ -68,12 +67,12 @@ namespace brogueHd::console
 
 	int brogueConsole::getArgumentInt(const simpleArray<simpleString>& args, const char* argumentName)
 	{
-		for (int index = 0; index < sizeof(args); index++)
+		for (int index = 0; index < args.count(); index++)
 		{
 			if (args.get(index) == simpleString(argumentName) &&
-				index < sizeof(args) + 1)
+				index < args.count() + 1)
 			{
-				return typeConverter::stringToInt(args.get(index + 1));
+				return args.get(index + 1).toInt();
 			}
 		}
 
@@ -82,12 +81,12 @@ namespace brogueHd::console
 
 	bool brogueConsole::getArgumentBool(const simpleArray<simpleString>& args, const char* argumentName)
 	{
-		for (int index = 0; index < sizeof(args); index++)
+		for (int index = 0; index < args.count(); index++)
 		{
 			if (args.get(index) == std::string(argumentName) &&
-				index < sizeof(args) + 1)
+				index < args.count() + 1)
 			{
-				return typeConverter::stringToBool(args.get(index + 1));
+				return args.get(index + 1).toBool();
 			}
 		}
 

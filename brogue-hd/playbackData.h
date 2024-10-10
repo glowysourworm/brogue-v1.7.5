@@ -2,6 +2,9 @@
 
 #include "brogueGlobal.h"
 #include "broguefile.h"
+#include "simpleString.h"
+
+using namespace brogueHd::simple;
 
 namespace brogueHd::backend::model::io
 {

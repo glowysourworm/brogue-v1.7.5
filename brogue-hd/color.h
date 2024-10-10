@@ -1,11 +1,14 @@
 #pragma once
 
-#include "brogueGlobal.h"
+#include "simple.h"
+
+using namespace brogueHd::simple;
 
 namespace brogueHd::backend::model::game
 {
 	struct color : hashable
 	{
+
 		// base RGB components:
 		short red;
 		short green;
@@ -75,11 +78,9 @@ namespace brogueHd::backend::model::game
 			return !compare(other);
 		}
 
-		size_t getHash() const override
+		size_t getHash() const
 		{
 			return 0;
 		}
 	};
 }
-
-MAKE_HASHABLE_STRUCT(brogueHd::backend::model::game::color)

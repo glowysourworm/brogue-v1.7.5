@@ -4,13 +4,12 @@
 #include "playbackData.h"
 #include "gameData.h"
 #include "brogueColorMap.h"
-#include "typeConverter.h"
 #include "fileOperations.h"
 
-#include "brogueGlobal.h"
+#include "simpleEnumString.h"
 #include "simpleString.h"
-#include "stringExtension.h"
 #include "shaderData.h"
+#include "colorConstants.h"
 
 #include "json.hpp"
 
@@ -18,9 +17,11 @@
 #include <fstream>
 #include <format>
 
+using namespace brogueHd::simple;
 using namespace brogueHd::component;
 using namespace brogueHd::frontend::opengl;
 using namespace brogueHd::backend::model;
+using namespace brogueHd::backend::modelConstant;
 using namespace brogueHd::backend::model::game;
 using namespace brogueHd::backend::processor;
 
@@ -66,7 +67,7 @@ namespace brogueHd::backend::controller
 		}
 		catch (std::exception& ex)
 		{
-			brogueException::show(simpleString("Error reading resource config JSON file:  ") + simpleString(ex.what()));
+			simpleException::show("Error reading resource config JSON file:  {}", ex.what());
 			return false;
 		}
 
@@ -125,7 +126,7 @@ namespace brogueHd::backend::controller
 		}
 		catch (std::exception& ex)
 		{
-			brogueException::show("Failed to read high scores file.");
+			simpleException::showCstr("Failed to read high scores file.");
 			throw ex;
 		}
 
@@ -150,7 +151,7 @@ namespace brogueHd::backend::controller
 
 			if (!stream.is_open())
 			{
-				brogueException::show("Error opening keymap file:  either missing, or locked");
+				simpleException::showCstr("Error opening keymap file:  either missing, or locked");
 				return;
 			}
 
@@ -162,7 +163,7 @@ namespace brogueHd::backend::controller
 				simpleArray<simpleString> linePieces = line.split(' ');
 
 				if (sizeof(linePieces) != 2)
-					brogueException::show("Invalid keymap file:  looking for two character split by only whitespace");
+					simpleException::showCstr("Invalid keymap file:  looking for two character split by only whitespace");
 
 				processor.addKeyMap(linePieces.get(0).c_str(), linePieces.get(1).c_str());
 			}
@@ -171,7 +172,7 @@ namespace brogueHd::backend::controller
 		}
 		catch (std::exception& ex)
 		{
-			brogueException::show(simpleString("gameController::loadKeyMap:  ") + ex.what());
+			simpleException::show("gameController::loadKeyMap:  ", ex.what());
 			throw ex;
 		}
 	}
@@ -208,14 +209,14 @@ namespace brogueHd::backend::controller
 				
 				EnumString<colorCollections>::To(collection, strings.get(2));
 
-				nextColor.red = typeConverter::stringToshort(strings.get(2));
-				nextColor.green = typeConverter::stringToshort(strings.get(2));
-				nextColor.blue = typeConverter::stringToshort(strings.get(2));
-				nextColor.redRand = typeConverter::stringToshort(strings.get(2));
-				nextColor.greenRand = typeConverter::stringToshort(strings.get(2));
-				nextColor.blueRand = typeConverter::stringToshort(strings.get(2));
-				nextColor.rand = typeConverter::stringToshort(strings.get(2));
-				nextColor.colorDances = typeConverter::stringToBool(strings.get(2));
+				nextColor.red = strings.get(2).toShort();
+				nextColor.green = strings.get(2).toShort();
+				nextColor.blue = strings.get(2).toShort();
+				nextColor.redRand = strings.get(2).toShort();
+				nextColor.greenRand = strings.get(2).toShort();
+				nextColor.blueRand = strings.get(2).toShort();
+				nextColor.rand = strings.get(2).toShort();
+				nextColor.colorDances = strings.get(2).toBool();
 
 				switch (collection)
 				{
@@ -278,7 +279,7 @@ namespace brogueHd::backend::controller
 		}
 		catch (std::exception ex)
 		{
-			brogueException::show(simpleString("Error opening colors.csv:  ") + ex.what());
+			simpleException::show("Error opening colors.csv:  ", ex.what());
 
 			delete result;
 		}

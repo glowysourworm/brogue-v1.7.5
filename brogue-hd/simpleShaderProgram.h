@@ -3,11 +3,11 @@
 #include "simplePrimitive.h"
 #include "simpleUniform.h"
 #include "simpleList.h"
-#include "brogueException.h"
+#include "simpleException.h"
 
 #include "gl.h"
 
-using namespace brogueHd::component;
+using namespace brogueHd::simple;
 
 namespace brogueHd::frontend::opengl
 {

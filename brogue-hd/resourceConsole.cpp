@@ -1,7 +1,8 @@
 #include "resourceConsole.h"
-#include "typeConverter.h"
+#include "simpleString.h"
+#include "simpleArray.h"
 
-using namespace brogueHd::component;
+using namespace brogueHd::simple;
 
 namespace brogueHd::console
 {
@@ -17,7 +18,7 @@ namespace brogueHd::console
 	{
 		int choice = 0;
 
-		if (!typeConverter::tryStringToInt(input, choice))
+		if (!input.tryToInt(choice))
 			return brogueConsoleReturn::CompletedWithError;
 
 		switch (choice)

@@ -9,7 +9,7 @@
 #include "shaderData.h"
 #include "simpleHash.h"
 
-using namespace brogueHd::component;
+using namespace brogueHd::simple;
 using namespace brogueHd::frontend::opengl;
 using namespace brogueHd::backend::processor;
 using namespace brogueHd::backend::model;

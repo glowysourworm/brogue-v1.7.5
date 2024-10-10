@@ -2,11 +2,10 @@
 
 #include "brogueLevelProfile.h"
 #include "simpleList.h"
-#include "brogueMath.h"
+#include "simpleMath.h"
 #include "brogueGlobal.h"
 
-using namespace brogueHd::component;
-using namespace brogueHd::component::math;
+using namespace brogueHd::simple;
 using namespace brogueHd::backend::model::game;
 
 namespace brogueHd::backend::model
@@ -36,7 +35,7 @@ namespace brogueHd::backend::model
 	brogueLevelProfile::brogueLevelProfile(const randomGenerator* randomGenerator, short depth, levelTypes type)
 	{
 		if (depth == 1 && type != levelTypes::DP_BASIC_FIRST_ROOM)
-			brogueException::show("Invalid first level type:  brogueLevelProfile.cpp");
+			simpleException::showCstr("Invalid first level type:  brogueLevelProfile.cpp");
 
 		_roomInfo = new simpleHash<roomTypes, brogueRoomInfo>();
 		_levelType = type;
@@ -123,7 +122,7 @@ namespace brogueHd::backend::model
 		}
 
 		// ADJUST FOR DEPTH (Brogue v1.7.5)
-		const short descentPercent = brogueMath<short>::clamp(100 * (_depth - 1) / (AMULET_LEVEL - 1), 0, 100);
+		const short descentPercent = simpleMath<short>::clamp(100 * (_depth - 1) / (AMULET_LEVEL - 1), 0, 100);
 
 		// Get static data to adjust
 		short roomFrequency = _roomFrequencyMap->get(_levelType)->get(roomType);

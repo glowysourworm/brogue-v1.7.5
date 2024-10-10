@@ -2,8 +2,9 @@
 
 #include "light.h"
 #include "color.h"
-#include "brogueGlobal.h"
+#include "simple.h"
 
+using namespace brogueHd::simple;
 using namespace brogueHd::backend::model::game;
 
 namespace brogueHd::backend::model::layout
@@ -85,7 +86,7 @@ namespace brogueHd::backend::model::layout
 				   needsUpdate == display.needsUpdate;// &&
 					//lighting.compare(display.lighting);
 		}
-		size_t getHash() const override
+		size_t getHash() const
 		{
 			return 0;
 		}
@@ -102,5 +103,3 @@ namespace brogueHd::backend::model::layout
 		}
 	};
 }
-
-MAKE_HASHABLE_STRUCT(brogueHd::backend::model::layout::brogueCellDisplay)

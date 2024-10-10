@@ -1,10 +1,11 @@
 #pragma once
 
-#include "brogueGlobal.h"
+#include "simpleException.h"
+#include "simpleMath.h"
 #include "gridRect.h"
 #include "gridDefinitions.h"
 
-using namespace brogueHd::component::math;
+using namespace brogueHd::simple;
 
 namespace brogueHd::component
 {
@@ -207,42 +208,42 @@ namespace brogueHd::component
 
         case brogueCompass::N:
             if (!this->isInBounds(column, row - 1))
-                brogueException::show("Out of bounds exception:  grid::getAdjacent");
+                simpleException::showCstr("Out of bounds exception:  grid::getAdjacent");
 
             return this->get(column, row - 1);
         case brogueCompass::S:
             if (!this->isInBounds(column, row + 1))
-                brogueException::show("Out of bounds exception:  grid::getAdjacent");
+                simpleException::showCstr("Out of bounds exception:  grid::getAdjacent");
 
             return this->get(column, row + 1);
         case brogueCompass::E:
             if (!this->isInBounds(column + 1, row))
-                brogueException::show("Out of bounds exception:  grid::getAdjacent");
+                simpleException::showCstr("Out of bounds exception:  grid::getAdjacent");
 
             return this->get(column + 1, row);
         case brogueCompass::W:
             if (!this->isInBounds(column - 1, row))
-                brogueException::show("Out of bounds exception:  grid::getAdjacent");
+                simpleException::showCstr("Out of bounds exception:  grid::getAdjacent");
 
             return this->get(column - 1, row);
         case brogueCompass::NW:
             if (!this->isInBounds(column - 1, row - 1))
-                brogueException::show("Out of bounds exception:  grid::getAdjacent");
+                simpleException::showCstr("Out of bounds exception:  grid::getAdjacent");
 
             return this->get(column - 1, row - 1);
         case brogueCompass::NE:
             if (!this->isInBounds(column + 1, row - 1))
-                brogueException::show("Out of bounds exception:  grid::getAdjacent");
+                simpleException::showCstr("Out of bounds exception:  grid::getAdjacent");
 
             return this->get(column + 1, row - 1);
         case brogueCompass::SW:
             if (!this->isInBounds(column - 1, row + 1))
-                brogueException::show("Out of bounds exception:  grid::getAdjacent");
+                simpleException::showCstr("Out of bounds exception:  grid::getAdjacent");
 
             return this->get(column - 1, row + 1);
         case brogueCompass::SE:
             if (!this->isInBounds(column + 1, row + 1))
-                brogueException::show("Out of bounds exception:  grid::getAdjacent");
+                simpleException::showCstr("Out of bounds exception:  grid::getAdjacent");
 
             return this->get(column + 1, row + 1);
         default:
@@ -338,10 +339,10 @@ namespace brogueHd::component
     void grid<T>::set(short column, short row, T value)
     {
         if (!_relativeBoundary.contains(column, row))
-            brogueException::show("Grid out of bounds:  grid.cpp");
+            simpleException::showCstr("Grid out of bounds:  grid.cpp");
 
         if (this->isDefined(column, row))
-            brogueException::show("Trying to overwrite grid value:  grid.cpp (use remove first)");
+            simpleException::showCstr("Trying to overwrite grid value:  grid.cpp (use remove first)");
 
         _grid[column][row] = value;
     }
@@ -459,7 +460,7 @@ namespace brogueHd::component
             return west == default_value<T>::value || (west != default_value<T>::value && !predicate(column - 1, row, west));
 
         else
-            brogueException::show("Invalid use of direction parameter:  grid.isExposedEdge");
+            simpleException::showCstr("Invalid use of direction parameter:  grid.isExposedEdge");
     }
 
     template<typename T>
@@ -482,7 +483,7 @@ namespace brogueHd::component
             isExposedEdge(column, row, brogueCompass::W, predicate);
 
         else
-            brogueException::show("Invalid use of direction parameter:  grid.isExposedCorner");
+            simpleException::showCstr("Invalid use of direction parameter:  grid.isExposedCorner");
     }
 
     template<typename T>
@@ -494,10 +495,10 @@ namespace brogueHd::component
         if (!this->isDefined(otherLocation.column, otherLocation.row))
             return false;
 
-        if (brogueMath<short>::abs(otherLocation.column - location.column) > 1)
+        if (simpleMath<short>::abs(otherLocation.column - location.column) > 1)
             return false;
 
-        if (brogueMath<short>::abs(otherLocation.row - location.row) > 1)
+        if (simpleMath<short>::abs(otherLocation.row - location.row) > 1)
             return false;
 
         return true;
@@ -530,10 +531,10 @@ namespace brogueHd::component
 
         gridRect boundary = this->getRelativeBoundary();
 
-        short left = brogueMath<short>::clamp(centerColumn - distance, boundary.left(), boundary.right());
-        short right = brogueMath<short>::clamp(centerColumn + distance, boundary.left(), boundary.right());
-        short top = brogueMath<short>::clamp(centerRow - distance, boundary.top(), boundary.bottom());
-        short bottom = brogueMath<short>::clamp(centerColumn + distance, boundary.top(), boundary.bottom());
+        short left = simpleMath<short>::clamp(centerColumn - distance, boundary.left(), boundary.right());
+        short right = simpleMath<short>::clamp(centerColumn + distance, boundary.left(), boundary.right());
+        short top = simpleMath<short>::clamp(centerRow - distance, boundary.top(), boundary.bottom());
+        short bottom = simpleMath<short>::clamp(centerColumn + distance, boundary.top(), boundary.bottom());
 
         for (short i = left; i <= right && !userBreak; i++)
         {
@@ -552,8 +553,8 @@ namespace brogueHd::component
 
         gridRect gridBoundary = this->getRelativeBoundary();
 
-        short safeRight = brogueMath<short>::clamp(boundary.right(), gridBoundary.left(), gridBoundary.right());
-        short safeBottom = brogueMath<short>::clamp(boundary.bottom(), gridBoundary.top(), gridBoundary.bottom());
+        short safeRight = simpleMath<short>::clamp(boundary.right(), gridBoundary.left(), gridBoundary.right());
+        short safeBottom = simpleMath<short>::clamp(boundary.bottom(), gridBoundary.top(), gridBoundary.bottom());
 
         for (short i = boundary.left(); i <= safeRight && !userBreak; i++)
         {

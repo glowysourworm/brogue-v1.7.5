@@ -1,13 +1,12 @@
 #include "openglRenderer.h"
-#include "brogueGlobal.h"
-#include "brogueLogger.h"
-#include "typeConverter.h"
+#include "simpleLogger.h"
+#include "simpleString.h"
 #include <mutex>
 
 #include <thread>
 #include <chrono>
 
-using namespace brogueHd::component;
+using namespace brogueHd::simple;
 
 namespace brogueHd::frontend::opengl
 {
@@ -23,7 +22,7 @@ namespace brogueHd::frontend::opengl
 
 	void openglRenderer::errorCallback(int error, const char* message)
 	{
-		brogueLogger::log("GLFW Error {} {}", typeConverter::toString<int>(error), message, brogueConsoleColor::Red);
+		simpleLogger::logColor(brogueConsoleColor::Red, "GLFW Error {} {}", simpleString::toStringNumber(error), message);
 	}
 	void openglRenderer::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 	{
@@ -107,7 +106,7 @@ namespace brogueHd::frontend::opengl
 
 		if (!gladLoadGL(glfwGetProcAddress))
 		{
-			brogueLogger::log("Error calling gladLoadGL", brogueConsoleColor::Red);
+			simpleLogger::logColor(brogueConsoleColor::Red, "Error calling gladLoadGL");
 
 			glfwDestroyWindow(window);
 			glfwTerminate();

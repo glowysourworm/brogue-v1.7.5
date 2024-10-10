@@ -26,10 +26,7 @@ namespace brogueHd::component
 	// Constraint for template function to help cast the brogue item details
 	//
 	template<typename T>
-	concept isGridLocator = requires(T a)
-	{
-		{ a } -> std::convertible_to<gridLocator>;
-	};
+	concept isGridLocator = std::convertible_to<T, gridLocator>;
 
 	/// <summary>
 	/// Simple iteration callback. Set the return value to either continue / break.

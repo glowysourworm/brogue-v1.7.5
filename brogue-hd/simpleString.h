@@ -1,5 +1,6 @@
 #pragma once
 
+#include "simpleEnumString.h"
 #include "simpleException.h"
 #include "simpleArray.h"
 #include "simpleList.h"
@@ -64,11 +65,11 @@ namespace brogueHd::simple
 
 		simpleString toUpper() const;
 
+		char* c_str() const;
+
 		// Hashable Object
 
-		bool operator==(const hashableObject& other) const override;
-		bool operator!=(const hashableObject& other) const override;
-		size_t getHash() const override;
+		size_t getHash() const;
 
 	public:
 
@@ -108,18 +109,16 @@ namespace brogueHd::simple
 		template<isStringConvertible T1, isStringConvertible T2, isStringConvertible T3, isStringConvertible T4>
 		static simpleString format(const simpleString& formatStr, const T1& param0, const T2& param1, const T3& param2, const T4& param3);
 
-	private:
+		static simpleString formatDate(time_t time);
+		static simpleString join(char* strings[], int arrayLength);
 
-		//template<isStringConvertible T, isStringConvertible...Rest>
-		//static simpleString formatImpl(const simpleString& resultStr, const T& param, Rest...rest);
+	private:
 
 		int searchImpl(int startIndex, const simpleString& search) const;
 
 		void copyImpl(const simpleString& copy);
 		void copyImpl(const simpleArray<char>& copy);
 		void copyImpl(const char* copy);
-
-		simpleArray<simpleString> splitImpl(const simpleString& input, const simpleArray<char>& tokens) const;
 
 		bool compare(const simpleString& other) const;
 		bool compareArray(const char* other) const;
@@ -130,6 +129,7 @@ namespace brogueHd::simple
 
 		simpleArray<char>* _array;
 	};
+
 	simpleString::simpleString()
 	{
 		// Pin down array value
@@ -182,23 +182,7 @@ namespace brogueHd::simple
 	{
 		this->copyImpl(copy);
 	}
-	//void simpleString::operator+=(const simpleString& other)
-	//{
-	//	int count = _array->count() + other.count();
 
-	//	simpleArray<char>* newArray = new simpleArray<char>(count);
-
-	//	// Copy over data to new array
-	//	for (int index = 0; index < _array->count(); index++)
-	//		newArray->set(index, _array->get(index));
-
-	//	for (int index = _array->count(); index < count; index++)
-	//		newArray->set(index, other.get(index));
-
-	//	delete _array;
-
-	//	_array = newArray;
-	//}
 	bool simpleString::operator==(const simpleString& other) const
 	{
 		return compare(other);
@@ -218,50 +202,21 @@ namespace brogueHd::simple
 
 	//simpleString simpleString::operator+(const simpleString& other) const
 	//{
-	//	simpleString result;
+	//	simpleString result(_array->getArray());
 
-	//	result.append(this->c_str());
 	//	result.append(other);
 
 	//	return result;
 	//}
 	//simpleString simpleString::operator+(const char* other) const
 	//{
-	//	simpleString result;
+	//	simpleString result(_array->getArray());
 
-	//	result.append(this->c_str());
 	//	result.append(other);
 
 	//	return result;
 	//}
 
-	//simpleString& operator+(const simpleString& left, const simpleString& right)
-	//{
-	//	simpleString result;
-
-	//	result.append(left);
-	//	result.append(right);
-
-	//	return result;
-	//}
-	//simpleString& operator+(const char* left, const simpleString& right)
-	//{
-	//	simpleString result;
-
-	//	result.append(left);
-	//	result.append(right);
-
-	//	return result;
-	//}
-	//simpleString& operator+(const simpleString& left, const char* right)
-	//{
-	//	simpleString result;
-
-	//	result.append(left);
-	//	result.append(right);
-
-	//	return result;
-	//}
 	std::ostream& operator<<(std::ostream& stream, const simpleString& other)
 	{
 		if (other == nullptr)
@@ -645,7 +600,7 @@ namespace brogueHd::simple
 		size_t length = strnlen_s(tokens, this->MAX_SPLIT_TOKENS);
 
 		if (length > this->MAX_SPLIT_TOKENS)
-			simpleException::show("Cannot have simpleString::split const char* tokens length greater than 30");
+			simpleException::showCstr("Cannot have simpleString::split const char* tokens length greater than 30");
 
 		simpleList<simpleString> result;
 		simpleList<simpleString> list;
@@ -663,7 +618,7 @@ namespace brogueHd::simple
 			{
 				simpleArray<simpleString> strings = result.get(index).split(token);
 
-				list.addRange(strings);
+				list.addRange(strings.getArray());
 			}
 
 			result.clear();
@@ -746,6 +701,9 @@ namespace brogueHd::simple
 		else if (std::same_as<T, int>)
 			return simpleString(std::to_string(param).c_str());
 
+		else if (std::same_as<T, unsigned int>)
+			return simpleString(std::to_string(param).c_str());
+
 		else if (std::same_as<T, long>)
 			return simpleString(std::to_string(param).c_str());
 
@@ -762,7 +720,7 @@ namespace brogueHd::simple
 			return simpleString(std::to_string(param).c_str());
 
 		else
-			simpleException::show("Unhandled type simpleString::toStringNumber");
+			simpleException::showCstr("Unhandled type simpleString::toStringNumber");
 	}
 
 	template<isNumber T>
@@ -821,6 +779,35 @@ namespace brogueHd::simple
 		return result;
 	}
 
+	simpleString simpleString::formatDate(time_t time)
+	{
+		char buffer[80];
+		tm timeValue;
+
+		localtime_s(&timeValue, &time);
+
+		std::strftime(buffer, 80, "%Y-%m-%d-%H:%M:%S", &timeValue);
+		simpleString result(buffer);
+
+		return result;
+	}
+	simpleString simpleString::join(char* strings[], int arrayLength)
+	{
+		simpleString result;
+
+		for (int index = 0; index < arrayLength; index++)
+		{
+			result.append(strings[index]);
+		}
+
+		return result;
+	}
+
+	char* simpleString::c_str() const
+	{
+		return _array->getArray();
+	}
+
 	std::string simpleString::toStdString() const
 	{
 		std::string result(_array->count(), '\0');
@@ -831,20 +818,9 @@ namespace brogueHd::simple
 		return result;
 	}
 
-	bool simpleString::operator==(const hashableObject& other) const
-	{
-		simpleException::show("Invalid use of comparison operator:  simpleString.h");
-
-		return false;
-	}
-	bool simpleString::operator!=(const hashableObject& other) const
-	{
-		simpleException::show("Invalid use of comparison operator:  simpleString.h");
-
-		return false;
-	}
 	size_t simpleString::getHash() const
 	{
 		return _array->getHash();
 	}
 }
+MAKE_HASHABLE_CLASS(brogueHd::simple::simpleString);

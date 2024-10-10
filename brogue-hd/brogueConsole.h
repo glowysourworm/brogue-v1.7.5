@@ -2,9 +2,10 @@
 
 #include "brogueGlobal.h"
 #include "simpleArray.h"
+#include "simpleString.h"
 #include <iostream>
 
-using namespace brogueHd::component;
+using namespace brogueHd::simple;
 
 namespace brogueHd::console
 {

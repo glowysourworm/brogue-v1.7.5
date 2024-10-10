@@ -1,12 +1,15 @@
 #pragma once
 
-#include "brogueGlobal.h"
 #include "grid.h"
+#include "gridRect.h"
 #include "gridDefinitions.h"
+#include "simpleException.h"
 #include "simpleBST.h"
 #include "simpleHash.h"
 #include "simpleArray.h"
 #include <functional>
+
+using namespace brogueHd::simple;
 
 namespace brogueHd::component
 {
@@ -233,7 +236,7 @@ namespace brogueHd::component
 	void dijkstra<T>::run()
 	{
 		if (!_initialized)
-			brogueException::show("Must call initialize() before run() dijkstra.h");
+			simpleException::showCstr("Must call initialize() before run() dijkstra.h");
 
 		if (_finished)
 			return;
@@ -398,7 +401,7 @@ namespace brogueHd::component
 				return !value;
 			}))
 		{
-			brogueException::show("Dijkstra's Map was unable to find the current goal location");
+			simpleException::showCstr("Dijkstra's Map was unable to find the current goal location");
 		}
 
 		// GENERATE PATHS
@@ -416,7 +419,7 @@ namespace brogueHd::component
 	simpleArray<T> dijkstra<T>::getResultPath(T targetLocation)
 	{
 		if (!_finished)
-			brogueException::show("Must first call dijkstra.run() before calling getResultPath(..)");
+			simpleException::showCstr("Must first call dijkstra.run() before calling getResultPath(..)");
 
 		return _completedPaths->get(targetLocation);
 	}
@@ -425,7 +428,7 @@ namespace brogueHd::component
 	simpleArray<T> dijkstra<T>::generatePath(T targetLocation)
 	{
 		if (!_targetLocations->contains(targetLocation))
-			brogueException::show("Requested target location not specified by the constructor dijkstra.h");
+			simpleException::showCstr("Requested target location not specified by the constructor dijkstra.h");
 
 		// Reverse ordered - starting with target
 		simpleList<T> result;
@@ -436,7 +439,7 @@ namespace brogueHd::component
 		bool valid = _mapPredicate(targetLocation.column, targetLocation.row);
 
 		if (!valid)
-			brogueException::show("Invalid target location:  dijkstra<T>::generatePath(...)");
+			simpleException::showCstr("Invalid target location:  dijkstra<T>::generatePath(...)");
 
 		T currentLocation = targetLocation;
 		T goalLocation = _sourceLocation;
@@ -505,7 +508,7 @@ namespace brogueHd::component
 
 			if (lowestWeight == std::numeric_limits<short>::max())
 			{
-				brogueException::show("Mishandled Dijkstra Map dijkstra.generatePath()");
+				simpleException::showCstr("Mishandled Dijkstra Map dijkstra.generatePath()");
 			}
 
 			currentLocation = lowestWeightLocation;
@@ -522,12 +525,12 @@ namespace brogueHd::component
 				valid &= _mapPredicate(lowestWeightLocation.column, lowestWeightLocation.row);
 
 				if (!valid)
-					brogueException::show("Invalid path found:  dijkstra.generatePath");
+					simpleException::showCstr("Invalid path found:  dijkstra.generatePath");
 			}
 
 			else
 			{
-				brogueException::show("Loop in Dijkstra Map path finding");
+				simpleException::showCstr("Loop in Dijkstra Map path finding");
 			}
 		}
 
@@ -569,7 +572,7 @@ namespace brogueHd::component
 		short cost = _mapCostPredicate(destColumn, destRow);
 
 		// Update the output map
-		_outputMap->set(destColumn, destRow, brogueMath<short>::minOf(_outputMap->get(destColumn, destRow), currentWeight + cost));
+		_outputMap->set(destColumn, destRow, simpleMath<short>::minOf(_outputMap->get(destColumn, destRow), currentWeight + cost));
 
 		// Update the frontier
 		short newWeight = _outputMap->get(destColumn, destRow);

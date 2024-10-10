@@ -1,8 +1,10 @@
 #pragma once
 
-#include "brogueGlobal.h"
 #include "simplePrimitive.h"
+#include "simpleException.h"
 #include "gl.h"
+
+using namespace brogueHd::simple;
 
 namespace brogueHd::frontend::opengl
 {
@@ -51,7 +53,7 @@ namespace brogueHd::frontend::opengl
     void simpleTexture::glCreate(GLuint programHandle)
     {
         if (this->isCreated)
-            brogueException::show("simpleTexture already created in the backend");
+            simpleException::showCstr("simpleTexture already created in the backend");
 
         // Procedure
         //
@@ -96,7 +98,7 @@ namespace brogueHd::frontend::opengl
     void simpleTexture::teardown()
     {
         if (!this->isCreated)
-            brogueException::show("GLTexture already deleted from the backend");
+            simpleException::showCstr("GLTexture already deleted from the backend");
 
         glDeleteTextures(1, &_textureIndex);
 
@@ -108,7 +110,7 @@ namespace brogueHd::frontend::opengl
     void simpleTexture::bind(bool bind)
     {
         if (!this->isCreated)
-            brogueException::show("GLTexture already deleted from the backend");
+            simpleException::showCstr("GLTexture already deleted from the backend");
 
         if (bind)
         {

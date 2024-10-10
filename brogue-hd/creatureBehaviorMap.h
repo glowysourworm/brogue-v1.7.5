@@ -1,12 +1,14 @@
 #pragma once
 
 #include "grid.h"
+#include "gridLocator.h"
 #include "brogueCell.h"
 #include "brogueObject.h"
 #include "creatureBehavior.h"
 #include "simpleList.h"
 
 using namespace brogueHd::component;
+using namespace brogueHd::backend::model::creature;
 using namespace brogueHd::backend::model::layout;
 
 namespace brogueHd::backend::model::creature

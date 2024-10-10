@@ -1,12 +1,16 @@
 #pragma once
 
 #include "simple.h"
+#include "simpleVector.h"
+#include "simplePoint.h"
+#include "simpleException.h"
 
 namespace brogueHd::simple
 {
 	template<isNumber TMath>
-	struct simpleMath
+	class simpleMath
 	{
+	public:
 		static TMath abs(TMath x)
 		{
 			if (x < 0)
@@ -59,7 +63,7 @@ namespace brogueHd::simple
 				return sqrtl(x);
 
 			else
-				simpleException::show("Unknown sqrt type brogueMath.h");
+				simpleException::showCstr("Unknown sqrt type simpleMath.h");
 		}
 		static TMath clamp(TMath x, TMath low, TMath high)
 		{

@@ -4,7 +4,7 @@
 #include "colorConstants.h"
 #include "simpleHash.h"
 
-using namespace brogueHd::component;
+using namespace brogueHd::simple;
 using namespace brogueHd::backend::modelConstant;
 using namespace brogueHd::backend::model::game;
 

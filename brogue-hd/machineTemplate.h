@@ -7,7 +7,6 @@
 
 using namespace brogueHd::backend::modelConstant;
 using namespace brogueHd::backend::model::game;
-using namespace brogueHd::backend::modelConstant;
 using namespace brogueHd::backend::model::construction;
 
 namespace brogueHd::backend::model::gameTemplate

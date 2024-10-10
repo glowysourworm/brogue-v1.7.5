@@ -16,7 +16,7 @@ namespace brogueHd::component
 
 		virtual graph<TNode, TEdge>* run(const simpleList<TNode>& vertices)
 		{
-			return NULL;
+			return nullptr;
 		}
 
 	protected:
@@ -59,7 +59,7 @@ namespace brogueHd::component
     graph<TNode, TEdge>* graphAlgorithm<TNode, TEdge>::createDefaultGraph(const simpleList<TNode>& vertices)
     {
         if (vertices.count() == 0)
-            brogueException::show("Trying to make a graph with zero vertices: delaunay.h");
+            simpleException::showCstr("Trying to make a graph with zero vertices: delaunay.h");
 
         else if (vertices.count() == 1)
         {

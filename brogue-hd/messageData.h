@@ -1,8 +1,9 @@
 #pragma once
 
-#include "brogueGlobal.h"
+#include "simpleException.h"
 #include "colorString.h"
-#include <string>
+
+using namespace brogueHd::simple;
 
 namespace brogueHd::backend::model::game
 {
@@ -22,7 +23,7 @@ namespace brogueHd::backend::model::game
 			//brogueAssert(SIZEOF(amessage) <= COLS * 2);
 
 			if (sizeof(amessage) > COLS * 2)
-				brogueException::show("Message is outside the bounds of the display:  messageData.h");
+				simpleException::showCstr("Message is outside the bounds of the display:  messageData.h");
 
 			message = colorString(amessage, textColor);
 			confirmed = aconfirmed;

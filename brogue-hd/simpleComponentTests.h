@@ -9,7 +9,7 @@
 #include "brogueObject.h"
 
 using namespace brogueHd::backend::model;
-using namespace brogueHd::component;
+using namespace brogueHd::simple;
 
 namespace brogueHd::test
 {

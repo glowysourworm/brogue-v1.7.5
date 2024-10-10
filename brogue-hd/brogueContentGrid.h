@@ -7,6 +7,7 @@
 #include "simpleList.h"
 #include "grid.h"
 
+using namespace brogueHd::simple;
 using namespace brogueHd::component;
 
 namespace brogueHd::backend::model

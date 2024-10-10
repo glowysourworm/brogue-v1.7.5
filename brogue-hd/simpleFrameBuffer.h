@@ -69,7 +69,7 @@ namespace brogueHd::frontend::opengl
     bool simpleFrameBuffer::isReady()
     {
         if (!this->isCreated)
-            brogueException::show("simpleFrameBuffer has not yet been created on the backend");
+            simpleException::showCstr("simpleFrameBuffer has not yet been created on the backend");
 
         // Have to check for the status of the buffer before drawing
         //
@@ -81,7 +81,7 @@ namespace brogueHd::frontend::opengl
     void simpleFrameBuffer::bind(bool bind)
     {
         if (!this->isCreated)
-            brogueException::show("simpleFrameBuffer has not yet been created on the backend");
+            simpleException::showCstr("simpleFrameBuffer has not yet been created on the backend");
 
         if (bind)
         {
@@ -99,10 +99,10 @@ namespace brogueHd::frontend::opengl
     void simpleFrameBuffer::attachTexture(GLuint textureHandle, GLenum attachment)
     {
         if (!this->isCreated)
-            brogueException::show("simpleFrameBuffer has not yet been created on the backend");
+            simpleException::showCstr("simpleFrameBuffer has not yet been created on the backend");
 
         if (!this->isBound)
-            brogueException::show("simpleFrameBuffer must be bound before use");
+            simpleException::showCstr("simpleFrameBuffer must be bound before use");
 
         // Bind the texture to our frame buffer (NOTE:  Scene texture level = 0 because of no minimaps)            
         glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, GL_TEXTURE_2D, textureHandle, (GLint)0);
@@ -129,7 +129,7 @@ namespace brogueHd::frontend::opengl
     void simpleFrameBuffer::teardown()
     {
         if (!this->isCreated)
-            brogueException::show("simpleFrameBuffer has not yet been created on the backend");
+            simpleException::showCstr("simpleFrameBuffer has not yet been created on the backend");
 
         // Unbind the framebuffer target
         glBindFramebuffer(GL_FRAMEBUFFER, 0);

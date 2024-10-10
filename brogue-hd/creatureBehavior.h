@@ -3,7 +3,6 @@
 #include "brogueGlobal.h"
 #include "creatureBehaviorConstants.h"
 
-using namespace brogueHd::component;
 using namespace brogueHd::backend::modelConstant;
 
 namespace brogueHd::backend::model::creature

@@ -8,7 +8,7 @@
 #include <functional>
 
 using namespace brogueHd::component;
-using namespace brogueHd::component::math;
+using namespace brogueHd::simple;
 
 namespace brogueHd::component
 {
@@ -304,7 +304,7 @@ namespace brogueHd::component
 		case brogueCompass::W:
 			return *_westExposedLocations;
 		default:
-			brogueException::show("Must use cardinal direction for gridRegion<>::getEdges");
+			simpleException::showCstr("Must use cardinal direction for gridRegion<>::getEdges");
 		}
 	}
 
@@ -336,7 +336,7 @@ namespace brogueHd::component
 				return item.row == boundary.left(); 
 			});
 		default:
-			brogueException::show("Must use cardinal direction for gridRegion<>::getEdges");
+			simpleException::showCstr("Must use cardinal direction for gridRegion<>::getEdges");
 		}
 	}
 
@@ -354,7 +354,7 @@ namespace brogueHd::component
 		case brogueCompass::SW:
 			return *_southWestCornerLocations;
 		default:
-			brogueException::show("Must use non cardinal direction for gridRegion<>::getCorners");
+			simpleException::showCstr("Must use non cardinal direction for gridRegion<>::getCorners");
 		}
 	}
 

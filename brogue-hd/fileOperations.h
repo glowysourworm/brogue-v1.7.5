@@ -1,9 +1,11 @@
 #pragma once
 
-#include "brogueGlobal.h"
+#include "simpleString.h"
+#include "simpleException.h"
 #include <fstream>
-#include <string>
 #include <strstream>
+
+using namespace brogueHd::simple;
 
 namespace brogueHd::component
 {
@@ -37,7 +39,7 @@ namespace brogueHd::component
 			}
 			catch (std::exception& ex)
 			{
-				brogueException::show("Error trying to check if file exists:  " + filename + ":  " + simpleString(ex.what()));
+				simpleException::show("Error trying to check if file exists:  {}:  {}", filename, ex.what());
 			}
 
 			return result;
@@ -47,12 +49,12 @@ namespace brogueHd::component
 			try
 			{
 				std::ifstream stream(filename.c_str());
-				simpleString result = "";
+				simpleString result;
 				std::string line;
 
 				while (std::getline(stream, line))
 				{
-					result += line.c_str();
+					result.append(line.c_str());
 					line = "";
 				}
 
@@ -62,7 +64,7 @@ namespace brogueHd::component
 			}
 			catch (std::exception& ex)
 			{
-				brogueException::show("Error trying to read file exists:  " + filename + ":  " + simpleString(ex.what()));
+				simpleException::show("Error trying to read file:  {}:  {}", filename, ex.what());
 			}
 		}
 		static void writeFile(const simpleString& filename, const simpleString& contents)
@@ -77,7 +79,7 @@ namespace brogueHd::component
 			}
 			catch (std::exception& ex)
 			{
-				brogueException::show("Error trying to write file exists:  " + filename + ":  " + simpleString(ex.what()));
+				simpleException::show("Error trying to write file:  {}:  {}", filename, ex.what());
 			}
 		}
 	};

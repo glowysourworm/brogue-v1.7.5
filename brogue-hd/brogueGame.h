@@ -9,6 +9,7 @@
 #include "playerCharacter.h"
 #include "simpleList.h"
 
+using namespace brogueHd::simple;
 using namespace brogueHd::component;
 using namespace brogueHd::backend::model::creature;
 

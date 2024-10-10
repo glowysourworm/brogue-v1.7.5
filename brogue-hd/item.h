@@ -6,9 +6,9 @@
 
 #include "randomRange.h"
 
-#include <string>
+#include "simpleString.h"
 
-using namespace brogueHd::component::math;
+using namespace brogueHd::simple;
 using namespace brogueHd::backend::modelConstant;
 
 namespace brogueHd::backend::model::game

@@ -4,10 +4,10 @@
 #include <format>
 #include <iostream>
 #include "graphNode.h"
-#include "brogueMath.h"
+#include "simpleMath.h"
 #include "brogueGlobal.h"
 
-using namespace brogueHd::component::math;
+using namespace brogueHd::simple;
 
 namespace brogueHd::component
 {
@@ -53,7 +53,7 @@ namespace brogueHd::component
 			double dx = location.column - column;
 			double dy = location.row - row;
 
-			return brogueMath<double>::sqrt((dx * dx) + (dy * dy));
+			return simpleMath<double>::sqrt((dx * dx) + (dy * dy));
 		}
 
 		bool isEmpty()
@@ -66,17 +66,9 @@ namespace brogueHd::component
 			return gridLocator(-1, -1);
 		}
 
-		simpleString getString()
-		{
-			//return std::format("(Col={}, Row={})", typeConverter::shortToString(column), typeConverter::shortToString(row));
-			return simpleString("TODO");
-		}
-
 		size_t getHash() const override
 		{
 			return hashGenerator::generateHash(column, row);
 		}
 	};
 }
-
-MAKE_HASHABLE_STRUCT(brogueHd::component::gridLocator)

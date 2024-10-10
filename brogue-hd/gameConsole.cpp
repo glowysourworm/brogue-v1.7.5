@@ -1,14 +1,14 @@
 #include "gameConsole.h"
 #include "brogueGlobal.h"
-#include "typeConverter.h"
+#include "simpleString.h"
 #include "gameController.h"
-#include "stringExtension.h"
 #include "broguefile.h"
+#include "simpleArray.h"
 #include <format>
 #include <thread>
 
 using namespace brogueHd::backend::controller;
-using namespace brogueHd::component;
+using namespace brogueHd::simple;
 
 namespace brogueHd::console
 {
@@ -54,7 +54,7 @@ namespace brogueHd::console
 		for (int i = 0; i < scoreFile->scoreCount; i++)
 		{
 			// Convert file time to readable string
-			simpleString dateStr = stringExtension::formatDate(scoreFile->scoreList.get(i).dateTime);
+			simpleString dateStr = simpleString::formatDate(scoreFile->scoreList.get(i).dateTime);
 
 			// Output to stream (console)
 			stream << std::format("{}\t{}\t{}", (int)scoreFile->scoreList.get(i).score, dateStr, scoreFile->scoreList.get(i).description) << std::endl;
@@ -67,7 +67,7 @@ namespace brogueHd::console
 	{
 		int choice = 0;
 
-		if (!typeConverter::tryStringToInt(input, choice))
+		if (!input.tryToInt(choice))
 			return brogueConsoleReturn::CompletedWithError;
 
 		//switch (choice)
@@ -258,7 +258,7 @@ namespace brogueHd::console
 			{
 				// Primary Exception Handler. Should show a popup if there is an error.
 				//
-				//brogueException::show(std::string(std::string("Brogue Error:  ") + ex.what()).c_str());
+				//simpleException::show(std::string(std::string("Brogue Error:  ") + ex.what()).c_str());
 			}
 		} while (result == true);
 

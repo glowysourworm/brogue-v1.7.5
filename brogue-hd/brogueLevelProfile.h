@@ -4,7 +4,7 @@
 #include "randomGenerator.h"
 #include "simpleHash.h"
 
-using namespace brogueHd::component;
+using namespace brogueHd::simple;
 using namespace brogueHd::backend::generator;
 using namespace brogueHd::backend::model::game;
 

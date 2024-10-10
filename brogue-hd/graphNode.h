@@ -1,12 +1,13 @@
 #pragma once
 
-#include "brogueGlobal.h"
+#include "simple.h"
+
+using namespace brogueHd::simple;
 
 namespace brogueHd::component
 {
 	struct graphNode : hashable
 	{
-	public:
 		graphNode(){};
 
 		virtual bool operator==(const graphNode& node) const
@@ -17,11 +18,9 @@ namespace brogueHd::component
 		{
 			return false;
 		}
-		virtual size_t getHash() const override
+		virtual size_t getHash() const
 		{
 			return 0;
 		}
 	};
 }
-
-MAKE_HASHABLE_STRUCT(brogueHd::component::graphNode)

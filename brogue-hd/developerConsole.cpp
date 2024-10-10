@@ -1,10 +1,13 @@
+#include "brogueGlobal.h"
 #include "developerConsole.h"
-#include "typeConverter.h"
+#include "simpleString.h"
+#include "simpleArray.h"
 #include "simpleArrayTests.h"
 #include "simpleHashTests.h"
 #include "simpleComponentTests.h"
 
 using namespace brogueHd::test;
+using namespace brogueHd::simple;
 
 namespace brogueHd::console
 {
@@ -18,7 +21,7 @@ namespace brogueHd::console
 	{
 		int choice = 0;
 		
-		if (!typeConverter::tryStringToInt(input, choice))
+		if (!input.tryToInt(choice))
 			return brogueConsoleReturn::CompletedWithError;
 
 		switch (choice)

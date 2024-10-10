@@ -11,7 +11,7 @@
 #include "simpleShaderProgram.h"
 #include "simpleVertexArray.h"
 
-using namespace brogueHd::component;
+using namespace brogueHd::simple;
 using namespace brogueHd::backend::model::layout;
 using namespace brogueHd::frontend::ui;
 

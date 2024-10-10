@@ -1,5 +1,6 @@
 #pragma once
 
+#include "simple.h"
 #include "simpleException.h"
 #include <iostream>
 #include <functional>
@@ -55,9 +56,9 @@ namespace brogueHd::simple
 
 		T* getArray();
 
-		bool operator==(const hashableObject& other) const override;
-		bool operator!=(const hashableObject& other) const override;
-		size_t getHash() const override;
+		bool operator==(const simpleArray<T>& other) const;
+		bool operator!=(const simpleArray<T>& other) const;
+		size_t getHash() const;
 
 	public:
 
@@ -167,7 +168,7 @@ namespace brogueHd::simple
 	void simpleArray<T>::reAllocate(const T* anArray)
 	{
 		if (anArray == nullptr)
-			simpleException::show("Trying to allocate from a null array:  simpleArray::reAllocate");
+			simpleException::showCstr("Trying to allocate from a null array:  simpleArray::reAllocate");
 
 		// Get the number of actual elements in the array
 		//
@@ -176,7 +177,7 @@ namespace brogueHd::simple
 		T* newArray = new T[count];
 
 		if (newArray == nullptr)
-			simpleException::show("malloc returned nullptr:  Unable to allocate memory. simpleArray.h");
+			simpleException::showCstr("malloc returned nullptr:  Unable to allocate memory. simpleArray.h");
 
 		// Initialize new memory
 		//
@@ -204,7 +205,7 @@ namespace brogueHd::simple
 	T simpleArray<T>::get(int index) const
 	{
 		if (index >= _count)
-			simpleException::show("Index is outside the bounds of the array: simpleArray.h");
+			simpleException::showCstr("Index is outside the bounds of the array: simpleArray.h");
 
 		return _array[index];
 	}
@@ -213,7 +214,7 @@ namespace brogueHd::simple
 	void simpleArray<T>::set(int index, T value)
 	{
 		if (index >= _count)
-			simpleException::show("Index is outside the bounds of the array: simpleArray.h");
+			simpleException::showCstr("Index is outside the bounds of the array: simpleArray.h");
 
 		_array[index] = value;
 	}
@@ -244,17 +245,17 @@ namespace brogueHd::simple
 	}
 
 	template<typename T>
-	bool simpleArray<T>::operator==(const hashableObject& other) const
+	bool simpleArray<T>::operator==(const simpleArray<T>& other) const
 	{
-		simpleException::show("Invalid use of comparison operator:  simpleArray.h");
+		simpleException::showCstr("Invalid use of comparison operator:  simpleArray.h");
 
 		return false;
 	}
 
 	template<typename T>
-	bool simpleArray<T>::operator!=(const hashableObject& other) const
+	bool simpleArray<T>::operator!=(const simpleArray<T>& other) const
 	{
-		simpleException::show("Invalid use of comparison operator:  simpleArray.h");
+		simpleException::showCstr("Invalid use of comparison operator:  simpleArray.h");
 
 		return false;
 	}

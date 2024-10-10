@@ -8,7 +8,7 @@
 #include "boltConstants.h"
 #include "randomRange.h"
 
-using namespace brogueHd::component::math;
+using namespace brogueHd::simple;
 using namespace brogueHd::backend::modelConstant;
 using namespace brogueHd::backend::model::game;
 

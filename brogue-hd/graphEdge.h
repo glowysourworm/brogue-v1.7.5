@@ -28,5 +28,3 @@ namespace brogueHd::component
 		}
 	};
 }
-
-MAKE_HASHABLE_STRUCT(brogueHd::component::graphEdge<gridLocator>)

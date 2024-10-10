@@ -1,9 +1,9 @@
 #pragma once
 
-#include <brogueMath.h>
+#include "simpleMath.h"
 #include "creature.h"
 
-using namespace brogueHd::component;
+using namespace brogueHd::simple;
 using namespace brogueHd::backend::model;
 
 // The Great Pender Prime: ...
@@ -21,10 +21,12 @@ using namespace brogueHd::backend::model;
 // without much affecting the results. So now pow() has been replaced by lookup tables.
 // Hopefully this will help with out of sync errors for saved games and recordings...
 
+// ~ RESPONSE ~
+// 
 // Are You Nuts??? Data truncation is very "in" nowadays. Get with it buddy...!
 //
 // "The Education of Pender Prime:  Canto I"  pow( {the obtusely long and meaningless C++ __cplusplus __stdcall _dumdumSquad}, {ANY NUMBER})
-//                                  purportedly does work...as reported by goblin wizards in the very far reaches of middle-earth. 
+//                                  purportedly does work...as reported by several pretentious goblin wizards in the very far reaches of middle-earth. 
 //
 //                                  However! One may always test this axi-umm.. with some programming "code". 
 //                                  e.g. UNIT TESTS! ("you hear thunder clap near your window")

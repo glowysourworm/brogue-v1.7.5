@@ -1,5 +1,7 @@
 #pragma once
 
+#include "simple.h"
+#include "simpleException.h"
 #include "simpleArray.h"
 #include <functional>
 
@@ -38,12 +40,12 @@ namespace brogueHd::simple
 	using simpleListAggregator = std::function<TResult(TResult current, T item)>;
 
 	template<typename T>
-	class simpleList
+	class simpleList : public hashableObject
 	{
 	public:
 		simpleList();
 		simpleList(const T* anArray);
-		simpleList(const simpleArray<T>& anArray);
+		//simpleList(const simpleArray<T>& anArray);
 		simpleList(const simpleList<T>& copy);
 		~simpleList();
 
@@ -100,9 +102,16 @@ namespace brogueHd::simple
 		template<typename TResult>
 		T withMax(simpleListSelector<T, TResult> selector) const;
 
+	public:
+
+		bool operator==(const simpleList<T>& other);
+		bool operator!=(const simpleList<T>& other);
+		size_t getHash() const;
+
 	private:
 
 		void reAllocate();
+		bool compare(const simpleList<T>& other);
 
 	private:
 
@@ -124,12 +133,12 @@ namespace brogueHd::simple
 		_count = 0;
 	}
 
-	template<typename T>
-	simpleList<T>::simpleList(const simpleArray<T>& anArray)
-	{
-		_array = new simpleArray<T>(anArray);
-		_count = _array->count();
-	}
+	//template<typename T>
+	//simpleList<T>::simpleList(const simpleArray<T>& anArray)
+	//{
+	//	_array = new simpleArray<T>(anArray);
+	//	_count = _array->count();
+	//}
 
 	template<typename T>
 	simpleList<T>::simpleList(const simpleList<T>& copy)
@@ -153,9 +162,38 @@ namespace brogueHd::simple
 	T simpleList<T>::get(int index) const
 	{
 		if (index >= _count)
-			simpleException::show("Index is outside the bounds of the list:  simpleList.h");
+			simpleException::showCstr("Index is outside the bounds of the list:  simpleList.h");
 
 		return _array->get(index);
+	}
+
+	template<typename T>
+	bool simpleList<T>::operator==(const simpleList<T>& other)
+	{
+		return compare(other);
+	}
+
+	template<typename T>
+	bool simpleList<T>::operator!=(const simpleList<T>& other)
+	{
+		return !compare(other);
+	}
+
+	template<typename T>
+	size_t simpleList<T>::getHash() const
+	{
+		size_t hash = 0;
+
+		for (int index = 0; index < _count; index++)
+		{
+			if (hash == 0)
+				hash = hashGenerator::generateHash(this->get(index));
+
+			else
+				hash = hashGenerator::combineHash(hash, this->get(index));
+		}
+
+		return hash;
 	}
 
 	template<typename T>
@@ -215,13 +253,13 @@ namespace brogueHd::simple
 	void simpleList<T>::reAllocate()
 	{
 		if (_count != _array->count())
-			simpleException::show("Trying to re-allocate memory for simple list before capacity is reached");
+			simpleException::showCstr("Trying to re-allocate memory for simple list before capacity is reached");
 
 		// Use doubling method: Always multiply size by 2 until {MaxElementIncrement} is reached
 		//
-		int newSize = (_array->count() == 0) ? 10 :
-			(_array->count() >= this->ArrayIncrement) ? (_array->count() + this->ArrayIncrement) :
-			_array->count() * 2;
+		int newSize = (_array->count() == 0) ? 10 : (_array->count() >= this->ArrayIncrement) ? 
+													(_array->count() + this->ArrayIncrement) :
+													 _array->count() * 2;
 
 		// Copy over the data
 		simpleArray<T>* newArray = new simpleArray<T>(newSize);
@@ -237,10 +275,30 @@ namespace brogueHd::simple
 	}
 
 	template<typename T>
+	bool simpleList<T>::compare(const simpleList<T>& other)
+	{
+		if (other == nullptr)
+			return false;
+
+		else if (_count != other.count())
+			return false;
+
+		for (int index = 0; index < _count; index++)
+		{
+			if (this->get(index) != other.get(index))
+				return false;
+		}
+
+		return true;
+
+
+	}
+
+	template<typename T>
 	T simpleList<T>::removeAt(int index)
 	{
 		if (index >= _count)
-			simpleException::show("Index is outside the bounds of the array");
+			simpleException::showCstr("Index is outside the bounds of the array");
 
 		T item = this->get(index);
 
@@ -272,7 +330,7 @@ namespace brogueHd::simple
 			this->removeAt(itemIndex);
 
 		else
-			simpleException::show("Item not found in simpleList::remove");
+			simpleException::showCstr("Item not found in simpleList::remove");
 	}
 
 	template<typename T>
@@ -378,7 +436,7 @@ namespace brogueHd::simple
 	T simpleList<T>::first() const
 	{
 		if (this->count() == 0)
-			simpleException::show("Trying to get element from an empty list:  simpleList::first()");
+			simpleException::showCstr("Trying to get element from an empty list:  simpleList::first()");
 
 		return this->get(0);
 	}

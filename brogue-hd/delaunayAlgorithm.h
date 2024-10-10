@@ -1,11 +1,14 @@
 #pragma once
 
-#include "triangle.h"
+#include "simpleTriangle.h"
+#include "simplePoint.h"
+#include "simpleList.h"
+
 #include "graph.h"
 #include "graphAlgorithm.h"
 #include "gridLocatorEdge.h"
-#include "simpleList.h"
-#include "brogueGlobal.h"
+
+using namespace brogueHd::simple;
 
 namespace brogueHd::component
 {
@@ -95,9 +98,9 @@ namespace brogueHd::component
         short left = std::numeric_limits<short>::max();
         short right = std::numeric_limits<short>::min();
 
-        // Create a lookup to convert from gridLocator to mathPoint
-        simpleHash<TNode, mathPoint<short>> vertexLookup;
-        simpleHash<mathPoint<short>, TNode> nodeLookup;
+        // Create a lookup to convert from gridLocator to simplePoint
+        simpleHash<TNode, simplePoint<short>> vertexLookup;
+        simpleHash<simplePoint<short>, TNode> nodeLookup;
 
         vertices.forEach([&top, &bottom, &left, &right, &vertexLookup, &nodeLookup](TNode vertex)
         {
@@ -114,7 +117,7 @@ namespace brogueHd::component
                 right = vertex.column;
 
             // Store these to use later on when creating edges
-            mathPoint<short> point = mathPoint<short>(vertex.column, vertex.row);
+            simplePoint<short> point = simplePoint<short>(vertex.column, vertex.row);
 
             vertexLookup.add(vertex, point);
             nodeLookup.add(point, vertex);
@@ -123,17 +126,17 @@ namespace brogueHd::component
         });
 
         // NOTE*** NULL VERTEX REFERENCE USED TO IDENTIFY SUPER TRIANGLE
-        mathPoint<short> point1(0, 0);
-        mathPoint<short> point2((short)((right * 2) + 1), 0);
-        mathPoint<short> point3(0, (short)((bottom * 2) + 1));
+        simplePoint<short> point1(0, 0);
+        simplePoint<short> point2((short)((right * 2) + 1), 0);
+        simplePoint<short> point3(0, (short)((bottom * 2) + 1));
 
         // Initialize the mesh (the "super-triangle" is removed as part of the algorithm)
         //
-        triangle<short> superTriangle(point1, point2, point3);
+        simpleTriangle<short> superTriangle(point1, point2, point3);
 
-        simpleList<triangle<short>> triangles;
-        simpleList<triangle<short>> badTriangles;
-        simpleList<triangle<short>> otherBadTriangles;
+        simpleList<simpleTriangle<short>> triangles;
+        simpleList<simpleTriangle<short>> badTriangles;
+        simpleList<simpleTriangle<short>> otherBadTriangles;
 
         triangles.add(superTriangle);
 
@@ -141,13 +144,13 @@ namespace brogueHd::component
         //
         vertices.forEach([&triangles, &badTriangles, &otherBadTriangles, &vertexLookup](TNode graphVertex)
         {
-            mathPoint<short> vertexPoint = vertexLookup[graphVertex];
+            simplePoint<short> vertexPoint = vertexLookup[graphVertex];
 
             // Find triangles in the mesh whose circum-circle contains the new point
             //
             // Remove those triangles from the mesh and return them
             //
-            badTriangles = triangles.remove([&vertexPoint](triangle<short> triangle)
+            badTriangles = triangles.remove([&vertexPoint](simpleTriangle<short> triangle)
             {
                 return triangle.circumCircleContains(vertexPoint);
             });
@@ -155,39 +158,39 @@ namespace brogueHd::component
             // Use edges from the polygon hole to create new triangles. This should be an "outline" of
             // the bad triangles. So, use all edges from the bad triangles except for shared edges.
             //
-            badTriangles.forEach([&otherBadTriangles, &vertexPoint, &badTriangles, &triangles, &vertexLookup](triangle<short> badTriangle)
+            badTriangles.forEach([&otherBadTriangles, &vertexPoint, &badTriangles, &triangles, &vertexLookup](simpleTriangle<short> badTriangle)
             {
-                otherBadTriangles = badTriangles.except([&badTriangle](triangle<short> triangle)
+                otherBadTriangles = badTriangles.except([&badTriangle](simpleTriangle<short> triangle)
                 {
                     return triangle == badTriangle;
                 });
 
-                bool edge12 = otherBadTriangles.any([&badTriangle](triangle<short> triangle)
+                bool edge12 = otherBadTriangles.any([&badTriangle](simpleTriangle<short> triangle)
                 {
                     return triangle.containsEqualEdge(triangle.point1, triangle.point2);
                 });
 
-                bool edge23 = otherBadTriangles.any([&badTriangle](triangle<short> triangle)
+                bool edge23 = otherBadTriangles.any([&badTriangle](simpleTriangle<short> triangle)
                 {
                     return triangle.containsEqualEdge(triangle.point2, triangle.point3);
                 });
 
-                bool edge31 = otherBadTriangles.any([&badTriangle](triangle<short> triangle)
+                bool edge31 = otherBadTriangles.any([&badTriangle](simpleTriangle<short> triangle)
                 {
                     return triangle.containsEqualEdge(triangle.point3, triangle.point1);
                 });
 
                 // Check Shared Edges 1 -> 2
                 if (!edge12)
-                    triangles.add(triangle<short>(badTriangle.point1, badTriangle.point2, vertexPoint));
+                    triangles.add(simpleTriangle<short>(badTriangle.point1, badTriangle.point2, vertexPoint));
 
                 // 2 -> 3
                 if (!edge23)
-                    triangles.add(triangle<short>(badTriangle.point2, badTriangle.point3, vertexPoint));
+                    triangles.add(simpleTriangle<short>(badTriangle.point2, badTriangle.point3, vertexPoint));
 
                 // 3 -> 1
                 if (!edge31)
-                    triangles.add(triangle<short>(badTriangle.point3, badTriangle.point1, vertexPoint));
+                    triangles.add(simpleTriangle<short>(badTriangle.point3, badTriangle.point1, vertexPoint));
 
                 return iterationCallback::iterate;
             });
@@ -199,7 +202,7 @@ namespace brogueHd::component
         simpleList<TEdge> delaunayEdges;
         delaunayAlgorithm<TNode, TEdge>* that = this;
 
-        triangles.forEach([&delaunayEdges, &point1, &point2, &point3, &that, &nodeLookup](triangle<short> triangle)
+        triangles.forEach([&delaunayEdges, &point1, &point2, &point3, &that, &nodeLookup](simpleTriangle<short> triangle)
         {
             // (Cleaning Up) Remove any edges shared with the "super-triangle" vertices
             //

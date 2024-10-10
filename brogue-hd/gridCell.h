@@ -1,9 +1,6 @@
 #pragma once
 
 #include "gridLocator.h"
-#include <string>
-#include <format>
-#include <iostream>
 
 using namespace brogueHd::component;
 

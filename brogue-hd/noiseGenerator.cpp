@@ -3,10 +3,10 @@
 #include "noiseGenerator.h"
 #include "grid.h"
 #include "gridRect.h"
-#include "brogueMath.h"
+#include "simpleMath.h"
 
 using namespace brogueHd::component;
-using namespace brogueHd::component::math;
+using namespace brogueHd::simple;
 using namespace brogueHd::backend::model;
 using namespace brogueHd::backend::model::layout;
 

@@ -3,7 +3,7 @@
 #include "brogueTestPackage.h"
 #include "simpleHash.h"
 
-using namespace brogueHd::component;
+using namespace brogueHd::simple;
 
 namespace brogueHd::test
 {

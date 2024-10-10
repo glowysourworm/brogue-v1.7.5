@@ -85,9 +85,9 @@ namespace brogueHd::component
                 usedVertices.add(firstVertex);
 
                 nextVertex = unusedVertices.withMin<short>([&firstVertex](TNode vertex)
-                    {
-                        return firstVertex.calculateDistance(vertex);
-                    });
+                {
+                    return firstVertex.calculateDistance(vertex);
+                });
 
                 nextEdge = this->graphEdgeConstructor(firstVertex, nextVertex);
             }
@@ -96,41 +96,41 @@ namespace brogueHd::component
             {
                 // Get the next edge that connects an UNUSED vertex to a USED vertex
                 unusedVertices.forEach([&treeEdges, &that](TNode vertex)
+                {
+                    // Edges in the current tree
+                    short potentialEdgeWeight = std::numeric_limits<short>::max();
+                    TNode potentialNode = NULL;
+
+                    treeEdges.forEach([&vertex, &potentialEdgeWeight, &that](TEdge edge)
                     {
-                        // Edges in the current tree
-                        short potentialEdgeWeight = std::numeric_limits<short>::max();
-                        TNode potentialNode = NULL;
+                        short distance = edge.node1.calculateDistance(vertex);
 
-                        treeEdges.forEach([&vertex, &potentialEdgeWeight, &that](TEdge edge)
+                        if (distance < potentialEdgeWeight)
                         {
-                            short distance = edge.node1.calculateDistance(vertex);
+                            potentialEdgeWeight = distance;
+                            potentialNode = edge.node1;
+                        }
 
-                            if (distance < potentialEdgeWeight)
-                            {
-                                potentialEdgeWeight = distance;
-                                potentialNode = edge.node1;
-                            }
+                        distance = edge.node2.calculateDistance(vertex);
 
-                            distance = edge.node2.calculateDistance(vertex);
-
-                            if (distance < potentialEdgeWeight)
-                            {
-                                potentialEdgeWeight = distance;
-                                potentialNode = edge.node2;
-                            }
-                        });
-
-                        // Check both potential edges for the least distant choice
-                        if (nextEdge == NULL || potentialEdgeWeight < nextEdge.weight())
+                        if (distance < potentialEdgeWeight)
                         {
-                            nextEdge = that->graphEdgeConstructor(potentialNode, vertex);
-                            nextVertex = vertex;
+                            potentialEdgeWeight = distance;
+                            potentialNode = edge.node2;
                         }
                     });
+
+                    // Check both potential edges for the least distant choice
+                    if (nextEdge == NULL || potentialEdgeWeight < nextEdge.weight())
+                    {
+                        nextEdge = that->graphEdgeConstructor(potentialNode, vertex);
+                        nextVertex = vertex;
+                    }
+                });
             }
 
             if (nextEdge == NULL)
-                brogueException::show("No connection found between regions Minimum Spanning Tree:  primsAlgorithm.cpp");
+                simpleException::showCstr("No connection found between regions Minimum Spanning Tree:  primsAlgorithm.cpp");
 
             unusedVertices.remove(nextVertex);
             usedVertices.add(nextVertex);

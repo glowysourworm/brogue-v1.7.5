@@ -2,9 +2,9 @@
 
 #include "broguefile.h"
 #include "simpleHash.h"
-#include <string>
+#include "simpleString.h"
 
-using namespace brogueHd::component;
+using namespace brogueHd::simple;
 
 namespace brogueHd::backend::processor
 {

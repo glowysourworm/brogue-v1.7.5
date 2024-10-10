@@ -1,5 +1,6 @@
 #pragma once
 
+#include "brogueGlobal.h"
 #include "color.h"
 
 using namespace brogueHd::backend::model::game;

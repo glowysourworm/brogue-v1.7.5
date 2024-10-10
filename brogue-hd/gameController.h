@@ -1,7 +1,7 @@
 #pragma once
 
 #include "gameData.h"
-#include "command.h"
+#include "brogueGlobal.h"
 #include "keyProcessor.h"
 #include "randomGenerator.h"
 #include "playbackProcessor.h"

@@ -4,16 +4,6 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "hashExtension.h"
-#include "componentMacros.h"
-#include "EnumString.h"
-#include "command.h"
-
-#include "simple.h"
-#include "simpleArray.h"
-#include "simpleString.h"
-#include "simpleHash.h"
-
 namespace brogueHd
 {
 	/*	
@@ -35,6 +25,49 @@ namespace brogueHd
 	static const char* ConfigFrameFragmentShader = "frameFragmentShader";
 
 	static const char* BrogueHighScoresFile = "BrogueHighScores.txt";
+
+	/*
+	
+		Global Enums (console level)
+	
+	*/
+
+	enum brogueConsoleReturn
+	{
+		Continue = 0,
+		Completed = 1,
+		Completed_SetMode_Game = 2,
+		Completed_SetMode_Dev = 3,
+		Completed_SetMode_Resource = 4,
+		CompletedWithError = 5,
+		Exit = 6
+	};
+
+	enum NGCommands {
+		NG_NOTHING = 0,
+		NG_NEW_GAME,
+		NG_NEW_GAME_WITH_SEED,
+		NG_OPEN_GAME,
+		NG_VIEW_RECORDING,
+		NG_HIGH_SCORES,
+		NG_SCUM,
+		NG_QUIT,
+	};
+
+	/// <summary>
+	/// Specific modes that relate to game controller settings. Changing modes means that the controller
+	/// will reset for the next mode. This has an impact on loaded variables.
+	/// </summary>
+	enum BrogueGameMode {
+		Menu = 0,
+		MenuHighScores = 1,
+		MenuOpenGame = 2,
+		MenuSetSeed = 3,
+		Game = 4,
+		Playback = 5,
+		Scum = 6,
+		Quit = 7
+	};
 
 	/*
 
@@ -524,11 +557,3 @@ namespace brogueHd
 
 }
 
-MAKE_HASHABLE_CLASS(brogueHd::simple::simpleArray<short>);
-MAKE_HASHABLE_CLASS(brogueHd::simple::simpleArray<int>);
-MAKE_HASHABLE_CLASS(brogueHd::simple::simpleArray<char>);
-MAKE_HASHABLE_CLASS(brogueHd::simple::simpleArray<float>);
-MAKE_HASHABLE_CLASS(brogueHd::simple::simpleArray<double>);
-MAKE_HASHABLE_CLASS(brogueHd::simple::simpleArray<brogueHd::simple::simpleString>);
-MAKE_HASHABLE_STRUCT(brogueHd::simple::simplePair<brogueHd::simple::simpleString COMMA brogueHd::simple::simpleString>);
-MAKE_HASHABLE_CLASS(brogueHd::simple::simpleString);

@@ -5,7 +5,7 @@
 #include "color.h"
 #include "simpleList.h"
 
-using namespace brogueHd::component;
+using namespace brogueHd::simple;
 using namespace brogueHd::backend::model::game;
 
 namespace brogueHd::backend::model

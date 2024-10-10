@@ -124,4 +124,3 @@ namespace brogueHd::backend::model::game
 		bool cursorMode;
 	};
 }
-

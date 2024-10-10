@@ -17,10 +17,10 @@ namespace brogueHd::frontend::opengl
     void simpleShaderProgram::compile()
     {
         if (_isCompiled)
-            brogueException::show("Already called simpleShaderProgram::compile");
+            simpleException::showCstr("Already called simpleShaderProgram::compile");
 
         if (_programVAOs->count() == 0)
-            brogueException::show("simpleShaderProgram must have a VAO attached before compiling");
+            simpleException::showCstr("simpleShaderProgram must have a VAO attached before compiling");
 
         // Procedure
         //
@@ -63,10 +63,10 @@ namespace brogueHd::frontend::opengl
     void simpleShaderProgram::draw(int bufferIndex)
     {
         if (!_isCompiled)
-            brogueException::show("Must first call IGLProgram.Compile() before using the GL program");
+            simpleException::showCstr("Must first call IGLProgram.Compile() before using the GL program");
 
         if (!_isActive)
-            brogueException::show("Must first call Bind to set the program active");
+            simpleException::showCstr("Must first call Bind to set the program active");
 
         simplePrimitive programVAO = _programVAOs->get(bufferIndex);
         programVAO.bind(true);
@@ -76,10 +76,10 @@ namespace brogueHd::frontend::opengl
     void simpleShaderProgram::drawAll()
     {
         if (!_isCompiled)
-            brogueException::show("Must first call compile before using the GL program");
+            simpleException::showCstr("Must first call compile before using the GL program");
 
         if (!_isActive)
-            brogueException::show("Must first call Bind to set the program active");
+            simpleException::showCstr("Must first call Bind to set the program active");
 
         _programVAOs->forEach([](simplePrimitive vao)
         {
@@ -92,7 +92,7 @@ namespace brogueHd::frontend::opengl
     void simpleShaderProgram::bind(bool bind)
     {
         if (!_isCompiled)
-            brogueException::show("Must first call compile before using the GL program");
+            simpleException::showCstr("Must first call compile before using the GL program");
 
         if (bind)
         {
@@ -109,7 +109,7 @@ namespace brogueHd::frontend::opengl
     void simpleShaderProgram::declareVAO(simplePrimitive programVAO)
     {
         if (_isCompiled)
-            brogueException::show("Must add texture before compiling:  simpleShaderProgram");
+            simpleException::showCstr("Must add texture before compiling:  simpleShaderProgram");
 
         _programVAOs->add(programVAO);
     }
@@ -147,7 +147,7 @@ namespace brogueHd::frontend::opengl
     void simpleShaderProgram::deleteProgram()
     {
         if (!_isCompiled)
-            brogueException::show("Must first call compile before using the GL program");
+            simpleException::showCstr("Must first call compile before using the GL program");
 
         // Procedure
         //

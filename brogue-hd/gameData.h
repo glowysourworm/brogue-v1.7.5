@@ -1,10 +1,10 @@
 #pragma once
 
 #include "levelData.h"
-#include "creature.h"
-#include "brogueCellDisplay.h"
 #include "playerCharacter.h"
-#include <string>
+#include "simpleString.h"
+
+using namespace brogueHd::simple;
 
 namespace brogueHd::backend::model
 {
@@ -36,7 +36,7 @@ namespace brogueHd::backend::model
 		//short** chokeMap;								// used to assess the importance of the map's various chokepoints
 		//const short nbDirs[8][2] = { {0,-1}, {0,1}, {-1,0}, {1,0}, {-1,-1}, {-1,1}, {1,-1}, {1,1} };
 		//const short cDirs[8][2] = { {0, 1}, {1, 1}, {1, 0}, {1, -1}, {0, -1}, {-1, -1}, {-1, 0}, {-1, 1} };
-		//short numberOfWaypoints;
+		short numberOfWaypoints;
 
 	public:
 

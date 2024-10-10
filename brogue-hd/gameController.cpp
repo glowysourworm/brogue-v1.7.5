@@ -4,11 +4,13 @@
 #include "randomGenerator.h"
 #include "broguefile.h"
 #include "brogueGlobal.h"
+#include "simpleException.h"
 
 #include <thread>
 #include <time.h>
 #include <fstream>
 
+using namespace brogueHd::simple;
 using namespace brogueHd::backend::model::game;
 
 namespace brogueHd::backend::controller
@@ -106,7 +108,7 @@ namespace brogueHd::backend::controller
 	void gameController::initNewGame(unsigned long seed)
 	{
 		//if (_gameData != NULL)
-		//	brogueException::show("Trying to initialize game while a current one is loaded:  call closeGame() first");
+		//	simpleException::show("Trying to initialize game while a current one is loaded:  call closeGame() first");
 
 		//_randomMain->reset(seed);
 
@@ -124,7 +126,7 @@ namespace brogueHd::backend::controller
 	void gameController::initGame(gameData* data)
 	{
 		if (_gameData != NULL)
-			brogueException::show("Trying to initialize game while a current one is loaded:  call closeGame() first");
+			simpleException::showCstr("Trying to initialize game while a current one is loaded:  call closeGame() first");
 
 		// unsigned long gameSeed (GET FROM GAME DATA)
 
@@ -163,10 +165,10 @@ namespace brogueHd::backend::controller
 	void gameController::initPlayback(const char* recordingPath)
 	{
 		if (_gameData != NULL)
-			brogueException::show("Trying to initialize playback while a current one is loaded:  call closeGame() first");
+			simpleException::showCstr("Trying to initialize playback while a current one is loaded:  call closeGame() first");
 
 		if (recordingPath == NULL)
-			brogueException::show("Recording path not specified");
+			simpleException::showCstr("Recording path not specified");
 
 		try
 		{

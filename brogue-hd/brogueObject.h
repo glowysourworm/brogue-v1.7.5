@@ -1,8 +1,9 @@
 #pragma once
 
-#include "brogueGlobal.h"
+#include "simple.h"
 #include "color.h"
 
+using namespace brogueHd::simple;
 using namespace brogueHd::backend::model::game;
 
 namespace brogueHd::backend::model
@@ -47,4 +48,3 @@ namespace brogueHd::backend::model
 		char opacity;
 	};
 }
-MAKE_HASHABLE_CLASS(brogueHd::backend::model::brogueObject)

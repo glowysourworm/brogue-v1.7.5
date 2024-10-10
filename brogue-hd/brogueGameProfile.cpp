@@ -1,10 +1,10 @@
 #pragma once
 
 #include "brogueGameProfile.h"
-#include "brogueMath.h"
+#include "simpleMath.h"
 #include "brogueGlobal.h"
 
-using namespace brogueHd::component::math;
+using namespace brogueHd::simple;
 
 namespace brogueHd::backend::model
 {

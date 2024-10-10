@@ -46,13 +46,13 @@ namespace brogueHd::simple
 		}
 		bool operator==(const hashable& pair) const override
 		{
-			simpleException::show("Invalid use of operator overloads:  simplePair<>");
+			simpleException::showCstr("Invalid use of operator overloads:  simplePair<>");
 
 			return false;
 		}
 		bool operator!=(const hashable& pair) const override
 		{
-			simpleException::show("Invalid use of operator overloads:  simplePair<>");
+			simpleException::showCstr("Invalid use of operator overloads:  simplePair<>");
 
 			return false;
 		}
@@ -169,7 +169,7 @@ namespace brogueHd::simple
 				return _table->get(bucketIndex)->get(index).value;
 		}
 
-		simpleException::show("Key not found in hash table:  simpleHash.cpp");
+		simpleException::showCstr("Key not found in hash table:  simpleHash.cpp");
 	}
 
 	template<typename K, typename V>
@@ -188,7 +188,7 @@ namespace brogueHd::simple
 	void simpleHash<K, V>::add(K key, V value)
 	{
 		if (this->contains(key))
-			simpleException::show("Trying to add duplicate value to simpleHash table. Use set(...)");
+			simpleException::showCstr("Trying to add duplicate value to simpleHash table. Use set(...)");
 
 		// First rehash will give 100 buckets
 		if (_table->count() == 0)
@@ -225,7 +225,7 @@ namespace brogueHd::simple
 	void simpleHash<K, V>::set(K key, V value)
 	{
 		if (!this->contains(key))
-			simpleException::show("Trying to set value for a key-value pair that doesn't exist. Use add(...)");
+			simpleException::showCstr("Trying to set value for a key-value pair that doesn't exist. Use add(...)");
 
 		V oldValue = this->get(key);
 

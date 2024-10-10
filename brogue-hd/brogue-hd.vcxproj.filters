@@ -276,9 +276,6 @@
     <ClCompile Include="simpleShaderProgram.cpp">
       <Filter>Source Files\frontend\opengl</Filter>
     </ClCompile>
-    <ClCompile Include="simpleString.cpp">
-      <Filter>Source Files\component</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="brogueCellDisplay.h">
@@ -518,9 +515,6 @@
     <ClInclude Include="machineTemplate.h">
       <Filter>Header Files\backend\model\gameTemplate</Filter>
     </ClInclude>
-    <ClInclude Include="command.h">
-      <Filter>Header Files\global</Filter>
-    </ClInclude>
     <ClInclude Include="brogueGlobal.h">
       <Filter>Header Files\global</Filter>
     </ClInclude>
@@ -572,17 +566,8 @@
     <ClInclude Include="gridRegionLocator.h">
       <Filter>Header Files\component</Filter>
     </ClInclude>
-    <ClInclude Include="componentMacros.h">
-      <Filter>Header Files\global</Filter>
-    </ClInclude>
-    <ClInclude Include="EnumString.h">
-      <Filter>Header Files\global</Filter>
-    </ClInclude>
     <ClInclude Include="primsAlgorithm.h">
       <Filter>Header Files\component</Filter>
-    </ClInclude>
-    <ClInclude Include="hashExtension.h">
-      <Filter>Header Files\global</Filter>
     </ClInclude>
     <ClInclude Include="simpleComponentTests.h">
       <Filter>Header Files\unit-test</Filter>
@@ -686,9 +671,6 @@
     <ClInclude Include="simpleString.h">
       <Filter>Header Files\simple</Filter>
     </ClInclude>
-    <ClInclude Include="stringExtension.h">
-      <Filter>Header Files\simple</Filter>
-    </ClInclude>
     <ClInclude Include="simpleMath.h">
       <Filter>Header Files\simple</Filter>
     </ClInclude>
@@ -709,6 +691,12 @@
     </ClInclude>
     <ClInclude Include="simpleLogger.h">
       <Filter>Header Files\simple</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleEnumString.h">
+      <Filter>Header Files\simple</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueMacroDeclaration.h">
+      <Filter>Header Files\global</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,13 +1,12 @@
 #pragma once
 
-#include "brogueGlobal.h"
 #include "simpleArray.h"
 #include "simplePrimitive.h"
 #include "simpleDataStream.h"
 #include "simpleVertexAttribute.h"
-#include "typeConverter.h"
+#include "simpleException.h"
 
-using namespace brogueHd::component;
+using namespace brogueHd::simple;
 
 namespace brogueHd::frontend::opengl
 {
@@ -57,7 +56,7 @@ namespace brogueHd::frontend::opengl
     void simpleVertexBuffer<T>::glCreate(GLuint programHandle)
     {
         if (this->isCreated)
-            brogueException::show("simpleVertexBuffer already created in the backend");
+            simpleException::showCstr("simpleVertexBuffer already created in the backend");
 
         // Procedure
         //
@@ -121,7 +120,7 @@ namespace brogueHd::frontend::opengl
             }
             break;
             default:
-                brogueException::show("Unhandled vertex array attribute data type:  " + typeConverter::intToString(attribute.getUniformType()));
+                simpleException::show("Unhandled vertex array attribute data type:  ", attribute.getUniformType());
             }
 
             // Declare the attribute array configuration
@@ -148,7 +147,7 @@ namespace brogueHd::frontend::opengl
     void simpleVertexBuffer<T>::teardown()
     {
         if (!this->isCreated)
-            brogueException::show("simpleVertexBuffer already deleted from the backend");
+            simpleException::showCstr("simpleVertexBuffer already deleted from the backend");
 
         // Bind the CURRENT buffer to a null pointer to detach the buffer from the GL
         glBindBuffer(GL_ARRAY_BUFFER, NULL);
@@ -186,7 +185,7 @@ namespace brogueHd::frontend::opengl
             if (attribute.getUniformType() == GL_FLOAT_VEC2)
                 return (stride + 2) * sizeof(float);
             else
-                brogueException::show("Unhandled vertex array attribute data type:  " + typeConverter::intToString(attribute.getUniformType()));
+                simpleException::show("Unhandled vertex array attribute data type:  ", attribute.getUniformType());
         });
     }
 
@@ -194,7 +193,7 @@ namespace brogueHd::frontend::opengl
     void simpleVertexBuffer<T>::bind(bool bind)
     {
         if (!this->isCreated)
-            brogueException::show("GLVertexBuffer already deleted from the backend");
+            simpleException::showCstr("GLVertexBuffer already deleted from the backend");
 
         // Bind VBO before using
         if (bind)

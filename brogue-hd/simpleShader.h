@@ -50,7 +50,7 @@ namespace brogueHd::frontend::opengl
     void simpleShader::teardown()
     {
         if (!this->isCreated)
-            brogueException::show("simpleShader already deleted from the backend");
+            simpleException::showCstr("simpleShader already deleted from the backend");
 
         // Deletes the shader object from the GL backend
         glDeleteShader(this->handle);
@@ -61,7 +61,7 @@ namespace brogueHd::frontend::opengl
     void simpleShader::glCreate(GLuint programHandle)
     {
         if (this->isCreated)
-            brogueException::show("simpleShader already created on the backend");
+            simpleException::showCstr("simpleShader already created on the backend");
 
         // Declare the shader on the GL backend
         this->handle = glCreateShader(_shaderType);
@@ -85,7 +85,7 @@ namespace brogueHd::frontend::opengl
 
         // For now, just show the exception from the shader
         if (buffer != NULL)
-            brogueException::show(buffer);
+            simpleException::showCstr(buffer);
 
         this->isCreated = true;
     }

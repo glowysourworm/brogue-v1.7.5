@@ -1,11 +1,11 @@
 #pragma once
 
 #include <functional>
-#include "brogueLogger.h"
+#include "simpleLogger.h"
 #include "simpleHash.h"
 #include "simpleString.h"
 
-using namespace brogueHd::component;
+using namespace brogueHd::simple;
 
 namespace brogueHd::test
 {
@@ -15,10 +15,11 @@ namespace brogueHd::test
 	class brogueTestPackage
 	{
 	public:
-
-		
-
-	public:
+		brogueTestPackage(const char* name)
+		{
+			_tests = new simpleHash<simpleString, brogueTestDelegate>();
+			_batteryName = name;
+		}
 		brogueTestPackage(simpleString name)
 		{
 			_tests = new simpleHash<simpleString, brogueTestDelegate>();
@@ -38,7 +39,7 @@ namespace brogueHd::test
 			{
 				that->setCurrentTest(key);
 
-				brogueLogger::log("Running Test:  {}", key);
+				simpleLogger::log("Running Test:  {}", key.c_str());
 
 				bool result = false;
 
@@ -48,15 +49,15 @@ namespace brogueHd::test
 				}
 				catch (const std::exception& ex)
 				{
-					brogueLogger::log("Exception: {}", ex.what(), brogueConsoleColor::Red);
+					simpleLogger::logColor(brogueConsoleColor::Red, "Exception: {}", ex.what());
 
 					result = false;
 				}
 
 				if (result)
-					brogueLogger::log("Test {} Success!", key, brogueConsoleColor::Green);
+					simpleLogger::logColor(brogueConsoleColor::Green, "Test {} Success!", key);
 				else
-					brogueLogger::log("Test {} Fail!", key, brogueConsoleColor::Red);
+					simpleLogger::logColor(brogueConsoleColor::Red, "Test {} Fail!", key);
 
 				anyErrors &= result;
 
@@ -76,12 +77,12 @@ namespace brogueHd::test
 			}
 			catch (const std::exception& ex)
 			{
-				brogueLogger::log("Unit Test {} Assertion Exception {}:  {}", _currentTestName, assertName, ex.what(), brogueConsoleColor::Red);
+				simpleLogger::logColor(brogueConsoleColor::Red, "Unit Test {} Assertion Exception {}:  {}", _currentTestName, assertName, ex.what());
 				result = false;
 			}
 				
 			if (!result)
-				brogueLogger::log("Unit Test {} Assertion {} Failed!", _currentTestName, assertName, brogueConsoleColor::Red);
+				simpleLogger::logColor(brogueConsoleColor::Red, "Unit Test {} Assertion {} Failed!", _currentTestName, assertName);
 		}
 
 		simpleString getName()

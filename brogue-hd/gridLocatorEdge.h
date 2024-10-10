@@ -2,9 +2,9 @@
 
 #include "graphEdge.h"
 #include "gridLocator.h"
-#include "mathPoint.h"
+#include "simplePoint.h"
 
-using namespace brogueHd::component::math;
+using namespace brogueHd::simple;
 
 namespace brogueHd::component
 {
@@ -43,7 +43,7 @@ namespace brogueHd::component
 		}
 
 		template<typename T>
-		bool isEquivalent(mathPoint<T> point1, mathPoint<T> point2)
+		bool isEquivalent(simplePoint<T> point1, simplePoint<T> point2)
 		{
 			return (node1.column == point1.x &&
 				    node1.row == point1.y &&
@@ -61,5 +61,3 @@ namespace brogueHd::component
 		}
 	};
 }
-
-MAKE_HASHABLE_STRUCT(brogueHd::component::gridLocatorEdge)

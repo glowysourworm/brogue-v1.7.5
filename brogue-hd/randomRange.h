@@ -1,6 +1,6 @@
 #pragma once
 
-namespace brogueHd::component::math
+namespace brogueHd::simple
 {
     struct randomRange 
     {

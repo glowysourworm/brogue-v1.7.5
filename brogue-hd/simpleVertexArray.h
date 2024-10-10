@@ -1,9 +1,11 @@
 #pragma once
 
-#include "brogueGlobal.h"
 #include "simplePrimitive.h"
 #include "simpleVertexBuffer.h"
+#include "simpleException.h"
 #include "gl.h"
+
+using namespace brogueHd::simple;
 
 namespace brogueHd::frontend::opengl
 {
@@ -45,7 +47,7 @@ namespace brogueHd::frontend::opengl
     void simpleVertexArray<T>::glCreate(GLuint programHandle)
     {
         if (this->isCreated)
-            brogueException::show("simpleVertexArray already created in the backend");
+            simpleException::showCstr("simpleVertexArray already created in the backend");
 
         // Procedure:  Create / Draw / Teardown several vertex buffers
         //
@@ -74,7 +76,7 @@ namespace brogueHd::frontend::opengl
     void simpleVertexArray<T>::teardown()
     {
         if (!this->isCreated)
-            brogueException::show("simpleVertexArray already deleted from the backend");
+            simpleException::showCstr("simpleVertexArray already deleted from the backend");
 
         // Teardown vertex buffers
         _vertexBuffer.teardown();
@@ -91,10 +93,10 @@ namespace brogueHd::frontend::opengl
     void simpleVertexArray<T>::draw()
     {
         if (!this->isCreated)
-            brogueException::show("simpleVertexArray already deleted from the backend");
+            simpleException::showCstr("simpleVertexArray already deleted from the backend");
 
         if (!this->isBound)
-            brogueException::show("simpleVertexArray must be bound before calling Draw()");
+            simpleException::showCstr("simpleVertexArray must be bound before calling Draw()");
 
         // Draw Buffer
         glDrawArrays(_primitiveType, 0, _vertexBuffer.getBufferLength());
@@ -104,7 +106,7 @@ namespace brogueHd::frontend::opengl
     void simpleVertexArray<T>::bind(bool bind)
     {
         if (!this->isCreated)
-            brogueException::show("simpleVertexArray already deleted from the backend");
+            simpleException::showCstr("simpleVertexArray already deleted from the backend");
 
         // Bind VAO before using
         if (bind)

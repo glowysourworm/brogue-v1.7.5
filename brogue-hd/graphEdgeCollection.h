@@ -6,6 +6,7 @@
 #include "simpleArray.h"
 #include "simpleList.h"
 #include "simpleHash.h"
+#include "simpleException.h"
 
 namespace brogueHd::component
 {
@@ -116,10 +117,10 @@ namespace brogueHd::component
     void graphEdgeCollection<TNode, TEdge>::addEdge(const TEdge& edge)
     {
         if (edge.node1 == edge.node2)
-            brogueException::show("Trying to add self-referencing edge to a graph:  graphEdgeCollection.addEdge");
+            simpleException::showCstr("Trying to add self-referencing edge to a graph:  graphEdgeCollection.addEdge");
 
         if (_edges->contains(edge))
-            brogueException::show("Trying to insert duplicate edge key:  graphEdgeCollection.addEdge");
+            simpleException::showCstr("Trying to insert duplicate edge key:  graphEdgeCollection.addEdge");
 
         _edges->add(edge, edge);
 
@@ -232,7 +233,7 @@ namespace brogueHd::component
     simpleList<TEdge> graphEdgeCollection<TNode, TEdge>::getAdjacentEdges(const TNode& node)
     {
         if (!_nodeAdjacentEdges->contains(node))
-            brogueException::show("No adjacent edges contained for node:  graphEdgeCollection.getAdjacentEdges");
+            simpleException::showCstr("No adjacent edges contained for node:  graphEdgeCollection.getAdjacentEdges");
 
         return _nodeAdjacentEdges->get(node)->getKeys();
     }

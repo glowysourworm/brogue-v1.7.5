@@ -18,7 +18,7 @@ namespace brogueHd::backend::generator
 	layoutGenerator::layoutGenerator(randomGenerator* randomGenerator)
 	{
         if(!randomGenerator->checkId(RANDOM_GENERATOR_MAIN))
-            brogueException::show("Improper use of random number generator:  layoutGenerator.cpp");
+            simpleException::showCstr("Improper use of random number generator:  layoutGenerator.cpp");
 
         _roomTiles = new simpleList<accretionTile>();
 		_randomGenerator = randomGenerator;
@@ -59,7 +59,7 @@ namespace brogueHd::backend::generator
     gridRect layoutGenerator::getPaddedBoundary(short padding) const
     {
         if (padding >= 10)
-            brogueException::show("Invalid level padding:  must be <= 10");
+            simpleException::showCstr("Invalid level padding:  must be <= 10");
 
         return gridRect(padding, padding, DCOLS - padding, DROWS - padding);
     }
@@ -67,7 +67,7 @@ namespace brogueHd::backend::generator
     brogueLayout* layoutGenerator::generateLayout()
 	{
         if (!_initialized)
-            brogueException::show("Layout generator not properly intiialized:  call initialize() before generateLayout()");
+            simpleException::showCstr("Layout generator not properly intiialized:  call initialize() before generateLayout()");
 
         // Procedure
         //

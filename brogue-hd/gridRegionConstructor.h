@@ -6,6 +6,8 @@
 #include "gridRegion.h"
 #include "simpleHash.h"
 
+using namespace brogueHd::simple;
+
 namespace brogueHd::component
 {
     template<isGridLocator T>
@@ -146,7 +148,7 @@ namespace brogueHd::component
     void gridRegionConstructor<T>::add(short column, short row, T location)
     {
         if (_completed)
-            brogueException::show("Trying to add location to a completed region constructor:  gridRegionConstructor.addCell");
+            simpleException::showCstr("Trying to add location to a completed region constructor:  gridRegionConstructor.addCell");
 
         else if (_locations->contains(location))
             return;
@@ -154,7 +156,7 @@ namespace brogueHd::component
         else
         {
             if (_locations->count() > 0 && !isConnected(column, row, location))
-                brogueException::show("Trying to add un-connected cell to the region:  gridRegionConstructor.addCell");
+                simpleException::showCstr("Trying to add un-connected cell to the region:  gridRegionConstructor.addCell");
 
             // Keep locations up to date
             _grid->set(column, row, location);
@@ -317,7 +319,7 @@ namespace brogueHd::component
         _locations->forEach([&grid](T key, T value)
         {
             if (grid->get(key.column, key.row) != key)
-                brogueException::show("RegionConstructor grid was not valid:  " + key.getString());
+                simpleException::show("RegionConstructor grid was not valid:  " + key.getString());
 
             return iterationCallback::iterate;
         });
@@ -339,7 +341,7 @@ namespace brogueHd::component
     void gridRegionConstructor<T>::validateRegionCollection(simpleString name, simpleHash<T, T>* collection)
     {
         if (collection->count() <= 0)
-            brogueException::show("Collection for building regions is not valid:  gridRegionConstructor.validate");
+            simpleException::showCstr("Collection for building regions is not valid:  gridRegionConstructor.validate");
     }
 
     template<isGridLocator T>
@@ -386,7 +388,7 @@ namespace brogueHd::component
 
                 for (short index2 = index1; index2 < rowCountersLength && minHeight > 0; index2++)
                 {
-                    minHeight = brogueMath<short>::minOf(minHeight, rowCounters.get(index1), rowCounters.get(index2));
+                    minHeight = simpleMath<short>::minOf(minHeight, rowCounters.get(index1), rowCounters.get(index2));
 
                     // Current column against previous
                     if (rowCounters.get(index1) > bestArea)

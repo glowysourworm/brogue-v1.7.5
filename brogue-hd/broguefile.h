@@ -6,7 +6,7 @@
 #include <iostream>
 #include <time.h>
 
-using namespace brogueHd::component;
+using namespace brogueHd::simple;
 
 namespace brogueHd::backend::model::io
 {

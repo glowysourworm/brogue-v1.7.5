@@ -108,7 +108,7 @@ namespace brogueHd::simple
                 p3 = point2;
             }
             else
-                simpleException::show("Improper use of circum-circle algorithm");
+                simpleException::showCstr("Improper use of circum-circle algorithm");
 
             // 3) Solve the circum-circle interior determinant
             //

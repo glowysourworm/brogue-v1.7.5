@@ -1,15 +1,14 @@
 #include "randomGenerator.h"
 #include "brogueGlobal.h"
 
-#include "brogueMath.h"
+#include "simpleMath.h"
 #include "randomRange.h"
 #include "simpleList.h"
 #include "simpleArray.h"
 
 #include <random>
 
-using namespace brogueHd::component;
-using namespace brogueHd::component::math;
+using namespace brogueHd::simple;
 
 namespace brogueHd::backend::generator
 {

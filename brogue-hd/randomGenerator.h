@@ -4,8 +4,7 @@
 #include "randomRange.h"
 #include <random>
 
-using namespace brogueHd::component;
-using namespace brogueHd::component::math;
+using namespace brogueHd::simple;
 
 namespace brogueHd::backend::generator
 {

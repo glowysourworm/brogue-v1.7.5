@@ -9,9 +9,8 @@
 #include "simpleDataStream.h"
 #include "simpleArray.h"
 #include "gl.h"
-#include "typeConverter.h"
 
-using namespace brogueHd::component;
+using namespace brogueHd::simple;
 
 namespace brogueHd::frontend::opengl
 {
@@ -103,7 +102,7 @@ namespace brogueHd::frontend::opengl
 			case GL_QUADS:
 				return 4;
 			default:
-				brogueException::show(simpleString("Unhandled primitive type for GLQuad:  ") + typeConverter::intToString(primitiveType));
+				simpleException::show("Unhandled primitive type for GLQuad:  {}", primitiveType);
 			}
 		}
 		int getStreamSize() override

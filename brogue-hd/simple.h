@@ -86,7 +86,6 @@ namespace brogueHd::simple
     /// </summary>
     struct hashable
     {
-    public:
         virtual bool operator==(const hashable& other) const
         {
             return false;
@@ -106,8 +105,7 @@ namespace brogueHd::simple
     //                         You can either use unordered_map, or 
     //                         your own std::hash container class.
     // 
-    //                         Add these to the GLOBAL NAMESPACE outside
-    //                         your class or struct definition (just below it).
+    //                         Add these to the GLOBAL NAMESPACE (see brogueMacroDeclaration.h)
     //
     // MAKE_HASHABLE_CLASS(brogueHd::backend::model::brogueObject)
     // MAKE_HASHABLE_STRUCT(brogueHd::backend::model::game::color)
@@ -140,6 +138,7 @@ namespace brogueHd::simple
         std::same_as<T, unsigned long> ||
         std::same_as<T, long> ||
         std::same_as<T, int> ||
+        std::same_as<T, unsigned int> ||
         std::same_as<T, short> ||
         std::same_as<T, size_t>;
 
@@ -177,7 +176,7 @@ namespace brogueHd::simple
                 return theObject.getHash();                         \
             }                                                       \
         };                                                          \
-    }                                                               \
+    }                                                               
 
 #define MAKE_HASHABLE_STRUCT(type)                                  \
     namespace std                                                   \
@@ -189,4 +188,4 @@ namespace brogueHd::simple
                 return theObject.getHash();                         \
             }                                                       \
         };                                                          \
-    }                                                               \
+    }                                                               

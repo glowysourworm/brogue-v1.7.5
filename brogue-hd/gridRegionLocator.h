@@ -124,7 +124,7 @@ namespace brogueHd::component
     gridRegionConstructor<T> gridRegionLocator<T>::runFloodFill(const grid<T>& grid, short column, short row, gridPredicate<T> inclusionPredicate)
     {
         if (!grid.isDefined(column, row) || !inclusionPredicate(column, row, grid.get(column, row)))
-            brogueException::show("Trying to start FloodFill in non-region location");
+            simpleException::showCstr("Trying to start FloodFill in non-region location");
 
         // Collect the region data in a constructor
         gridRegionConstructor<T> regionConstructor(gridRect(column, row, 0, 0), inclusionPredicate);
@@ -145,7 +145,7 @@ namespace brogueHd::component
             T regionLocation = resultQueue.removeAt(0);
 
             if (regionConstructor.contains(regionLocation))
-                brogueException::show("Trying to add location duplicate:  gridRegionLocator.runFloodFill");
+                simpleException::showCstr("Trying to add location duplicate:  gridRegionLocator.runFloodFill");
 
             // Add to region constructor (also prevents requeueing)
             regionConstructor.add(regionLocation.column, regionLocation.row, regionLocation);

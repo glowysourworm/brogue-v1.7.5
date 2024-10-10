@@ -1,6 +1,5 @@
 #pragma once
 
-#include "brogueGlobal.h"
 #include "dungeonConstants.h"
 
 using namespace brogueHd::backend::modelConstant;

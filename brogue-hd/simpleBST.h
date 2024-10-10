@@ -151,7 +151,7 @@ namespace brogueHd::simple
     T simpleBST<K, T>::remove(K key)
     {
         if (!_nodeMap->contains(key))
-            brogueException::show("Trying to remove non-existing key from binary search tree");
+            simpleException::showCstr("Trying to remove non-existing key from binary search tree");
 
         // Remove the specified key -> Rebalance the tree
         _root = this->removalImpl(_root, key);
@@ -194,7 +194,7 @@ namespace brogueHd::simple
             return _nodeMap->get(key)->value;
 
         else
-            brogueException::show("Trying to retrieve hash-backed node from BST without checking");
+            simpleException::showCstr("Trying to retrieve hash-backed node from BST without checking");
     }
 
     template<isComparable K, typename T>
@@ -248,7 +248,7 @@ namespace brogueHd::simple
         simpleBSTNode<K, T>* minNode = this->minImpl(_root);
 
         if (minNode == NULL)
-            brogueException::show("Trying to resolve min key from an empty Binary Search Tree");
+            simpleException::showCstr("Trying to resolve min key from an empty Binary Search Tree");
 
         else
             return minNode->key;
@@ -272,7 +272,7 @@ namespace brogueHd::simple
         simpleBSTNode<K, T>* maxNode = this->maxImpl(_root);
 
         if (maxNode == NULL)
-            brogueException::show("Trying to resolve max key from an empty Binary Search Tree");
+            simpleException::showCstr("Trying to resolve max key from an empty Binary Search Tree");
 
         else
             return maxNode->key;
@@ -295,10 +295,10 @@ namespace brogueHd::simple
             node->right = this->insertImpl(node->right, key, value);
 
         else
-            brogueException::show("Duplicate key insertion BinarySearchTree");
+            simpleException::showCstr("Duplicate key insertion BinarySearchTree");
 
         // Set the height
-        node->height = brogueMath<int>::maxOf((node->left != NULL) ? node->left->height : -1,
+        node->height = simpleMath<int>::maxOf((node->left != NULL) ? node->left->height : -1,
             (node->right != NULL) ? node->right->height : -1) + 1;
 
         return this->balance(node);
@@ -339,7 +339,7 @@ namespace brogueHd::simple
         }
 
         // Set the height
-        node->height = brogueMath<int>::maxOf((node->left != NULL) ? node->left->height : -1,
+        node->height = simpleMath<int>::maxOf((node->left != NULL) ? node->left->height : -1,
             (node->right != NULL) ? node->right->height : -1) + 1;
 
         return this->balance(node);
@@ -354,7 +354,7 @@ namespace brogueHd::simple
         node->left = this->deleteMin(node->left);
 
         // Set the height
-        node->height = brogueMath<int>::maxOf((node->left != NULL) ? node->left->height : -1,
+        node->height = simpleMath<int>::maxOf((node->left != NULL) ? node->left->height : -1,
             (node->right != NULL) ? node->right->height : -1) + 1;
 
         return this->balance(node);
@@ -534,8 +534,8 @@ namespace brogueHd::simple
         Z->left = X;
 
         // Set up height of nodes
-        X->height = brogueMath<int>::maxOf((X->left != NULL) ? X->left->height : -1, (X->right != NULL) ? X->right->height : -1) + 1;
-        Z->height = brogueMath<int>::maxOf((Z->left != NULL) ? Z->left->height : -1, (Z->right != NULL) ? Z->right->height : -1) + 1;
+        X->height = simpleMath<int>::maxOf((X->left != NULL) ? X->left->height : -1, (X->right != NULL) ? X->right->height : -1) + 1;
+        Z->height = simpleMath<int>::maxOf((Z->left != NULL) ? Z->left->height : -1, (Z->right != NULL) ? Z->right->height : -1) + 1;
 
         // Return node of the new sub-tree
         return Z;
@@ -569,8 +569,8 @@ namespace brogueHd::simple
         Z->right = X;
 
         // Set up height of nodes
-        X->height = brogueMath<int>::maxOf((X->left != NULL) ? X->left->height : -1, (X->right != NULL) ? X->right->height : -1) + 1;
-        Z->height = brogueMath<int>::maxOf((Z->left != NULL) ? Z->left->height : -1, (Z->right != NULL) ? Z->right->height : -1) + 1;
+        X->height = simpleMath<int>::maxOf((X->left != NULL) ? X->left->height : -1, (X->right != NULL) ? X->right->height : -1) + 1;
+        Z->height = simpleMath<int>::maxOf((Z->left != NULL) ? Z->left->height : -1, (Z->right != NULL) ? Z->right->height : -1) + 1;
 
         // Return node of the new sub-tree
         return Z;

@@ -4,7 +4,7 @@
 #include "colorConstants.h"
 #include "simpleList.h"
 
-using namespace brogueHd::component;
+using namespace brogueHd::simple;
 
 namespace brogueHd::backend::model
 {

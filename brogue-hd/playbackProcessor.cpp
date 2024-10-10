@@ -1,5 +1,8 @@
 #include "playbackProcessor.h"
+#include "simpleException.h"
 #include <fstream>
+
+using namespace brogueHd::simple;
 
 namespace brogueHd::backend::processor
 {
@@ -28,7 +31,7 @@ namespace brogueHd::backend::processor
 			fileStream.open(filePath);
 
 			if (!fileStream.good())
-				brogueException::show(simpleString("Error opening file:  ") + filePath);
+				simpleException::show("Error opening file:  {}", filePath);
 
 			// Store the path of the playback file
 			_playbackData->filePath = filePath;
@@ -40,7 +43,7 @@ namespace brogueHd::backend::processor
 		}
 		catch (std::exception& ex)
 		{
-			throw brogueException::show(simpleString("Error opening playback file: ") + ex.what());
+			simpleException::show("Error opening playback file: ", ex.what());
 		}
 	}
 }

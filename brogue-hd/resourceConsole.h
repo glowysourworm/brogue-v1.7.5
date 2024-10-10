@@ -1,7 +1,7 @@
 #pragma once
 
 #include "brogueConsole.h"
-#include "command.h"
+#include "brogueGlobal.h"
 #include "resourceController.h"
 #include <iostream>
 

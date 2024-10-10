@@ -1,6 +1,7 @@
 #pragma once
 
 #include "grid.h"
+#include "gridRect.h"
 #include "brogueCellDisplay.h"
 
 using namespace brogueHd::component;

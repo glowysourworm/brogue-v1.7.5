@@ -3,7 +3,7 @@
 #include "color.h"
 #include "randomRange.h"
 
-using namespace brogueHd::component::math;
+using namespace brogueHd::simple;
 
 namespace brogueHd::backend::model::game
 {

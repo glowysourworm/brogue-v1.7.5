@@ -84,6 +84,7 @@
     <SourcePath>C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\include;$(SourcePath)</SourcePath>
     <LibraryPath>C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\lib-vc2022;$(LibraryPath)</LibraryPath>
     <ExecutablePath>C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\lib-vc2022;$(ExecutablePath)</ExecutablePath>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -132,6 +133,7 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AdditionalIncludeDirectories>C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard_C>stdclatest</LanguageStandard_C>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -214,7 +216,6 @@
     <ClCompile Include="roomGenerator.cpp" />
     <ClCompile Include="renderingController.cpp" />
     <ClCompile Include="simpleShaderProgram.cpp" />
-    <ClCompile Include="simpleString.cpp" />
     <ClCompile Include="terrainGenerator.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -230,6 +231,7 @@
     <ClInclude Include="brogueGlobal.h" />
     <ClInclude Include="brogueGameProfile.h" />
     <ClInclude Include="brogueLevelProfile.h" />
+    <ClInclude Include="brogueMacroDeclaration.h" />
     <ClInclude Include="simpleLogger.h" />
     <ClInclude Include="brogueMachine.h" />
     <ClInclude Include="simpleMath.h" />
@@ -239,7 +241,6 @@
     <ClInclude Include="brogueSceneBuilder.h" />
     <ClInclude Include="brogueTestPackage.h" />
     <ClInclude Include="cellularAutomataParameters.h" />
-    <ClInclude Include="componentMacros.h" />
     <ClInclude Include="coordinateConverter.h" />
     <ClInclude Include="fileOperations.h" />
     <ClInclude Include="gl.h" />
@@ -261,7 +262,7 @@
     <ClInclude Include="dungeonFeature.h" />
     <ClInclude Include="dungeonFeatureConstants.h" />
     <ClInclude Include="dungeonTemplate.h" />
-    <ClInclude Include="EnumString.h" />
+    <ClInclude Include="simpleEnumString.h" />
     <ClInclude Include="simpleException.h" />
     <ClInclude Include="gameConsole.h" />
     <ClInclude Include="graph.h" />
@@ -278,7 +279,6 @@
     <ClInclude Include="gridRegion.h" />
     <ClInclude Include="gridRegionConstructor.h" />
     <ClInclude Include="gridRegionLocator.h" />
-    <ClInclude Include="hashExtension.h" />
     <ClInclude Include="item.h" />
     <ClInclude Include="itemTemplate.h" />
     <ClInclude Include="linearGenerationParameters.h" />
@@ -299,7 +299,6 @@
     <ClInclude Include="color.h" />
     <ClInclude Include="colorConstants.h" />
     <ClInclude Include="colorString.h" />
-    <ClInclude Include="command.h" />
     <ClInclude Include="contentGenerator.h" />
     <ClInclude Include="creature.h" />
     <ClInclude Include="dungeonConstants.h" />
@@ -356,7 +355,6 @@
     <ClInclude Include="simpleVertexBuffer.h" />
     <ClInclude Include="statusEffectConstants.h" />
     <ClInclude Include="statusEffect.h" />
-    <ClInclude Include="stringExtension.h" />
     <ClInclude Include="terrainDeclaration.h" />
     <ClInclude Include="terrainGenerator.h" />
     <ClInclude Include="simpleTriangle.h" />
