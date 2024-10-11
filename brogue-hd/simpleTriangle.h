@@ -1,5 +1,6 @@
 #pragma once
 
+#include "simple.h"
 #include "simplePoint.h"
 #include "simpleVector.h"
 #include "simpleMath.h"
@@ -7,8 +8,8 @@
 
 namespace brogueHd::simple
 {
-    template<typename T>
-	struct simpleTriangle
+    template<isHashable T>
+	struct simpleTriangle : hashable
 	{
         simplePoint<T> point1;
         simplePoint<T> point2;
@@ -22,18 +23,23 @@ namespace brogueHd::simple
             point3 = apoint3;
         }
 
-        bool operator==(const simpleTriangle<T>& triangle)
+        bool operator==(const simpleTriangle<T>& triangle) const
         {
             return point1 == triangle.point1 &&
                    point2 == triangle.point2 &&
                    point3 == triangle.point3;
         }
 
-        bool operator!=(const simpleTriangle<T>& triangle)
+        bool operator!=(const simpleTriangle<T>& triangle) const
         {
             return point1 != triangle.point1 ||
                    point2 != triangle.point2 ||
                    point3 != triangle.point3;
+        }
+
+        size_t getHash() const override
+        {
+            return hashGenerator::generateHash(point1, point2, point3);
         }
 
         bool containsEqualEdge(simplePoint<T> vertex1, simplePoint<T> vertex2)

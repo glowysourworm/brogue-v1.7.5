@@ -5,6 +5,7 @@
 #include "simpleArray.h"
 #include "simpleList.h"
 #include <string>
+#include <iostream>
 
 namespace brogueHd::simple
 {
@@ -67,9 +68,9 @@ namespace brogueHd::simple
 
 		char* c_str() const;
 
-		// Hashable Object
+	public: // Hashable Object
 
-		size_t getHash() const;
+		size_t getHash() const override;
 
 	public:
 
@@ -122,8 +123,6 @@ namespace brogueHd::simple
 
 		bool compare(const simpleString& other) const;
 		bool compareArray(const char* other) const;
-
-		std::string toStdString() const;
 
 	private:
 
@@ -222,7 +221,7 @@ namespace brogueHd::simple
 		if (other == nullptr)
 			return stream;
 
-		stream << other.toStdString();
+		stream << other.c_str();
 
 		return stream;
 	}
@@ -297,7 +296,7 @@ namespace brogueHd::simple
 
 	void simpleString::append(const simpleString& other)
 	{
-		this->append(other.toStdString().c_str());
+		this->append(other.c_str());
 	}
 	void simpleString::append(const char* other)
 	{
@@ -692,31 +691,31 @@ namespace brogueHd::simple
 	template<isNumber T>
 	simpleString simpleString::toStringNumber(const T& param)
 	{
-		if (std::same_as<T, short>)
+		if (std::same_as<T, short>{}())
 			return simpleString(std::to_string(param).c_str());
 
-		else if (std::same_as<T, size_t>)
+		else if (std::same_as<T, size_t>{}())
 			return simpleString(std::to_string(param).c_str());
 
-		else if (std::same_as<T, int>)
+		else if (std::same_as<T, int>{}())
 			return simpleString(std::to_string(param).c_str());
 
-		else if (std::same_as<T, unsigned int>)
+		else if (std::same_as<T, unsigned int>{}())
 			return simpleString(std::to_string(param).c_str());
 
-		else if (std::same_as<T, long>)
+		else if (std::same_as<T, long>{}())
 			return simpleString(std::to_string(param).c_str());
 
-		else if (std::same_as<T, unsigned long>)
+		else if (std::same_as<T, unsigned long>{}())
 			return simpleString(std::to_string(param).c_str());
 
-		else if (std::same_as<T, float>)
+		else if (std::same_as<T, float>{}())
 			return simpleString(std::to_string(param).c_str());
 
-		else if (std::same_as<T, double>)
+		else if (std::same_as<T, double>{}())
 			return simpleString(std::to_string(param).c_str());
 
-		else if (std::same_as<T, char>)
+		else if (std::same_as<T, char>{}())
 			return simpleString(std::to_string(param).c_str());
 
 		else
@@ -808,19 +807,8 @@ namespace brogueHd::simple
 		return _array->getArray();
 	}
 
-	std::string simpleString::toStdString() const
-	{
-		std::string result(_array->count(), '\0');
-
-		for (int index = 0; index < _array->count(); index++)
-			result[index] = _array->get(index);
-
-		return result;
-	}
-
 	size_t simpleString::getHash() const
 	{
 		return _array->getHash();
 	}
 }
-MAKE_HASHABLE_CLASS(brogueHd::simple::simpleString);

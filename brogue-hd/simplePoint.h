@@ -4,7 +4,7 @@
 
 namespace brogueHd::simple
 {
-	template<typename T>
+	template<isHashable T>
 	struct simplePoint : hashable
 	{
 		T x;

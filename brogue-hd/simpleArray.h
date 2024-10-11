@@ -12,29 +12,29 @@ namespace brogueHd::simple
 	/// value to either break, or continue the loop.
 	/// </summary>
 	/// <param name="value">callback (current) value</param>
-	template<typename T>
+	template<isHashable T>
 	using simpleArrayCallback = std::function<iterationCallback(T item)>;
 
 	/// <summary>
 	/// Definition of a simple decision predicate
 	/// </summary>
-	template<typename T>
+	template<isHashable T>
 	using simpleArrayPredicate = std::function<bool(T item)>;
 
 	/// <summary>
 	/// Aggregate uses a callback with the current value of iteration. Setting the return 
 	/// value will forward the aggregate. (e.g. aggregate = simpleArrayAggregate(aggregate, currentValue))
 	/// </summary>
-	template<typename T, typename TResult>
+	template<isHashable T, typename TResult>
 	using simpleArrayAggregate = std::function<TResult(TResult, T)>;
 
 	/// <summary>
 	/// Selector delegate that transforms T->TResult by use of user function
 	/// </summary>
-	template<typename T, typename TResult>
+	template<isHashable T, typename TResult>
 	using simpleArraySelector = std::function<TResult(T)>;
 
-	template<typename T>
+	template<isHashable T>
 	class simpleArray : public hashableObject
 	{
 	public:
@@ -56,9 +56,7 @@ namespace brogueHd::simple
 
 		T* getArray();
 
-		bool operator==(const simpleArray<T>& other) const;
-		bool operator!=(const simpleArray<T>& other) const;
-		size_t getHash() const;
+		size_t getHash() const override;
 
 	public:
 
@@ -81,14 +79,14 @@ namespace brogueHd::simple
 		size_t _count;
 	};
 
-	template<typename T>
+	template<isHashable T>
 	simpleArray<T>::simpleArray()
 	{
 		_array = nullptr;
 		_count = 0;
 	}
 
-	template<typename T>
+	template<isHashable T>
 	simpleArray<T>::simpleArray(int count)
 	{
 		_count = 0;
@@ -98,7 +96,7 @@ namespace brogueHd::simple
 			allocate(count);
 	}
 
-	template<typename T>
+	template<isHashable T>
 	simpleArray<T>::simpleArray(const T* anArray)
 	{
 		_count = 0;
@@ -107,7 +105,7 @@ namespace brogueHd::simple
 		reAllocate(anArray);
 	}
 
-	template<typename T>
+	template<isHashable T>
 	simpleArray<T>::simpleArray(const simpleArray<T>& copy)
 	{
 		_count = 0;
@@ -122,7 +120,7 @@ namespace brogueHd::simple
 		}
 	}
 
-	template<typename T>
+	template<isHashable T>
 	simpleArray<T>::~simpleArray()
 	{
 		if (_array != nullptr)
@@ -134,7 +132,7 @@ namespace brogueHd::simple
 		}
 	}
 
-	template<typename T>
+	template<isHashable T>
 	size_t simpleArray<T>::getArrayCount(const T* anArray)
 	{
 		size_t index = 0;
@@ -148,7 +146,7 @@ namespace brogueHd::simple
 		return count;
 	}
 
-	template<typename T>
+	template<isHashable T>
 	void simpleArray<T>::allocate(size_t capacity)
 	{
 		T* newArray = new T[capacity];
@@ -164,7 +162,7 @@ namespace brogueHd::simple
 		_count = capacity;
 	}
 
-	template<typename T>
+	template<isHashable T>
 	void simpleArray<T>::reAllocate(const T* anArray)
 	{
 		if (anArray == nullptr)
@@ -195,13 +193,13 @@ namespace brogueHd::simple
 		_count = count;
 	}
 
-	template<typename T>
+	template<isHashable T>
 	int simpleArray<T>::count() const
 	{
 		return _count;
 	}
 
-	template<typename T>
+	template<isHashable T>
 	T simpleArray<T>::get(int index) const
 	{
 		if (index >= _count)
@@ -210,7 +208,7 @@ namespace brogueHd::simple
 		return _array[index];
 	}
 
-	template<typename T>
+	template<isHashable T>
 	void simpleArray<T>::set(int index, T value)
 	{
 		if (index >= _count)
@@ -219,13 +217,13 @@ namespace brogueHd::simple
 		_array[index] = value;
 	}
 
-	template<typename T>
+	template<isHashable T>
 	T* simpleArray<T>::getArray()
 	{
 		return _array;
 	}
 
-	template<typename T>
+	template<isHashable T>
 	void simpleArray<T>::operator=(const simpleArray<T>& other)
 	{
 		if (_count > 0)
@@ -244,23 +242,7 @@ namespace brogueHd::simple
 		}
 	}
 
-	template<typename T>
-	bool simpleArray<T>::operator==(const simpleArray<T>& other) const
-	{
-		simpleException::showCstr("Invalid use of comparison operator:  simpleArray.h");
-
-		return false;
-	}
-
-	template<typename T>
-	bool simpleArray<T>::operator!=(const simpleArray<T>& other) const
-	{
-		simpleException::showCstr("Invalid use of comparison operator:  simpleArray.h");
-
-		return false;
-	}
-
-	template<typename T>
+	template<isHashable T>
 	size_t simpleArray<T>::getHash() const
 	{
 		size_t hash = 0;
@@ -277,7 +259,7 @@ namespace brogueHd::simple
 		return hash;
 	}
 
-	template<typename T>
+	template<isHashable T>
 	std::ostream& operator<<(std::ostream& stream, const simpleArray<T>& other)
 	{
 		for (int index = 0; index < other.count(); index++)
@@ -289,7 +271,7 @@ namespace brogueHd::simple
 		return stream;
 	}
 
-	template<typename T>
+	template<isHashable T>
 	std::istream& operator>>(std::istream& stream, simpleArray<T>& other)
 	{
 		// Compiler will try to build an instance of simpleArray<T> on the stack
@@ -308,7 +290,7 @@ namespace brogueHd::simple
 		return stream;
 	}
 
-	template<typename T>
+	template<isHashable T>
 	void simpleArray<T>::forEach(simpleArrayCallback<T> callback)
 	{
 		for (int index = 0; index < _count; index++)
@@ -318,7 +300,7 @@ namespace brogueHd::simple
 		}
 	}
 
-	template<typename T>
+	template<isHashable T>
 	bool simpleArray<T>::areAll(T value)
 	{
 		for (int index = 0; index < _count; index++)
@@ -329,7 +311,7 @@ namespace brogueHd::simple
 
 		return true;
 	}
-	template<typename T>
+	template<isHashable T>
 	bool simpleArray<T>::areAllWhere(simpleArrayPredicate<T> predicate)
 	{
 		for (int index = 0; index < _count; index++)
@@ -341,7 +323,7 @@ namespace brogueHd::simple
 		return true;
 	}
 
-	template<typename T>
+	template<isHashable T>
 	bool simpleArray<T>::contains(T item)
 	{
 		for (int index = 0; index < _count; index++)
@@ -354,7 +336,7 @@ namespace brogueHd::simple
 		return false;
 	}
 
-	template<typename T>
+	template<isHashable T>
 	template<typename TResult>
 	TResult simpleArray<T>::aggregate(TResult& seedValue, simpleArrayAggregate<T, TResult> aggregator)
 	{

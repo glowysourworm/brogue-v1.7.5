@@ -5,7 +5,7 @@
 
 namespace brogueHd::component
 {
-	template<typename TNode>
+	template<isHashable TNode>
 	struct graphEdge : hashable
 	{
 		TNode node1;
@@ -24,7 +24,7 @@ namespace brogueHd::component
 
 		virtual size_t getHash() const override
 		{
-			return 0;
+			return hashGenerator::generateHash(node1, node2);
 		}
 	};
 }

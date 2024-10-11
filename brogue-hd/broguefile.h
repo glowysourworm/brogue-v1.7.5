@@ -1,5 +1,6 @@
 #pragma once
 
+#include "simple.h"
 #include "brogueGlobal.h"
 #include "gameConstants.h"
 #include "simpleList.h"
@@ -15,7 +16,7 @@ namespace brogueHd::backend::model::io
 		char date[100];
 	} fileEntry;
 
-	struct brogueScoreEntry
+	struct brogueScoreEntry : hashable
 	{
 
 		long int score;
@@ -54,6 +55,16 @@ namespace brogueHd::backend::model::io
 			return result;
 		}
 
+		size_t getHash() const override
+		{
+			size_t hash = hashGenerator::generateHash(score, dateTime);
+
+			for (int index = 0; index < COLS; index++)
+				hash = hashGenerator::combineHash(hash, description[index]);
+
+			return hash;
+		}
+
 	};
 
 	/// <summary>
@@ -64,7 +75,7 @@ namespace brogueHd::backend::model::io
 		char outputCharacter;
 	} keyMap;
 
-	struct brogueEvent
+	struct brogueEvent : hashable
 	{
 
 		enum BrogueEventType eventType;
@@ -99,6 +110,10 @@ namespace brogueHd::backend::model::io
 			return result;
 		}
 
+		size_t getHash() const override
+		{
+			return hashGenerator::generateHash(eventType, param1, param2, controlKey, shiftKey);
+		}
 	};
 
 	struct brogueEventFile 

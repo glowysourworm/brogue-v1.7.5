@@ -28,53 +28,12 @@ namespace brogueHd::simple
 
     */
 
-    class hashGenerator
-    {
-    private:
-        template<typename T, typename ...Rest>
-        static void hash_combine(size_t& seed, const T& next, Rest... rest)
-        {
-            size_t nextHash = std::hash<T>{}(next);
-
-            seed = seed ^ (nextHash << 1);
-
-            (hash_combine(seed, rest), ...);
-        }
-
-    public:
-
-        template<typename ...T>
-        static size_t generateHash(const T&...values)
-        {
-            // Large Prime
-            size_t seed = 5999471;
-            (hash_combine(seed, values), ...);
-            return seed;
-        }
-
-        template<typename ...T>
-        static size_t combineHash(const size_t& hashValue, const T&...values)
-        {
-            size_t result = hashValue;
-            (hash_combine(result, values), ...);
-            return result;
-        }
-    };
-
     /// <summary>
     /// Class to extend std::hash functionality. Inherit and extend getHash().
     /// </summary>
     class hashableObject
     {
     public:
-        virtual bool operator==(const hashableObject& other) const
-        {
-            return false;
-        }
-        virtual bool operator!=(const hashableObject& other) const
-        {
-            return false;
-        }
         virtual size_t getHash() const
         {
             return 0;
@@ -86,39 +45,16 @@ namespace brogueHd::simple
     /// </summary>
     struct hashable
     {
-        virtual bool operator==(const hashable& other) const
-        {
-            return false;
-        }
-        virtual bool operator!=(const hashable& other) const
-        {
-            return false;
-        }
+    public:
         virtual size_t getHash() const
         {
             return 0;
         }
     };
 
-    // Hashable Declarations:  These will extend the std namespace to
-    //                         create hash code support for std::hash.
-    //                         You can either use unordered_map, or 
-    //                         your own std::hash container class.
-    // 
-    //                         Add these to the GLOBAL NAMESPACE (see brogueMacroDeclaration.h)
-    //
-    // MAKE_HASHABLE_CLASS(brogueHd::backend::model::brogueObject)
-    // MAKE_HASHABLE_STRUCT(brogueHd::backend::model::game::color)
-
-
-    /// <summary>
-    /// Instructs the iterator to either continue or break out of its loop
-    /// </summary>
-    enum iterationCallback
-    {
-        iterate = 0,
-        breakAndReturn = 1
-    };
+    /*
+        Concepts
+    */
 
     // Constraint that the type T must inherit from gridOperator<T>
     template<typename T>
@@ -132,15 +68,20 @@ namespace brogueHd::simple
     };
 
     template<typename T>
-    concept isNumber =
-        std::same_as<T, double> ||
-        std::same_as<T, float> ||
-        std::same_as<T, unsigned long> ||
-        std::same_as<T, long> ||
-        std::same_as<T, int> ||
-        std::same_as<T, unsigned int> ||
-        std::same_as<T, short> ||
-        std::same_as<T, size_t>;
+    concept isIntLike = std::same_as<T, unsigned long> ||
+                        std::same_as<T, long> ||
+                        std::same_as<T, int> ||
+                        std::same_as<T, unsigned int> ||
+                        std::same_as<T, short> ||
+                        std::same_as<T, unsigned short> ||
+                        std::same_as<T, size_t>;
+
+    template<typename T>
+    concept isFloatLike = std::same_as<T, double> ||
+                          std::same_as<T, float>;
+
+    template<typename T>
+    concept isNumber = isIntLike<T> || isFloatLike<T>;
 
     class simpleString;
 
@@ -153,9 +94,130 @@ namespace brogueHd::simple
         std::same_as<T, const char[]>;
 
     template<typename T>
+    concept isBool = std::same_as<T, bool>;
+
+    template<typename T>
+    concept isChar = std::same_as<T, char>;
+
+    template<typename T>
+    concept isPointer = std::is_pointer<T>::value;
+
+    template<typename T>
     concept isStringConvertible = isNumber<T> || isStringLike<T>;
 
+    // Use these as a crutch until compiler errors are fixed
+    template<typename T>
+    concept isHashableExplicit = std::same_as<T, simpleString>;
 
+    template<typename T>
+    concept isHashable = isHashableExplicit<T> ||
+                         std::convertible_to<T, hashable> ||
+                         std::convertible_to<T, hashableObject> ||
+                         isNumber<T> ||
+                         isPointer<T> ||
+                         isChar<T>;
+
+    class hashGenerator
+    {
+    private:
+
+        template<isHashable...Rest>
+        static void hash_combine(size_t& seed, const hashable& next, Rest... rest)
+        {
+            // isHashable<T>
+            size_t nextHash = next.getHash();
+
+            seed = seed ^ (nextHash << 1);
+
+            (hash_combine(seed, rest), ...);
+        }
+
+        template<isHashable...Rest>
+        static void hash_combine(size_t& seed, const hashableObject& next, Rest... rest)
+        {
+            // isHashable<T>
+            size_t nextHash = next.getHash();
+
+            seed = seed ^ (nextHash << 1);
+
+            (hash_combine(seed, rest), ...);
+        }
+
+        template<isNumber T, isHashable...Rest>
+        static void hash_combine(size_t& seed, const T& next, Rest... rest)
+        {
+            // isNumber<T>
+            size_t nextHash = std::hash<T>{}(next);
+
+            seed = seed ^ (nextHash << 1);
+
+            (hash_combine(seed, rest), ...);
+        }
+
+        template<isChar T, isHashable...Rest>
+        static void hash_combine(size_t& seed, const T& next, Rest...rest)
+        {
+            // isChar<T>
+            size_t nextHash = std::hash<T>{}(next);
+
+            seed = seed ^ (nextHash << 1);
+
+            (hash_combine(seed, rest), ...);
+        }
+
+        template<isBool T, isHashable...Rest>
+        static void hash_combine(size_t& seed, const T& next, Rest...rest)
+        {
+            // isBool<T>
+            size_t nextHash = std::hash<T>{}(next);
+
+            seed = seed ^ (nextHash << 1);
+
+            (hash_combine(seed, rest), ...);
+        }
+
+        template<isPointer T, isHashable...Rest>
+        static void hash_combine(size_t& seed, const T& next, Rest...rest)
+        {
+            // isPointer<T>
+            std::uintptr_t ptrValue = reinterpret_cast<std::uintptr_t>(next);
+
+            size_t nextHash = std::hash<uintptr_t>{}(ptrValue);
+
+            seed = seed ^ (nextHash << 1);
+
+            (hash_combine(seed, rest), ...);
+        }
+
+    public: // These methods will look for the above overloads, variadically... ... ...
+
+        template<isHashable ...T>
+        static size_t generateHash(const T&...values)
+        {
+            // Large Prime
+            size_t seed = 5999471;
+            (hash_combine(seed, values), ...);
+            return seed;
+        }
+
+        template<isHashable ...T>
+        static size_t combineHash(const size_t& hashValue, const T&...values)
+        {
+            size_t result = hashValue;
+            (hash_combine(result, values), ...);
+            return result;
+        }
+    };
+
+
+    /// <summary>
+    /// Instructs the iterator to either continue or break out of its loop
+    /// </summary>
+    enum iterationCallback
+    {
+        iterate = 0,
+        breakAndReturn = 1
+    };
 }
 
 /*
@@ -164,28 +226,28 @@ namespace brogueHd::simple
 
 */
 
-#define COMMA   ,
-
-#define MAKE_HASHABLE_CLASS(hashableClass)                          \
-    namespace std                                                   \
-    {                                                               \
-        template<> struct hash<hashableClass>                       \
-        {                                                           \
-            size_t operator()(const hashableClass &theObject) const \
-            {                                                       \
-                return theObject.getHash();                         \
-            }                                                       \
-        };                                                          \
-    }                                                               
-
-#define MAKE_HASHABLE_STRUCT(type)                                  \
-    namespace std                                                   \
-    {                                                               \
-        template<> struct hash<type>                                \
-        {                                                           \
-            size_t operator()(const type &theObject) const          \
-            {                                                       \
-                return theObject.getHash();                         \
-            }                                                       \
-        };                                                          \
-    }                                                               
+//#define COMMA   ,
+//
+//#define MAKE_HASHABLE_CLASS(hashableClass)                          \
+//    namespace std                                                   \
+//    {                                                               \
+//        template<> struct hash<hashableClass>                       \
+//        {                                                           \
+//            size_t operator()(const hashableClass &theObject) const \
+//            {                                                       \
+//                return theObject.getHash();                         \
+//            }                                                       \
+//        };                                                          \
+//    }                                                               \
+//
+//#define MAKE_HASHABLE_STRUCT(type)                                  \
+//    namespace std                                                   \
+//    {                                                               \
+//        template<> struct hash<type>                                \
+//        {                                                           \
+//            size_t operator()(const type &theObject) const          \
+//            {                                                       \
+//                return theObject.getHash();                         \
+//            }                                                       \
+//        };                                                          \
+//    }                                                               \

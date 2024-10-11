@@ -27,5 +27,17 @@ namespace brogueHd::backend::model::layout
 		gridLocator connectionPointW;
 
 		gridRegion<gridLocator>* region;
+
+		size_t getHash() const override
+		{
+			return hashGenerator::generateHash(hasNorthConnection, 
+											   hasSouthConnection, 
+											   hasEastConnection, 
+											   hasWestConnection, 
+											   connectionPointN,
+											   connectionPointS, 
+											   connectionPointE, 
+											   connectionPointW);
+		}
 	};
 }

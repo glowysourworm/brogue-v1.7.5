@@ -30,37 +30,35 @@ namespace brogueHd::simple
 
 			return x;
 		}
-		static TMath minOf(TMath x, TMath y, TMath z)
+		template<isNumber...Args>
+		static TMath maxOf(TMath x, Args...args)
 		{
-			if (x <= y)
-				return minOf(x, z);
+			if (sizeof...(args) > 1)
+				return maxOf(x, args...);
 
-			return minOf(y, z);
-		}
-		static TMath maxOf(TMath x, TMath y)
-		{
-			if (x > y)
-				return x;
+			else if (sizeof...(args) > 0)
+				return x > args;
 
-			return y;
-		}
-		static TMath maxOf(TMath x, TMath y, TMath z)
-		{
-			if (x > y)
-				return maxOf(x, z);
-
-			return maxOf(y, z);
+			return x;
 		}
 		static TMath sqrt(TMath x)
 		{
-			if (std::is_same<TMath, double>())
-				return sqrt(static_cast<double>(x));
-
-			else if (std::is_same<TMath, float>())
+			if (isFloatLike<TMath>{}())
 				return sqrtf(static_cast<float>(x));
 
-			else if (std::is_convertible<TMath, int>())
-				return sqrtl(x);
+			else if (isIntLike<TMath>{}())
+				return sqrt(x);
+
+			else
+				simpleException::showCstr("Unknown sqrt type simpleMath.h");
+		}
+		static TMath exp(TMath x)
+		{
+			if (isFloatLike<TMath>{}())
+				return expf(static_cast<float>(x));
+
+			else if (isIntLike<TMath>{}())
+				return exp(x);
 
 			else
 				simpleException::showCstr("Unknown sqrt type simpleMath.h");

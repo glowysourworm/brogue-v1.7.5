@@ -21,11 +21,31 @@ namespace brogueHd::simple
 		}
 
 		template<isNumber T>
+		static void show(const char* formatStr, const T& param)
+		{
+			simpleString result(formatStr);
+
+			result.replaceFirst("{}", simpleString::toStringNumber(param));
+
+			simpleException::show(result);
+		}
+
+		template<isNumber T>
 		static void show(const simpleString& formatStr, const T& param)
 		{
 			simpleString result = formatStr;
 
 			result.replaceFirst("{}", simpleString::toStringNumber(param));
+
+			simpleException::show(result);
+		}
+
+		template<isStringLike T>
+		static void show(const char* formatStr, const T& param)
+		{
+			simpleString result(formatStr);
+
+			result.replaceFirst("{}", simpleString(param));
 
 			simpleException::show(result);
 		}

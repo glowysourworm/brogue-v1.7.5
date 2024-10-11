@@ -64,7 +64,7 @@ using namespace brogueHd::simple;
     }
 
 // The EnumString base class
-template <class EnumType>
+template <isHashable EnumType>
 struct simpleEnumString
 {
 public:
@@ -84,6 +84,10 @@ public:
         delete DescriptionLookup;
     }
 
+    static void Register()
+    {
+
+    }
 
     // Use this helper function to register each enumerator
     // and its string representation.
@@ -133,7 +137,7 @@ protected:
     simpleHash<EnumType, simpleString>* DescriptionLookup;
 };
 
-template <typename EnumTypeA>
+template <isHashable EnumTypeA>
 struct EnumString : simpleEnumString<EnumTypeA>
 {
     static void Register()

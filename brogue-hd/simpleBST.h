@@ -8,7 +8,7 @@ namespace brogueHd::simple
     // Stole this implementation:  This should be a balanced BST. The implementation looks
     //                             clean enough; and will be changed if there are any issues.
 
-    template<isComparable K, typename T>
+    template<isHashable K, typename T>
     struct simpleBSTNode
     {
         simpleBSTNode<K, T>* left;
@@ -51,7 +51,7 @@ namespace brogueHd::simple
     /// </summary>
     /// <typeparam name="K">Key type</typeparam>
     /// <typeparam name="T">Node type</typeparam>
-    template<isComparable K, typename T>
+    template<isHashable K, typename T>
     class simpleBST
     {
     public:
@@ -107,7 +107,7 @@ namespace brogueHd::simple
         simpleHash<K, simpleBSTNode<K, T>*>* _nodeMap;
     };
 
-    template<isComparable K, typename T>
+    template<isHashable K, typename T>
     simpleBST<K, T>::simpleBST()
     {
         // Track values to boost performance for direct lookups
@@ -116,7 +116,7 @@ namespace brogueHd::simple
         _root = NULL;
     }
 
-    template<isComparable K, typename T>
+    template<isHashable K, typename T>
     simpleBST<K, T>::~simpleBST()
     {
         this->clear();
@@ -124,7 +124,7 @@ namespace brogueHd::simple
         delete _nodeMap;
     }
 
-    template<isComparable K, typename T>
+    template<isHashable K, typename T>
     void simpleBST<K, T>::clear()
     {
         // Delete nodes recursively
@@ -134,7 +134,7 @@ namespace brogueHd::simple
         _nodeMap->clear();
     }
 
-    template<isComparable K, typename T>
+    template<isHashable K, typename T>
     void simpleBST<K, T>::insert(K key, T value)
     {
         // Insert value into the tree -> Rebalance the tree
@@ -147,7 +147,7 @@ namespace brogueHd::simple
         _nodeMap->set(key, node);
     }
 
-    template<isComparable K, typename T>
+    template<isHashable K, typename T>
     T simpleBST<K, T>::remove(K key)
     {
         if (!_nodeMap->contains(key))
@@ -165,19 +165,19 @@ namespace brogueHd::simple
         return item;
     }
 
-    template<isComparable K, typename T>
+    template<isHashable K, typename T>
     int simpleBST<K, T>::count() const
     {
         return _nodeMap->count();
     }
 
-    template<isComparable K, typename T>
+    template<isHashable K, typename T>
     bool simpleBST<K, T>::containsKey(K key)
     {
         return _nodeMap->contains(key);
     }
 
-    template<isComparable K, typename T>
+    template<isHashable K, typename T>
     void simpleBST<K, T>::iterate(simpleHashCallback<K, T> callback) const
     {
         _nodeMap->iterate([&callback](K key, simpleBSTNode<K, T>* node)
@@ -186,7 +186,7 @@ namespace brogueHd::simple
             });
     }
 
-    template<isComparable K, typename T>
+    template<isHashable K, typename T>
     T simpleBST<K, T>::get(K key)
     {
         // Utilize dictionary for O(1) lookup
@@ -197,7 +197,7 @@ namespace brogueHd::simple
             simpleException::showCstr("Trying to retrieve hash-backed node from BST without checking");
     }
 
-    template<isComparable K, typename T>
+    template<isHashable K, typename T>
     T simpleBST<K, T>::search(K key)
     {
         // Utilize dictionary for O(1) lookup
@@ -212,7 +212,7 @@ namespace brogueHd::simple
         return NULL;
     }
 
-    template<isComparable K, typename T>
+    template<isHashable K, typename T>
     simpleBSTNode<K, T>* simpleBST<K, T>::successor(K searchKey)
     {
         if (!_nodeMap->contains(searchKey))
@@ -221,7 +221,7 @@ namespace brogueHd::simple
         return this->successorImpl(searchKey, _root, NULL);
     }
 
-    template<isComparable K, typename T>
+    template<isHashable K, typename T>
     simpleBSTNode<K, T>* simpleBST<K, T>::predecessor(K searchKey)
     {
         if (!_nodeMap->contains(searchKey))
@@ -230,7 +230,7 @@ namespace brogueHd::simple
         return this->predecessorImpl(searchKey, _root, NULL);
     }
 
-    template<isComparable K, typename T>
+    template<isHashable K, typename T>
     T simpleBST<K, T>::min()
     {
         simpleBSTNode<K, T>* result = this->minImpl(_root);
@@ -242,7 +242,7 @@ namespace brogueHd::simple
             return result->value;
     }
 
-    template<isComparable K, typename T>
+    template<isHashable K, typename T>
     K simpleBST<K, T>::minKey()
     {
         simpleBSTNode<K, T>* minNode = this->minImpl(_root);
@@ -254,7 +254,7 @@ namespace brogueHd::simple
             return minNode->key;
     }
 
-    template<isComparable K, typename T>
+    template<isHashable K, typename T>
     T simpleBST<K, T>::max()
     {
         simpleBSTNode<K, T>* result = this->maxImpl(_root);
@@ -266,7 +266,7 @@ namespace brogueHd::simple
             return result->value;
     }
 
-    template<isComparable K, typename T>
+    template<isHashable K, typename T>
     K simpleBST<K, T>::maxKey()
     {
         simpleBSTNode<K, T>* maxNode = this->maxImpl(_root);
@@ -278,7 +278,7 @@ namespace brogueHd::simple
             return maxNode->key;
     }
 
-    template<isComparable K, typename T>
+    template<isHashable K, typename T>
     simpleBSTNode<K, T>* simpleBST<K, T>::insertImpl(simpleBSTNode<K, T>* node, K key, T value)
     {
         if (node == NULL)
@@ -304,7 +304,7 @@ namespace brogueHd::simple
         return this->balance(node);
     }
 
-    template<isComparable K, typename T>
+    template<isHashable K, typename T>
     simpleBSTNode<K, T>* simpleBST<K, T>::removalImpl(simpleBSTNode<K, T>* node, K key)
     {
         // Procedure:  https://algs4.cs.princeton.edu/code/edu/princeton/cs/algs4/AVLTreeST.java.html
@@ -345,7 +345,7 @@ namespace brogueHd::simple
         return this->balance(node);
     }
 
-    template<isComparable K, typename T>
+    template<isHashable K, typename T>
     simpleBSTNode<K, T>* simpleBST<K, T>::deleteMin(simpleBSTNode<K, T>* node)
     {
         if (node->left == NULL)
@@ -360,7 +360,7 @@ namespace brogueHd::simple
         return this->balance(node);
     }
 
-    template<isComparable K, typename T>
+    template<isHashable K, typename T>
     simpleBSTNode<K, T>* simpleBST<K, T>::minImpl(simpleBSTNode<K, T>* node)
     {
         if (node == NULL)
@@ -369,7 +369,7 @@ namespace brogueHd::simple
         return this->minImpl(node->left) != NULL ? node : NULL;
     }
 
-    template<isComparable K, typename T>
+    template<isHashable K, typename T>
     simpleBSTNode<K, T>* simpleBST<K, T>::maxImpl(simpleBSTNode<K, T>* node)
     {
         if (node == NULL)
@@ -378,7 +378,7 @@ namespace brogueHd::simple
         return this->maxImpl(node->right) != NULL ? node : NULL;
     }
 
-    template<isComparable K, typename T>
+    template<isHashable K, typename T>
     simpleBSTNode<K, T>* simpleBST<K, T>::searchImpl(K key, simpleBSTNode<K, T>* node)
     {
         if (node == NULL)
@@ -396,7 +396,7 @@ namespace brogueHd::simple
             return node;
     }
 
-    template<isComparable K, typename T>
+    template<isHashable K, typename T>
     simpleBSTNode<K, T>* simpleBST<K, T>::successorImpl(K key, simpleBSTNode<K, T>* node, simpleBSTNode<K, T>* savedParent)
     {
         // Recursively look for the search key's node - keeping track of the last parent with a LEFT child. This 
@@ -432,7 +432,7 @@ namespace brogueHd::simple
         }
     }
 
-    template<isComparable K, typename T>
+    template<isHashable K, typename T>
     simpleBSTNode<K, T>* simpleBST<K, T>::predecessorImpl(K key, simpleBSTNode<K, T>* node, simpleBSTNode<K, T>* savedParent)
     {
         // Recursively look for the search key's node - keeping track of the last parent with a RIGHT child. This 
@@ -468,7 +468,7 @@ namespace brogueHd::simple
         }
     }
 
-    template<isComparable K, typename T>
+    template<isHashable K, typename T>
     simpleBSTNode<K, T>* simpleBST<K, T>::balance(simpleBSTNode<K, T>* node)
     {
         // Procedure - https://en.wikipedia.org/wiki/AVL_tree
@@ -506,7 +506,7 @@ namespace brogueHd::simple
         return node;
     }
 
-    template<isComparable K, typename T>
+    template<isHashable K, typename T>
     simpleBSTNode<K, T>* simpleBST<K, T>::rotateLeft(simpleBSTNode<K, T>* subTree)
     {
         // Procedure - https://en.wikipedia.org/wiki/AVL_tree
@@ -541,7 +541,7 @@ namespace brogueHd::simple
         return Z;
     }
 
-    template<isComparable K, typename T>
+    template<isHashable K, typename T>
     simpleBSTNode<K, T>* simpleBST<K, T>::rotateRight(simpleBSTNode<K, T>* node)
     {
         // Procedure - https://en.wikipedia.org/wiki/AVL_tree

@@ -5,7 +5,7 @@
 	will work better with our backend:  vec2, vec4, ...
 */
 
-#include "brogueGlobal.h"
+#include "simple.h"
 #include "simpleDataStream.h"
 #include "simpleArray.h"
 #include "gl.h"
@@ -14,7 +14,7 @@ using namespace brogueHd::simple;
 
 namespace brogueHd::frontend::opengl
 {
-	struct simpleGlData
+	struct simpleGlData : hashable
 	{
 	public:
 
@@ -34,9 +34,14 @@ namespace brogueHd::frontend::opengl
 		{
 
 		}
+
+		size_t getHash() const override
+		{
+			return 0;
+		}
 	};
 
-	struct vec2
+	struct vec2 : hashable
 	{
 		float x;
 		float y;
@@ -47,9 +52,13 @@ namespace brogueHd::frontend::opengl
 			x = ax;
 			y = ay;
 		}
+		size_t getHash() const override
+		{
+			return hashGenerator::generateHash(x, y);
+		}
 	};
 
-	struct vec4
+	struct vec4 : hashable
 	{
 		float x;
 		float y;
@@ -63,6 +72,10 @@ namespace brogueHd::frontend::opengl
 			y = ay;
 			z = az;
 			w = aw;
+		}
+		size_t getHash() const override
+		{
+			return hashGenerator::generateHash(x, y, z, w);
 		}
 	};
 
@@ -103,6 +116,7 @@ namespace brogueHd::frontend::opengl
 				return 4;
 			default:
 				simpleException::show("Unhandled primitive type for GLQuad:  {}", primitiveType);
+				break;
 			}
 		}
 		int getStreamSize() override
@@ -122,10 +136,14 @@ namespace brogueHd::frontend::opengl
 			outputStream.write(left);
 			outputStream.write(bottom);
 		}
+		size_t getHash() const override
+		{
+			return hashGenerator::generateHash(left, top, right, bottom);
+		}
 	};
 
-	template<typename T>
-	struct uniformData
+	template<isHashable T>
+	struct uniformData : hashable
 	{
 		uniformData(){}
 		uniformData(const simpleString& aname, GLenum atype)
@@ -142,9 +160,14 @@ namespace brogueHd::frontend::opengl
 		/// NOTE:  Can also be the index of the texture! used for sampler2D
 		/// </summary>
 		T value;
+
+		size_t getHash() const override
+		{
+			return hashGenerator::generateHash(name, type, value);
+		}
 	};
 
-	struct vertexAttributeData
+	struct vertexAttributeData : hashable
 	{
 		vertexAttributeData()
 		{
@@ -179,6 +202,11 @@ namespace brogueHd::frontend::opengl
 		/// Type of input data for the shader - this would be some sort of GLSL supported data type.
 		/// </summary>
 		GLenum type;
+
+		size_t getHash() const override
+		{
+			return hashGenerator::generateHash(name, type, index);
+		}
 
 	private:
 

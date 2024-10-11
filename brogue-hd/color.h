@@ -8,7 +8,6 @@ namespace brogueHd::backend::model::game
 {
 	struct color : hashable
 	{
-
 		// base RGB components:
 		short red;
 		short green;
@@ -80,7 +79,7 @@ namespace brogueHd::backend::model::game
 
 		size_t getHash() const
 		{
-			return 0;
+			return hashGenerator::generateHash(red, green, blue, redRand, greenRand, blueRand, rand, colorDances);
 		}
 	};
 }

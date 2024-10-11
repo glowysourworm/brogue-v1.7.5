@@ -57,7 +57,7 @@ namespace brogueHd::component
 
 		virtual size_t getHash() const
 		{
-			return 0;
+			return hashGenerator::generateHash(node1, node2);
 		}
 	};
 }

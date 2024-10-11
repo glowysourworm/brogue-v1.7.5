@@ -9,7 +9,7 @@ namespace brogueHd::simple
 	{		
 	public:
 
-		template<typename T>
+		template<isHashable T>
 		static simpleArray<T> whereArray(const simpleArray<T>& input, simpleArrayPredicate<T> predicate)
 		{
 			simpleList<T> result;
@@ -23,7 +23,7 @@ namespace brogueHd::simple
 			return simpleArray<T>(result.toArray());
 		}
 
-		template<typename T, typename TResult>
+		template<isHashable T, typename TResult>
 		static simpleArray<TResult> select(const simpleArray<T>& input, simpleArraySelector<T, TResult> selector)
 		{
 			int count = input.count();

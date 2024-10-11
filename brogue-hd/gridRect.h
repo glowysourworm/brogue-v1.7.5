@@ -10,7 +10,7 @@ namespace brogueHd::component
 	/// </summary>
 	using gridRectIterator = std::function<iterationCallback(short column, short row)>;
 
-	struct gridRect
+	struct gridRect : hashable
 	{
 	public:
 		short column;
@@ -56,6 +56,10 @@ namespace brogueHd::component
 				   row != rect.row ||
 				   width != rect.width ||
 				   height != rect.height;
+		}
+		size_t getHash() const override
+		{
+			hashGenerator::generateHash(column, row, width, height);
 		}
 
 		static gridRect fromCircle(short centerColumn, short centerRow, short radiusX, short radiusY)

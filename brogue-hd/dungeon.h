@@ -1,7 +1,9 @@
 #pragma once
 
+#include "simple.h"
 #include "dungeonConstants.h"
 
+using namespace brogueHd::simple;
 using namespace brogueHd::backend::modelConstant;
 
 namespace brogueHd::backend::model::game
@@ -31,7 +33,7 @@ namespace brogueHd::backend::model::game
 
 	*/
 
-	struct brogueRoomInfo
+	struct brogueRoomInfo : hashable
 	{
 		roomTypes type;
 		short frequency;
@@ -57,6 +59,11 @@ namespace brogueHd::backend::model::game
 			return type != info.type ||
 				   frequency != info.frequency ||
 				   corridorChance != info.corridorChance;
+		}
+
+		size_t getHash() const override
+		{
+			return hashGenerator::generateHash(type, frequency, corridorChance);
 		}
 	};
 }

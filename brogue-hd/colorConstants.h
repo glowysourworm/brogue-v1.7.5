@@ -18,7 +18,7 @@ namespace brogueHd::backend::modelConstant
 		bInterface = 9
 	};
 
-	enum gameColors
+	enum gameColors : int
 	{
 		white,
 		gray,

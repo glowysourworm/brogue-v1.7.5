@@ -1,5 +1,6 @@
 #pragma once
 
+#include "simple.h"
 #include "simpleException.h"
 #include "colorString.h"
 
@@ -7,7 +8,7 @@ using namespace brogueHd::simple;
 
 namespace brogueHd::backend::model::game
 {
-	struct messageData
+	struct messageData : hashable
 	{
 		colorString message;
 		bool confirmed;
@@ -33,6 +34,10 @@ namespace brogueHd::backend::model::game
 		{
 			message.updateAll(amessage, atextColor);
 			confirmed = aconfirmed;
+		}
+		size_t getHash() const override
+		{
+			return hashGenerator::generateHash(message, confirmed);
 		}
 	};
 }

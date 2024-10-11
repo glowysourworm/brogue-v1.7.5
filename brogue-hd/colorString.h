@@ -1,13 +1,13 @@
 #pragma once
 
+#include "simple.h"
 #include "color.h"
 #include "brogueGlobal.h"
 
 namespace brogueHd::backend::model::game
 {
-	struct colorString 
+	struct colorString : hashable
 	{
-
 		char theString[COLS * 2];
 		color theColors[COLS * 2];
 
@@ -33,6 +33,22 @@ namespace brogueHd::backend::model::game
 				theString[index] = message[index];
 				theColors[index] = foreColor;
 			}
+		}
+
+		size_t getHash() const override
+		{
+			size_t hash = 0;
+
+			for (int index = 0; index < COLS * 2; index++)
+			{
+				if (hash == 0)
+					hash = hashGenerator::generateHash(theString[index], theColors[index]);
+
+				else
+					hash = hashGenerator::combineHash(hash, theString[index], theColors[index]);
+			}
+
+			return hash;
 		}
 	};
 }

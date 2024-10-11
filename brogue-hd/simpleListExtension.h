@@ -5,7 +5,7 @@
 
 namespace brogueHd::component
 {
-	template<typename T>
+	template<isHashable T>
 	class simpleListExtension
 	{
 	public:

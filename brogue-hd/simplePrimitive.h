@@ -1,11 +1,13 @@
 #pragma once
 
-#include "brogueGlobal.h"
+#include "simple.h"
 #include "gl.h"
+
+using namespace brogueHd::simple;
 
 namespace brogueHd::frontend::opengl
 {
-	class simplePrimitive
+	class simplePrimitive : public hashableObject
 	{
 
     public:
@@ -59,6 +61,11 @@ namespace brogueHd::frontend::opengl
         GLuint getHandle() const
         {
             return handle;
+        }
+
+        virtual size_t getHash() const override
+        {
+            return 0;   // These handles are from the GL backend; and are usually 0, 1, 2, ...
         }
 
     protected:

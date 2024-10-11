@@ -28,21 +28,21 @@ using namespace brogueHd::backend::modelConstant;
 
 //MAKE_HASHABLE_CLASS(brogueHd::simple::simpleArray<short>);
 //MAKE_HASHABLE_CLASS(brogueHd::simple::simpleArray<int>);
-MAKE_HASHABLE_CLASS(brogueHd::simple::simpleArray<char>);
-//MAKE_HASHABLE_CLASS(brogueHd::simple::simpleArray<float>);
-//MAKE_HASHABLE_CLASS(brogueHd::simple::simpleArray<double>);
-MAKE_HASHABLE_CLASS(brogueHd::simple::simpleArray<brogueHd::simple::simpleString>);
-MAKE_HASHABLE_CLASS(brogueHd::simple::simpleList<brogueHd::simple::simpleString>);
-//MAKE_HASHABLE_STRUCT(SINGLE_ARG(brogueHd::simple::simplePair<brogueHd::simple::simpleString,brogueHd::simple::simpleString>));
-MAKE_HASHABLE_CLASS(brogueHd::simple::simpleString);
-MAKE_HASHABLE_CLASS(brogueHd::backend::model::brogueObject)
-MAKE_HASHABLE_STRUCT(brogueHd::backend::model::layout::brogueCellDisplay)
-MAKE_HASHABLE_STRUCT(brogueHd::backend::model::game::color)
-MAKE_HASHABLE_STRUCT(brogueHd::simple::simplePoint<short>)
-MAKE_HASHABLE_STRUCT(brogueHd::component::graphEdge<gridLocator>)
-MAKE_HASHABLE_STRUCT(brogueHd::component::graphNode)
-MAKE_HASHABLE_STRUCT(brogueHd::component::gridLocator)
-MAKE_HASHABLE_STRUCT(brogueHd::component::gridLocatorEdge)
+//MAKE_HASHABLE_CLASS(brogueHd::simple::simpleArray<char>);
+////MAKE_HASHABLE_CLASS(brogueHd::simple::simpleArray<float>);
+////MAKE_HASHABLE_CLASS(brogueHd::simple::simpleArray<double>);
+//MAKE_HASHABLE_CLASS(brogueHd::simple::simpleArray<brogueHd::simple::simpleString>);
+//MAKE_HASHABLE_CLASS(brogueHd::simple::simpleList<brogueHd::simple::simpleString>);
+////MAKE_HASHABLE_STRUCT(SINGLE_ARG(brogueHd::simple::simplePair<brogueHd::simple::simpleString,brogueHd::simple::simpleString>));
+//MAKE_HASHABLE_CLASS(brogueHd::simple::simpleString);
+//MAKE_HASHABLE_CLASS(brogueHd::backend::model::brogueObject)
+//MAKE_HASHABLE_STRUCT(brogueHd::backend::model::layout::brogueCellDisplay)
+//MAKE_HASHABLE_STRUCT(brogueHd::backend::model::game::color)
+//MAKE_HASHABLE_STRUCT(brogueHd::simple::simplePoint<short>)
+//MAKE_HASHABLE_STRUCT(brogueHd::component::graphEdge<gridLocator>)
+//MAKE_HASHABLE_STRUCT(brogueHd::component::graphNode)
+//MAKE_HASHABLE_STRUCT(brogueHd::component::gridLocator)
+//MAKE_HASHABLE_STRUCT(brogueHd::component::gridLocatorEdge)
 
 // Macro Enum Definitions:  Used for string <-> value methods EnumString<...>::To and EnumString<...>::From
 
