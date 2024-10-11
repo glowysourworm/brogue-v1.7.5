@@ -46,406 +46,476 @@ using namespace brogueHd::backend::modelConstant;
 
 // Macro Enum Definitions:  Used for string <-> value methods EnumString<...>::To and EnumString<...>::From
 
-#pragma region colorConstants.h
+Register_Enum(colorCollections)
+	Declare_Enum_Name(colorCollections)
+		Enum_Name(colorCollections, game)
+		Enum_Name(colorCollections, bolt)
+		Enum_Name(colorCollections, tile)
+		Enum_Name(colorCollections, creature)
+		Enum_Name(colorCollections, light)
+		Enum_Name(colorCollections, flare)
+		Enum_Name(colorCollections, multipliers)
+		Enum_Name(colorCollections, blood)
+		Enum_Name(colorCollections, gas)
+		Enum_Name(colorCollections, bInterface)
+	End_Enum_Name;
+End_Enum;
 
-//Begin_Enum_String(colorCollections)
-//{
-//	Enum_String(game);
-//	Enum_String(bolt);
-//	Enum_String(tile);
-//	Enum_String(creature);
-//	Enum_String(light);
-//	Enum_String(flare);
-//	Enum_String(multipliers);
-//	Enum_String(blood);
-//	Enum_String(gas);
-//	Enum_String(bInterface);
-//}
-//End_Enum_String;
+Register_Enum(gameColors)
+	Declare_Enum_Name(gameColors)
+		Enum_Name(gameColors, white)
+		Enum_Name(gameColors, gray)
+		Enum_Name(gameColors, darkGray)
+		Enum_Name(gameColors, veryDarkGray)
+		Enum_Name(gameColors, black)
+		Enum_Name(gameColors, yellow)
+		Enum_Name(gameColors, darkYellow)
+		Enum_Name(gameColors, teal)
+		Enum_Name(gameColors, purple)
+		Enum_Name(gameColors, darkPurple)
+		Enum_Name(gameColors, brown)
+		Enum_Name(gameColors, green)
+		Enum_Name(gameColors, darkGreen)
+		Enum_Name(gameColors, orange)
+		Enum_Name(gameColors, darkOrange)
+		Enum_Name(gameColors, blue)
+		Enum_Name(gameColors, darkBlue)
+		Enum_Name(gameColors, darkTurquoise)
+		Enum_Name(gameColors, lightBlue)
+		Enum_Name(gameColors, pink)
+		Enum_Name(gameColors, red)
+		Enum_Name(gameColors, darkRed)
+		Enum_Name(gameColors, tanColor)
+	End_Enum_Name;
+End_Enum;
 
-Begin_Enum_String(gameColors)
-{
-	Enum_String(white);
-	Enum_String(gray);
-	Enum_String(darkGray);
-	Enum_String(veryDarkGray);
-	Enum_String(black);
-	Enum_String(yellow);
-	Enum_String(darkYellow);
-	Enum_String(teal);
-	Enum_String(purple);
-	Enum_String(darkPurple);
-	Enum_String(brown);
-	Enum_String(green);
-	Enum_String(darkGreen);
-	Enum_String(orange);
-	Enum_String(darkOrange);
-	Enum_String(blue);
-	Enum_String(darkBlue);
-	Enum_String(darkTurquoise);
-	Enum_String(lightBlue);
-	Enum_String(pink);
-	Enum_String(red);
-	Enum_String(darkRed);
-	Enum_String(tanColor);
-}
-End_Enum_String;
+Register_Enum(boltColors)
+	Declare_Enum_Name(boltColors)
+		Enum_Name(boltColors, rainbow)
+		Enum_Name(boltColors, descentBoltColor)
+		Enum_Name(boltColors, discordColor)
+		Enum_Name(boltColors, poisonColor)
+		Enum_Name(boltColors, beckonColor)
+		Enum_Name(boltColors, invulnerabilityColor)
+		Enum_Name(boltColors, dominationColor)
+		Enum_Name(boltColors, empowermentColor)
+		Enum_Name(boltColors, fireBoltColor)
+		Enum_Name(boltColors, yendorLightColor)
+		Enum_Name(boltColors, dragonFireColor)
+		Enum_Name(boltColors, flamedancerCoronaColor)
+		Enum_Name(boltColors, shieldingColor)
+	End_Enum_Name;
+End_Enum;
 
-Begin_Enum_String(boltColors)
-{
-	Enum_String(rainbow);
-	Enum_String(descentBoltColor);
-	Enum_String(discordColor);
-	Enum_String(poisonColor);
-	Enum_String(beckonColor);
-	Enum_String(invulnerabilityColor);
-	Enum_String(dominationColor);
-	Enum_String(empowermentColor);
-	Enum_String(fireBoltColor);
-	Enum_String(yendorLightColor);
-	Enum_String(dragonFireColor);
-	Enum_String(flamedancerCoronaColor);
-	Enum_String(shieldingColor);
-}
-End_Enum_String;
+Register_Enum(tileColors)
+	Declare_Enum_Name(tileColors)
+		Enum_Name(tileColors, undiscoveredColor)
+		Enum_Name(tileColors, wallForeColor)
+		Enum_Name(tileColors, wallBackColorStart)
+		Enum_Name(tileColors, wallBackColorEnd)
 
-Begin_Enum_String(tileColors)
-{
-	Enum_String(undiscoveredColor);
-	Enum_String(wallForeColor);
-	Enum_String(wallBackColorStart);
-	Enum_String(wallBackColorEnd);
+		Enum_Name(tileColors, mudWallForeColor)
+		Enum_Name(tileColors, mudWallBackColor)
+		Enum_Name(tileColors, graniteBackColor)
+		Enum_Name(tileColors, floorForeColor)
 
-	Enum_String(mudWallForeColor);
-	Enum_String(mudWallForeColor);
-	Enum_String(mudWallBackColor);
-	Enum_String(graniteBackColor);
-	Enum_String(floorForeColor);
+		Enum_Name(tileColors, floorBackColorStart)
+		Enum_Name(tileColors, floorBackColorEnd)
 
-	Enum_String(floorBackColorStart);
-	Enum_String(floorBackColorEnd);
+		Enum_Name(tileColors, stairsBackColor)
+		Enum_Name(tileColors, firstStairsBackColor)
 
-	Enum_String(stairsBackColor);
-	Enum_String(firstStairsBackColor);
+		Enum_Name(tileColors, refuseBackColor)
+		Enum_Name(tileColors, rubbleBackColor)
+		Enum_Name(tileColors, bloodflowerForeColor)
+		Enum_Name(tileColors, bloodflowerPodForeColor)
+		Enum_Name(tileColors, bloodflowerBackColor)
+		Enum_Name(tileColors, bedrollBackColor)
 
-	Enum_String(refuseBackColor);
-	Enum_String(rubbleBackColor);
-	Enum_String(bloodflowerForeColor);
-	Enum_String(bloodflowerPodForeColor);
-	Enum_String(bloodflowerBackColor);
-	Enum_String(bedrollBackColor);
+		Enum_Name(tileColors, obsidianBackColor)
+		Enum_Name(tileColors, carpetForeColor)
+		Enum_Name(tileColors, carpetBackColor)
+		Enum_Name(tileColors, marbleForeColor)
+		Enum_Name(tileColors, marbleBackColor)
+		Enum_Name(tileColors, doorForeColor)
+		Enum_Name(tileColors, doorBackColor)
+		Enum_Name(tileColors, ironDoorForeColor)
+		Enum_Name(tileColors, ironDoorBackColor)
+		Enum_Name(tileColors, bridgeFrontColor)
+		Enum_Name(tileColors, bridgeBackColor)
+		Enum_Name(tileColors, statueBackColor)
+		Enum_Name(tileColors, glyphColor)
+		Enum_Name(tileColors, glyphLightColor)
+		Enum_Name(tileColors, sacredGlyphColor)
+		Enum_Name(tileColors, sacredGlyphLightColor)
 
-	Enum_String(obsidianBackColor);
-	Enum_String(carpetForeColor);
-	Enum_String(carpetBackColor);
-	Enum_String(marbleForeColor);
-	Enum_String(marbleBackColor);
-	Enum_String(doorForeColor);
-	Enum_String(doorBackColor);
-	Enum_String(ironDoorForeColor);
-	Enum_String(ironDoorBackColor);
-	Enum_String(bridgeFrontColor);
-	Enum_String(bridgeBackColor);
-	Enum_String(statueBackColor);
-	Enum_String(glyphColor);
-	Enum_String(glyphLightColor);
-	Enum_String(sacredGlyphColor);
-	Enum_String(sacredGlyphLightColor);
+		Enum_Name(tileColors, deepWaterForeColor)
+		Enum_Name(tileColors, deepWaterBackColorStart)
+		Enum_Name(tileColors, deepWaterBackColorEnd)
+		Enum_Name(tileColors, shallowWaterForeColor)
+		Enum_Name(tileColors, shallowWaterBackColorStart)
+		Enum_Name(tileColors, shallowWaterBackColorEnd)
 
-	Enum_String(deepWaterForeColor);
-	Enum_String(deepWaterBackColorStart);
-	Enum_String(deepWaterBackColorEnd);
-	Enum_String(shallowWaterForeColor);
-	Enum_String(shallowWaterBackColorStart);
-	Enum_String(shallowWaterBackColorEnd);
+		Enum_Name(tileColors, mudForeColor)
+		Enum_Name(tileColors, mudBackColor)
+		Enum_Name(tileColors, chasmForeColor)
+		Enum_Name(tileColors, chasmEdgeBackColorStart)
+		Enum_Name(tileColors, chasmEdgeBackColorEnd)
+		Enum_Name(tileColors, fireForeColor)
+		Enum_Name(tileColors, lavaForeColor)
+		Enum_Name(tileColors, brimstoneForeColor)
+		Enum_Name(tileColors, brimstoneBackColor)
 
-	Enum_String(mudForeColor);
-	Enum_String(mudBackColor);
-	Enum_String(chasmForeColor);
-	Enum_String(chasmEdgeBackColorStart);
-	Enum_String(chasmEdgeBackColorEnd);
-	Enum_String(fireForeColor);
-	Enum_String(lavaForeColor);
-	Enum_String(brimstoneForeColor);
-	Enum_String(brimstoneBackColor);
+		Enum_Name(tileColors, lavaBackColor)
+		Enum_Name(tileColors, acidBackColor)
 
-	Enum_String(lavaBackColor);
-	Enum_String(acidBackColor);
+		Enum_Name(tileColors, lightningColor)
+		Enum_Name(tileColors, fungusLightColor)
+		Enum_Name(tileColors, lavaLightColor)
+		Enum_Name(tileColors, deepWaterLightColor)
 
-	Enum_String(lightningColor);
-	Enum_String(fungusLightColor);
-	Enum_String(lavaLightColor);
-	Enum_String(deepWaterLightColor);
+		Enum_Name(tileColors, grassColor)
+		Enum_Name(tileColors, deadGrassColor)
+		Enum_Name(tileColors, fungusColor)
+		Enum_Name(tileColors, grayFungusColor)
+		Enum_Name(tileColors, foliageColor)
+		Enum_Name(tileColors, deadFoliageColor)
+		Enum_Name(tileColors, lichenColor)
+		Enum_Name(tileColors, hayColor)
+		Enum_Name(tileColors, ashForeColor)
+		Enum_Name(tileColors, bonesForeColor)
+		Enum_Name(tileColors, ectoplasmColor)
+		Enum_Name(tileColors, forceFieldColor)
+		Enum_Name(tileColors, wallCrystalColor)
+		Enum_Name(tileColors, altarForeColor)
+		Enum_Name(tileColors, altarBackColor)
+		Enum_Name(tileColors, greenAltarBackColor)
+		Enum_Name(tileColors, goldAltarBackColor)
+		Enum_Name(tileColors, pedestalBackColor)
+	End_Enum_Name;
+End_Enum;
 
-	Enum_String(grassColor);
-	Enum_String(deadGrassColor);
-	Enum_String(fungusColor);
-	Enum_String(grayFungusColor);
-	Enum_String(foliageColor);
-	Enum_String(deadFoliageColor);
-	Enum_String(lichenColor);
-	Enum_String(hayColor);
-	Enum_String(ashForeColor);
-	Enum_String(bonesForeColor);
-	Enum_String(ectoplasmColor);
-	Enum_String(forceFieldColor);
-	Enum_String(wallCrystalColor);
-	Enum_String(altarForeColor);
-	Enum_String(altarBackColor);
-	Enum_String(greenAltarBackColor);
-	Enum_String(goldAltarBackColor);
-	Enum_String(pedestalBackColor);
-}
-End_Enum_String;
+Register_Enum(creatureColors)
+	Declare_Enum_Name(creatureColors)
+		Enum_Name(creatureColors, goblinColor)
+		Enum_Name(creatureColors, jackalColor)
+		Enum_Name(creatureColors, ogreColor)
+		Enum_Name(creatureColors, eelColor)
+		Enum_Name(creatureColors, goblinConjurerColor)
+		Enum_Name(creatureColors, spectralBladeColor)
+		Enum_Name(creatureColors, spectralImageColor)
+		Enum_Name(creatureColors, toadColor)
+		Enum_Name(creatureColors, trollColor)
+		Enum_Name(creatureColors, centipedeColor)
+		Enum_Name(creatureColors, dragonColor)
+		Enum_Name(creatureColors, krakenColor)
+		Enum_Name(creatureColors, salamanderColor)
+		Enum_Name(creatureColors, pixieColor)
+		Enum_Name(creatureColors, darPriestessColor)
+		Enum_Name(creatureColors, darMageColor)
+		Enum_Name(creatureColors, wraithColor)
+		Enum_Name(creatureColors, pinkJellyColor)
+		Enum_Name(creatureColors, wormColor)
+		Enum_Name(creatureColors, sentinelColor)
+		Enum_Name(creatureColors, goblinMysticColor)
+		Enum_Name(creatureColors, ifritColor)
+		Enum_Name(creatureColors, phoenixColor)
+	End_Enum_Name;
+End_Enum;
 
-Begin_Enum_String(creatureColors)
-{
-	Enum_String(goblinColor);
-	Enum_String(jackalColor);
-	Enum_String(ogreColor);
-	Enum_String(eelColor);
-	Enum_String(goblinConjurerColor);
-	Enum_String(spectralBladeColor);
-	Enum_String(spectralImageColor);
-	Enum_String(toadColor);
-	Enum_String(trollColor);
-	Enum_String(centipedeColor);
-	Enum_String(dragonColor);
-	Enum_String(krakenColor);
-	Enum_String(salamanderColor);
-	Enum_String(pixieColor);
-	Enum_String(darPriestessColor);
-	Enum_String(darMageColor);
-	Enum_String(wraithColor);
-	Enum_String(pinkJellyColor);
-	Enum_String(wormColor);
-	Enum_String(sentinelColor);
-	Enum_String(goblinMysticColor);
-	Enum_String(ifritColor);
-	Enum_String(phoenixColor);
-}
-End_Enum_String;
+Register_Enum(lightColors)
+	Declare_Enum_Name(lightColors)
+		Enum_Name(lightColors, minersLightStartColor)
+		Enum_Name(lightColors, minersLightEndColor)
+		Enum_Name(lightColors, torchColor)
+		Enum_Name(lightColors, torchLightColor)
+		Enum_Name(lightColors, hauntedTorchColor)
+		Enum_Name(lightColors, hauntedTorchLightColor)
+		Enum_Name(lightColors, ifritLightColor)
+		Enum_Name(lightColors, unicornLightColor)
+		Enum_Name(lightColors, wispLightColor)
+		Enum_Name(lightColors, summonedImageLightColor)
+		Enum_Name(lightColors, spectralBladeLightColor)
+		Enum_Name(lightColors, ectoplasmLightColor)
+		Enum_Name(lightColors, explosionColor)
+		Enum_Name(lightColors, explosiveAuraColor)
+		Enum_Name(lightColors, sacrificeTargetColor)
+		Enum_Name(lightColors, dartFlashColor)
+		Enum_Name(lightColors, lichLightColor)
+		Enum_Name(lightColors, forceFieldLightColor)
+		Enum_Name(lightColors, crystalWallLightColor)
+		Enum_Name(lightColors, sunLightColor)
+		Enum_Name(lightColors, fungusForestLightColor)
+		Enum_Name(lightColors, fungusTrampledLightColor)
+		Enum_Name(lightColors, redFlashColor)
+		Enum_Name(lightColors, darknessPatchColor)
+		Enum_Name(lightColors, darknessCloudColor)
+		Enum_Name(lightColors, magicMapFlashColor)
+		Enum_Name(lightColors, sentinelLightColor)
+		Enum_Name(lightColors, telepathyColor)
+		Enum_Name(lightColors, confusionLightColor)
+		Enum_Name(lightColors, portalActivateLightColor)
+		Enum_Name(lightColors, descentLightColor)
+		Enum_Name(lightColors, algaeBlueLightColor)
+		Enum_Name(lightColors, algaeGreenLightColor)
+	End_Enum_Name;
+End_Enum;
 
-Begin_Enum_String(lightColors)
-{
-	Enum_String(minersLightStartColor);
-	Enum_String(minersLightEndColor);
-	Enum_String(torchColor);
-	Enum_String(torchLightColor);
-	Enum_String(hauntedTorchColor);
-	Enum_String(hauntedTorchLightColor);
-	Enum_String(ifritLightColor);
-	Enum_String(unicornLightColor);
-	Enum_String(wispLightColor);
-	Enum_String(summonedImageLightColor);
-	Enum_String(spectralBladeLightColor);
-	Enum_String(ectoplasmLightColor);
-	Enum_String(explosionColor);
-	Enum_String(explosiveAuraColor);
-	Enum_String(sacrificeTargetColor);
-	Enum_String(dartFlashColor);
-	Enum_String(lichLightColor);
-	Enum_String(forceFieldLightColor);
-	Enum_String(crystalWallLightColor);
-	Enum_String(sunLightColor);
-	Enum_String(fungusForestLightColor);
-	Enum_String(fungusTrampledLightColor);
-	Enum_String(redFlashColor);
-	Enum_String(darknessPatchColor);
-	Enum_String(darknessCloudColor);
-	Enum_String(magicMapFlashColor);
-	Enum_String(sentinelLightColor);
-	Enum_String(telepathyColor);
-	Enum_String(confusionLightColor);
-	Enum_String(portalActivateLightColor);
-	Enum_String(descentLightColor);
-	Enum_String(algaeBlueLightColor);
-	Enum_String(algaeGreenLightColor);
-}
-End_Enum_String;
+Register_Enum(flareColors)
+	Declare_Enum_Name(flareColors)
+		Enum_Name(flareColors, scrollProtectionColor)
+		Enum_Name(flareColors, scrollEnchantmentColor)
+		Enum_Name(flareColors, potionStrengthColor)
+		Enum_Name(flareColors, empowermentFlashColor)
+		Enum_Name(flareColors, genericFlashColor)
+		Enum_Name(flareColors, summoningFlashColor)
+		Enum_Name(flareColors, fireFlashColor)
+		Enum_Name(flareColors, explosionFlareColor)
+		Enum_Name(flareColors, quietusFlashColor)
+		Enum_Name(flareColors, slayingFlashColor)
+	End_Enum_Name;
+End_Enum;
 
-Begin_Enum_String(flareColors)
-{
-	Enum_String(scrollProtectionColor);
-	Enum_String(scrollEnchantmentColor);
-	Enum_String(potionStrengthColor);
-	Enum_String(empowermentFlashColor);
-	Enum_String(genericFlashColor);
-	Enum_String(summoningFlashColor);
-	Enum_String(fireFlashColor);
-	Enum_String(explosionFlareColor);
-	Enum_String(quietusFlashColor);
-	Enum_String(slayingFlashColor);
-}
-End_Enum_String;
+Register_Enum(colorMultipliers)
+	Declare_Enum_Name(colorMultipliers)
+		Enum_Name(colorMultipliers, colorDim25)
+		Enum_Name(colorMultipliers, colorMultiplier100)
+		Enum_Name(colorMultipliers, memoryColor)
+		Enum_Name(colorMultipliers, memoryOverlay)
+		Enum_Name(colorMultipliers, magicMapColor)
+		Enum_Name(colorMultipliers, clairvoyanceColor)
+		Enum_Name(colorMultipliers, telepathyMultiplier)
+		Enum_Name(colorMultipliers, omniscienceColor)
+		Enum_Name(colorMultipliers, basicLightColor)
+	End_Enum_Name;
+End_Enum;
 
-Begin_Enum_String(colorMultipliers)
-{
-	Enum_String(colorDim25);
-	Enum_String(colorMultiplier100);
-	Enum_String(memoryColor);
-	Enum_String(memoryOverlay);
-	Enum_String(magicMapColor);
-	Enum_String(clairvoyanceColor);
-	Enum_String(telepathyMultiplier);
-	Enum_String(omniscienceColor);
-	Enum_String(basicLightColor);
-}
-End_Enum_String;
+Register_Enum(bloodColors)
+	Declare_Enum_Name(bloodColors)
+		Enum_Name(bloodColors, humanBloodColor)
+		Enum_Name(bloodColors, insectBloodColor)
+		Enum_Name(bloodColors, vomitColor)
+		Enum_Name(bloodColors, urineColor)
+		Enum_Name(bloodColors, methaneColor)
+	End_Enum_Name;
+End_Enum;
 
-Begin_Enum_String(bloodColors)
-{
-	Enum_String(humanBloodColor);
-	Enum_String(insectBloodColor);
-	Enum_String(vomitColor);
-	Enum_String(urineColor);
-	Enum_String(methaneColor);
-}
-End_Enum_String;
+Register_Enum(gasColors)
+	Declare_Enum_Name(gasColors)
+		Enum_Name(gasColors, poisonGasColor)
+		Enum_Name(gasColors, confusionGasColor)
+	End_Enum_Name;
+End_Enum;
 
-Begin_Enum_String(gasColors)
-{
-	Enum_String(poisonGasColor);
-	Enum_String(confusionGasColor);
-}
-End_Enum_String;
+Register_Enum(interfaceColors)
+	Declare_Enum_Name(interfaceColors)
+		Enum_Name(interfaceColors, itemColor)
+		Enum_Name(interfaceColors, blueBar)
+		Enum_Name(interfaceColors, redBar)
+		Enum_Name(interfaceColors, hiliteColor)
+		Enum_Name(interfaceColors, interfaceBoxColor)
+		Enum_Name(interfaceColors, interfaceButtonColor)
+		Enum_Name(interfaceColors, buttonHoverColor)
+		Enum_Name(interfaceColors, titleButtonColor)
 
-Begin_Enum_String(interfaceColors)
-{
-	Enum_String(itemColor);
-	Enum_String(blueBar);
-	Enum_String(redBar);
-	Enum_String(hiliteColor);
-	Enum_String(interfaceBoxColor);
-	Enum_String(interfaceButtonColor);
-	Enum_String(buttonHoverColor);
-	Enum_String(titleButtonColor);
+		Enum_Name(interfaceColors, playerInvisibleColor)
+		Enum_Name(interfaceColors, playerInLightColor)
+		Enum_Name(interfaceColors, playerInShadowColor)
+		Enum_Name(interfaceColors, playerInDarknessColor)
 
-	Enum_String(playerInvisibleColor);
-	Enum_String(playerInLightColor);
-	Enum_String(playerInShadowColor);
-	Enum_String(playerInDarknessColor);
+		Enum_Name(interfaceColors, inLightMultiplierColor)
+		Enum_Name(interfaceColors, inDarknessMultiplierColor)
 
-	Enum_String(inLightMultiplierColor);
-	Enum_String(inDarknessMultiplierColor);
+		Enum_Name(interfaceColors, goodMessageColor)
+		Enum_Name(interfaceColors, badMessageColor)
+		Enum_Name(interfaceColors, advancementMessageColor)
+		Enum_Name(interfaceColors, itemMessageColor)
+		Enum_Name(interfaceColors, flavorTextColor)
+		Enum_Name(interfaceColors, backgroundMessageColor)
 
-	Enum_String(goodMessageColor);
-	Enum_String(badMessageColor);
-	Enum_String(advancementMessageColor);
-	Enum_String(itemMessageColor);
-	Enum_String(flavorTextColor);
-	Enum_String(backgroundMessageColor);
+		Enum_Name(interfaceColors, superVictoryColor)
 
-	Enum_String(superVictoryColor);
+		Enum_Name(interfaceColors, flameSourceColor)
+		Enum_Name(interfaceColors, flameSourceColorSecondary)
 
-	Enum_String(flameSourceColor);
-	Enum_String(flameSourceColorSecondary);
-
-	Enum_String(flameTitleColor);
-}
-End_Enum_String;
+		Enum_Name(interfaceColors, flameTitleColor)
+	End_Enum_Name;
+End_Enum;
 
 #pragma endregion colorConstants.h
 
 #pragma region creatureBehaviorConstants.h
 
-Begin_Enum_String(creatureAbilityFlags)
-{
-	Enum_String_With_Description(MA_HIT_HALLUCINATE, "can induce hallucinations");
-	Enum_String_With_Description(MA_HIT_STEAL_FLEE, "can steal items");
-	Enum_String_With_Description(MA_HIT_BURN, "lights enemies on fire when $HESHE hits");
-	Enum_String_With_Description(MA_ENTER_SUMMONS, "can possess $HISHER summoned allies");
-	Enum_String_With_Description(MA_HIT_DEGRADE_ARMOR, "corrodes armor when $HESHE hits");
-	Enum_String_With_Description(MA_CAST_SUMMON, "can summon allies");
-	Enum_String_With_Description(MA_SEIZES, "immobilizes $HISHER prey");
-	Enum_String_With_Description(MA_POISONS, "injects poison when $HESHE hits");
-	Enum_String_With_Description(MA_DF_ON_DEATH, "");
-	Enum_String_With_Description(MA_CLONE_SELF_ON_DEFEND, "divides in two when struck");
-	Enum_String_With_Description(MA_KAMIKAZE, "dies when $HESHE attacks");
-	Enum_String_With_Description(MA_TRANSFERENCE, "recovers health when $HESHE inflicts damage");
-	Enum_String_With_Description(MA_CAUSES_WEAKNESS, "saps strength when $HESHE inflicts damage");
+Register_Enum(creatureAbilityFlags)
+	Declare_Enum_Name(creatureAbilityFlags)
+		Enum_Name(creatureAbilityFlags, MA_HIT_HALLUCINATE)
+		Enum_Name(creatureAbilityFlags, MA_HIT_STEAL_FLEE)
+		Enum_Name(creatureAbilityFlags, MA_HIT_BURN)
+		Enum_Name(creatureAbilityFlags, MA_ENTER_SUMMONS)
+		Enum_Name(creatureAbilityFlags, MA_HIT_DEGRADE_ARMOR)
+		Enum_Name(creatureAbilityFlags, MA_CAST_SUMMON)
+		Enum_Name(creatureAbilityFlags, MA_SEIZES)
+		Enum_Name(creatureAbilityFlags, MA_POISONS)
+		Enum_Name(creatureAbilityFlags, MA_DF_ON_DEATH)
+		Enum_Name(creatureAbilityFlags, MA_CLONE_SELF_ON_DEFEND)
+		Enum_Name(creatureAbilityFlags, MA_KAMIKAZE)
+		Enum_Name(creatureAbilityFlags, MA_TRANSFERENCE)
+		Enum_Name(creatureAbilityFlags, MA_CAUSES_WEAKNESS)
 
-	Enum_String_With_Description(MA_ATTACKS_PENETRATE, "attacks up to two opponents in a line");
-	Enum_String_With_Description(MA_ATTACKS_ALL_ADJACENT, "attacks all adjacent opponents at once");
-	Enum_String_With_Description(MA_ATTACKS_EXTEND, "attacks with a whip");
-	Enum_String_With_Description(MA_ATTACKS_STAGGER, "pushes opponents backward when $HESHE hits");
-	Enum_String_With_Description(MA_AVOID_CORRIDORS, "avoids attacking in corridors in a group");
-}
-End_Enum_String;
+		Enum_Name(creatureAbilityFlags, MA_ATTACKS_PENETRATE)
+		Enum_Name(creatureAbilityFlags, MA_ATTACKS_ALL_ADJACENT)
+		Enum_Name(creatureAbilityFlags, MA_ATTACKS_EXTEND)
+		Enum_Name(creatureAbilityFlags, MA_ATTACKS_STAGGER)
+		Enum_Name(creatureAbilityFlags, MA_AVOID_CORRIDORS)
+	End_Enum_Name;
 
-Begin_Enum_String(creatureBehaviorFlags)
-{
-	Enum_String_With_Description(MONST_INVISIBLE, "is invisible");
-	Enum_String_With_Description(MONST_INANIMATE, "is an inanimate object");
-	Enum_String_With_Description(MONST_IMMOBILE, "cannot move");
-	Enum_String_With_Description(MONST_CARRY_ITEM_100, "");
-	Enum_String_With_Description(MONST_CARRY_ITEM_25, "");
-	Enum_String_With_Description(MONST_ALWAYS_HUNTING, "");
-	Enum_String_With_Description(MONST_FLEES_NEAR_DEATH, "flees at low health");
-	Enum_String_With_Description(MONST_ATTACKABLE_THRU_WALLS, "");
-	Enum_String_With_Description(MONST_DEFEND_DEGRADE_WEAPON, "corrodes weapons when hit");
-	Enum_String_With_Description(MONST_IMMUNE_TO_WEAPONS, "is immune to weapon damage");
-	Enum_String_With_Description(MONST_FLIES, "flies");
-	Enum_String_With_Description(MONST_FLITS, "moves erratically");
-	Enum_String_With_Description(MONST_IMMUNE_TO_FIRE, "is immune to fire");
-	Enum_String_With_Description(MONST_CAST_SPELLS_SLOWLY, "");
-	Enum_String_With_Description(MONST_IMMUNE_TO_WEBS, "cannot be entangled");
-	Enum_String_With_Description(MONST_REFLECT_4, "can reflect magic spells");
-	Enum_String_With_Description(MONST_NEVER_SLEEPS, "never sleeps");
-	Enum_String_With_Description(MONST_FIERY, "burns unceasingly");
-	Enum_String_With_Description(MONST_INVULNERABLE, "is invulnerable");
-	Enum_String_With_Description(MONST_IMMUNE_TO_WATER, "is at home in water");
-	Enum_String_With_Description(MONST_RESTRICTED_TO_LIQUID, "cannot venture onto dry land");
-	Enum_String_With_Description(MONST_SUBMERGES, "submerges");
-	Enum_String_With_Description(MONST_MAINTAINS_DISTANCE, "keeps $HISHER distance");
-	Enum_String_With_Description(MONST_WILL_NOT_USE_STAIRS, "");
-	Enum_String_With_Description(MONST_DIES_IF_NEGATED, "is animated purely by magic");
-	Enum_String_With_Description(MONST_MALE, "");
-	Enum_String_With_Description(MONST_FEMALE, "");
-	Enum_String_With_Description(MONST_NOT_LISTED_IN_SIDEBAR, "");
-	Enum_String_With_Description(MONST_GETS_TURN_ON_ACTIVATION, "moves only when activated");
-}
-End_Enum_String;
+	Declare_Enum_Descr(creatureAbilityFlags)
+		Enum_Descr(creatureAbilityFlags, MA_HIT_HALLUCINATE, "can induce hallucinations");
+		Enum_Descr(creatureAbilityFlags, MA_HIT_STEAL_FLEE, "can steal items");
+		Enum_Descr(creatureAbilityFlags, MA_HIT_BURN, "lights enemies on fire when $HESHE hits");
+		Enum_Descr(creatureAbilityFlags, MA_ENTER_SUMMONS, "can possess $HISHER summoned allies");
+		Enum_Descr(creatureAbilityFlags, MA_HIT_DEGRADE_ARMOR, "corrodes armor when $HESHE hits");
+		Enum_Descr(creatureAbilityFlags, MA_CAST_SUMMON, "can summon allies");
+		Enum_Descr(creatureAbilityFlags, MA_SEIZES, "immobilizes $HISHER prey");
+		Enum_Descr(creatureAbilityFlags, MA_POISONS, "injects poison when $HESHE hits");
+		Enum_Descr(creatureAbilityFlags, MA_DF_ON_DEATH, "");
+		Enum_Descr(creatureAbilityFlags, MA_CLONE_SELF_ON_DEFEND, "divides in two when struck");
+		Enum_Descr(creatureAbilityFlags, MA_KAMIKAZE, "dies when $HESHE attacks");
+		Enum_Descr(creatureAbilityFlags, MA_TRANSFERENCE, "recovers health when $HESHE inflicts damage");
+		Enum_Descr(creatureAbilityFlags, MA_CAUSES_WEAKNESS, "saps strength when $HESHE inflicts damage");
 
-Begin_Enum_String(creatureBookkeepingFlags)
-{
-	Enum_String_With_Description(MB_WAS_VISIBLE, "");
-	Enum_String_With_Description(MB_TELEPATHICALLY_REVEALED, "is telepathically bonded with you");
-	Enum_String_With_Description(MB_PREPLACED, "");
-	Enum_String_With_Description(MB_APPROACHING_UPSTAIRS, "");
-	Enum_String_With_Description(MB_APPROACHING_DOWNSTAIRS, "");
-	Enum_String_With_Description(MB_APPROACHING_PIT, "");
-	Enum_String_With_Description(MB_LEADER, "");
-	Enum_String_With_Description(MB_FOLLOWER, "");
-	Enum_String_With_Description(MB_CAPTIVE, "");
-	Enum_String_With_Description(MB_SEIZED, "has been immobilized");
-	Enum_String_With_Description(MB_SEIZING, "is currently holding $HISHER prey immobile");
-	Enum_String_With_Description(MB_SUBMERGED, "is submerged");
-	Enum_String_With_Description(MB_JUST_SUMMONED, "");
-	Enum_String_With_Description(MB_WILL_FLASH, "");
-	Enum_String_With_Description(MB_BOUND_TO_LEADER, "is anchored to reality by $HISHER summoner");
-	Enum_String_With_Description(MB_MARKED_FOR_SACRIFICE, "is marked for demonic sacrifice");
-}
-End_Enum_String;
+		Enum_Descr(creatureAbilityFlags, MA_ATTACKS_PENETRATE, "attacks up to two opponents in a line");
+		Enum_Descr(creatureAbilityFlags, MA_ATTACKS_ALL_ADJACENT, "attacks all adjacent opponents at once");
+		Enum_Descr(creatureAbilityFlags, MA_ATTACKS_EXTEND, "attacks with a whip");
+		Enum_Descr(creatureAbilityFlags, MA_ATTACKS_STAGGER, "pushes opponents backward when $HESHE hits");
+		Enum_Descr(creatureAbilityFlags, MA_AVOID_CORRIDORS, "avoids attacking in corridors in a group");
+	End_Enum_Descr;
+End_Enum;
+
+Register_Enum(creatureBehaviorFlags)
+	Declare_Enum_Name(creatureBehaviorFlags)
+		Enum_Name(creatureBehaviorFlags, MONST_INVISIBLE)
+		Enum_Name(creatureBehaviorFlags, MONST_INANIMATE)
+		Enum_Name(creatureBehaviorFlags, MONST_IMMOBILE)
+		Enum_Name(creatureBehaviorFlags, MONST_CARRY_ITEM_100)
+		Enum_Name(creatureBehaviorFlags, MONST_CARRY_ITEM_25)
+		Enum_Name(creatureBehaviorFlags, MONST_ALWAYS_HUNTING)
+		Enum_Name(creatureBehaviorFlags, MONST_FLEES_NEAR_DEATH)
+		Enum_Name(creatureBehaviorFlags, MONST_ATTACKABLE_THRU_WALLS)
+		Enum_Name(creatureBehaviorFlags, MONST_DEFEND_DEGRADE_WEAPON)
+		Enum_Name(creatureBehaviorFlags, MONST_IMMUNE_TO_WEAPONS)
+		Enum_Name(creatureBehaviorFlags, MONST_FLIES)
+		Enum_Name(creatureBehaviorFlags, MONST_FLITS)
+		Enum_Name(creatureBehaviorFlags, MONST_IMMUNE_TO_FIRE)
+		Enum_Name(creatureBehaviorFlags, MONST_CAST_SPELLS_SLOWLY)
+		Enum_Name(creatureBehaviorFlags, MONST_IMMUNE_TO_WEBS)
+		Enum_Name(creatureBehaviorFlags, MONST_REFLECT_4)
+		Enum_Name(creatureBehaviorFlags, MONST_NEVER_SLEEPS)
+		Enum_Name(creatureBehaviorFlags, MONST_FIERY)
+		Enum_Name(creatureBehaviorFlags, MONST_INVULNERABLE)
+		Enum_Name(creatureBehaviorFlags, MONST_IMMUNE_TO_WATER)
+		Enum_Name(creatureBehaviorFlags, MONST_RESTRICTED_TO_LIQUID)
+		Enum_Name(creatureBehaviorFlags, MONST_SUBMERGES)
+		Enum_Name(creatureBehaviorFlags, MONST_MAINTAINS_DISTANCE)
+		Enum_Name(creatureBehaviorFlags, MONST_WILL_NOT_USE_STAIRS)
+		Enum_Name(creatureBehaviorFlags, MONST_DIES_IF_NEGATED)
+		Enum_Name(creatureBehaviorFlags, MONST_MALE)
+		Enum_Name(creatureBehaviorFlags, MONST_FEMALE)
+		Enum_Name(creatureBehaviorFlags, MONST_NOT_LISTED_IN_SIDEBAR)
+		Enum_Name(creatureBehaviorFlags, MONST_GETS_TURN_ON_ACTIVATION)
+	End_Enum_Name;
+
+	Declare_Enum_Descr(creatureBehaviorFlags)
+		Enum_Descr(creatureBehaviorFlags, MONST_INVISIBLE, "is invisible");
+		Enum_Descr(creatureBehaviorFlags, MONST_INANIMATE, "is an inanimate object");
+		Enum_Descr(creatureBehaviorFlags, MONST_IMMOBILE, "cannot move");
+		Enum_Descr(creatureBehaviorFlags, MONST_CARRY_ITEM_100, "");
+		Enum_Descr(creatureBehaviorFlags, MONST_CARRY_ITEM_25, "");
+		Enum_Descr(creatureBehaviorFlags, MONST_ALWAYS_HUNTING, "");
+		Enum_Descr(creatureBehaviorFlags, MONST_FLEES_NEAR_DEATH, "flees at low health");
+		Enum_Descr(creatureBehaviorFlags, MONST_ATTACKABLE_THRU_WALLS, "");
+		Enum_Descr(creatureBehaviorFlags, MONST_DEFEND_DEGRADE_WEAPON, "corrodes weapons when hit");
+		Enum_Descr(creatureBehaviorFlags, MONST_IMMUNE_TO_WEAPONS, "is immune to weapon damage");
+		Enum_Descr(creatureBehaviorFlags, MONST_FLIES, "flies");
+		Enum_Descr(creatureBehaviorFlags, MONST_FLITS, "moves erratically");
+		Enum_Descr(creatureBehaviorFlags, MONST_IMMUNE_TO_FIRE, "is immune to fire");
+		Enum_Descr(creatureBehaviorFlags, MONST_CAST_SPELLS_SLOWLY, "");
+		Enum_Descr(creatureBehaviorFlags, MONST_IMMUNE_TO_WEBS, "cannot be entangled");
+		Enum_Descr(creatureBehaviorFlags, MONST_REFLECT_4, "can reflect magic spells");
+		Enum_Descr(creatureBehaviorFlags, MONST_NEVER_SLEEPS, "never sleeps");
+		Enum_Descr(creatureBehaviorFlags, MONST_FIERY, "burns unceasingly");
+		Enum_Descr(creatureBehaviorFlags, MONST_INVULNERABLE, "is invulnerable");
+		Enum_Descr(creatureBehaviorFlags, MONST_IMMUNE_TO_WATER, "is at home in water");
+		Enum_Descr(creatureBehaviorFlags, MONST_RESTRICTED_TO_LIQUID, "cannot venture onto dry land");
+		Enum_Descr(creatureBehaviorFlags, MONST_SUBMERGES, "submerges");
+		Enum_Descr(creatureBehaviorFlags, MONST_MAINTAINS_DISTANCE, "keeps $HISHER distance");
+		Enum_Descr(creatureBehaviorFlags, MONST_WILL_NOT_USE_STAIRS, "");
+		Enum_Descr(creatureBehaviorFlags, MONST_DIES_IF_NEGATED, "is animated purely by magic");
+		Enum_Descr(creatureBehaviorFlags, MONST_MALE, "");
+		Enum_Descr(creatureBehaviorFlags, MONST_FEMALE, "");
+		Enum_Descr(creatureBehaviorFlags, MONST_NOT_LISTED_IN_SIDEBAR, "");
+		Enum_Descr(creatureBehaviorFlags, MONST_GETS_TURN_ON_ACTIVATION, "moves only when activated");
+	End_Enum_Descr;
+End_Enum;
+
+Register_Enum(creatureBookkeepingFlags)
+	Declare_Enum_Name(creatureBookkeepingFlags)
+		Enum_Name(creatureBookkeepingFlags, MB_WAS_VISIBLE)
+		Enum_Name(creatureBookkeepingFlags, MB_TELEPATHICALLY_REVEALED)
+		Enum_Name(creatureBookkeepingFlags, MB_PREPLACED)
+		Enum_Name(creatureBookkeepingFlags, MB_APPROACHING_UPSTAIRS)
+		Enum_Name(creatureBookkeepingFlags, MB_APPROACHING_DOWNSTAIRS)
+		Enum_Name(creatureBookkeepingFlags, MB_APPROACHING_PIT)
+		Enum_Name(creatureBookkeepingFlags, MB_LEADER)
+		Enum_Name(creatureBookkeepingFlags, MB_FOLLOWER)
+		Enum_Name(creatureBookkeepingFlags, MB_CAPTIVE)
+		Enum_Name(creatureBookkeepingFlags, MB_SEIZED)
+		Enum_Name(creatureBookkeepingFlags, MB_SEIZING)
+		Enum_Name(creatureBookkeepingFlags, MB_SUBMERGED)
+		Enum_Name(creatureBookkeepingFlags, MB_JUST_SUMMONED)
+		Enum_Name(creatureBookkeepingFlags, MB_WILL_FLASH)
+		Enum_Name(creatureBookkeepingFlags, MB_BOUND_TO_LEADER)
+		Enum_Name(creatureBookkeepingFlags, MB_MARKED_FOR_SACRIFICE)
+	End_Enum_Name;
+
+	Declare_Enum_Descr(creatureBookkeepingFlags)
+		Enum_Descr(creatureBookkeepingFlags, MB_WAS_VISIBLE, "");
+		Enum_Descr(creatureBookkeepingFlags, MB_TELEPATHICALLY_REVEALED, "is telepathically bonded with you");
+		Enum_Descr(creatureBookkeepingFlags, MB_PREPLACED, "");
+		Enum_Descr(creatureBookkeepingFlags, MB_APPROACHING_UPSTAIRS, "");
+		Enum_Descr(creatureBookkeepingFlags, MB_APPROACHING_DOWNSTAIRS, "");
+		Enum_Descr(creatureBookkeepingFlags, MB_APPROACHING_PIT, "");
+		Enum_Descr(creatureBookkeepingFlags, MB_LEADER, "");
+		Enum_Descr(creatureBookkeepingFlags, MB_FOLLOWER, "");
+		Enum_Descr(creatureBookkeepingFlags, MB_CAPTIVE, "");
+		Enum_Descr(creatureBookkeepingFlags, MB_SEIZED, "has been immobilized");
+		Enum_Descr(creatureBookkeepingFlags, MB_SEIZING, "is currently holding $HISHER prey immobile");
+		Enum_Descr(creatureBookkeepingFlags, MB_SUBMERGED, "is submerged");
+		Enum_Descr(creatureBookkeepingFlags, MB_JUST_SUMMONED, "");
+		Enum_Descr(creatureBookkeepingFlags, MB_WILL_FLASH, "");
+		Enum_Descr(creatureBookkeepingFlags, MB_BOUND_TO_LEADER, "is anchored to reality by $HISHER summoner");
+		Enum_Descr(creatureBookkeepingFlags, MB_MARKED_FOR_SACRIFICE, "is marked for demonic sacrifice");
+	End_Enum_Descr;
+End_Enum;
 
 #pragma endregion creatureBehaviorConstants.h
 
 #pragma region feat.h
 
-Begin_Enum_String(featTypes)
-{
-	Enum_String(FEAT_PURE_MAGE);
-	Enum_String(FEAT_PURE_WARRIOR);
-	Enum_String(FEAT_PACIFIST);
-	Enum_String(FEAT_ARCHIVIST);
-	Enum_String(FEAT_COMPANION);
-	Enum_String(FEAT_SPECIALIST);
-	Enum_String(FEAT_JELLYMANCER);
-	Enum_String(FEAT_INDOMITABLE);
-	Enum_String(FEAT_MYSTIC);
-	Enum_String(FEAT_DRAGONSLAYER);
-	Enum_String(FEAT_PALADIN);
-}
-End_Enum_String;
+Register_Enum(featTypes)
+	Declare_Enum_Name(featTypes)
+		Enum_Name(featTypes, FEAT_PURE_MAGE)
+		Enum_Name(featTypes, FEAT_PURE_WARRIOR)
+		Enum_Name(featTypes, FEAT_PACIFIST)
+		Enum_Name(featTypes, FEAT_ARCHIVIST)
+		Enum_Name(featTypes, FEAT_COMPANION)
+		Enum_Name(featTypes, FEAT_SPECIALIST)
+		Enum_Name(featTypes, FEAT_JELLYMANCER)
+		Enum_Name(featTypes, FEAT_INDOMITABLE)
+		Enum_Name(featTypes, FEAT_MYSTIC)
+		Enum_Name(featTypes, FEAT_DRAGONSLAYER)
+		Enum_Name(featTypes, FEAT_PALADIN)
+	End_Enum_Name;
+End_Enum;
 
 #pragma endregion feat.h
