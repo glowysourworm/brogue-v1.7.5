@@ -48,13 +48,15 @@ namespace brogueHd::simple
 		int count() const;
 
 		T get(int index) const;
+		void set(int index, T value);
 
 		void operator=(const simpleArray<T>& other);
 
-		void set(int index, T value);
-		bool contains(T item);
+	public:
 
 		T* getArray();
+
+	public:
 
 		size_t getHash() const override;
 
@@ -64,19 +66,21 @@ namespace brogueHd::simple
 		bool areAll(T value);
 		bool areAllWhere(simpleArrayPredicate<T> predicate);
 
+		bool contains(T item);
+
 		template<typename TResult>
 		TResult aggregate(TResult& seedValue, simpleArrayAggregate<T, TResult> aggregator);
 
 	private:
 
-		void allocate(size_t capacity);
+		void allocate(int capacity);
 		void reAllocate(const T* anArray);
-		size_t getArrayCount(const T* anArray);
+		int getArrayCount(const T* anArray);
 
 	private:
 
 		T* _array;
-		size_t _count;
+		int _count;
 	};
 
 	template<isHashable T>
@@ -133,10 +137,10 @@ namespace brogueHd::simple
 	}
 
 	template<isHashable T>
-	size_t simpleArray<T>::getArrayCount(const T* anArray)
+	int simpleArray<T>::getArrayCount(const T* anArray)
 	{
-		size_t index = 0;
-		size_t count = 0;
+		int index = 0;
+		int count = 0;
 
 		while (anArray[index++] != NULL)
 		{
@@ -147,7 +151,7 @@ namespace brogueHd::simple
 	}
 
 	template<isHashable T>
-	void simpleArray<T>::allocate(size_t capacity)
+	void simpleArray<T>::allocate(int capacity)
 	{
 		T* newArray = new T[capacity];
 

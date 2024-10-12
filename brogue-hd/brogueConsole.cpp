@@ -83,7 +83,7 @@ namespace brogueHd::console
 	{
 		for (int index = 0; index < args.count(); index++)
 		{
-			if (args.get(index) == std::string(argumentName) &&
+			if (args.get(index) == simpleString(argumentName) &&
 				index < args.count() + 1)
 			{
 				return args.get(index + 1).toBool();

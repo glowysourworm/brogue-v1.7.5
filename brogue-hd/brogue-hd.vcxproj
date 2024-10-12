@@ -84,7 +84,6 @@
     <SourcePath>C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\include;$(SourcePath)</SourcePath>
     <LibraryPath>C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\lib-vc2022;$(LibraryPath)</LibraryPath>
     <ExecutablePath>C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\lib-vc2022;$(ExecutablePath)</ExecutablePath>
-    <RunCodeAnalysis>true</RunCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -134,6 +133,7 @@
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AdditionalIncludeDirectories>C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard_C>stdclatest</LanguageStandard_C>
+      <DisableSpecificWarnings>4267;4244;4104;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -232,6 +232,7 @@
     <ClInclude Include="brogueGameProfile.h" />
     <ClInclude Include="brogueLevelProfile.h" />
     <ClInclude Include="brogueMacroDeclaration.h" />
+    <ClInclude Include="simpleExt.h" />
     <ClInclude Include="simpleLogger.h" />
     <ClInclude Include="brogueMachine.h" />
     <ClInclude Include="simpleMath.h" />

@@ -149,7 +149,7 @@ namespace brogueHd::backend::generator
 		short roomWidth, roomHeight, roomWidth2, roomHeight2, roomX, roomY, roomX2, roomY2;
 
 		roomWidth = _randomGenerator->rand_range(3, 12);
-		roomX = _randomGenerator->rand_range(simpleMath<short>::maxOf(0, DCOLS / 2 - (roomWidth - 1)), simpleMath<short>::minOf(DCOLS, DCOLS / 2));
+		roomX = _randomGenerator->rand_range(simpleMath::maxOf(0, DCOLS / 2 - (roomWidth - 1)), simpleMath::minOf(DCOLS, DCOLS / 2));
 		roomWidth2 = _randomGenerator->rand_range(4, 20);
 		roomX2 = (roomX + (roomWidth / 2) + _randomGenerator->rand_range(0, 2) + _randomGenerator->rand_range(0, 2) - 3) - (roomWidth2 / 2);
 
@@ -319,10 +319,10 @@ namespace brogueHd::backend::generator
 					return iterationCallback::iterate;
 				});
 
-				minX = simpleMath<short>::maxOf(1, simpleMath<short>::minOf(x - 3, minX));
-				maxX = simpleMath<short>::minOf(DCOLS - 2, simpleMath<short>::maxOf(x + 3, maxX));
-				minY = simpleMath<short>::maxOf(1, simpleMath<short>::minOf(y - 3, minY));
-				maxY = simpleMath<short>::minOf(DROWS - 2, simpleMath<short>::maxOf(y + 3, maxY));
+				minX = simpleMath::maxOf(1, simpleMath::minOf(x - 3, minX));
+				maxX = simpleMath::minOf(DCOLS - 2, simpleMath::maxOf(x + 3, maxX));
+				minY = simpleMath::maxOf(1, simpleMath::minOf(y - 3, minY));
+				maxY = simpleMath::minOf(DROWS - 2, simpleMath::maxOf(y + 3, maxY));
 
 				//            hiliteGrid(grid, &green, 50);
 				//            temporaryMessage("Added a chunk:", true);

@@ -62,7 +62,7 @@ namespace brogueHd::component
         void addEdges(short column, short row, T item);
         void addBoundary(short column, short row, T item);
         void validate();
-        void validateRegionCollection(simpleString name, simpleHash<T, T>* collection);
+        void validateRegionCollection(const char* name, simpleHash<T, T>* collection);
         gridRect calculateLargestRectangle();
 
     private:
@@ -319,7 +319,7 @@ namespace brogueHd::component
         _locations->forEach([&grid](T key, T value)
         {
             if (grid->get(key.column, key.row) != key)
-                simpleException::show("RegionConstructor grid was not valid:  " + key.getString());
+                simpleException::show("RegionConstructor grid was not valid:  {}", key.getString());
 
             return iterationCallback::iterate;
         });
@@ -338,7 +338,7 @@ namespace brogueHd::component
     }
 
     template<isGridLocator T>
-    void gridRegionConstructor<T>::validateRegionCollection(simpleString name, simpleHash<T, T>* collection)
+    void gridRegionConstructor<T>::validateRegionCollection(const char* name, simpleHash<T, T>* collection)
     {
         if (collection->count() <= 0)
             simpleException::showCstr("Collection for building regions is not valid:  gridRegionConstructor.validate");
@@ -388,7 +388,7 @@ namespace brogueHd::component
 
                 for (short index2 = index1; index2 < rowCountersLength && minHeight > 0; index2++)
                 {
-                    minHeight = simpleMath<short>::minOf(minHeight, rowCounters.get(index1), rowCounters.get(index2));
+                    minHeight = simpleMath::minOf(minHeight, rowCounters.get(index1), rowCounters.get(index2));
 
                     // Current column against previous
                     if (rowCounters.get(index1) > bestArea)

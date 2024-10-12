@@ -1,11 +1,8 @@
 #pragma once
 
-#include <string>
-#include <format>
-#include <iostream>
 #include "graphNode.h"
 #include "simpleMath.h"
-#include "brogueGlobal.h"
+#include "simpleExt.h"
 
 using namespace brogueHd::simple;
 
@@ -53,7 +50,7 @@ namespace brogueHd::component
 			double dx = location.column - column;
 			double dy = location.row - row;
 
-			return simpleMath<double>::sqrt((dx * dx) + (dy * dy));
+			return simpleMath::sqrt((dx * dx) + (dy * dy));
 		}
 
 		bool isEmpty()
@@ -64,6 +61,13 @@ namespace brogueHd::component
 		static gridLocator getEmpty()
 		{
 			return gridLocator(-1, -1);
+		}
+
+		virtual const char* getString() const
+		{
+			std::string result = simpleExt::format("Column={}, Row={}", column, row);
+
+			return result.c_str();
 		}
 
 		size_t getHash() const override

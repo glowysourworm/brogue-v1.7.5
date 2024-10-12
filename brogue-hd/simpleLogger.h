@@ -1,6 +1,8 @@
 #pragma once
 
 #include "simple.h"
+#include "simpleString.h"
+#include "simpleExt.h"
 #include <iostream>
 
 namespace brogueHd::simple
@@ -38,97 +40,36 @@ namespace brogueHd::simple
 			std::cout << message << std::endl;
 		}
 
-		template<isNumber T>
-		static void log(const simpleString& formatStr, const T& param)
+		template<isStringConvertible T, isStringConvertible...Args>
+		static void log(const char* formatStr, const T& param, const Args&...args)
 		{
-			simpleString message = simpleString::format(formatStr, param);
+			std::string message = simpleExt::format(formatStr, param, args...);
 
 			std::cout << message << std::endl;
 		}
 
-		template<isStringLike T>
-		static void log(const simpleString& formatStr, const T& param)
+		template<isStringConvertible T, isStringConvertible...Args>
+		static void log(const simpleString& formatStr, const T& param, const Args&...args)
 		{
-			simpleString message = simpleString::format(formatStr, param);
+			std::string message = simpleExt::format(formatStr.c_str(), param, args...);
 
 			std::cout << message << std::endl;
 		}
 
-		template<isStringConvertible T1, isStringConvertible T2>
-		static void log(const simpleString& formatStr, const T1& param0, const T2& param1)
+		template<isStringConvertible T, isStringConvertible...Args>
+		static void logColor(const brogueConsoleColor& color, const char* formatStr, const T& param, const Args&...args)
 		{
-			simpleString message = simpleString::format(formatStr, param0, param1);
-
-			std::cout << message << std::endl;
-		}
-
-		template<isStringConvertible T1, isStringConvertible T2, isStringConvertible T3>
-		static void log(const simpleString& formatStr, const T1& param0, const T2& param1, const T3& param2)
-		{
-			simpleString message = simpleString::format(formatStr, param0, param1, param2);
-
-			std::cout << message << std::endl;
-		}
-
-		template<isStringConvertible T1, isStringConvertible T2, isStringConvertible T3, isStringConvertible T4>
-		static void log(const simpleString& formatStr, const T1& param0, const T2& param1, const T3& param2, const T4& param3)
-		{
-			simpleString message = simpleString::format(formatStr, param0, param1, param2, param3);
-
-			std::cout << message << std::endl;
-		}
-
-		static void logColor(const brogueConsoleColor& color, const simpleString& message)
-		{
-			setColor(color);
-			std::cout << message << std::endl;
-			setColor(brogueConsoleColor::White);
-		}
-
-		template<isNumber T>
-		static void logColor(const brogueConsoleColor& color, const simpleString& formatStr, const T& param)
-		{
-			simpleString message = simpleString::format(formatStr, param);
+			std::string message = simpleExt::format(formatStr, param, args...);
 
 			setColor(color);
 			std::cout << message << std::endl;
 			setColor(brogueConsoleColor::White);
 		}
 
-		template<isStringLike T>
-		static void logColor(const brogueConsoleColor& color, const simpleString& formatStr, const T& param)
+		template<isStringConvertible T, isStringConvertible...Args>
+		static void logColor(const brogueConsoleColor& color, const simpleString& formatStr, const T& param, const Args&...args)
 		{
-			simpleString message = simpleString::format(formatStr, param);
-
-			setColor(color);
-			std::cout << message << std::endl;
-			setColor(brogueConsoleColor::White);
-		}
-
-		template<isStringConvertible T1, isStringConvertible T2>
-		static void logColor(const brogueConsoleColor& color, const simpleString& formatStr, const T1& param0, const T2& param1)
-		{
-			simpleString message = simpleString::format(formatStr, param0, param1);
-
-			setColor(color);
-			std::cout << message << std::endl;
-			setColor(brogueConsoleColor::White);
-		}
-
-		template<isStringConvertible T1, isStringConvertible T2, isStringConvertible T3>
-		static void logColor(const brogueConsoleColor& color, const simpleString& formatStr, const T1& param0, const T2& param1, const T3& param2)
-		{
-			simpleString message = simpleString::format(formatStr, param0, param1, param2);
-
-			setColor(color);
-			std::cout << message << std::endl;
-			setColor(brogueConsoleColor::White);
-		}
-
-		template<isStringConvertible T1, isStringConvertible T2, isStringConvertible T3, isStringConvertible T4>
-		static void logColor(const brogueConsoleColor& color, const simpleString& formatStr, const T1& param0, const T2& param1, const T3& param2, const T4& param3)
-		{
-			simpleString message = simpleString::format(formatStr, param0, param1, param2, param3);
+			std::string message = simpleExt::format(formatStr.c_str(), param, args...);
 
 			setColor(color);
 			std::cout << message << std::endl;

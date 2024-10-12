@@ -19,12 +19,12 @@ namespace brogueHd::simple
         Hash Explanation:  std::hash provides standard type handling; and can be
                            specialized to work with your classes and structs.
 
-                           http://www.man6.org/docs/cppreference-doc/reference/en.cppreference.com/w/cpp/utility/hash.html
+                           This wasn't used; but it was tried. It's easier to use
+                           a base class/struct definition with concept constraints.
 
-                           Using the macro, you can add the specialization after your
-                           class is defined in your .h file.
-
-                           MAKE_HASHABLE({type}, field1, field2, ...)
+                           The overload for getHash has template support so that
+                           the compiler can hunt around for a suitable overload. The
+                           std::hash methods can be used for primitive types. (see below...)
 
     */
 
@@ -70,6 +70,7 @@ namespace brogueHd::simple
     template<typename T>
     concept isIntLike = std::same_as<T, unsigned long> ||
                         std::same_as<T, long> ||
+                        std::same_as<T, long long> ||
                         std::same_as<T, int> ||
                         std::same_as<T, unsigned int> ||
                         std::same_as<T, short> ||
@@ -78,20 +79,10 @@ namespace brogueHd::simple
 
     template<typename T>
     concept isFloatLike = std::same_as<T, double> ||
-                          std::same_as<T, float>;
+        std::same_as<T, float>;
 
     template<typename T>
-    concept isNumber = isIntLike<T> || isFloatLike<T>;
-
-    class simpleString;
-
-    template<typename T>
-    concept isStringLike =
-        std::same_as<T, simpleString> ||
-        std::same_as<T, char> ||
-        std::same_as<T, const char*> ||
-        std::same_as<T, char[]> ||
-        std::same_as<T, const char[]>;
+    concept isNumber = (isIntLike<T> || isFloatLike<T>);
 
     template<typename T>
     concept isBool = std::same_as<T, bool>;
@@ -100,22 +91,36 @@ namespace brogueHd::simple
     concept isChar = std::same_as<T, char>;
 
     template<typename T>
+    concept isEnum = std::is_enum<T>{}();
+
+    template<typename T>
     concept isPointer = std::is_pointer<T>::value;
+
+    // Single char, bounded array char[], array pointer char*
+    template<typename T>
+    concept isStringLike = isChar<T> ||
+                           std::same_as<T, char[]> ||
+                           std::same_as<T, const char[]> ||
+                           std::same_as<T, char*> ||
+                           std::same_as<T, const char*> ||
+                           std::convertible_to<T, char*> ||
+                           std::convertible_to<T, const char*>;
 
     template<typename T>
     concept isStringConvertible = isNumber<T> || isStringLike<T>;
 
-    // Use these as a crutch until compiler errors are fixed
-    template<typename T>
-    concept isHashableExplicit = std::same_as<T, simpleString>;
+    // Forward declaration of simple string (concept isHashable wasn't compiling properly with IDE)
+    class simpleString;
 
     template<typename T>
-    concept isHashable = isHashableExplicit<T> ||
+    concept isHashable = std::same_as<T, simpleString> ||
                          std::convertible_to<T, hashable> ||
                          std::convertible_to<T, hashableObject> ||
                          isNumber<T> ||
                          isPointer<T> ||
-                         isChar<T>;
+                         isEnum<T> ||
+                         isChar<T> ||
+                         isBool<T>;
 
     class hashGenerator
     {
@@ -176,6 +181,17 @@ namespace brogueHd::simple
             (hash_combine(seed, rest), ...);
         }
 
+        template<isEnum T, isHashable...Rest>
+        static void hash_combine(size_t& seed, const T& next, Rest...rest)
+        {
+            // isEnum<T>
+            size_t nextHash = std::hash<T>{}(next);
+
+            seed = seed ^ (nextHash << 1);
+
+            (hash_combine(seed, rest), ...);
+        }
+
         template<isPointer T, isHashable...Rest>
         static void hash_combine(size_t& seed, const T& next, Rest...rest)
         {
@@ -219,35 +235,3 @@ namespace brogueHd::simple
         breakAndReturn = 1
     };
 }
-
-/*
-
-    Global Macros:  std::hash extension, enum string (simpleEnumString.h)
-
-*/
-
-//#define COMMA   ,
-//
-//#define MAKE_HASHABLE_CLASS(hashableClass)                          \
-//    namespace std                                                   \
-//    {                                                               \
-//        template<> struct hash<hashableClass>                       \
-//        {                                                           \
-//            size_t operator()(const hashableClass &theObject) const \
-//            {                                                       \
-//                return theObject.getHash();                         \
-//            }                                                       \
-//        };                                                          \
-//    }                                                               \
-//
-//#define MAKE_HASHABLE_STRUCT(type)                                  \
-//    namespace std                                                   \
-//    {                                                               \
-//        template<> struct hash<type>                                \
-//        {                                                           \
-//            size_t operator()(const type &theObject) const          \
-//            {                                                       \
-//                return theObject.getHash();                         \
-//            }                                                       \
-//        };                                                          \
-//    }                                                               \

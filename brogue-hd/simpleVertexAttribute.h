@@ -1,6 +1,7 @@
 #pragma once
 
-#include <string>
+#include "simple.h"
+#include "simpleString.h"
 #include "gl.h"
 
 namespace brogueHd::frontend::opengl
@@ -8,7 +9,7 @@ namespace brogueHd::frontend::opengl
     /// <summary>
     /// Describes a single vertex attribute "in" parameter for a shader
     /// </summary>
-    struct simpleVertexAttribute
+    struct simpleVertexAttribute : hashable
     {
     public:
         simpleVertexAttribute()
@@ -51,6 +52,11 @@ namespace brogueHd::frontend::opengl
         GLenum getUniformType() const
         {
             return _activeUniformType;
+        }
+
+        size_t getHash() const override
+        {
+            return hashGenerator::generateHash(_index, _name, _activeUniformType);
         }
 
     private:

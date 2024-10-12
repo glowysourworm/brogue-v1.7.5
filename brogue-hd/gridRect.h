@@ -59,7 +59,7 @@ namespace brogueHd::component
 		}
 		size_t getHash() const override
 		{
-			hashGenerator::generateHash(column, row, width, height);
+			return hashGenerator::generateHash(column, row, width, height);
 		}
 
 		static gridRect fromCircle(short centerColumn, short centerRow, short radiusX, short radiusY)

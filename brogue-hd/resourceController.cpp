@@ -207,7 +207,7 @@ namespace brogueHd::backend::controller
 				color nextColor;
 				colorCollections collection;
 				
-				EnumString<colorCollections>::To(collection, strings.get(2));
+				EnumString<colorCollections>::GetName(collection, strings.get(2));
 
 				nextColor.red = strings.get(2).toShort();
 				nextColor.green = strings.get(2).toShort();

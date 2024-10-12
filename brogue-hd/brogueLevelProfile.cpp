@@ -122,7 +122,7 @@ namespace brogueHd::backend::model
 		}
 
 		// ADJUST FOR DEPTH (Brogue v1.7.5)
-		const short descentPercent = simpleMath<short>::clamp(100 * (_depth - 1) / (AMULET_LEVEL - 1), 0, 100);
+		const short descentPercent = simpleMath::clamp(100 * (_depth - 1) / (AMULET_LEVEL - 1), 0, 100);
 
 		// Get static data to adjust
 		short roomFrequency = _roomFrequencyMap->get(_levelType)->get(roomType);

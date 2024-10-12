@@ -39,7 +39,7 @@ namespace brogueHd::component
 			}
 			catch (std::exception& ex)
 			{
-				simpleException::show("Error trying to check if file exists:  {}:  {}", filename, ex.what());
+				simpleException::show("Error trying to check if file exists:  {}:  {}", filename.c_str(), ex.what());
 			}
 
 			return result;
@@ -64,7 +64,7 @@ namespace brogueHd::component
 			}
 			catch (std::exception& ex)
 			{
-				simpleException::show("Error trying to read file:  {}:  {}", filename, ex.what());
+				simpleException::show("Error trying to read file:  {}:  {}", filename.c_str(), ex.what());
 			}
 		}
 		static void writeFile(const simpleString& filename, const simpleString& contents)
@@ -79,7 +79,7 @@ namespace brogueHd::component
 			}
 			catch (std::exception& ex)
 			{
-				simpleException::show("Error trying to write file:  {}:  {}", filename, ex.what());
+				simpleException::show("Error trying to write file:  {}:  {}", filename.c_str(), ex.what());
 			}
 		}
 	};

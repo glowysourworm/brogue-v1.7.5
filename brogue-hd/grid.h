@@ -495,10 +495,10 @@ namespace brogueHd::component
         if (!this->isDefined(otherLocation.column, otherLocation.row))
             return false;
 
-        if (simpleMath<short>::abs(otherLocation.column - location.column) > 1)
+        if (simpleMath::abs(otherLocation.column - location.column) > 1)
             return false;
 
-        if (simpleMath<short>::abs(otherLocation.row - location.row) > 1)
+        if (simpleMath::abs(otherLocation.row - location.row) > 1)
             return false;
 
         return true;
@@ -531,10 +531,10 @@ namespace brogueHd::component
 
         gridRect boundary = this->getRelativeBoundary();
 
-        short left = simpleMath<short>::clamp(centerColumn - distance, boundary.left(), boundary.right());
-        short right = simpleMath<short>::clamp(centerColumn + distance, boundary.left(), boundary.right());
-        short top = simpleMath<short>::clamp(centerRow - distance, boundary.top(), boundary.bottom());
-        short bottom = simpleMath<short>::clamp(centerColumn + distance, boundary.top(), boundary.bottom());
+        short left = simpleMath::clamp(centerColumn - distance, boundary.left(), boundary.right());
+        short right = simpleMath::clamp(centerColumn + distance, boundary.left(), boundary.right());
+        short top = simpleMath::clamp(centerRow - distance, boundary.top(), boundary.bottom());
+        short bottom = simpleMath::clamp(centerColumn + distance, boundary.top(), boundary.bottom());
 
         for (short i = left; i <= right && !userBreak; i++)
         {
@@ -553,8 +553,8 @@ namespace brogueHd::component
 
         gridRect gridBoundary = this->getRelativeBoundary();
 
-        short safeRight = simpleMath<short>::clamp(boundary.right(), gridBoundary.left(), gridBoundary.right());
-        short safeBottom = simpleMath<short>::clamp(boundary.bottom(), gridBoundary.top(), gridBoundary.bottom());
+        short safeRight = simpleMath::clamp(boundary.right(), gridBoundary.left(), gridBoundary.right());
+        short safeBottom = simpleMath::clamp(boundary.bottom(), gridBoundary.top(), gridBoundary.bottom());
 
         for (short i = boundary.left(); i <= safeRight && !userBreak; i++)
         {

@@ -81,10 +81,10 @@ namespace brogueHd::simple
             // Double Check:  There are only 2 possible orderings of the points
 
             // 1 -> 2 -> 3 (Results from crossing the vectors 12 X 23 - where subtracting the points gives you the vector)
-            T d123 = simpleMath<T>::orientation(point1, point2, point3);
+            T d123 = simpleMath::orientation(point1, point2, point3);
 
             // 1 -> 3 -> 2
-            T d132 = simpleMath<T>::orientation(point1, point3, point2);
+            T d132 = simpleMath::orientation(point1, point3, point2);
 
             // NOTE*** Must handle collinear case. This may be the incorrect way to handle this.
             if (d123 == 0 || d132 == 0)

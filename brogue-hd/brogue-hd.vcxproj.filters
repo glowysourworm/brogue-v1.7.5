@@ -698,6 +698,9 @@
     <ClInclude Include="brogueMacroDeclaration.h">
       <Filter>Header Files\global</Filter>
     </ClInclude>
+    <ClInclude Include="simpleExt.h">
+      <Filter>Header Files\simple</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\resources\model\armor.csv">

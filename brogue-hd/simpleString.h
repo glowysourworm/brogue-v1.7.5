@@ -26,7 +26,6 @@ namespace brogueHd::simple
 		simpleString(int count);
 		simpleString(const char character);
 		simpleString(const char* chars);
-		simpleString(const simpleArray<char>& copy);
 		simpleString(const simpleString& copy);
 		~simpleString();
 
@@ -92,33 +91,11 @@ namespace brogueHd::simple
 		double toDouble();
 		bool toBool();
 
-		template<isNumber T>
-		static simpleString toStringNumber(const T& param);
-
-		template<isNumber T>
-		static simpleString format(const simpleString& formatStr, const T& param);
-
-		template<isStringLike T>
-		static simpleString format(const simpleString& formatStr, const T& param);
-
-		template<isStringConvertible T1, isStringConvertible T2>
-		static simpleString format(const simpleString& formatStr, const T1& param0, const T2& param1);
-
-		template<isStringConvertible T1, isStringConvertible T2, isStringConvertible T3>
-		static simpleString format(const simpleString& formatStr, const T1& param0, const T2& param1, const T3& param2);
-
-		template<isStringConvertible T1, isStringConvertible T2, isStringConvertible T3, isStringConvertible T4>
-		static simpleString format(const simpleString& formatStr, const T1& param0, const T2& param1, const T3& param2, const T4& param3);
-
-		static simpleString formatDate(time_t time);
-		static simpleString join(char* strings[], int arrayLength);
-
 	private:
 
 		int searchImpl(int startIndex, const simpleString& search) const;
 
 		void copyImpl(const simpleString& copy);
-		void copyImpl(const simpleArray<char>& copy);
 		void copyImpl(const char* copy);
 
 		bool compare(const simpleString& other) const;
@@ -153,13 +130,6 @@ namespace brogueHd::simple
 		_array = new simpleArray<char>(0);
 
 		this->copyImpl(chars);
-	}
-	simpleString::simpleString(const simpleArray<char>& copy)
-	{
-		// Pin down array value
-		_array = new simpleArray<char>(0);
-
-		this->copyImpl(copy);
 	}
 	simpleString::simpleString(const simpleString& copy)
 	{
@@ -392,18 +362,6 @@ namespace brogueHd::simple
 		for (int index = 0; index < copy.count(); index++)
 			_array->set(index, copy.get(index));
 	}
-	void simpleString::copyImpl(const simpleArray<char>& copy)
-	{
-		if (copy.count() >= this->MAX_LENGTH)
-			simpleException::showCstr("Trying to declare simpleString greater than 1MB");
-
-		delete _array;
-
-		_array = new simpleArray<char>(copy.count());
-
-		for (int index = 0; index < copy.count(); index++)
-			_array->set(index, copy.get(index));
-	}
 
 	void simpleString::copyImpl(const char* copy)
 	{
@@ -535,7 +493,7 @@ namespace brogueHd::simple
 	bool simpleString::isEmptyOrWhiteSpace() const
 	{
 		return _array->count() == 0 ||
-			_array->areAllWhere([](char value)
+			_array->areAllWhere([] (char value)
 				{
 					return value == '\0' || std::isspace(value);
 				});
@@ -594,6 +552,7 @@ namespace brogueHd::simple
 
 		return result.toArray();
 	}
+
 	simpleArray<simpleString> simpleString::split(const char* tokens) const
 	{
 		size_t length = strnlen_s(tokens, this->MAX_SPLIT_TOKENS);
@@ -686,120 +645,6 @@ namespace brogueHd::simple
 			return true;
 
 		return false;
-	}
-
-	template<isNumber T>
-	simpleString simpleString::toStringNumber(const T& param)
-	{
-		if (std::same_as<T, short>{}())
-			return simpleString(std::to_string(param).c_str());
-
-		else if (std::same_as<T, size_t>{}())
-			return simpleString(std::to_string(param).c_str());
-
-		else if (std::same_as<T, int>{}())
-			return simpleString(std::to_string(param).c_str());
-
-		else if (std::same_as<T, unsigned int>{}())
-			return simpleString(std::to_string(param).c_str());
-
-		else if (std::same_as<T, long>{}())
-			return simpleString(std::to_string(param).c_str());
-
-		else if (std::same_as<T, unsigned long>{}())
-			return simpleString(std::to_string(param).c_str());
-
-		else if (std::same_as<T, float>{}())
-			return simpleString(std::to_string(param).c_str());
-
-		else if (std::same_as<T, double>{}())
-			return simpleString(std::to_string(param).c_str());
-
-		else if (std::same_as<T, char>{}())
-			return simpleString(std::to_string(param).c_str());
-
-		else
-			simpleException::showCstr("Unhandled type simpleString::toStringNumber");
-	}
-
-	template<isNumber T>
-	simpleString simpleString::format(const simpleString& formatStr, const T& param)
-	{
-		simpleString result = formatStr;
-
-		result.replaceFirst("{}", simpleString::toStringNumber(param));
-
-		return result;
-	}
-
-	template<isStringLike T>
-	simpleString simpleString::format(const simpleString& formatStr, const T& param)
-	{
-		simpleString result = formatStr;
-
-		result.replaceFirst("{}", simpleString(param));
-
-		return result;
-	}
-
-	template<isStringConvertible T1, isStringConvertible T2>
-	simpleString simpleString::format(const simpleString& formatStr, const T1& param0, const T2& param1)
-	{
-		simpleString result = formatStr;
-
-		result = simpleString::format<T1>(formatStr, param0);
-		result = simpleString::format<T2>(result, param1);
-
-		return result;
-	}
-
-	template<isStringConvertible T1, isStringConvertible T2, isStringConvertible T3>
-	simpleString simpleString::format(const simpleString& formatStr, const T1& param0, const T2& param1, const T3& param2)
-	{
-		simpleString result = formatStr;
-
-		result = simpleString::format<T1>(formatStr, param0);
-		result = simpleString::format<T2>(result, param1);
-		result = simpleString::format<T3>(result, param2);
-
-		return result;
-	}
-
-	template<isStringConvertible T1, isStringConvertible T2, isStringConvertible T3, isStringConvertible T4>
-	simpleString simpleString::format(const simpleString& formatStr, const T1& param0, const T2& param1, const T3& param2, const T4& param3)
-	{
-		simpleString result = formatStr;
-
-		result = simpleString::format<T1>(formatStr, param0);
-		result = simpleString::format<T2>(result, param1);
-		result = simpleString::format<T3>(result, param2);
-		result = simpleString::format<T4>(result, param3);
-
-		return result;
-	}
-
-	simpleString simpleString::formatDate(time_t time)
-	{
-		char buffer[80];
-		tm timeValue;
-
-		localtime_s(&timeValue, &time);
-
-		std::strftime(buffer, 80, "%Y-%m-%d-%H:%M:%S", &timeValue);
-		simpleString result(buffer);
-
-		return result;
-	}
-	simpleString simpleString::join(char* strings[], int arrayLength)
-	{
-		simpleString result;
-
-		for (int index = 0; index < arrayLength; index++)
-		{
-			result.append(strings[index]);
-		}
-
-		return result;
 	}
 
 	char* simpleString::c_str() const
