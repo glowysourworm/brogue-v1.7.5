@@ -44,7 +44,7 @@ namespace brogueHd::simple
 	{
 	public:
 		simpleList();
-		simpleList(const T* anArray);
+		simpleList(const T* anArray, int arrayLength);
 		simpleList(const simpleArray<T>& anArray);
 		simpleList(const simpleList<T>& copy);
 		~simpleList();
@@ -53,7 +53,7 @@ namespace brogueHd::simple
 		int count() const;
 
 		void add(T item);
-		void addRange(T* list);
+		void addRange(const T* list, int listLength);
 		void addRange(const simpleList<T>& list);
 		void insert(int index, T item);
 		void remove(T item);
@@ -125,9 +125,9 @@ namespace brogueHd::simple
 		_count = 0;
 	}
 	template<isHashable T>
-	simpleList<T>::simpleList(const T* anArray)
+	simpleList<T>::simpleList(const T* anArray, int arrayLength)
 	{
-		_array = new simpleArray<T>(anArray);
+		_array = new simpleArray<T>(anArray, arrayLength);
 		_count = 0;
 	}
 	template<isHashable T>
@@ -199,11 +199,9 @@ namespace brogueHd::simple
 	}
 
 	template<isHashable T>
-	void simpleList<T>::addRange(T* list)
+	void simpleList<T>::addRange(const T* list, int listLength)
 	{
-		int count = sizeof(list) / sizeof(T);
-
-		for (int index = 0; index < count; index++)
+		for (int index = 0; index < listLength; index++)
 			this->add(list[index]);
 	}
 

@@ -48,7 +48,7 @@ namespace brogueHd::frontend::opengl
             _array->set(_cursor++, primitive);
         }
 
-        T* getData()
+        const T* getData()
         {
             return _array->getArray();
         }

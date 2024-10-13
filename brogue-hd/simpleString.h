@@ -64,7 +64,7 @@ namespace brogueHd::simple
 
 		simpleString toUpper() const;
 
-		char* c_str() const;
+		const char* c_str() const;
 
 	public: // Hashable Object
 
@@ -374,10 +374,7 @@ namespace brogueHd::simple
 
 		delete _array;
 
-		_array = new simpleArray<char>(length);
-
-		for (int index = 0; index < length; index++)
-			_array->set(index, copy[index]);
+		_array = new simpleArray<char>(copy, length);
 	}
 
 	void simpleString::insert(int index, const char* replacement)
@@ -575,7 +572,7 @@ namespace brogueHd::simple
 			{
 				simpleArray<simpleString> strings = result.get(index).split(token);
 
-				list.addRange(strings.getArray());
+				list.addRange(strings.getArray(), strings.count());
 			}
 
 			result.clear();
@@ -646,8 +643,16 @@ namespace brogueHd::simple
 		return false;
 	}
 
-	char* simpleString::c_str() const
+	const char* simpleString::c_str() const
 	{
+		// MEMORY ALLOCATION ISSUE!!! IT'S ALLOCATING EXTRA GARBAGE CHARACTERS!
+		//
+		// (see above...)
+		//
+
+		// Workaround:  Iterate and "trim" the string manually before outputting.
+		//
+
 		return _array->getArray();
 	}
 

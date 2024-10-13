@@ -54,7 +54,7 @@ namespace brogueHd::simple
 
 	public:
 
-		T* getArray();
+		const T* getArray();
 
 	public:
 
@@ -164,8 +164,13 @@ namespace brogueHd::simple
 
 		// Initialize new memory
 		//
-		for (size_t i = 0; i < anArrayLength; i++)
-			newArray[i] = anArray[i];
+		int index = 0;
+
+		while (index < anArrayLength)
+		{
+			newArray[index] = anArray[index];
+			index++;
+		}
 
 		// Free old memory
 		//
@@ -203,7 +208,7 @@ namespace brogueHd::simple
 	}
 
 	template<isHashable T>
-	T* simpleArray<T>::getArray()
+	const T* simpleArray<T>::getArray()
 	{
 		return _array;
 	}

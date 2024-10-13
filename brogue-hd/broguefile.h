@@ -87,6 +87,7 @@ namespace brogueHd::backend::model::io
 		bool controlKey;
 		bool shiftKey;
 
+
 		/// <summary>
 		/// Serializes public data to the output stream
 		/// </summary>
