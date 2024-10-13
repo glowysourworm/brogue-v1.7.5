@@ -57,21 +57,22 @@ namespace brogueHd::frontend::ui
 									 int spreadSpeed,
 									 int colorDriftSpeed,
 									 int fadeSpeed,
-									 int updateDelay) : brogueView(gridRect(0, 0, DCOLS, DROWS), gridRect(0, 0, DCOLS, DROWS))
+									 int updateDelay) : brogueView(gridRect(0, 0, DCOLS, DROWS), gridRect(0, 0, MENU_TITLE_WIDTH, MENU_TITLE_HEIGHT))
 	{
+		brogueFlameMenu* that = this;
+
 		// Transfer rendering to the primary view grid
-		for (int column = 0; column < MENU_TITLE_WIDTH; column++)
+		this->getViewBoundary().iterate([&that] (short column, short row)
 		{
-			for (int row = 0; row < MENU_TITLE_HEIGHT; row++)
-			{
-				brogueCellDisplay cell = this->get(column, row);
+			brogueCellDisplay cell = that->get(column, row);
 
-				cell.character = this->Title[column][row];
-				cell.foreColor = color(500, 500, 500, 0, 0, 0, 0, false);
+			cell.character = that->Title[column][row];
+			cell.foreColor = color(500, 500, 500, 0, 0, 0, 0, false);
 
-				this->update(cell, column, row);
-			}
-		}
+			that->update(cell, column, row);
+
+			return iterationCallback::iterate;
+		});
 	}
 	brogueFlameMenu::~brogueFlameMenu()
 	{

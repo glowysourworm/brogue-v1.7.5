@@ -31,7 +31,7 @@ namespace brogueHd::frontend::opengl
         simpleDataStream(int capacity, int vectorElementNumberVertices, int vectorStreamSize)
         {
             _streamNumberVertices = capacity * vectorElementNumberVertices;
-            _array = new simpleArray<T>(capacity);
+            _array = new simpleArray<T>(capacity * vectorStreamSize);
             _cursor = 0;
         }
 
