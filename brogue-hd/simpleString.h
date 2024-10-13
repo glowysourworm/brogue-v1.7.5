@@ -49,6 +49,7 @@ namespace brogueHd::simple
 		int search(const simpleString& search) const;
 
 		void set(int index, char value);
+		void clear();
 
 		void append(const simpleString& other);
 		void append(const char* chars);
@@ -499,6 +500,17 @@ namespace brogueHd::simple
 	void simpleString::set(int index, char value)
 	{
 		_array->set(index, value);
+	}
+
+	void simpleString::clear()
+	{
+		// Delete and reallocate
+		if (_array != nullptr)
+		{
+			delete _array;
+		}
+
+		_array = new simpleArray<char>(0);
 	}
 
 	simpleString simpleString::subString(int index, int count) const

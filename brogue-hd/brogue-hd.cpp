@@ -43,44 +43,47 @@ int main(int argc, char* argv[])
 	while (returnValue != brogueConsoleReturn::Exit && iterate)
 	{
 		// Pass command to the console component
-		returnValue = currentConsole->command(cmd, std::cout);
-
-		switch (returnValue)
+		if (!cmd.isEmptyOrWhiteSpace())
 		{
-		case brogueConsoleReturn::Continue:
-		case brogueConsoleReturn::Completed:
-			currentConsole = defaultConsole;
+			returnValue = currentConsole->command(cmd, std::cout);
+
+			switch (returnValue)
+			{
+			case brogueConsoleReturn::Continue:
+			case brogueConsoleReturn::Completed:
+				currentConsole = defaultConsole;
+				break;
+			case brogueConsoleReturn::Completed_SetMode_Game:
+			{
+				if (currentConsole != defaultConsole)
+					delete currentConsole;
+
+				currentConsole = new gameConsole(brogueResourceController);
+			}
 			break;
-		case brogueConsoleReturn::Completed_SetMode_Game:
-		{
-			if (currentConsole != defaultConsole)
-				delete currentConsole;
+			case brogueConsoleReturn::Completed_SetMode_Dev:
+			{
+				if (currentConsole != defaultConsole)
+					delete currentConsole;
 
-			currentConsole = new gameConsole(brogueResourceController);
-		}
-		break;
-		case brogueConsoleReturn::Completed_SetMode_Dev:
-		{
-			if (currentConsole != defaultConsole)
-				delete currentConsole;
-
-			currentConsole = new developerConsole();
-		}
-		break;
-		case brogueConsoleReturn::Completed_SetMode_Resource:
-		{
-			if (currentConsole != defaultConsole)
-				delete currentConsole;
-
-			currentConsole = new resourceConsole(brogueResourceController);
-		}
-		break;
-		case brogueConsoleReturn::CompletedWithError:
+				currentConsole = new developerConsole();
+			}
 			break;
-		case brogueConsoleReturn::Exit:
-		default:
-			iterate = false;
+			case brogueConsoleReturn::Completed_SetMode_Resource:
+			{
+				if (currentConsole != defaultConsole)
+					delete currentConsole;
+
+				currentConsole = new resourceConsole(brogueResourceController);
+			}
 			break;
+			case brogueConsoleReturn::CompletedWithError:
+				break;
+			case brogueConsoleReturn::Exit:
+			default:
+				iterate = false;
+				break;
+			}
 		}
 
 		// Print Help for the menu loop
@@ -96,13 +99,11 @@ int main(int argc, char* argv[])
 			return 0;
 		}
 
+		cmd.clear();
+
 		// Read console line
 		std::cout << std::endl << currentConsole->consoleName << " @> ";
-		std::string cmdStr;
-		std::getline(std::cin, cmdStr);
-
-		// Didn't want to rewrite getline..
-		cmd = cmdStr.c_str();
+		std::cin >> cmd;
 	}
 
 	if (currentConsole != defaultConsole)
