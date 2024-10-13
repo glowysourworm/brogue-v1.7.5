@@ -40,6 +40,25 @@ namespace brogueHd::simple
 			std::cout << message << std::endl;
 		}
 
+		static void log(const char* message)
+		{
+			std::cout << message << std::endl;
+		}
+
+		static void logColor(const brogueConsoleColor& color, const simpleString& message)
+		{
+			setColor(color);
+			std::cout << message << std::endl;
+			setColor(brogueConsoleColor::White);
+		}
+
+		static void logColor(const brogueConsoleColor& color, const char* message)
+		{
+			setColor(color);
+			std::cout << message << std::endl;
+			setColor(brogueConsoleColor::White);
+		}
+
 		template<isStringConvertible T, isStringConvertible...Args>
 		static void log(const char* formatStr, const T& param, const Args&...args)
 		{

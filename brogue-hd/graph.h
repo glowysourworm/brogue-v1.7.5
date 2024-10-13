@@ -53,10 +53,8 @@ namespace brogueHd::component
     template<graphNodeType TNode, graphEdgeType<TNode> TEdge>
     graph<TNode, TEdge>::graph(const simpleArray<TNode>& nodes)
     {
-        TEdge* edges = NULL;
-
         _nodes = new simpleList<TNode>(nodes);
-        _edgeCollection = new graphEdgeCollection<TNode, TEdge>(nodes, edges);
+        _edgeCollection = new graphEdgeCollection<TNode, TEdge>(nodes, simpleArray<TEdge>());
     }
 
     template<graphNodeType TNode, graphEdgeType<TNode> TEdge>

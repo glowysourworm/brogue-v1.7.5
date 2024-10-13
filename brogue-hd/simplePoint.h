@@ -32,11 +32,11 @@ namespace brogueHd::simple
 			y = copy.y;
 		}
 
-		bool operator != (const simplePoint<T>& point)
+		bool operator != (const simplePoint<T>& point) const
 		{
 			return x != point.x || y != point.y;
 		}
-		bool operator == (const simplePoint<T>& point)
+		bool operator == (const simplePoint<T>& point) const
 		{
 			return x == point.x && y == point.y;
 		}

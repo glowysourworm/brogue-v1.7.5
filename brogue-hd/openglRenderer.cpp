@@ -22,7 +22,7 @@ namespace brogueHd::frontend::opengl
 
 	void openglRenderer::errorCallback(int error, const char* message)
 	{
-		simpleLogger::logColor(brogueConsoleColor::Red, "GLFW Error {} {}", simpleString::toStringNumber(error), message);
+		simpleLogger::logColor(brogueConsoleColor::Red, "GLFW Error {} {}", simpleExt::toString(error), message);
 	}
 	void openglRenderer::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 	{

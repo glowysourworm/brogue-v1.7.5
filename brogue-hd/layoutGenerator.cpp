@@ -550,7 +550,7 @@ namespace brogueHd::backend::generator
             gridLocator targets[1] = { edge.node2 };
             
             // Run Dijkstra
-            algorithm.initialize(source, targets);
+            algorithm.initialize(source, simpleArray<gridLocator>(targets, 1));
             algorithm.run();
 
             simpleArray<gridLocator> resultPath = algorithm.getResultPath(targets[0]);

@@ -41,7 +41,7 @@ namespace brogueHd::simple
 
 		simpleArray();
 		simpleArray(int count);
-		simpleArray(const T* anArray);
+		simpleArray(const T* anArray, int anArrayLength);
 		simpleArray(const simpleArray<T>& copy);
 		~simpleArray();
 
@@ -74,8 +74,7 @@ namespace brogueHd::simple
 	private:
 
 		void allocate(int capacity);
-		void reAllocate(const T* anArray);
-		int getArrayCount(const T* anArray);
+		void reAllocate(const T* anArray, int anArrayLength);
 
 	private:
 
@@ -101,12 +100,12 @@ namespace brogueHd::simple
 	}
 
 	template<isHashable T>
-	simpleArray<T>::simpleArray(const T* anArray)
+	simpleArray<T>::simpleArray(const T* anArray, int anArrayLength)
 	{
 		_count = 0;
 		_array = nullptr;
 
-		reAllocate(anArray);
+		reAllocate(anArray, anArrayLength);
 	}
 
 	template<isHashable T>
@@ -137,20 +136,6 @@ namespace brogueHd::simple
 	}
 
 	template<isHashable T>
-	int simpleArray<T>::getArrayCount(const T* anArray)
-	{
-		int index = 0;
-		int count = 0;
-
-		while (anArray[index++] != NULL)
-		{
-			count++;
-		}
-
-		return count;
-	}
-
-	template<isHashable T>
 	void simpleArray<T>::allocate(int capacity)
 	{
 		T* newArray = new T[capacity];
@@ -167,23 +152,19 @@ namespace brogueHd::simple
 	}
 
 	template<isHashable T>
-	void simpleArray<T>::reAllocate(const T* anArray)
+	void simpleArray<T>::reAllocate(const T* anArray, int anArrayLength)
 	{
 		if (anArray == nullptr)
 			simpleException::showCstr("Trying to allocate from a null array:  simpleArray::reAllocate");
 
-		// Get the number of actual elements in the array
-		//
-		size_t count = this->getArrayCount(anArray);
-
-		T* newArray = new T[count];
+		T* newArray = new T[anArrayLength];
 
 		if (newArray == nullptr)
-			simpleException::showCstr("malloc returned nullptr:  Unable to allocate memory. simpleArray.h");
+			simpleException::showCstr("Unable to allocate memory. simpleArray.h");
 
 		// Initialize new memory
 		//
-		for (size_t i = 0; i < count; i++)
+		for (size_t i = 0; i < anArrayLength; i++)
 			newArray[i] = anArray[i];
 
 		// Free old memory
@@ -194,7 +175,7 @@ namespace brogueHd::simple
 		}
 
 		_array = newArray;
-		_count = count;
+		_count = anArrayLength;
 	}
 
 	template<isHashable T>

@@ -19,6 +19,8 @@ namespace brogueHd::simple
 		static void showCstr(const char* message)
 		{
 			throw std::exception(message);
+
+			throw;
 		}
 
 	public:

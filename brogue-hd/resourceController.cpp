@@ -44,7 +44,7 @@ namespace brogueHd::backend::controller
 		try
 		{
 			// Parse the JSON file
-			nlohmann::json jsonConfig = nlohmann::json::parse(configuration);
+			nlohmann::json jsonConfig = nlohmann::json::parse(configuration.c_str());
 
 			auto thing = jsonConfig["sdf"];
 
@@ -207,7 +207,7 @@ namespace brogueHd::backend::controller
 				color nextColor;
 				colorCollections collection;
 				
-				EnumString<colorCollections>::GetName(collection, strings.get(2));
+				EnumString<colorCollections>::To(collection, strings.get(2).c_str());
 
 				nextColor.red = strings.get(2).toShort();
 				nextColor.green = strings.get(2).toShort();
@@ -222,52 +222,52 @@ namespace brogueHd::backend::controller
 				{
 				case colorCollections::game:
 					gameColors gameSelector;
-					EnumString<gameColors>::To(gameSelector, strings.get(1));
+					EnumString<gameColors>::To(gameSelector, strings.get(1).c_str());
 					result->setColor(gameSelector, nextColor);
 					break;
 				case colorCollections::bolt:
 					boltColors boltSelector;
-					EnumString<boltColors>::To(boltSelector, strings.get(1));
+					EnumString<boltColors>::To(boltSelector, strings.get(1).c_str());
 					result->setColor(boltSelector, nextColor);
 					break;
 				case colorCollections::tile:
 					tileColors tileSelector;
-					EnumString<tileColors>::To(tileSelector, strings.get(1));
+					EnumString<tileColors>::To(tileSelector, strings.get(1).c_str());
 					result->setColor(tileSelector, nextColor);
 					break;
 				case colorCollections::creature:
 					creatureColors creatureSelector;
-					EnumString<creatureColors>::To(creatureSelector, strings.get(1));
+					EnumString<creatureColors>::To(creatureSelector, strings.get(1).c_str());
 					result->setColor(creatureSelector, nextColor);
 					break;
 				case colorCollections::light:
 					lightColors lightSelector;
-					EnumString<lightColors>::To(lightSelector, strings.get(1));
+					EnumString<lightColors>::To(lightSelector, strings.get(1).c_str());
 					result->setColor(lightSelector, nextColor);
 					break;
 				case colorCollections::flare:
 					flareColors flareSelector;
-					EnumString<flareColors>::To(flareSelector, strings.get(1));
+					EnumString<flareColors>::To(flareSelector, strings.get(1).c_str());
 					result->setColor(flareSelector, nextColor);
 					break;
 				case colorCollections::multipliers:
 					colorMultipliers multiplierSelector;
-					EnumString<colorMultipliers>::To(multiplierSelector, strings.get(1));
+					EnumString<colorMultipliers>::To(multiplierSelector, strings.get(1).c_str());
 					result->setColor(multiplierSelector, nextColor);
 					break;
 				case colorCollections::blood:
 					bloodColors bloodSelector;
-					EnumString<bloodColors>::To(bloodSelector, strings.get(1));
+					EnumString<bloodColors>::To(bloodSelector, strings.get(1).c_str());
 					result->setColor(bloodSelector, nextColor);
 					break;
 				case colorCollections::gas:
 					gasColors gasSelector;
-					EnumString<gasColors>::To(gasSelector, strings.get(1));
+					EnumString<gasColors>::To(gasSelector, strings.get(1).c_str());
 					result->setColor(gasSelector, nextColor);
 					break;
 				case colorCollections::bInterface:
 					interfaceColors interfaceSelector;
-					EnumString<interfaceColors>::To(interfaceSelector, strings.get(1));
+					EnumString<interfaceColors>::To(interfaceSelector, strings.get(1).c_str());
 					result->setColor(interfaceSelector, nextColor);
 					break;
 				default:

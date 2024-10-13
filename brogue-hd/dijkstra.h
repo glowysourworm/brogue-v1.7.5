@@ -62,7 +62,7 @@ namespace brogueHd::component
 
         ~dijkstra();
 
-        void initialize(T source, T* targets);
+        void initialize(T source, const simpleArray<T>& targets);
 
 		/// <summary>
 		/// Runs Dijkstra's algorithm ONCE. WILL NOT RE-RUN.
@@ -188,7 +188,7 @@ namespace brogueHd::component
 	}
 
 	template<isGridLocator T>
-	void dijkstra<T>::initialize(T source, T* targets)
+	void dijkstra<T>::initialize(T source, const simpleArray<T>& targets)
 	{
 		_sourceLocation = source;
 		_targetLocations = new simpleArray<T>(targets);

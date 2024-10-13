@@ -1,6 +1,7 @@
 #pragma once
 
 #include "brogueTestPackage.h"
+#include "brogueTestFunction.h"
 #include "simpleHash.h"
 
 using namespace brogueHd::simple;
@@ -14,20 +15,20 @@ namespace brogueHd::test
 		simpleHashTests() : brogueTestPackage("Simple Hash Tests")
 		{
 			// simpleArray<int>
-			this->addTest("instantiate_IntInt_OnStack", std::bind(&simpleHashTests::instantiate_IntInt_OnStack, this));
-			this->addTest("instantiate_IntInt_OnHeap_And_Delete", std::bind(&simpleHashTests::instantiate_IntInt_OnHeap_And_Delete, this));
-			this->addTest("intInt_OnStack_Set_Get", std::bind(&simpleHashTests::intInt_OnStack_Set_Get, this));
-			this->addTest("intInt_OnHeap_Set_Get_Delete", std::bind(&simpleHashTests::intInt_OnHeap_Set_Get_Delete, this));
-			this->addTest("intInt_OnStack_iterate", std::bind(&simpleHashTests::intInt_OnStack_iterate, this));
-			this->addTest("intInt_OnHeap_iterate", std::bind(&simpleHashTests::intInt_OnHeap_iterate, this));
+			this->addTest(brogueTestFunction("instantiate_IntInt_OnStack", std::bind(&simpleHashTests::instantiate_IntInt_OnStack, this)));
+			this->addTest(brogueTestFunction("instantiate_IntInt_OnHeap_And_Delete", std::bind(&simpleHashTests::instantiate_IntInt_OnHeap_And_Delete, this)));
+			this->addTest(brogueTestFunction("intInt_OnStack_Set_Get", std::bind(&simpleHashTests::intInt_OnStack_Set_Get, this)));
+			this->addTest(brogueTestFunction("intInt_OnHeap_Set_Get_Delete", std::bind(&simpleHashTests::intInt_OnHeap_Set_Get_Delete, this)));
+			this->addTest(brogueTestFunction("intInt_OnStack_iterate", std::bind(&simpleHashTests::intInt_OnStack_iterate, this)));
+			this->addTest(brogueTestFunction("intInt_OnHeap_iterate", std::bind(&simpleHashTests::intInt_OnHeap_iterate, this)));
 
 			// simpleArray<simpleString>
-			this->addTest("instantiate_StringString_OnStack", std::bind(&simpleHashTests::instantiate_StringString_OnStack, this));
-			this->addTest("instantiate_StringString_OnHeap_And_Delete", std::bind(&simpleHashTests::instantiate_StringString_OnHeap_And_Delete, this));
-			this->addTest("stringString_OnStack_Set_Get", std::bind(&simpleHashTests::stringString_OnStack_Set_Get, this));
-			this->addTest("stringString_OnHeap_Set_Get_Delete", std::bind(&simpleHashTests::stringString_OnHeap_Set_Get_Delete, this));
-			this->addTest("stringString_OnStack_iterate", std::bind(&simpleHashTests::stringString_OnStack_iterate, this));
-			this->addTest("stringString_OnHeap_iterate", std::bind(&simpleHashTests::stringString_OnHeap_iterate, this));
+			this->addTest(brogueTestFunction("instantiate_StringString_OnStack", std::bind(&simpleHashTests::instantiate_StringString_OnStack, this)));
+			this->addTest(brogueTestFunction("instantiate_StringString_OnHeap_And_Delete", std::bind(&simpleHashTests::instantiate_StringString_OnHeap_And_Delete, this)));
+			this->addTest(brogueTestFunction("stringString_OnStack_Set_Get", std::bind(&simpleHashTests::stringString_OnStack_Set_Get, this)));
+			this->addTest(brogueTestFunction("stringString_OnHeap_Set_Get_Delete", std::bind(&simpleHashTests::stringString_OnHeap_Set_Get_Delete, this)));
+			this->addTest(brogueTestFunction("stringString_OnStack_iterate", std::bind(&simpleHashTests::stringString_OnStack_iterate, this)));
+			this->addTest(brogueTestFunction("stringString_OnHeap_iterate", std::bind(&simpleHashTests::stringString_OnHeap_iterate, this)));
 		}
 		~simpleHashTests()
 		{

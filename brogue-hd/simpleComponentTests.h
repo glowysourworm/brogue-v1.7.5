@@ -18,7 +18,7 @@ namespace brogueHd::test
 	public:
 		simpleComponentTests() : brogueTestPackage("Simple Component Tests")
 		{
-			this->addTest("create_simpleHash_brogueObject", std::bind(&simpleComponentTests::create_simpleHash_brogueObject, this));
+			this->addTest(brogueTestFunction("create_simpleHash_brogueObject", std::bind(&simpleComponentTests::create_simpleHash_brogueObject, this)));
 		}
 		~simpleComponentTests()
 		{

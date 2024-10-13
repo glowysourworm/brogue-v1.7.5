@@ -701,6 +701,9 @@
     <ClInclude Include="simpleExt.h">
       <Filter>Header Files\simple</Filter>
     </ClInclude>
+    <ClInclude Include="brogueTestFunction.h">
+      <Filter>Header Files\unit-test</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\resources\model\armor.csv">

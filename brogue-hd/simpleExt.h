@@ -81,11 +81,11 @@ namespace brogueHd::simple
 		{
 			if (isNumber<T>)
 			{
-				return simpleExt::toStringImpl(param);
+				return simpleExt::toStringImpl(param).c_str();
 			}
 			else if (isStringLike<T>)
 			{
-				return simpleExt::toStringImpl(param);
+				return simpleExt::toStringImpl(param).c_str();
 			}
 			else
 				showError("Invalid use of concept constraints:  simpleExt::format");

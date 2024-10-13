@@ -14,20 +14,20 @@ namespace brogueHd::test
 		simpleArrayTests() : brogueTestPackage("Simple Array Tests")
 		{
 			// simpleArray<int>
-			this->addTest("instantiate_IntArray_OnStack", std::bind(&simpleArrayTests::instantiate_IntArray_OnStack, this));
-			this->addTest("instantiate_IntArray_OnHeap_And_Delete", std::bind(&simpleArrayTests::instantiate_IntArray_OnHeap_And_Delete, this));
-			this->addTest("intArray_OnStack_Set_Get", std::bind(&simpleArrayTests::intArray_OnStack_Set_Get, this));
-			this->addTest("intArray_OnHeap_Set_Get_Delete", std::bind(&simpleArrayTests::intArray_OnHeap_Set_Get_Delete, this));
-			this->addTest("intArray_OnStack_forEach", std::bind(&simpleArrayTests::intArray_OnStack_forEach, this));
-			this->addTest("intArray_OnHeap_forEach", std::bind(&simpleArrayTests::intArray_OnHeap_forEach, this));
+			this->addTest(brogueTestFunction("instantiate_IntArray_OnStack", std::bind(&simpleArrayTests::instantiate_IntArray_OnStack, this)));
+			this->addTest(brogueTestFunction("instantiate_IntArray_OnHeap_And_Delete", std::bind(&simpleArrayTests::instantiate_IntArray_OnHeap_And_Delete, this)));
+			this->addTest(brogueTestFunction("intArray_OnStack_Set_Get", std::bind(&simpleArrayTests::intArray_OnStack_Set_Get, this)));
+			this->addTest(brogueTestFunction("intArray_OnHeap_Set_Get_Delete", std::bind(&simpleArrayTests::intArray_OnHeap_Set_Get_Delete, this)));
+			this->addTest(brogueTestFunction("intArray_OnStack_forEach", std::bind(&simpleArrayTests::intArray_OnStack_forEach, this)));
+			this->addTest(brogueTestFunction("intArray_OnHeap_forEach", std::bind(&simpleArrayTests::intArray_OnHeap_forEach, this)));
 
 			// simpleArray<simpleString>
-			this->addTest("instantiate_StringArray_OnStack", std::bind(&simpleArrayTests::instantiate_StringArray_OnStack, this));
-			this->addTest("instantiate_StringArray_OnHeap_And_Delete", std::bind(&simpleArrayTests::instantiate_StringArray_OnHeap_And_Delete, this));
-			this->addTest("stringArray_OnStack_Set_Get", std::bind(&simpleArrayTests::stringArray_OnStack_Set_Get, this));
-			this->addTest("stringArray_OnHeap_Set_Get_Delete", std::bind(&simpleArrayTests::stringArray_OnHeap_Set_Get_Delete, this));
-			this->addTest("stringArray_OnStack_forEach", std::bind(&simpleArrayTests::stringArray_OnStack_forEach, this));
-			this->addTest("stringArray_OnHeap_forEach", std::bind(&simpleArrayTests::stringArray_OnHeap_forEach, this));
+			this->addTest(brogueTestFunction("instantiate_StringArray_OnStack", std::bind(&simpleArrayTests::instantiate_StringArray_OnStack, this)));
+			this->addTest(brogueTestFunction("instantiate_StringArray_OnHeap_And_Delete", std::bind(&simpleArrayTests::instantiate_StringArray_OnHeap_And_Delete, this)));
+			this->addTest(brogueTestFunction("stringArray_OnStack_Set_Get", std::bind(&simpleArrayTests::stringArray_OnStack_Set_Get, this)));
+			this->addTest(brogueTestFunction("stringArray_OnHeap_Set_Get_Delete", std::bind(&simpleArrayTests::stringArray_OnHeap_Set_Get_Delete, this)));
+			this->addTest(brogueTestFunction("stringArray_OnStack_forEach", std::bind(&simpleArrayTests::stringArray_OnStack_forEach, this)));
+			this->addTest(brogueTestFunction("stringArray_OnHeap_forEach", std::bind(&simpleArrayTests::stringArray_OnHeap_forEach, this)));
 		}
 		~simpleArrayTests()
 		{

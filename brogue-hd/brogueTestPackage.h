@@ -4,25 +4,25 @@
 #include "simpleLogger.h"
 #include "simpleHash.h"
 #include "simpleString.h"
+#include "brogueTestFunction.h"
 
 using namespace brogueHd::simple;
 
 namespace brogueHd::test
 {
-	typedef std::function<bool(void)> brogueTestDelegate;
-	typedef std::function<bool(void)> brogueTestAssertDelegate;
+	using brogueTestAssertion = std::function<bool(void)>;
 
 	class brogueTestPackage
 	{
 	public:
 		brogueTestPackage(const char* name)
 		{
-			_tests = new simpleHash<simpleString, brogueTestDelegate>();
+			_tests = new simpleHash<simpleString, brogueTestFunction>();
 			_batteryName = name;
 		}
 		brogueTestPackage(simpleString name)
 		{
-			_tests = new simpleHash<simpleString, brogueTestDelegate>();
+			_tests = new simpleHash<simpleString, brogueTestFunction>();
 			_batteryName = name;
 		}
 		~brogueTestPackage()
@@ -35,7 +35,7 @@ namespace brogueHd::test
 			brogueTestPackage* that = this;
 			bool anyErrors = false;
 			
-			_tests->iterate([&that, &anyErrors](simpleString key, brogueTestDelegate value)
+			_tests->iterate([&that, &anyErrors](simpleString key, brogueTestFunction value)
 			{
 				that->setCurrentTest(key);
 
@@ -45,7 +45,7 @@ namespace brogueHd::test
 
 				try
 				{
-					 result = value();
+					 result = value.testRun();
 				}
 				catch (const std::exception& ex)
 				{
@@ -55,9 +55,9 @@ namespace brogueHd::test
 				}
 
 				if (result)
-					simpleLogger::logColor(brogueConsoleColor::Green, "Test {} Success!", key);
+					simpleLogger::logColor(brogueConsoleColor::Green, "Test {} Success!", key.c_str());
 				else
-					simpleLogger::logColor(brogueConsoleColor::Red, "Test {} Fail!", key);
+					simpleLogger::logColor(brogueConsoleColor::Red, "Test {} Fail!", key.c_str());
 
 				anyErrors &= result;
 
@@ -67,7 +67,7 @@ namespace brogueHd::test
 			return anyErrors;
 		}
 
-		void testAssert(simpleString assertName, brogueTestAssertDelegate assertion)
+		void testAssert(simpleString assertName, brogueTestAssertion assertion)
 		{
 			bool result = false;
 
@@ -77,12 +77,12 @@ namespace brogueHd::test
 			}
 			catch (const std::exception& ex)
 			{
-				simpleLogger::logColor(brogueConsoleColor::Red, "Unit Test {} Assertion Exception {}:  {}", _currentTestName, assertName, ex.what());
+				simpleLogger::logColor(brogueConsoleColor::Red, "Unit Test {} Assertion Exception {}:  {}", _currentTestName.c_str(), assertName.c_str(), ex.what());
 				result = false;
 			}
 				
 			if (!result)
-				simpleLogger::logColor(brogueConsoleColor::Red, "Unit Test {} Assertion {} Failed!", _currentTestName, assertName);
+				simpleLogger::logColor(brogueConsoleColor::Red, "Unit Test {} Assertion {} Failed!", _currentTestName.c_str(), assertName.c_str());
 		}
 
 		simpleString getName()
@@ -92,9 +92,9 @@ namespace brogueHd::test
 
 	protected:
 
-		void addTest(simpleString testName, brogueTestDelegate testDelegate)
+		void addTest(brogueTestFunction testDelegate)
 		{
-			_tests->add(testName, testDelegate);
+			_tests->add(testDelegate.name, testDelegate);
 		}
 
 		void setCurrentTest(simpleString testName)
@@ -104,7 +104,7 @@ namespace brogueHd::test
 
 	private:
 
-		simpleHash<simpleString, brogueTestDelegate>* _tests;
+		simpleHash<simpleString, brogueTestFunction>* _tests;
 
 		simpleString _currentTestName;
 		simpleString _batteryName;

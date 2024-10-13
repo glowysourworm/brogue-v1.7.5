@@ -54,10 +54,10 @@ namespace brogueHd::console
 		for (int i = 0; i < scoreFile->scoreCount; i++)
 		{
 			// Convert file time to readable string
-			simpleString dateStr = simpleString::formatDate(scoreFile->scoreList.get(i).dateTime);
+			const char* dateStr = simpleExt::formatDate(scoreFile->scoreList.get(i).dateTime);
 
 			// Output to stream (console)
-			stream << std::format("{}\t{}\t{}", (int)scoreFile->scoreList.get(i).score, dateStr, scoreFile->scoreList.get(i).description) << std::endl;
+			stream << simpleExt::format("{}\t{}\t{}", scoreFile->scoreList.get(i).score, dateStr, scoreFile->scoreList.get(i).description) << std::endl;
 		}
 
 		delete scoreFile;

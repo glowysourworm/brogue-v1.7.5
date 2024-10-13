@@ -277,7 +277,7 @@ namespace brogueHd::simple
 		{
 			delete _array;
 
-			_array = new simpleArray<char>(other);
+			_array = new simpleArray<char>(other, otherCount);
 		}
 		else
 		{
