@@ -39,5 +39,17 @@ namespace brogueHd::backend::model
 		gridLocator* _downStairsLoc;
 		gridLocator* _playerExitedVia;
 	};
+
+	brogueLevel::brogueLevel(short depth, unsigned long levelSeed)
+	{
+
+	}
+	brogueLevel::~brogueLevel()
+	{
+	}
+	short brogueLevel::getDepth() const
+	{
+		return 1;
+	}
 }
 

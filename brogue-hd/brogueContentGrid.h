@@ -47,5 +47,14 @@ namespace brogueHd::backend::model
 		simpleList<brogueItem*>* _charms;
 		simpleList<brogueItem*>* _scrolls;
 	};
+
+	brogueContentGrid::brogueContentGrid()
+	{
+
+	}
+	brogueContentGrid::~brogueContentGrid()
+	{
+
+	}
 }
 

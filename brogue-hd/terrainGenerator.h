@@ -15,4 +15,14 @@ namespace brogueHd::backend::generator
 
 		randomGenerator* _randomGenerator;
 	};
+
+	terrainGenerator::terrainGenerator(randomGenerator* randomGenerator)
+	{
+		_randomGenerator = randomGenerator;
+	}
+
+	terrainGenerator::~terrainGenerator()
+	{
+
+	}
 }

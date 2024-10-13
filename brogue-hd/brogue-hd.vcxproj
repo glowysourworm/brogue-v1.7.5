@@ -172,37 +172,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="brogue-hd.cpp" />
-    <ClCompile Include="brogueColorMap.cpp" />
-    <ClCompile Include="brogueConsole.cpp" />
-    <ClCompile Include="brogueContentGrid.cpp" />
-    <ClCompile Include="brogueGame.cpp" />
-    <ClCompile Include="brogueGameProfile.cpp" />
-    <ClCompile Include="brogueLayout.cpp" />
-    <ClCompile Include="brogueItem.cpp" />
-    <ClCompile Include="brogueLevel.cpp" />
-    <ClCompile Include="brogueLevelProfile.cpp" />
-    <ClCompile Include="brogueMachine.cpp" />
-    <ClCompile Include="brogueMessageQueue.cpp" />
-    <ClCompile Include="brogueView.cpp" />
-    <ClCompile Include="contentGenerator.cpp" />
-    <ClCompile Include="developerConsole.cpp" />
-    <ClCompile Include="gameConsole.cpp" />
-    <ClCompile Include="gameController.cpp" />
     <ClCompile Include="gl.c" />
-    <ClCompile Include="keyProcessor.cpp" />
-    <ClCompile Include="layoutGenerator.cpp" />
-    <ClCompile Include="levelProcessor.cpp" />
-    <ClCompile Include="levelRenderer.cpp" />
-    <ClCompile Include="noiseGenerator.cpp" />
-    <ClCompile Include="openglRenderer.cpp" />
-    <ClCompile Include="playbackProcessor.cpp" />
-    <ClCompile Include="randomGenerator.cpp" />
-    <ClCompile Include="resourceConsole.cpp" />
-    <ClCompile Include="resourceController.cpp" />
-    <ClCompile Include="roomGenerator.cpp" />
-    <ClCompile Include="renderingController.cpp" />
-    <ClCompile Include="simpleShaderProgram.cpp" />
-    <ClCompile Include="terrainGenerator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="accretionTile.h" />

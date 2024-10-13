@@ -24,5 +24,24 @@ namespace brogueHd::backend::model
 		machineFeatureFlags _featureFlags;
 
 	};
+
+	brogueMachine::brogueMachine(machineBase generator, machineFeatureFlags featureFlags)
+	{
+		_generator = generator;
+		_featureFlags = featureFlags;
+	}
+	brogueMachine::~brogueMachine()
+	{
+
+	}
+
+	machineBase brogueMachine::getGenerator() const
+	{
+		return _generator;
+	}
+	machineFeatureFlags brogueMachine::getFeatureFlags() const
+	{
+		return _featureFlags;
+	}
 }
 

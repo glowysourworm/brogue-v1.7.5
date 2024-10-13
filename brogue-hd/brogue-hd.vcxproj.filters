@@ -40,38 +40,8 @@
     <Filter Include="Header Files\backend\model\layout">
       <UniqueIdentifier>{dacca4eb-ea81-4b09-8674-cc98a9df6fd3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\backend">
-      <UniqueIdentifier>{76c3f37c-f040-4976-971f-dd79a3d39a34}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\frontend">
-      <UniqueIdentifier>{f62ea149-e1fe-49ad-9116-cbdefaa29b1a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\backend\model">
-      <UniqueIdentifier>{c73fed91-5fa8-4d2b-ab8c-bc9ea4b22bbf}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\backend\model\layout">
-      <UniqueIdentifier>{d2e157b9-f568-4569-80f8-e688014dadc0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\backend\controller">
-      <UniqueIdentifier>{128a7fda-b6d5-48aa-8085-f952f5d1d7ad}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\backend\generator">
-      <UniqueIdentifier>{803ef6ce-b221-4dae-98fc-1a850e26b774}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\backend\processor">
-      <UniqueIdentifier>{0ab7ec97-0650-48f2-a4df-f74da2c812d8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\frontend\opengl">
-      <UniqueIdentifier>{11bf4396-ffa8-4573-a7be-83d06de476ae}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\frontend\renderer">
-      <UniqueIdentifier>{8539ee47-062f-4fba-9f14-acf1754e9266}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\backend\methods">
       <UniqueIdentifier>{19e8db3f-3028-4fc5-a766-0acc4a985a66}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\backend\model\machine">
-      <UniqueIdentifier>{f8a5de6e-584a-4f1a-9a51-0910cf1775e8}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\backend\model\game">
       <UniqueIdentifier>{b4b497ca-87eb-4e86-8726-0915fbca2ca9}</UniqueIdentifier>
@@ -82,14 +52,8 @@
     <Filter Include="Header Files\backend\model\construction">
       <UniqueIdentifier>{4cf08ea0-1b5a-4aa1-bd85-35d32b4b2d85}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\backend\model\construction">
-      <UniqueIdentifier>{0d09d2a0-9793-47dc-90a1-775429bc19e3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\console">
       <UniqueIdentifier>{15f65e3e-9bc9-4e95-8b4a-717a8edd7943}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\console">
-      <UniqueIdentifier>{15939b54-040a-4765-bb80-c9c6166b4686}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\backend\modelConstant">
       <UniqueIdentifier>{03af9654-3ceb-4669-bae7-524b19acd782}</UniqueIdentifier>
@@ -106,12 +70,6 @@
     <Filter Include="Header Files\unit-test">
       <UniqueIdentifier>{1f590ab0-d252-4222-bd33-0db49b360e64}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\unit-test">
-      <UniqueIdentifier>{aed2c6b1-7399-461e-82ad-bb19186ee711}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\frontend\ui">
-      <UniqueIdentifier>{f95ad6d9-fe89-4b74-8f6e-12b1e4a41284}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\frontend\ui">
       <UniqueIdentifier>{d58c08d5-7216-4bfc-be43-301d5bc1744b}</UniqueIdentifier>
     </Filter>
@@ -127,112 +85,16 @@
     <Filter Include="Resource Files\model">
       <UniqueIdentifier>{98d455ff-7ca8-4858-8854-a2055c70503f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\component">
-      <UniqueIdentifier>{69432685-08c1-4d6a-bb3b-bf4b2c9c26a6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\simple">
       <UniqueIdentifier>{27876192-d83a-47bf-a2c2-07eeb972ed3c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\simple">
-      <UniqueIdentifier>{75ccf2d0-cf01-462f-826e-270a8869a997}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="brogue-hd.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="brogueLevel.cpp">
-      <Filter>Source Files\backend\model</Filter>
-    </ClCompile>
-    <ClCompile Include="brogueGame.cpp">
-      <Filter>Source Files\backend\model</Filter>
-    </ClCompile>
-    <ClCompile Include="brogueMessageQueue.cpp">
-      <Filter>Source Files\backend\model</Filter>
-    </ClCompile>
-    <ClCompile Include="gameController.cpp">
-      <Filter>Source Files\backend\controller</Filter>
-    </ClCompile>
-    <ClCompile Include="layoutGenerator.cpp">
-      <Filter>Source Files\backend\generator</Filter>
-    </ClCompile>
-    <ClCompile Include="playbackProcessor.cpp">
-      <Filter>Source Files\backend\processor</Filter>
-    </ClCompile>
-    <ClCompile Include="randomGenerator.cpp">
-      <Filter>Source Files\backend\generator</Filter>
-    </ClCompile>
-    <ClCompile Include="renderingController.cpp">
-      <Filter>Source Files\backend\controller</Filter>
-    </ClCompile>
-    <ClCompile Include="levelRenderer.cpp">
-      <Filter>Source Files\frontend\renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="openglRenderer.cpp">
-      <Filter>Source Files\frontend\opengl</Filter>
-    </ClCompile>
-    <ClCompile Include="keyProcessor.cpp">
-      <Filter>Source Files\backend\processor</Filter>
-    </ClCompile>
-    <ClCompile Include="levelProcessor.cpp">
-      <Filter>Source Files\backend\processor</Filter>
-    </ClCompile>
-    <ClCompile Include="contentGenerator.cpp">
-      <Filter>Source Files\backend\generator</Filter>
-    </ClCompile>
-    <ClCompile Include="brogueMachine.cpp">
-      <Filter>Source Files\backend\model</Filter>
-    </ClCompile>
-    <ClCompile Include="brogueItem.cpp">
-      <Filter>Source Files\backend\model</Filter>
-    </ClCompile>
-    <ClCompile Include="brogueContentGrid.cpp">
-      <Filter>Source Files\backend\model</Filter>
-    </ClCompile>
-    <ClCompile Include="roomGenerator.cpp">
-      <Filter>Source Files\backend\generator</Filter>
-    </ClCompile>
-    <ClCompile Include="brogueLayout.cpp">
-      <Filter>Source Files\backend\model</Filter>
-    </ClCompile>
-    <ClCompile Include="terrainGenerator.cpp">
-      <Filter>Source Files\backend\generator</Filter>
-    </ClCompile>
-    <ClCompile Include="brogueGameProfile.cpp">
-      <Filter>Source Files\backend\model</Filter>
-    </ClCompile>
-    <ClCompile Include="brogueLevelProfile.cpp">
-      <Filter>Source Files\backend\model</Filter>
-    </ClCompile>
-    <ClCompile Include="noiseGenerator.cpp">
-      <Filter>Source Files\backend\generator</Filter>
-    </ClCompile>
-    <ClCompile Include="brogueConsole.cpp">
-      <Filter>Source Files\console</Filter>
-    </ClCompile>
-    <ClCompile Include="developerConsole.cpp">
-      <Filter>Source Files\console</Filter>
-    </ClCompile>
-    <ClCompile Include="resourceConsole.cpp">
-      <Filter>Source Files\console</Filter>
-    </ClCompile>
-    <ClCompile Include="gameConsole.cpp">
-      <Filter>Source Files\console</Filter>
-    </ClCompile>
-    <ClCompile Include="resourceController.cpp">
-      <Filter>Source Files\backend\controller</Filter>
-    </ClCompile>
-    <ClCompile Include="brogueColorMap.cpp">
-      <Filter>Source Files\backend\model</Filter>
-    </ClCompile>
-    <ClCompile Include="brogueView.cpp">
-      <Filter>Source Files\frontend\ui</Filter>
-    </ClCompile>
     <ClCompile Include="gl.c">
       <Filter>Source Files\vendor</Filter>
-    </ClCompile>
-    <ClCompile Include="simpleShaderProgram.cpp">
-      <Filter>Source Files\frontend\opengl</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

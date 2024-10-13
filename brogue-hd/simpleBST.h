@@ -9,7 +9,7 @@ namespace brogueHd::simple
     //                             clean enough; and will be changed if there are any issues.
 
     template<isHashable K, typename T>
-    struct simpleBSTNode
+    struct simpleBSTNode : hashable
     {
         simpleBSTNode<K, T>* left;
         simpleBSTNode<K, T>* right;
@@ -27,6 +27,11 @@ namespace brogueHd::simple
         {
             key = akey;
             value = avalue;
+        }
+
+        size_t getHash() const override
+        {
+            return key.getHash();
         }
     };
 
@@ -69,9 +74,9 @@ namespace brogueHd::simple
         T get(K key);
         T search(K key);
 
-        T min();
+        T minValue();
         K minKey();
-        T max();
+        T maxValue();
         K maxKey();
 
         void clear();
@@ -231,12 +236,12 @@ namespace brogueHd::simple
     }
 
     template<isHashable K, typename T>
-    T simpleBST<K, T>::min()
+    T simpleBST<K, T>::minValue()
     {
         simpleBSTNode<K, T>* result = this->minImpl(_root);
 
-        if (result == NULL)
-            return NULL;
+        if (result == nullptr)
+            return nullptr;
 
         else
             return result->value;
@@ -255,7 +260,7 @@ namespace brogueHd::simple
     }
 
     template<isHashable K, typename T>
-    T simpleBST<K, T>::max()
+    T simpleBST<K, T>::maxValue()
     {
         simpleBSTNode<K, T>* result = this->maxImpl(_root);
 
@@ -576,4 +581,3 @@ namespace brogueHd::simple
         return Z;
     }
 }
-
