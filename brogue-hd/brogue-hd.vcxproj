@@ -172,12 +172,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="brogue-hd.cpp" />
-    <ClCompile Include="brogueCell.cpp" />
     <ClCompile Include="brogueColorMap.cpp" />
     <ClCompile Include="brogueConsole.cpp" />
     <ClCompile Include="brogueContentGrid.cpp" />
-    <ClCompile Include="brogueCreature.cpp" />
-    <ClCompile Include="brogueCreatureHorde.cpp" />
     <ClCompile Include="brogueGame.cpp" />
     <ClCompile Include="brogueGameProfile.cpp" />
     <ClCompile Include="brogueLayout.cpp" />
@@ -186,30 +183,19 @@
     <ClCompile Include="brogueLevelProfile.cpp" />
     <ClCompile Include="brogueMachine.cpp" />
     <ClCompile Include="brogueMessageQueue.cpp" />
-    <ClCompile Include="brogueObject.cpp" />
-    <ClCompile Include="broguePlayer.cpp" />
-    <ClCompile Include="brogueRememberedCell.cpp" />
     <ClCompile Include="brogueView.cpp" />
     <ClCompile Include="contentGenerator.cpp" />
-    <ClCompile Include="creature.cpp" />
     <ClCompile Include="developerConsole.cpp" />
-    <ClCompile Include="flare.cpp" />
     <ClCompile Include="gameConsole.cpp" />
     <ClCompile Include="gameController.cpp" />
-    <ClCompile Include="gameData.cpp" />
     <ClCompile Include="gl.c" />
-    <ClCompile Include="item.cpp" />
     <ClCompile Include="keyProcessor.cpp" />
     <ClCompile Include="layoutGenerator.cpp" />
-    <ClCompile Include="levelData.cpp" />
     <ClCompile Include="levelProcessor.cpp" />
     <ClCompile Include="levelRenderer.cpp" />
-    <ClCompile Include="lightSource.cpp" />
-    <ClCompile Include="machine.cpp" />
     <ClCompile Include="noiseGenerator.cpp" />
     <ClCompile Include="openglRenderer.cpp" />
     <ClCompile Include="playbackProcessor.cpp" />
-    <ClCompile Include="playerCharacter.cpp" />
     <ClCompile Include="randomGenerator.cpp" />
     <ClCompile Include="resourceConsole.cpp" />
     <ClCompile Include="resourceController.cpp" />

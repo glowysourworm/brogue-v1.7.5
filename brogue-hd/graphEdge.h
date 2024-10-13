@@ -1,5 +1,6 @@
 #pragma once
 
+#include "simple.h"
 #include "brogueGlobal.h"
 #include "graphNode.h"
 
@@ -8,6 +9,8 @@ namespace brogueHd::component
 	template<isHashable TNode>
 	struct graphEdge : hashable
 	{
+	public:
+
 		TNode node1;
 		TNode node2;
 

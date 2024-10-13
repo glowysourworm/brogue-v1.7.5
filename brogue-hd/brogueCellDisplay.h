@@ -11,6 +11,8 @@ namespace brogueHd::backend::model::layout
 {
 	struct brogueCellDisplay : hashable
 	{
+	public:
+
 		char character;
 		color foreColor;
 		color backColor;
@@ -86,7 +88,7 @@ namespace brogueHd::backend::model::layout
 				   needsUpdate == display.needsUpdate;// &&
 					//lighting.compare(display.lighting);
 		}
-		size_t getHash() const
+		size_t getHash() const override
 		{
 			return 0;
 		}

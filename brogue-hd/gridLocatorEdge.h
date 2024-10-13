@@ -1,5 +1,6 @@
 #pragma once
 
+#include "simple.h"
 #include "graphEdge.h"
 #include "gridLocator.h"
 #include "simplePoint.h"
@@ -10,6 +11,8 @@ namespace brogueHd::component
 {
 	struct gridLocatorEdge : graphEdge<gridLocator>
 	{
+	public:
+
 		gridLocator node1;
 		gridLocator node2;
 
@@ -55,7 +58,7 @@ namespace brogueHd::component
 					node2.row == point1.y);
 		}
 
-		virtual size_t getHash() const
+		virtual size_t getHash() const override
 		{
 			return hashGenerator::generateHash(node1, node2);
 		}

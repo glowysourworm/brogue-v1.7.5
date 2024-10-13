@@ -8,6 +8,8 @@ namespace brogueHd::component
 {
 	struct graphNode : hashable
 	{
+	public:
+
 		graphNode(){};
 
 		virtual bool operator==(const graphNode& node) const
@@ -18,7 +20,7 @@ namespace brogueHd::component
 		{
 			return false;
 		}
-		virtual size_t getHash() const
+		virtual size_t getHash() const override
 		{
 			return 0;
 		}

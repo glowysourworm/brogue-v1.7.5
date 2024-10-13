@@ -4,6 +4,8 @@
 #include "simpleString.h"
 #include "gl.h"
 
+using namespace brogueHd::simple;
+
 namespace brogueHd::frontend::opengl
 {
     /// <summary>

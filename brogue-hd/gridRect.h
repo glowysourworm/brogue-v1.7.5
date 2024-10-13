@@ -57,7 +57,7 @@ namespace brogueHd::component
 				   width != rect.width ||
 				   height != rect.height;
 		}
-		size_t getHash() const override
+		virtual size_t getHash() const override
 		{
 			return hashGenerator::generateHash(column, row, width, height);
 		}

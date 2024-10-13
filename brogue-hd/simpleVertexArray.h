@@ -26,6 +26,11 @@ namespace brogueHd::frontend::opengl
         void teardown() override;
         void draw() override;
 
+        size_t getHash() const override
+        {
+            return _vertexBuffer.getHash();
+        }
+
     private:
 
         // Primary VBO vertex buffer objects indexed by the OpenGL BufferIndex

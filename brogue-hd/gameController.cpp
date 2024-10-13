@@ -17,7 +17,7 @@ namespace brogueHd::backend::controller
 {
 	gameController::gameController(resourceController* resourceController)
 	{
-		_gameData = NULL;
+		_gameData = nullptr;
 		_keyProcessor = new keyProcessor();
 		_playbackProcessor = new playbackProcessor();
 		_randomMain = new randomGenerator(RANDOM_GENERATOR_MAIN);
@@ -27,11 +27,11 @@ namespace brogueHd::backend::controller
 
 	gameController::~gameController()
 	{
-		if (_gameData != NULL)
+		if (_gameData != nullptr)
 		{
 			delete _gameData;
 
-			_gameData = NULL;
+			_gameData = nullptr;
 		}
 
 		delete _keyProcessor;

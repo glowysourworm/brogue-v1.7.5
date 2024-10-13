@@ -10,6 +10,8 @@ namespace brogueHd::backend::model::game
 {
 	struct messageData : hashable
 	{
+	public:
+
 		colorString message;
 		bool confirmed;
 

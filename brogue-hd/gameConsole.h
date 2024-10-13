@@ -3,8 +3,10 @@
 #include "brogueConsole.h"
 #include "gameController.h"
 #include "resourceController.h"
+#include "simpleString.h"
 #include <iostream>
 
+using namespace brogueHd::simple;
 using namespace brogueHd::backend::controller;
 
 namespace brogueHd::console

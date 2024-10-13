@@ -2,9 +2,11 @@
 
 #include "brogueGlobal.h"
 #include "simpleArray.h"
+#include "simpleString.h"
 #include "simpleGlData.h"
 #include "gl.h"
-#include <string>
+
+using namespace brogueHd::simple;
 
 namespace brogueHd::frontend::opengl
 {

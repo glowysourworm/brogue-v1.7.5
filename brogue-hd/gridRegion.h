@@ -19,7 +19,7 @@ namespace brogueHd::component
 	/// offsets are required for use.
 	/// </summary>
 	template<isGridLocator T>
-	class gridRegion
+	class gridRegion : public hashableObject
 	{
 	public:
 		gridRegion(){}
@@ -56,6 +56,22 @@ namespace brogueHd::component
 		/// Copies grid region to another grid
 		/// </summary>
 		void copyTo(grid<T>& grid) const;
+
+	public:
+
+		size_t getHash() const override
+		{
+			// TODO: Look for more efficient method. Probably, we want to avoid hashing values
+			//		 when there is an available pointer. (SEE SIMPLE.H) (isPointer<T> overloads...)
+			//
+			//		 Actually, lets just use the locations pointer for now and see what other
+			//		 methods make sense.
+			//
+			//		 (value hash is expensive) return _locations->getHash();	// TOO EXPENSIVE
+			//
+
+			return hashGenerator::generateHash(_locations);
+		}
 
 	public:
 
@@ -403,6 +419,8 @@ namespace brogueHd::component
 		{
 			if (region.isDefined(column, row))
 				return iterationCallback::breakAndReturn;
+
+			return iterationCallback::iterate;
 		});
 
 		return overlap;

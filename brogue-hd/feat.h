@@ -1,6 +1,5 @@
 #pragma once
 
-#include "brogueGlobal.h"
 #include "simpleString.h"
 
 using namespace brogueHd::simple;

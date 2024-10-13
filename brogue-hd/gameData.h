@@ -1,5 +1,6 @@
 #pragma once
 
+#include "brogueGlobal.h"
 #include "levelData.h"
 #include "playerCharacter.h"
 #include "simpleString.h"

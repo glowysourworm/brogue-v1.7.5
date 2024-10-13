@@ -1,6 +1,5 @@
 #include "openglRenderer.h"
 #include "simpleLogger.h"
-#include "simpleString.h"
 #include <mutex>
 
 #include <thread>

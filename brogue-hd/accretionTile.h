@@ -14,6 +14,8 @@ namespace brogueHd::backend::model::layout
 	/// </summary>
 	struct accretionTile : gridRect
 	{
+	public:
+
 		// Tile has been connected to another tile
 		bool hasNorthConnection;
 		bool hasSouthConnection;

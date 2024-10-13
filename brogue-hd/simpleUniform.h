@@ -1,10 +1,11 @@
 #pragma once
 
+#include "simple.h"
 #include "simplePrimitive.h"
 
 namespace brogueHd::frontend::opengl
 {
-    template<typename T>
+    template<isHashable T>
     class simpleUniform : simplePrimitive
     {
     public:
@@ -15,5 +16,10 @@ namespace brogueHd::frontend::opengl
         /// Data to be passed as a uniform to the shader code
         /// </summary>
         T data;
+
+        size_t getHash() const override
+        {
+            return hashGenerator::generateHash(data);
+        }
     };
 }

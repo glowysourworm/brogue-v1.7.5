@@ -1,5 +1,6 @@
 #pragma once
 
+#include "simple.h"
 #include "simplePrimitive.h"
 #include "simpleException.h"
 #include "gl.h"
@@ -25,6 +26,13 @@ namespace brogueHd::frontend::opengl
         void glCreate(GLuint programHandle) override;
         void teardown() override;
         void bind(bool bind) override;
+
+    public:
+
+        size_t getHash() const override
+        {
+            return hashGenerator::generateHash(_textureUnit, _textureIndex, _pixelBuffer, _width, _height, _pixelFormat, _pixelType);
+        }
 
     private:
 

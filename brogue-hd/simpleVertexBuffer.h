@@ -28,6 +28,11 @@ namespace brogueHd::frontend::opengl
         int getBufferLength();
         int calculateAttributeStride();
 
+        size_t getHash() const override
+        {
+            return hashGenerator::generateHash(_bufferIndex, _stream.getHash(), _vertexAttributes.getHash());
+        }
+
     private:
         int _bufferIndex;
 

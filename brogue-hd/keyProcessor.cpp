@@ -1,6 +1,4 @@
 #include "keyProcessor.h"
-#include "brogueGlobal.h"
-#include "broguefile.h"
 
 namespace brogueHd::backend::processor
 {

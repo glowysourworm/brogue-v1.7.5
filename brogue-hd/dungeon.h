@@ -35,6 +35,8 @@ namespace brogueHd::backend::model::game
 
 	struct brogueRoomInfo : hashable
 	{
+	public:
+
 		roomTypes type;
 		short frequency;
 		short corridorChance;
@@ -48,13 +50,13 @@ namespace brogueHd::backend::model::game
 			corridorChance = acorridorChance;
 		}
 
-		bool operator==(const brogueRoomInfo& info)
+		bool operator==(const brogueRoomInfo& info) const
 		{
 			return type == info.type &&
 				   frequency == info.frequency &&
 				   corridorChance == info.corridorChance;
 		}
-		bool operator!=(const brogueRoomInfo& info)
+		bool operator!=(const brogueRoomInfo& info) const
 		{
 			return type != info.type ||
 				   frequency != info.frequency ||

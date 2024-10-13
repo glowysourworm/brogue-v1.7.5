@@ -1,5 +1,6 @@
 #pragma once
 
+#include "simple.h"
 #include "simpleArray.h"
 
 using namespace brogueHd::simple;
@@ -9,8 +10,8 @@ namespace brogueHd::frontend::opengl
     /// <summary>
     /// Simple class to handle streaming the IGLVector instances more specifically
     /// </summary>
-    template<typename T>
-	class simpleDataStream
+    template<isHashable T>
+	class simpleDataStream : public hashableObject
 	{
     public:
 
@@ -50,6 +51,11 @@ namespace brogueHd::frontend::opengl
         T* getData()
         {
             return _array->getArray();
+        }
+        
+        size_t getHash() const override
+        {
+            return hashGenerator::generateHash(_array->getHash(), _cursor, _streamNumberVertices);
         }
 
     private:

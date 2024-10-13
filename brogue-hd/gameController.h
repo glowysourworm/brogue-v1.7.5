@@ -6,7 +6,9 @@
 #include "randomGenerator.h"
 #include "playbackProcessor.h"
 #include "renderingController.h"
+#include "simpleString.h"
 
+using namespace brogueHd::simple;
 using namespace brogueHd::backend::generator;
 using namespace brogueHd::backend::processor;
 using namespace brogueHd::backend::model;

@@ -2,6 +2,7 @@
 
 #include "brogueTestPackage.h"
 #include "simpleArray.h"
+#include "simpleString.h"
 
 using namespace brogueHd::simple;
 

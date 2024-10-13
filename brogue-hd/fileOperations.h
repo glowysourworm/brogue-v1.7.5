@@ -66,6 +66,8 @@ namespace brogueHd::component
 			{
 				simpleException::show("Error trying to read file:  {}:  {}", filename.c_str(), ex.what());
 			}
+
+			return simpleString("");
 		}
 		static void writeFile(const simpleString& filename, const simpleString& contents)
 		{

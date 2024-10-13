@@ -1,6 +1,5 @@
 #pragma once
 
-#include "simpleEnumString.h"
 #include "simpleException.h"
 #include "simpleArray.h"
 #include "simpleList.h"

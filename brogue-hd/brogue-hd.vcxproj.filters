@@ -141,33 +141,6 @@
     <ClCompile Include="brogue-hd.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="creature.cpp">
-      <Filter>Source Files\backend\model</Filter>
-    </ClCompile>
-    <ClCompile Include="gameData.cpp">
-      <Filter>Source Files\backend\model</Filter>
-    </ClCompile>
-    <ClCompile Include="item.cpp">
-      <Filter>Source Files\backend\model</Filter>
-    </ClCompile>
-    <ClCompile Include="levelData.cpp">
-      <Filter>Source Files\backend\model</Filter>
-    </ClCompile>
-    <ClCompile Include="playerCharacter.cpp">
-      <Filter>Source Files\backend\model</Filter>
-    </ClCompile>
-    <ClCompile Include="lightSource.cpp">
-      <Filter>Source Files\backend\model</Filter>
-    </ClCompile>
-    <ClCompile Include="flare.cpp">
-      <Filter>Source Files\backend\model</Filter>
-    </ClCompile>
-    <ClCompile Include="brogueCell.cpp">
-      <Filter>Source Files\backend\model\layout</Filter>
-    </ClCompile>
-    <ClCompile Include="machine.cpp">
-      <Filter>Source Files\backend\model</Filter>
-    </ClCompile>
     <ClCompile Include="brogueLevel.cpp">
       <Filter>Source Files\backend\model</Filter>
     </ClCompile>
@@ -207,28 +180,13 @@
     <ClCompile Include="contentGenerator.cpp">
       <Filter>Source Files\backend\generator</Filter>
     </ClCompile>
-    <ClCompile Include="brogueRememberedCell.cpp">
-      <Filter>Source Files\backend\model\layout</Filter>
-    </ClCompile>
     <ClCompile Include="brogueMachine.cpp">
-      <Filter>Source Files\backend\model</Filter>
-    </ClCompile>
-    <ClCompile Include="broguePlayer.cpp">
-      <Filter>Source Files\backend\model</Filter>
-    </ClCompile>
-    <ClCompile Include="brogueObject.cpp">
       <Filter>Source Files\backend\model</Filter>
     </ClCompile>
     <ClCompile Include="brogueItem.cpp">
       <Filter>Source Files\backend\model</Filter>
     </ClCompile>
     <ClCompile Include="brogueContentGrid.cpp">
-      <Filter>Source Files\backend\model</Filter>
-    </ClCompile>
-    <ClCompile Include="brogueCreature.cpp">
-      <Filter>Source Files\backend\model</Filter>
-    </ClCompile>
-    <ClCompile Include="brogueCreatureHorde.cpp">
       <Filter>Source Files\backend\model</Filter>
     </ClCompile>
     <ClCompile Include="roomGenerator.cpp">

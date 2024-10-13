@@ -1,7 +1,6 @@
 #pragma once
 
 #include "brogueGameProfile.h"
-#include "simpleMath.h"
 #include "brogueGlobal.h"
 
 using namespace brogueHd::simple;

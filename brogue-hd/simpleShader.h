@@ -3,7 +3,10 @@
 #include "brogueGlobal.h"
 #include "simplePrimitive.h"
 #include "simpleList.h"
+#include "simpleString.h"
 #include "gl.h"
+
+using namespace brogueHd::simple;
 
 namespace brogueHd::frontend::opengl
 {
@@ -21,6 +24,11 @@ namespace brogueHd::frontend::opengl
         void glCreate(GLuint programHandle) override;
         void bind(bool bind) override;
         void teardown() override;
+
+        size_t getHash() const override
+        {
+            return _source->getHash();
+        }
 
     private:
 

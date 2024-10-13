@@ -8,6 +8,8 @@ namespace brogueHd::backend::model::game
 {
 	struct colorString : hashable
 	{
+	public:
+
 		char theString[COLS * 2];
 		color theColors[COLS * 2];
 

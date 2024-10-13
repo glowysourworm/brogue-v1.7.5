@@ -6,6 +6,7 @@
 */
 
 #include "simple.h"
+#include "simpleString.h"
 #include "simpleDataStream.h"
 #include "simpleArray.h"
 #include "gl.h"
@@ -35,7 +36,7 @@ namespace brogueHd::frontend::opengl
 
 		}
 
-		size_t getHash() const override
+		virtual size_t getHash() const override
 		{
 			return 0;
 		}

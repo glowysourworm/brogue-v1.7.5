@@ -200,7 +200,7 @@ namespace brogueHd::simple
 		{
 			// Multiply the bucket size by e ~ 2.718281828
 			//
-			rehash(_table->count() * simpleMath::exp(1));
+			rehash(_table->count() * simpleMath::exponential(1));
 		}
 
 		// If there's still overflow, the max size will be set for the next call to set(..)

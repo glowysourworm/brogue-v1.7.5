@@ -9,6 +9,8 @@ namespace brogueHd::backend::model::layout
 	template<typename T>
 	struct gridCell : gridLocator
 	{
+	public:
+
 		gridLocator locator;
 		T value;
 

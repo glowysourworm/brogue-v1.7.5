@@ -10,6 +10,8 @@ namespace brogueHd::component
 {
 	struct gridLocator : graphNode
 	{
+	public:
+
 		short column;
 		short row;
 

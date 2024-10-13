@@ -1,7 +1,6 @@
 #pragma once
 
 #include "simple.h"
-#include "simpleString.h"
 #include "simpleExt.h"
 #include <iostream>
 
@@ -35,21 +34,9 @@ namespace brogueHd::simple
 
 		*/
 
-		static void log(const simpleString& message)
-		{
-			std::cout << message << std::endl;
-		}
-
 		static void log(const char* message)
 		{
 			std::cout << message << std::endl;
-		}
-
-		static void logColor(const brogueConsoleColor& color, const simpleString& message)
-		{
-			setColor(color);
-			std::cout << message << std::endl;
-			setColor(brogueConsoleColor::White);
 		}
 
 		static void logColor(const brogueConsoleColor& color, const char* message)
@@ -68,27 +55,9 @@ namespace brogueHd::simple
 		}
 
 		template<isStringConvertible T, isStringConvertible...Args>
-		static void log(const simpleString& formatStr, const T& param, const Args&...args)
-		{
-			std::string message = simpleExt::format(formatStr.c_str(), param, args...);
-
-			std::cout << message << std::endl;
-		}
-
-		template<isStringConvertible T, isStringConvertible...Args>
 		static void logColor(const brogueConsoleColor& color, const char* formatStr, const T& param, const Args&...args)
 		{
 			std::string message = simpleExt::format(formatStr, param, args...);
-
-			setColor(color);
-			std::cout << message << std::endl;
-			setColor(brogueConsoleColor::White);
-		}
-
-		template<isStringConvertible T, isStringConvertible...Args>
-		static void logColor(const brogueConsoleColor& color, const simpleString& formatStr, const T& param, const Args&...args)
-		{
-			std::string message = simpleExt::format(formatStr.c_str(), param, args...);
 
 			setColor(color);
 			std::cout << message << std::endl;

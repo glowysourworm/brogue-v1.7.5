@@ -19,6 +19,7 @@ namespace brogueHd::backend::model::io
 
 	struct brogueScoreEntry : hashable
 	{
+	public:
 
 		long int score;
 		time_t dateTime;
@@ -78,6 +79,7 @@ namespace brogueHd::backend::model::io
 
 	struct brogueEvent : hashable
 	{
+	public:
 
 		enum BrogueEventType eventType;
 		signed long param1;

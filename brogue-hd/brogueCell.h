@@ -19,8 +19,10 @@ namespace brogueHd::backend::model::layout
 	//	pdsLink links[DCOLS * DROWS];
 	//};
 
-	struct brogueCell : gridLocator
+	struct brogueCell : public gridLocator
 	{
+	public:
+
 		// Sets default values (isEmpty() == true)
 		brogueCell()
 		{

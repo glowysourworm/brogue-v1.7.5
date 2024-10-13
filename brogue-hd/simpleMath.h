@@ -60,7 +60,7 @@ namespace brogueHd::simple
 		}
 
 		template<isNumber TMath>
-		static TMath exp(TMath x)
+		static TMath exponential(TMath x)
 		{
 			if (isFloatLike<TMath>)
 				return expf(static_cast<float>(x));

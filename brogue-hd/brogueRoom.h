@@ -1,5 +1,6 @@
 #pragma once
 
+#include "simple.h"
 #include "gridLocator.h"
 #include "gridRegion.h"
 #include "brogueCell.h"
@@ -9,8 +10,10 @@ using namespace brogueHd::backend::model::layout;
 
 namespace brogueHd::backend::model
 {
-	class brogueRoom
+	class brogueRoom : public hashableObject
 	{
+	public:
+
 		brogueRoom(gridRegion<brogueCell> region,
 					gridLocator connectionPointN,
 					gridLocator connectionPointS,
@@ -25,6 +28,13 @@ namespace brogueHd::backend::model
 		}
 
 		~brogueRoom(){};
+
+	public:
+
+		size_t getHash() const override
+		{
+			return 0;
+		}
 
 	private:
 

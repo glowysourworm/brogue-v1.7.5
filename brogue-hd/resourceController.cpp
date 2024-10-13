@@ -130,17 +130,17 @@ namespace brogueHd::backend::controller
 			throw ex;
 		}
 
-		return NULL;
+		return nullptr;
 	}
 
 	gameData* resourceController::loadGame(const char* path)
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	playbackData* resourceController::loadPlayback(const char* path)
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	void resourceController::loadKeymap(keyProcessor& processor)
@@ -183,97 +183,97 @@ namespace brogueHd::backend::controller
 
 		try
 		{
-			std::ifstream stream(path);
+		//	std::ifstream stream(path);
 
-			// collection,name,red,green,blue,redRand,greenRand,blueRand,rand,colorDances
+		//	// collection,name,red,green,blue,redRand,greenRand,blueRand,rand,colorDances
 
-			
-			std::string nextLineStr;
+		//	
+		//	std::string nextLineStr;
 
-			while (std::getline(stream, nextLineStr))
-			{
-				// Comment
-				if (nextLineStr.starts_with('#'))
-					continue;
+		//	while (std::getline(stream, nextLineStr))
+		//	{
+		//		// Comment
+		//		if (nextLineStr.starts_with('#'))
+		//			continue;
 
-				simpleString nextLine(nextLineStr.c_str());
+		//		simpleString nextLine(nextLineStr.c_str());
 
-				// Split by comma and white space
-				simpleArray<simpleString> strings = nextLine.split(", ");
+		//		// Split by comma and white space
+		//		simpleArray<simpleString> strings = nextLine.split(", ");
 
-				if (sizeof(strings) != 10)
-					continue;
+		//		if (sizeof(strings) != 10)
+		//			continue;
 
-				color nextColor;
-				colorCollections collection;
-				
-				EnumString<colorCollections>::To(collection, strings.get(2).c_str());
+		//		color nextColor;
+		//		colorCollections collection;
+		//		
+		//		EnumString<colorCollections>::To(collection, strings.get(2).c_str());
 
-				nextColor.red = strings.get(2).toShort();
-				nextColor.green = strings.get(2).toShort();
-				nextColor.blue = strings.get(2).toShort();
-				nextColor.redRand = strings.get(2).toShort();
-				nextColor.greenRand = strings.get(2).toShort();
-				nextColor.blueRand = strings.get(2).toShort();
-				nextColor.rand = strings.get(2).toShort();
-				nextColor.colorDances = strings.get(2).toBool();
+		//		nextColor.red = strings.get(2).toShort();
+		//		nextColor.green = strings.get(2).toShort();
+		//		nextColor.blue = strings.get(2).toShort();
+		//		nextColor.redRand = strings.get(2).toShort();
+		//		nextColor.greenRand = strings.get(2).toShort();
+		//		nextColor.blueRand = strings.get(2).toShort();
+		//		nextColor.rand = strings.get(2).toShort();
+		//		nextColor.colorDances = strings.get(2).toBool();
 
-				switch (collection)
-				{
-				case colorCollections::game:
-					gameColors gameSelector;
-					EnumString<gameColors>::To(gameSelector, strings.get(1).c_str());
-					result->setColor(gameSelector, nextColor);
-					break;
-				case colorCollections::bolt:
-					boltColors boltSelector;
-					EnumString<boltColors>::To(boltSelector, strings.get(1).c_str());
-					result->setColor(boltSelector, nextColor);
-					break;
-				case colorCollections::tile:
-					tileColors tileSelector;
-					EnumString<tileColors>::To(tileSelector, strings.get(1).c_str());
-					result->setColor(tileSelector, nextColor);
-					break;
-				case colorCollections::creature:
-					creatureColors creatureSelector;
-					EnumString<creatureColors>::To(creatureSelector, strings.get(1).c_str());
-					result->setColor(creatureSelector, nextColor);
-					break;
-				case colorCollections::light:
-					lightColors lightSelector;
-					EnumString<lightColors>::To(lightSelector, strings.get(1).c_str());
-					result->setColor(lightSelector, nextColor);
-					break;
-				case colorCollections::flare:
-					flareColors flareSelector;
-					EnumString<flareColors>::To(flareSelector, strings.get(1).c_str());
-					result->setColor(flareSelector, nextColor);
-					break;
-				case colorCollections::multipliers:
-					colorMultipliers multiplierSelector;
-					EnumString<colorMultipliers>::To(multiplierSelector, strings.get(1).c_str());
-					result->setColor(multiplierSelector, nextColor);
-					break;
-				case colorCollections::blood:
-					bloodColors bloodSelector;
-					EnumString<bloodColors>::To(bloodSelector, strings.get(1).c_str());
-					result->setColor(bloodSelector, nextColor);
-					break;
-				case colorCollections::gas:
-					gasColors gasSelector;
-					EnumString<gasColors>::To(gasSelector, strings.get(1).c_str());
-					result->setColor(gasSelector, nextColor);
-					break;
-				case colorCollections::bInterface:
-					interfaceColors interfaceSelector;
-					EnumString<interfaceColors>::To(interfaceSelector, strings.get(1).c_str());
-					result->setColor(interfaceSelector, nextColor);
-					break;
-				default:
-					break;
-				}
-			} 
+		//		switch (collection)
+		//		{
+		//		case colorCollections::game:
+		//			gameColors gameSelector;
+		//			EnumString<gameColors>::To(gameSelector, strings.get(1).c_str());
+		//			result->setColor(gameSelector, nextColor);
+		//			break;
+		//		case colorCollections::bolt:
+		//			boltColors boltSelector;
+		//			EnumString<boltColors>::To(boltSelector, strings.get(1).c_str());
+		//			result->setColor(boltSelector, nextColor);
+		//			break;
+		//		case colorCollections::tile:
+		//			tileColors tileSelector;
+		//			EnumString<tileColors>::To(tileSelector, strings.get(1).c_str());
+		//			result->setColor(tileSelector, nextColor);
+		//			break;
+		//		case colorCollections::creature:
+		//			creatureColors creatureSelector;
+		//			EnumString<creatureColors>::To(creatureSelector, strings.get(1).c_str());
+		//			result->setColor(creatureSelector, nextColor);
+		//			break;
+		//		case colorCollections::light:
+		//			lightColors lightSelector;
+		//			EnumString<lightColors>::To(lightSelector, strings.get(1).c_str());
+		//			result->setColor(lightSelector, nextColor);
+		//			break;
+		//		case colorCollections::flare:
+		//			flareColors flareSelector;
+		//			EnumString<flareColors>::To(flareSelector, strings.get(1).c_str());
+		//			result->setColor(flareSelector, nextColor);
+		//			break;
+		//		case colorCollections::multipliers:
+		//			colorMultipliers multiplierSelector;
+		//			EnumString<colorMultipliers>::To(multiplierSelector, strings.get(1).c_str());
+		//			result->setColor(multiplierSelector, nextColor);
+		//			break;
+		//		case colorCollections::blood:
+		//			bloodColors bloodSelector;
+		//			EnumString<bloodColors>::To(bloodSelector, strings.get(1).c_str());
+		//			result->setColor(bloodSelector, nextColor);
+		//			break;
+		//		case colorCollections::gas:
+		//			gasColors gasSelector;
+		//			EnumString<gasColors>::To(gasSelector, strings.get(1).c_str());
+		//			result->setColor(gasSelector, nextColor);
+		//			break;
+		//		case colorCollections::bInterface:
+		//			interfaceColors interfaceSelector;
+		//			EnumString<interfaceColors>::To(interfaceSelector, strings.get(1).c_str());
+		//			result->setColor(interfaceSelector, nextColor);
+		//			break;
+		//		default:
+		//			break;
+		//		}
+		//	} 
 
 			return result;
 		}
@@ -284,6 +284,6 @@ namespace brogueHd::backend::controller
 			delete result;
 		}
 
-		return NULL;
+		return nullptr;
 	}
 }
