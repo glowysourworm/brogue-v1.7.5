@@ -18,6 +18,7 @@ namespace brogueHd::simple
 		/// </summary>
 		static const size_t MAX_LENGTH = 1000000;
 		static const size_t MAX_SPLIT_TOKENS = 10;
+		static const char NULL_CHAR = '\0';
 
 	public:
 
@@ -645,14 +646,6 @@ namespace brogueHd::simple
 
 	const char* simpleString::c_str() const
 	{
-		// MEMORY ALLOCATION ISSUE!!! IT'S ALLOCATING EXTRA GARBAGE CHARACTERS!
-		//
-		// (see above...)
-		//
-
-		// Workaround:  Iterate and "trim" the string manually before outputting.
-		//
-
 		return _array->getArray();
 	}
 

@@ -48,7 +48,8 @@ namespace brogueHd::component
 		{
 			try
 			{
-				std::ifstream stream(filename.c_str());
+				const char* filenameStr = filename.c_str();
+				std::ifstream stream(filenameStr);
 				simpleString result;
 				std::string line;
 

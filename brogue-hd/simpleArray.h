@@ -80,6 +80,7 @@ namespace brogueHd::simple
 
 		T* _array;
 		int _count;
+		int _countAlloc;
 	};
 
 	template<isHashable T>
@@ -87,6 +88,7 @@ namespace brogueHd::simple
 	{
 		_array = nullptr;
 		_count = 0;
+		_countAlloc = 0;
 	}
 
 	template<isHashable T>
@@ -103,6 +105,7 @@ namespace brogueHd::simple
 	simpleArray<T>::simpleArray(const T* anArray, int anArrayLength)
 	{
 		_count = 0;
+		_countAlloc = 0;
 		_array = nullptr;
 
 		reAllocate(anArray, anArrayLength);
@@ -112,6 +115,7 @@ namespace brogueHd::simple
 	simpleArray<T>::simpleArray(const simpleArray<T>& copy)
 	{
 		_count = 0;
+		_countAlloc = 0;
 		_array = nullptr;
 
 		if (copy.count() > 0)
@@ -132,19 +136,37 @@ namespace brogueHd::simple
 
 			_array = nullptr;
 			_count = 0;
+			_countAlloc = 0;
 		}
 	}
 
 	template<isHashable T>
 	void simpleArray<T>::allocate(int capacity)
 	{
-		T* newArray = new T[capacity];
-
 		// Free old memory
 		//
 		if (_array != nullptr)
 		{
 			delete[] _array;
+		}
+
+		T* newArray = nullptr;
+
+		// Handle isChar<T> null terminator (was adding garbage to the end (?????))
+		if (isChar<T>)
+		{
+			newArray = new T[capacity + 1]{ default_value<T>::value };
+
+			_countAlloc = capacity + 1;
+
+			// HANDLE NULL TERMINATOR RIGHT HERE! (DON'T PROPAGATE THIS ISSUE!)
+			newArray[capacity] = default_value<T>::value;
+		}
+		else
+		{
+			newArray = new T[capacity]{ default_value<T>::value };
+
+			_countAlloc = capacity;
 		}
 
 		_array = newArray;
@@ -157,26 +179,39 @@ namespace brogueHd::simple
 		if (anArray == nullptr)
 			simpleException::showCstr("Trying to allocate from a null array:  simpleArray::reAllocate");
 
-		T* newArray = new T[anArrayLength];
+		// Free old memory
+		//
+		if (_array != nullptr)
+		{
+			delete[] _array;
+		}
 
-		if (newArray == nullptr)
-			simpleException::showCstr("Unable to allocate memory. simpleArray.h");
+		T* newArray = nullptr;
+
+		// Handle isChar<T> null terminator (was adding garbage to the end (?????))
+		if (isChar<T>)
+		{
+			newArray = new T[anArrayLength + 1]{ default_value<T>::value };
+
+			_countAlloc = anArrayLength + 1;
+
+			// HANDLE NULL TERMINATOR RIGHT HERE! (DON'T PROPAGATE THIS ISSUE!)
+			newArray[anArrayLength] = default_value<T>::value;
+		}
+		else
+		{
+			newArray = new T[anArrayLength]{ default_value<T>::value };
+
+			_countAlloc = anArrayLength;
+		}
 
 		// Initialize new memory
-		//
 		int index = 0;
 
 		while (index < anArrayLength)
 		{
 			newArray[index] = anArray[index];
 			index++;
-		}
-
-		// Free old memory
-		//
-		if (_array != nullptr)
-		{
-			delete[] _array;
 		}
 
 		_array = newArray;
