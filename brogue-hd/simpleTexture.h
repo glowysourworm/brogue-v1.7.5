@@ -9,23 +9,54 @@ using namespace brogueHd::simple;
 
 namespace brogueHd::frontend::opengl
 {
-    class simpleTexture : public simplePrimitive
+    struct simpleTexture : public simplePrimitive
     {
     public:
 
-        // Corresponds to the level of the nth minimap for the texture (see texture rendering to learn about minimaps)
+        // Corresponds to the level of the nth mipmap for the texture (see texture rendering to learn about minimaps)
         //
-        const GLuint TEXTURE_MINIMAP_LEVEL = 0;
+        const GLuint TEXTURE_MIPMAP_LEVEL = 0;
 
     public:
 
-        simpleTexture(){};
+        simpleTexture();
+        simpleTexture(const simpleTexture& copy);
         simpleTexture(int pixelBuffer, GLsizei width, GLsizei height, GLuint textureIndex, GLenum textureUnit, GLenum pixelFormat, GLenum pixelType);
         ~simpleTexture(){};
 
         void glCreate(GLuint programHandle) override;
         void teardown() override;
         void bind(bool bind) override;
+
+        GLenum getTextureUnit() const
+        {
+            return _textureUnit;
+        }
+        GLuint getTextureIndex() const
+        {
+            return _textureIndex;
+        }
+
+        int getPixelBuffer() const
+        {
+            return _pixelBuffer;
+        }
+        GLsizei getWidth() const
+        {
+            return _width;
+        }
+        GLsizei getHeight() const
+        {
+            return _height;
+        }
+        GLenum getPixelFormat() const
+        {
+            return _pixelFormat;
+        }
+        GLenum getPixelType() const
+        {
+            return _pixelType;
+        }
 
     public:
 
@@ -46,6 +77,28 @@ namespace brogueHd::frontend::opengl
         GLenum _pixelType;
     };
       
+    simpleTexture::simpleTexture()
+    {
+        _textureUnit = NULL;
+        _textureIndex = NULL;
+
+        _pixelBuffer = NULL;
+        _width = 0;
+        _height = 0;
+        _pixelFormat = NULL;
+        _pixelType = NULL;
+    }
+    simpleTexture::simpleTexture(const simpleTexture& copy)
+    {
+        _textureUnit = copy.getTextureUnit();
+        _textureIndex = copy.getTextureIndex();
+
+        _pixelBuffer = copy.getPixelBuffer();
+        _width = copy.getWidth();
+        _height = copy.getHeight();
+        _pixelFormat = copy.getPixelFormat();
+        _pixelType = copy.getPixelType();
+    }
     simpleTexture::simpleTexture(int pixelBuffer, GLsizei width, GLsizei height, GLuint textureIndex, GLenum textureUnit, GLenum pixelFormat, GLenum pixelType)
     {
         _textureUnit = textureUnit;
@@ -84,7 +137,7 @@ namespace brogueHd::frontend::opengl
 
         // Apply the pixel data to the backend
         glTexImage2D(GL_TEXTURE_2D,
-                     TEXTURE_MINIMAP_LEVEL,
+                     TEXTURE_MIPMAP_LEVEL,
                      GL_RGBA,                      // I believe this is the format used in the shader (some kind of 4-vector)
                      _width, _height, 0,           // border:  "Should always be set to zero" ....?
                      _pixelFormat,                 // This should be the format used in OUR pixel data array

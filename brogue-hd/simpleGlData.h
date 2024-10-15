@@ -47,11 +47,25 @@ namespace brogueHd::frontend::opengl
 		float x;
 		float y;
 
-		vec2(){}
+		vec2()
+		{
+			x = -1;
+			y = -1;
+		}
+		vec2(const vec2& copy)
+		{
+			x = copy.x;
+			y = copy.y;
+		}
 		vec2(float ax, float ay)
 		{
 			x = ax;
 			y = ay;
+		}
+		void operator=(const vec2& other)
+		{
+			x = other.x;
+			y = other.y;
 		}
 		size_t getHash() const override
 		{
@@ -66,13 +80,33 @@ namespace brogueHd::frontend::opengl
 		float z;
 		float w;
 
-		vec4(){}
+		vec4()
+		{
+			x = -1;
+			y = -1;
+			z = -1;
+			w = -1;
+		}
+		vec4(const vec4& copy)
+		{
+			x = copy.x;
+			y = copy.y;
+			w = copy.w;
+			z = copy.z;
+		}
 		vec4(float ax, float ay, float az, float aw)
 		{
 			x = ax;
 			y = ay;
 			z = az;
 			w = aw;
+		}
+		void operator=(const vec4& other)
+		{
+			x = other.x;
+			y = other.y;
+			w = other.w;
+			z = other.z;
 		}
 		size_t getHash() const override
 		{
@@ -91,7 +125,20 @@ namespace brogueHd::frontend::opengl
 		float right;
 		float bottom;
 
-		simpleQuad(){}
+		simpleQuad()
+		{
+			left = 0;
+			top = 0;
+			right = 0;
+			bottom = 0;
+		}
+		simpleQuad(const simpleQuad& copy)
+		{
+			left = copy.left;
+			top = copy.top;
+			right = copy.right;
+			bottom = copy.bottom;
+		}
 		simpleQuad(float aleft, float atop, float aright, float abottom)
 		{
 			left = aleft;
@@ -146,7 +193,18 @@ namespace brogueHd::frontend::opengl
 	template<isHashable T>
 	struct uniformData : hashable
 	{
-		uniformData(){}
+		uniformData()
+		{
+			name = default_value<simpleString>::value;
+			type = default_value<GLenum>::value;
+			value = default_value<T>::value;
+		}
+		uniformData(const uniformData<T>& copy)
+		{
+			name = copy.name;
+			type = copy.type;
+			value = copy.value;
+		}
 		uniformData(const simpleString& aname, GLenum atype)
 		{
 			name = aname;

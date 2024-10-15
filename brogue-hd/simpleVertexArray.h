@@ -17,9 +17,9 @@ namespace brogueHd::frontend::opengl
     class simpleVertexArray : public simplePrimitive
     {
     public:
-        simpleVertexArray(){};
-        simpleVertexArray(const GLenum& primitiveType, const simpleVertexBuffer<T>& vertexBuffer);
-        ~simpleVertexArray(){};
+        simpleVertexArray();
+        simpleVertexArray(const GLenum& primitiveType, simpleVertexBuffer<T>* vertexBuffer);
+        ~simpleVertexArray();
 
         void glCreate(GLuint programHandle) override;
         void bind(bool bind) override;
@@ -28,24 +28,37 @@ namespace brogueHd::frontend::opengl
 
         size_t getHash() const override
         {
-            return _vertexBuffer.getHash();
+            return _vertexBuffer->getHash();
         }
 
     private:
 
         // Primary VBO vertex buffer objects indexed by the OpenGL BufferIndex
         GLenum _primitiveType;
-        simpleVertexBuffer<T> _vertexBuffer;
+        simpleVertexBuffer<T>* _vertexBuffer;
     };
 
     template<typename T>
-    simpleVertexArray<T>::simpleVertexArray(const GLenum& primitiveType, const simpleVertexBuffer<T>& vertexBuffer)
+    simpleVertexArray<T>::simpleVertexArray()
+    {
+        _vertexBuffer = new simpleVertexBuffer<T>();
+    }
+
+    template<typename T>
+    simpleVertexArray<T>::simpleVertexArray(const GLenum& primitiveType, simpleVertexBuffer<T>* vertexBuffer)
     {
         _primitiveType = primitiveType;
         _vertexBuffer = vertexBuffer;
 
         this->isBound = false;
         this->isCreated = false;
+    }
+
+    template<typename T>
+    simpleVertexArray<T>::~simpleVertexArray()
+    {
+        // THESE ARE (MAY BE) CREATED BY THE SCENE BUILDER!
+        delete _vertexBuffer;
     }
 
     template<typename T>
@@ -71,7 +84,7 @@ namespace brogueHd::frontend::opengl
         //       
         //       Simply call IGLPrimitve.Create() to initialize the vertex buffer
         //
-        _vertexBuffer.glCreate(programHandle);
+        _vertexBuffer->glCreate(programHandle);
 
         this->isCreated = true;
         this->isBound = true;
@@ -84,7 +97,7 @@ namespace brogueHd::frontend::opengl
             simpleException::showCstr("simpleVertexArray already deleted from the backend");
 
         // Teardown vertex buffers
-        _vertexBuffer.teardown();
+        _vertexBuffer->teardown();
 
         // Delete this vertex array
         glDeleteVertexArrays(1, &this->handle);
@@ -104,7 +117,7 @@ namespace brogueHd::frontend::opengl
             simpleException::showCstr("simpleVertexArray must be bound before calling Draw()");
 
         // Draw Buffer
-        glDrawArrays(_primitiveType, 0, _vertexBuffer.getBufferLength());
+        glDrawArrays(_primitiveType, 0, _vertexBuffer->getBufferLength());
     }
 
     template<typename T>

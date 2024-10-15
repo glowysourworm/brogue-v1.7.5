@@ -22,6 +22,12 @@ namespace brogueHd::simple
 
 			throw;
 		}
+		static void show(const char* message)
+		{
+			throw std::exception(message);
+
+			throw;
+		}
 
 	public:
 

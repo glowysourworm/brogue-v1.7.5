@@ -18,6 +18,7 @@ namespace brogueHd::frontend::opengl
 	{
     public:
 		boundingBox2D();
+        boundingBox2D(const boundingBox2D& copy);
 		boundingBox2D(int pixelX, int pixelY, int pixelWidth, int pixelHeight, int scenePixelWidth, int scenePixelHeight);
 
         /// <summary>
@@ -36,6 +37,31 @@ namespace brogueHd::frontend::opengl
         /// </summary>
         simpleArray<vec2> getUICoordinates();
 
+        int getPixelX() const
+        {
+            return _pixelX;
+        }
+        int getPixelY() const
+        {
+            return _pixelY;
+        }
+        int getPixelWidth() const
+        {
+            return _pixelWidth;
+        }
+        int getPixelHeight() const
+        {
+            return _pixelHeight;
+        }
+        int getScenePixelWidth() const
+        {
+            return _scenePixelWidth;
+        }
+        int getScenePixelHeight() const
+        {
+            return _scenePixelHeight;
+        }
+
     private:
         int _pixelX;
         int _pixelY;
@@ -53,6 +79,15 @@ namespace brogueHd::frontend::opengl
         _pixelHeight = 0;
         _scenePixelHeight = 0;
         _scenePixelWidth = 0;
+    }
+    boundingBox2D::boundingBox2D(const boundingBox2D& copy)
+    {
+        _pixelX = copy.getPixelX();
+        _pixelY = copy.getPixelY();
+        _pixelWidth = copy.getPixelWidth();
+        _pixelHeight = copy.getPixelHeight();
+        _scenePixelHeight = copy.getScenePixelHeight();
+        _scenePixelWidth = copy.getScenePixelWidth();
     }
     boundingBox2D::boundingBox2D(int pixelX, int pixelY, int pixelWidth, int pixelHeight, int scenePixelWidth, int scenePixelHeight)
     {

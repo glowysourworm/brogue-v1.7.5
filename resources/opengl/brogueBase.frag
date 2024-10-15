@@ -10,7 +10,7 @@ in vec2 currentTex;
 // This is the combined scene texture - which is the scene images rendered with the base lighting
 // applied (ambient + accent)
 //
-uniform sampler2D sceneBaseTexture;
+//uniform sampler2D sceneBaseTexture;
 
 void main()
 {
@@ -18,5 +18,6 @@ void main()
     //        texture 2D coordinates are neglected because they can be easily calculated
     //
 
-    outputColor = texture(sceneBaseTexture, currentTex);
+    //outputColor = texture(sceneBaseTexture, currentTex);
+    outputColor = vec4(1.0, 1.0, 1.0, 1.0);
 }

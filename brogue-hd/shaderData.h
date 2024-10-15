@@ -19,7 +19,7 @@ namespace brogueHd::frontend::opengl
     public:
         shaderData()
         {
-            this->source = NULL;
+            this->source = nullptr;
             this->resource = shaderResource::brogueBaseFrag;
             this->type = 0;
 
@@ -28,6 +28,17 @@ namespace brogueHd::frontend::opengl
             this->uniforms1i = new simpleList<uniformData<int>>();
             this->uniforms2 = new simpleList<uniformData<vec2>>();
             this->uniforms4 = new simpleList<uniformData<vec4>>();
+        }
+        shaderData(const shaderData& copy)
+        {
+            this->source = copy.source;
+            this->attributes = copy.attributes;
+            this->resource = copy.resource;
+            this->type = copy.type;
+            this->uniforms1 = copy.uniforms1;
+            this->uniforms1i = copy.uniforms1i;
+            this->uniforms2 = copy.uniforms2;
+            this->uniforms4 = copy.uniforms4;
         }
         shaderData(shaderResource aresource, GLenum atype, const simpleString& asource)
         {
@@ -47,10 +58,10 @@ namespace brogueHd::frontend::opengl
             {
                 // FRAGMENT SHADERS
             case shaderResource::brogueBaseFrag:
-                this->uniforms1i->add(uniformData<int>("sceneBaseTexture", GL_SAMPLER_2D));
+                //this->uniforms1i->add(uniformData<int>("sceneBaseTexture", GL_SAMPLER_2D));
                 break;
             case shaderResource::brogueFrameFrag:
-                this->uniforms1i->add(uniformData<int>("frameTexture", GL_SAMPLER_2D));
+                //this->uniforms1i->add(uniformData<int>("frameTexture", GL_SAMPLER_2D));
                 break;
 
                 // VERTEX SHADERS

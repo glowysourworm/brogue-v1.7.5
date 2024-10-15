@@ -55,7 +55,7 @@ namespace brogueHd::simple
 			std::string replaceStr = "{}";
 
 			// Find!
-			size_t index = result.find(replaceStr.c_str(), replaceStr.length());
+			size_t index = result.find(replaceStr.c_str());
 
 			// Nothing to do...!
 			if (index < 0 || index >= result.length())

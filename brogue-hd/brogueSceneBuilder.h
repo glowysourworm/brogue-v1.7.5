@@ -22,10 +22,10 @@ namespace brogueHd::frontend::opengl
 	public:
 
 		/// <summary>
-		/// The scene data is the data from a brogueView. Using quads, this data is streamed out to our simpleDataStream
+		/// (MEMORY!) The scene data is the data from a brogueView. Using quads, this data is streamed out to our simpleDataStream
 		/// object to hold for the GL backend calls.
 		/// </summary>
-		static simpleDataStream<float> prepareSceneDataStream(const brogueView& view)
+		static simpleDataStream<float>* prepareSceneDataStream(const brogueView* view)
 		{
 			// Starting with the raw data, build a simpleQuad data vector to pass to the simpleDataStream<float>
 			//
@@ -33,7 +33,7 @@ namespace brogueHd::frontend::opengl
 			int cellWidth = 10;
 			int cellHeight = 15;
 
-			view.iterate([&cellQuads, &cellWidth, &cellHeight](short column, short row, brogueCellDisplay cell)
+			view->iterate([&cellQuads, &cellWidth, &cellHeight](short column, short row, brogueCellDisplay cell)
 			{
 				cellQuads.add(simpleQuad(column * cellWidth, row * cellHeight, (column + 1) * cellWidth, (row + 1) * cellHeight));
 
@@ -47,12 +47,12 @@ namespace brogueHd::frontend::opengl
 			//
 
 			// Scene Base: Must declare before streaming the data onto it
-			simpleDataStream<float> dataStream(cellQuads.count(), cellQuads.first().getElementSize(GL_QUADS), cellQuads.first().getStreamSize());
+			simpleDataStream<float>* dataStream = new simpleDataStream<float>(cellQuads.count(), cellQuads.first().getElementSize(GL_QUADS), cellQuads.first().getStreamSize());
 
 			// Stream the data for output
 			cellQuads.forEach([&dataStream](simpleQuad quad)
 			{
-				quad.streamBuffer(dataStream);
+				quad.streamBuffer(*dataStream);
 				return iterationCallback::iterate;
 			});
 
@@ -60,12 +60,12 @@ namespace brogueHd::frontend::opengl
 		}
 
 		/// <summary>
-		/// The Frame of the scene is essentially the buffer that owns the scene's rendering output. It must be declared before 
+		/// (MEMORY!) The Frame of the scene is essentially the buffer that owns the scene's rendering output. It must be declared before 
 		/// it is used during rendering.
 		/// </summary>
-		static simpleDataStream<float> prepareFrameDataStream(const brogueView& view)
+		static simpleDataStream<float>* prepareFrameDataStream(const brogueView* view)
 		{
-			gridRect sceneBoundary = view.getSceneBoundary();
+			gridRect sceneBoundary = view->getSceneBoundary();
 
 			// Frame Data (for the scene)
 			simpleQuad frameQuad = coordinateConverter::createQuadNormalizedXYScene(0, 0, sceneBoundary.width, sceneBoundary.height, sceneBoundary.width, sceneBoundary.height);
@@ -77,25 +77,25 @@ namespace brogueHd::frontend::opengl
 			//
 
 			// Frame
-			simpleDataStream<float> dataStream(1, frameQuad.getElementSize(GL_QUADS), frameQuad.getStreamSize());
+			simpleDataStream<float>* dataStream = new simpleDataStream<float>(1, frameQuad.getElementSize(GL_QUADS), frameQuad.getStreamSize());
 
 			// Transfer data to the stream
-			frameQuad.streamBuffer(dataStream);
+			frameQuad.streamBuffer(*dataStream);
 
 			return dataStream;
 		}
 		
 		/// <summary>
-		/// Creates the program for working with the frame VAO on the GL backend. This should be used to render scene data to before
+		/// (MEMORY!) Creates the program for working with the frame VAO on the GL backend. This should be used to render scene data to before
 		/// calling routines to show the frame buffer.
 		/// </summary>
-		static simpleShaderProgram* createFrameShaderProgram(const simpleDataStream<float>& frameDataStream,
+		static simpleShaderProgram* createFrameShaderProgram(simpleDataStream<float>* frameDataStream,
 															 const shaderData& vertexData,
 															 const shaderData& fragmentData)
 		{
 			// Create Shaders
-			simpleShader vertexShader(vertexData.source);
-			simpleShader fragmentShader(fragmentData.source);
+			simpleShader vertexShader(vertexData);
+			simpleShader fragmentShader(fragmentData);
 
 			// Shaders / Vertex Attributes
 			
@@ -114,8 +114,8 @@ namespace brogueHd::frontend::opengl
 			});
 
 
-			simpleVertexBuffer<float> frameVBO(vertexBufferIndex++, frameDataStream, frameVertexAttributes);
-			simpleVertexArray<float> frameVAO(GL_QUADS, frameVBO);
+			simpleVertexBuffer<float>* frameVBO = new simpleVertexBuffer<float>(vertexBufferIndex++, frameDataStream, frameVertexAttributes);
+			simpleVertexArray<float>* frameVAO = new simpleVertexArray<float>(GL_QUADS, frameVBO);
 
 			simpleShaderProgram* program = new simpleShaderProgram(vertexShader, fragmentShader);
 
@@ -123,18 +123,16 @@ namespace brogueHd::frontend::opengl
 
 			return program;
 		}
-
-        
 		/// <summary>
-		/// Creates program for rendering the scene's data to a buffer on the GL backend
+		/// (MEMORY!) Creates program for rendering the scene's data to a buffer on the GL backend
 		/// </summary>
-		static simpleShaderProgram* createSceneShaderProgram(const simpleDataStream<float>& sceneDataStream,
+		static simpleShaderProgram* createSceneShaderProgram(simpleDataStream<float>* sceneDataStream,
 															 const shaderData& vertexData,
 															 const shaderData& fragmentData)
 		{
 			// Create Shaders
-			simpleShader vertexShader(vertexData.source);
-			simpleShader fragmentShader(fragmentData.source);
+			simpleShader vertexShader(vertexData);
+			simpleShader fragmentShader(fragmentData);
 
 			// Shaders / Vertex Attributes
 
@@ -152,8 +150,8 @@ namespace brogueHd::frontend::opengl
 				return simpleVertexAttribute(data.index, data.name, data.type);
 			});
 
-			simpleVertexBuffer<float> sceneVBO(vertexBufferIndex++, sceneDataStream, vertexAttributes);
-			simpleVertexArray<float> sceneVAO(GL_QUADS, sceneVBO);
+			simpleVertexBuffer<float>* sceneVBO = new simpleVertexBuffer<float>(vertexBufferIndex++, sceneDataStream, vertexAttributes);
+			simpleVertexArray<float>* sceneVAO = new simpleVertexArray<float>(GL_QUADS, sceneVBO);
 
 			simpleShaderProgram* program = new simpleShaderProgram(vertexShader, fragmentShader);
 

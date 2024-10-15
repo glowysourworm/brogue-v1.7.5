@@ -55,12 +55,22 @@ namespace brogueHd::frontend::opengl
 
         }
 
+        virtual bool hasErrors()
+        {
+            return false;
+        }
+
         /// <summary>
         /// GL handle created by the GL backend
         /// </summary>
         GLuint getHandle() const
         {
             return handle;
+        }
+
+        bool getIsBound() const
+        {
+            return isBound;
         }
 
         virtual size_t getHash() const override

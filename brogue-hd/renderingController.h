@@ -26,18 +26,13 @@ namespace brogueHd::backend::controller
 		/// </summary>
 		void setViewMode(BrogueGameMode mode);
 
-		/// <summary>
-		/// Renders view to device output
-		/// </summary>
-		void renderView();
-
 	private:
 
-		void renderMenuView();
-		void renderHighScoresView();
-		void renderSetSeedView();
-		void renderOpenGameView();
-		void renderGameView();
+		simpleShaderProgram* createMenuView();
+		simpleShaderProgram* createHighScoresView();
+		simpleShaderProgram* createSetSeedView();
+		simpleShaderProgram* createOpenGameView();
+		simpleShaderProgram* createGameView();
 
 	private:
 
@@ -63,6 +58,9 @@ namespace brogueHd::backend::controller
 	{
 		_mode = mode;
 
+		if (!_openglRenderer->isInitializedGL())
+			_openglRenderer->initializeOpenGL();
+
 		switch (_mode)
 		{
 		case BrogueGameMode::Menu:
@@ -72,22 +70,19 @@ namespace brogueHd::backend::controller
 		case BrogueGameMode::Game:
 		case BrogueGameMode::Playback:
 		{
-			// Prepare pieces of the render program
-			brogueFlameMenu mainMenu(0, 1, 1, 1, 1, 1, 1);
-			simpleDataStream<float> sceneDataStream = brogueSceneBuilder::prepareSceneDataStream(mainMenu);
-			shaderData vertexShaderData = _resourceController->getShader(shaderResource::brogueBaseVert);
-			shaderData fragmentShaderData = _resourceController->getShader(shaderResource::brogueBaseFrag);
+			// Shuts down thread, deletes our program memory
+			_openglRenderer->terminateProgram();
+			
+			simpleShaderProgram* program = createMenuView();
 
-			// Create view for the renderer as shader program
-			simpleShaderProgram* program = brogueSceneBuilder::createSceneShaderProgram(sceneDataStream, vertexShaderData, fragmentShaderData);
-
-			_openglRenderer->openWindow(program);
+			_openglRenderer->setProgram(program);
+			_openglRenderer->startProgram();
 		}
 		break;
 		case BrogueGameMode::Scum:
 		case BrogueGameMode::Quit:
 		{
-			_openglRenderer->closeWindow();
+			_openglRenderer->terminateProgram();
 		}
 		break;
 		default:
@@ -95,42 +90,17 @@ namespace brogueHd::backend::controller
 		}
 	}
 
-
-	void renderingController::renderView()
+	simpleShaderProgram* renderingController::createMenuView()
 	{
-		switch (_mode)
-		{
-		case BrogueGameMode::Menu:
-			renderMenuView();
-			break;
-		case BrogueGameMode::MenuHighScores:
-			renderHighScoresView();
-			break;
-		case BrogueGameMode::MenuSetSeed:
-			renderSetSeedView();
-			break;
-		case BrogueGameMode::MenuOpenGame:
-			renderOpenGameView();
-			break;
-		case BrogueGameMode::Game:
-			renderGameView();
-			break;
-		case BrogueGameMode::Playback:
-			// TODO
-			break;
-		case BrogueGameMode::Scum:
-			// TODO
-			break;
-		case BrogueGameMode::Quit:
-			// TODO
-			break;
-		default:
-			break;
-		}
-	}
+		// Prepare pieces of the render program
+		brogueFlameMenu* mainMenu = new brogueFlameMenu(0, 1, 1, 1, 1, 1, 1);
+		simpleDataStream<float>* sceneDataStream = brogueSceneBuilder::prepareSceneDataStream(mainMenu);
+		shaderData vertexShaderData = _resourceController->getShader(shaderResource::brogueBaseVert);
+		shaderData fragmentShaderData = _resourceController->getShader(shaderResource::brogueBaseFrag);
 
-	void renderingController::renderMenuView()
-	{
+		// (MEMORY!) Create view for the renderer as shader program
+		return brogueSceneBuilder::createSceneShaderProgram(sceneDataStream, vertexShaderData, fragmentShaderData);
+
 		//signed short flames[COLS][(ROWS + MENU_FLAME_ROW_PADDING)][3]; // red, green and blue
 		//signed short colorSources[MENU_FLAME_COLOR_SOURCE_COUNT][4]; // red, green, blue, and rand, one for each color source (no more than MENU_FLAME_COLOR_SOURCE_COUNT).
 		//const color* colors[COLS][(ROWS + MENU_FLAME_ROW_PADDING)];
@@ -264,21 +234,21 @@ namespace brogueHd::backend::controller
 		//	}
 		//}
 	}
-	void renderingController::renderHighScoresView()
+	simpleShaderProgram* renderingController::createHighScoresView()
 	{
-
+		return nullptr;
 	}
-	void renderingController::renderOpenGameView()
+	simpleShaderProgram* renderingController::createOpenGameView()
 	{
-
+		return nullptr;
 	}
-	void renderingController::renderGameView()
+	simpleShaderProgram* renderingController::createGameView()
 	{
-
+		return nullptr;
 	}
-
-	void renderingController::renderSetSeedView()
+	simpleShaderProgram* renderingController::createSetSeedView()
 	{
+		return nullptr;
 		//// Prompt for seed; default is the previous game's seed.
 		//sprintf(maxSeed, "%lu", ULONG_MAX);
 

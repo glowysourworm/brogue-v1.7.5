@@ -4,6 +4,8 @@
 #include "simplePrimitive.h"
 #include "simpleList.h"
 #include "simpleString.h"
+#include "shaderData.h"
+#include "simpleLogger.h"
 #include "gl.h"
 
 using namespace brogueHd::simple;
@@ -14,26 +16,55 @@ namespace brogueHd::frontend::opengl
     /// Representation of a shader shared by the GPU. This contains the shader handle and data needed to
     /// compile the shader at runtime.
     /// </summary>
-    class simpleShader : public simplePrimitive
+    struct simpleShader : public simplePrimitive
     {
     public:
         simpleShader();
-        simpleShader(simpleString* source);
+        simpleShader(const simpleShader& copy);
+        simpleShader(const shaderData& data);
         ~simpleShader(){};
+
+        void operator=(const simpleShader& copy);
 
         void glCreate(GLuint programHandle) override;
         void bind(bool bind) override;
         void teardown() override;
 
+        simpleString getSource() const
+        {
+            return _source;
+        }
+        GLenum getShaderType() const
+        {
+            return _shaderType;
+        }
+
         size_t getHash() const override
         {
-            return _source->getHash();
+            return _source.getHash();
+        }
+
+        bool hasErrors() override
+        {
+            GLchar* buffer = new GLchar[10000];
+            GLsizei  length = 0;
+
+            // Check info log for the errors
+            glGetShaderInfoLog(this->handle, 10000, &length, buffer);
+
+            // For now, just show the exception from the shader
+            if (length > 0)
+                simpleLogger::logColor(brogueConsoleColor::Red, buffer);
+
+            delete[] buffer;
+
+            return length > 0;
         }
 
     private:
 
         GLenum _shaderType;
-        simpleString* _source;
+        simpleString _source;
     };
 
     simpleShader::simpleShader()
@@ -43,16 +74,30 @@ namespace brogueHd::frontend::opengl
         this->isBound = false;
 
         _shaderType = NULL;
-        _source = NULL;
     }
-    simpleShader::simpleShader(simpleString* source)
+    simpleShader::simpleShader(const simpleShader& copy)
     {
         this->handle = NULL;
         this->isCreated = false;
         this->isBound = false;
 
-        _source = source;
-        _shaderType = NULL;
+        _shaderType = copy.getShaderType();
+        _source = copy.getSource();
+    }
+    simpleShader::simpleShader(const shaderData& data)
+    {
+        this->handle = NULL;
+        this->isCreated = false;
+        this->isBound = false;
+
+        _source = *(data.source);
+        _shaderType = data.type;
+    }
+
+    void simpleShader::operator=(const simpleShader& copy)
+    {
+        _shaderType = copy.getShaderType();
+        _source = copy.getSource();
     }
 
     void simpleShader::teardown()
@@ -75,25 +120,14 @@ namespace brogueHd::frontend::opengl
         this->handle = glCreateShader(_shaderType);
 
         // (some funny casting)
-        const GLchar* source = _source->c_str();
-        const GLint size = _source->count();
+        const GLchar* source = _source.c_str();
+        const GLint size = _source.count();
 
         // Set the shader source on the GL backend
         glShaderSource(this->handle, 1, &source, &size);
 
         // Compile the shader and check for errors
         glCompileShader(this->handle);
-
-        GLchar* buffer = NULL;
-        GLsizei  bufferSize = 0;
-        GLsizei  length = 0;
-
-        // Check info log for the errors
-        glGetShaderInfoLog(this->handle, bufferSize, &length, buffer);
-
-        // For now, just show the exception from the shader
-        if (buffer != NULL)
-            simpleException::showCstr(buffer);
 
         this->isCreated = true;
     }

@@ -64,9 +64,13 @@ namespace brogueHd::frontend::ui
 		// Transfer rendering to the primary view grid
 		this->getViewBoundary().iterate([&that] (short column, short row)
 		{
+			if (!that->Title[row][column])
+				return iterationCallback::iterate;
+
 			brogueCellDisplay cell = that->get(column, row);
 
-			cell.character = that->Title[column][row];
+			// THESE ARE SETUP BACKWARDS FROM USUAL INDICES
+			cell.character = that->Title[row][column];
 			cell.foreColor = color(500, 500, 500, 0, 0, 0, 0, false);
 
 			that->update(cell, column, row);

@@ -18,7 +18,7 @@ namespace brogueHd::frontend::opengl
     {
     public:
         simpleVertexBuffer(){}
-        simpleVertexBuffer(int bufferIndex, const simpleDataStream<T>& dataStream, const simpleList<simpleVertexAttribute>& vertexAttributes);
+        simpleVertexBuffer(int bufferIndex, simpleDataStream<T>* dataStream, const simpleList<simpleVertexAttribute>& vertexAttributes);
         ~simpleVertexBuffer();
 
         void bind(bool bind) override;
@@ -30,24 +30,25 @@ namespace brogueHd::frontend::opengl
 
         size_t getHash() const override
         {
-            return hashGenerator::generateHash(_bufferIndex, _stream.getHash(), _vertexAttributes.getHash());
+            return hashGenerator::generateHash(_bufferIndex, _stream->getHash(), _vertexAttributes->getHash());
         }
 
     private:
+
         int _bufferIndex;
 
         // Primary vertex data for the buffer
-        simpleDataStream<T> _stream;
-        simpleList<simpleVertexAttribute> _vertexAttributes;
+        simpleDataStream<T>* _stream;
+        simpleList<simpleVertexAttribute>* _vertexAttributes;
     };
 
     template<typename T>
     simpleVertexBuffer<T>::simpleVertexBuffer(int bufferIndex, 
-                                              const simpleDataStream<T>& dataStream, 
+                                              simpleDataStream<T>* dataStream, 
                                               const simpleList<simpleVertexAttribute>& vertexAttributes)
     {
         _stream = dataStream;
-        _vertexAttributes = vertexAttributes;
+        _vertexAttributes = new simpleList<simpleVertexAttribute>(vertexAttributes);
 
         _bufferIndex = bufferIndex;
     }
@@ -55,6 +56,9 @@ namespace brogueHd::frontend::opengl
     template<typename T>
     simpleVertexBuffer<T>::~simpleVertexBuffer()
     {
+        // THESE COME FROM THE SCENE BUILDER
+        delete _stream;
+        delete _vertexAttributes;
     }
 
     template<typename T>
@@ -77,12 +81,12 @@ namespace brogueHd::frontend::opengl
 
         // Bind to array buffer type in OpenGL
         glBindBuffer(GL_ARRAY_BUFFER, this->handle);
-
+        
         // COPY DATA TO GPU BUFFER:  This is one of the ways to take application memory to the GPU. 
         //
         glBufferData(GL_ARRAY_BUFFER,
-                        _stream.getStreamSize(),
-                        _stream.getData(),
+                        (GLsizeiptr)_stream->getStreamSize(),
+                        _stream->getData(),
                         GL_STATIC_DRAW);
 
         // SETUP VERTEX ATTRIBUTE POINTERS:
@@ -96,7 +100,7 @@ namespace brogueHd::frontend::opengl
         int offsetBytes = 0;
         int strideBytes = calculateAttributeStride();
 
-        _vertexAttributes.forEach([&programHandle, &offsetBytes, &strideBytes](simpleVertexAttribute attribute)
+        _vertexAttributes->forEach([&programHandle, &offsetBytes, &strideBytes](simpleVertexAttribute attribute)
         {
             // Get the attribute handle for the input variable
             GLuint attributeHandle = glGetAttribLocation(programHandle, attribute.getName().c_str());
@@ -175,7 +179,7 @@ namespace brogueHd::frontend::opengl
         //
 
         // THIS MUST PRODUCE A WHOLE NUMBER
-        return _stream.getStreamSize();        // Apparently Byte Length
+        return _stream->getStreamSize();        // Apparently Byte Length
         //return _stream.GetStreamSize() / 4;
     }
 
@@ -184,7 +188,7 @@ namespace brogueHd::frontend::opengl
     {
         int seed = 0;
 
-        return _vertexAttributes.aggregate<int>(seed, [](int stride, simpleVertexAttribute attribute)
+        return _vertexAttributes->aggregate<int>(seed, [](int stride, simpleVertexAttribute attribute)
         {
             // HANDLE ATTRIBUTES BY DATA TYPE
             if (attribute.getUniformType() == GL_FLOAT_VEC2)
