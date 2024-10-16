@@ -94,8 +94,6 @@ namespace brogueHd::backend::controller
 			// Parse the JSON file
 			nlohmann::json jsonConfig = nlohmann::json::parse(configuration.c_str());
 
-			auto thing = jsonConfig["sdf"];
-
 			simpleString baseVertSource = fileOperations::readFile(std::string(jsonConfig[brogueHd::ConfigBaseVertexShader]).c_str());
 			simpleString baseFragSource = fileOperations::readFile(std::string(jsonConfig[brogueHd::ConfigBaseFragmentShader]).c_str());
 			simpleString frameVertSource = fileOperations::readFile(std::string(jsonConfig[brogueHd::ConfigFrameVertexShader]).c_str());

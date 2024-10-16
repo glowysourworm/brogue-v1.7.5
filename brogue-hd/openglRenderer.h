@@ -64,6 +64,8 @@ namespace brogueHd::frontend::opengl
 		static void refreshCallback(GLFWwindow* window);
 		static void windowCloseCallback(GLFWwindow* window);
 
+		static void forceLastErrorGLFW();
+
 	private:
 
 		void thread_start();
@@ -113,6 +115,13 @@ namespace brogueHd::frontend::opengl
 		//
 		simpleLogger::logColor(brogueConsoleColor::Red, "GLFW Error {} {}", simpleExt::toString(error), message);
 	}
+	void openglRenderer::forceLastErrorGLFW()
+	{
+		int errorCode = glfwGetError(NULL);
+
+		if (errorCode)
+			errorCallback(errorCode, "No Message");
+	}
 	void openglRenderer::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 	{
 		glfwSetWindowShouldClose(window, GLFW_TRUE);
@@ -149,6 +158,25 @@ namespace brogueHd::frontend::opengl
 			glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 			glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 			glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+			switch (glfwGetPlatform())
+			{
+				case GLFW_PLATFORM_WIN32:
+					simpleLogger::logColor(brogueConsoleColor::Yellow, "glfwGetPlatform() == GLFW_PLATFORM_WIN32");
+					break;
+				case GLFW_PLATFORM_COCOA:
+					simpleLogger::logColor(brogueConsoleColor::Yellow, "glfwGetPlatform() == GLFW_PLATFORM_WIN32");
+					break;
+				case GLFW_PLATFORM_ERROR:
+					simpleLogger::logColor(brogueConsoleColor::Red, "glfwGetPlatform() == GLFW_PLATFORM_ERROR");
+					break;
+				case GLFW_PLATFORM_NULL:
+					simpleLogger::logColor(brogueConsoleColor::Red, "glfwGetPlatform() == GLFW_PLATFORM_NULL");
+					break;
+				default:
+					simpleLogger::logColor(brogueConsoleColor::Red, "glfwGetPlatform() not setup properly. Showing some other platform openglRenderer.h");
+					break;
+			}
 
 			// Get full screen window details
 			GLFWmonitor* monitor = glfwGetPrimaryMonitor();
@@ -233,13 +261,33 @@ namespace brogueHd::frontend::opengl
 		// Open GL Context
 		glfwMakeContextCurrent(window);
 
-		if (!gladLoadGL(glfwGetProcAddress))
+		int version = gladLoadGL(glfwGetProcAddress);
+
+		if (!version)
 		{
 			simpleLogger::logColor(brogueConsoleColor::Red, "Error calling gladLoadGL");
 
 			glfwDestroyWindow(window);
 			//glfwTerminate();
 			return;
+		}
+		else
+		{
+			// Version
+			simpleLogger::logColor(brogueConsoleColor::Yellow, "Glad Version:  {}.{}", GLAD_VERSION_MAJOR(version), GLAD_VERSION_MINOR(version));
+			simpleLogger::logColor(brogueConsoleColor::Yellow, "GL Shading Language:  {}", (char*)glGetString(GL_SHADING_LANGUAGE_VERSION));
+			simpleLogger::logColor(brogueConsoleColor::Yellow, "GL Version:  {}", (char*)glGetString(GL_VERSION));
+			simpleLogger::logColor(brogueConsoleColor::Yellow, "GL Vendor:  {}", (char*)glGetString(GL_VENDOR));
+			simpleLogger::logColor(brogueConsoleColor::Yellow, "GL Renderer:  {}", (char*)glGetString(GL_RENDERER));
+
+			// Print out extension(s)
+			GLint numExtensions;
+			glGetIntegerv(GL_NUM_EXTENSIONS, &numExtensions);
+
+			for (GLint index = 0; index < numExtensions; index++)
+			{
+				simpleLogger::logColor(brogueConsoleColor::Yellow, "GL Extension (loaded):  {}", (char*)glGetStringi(GL_EXTENSIONS, index));
+			}
 		}
 
 		glfwSwapInterval(1);

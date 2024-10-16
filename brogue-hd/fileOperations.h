@@ -55,7 +55,9 @@ namespace brogueHd::component
 
 				while (std::getline(stream, line))
 				{
+					line.append("\n");
 					result.append(line.c_str());
+
 					line = "";
 				}
 
