@@ -5,7 +5,7 @@
 out vec4 outputColor;
 
 in vec2 currentVertex;
-in vec2 currentTex;
+//in vec2 currentTex;
 
 // This is the combined scene texture - which is the scene images rendered with the base lighting
 // applied (ambient + accent)
@@ -19,5 +19,5 @@ void main()
     //
 
     //outputColor = texture(sceneBaseTexture, currentTex);
-    outputColor = vec4(1.0, 1.0, 1.0, 1.0);
+    outputColor = vec4(1.0, 0.5, 0.5, 1.0);
 }

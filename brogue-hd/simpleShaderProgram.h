@@ -22,8 +22,7 @@ namespace brogueHd::frontend::opengl
         ~simpleShaderProgram();
 
         void compile();
-        void draw(int bufferIndex);
-        void drawAll();
+        void run();
 
         template<typename T>
         void bindUniform(simpleUniform<T> uniform);
@@ -34,6 +33,11 @@ namespace brogueHd::frontend::opengl
 
         bool hasErrors() override;
 
+    protected:
+
+        void draw(int bufferIndex);
+        void drawAll();
+
     private:
 
         void checkStatus(const char* statusName, GLenum status, bool logOutput = true) const;
@@ -41,7 +45,6 @@ namespace brogueHd::frontend::opengl
     private:
 
         bool _isCompiled;
-        bool _isActive;
 
         simpleList<simplePrimitive*>* _programVAOs;
 
@@ -55,7 +58,6 @@ namespace brogueHd::frontend::opengl
         _vertexShader = vertexShader;
         _fragmentShader = fragmentShader;
         _isCompiled = false;
-        _isActive = false;
     }
     simpleShaderProgram::~simpleShaderProgram()
     {
@@ -106,7 +108,7 @@ namespace brogueHd::frontend::opengl
         glUseProgram(handle);
 
         _isCompiled = true;
-        _isActive = true;
+        this->isBound = true;
     }
 
     void simpleShaderProgram::checkStatus(const char* statusName, GLenum status, bool logOutput) const
@@ -151,7 +153,7 @@ namespace brogueHd::frontend::opengl
         if (!_isCompiled)
             simpleException::showCstr("Must first call IGLProgram.Compile() before using the GL program");
 
-        if (!_isActive)
+        if (!this->isBound)
             simpleException::showCstr("Must first call Bind to set the program active");
 
         simplePrimitive* programVAO = _programVAOs->get(bufferIndex);
@@ -164,23 +166,35 @@ namespace brogueHd::frontend::opengl
         if (!_isCompiled)
             simpleException::showCstr("Must first call compile before using the GL program");
 
-        if (!_isActive)
-            simpleException::showCstr("Must first call Bind to set the program active");
+        if (!this->isBound)
+            simpleException::show("Must first call Bind to set the program active");
 
         _programVAOs->forEach([] (simplePrimitive* vao)
         {
-            if (!vao->getIsBound())
-                vao->bind(true);
-
+            vao->bind(true);
             vao->draw();
             return iterationCallback::iterate;
         });
     }
 
+    void simpleShaderProgram::run()
+    {
+        if (!_isCompiled)
+            simpleException::show("Must first call compile before using the GL program");
+
+        if (!this->isBound)
+            simpleException::show("Must first call Bind to set the program active");
+
+        glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
+        this->drawAll();
+    }
+
     void simpleShaderProgram::bind(bool bind)
     {
         if (!_isCompiled)
-            simpleException::showCstr("Must first call compile before using the GL program");
+            simpleException::show("Must first call compile before using the GL program");
 
         if (bind)
         {
@@ -191,14 +205,15 @@ namespace brogueHd::frontend::opengl
             glUseProgram(0);
         }
 
-        _isActive = bind;
         this->isBound = bind;
     }
 
     void simpleShaderProgram::declareVAO(simplePrimitive* programVAO)
     {
-        if (_isCompiled)
-            simpleException::showCstr("Must add texture before compiling:  simpleShaderProgram");
+        // Might've had to do with the textures.
+        // 
+        //if (_isCompiled)
+        //    simpleException::showCstr("Must first compile before declaring VAO");
 
         _programVAOs->add(programVAO);
     }
@@ -268,6 +283,6 @@ namespace brogueHd::frontend::opengl
         glDeleteProgram(this->handle);
 
         _isCompiled = false;
-        _isActive = false;
+        this->isBound = false;
     }
 }

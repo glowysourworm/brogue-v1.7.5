@@ -28,18 +28,19 @@ namespace brogueHd::frontend::opengl
         /// <summary>
         /// Creates Quad from UI coordinates converting to XY-Normalized
         /// </summary>
+        /// <param name="primitiveType">Eventual draw type for each primitive. e.g. GL_TRIANGLES</param>
         /// <param name="pixelX">UI-coordinate X</param>
         /// <param name="pixelY">UI-coordinate Y</param>
         /// <param name="pixelWidth">UI-coordinate Width</param>
         /// <param name="pixelHeight">UI-coordinate Height</param>
         /// <param name="sceneWidth">UI Width</param>
         /// <param name="sceneHeight">UI Height</param>
-        static simpleQuad createQuadNormalizedXYScene(int pixelX, int pixelY, int pixelWidth, int pixelHeight, int sceneWidth, int sceneHeight)
+        static simpleQuad createQuadNormalizedXYScene(GLenum primitiveType, int pixelX, int pixelY, int pixelWidth, int pixelHeight, int sceneWidth, int sceneHeight)
         {
             vec2 topLeft = convertToNormalizedXYScene(pixelX, pixelY, sceneWidth, sceneHeight);
             vec2 bottomRight = convertToNormalizedXYScene(pixelX + pixelWidth, pixelY + pixelHeight, sceneWidth, sceneHeight);
 
-            return simpleQuad(topLeft.x, topLeft.y, bottomRight.x, bottomRight.y);
+            return simpleQuad(primitiveType, topLeft.x, topLeft.y, bottomRight.x, bottomRight.y);
         }
 
         /// <summary>
@@ -62,17 +63,18 @@ namespace brogueHd::frontend::opengl
         /// <summary>
         /// Creates GLQuad from UI coordinates converting to UV-Normalized scene coordinates - used for texture overlays or post-processing
         /// </summary>
+        /// <param name="primitiveType">Eventual draw type for each primitive. e.g. GL_TRIANGLES</param>
         /// <param name="pixelX">UI Pixel X</param>
         /// <param name="pixelY">UI Pixel Y</param>
         /// <param name="sceneWidth">UI scene width</param>
         /// <param name="sceneHeight">UI scene height</param>
         /// <returns>UV coordinate GLQuad with respect to the scene</returns>
-        static simpleQuad createQuadNormalizedUVScene(int pixelX, int pixelY, int pixelWidth, int pixelHeight, int sceneWidth, int sceneHeight)
+        static simpleQuad createQuadNormalizedUVScene(GLenum primitiveType, int pixelX, int pixelY, int pixelWidth, int pixelHeight, int sceneWidth, int sceneHeight)
         {
             vec2 topLeft = convertToNormalizedUVScene(pixelX, pixelY, sceneWidth, sceneHeight);
             vec2 bottomRight = convertToNormalizedUVScene(pixelX + pixelWidth, pixelY + pixelHeight, sceneWidth, sceneHeight);
 
-            return simpleQuad(topLeft.x, topLeft.y, bottomRight.x, bottomRight.y);
+            return simpleQuad(primitiveType, topLeft.x, topLeft.y, bottomRight.x, bottomRight.y);
         }
 	};
 }

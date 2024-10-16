@@ -43,6 +43,11 @@ namespace brogueHd::frontend::opengl
             return _array->count() * sizeof(T);
         }
 
+        int getStreamNumberVertices()
+        {
+            return _streamNumberVertices;
+        }
+
         void write(T primitive)
         {
             _array->set(_cursor++, primitive);

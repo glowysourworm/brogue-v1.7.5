@@ -66,6 +66,12 @@ namespace brogueHd::frontend::opengl
 
 		static void forceLastErrorGLFW();
 
+		// GL Debug Enable
+		static void debugMessage(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
+								 const GLchar* message, const void* userParam);
+
+		const char* getGLErrorString(GLenum error);
+
 	private:
 
 		void thread_start();
@@ -122,13 +128,19 @@ namespace brogueHd::frontend::opengl
 		if (errorCode)
 			errorCallback(errorCode, "No Message");
 	}
+	void openglRenderer::debugMessage(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
+									  const GLchar* message, const void* userParam)
+	{
+		simpleLogger::log("GL Debug:  Source: {} Type: {} Id: {} Severity:{} Message:   {}", source, type, id, severity, message);
+	}
+
 	void openglRenderer::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 	{
 		glfwSetWindowShouldClose(window, GLFW_TRUE);
 	}
 	void openglRenderer::resizeCallback(GLFWwindow* window, int height, int width)
 	{
-
+		glViewport(0, 0, width, height);
 	}
 	void openglRenderer::refreshCallback(GLFWwindow* window)
 	{
@@ -204,17 +216,6 @@ namespace brogueHd::frontend::opengl
 
 		// Shared Program Pointer (the program is acutally built, separating it from the brogueView)
 		_glProgram = program;
-
-		//glutInit(0, NULL);
-		//glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
-		//glutInitWindowSize(1024, 768);
-		//glutInitWindowPosition(100, 100);
-		//glutCreateWindow("Brogue Game Window");
-		//glutDisplayFunc(&gameController::renderWindow);
-		//glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-		//glutMainLoop();
-		//glClear(GL_COLOR_BUFFER_BIT);
-		//glutSwapBuffers();
 	}
 	void openglRenderer::startProgram()
 	{
@@ -255,8 +256,11 @@ namespace brogueHd::frontend::opengl
 		// Full Screen Mode, Primary Monitor
 		//window = glfwCreateWindow(mode->width, mode->height, "Brogue v1.7.5", monitor, NULL);
 
+		int windowWidth = 640;
+		int windowHeight = 480;
+
 		// Windowed Mode
-		GLFWwindow* window = glfwCreateWindow(640, 480, "Brogue v1.7.5", NULL, NULL);
+		GLFWwindow* window = glfwCreateWindow(windowWidth, windowHeight, "Brogue v1.7.5", NULL, NULL);
 
 		// Open GL Context
 		glfwMakeContextCurrent(window);
@@ -304,6 +308,14 @@ namespace brogueHd::frontend::opengl
 		// Window Close Callback (NOT NEEDED! This is a callback to perform before window closes)
 		glfwSetWindowCloseCallback(window, &openglRenderer::windowCloseCallback);
 
+		// GL Enable Debug Output:
+		glEnable(GL_DEBUG_OUTPUT);
+		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+		glDebugMessageCallback(&openglRenderer::debugMessage, NULL);
+
+		// (Not sure)
+		glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
+
 		// *** Compile our program for the main loop: HOPING THIS IS OK WHEN DONE FROM THE RENDERING THREAD
 		//
 		// GL Functions must be called after calling glfwMakeContextCurrent.
@@ -314,25 +326,53 @@ namespace brogueHd::frontend::opengl
 		if (_glProgram->hasErrors())
 			return;
 
+		// Initialize the viewport
+		int surfaceWidth, surfaceHeight;
+		glfwGetFramebufferSize(window, &surfaceWidth, &surfaceHeight);
+		glViewport(0, 0, surfaceWidth, surfaceHeight);
+
 		// Main Rendering Loop
 		while (!glfwWindowShouldClose(window))
 		{
 			// Update from main thread's brogueView*
 			_threadLock->lock();
 
-			_glProgram->drawAll();
+			_glProgram->run();
+			_glProgram->hasErrors();	// log errors
+
+			GLenum error = glGetError();
+
+			if (error)
+				simpleLogger::log(getGLErrorString(error));
 
 			_threadLock->unlock();
 
 			glfwSwapBuffers(window);
 			glfwPollEvents();
 
-			std::this_thread::sleep_for(std::chrono::milliseconds(1));
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
 		}
 
 		// Window could've been destroyed already
 		//
-		glfwDestroyWindow(window);
+		//glfwDestroyWindow(window);
+	}
+
+	const char* openglRenderer::getGLErrorString(GLenum error)
+	{
+		switch (error)
+		{
+		case GL_NO_ERROR:          return "No Error";
+		case GL_INVALID_ENUM:      return "Invalid Enum";
+		case GL_INVALID_VALUE:     return "Invalid Value";
+		case GL_INVALID_OPERATION: return "Invalid Operation";
+		case GL_INVALID_FRAMEBUFFER_OPERATION: return "Invalid Framebuffer Operation";
+		case GL_OUT_OF_MEMORY:     return "Out of Memory";
+		case GL_STACK_UNDERFLOW:   return "Stack Underflow";
+		case GL_STACK_OVERFLOW:    return "Stack Overflow";
+		case GL_CONTEXT_LOST:      return "Context Lost";
+		default:                   return "Unknown Error";
+		}
 	}
 }
 

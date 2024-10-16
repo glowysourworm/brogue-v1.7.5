@@ -29,13 +29,22 @@ namespace brogueHd::frontend::opengl
 		{
 			// Starting with the raw data, build a simpleQuad data vector to pass to the simpleDataStream<float>
 			//
+			gridRect sceneBoundary = view->getSceneBoundary();
 			simpleList<simpleQuad> cellQuads;
 			int cellWidth = 10;
 			int cellHeight = 15;
 
-			view->iterate([&cellQuads, &cellWidth, &cellHeight](short column, short row, brogueCellDisplay cell)
+			view->iterate([&sceneBoundary, &cellQuads, &cellWidth, &cellHeight](short column, short row, brogueCellDisplay cell)
 			{
-				cellQuads.add(simpleQuad(column * cellWidth, row * cellHeight, (column + 1) * cellWidth, (row + 1) * cellHeight));
+				simpleQuad quad = coordinateConverter::createQuadNormalizedXYScene(GL_TRIANGLES, 
+																					 column * cellWidth, 
+																					 row * cellHeight, 
+																					 cellWidth, 
+																					 cellHeight, 
+																					 sceneBoundary.width, 
+																					 sceneBoundary.height);
+
+				cellQuads.add(quad);
 
 				return iterationCallback::iterate;
 			});
@@ -47,7 +56,9 @@ namespace brogueHd::frontend::opengl
 			//
 
 			// Scene Base: Must declare before streaming the data onto it
-			simpleDataStream<float>* dataStream = new simpleDataStream<float>(cellQuads.count(), cellQuads.first().getElementSize(GL_QUADS), cellQuads.first().getStreamSize());
+			simpleDataStream<float>* dataStream = new simpleDataStream<float>(cellQuads.count(), 
+																			  cellQuads.first().getElementSize(GL_TRIANGLES), 
+																			  cellQuads.first().getStreamSize());
 
 			// Stream the data for output
 			cellQuads.forEach([&dataStream](simpleQuad quad)
@@ -68,7 +79,7 @@ namespace brogueHd::frontend::opengl
 			gridRect sceneBoundary = view->getSceneBoundary();
 
 			// Frame Data (for the scene)
-			simpleQuad frameQuad = coordinateConverter::createQuadNormalizedXYScene(0, 0, sceneBoundary.width, sceneBoundary.height, sceneBoundary.width, sceneBoundary.height);
+			simpleQuad frameQuad = coordinateConverter::createQuadNormalizedXYScene(GL_TRIANGLES, 0, 0, sceneBoundary.width * 10, sceneBoundary.height * 15, sceneBoundary.width * 10, sceneBoundary.height * 15);
 
 			// Create Scene Data Streams
 
@@ -77,7 +88,7 @@ namespace brogueHd::frontend::opengl
 			//
 
 			// Frame
-			simpleDataStream<float>* dataStream = new simpleDataStream<float>(1, frameQuad.getElementSize(GL_QUADS), frameQuad.getStreamSize());
+			simpleDataStream<float>* dataStream = new simpleDataStream<float>(1, frameQuad.getElementSize(GL_TRIANGLES), frameQuad.getStreamSize());
 
 			// Transfer data to the stream
 			frameQuad.streamBuffer(*dataStream);
@@ -115,7 +126,7 @@ namespace brogueHd::frontend::opengl
 
 
 			simpleVertexBuffer<float>* frameVBO = new simpleVertexBuffer<float>(vertexBufferIndex++, frameDataStream, frameVertexAttributes);
-			simpleVertexArray<float>* frameVAO = new simpleVertexArray<float>(GL_QUADS, frameVBO);
+			simpleVertexArray<float>* frameVAO = new simpleVertexArray<float>(GL_TRIANGLES, frameVBO);
 
 			simpleShaderProgram* program = new simpleShaderProgram(vertexShader, fragmentShader);
 
@@ -151,7 +162,7 @@ namespace brogueHd::frontend::opengl
 			});
 
 			simpleVertexBuffer<float>* sceneVBO = new simpleVertexBuffer<float>(vertexBufferIndex++, sceneDataStream, vertexAttributes);
-			simpleVertexArray<float>* sceneVAO = new simpleVertexArray<float>(GL_QUADS, sceneVBO);
+			simpleVertexArray<float>* sceneVAO = new simpleVertexArray<float>(GL_TRIANGLES, sceneVBO);
 
 			simpleShaderProgram* program = new simpleShaderProgram(vertexShader, fragmentShader);
 

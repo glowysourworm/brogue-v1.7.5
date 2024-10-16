@@ -85,9 +85,9 @@ namespace brogueHd::frontend::opengl
         // COPY DATA TO GPU BUFFER:  This is one of the ways to take application memory to the GPU. 
         //
         glBufferData(GL_ARRAY_BUFFER,
-                        (GLsizeiptr)_stream->getStreamSize(),
-                        _stream->getData(),
-                        GL_STATIC_DRAW);
+                    (GLsizeiptr)_stream->getStreamSize(),
+                    _stream->getData(),
+                    GL_STATIC_DRAW);
 
         // SETUP VERTEX ATTRIBUTE POINTERS:
         //
@@ -121,7 +121,7 @@ namespace brogueHd::frontend::opengl
                 // Data type to read on the GL backend
                 glType = GL_FLOAT;
 
-                // Normalized coordinates (?)
+                // Normalized coordinates (?) (probably UV coords)
                 glNormalized = false;
 
                 // Setup an offset to be added to the total offset
@@ -132,6 +132,9 @@ namespace brogueHd::frontend::opengl
                 simpleException::show("Unhandled vertex array attribute data type:  ", attribute.getUniformType());
             }
 
+            // Enable the vertex attribute
+            glEnableVertexAttribArray(attributeHandle);
+
             // Declare the attribute array configuration
             glVertexAttribPointer(attribute.getIndex(),
                                   attributeSize,
@@ -139,9 +142,6 @@ namespace brogueHd::frontend::opengl
                                   glNormalized,
                                   strideBytes,
                                   (void*)offsetBytes);           // SEE RogueCreator for the function call. Not sure about void* (!!)
-
-            // Enable the vertex attribute
-            glEnableVertexAttribArray(attributeHandle);
 
             // Increment the data offset
             offsetBytes += currentOffset;
@@ -179,7 +179,7 @@ namespace brogueHd::frontend::opengl
         //
 
         // THIS MUST PRODUCE A WHOLE NUMBER
-        return _stream->getStreamSize();        // Apparently Byte Length
+        return _stream->getStreamNumberVertices();      
         //return _stream.GetStreamSize() / 4;
     }
 
@@ -192,7 +192,7 @@ namespace brogueHd::frontend::opengl
         {
             // HANDLE ATTRIBUTES BY DATA TYPE
             if (attribute.getUniformType() == GL_FLOAT_VEC2)
-                return (stride + 2) * sizeof(float);
+                return stride + (2 * sizeof(float));
             else
                 simpleException::show("Unhandled vertex array attribute data type:  ", attribute.getUniformType());
         });

@@ -68,7 +68,7 @@ namespace brogueHd::frontend::opengl
             case shaderResource::brogueBaseVert:
             case shaderResource::brogueFrameVert:
                 this->attributes->add(vertexAttributeData(0, "vertex", GL_FLOAT_VEC2));
-                this->attributes->add(vertexAttributeData(1, "texcoord", GL_FLOAT_VEC2));
+                //this->attributes->add(vertexAttributeData(1, "texcoord", GL_FLOAT_VEC2));
                 break;
             default:
                 simpleException::showCstr("Unhandled shaderResource type:  shaderData.h");

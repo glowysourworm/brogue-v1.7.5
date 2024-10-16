@@ -5,7 +5,7 @@
 out vec4 outputColor;
 
 in vec2 currentVertex;
-in vec2 currentTex;
+//in vec2 currentTex;
 
 // Try and use a 2D sampler to work with the texture. The active texture should be the 0th texture.
 // uniform sampler2D frameTexture;

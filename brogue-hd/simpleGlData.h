@@ -124,9 +124,11 @@ namespace brogueHd::frontend::opengl
 		float top;
 		float right;
 		float bottom;
+		GLenum primitiveType;
 
 		simpleQuad()
 		{
+			primitiveType = GL_TRIANGLES;
 			left = 0;
 			top = 0;
 			right = 0;
@@ -134,13 +136,15 @@ namespace brogueHd::frontend::opengl
 		}
 		simpleQuad(const simpleQuad& copy)
 		{
+			primitiveType = copy.primitiveType;
 			left = copy.left;
 			top = copy.top;
 			right = copy.right;
 			bottom = copy.bottom;
 		}
-		simpleQuad(float aleft, float atop, float aright, float abottom)
+		simpleQuad(GLenum aprimitiveType, float aleft, float atop, float aright, float abottom)
 		{
+			primitiveType = aprimitiveType;
 			left = aleft;
 			top = atop;
 			right = aright;
@@ -149,10 +153,35 @@ namespace brogueHd::frontend::opengl
 
 		float* getBuffer()
 		{
-			// topLeft: [x, y], topRight: [x, x], ...
-			float result[8] { left, top, right, top, right, bottom, left, bottom };
+			// These should probably be tested! :)
+			switch (primitiveType)
+			{
+			case GL_QUADS:
+			{
+				// topLeft: [x, y], topRight: [x, y], ...
+				float result[8]{ left, top, right, top, right, bottom, left, bottom };
 
-			return result;
+				return result;
+			}
+			case GL_TRIANGLES:
+			{
+				// (T1) topLeft, topRight, bottomRight, (T2) topLeft, bottomRight, bottomLeft
+				float result[12]{ left, top, 
+								  right, top, 
+								  right, bottom, 
+
+								  left, top, 
+								  right, bottom, 
+								  left, bottom};
+
+				return result;
+			}
+			default:
+				simpleException::show("Unhandled primitive type for GLQuad:  {}", primitiveType);
+				break;
+			}
+
+			return nullptr;
 		}
 
 		int getElementSize(GLenum primitiveType) override
@@ -162,6 +191,8 @@ namespace brogueHd::frontend::opengl
 			{
 			case GL_QUADS:
 				return 4;
+			case GL_TRIANGLES:
+				return 6;
 			default:
 				simpleException::show("Unhandled primitive type for GLQuad:  {}", primitiveType);
 				break;
@@ -169,20 +200,26 @@ namespace brogueHd::frontend::opengl
 		}
 		int getStreamSize() override
 		{
-			// 8 TOTAL FLOATS
-			return 8;
+			// Total # of floats
+			switch (primitiveType)
+			{
+			case GL_QUADS:
+				return 8;
+			case GL_TRIANGLES:
+				return 12;
+			default:
+				simpleException::show("Unhandled primitive type for GLQuad:  {}", primitiveType);
+				break;
+			}
 		}
 
 		void streamBuffer(simpleDataStream<float>& outputStream) override
 		{
-			outputStream.write(left);
-			outputStream.write(top);
-			outputStream.write(right);
-			outputStream.write(top);
-			outputStream.write(right);
-			outputStream.write(bottom);
-			outputStream.write(left);
-			outputStream.write(bottom);
+			float* buffer = this->getBuffer();
+			int bufferLength = this->getStreamSize();
+
+			for (int index = 0; index < bufferLength; index++)
+				outputStream.write(buffer[index]);
 		}
 		size_t getHash() const override
 		{
