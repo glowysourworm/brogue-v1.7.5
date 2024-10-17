@@ -236,16 +236,16 @@ namespace brogueHd::component
         T east = _grid->getAdjacent(column, row, brogueCompass::E);
         T west = _grid->getAdjacent(column, row, brogueCompass::W);
 
-        if (north != default_value<T>::value && _predicate(column, row - 1, north))
+        if (north != default_value::value<T>() && _predicate(column, row - 1, north))
             return true;
 
-        if (south != default_value<T>::value && _predicate(column, row + 1, south))
+        if (south != default_value::value<T>() && _predicate(column, row + 1, south))
             return true;
 
-        if (east != default_value<T>::value && _predicate(column + 1, row, east))
+        if (east != default_value::value<T>() && _predicate(column + 1, row, east))
             return true;
 
-        if (west != default_value<T>::value && _predicate(column - 1, row, west))
+        if (west != default_value::value<T>() && _predicate(column - 1, row, west))
             return true;
 
         return false;

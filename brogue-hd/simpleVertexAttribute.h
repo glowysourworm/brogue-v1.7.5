@@ -17,8 +17,8 @@ namespace brogueHd::frontend::opengl
         simpleVertexAttribute()
         {
             _index = 0;
-            _name = default_value<simpleString>::value;
-            _activeUniformType = 0;
+            _name = default_value::value<simpleString>();
+            _attributeType = 0;
         }
         simpleVertexAttribute(const simpleVertexAttribute& copy)
         {
@@ -28,7 +28,7 @@ namespace brogueHd::frontend::opengl
         {
             _index = index;
             _name = name;
-            _activeUniformType = glActiveUniformType;
+            _attributeType = glActiveUniformType;
             
             // NO ENUM SUPPORT
 
@@ -51,14 +51,14 @@ namespace brogueHd::frontend::opengl
         {
             return _name;
         }
-        GLenum getUniformType() const
+        GLenum getAttributeType() const
         {
-            return _activeUniformType;
+            return _attributeType;
         }
 
         size_t getHash() const override
         {
-            return hashGenerator::generateHash(_index, _name, _activeUniformType);
+            return hashGenerator::generateHash(_index, _name, _attributeType);
         }
 
     private:
@@ -67,7 +67,7 @@ namespace brogueHd::frontend::opengl
         {
             _index = copy.getIndex();
             _name = copy.getName();
-            _activeUniformType = copy.getUniformType();
+            _attributeType = copy.getAttributeType();
         }
 
     private:
@@ -78,6 +78,6 @@ namespace brogueHd::frontend::opengl
         /// <summary>
         /// Type of input data for the shader - this would be some sort of GLSL supported data type.
         /// </summary>
-        GLenum _activeUniformType;
+        GLenum _attributeType;
     };
 }

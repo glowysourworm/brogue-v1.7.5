@@ -189,7 +189,10 @@
     <ClInclude Include="brogueGameProfile.h" />
     <ClInclude Include="brogueLevelProfile.h" />
     <ClInclude Include="brogueMacroDeclaration.h" />
+    <ClInclude Include="brogueModel.h" />
     <ClInclude Include="brogueTestFunction.h" />
+    <ClInclude Include="brogueValueQuad.h" />
+    <ClInclude Include="simpleBoundingBox.h" />
     <ClInclude Include="simpleExt.h" />
     <ClInclude Include="simpleLogger.h" />
     <ClInclude Include="brogueMachine.h" />
@@ -354,6 +357,8 @@
     <None Include="..\resources\model\weapons.csv" />
     <None Include="..\resources\opengl\brogueBase.frag" />
     <None Include="..\resources\opengl\brogueBase.vert" />
+    <None Include="..\resources\opengl\brogueFlameMenu.frag" />
+    <None Include="..\resources\opengl\brogueFlameMenu.vert" />
     <None Include="..\resources\opengl\brogueFrame.frag" />
     <None Include="..\resources\opengl\brogueFrame.vert" />
     <None Include="..\resources\resource-config.json" />

@@ -252,7 +252,7 @@ namespace brogueHd::component
 		short column = _sourceLocation.column;
 		short row = _sourceLocation.row;
 
-		T lastLocator = default_value<T>::value;
+		T lastLocator = default_value::value<T>();
 
 		// Iterate while any target not reached (AND) not visited
 		while (!_visitedMap->get(column, row) &&
@@ -335,7 +335,7 @@ namespace brogueHd::component
 			});
 
 			// O(1)
-			if (goalLocator != default_value<T>::value)
+			if (goalLocator != default_value::value<T>())
 				goalDict.set(goalLocator, true);
 
 			// Select next location from frontier queue - using the smallest weight
@@ -348,7 +348,7 @@ namespace brogueHd::component
 				// Get the first from the dictionary
 				// var nextNode = nextCostDict.First();
 
-				T nextNode = default_value<T>::value;
+				T nextNode = default_value::value<T>();
 
 				// CHECK FOR GOAL LOCATION!
 				goalDict.forEach([&nextNode, &nextCostDict](T location, bool value)
@@ -361,7 +361,7 @@ namespace brogueHd::component
 									ckey.row == location.row;
 						});
 
-						if (nextNode != default_value<T>::value)
+						if (nextNode != default_value::value<T>())
 							return iterationCallback::breakAndReturn;
 					}
 
@@ -369,7 +369,7 @@ namespace brogueHd::component
 				});
 
 				// Otherwise, set to the next location (should be first dictionary key)
-				if (nextNode == default_value<T>::value)
+				if (nextNode == default_value::value<T>())
 					nextNode = nextCostDict->getAt(0).key;
 
 				// Maintain frontier hash

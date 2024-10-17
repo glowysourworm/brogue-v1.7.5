@@ -6,16 +6,6 @@
 
 namespace brogueHd::simple
 {
-    template<typename T>
-    struct default_value
-    {
-        inline static const T value = T();
-        inline static T ctor()
-        {
-            return T();
-        }
-    };
-
     /*
 
         Hash Explanation:  std::hash provides standard type handling; and can be
@@ -114,8 +104,11 @@ namespace brogueHd::simple
     //template<typename T>
     //concept isBool = std::same_as<T, bool>;
 
-    //template<typename T>
-    //concept isPointer = std::is_pointer<T>::value;
+    template<typename T>
+    concept isPointer = std::is_pointer<T>::value;
+
+    template<typename T>
+    concept isStruct = !std::is_pointer<T>::value;
 
     // Single char, bounded array char[], array pointer char*
     template<typename T>
@@ -193,6 +186,21 @@ namespace brogueHd::simple
             size_t result = hashValue;
             (hash_combine(result, values), ...);
             return result;
+        }
+    };
+
+    struct default_value
+    {
+        template<isPointer T>
+        inline static const T value()
+        {
+            return nullptr;
+        }
+
+        template<isStruct T>
+        inline static const T value()
+        {
+            return T();
         }
     };
 

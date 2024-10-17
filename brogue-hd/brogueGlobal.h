@@ -17,13 +17,17 @@ namespace brogueHd
 		brogueBaseVert = 0,
 		brogueBaseFrag = 1,
 		brogueFrameVert = 2,
-		brogueFrameFrag = 3
+		brogueFrameFrag = 3,
+		brogueFlameMenuVert = 4,
+		brogueFlameMenuFrag = 5
 	};
 
 	static const char* ConfigBaseVertexShader = "baseVertexShader";
 	static const char* ConfigBaseFragmentShader = "baseFragmentShader";
 	static const char* ConfigFrameVertexShader = "frameVertexShader";
 	static const char* ConfigFrameFragmentShader = "frameFragmentShader";
+	static const char* ConfigFlameMenuVertexShader = "flameMenuVertexShader";
+	static const char* ConfigFlameMenuFragmentShader = "flameMenuFragmentShader";
 
 	static const char* BrogueHighScoresFile = "BrogueHighScores.txt";
 

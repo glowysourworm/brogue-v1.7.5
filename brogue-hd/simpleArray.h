@@ -155,16 +155,16 @@ namespace brogueHd::simple
 		// Handle isChar<T> null terminator (was adding garbage to the end (?????))
 		if (isChar<T>)
 		{
-			newArray = new T[capacity + 1]{ default_value<T>::value };
+			newArray = new T[capacity + 1]{ default_value::value<T>() };
 
 			_countAlloc = capacity + 1;
 
 			// HANDLE NULL TERMINATOR RIGHT HERE! (DON'T PROPAGATE THIS ISSUE!)
-			newArray[capacity] = default_value<T>::value;
+			newArray[capacity] = default_value::value<T>();
 		}
 		else
 		{
-			newArray = new T[capacity]{ default_value<T>::value };
+			newArray = new T[capacity]{ default_value::value<T>() };
 
 			_countAlloc = capacity;
 		}
@@ -191,16 +191,16 @@ namespace brogueHd::simple
 		// Handle isChar<T> null terminator (was adding garbage to the end (?????))
 		if (isChar<T>)
 		{
-			newArray = new T[anArrayLength + 1]{ default_value<T>::value };
+			newArray = new T[anArrayLength + 1]{ default_value::value<T>() };
 
 			_countAlloc = anArrayLength + 1;
 
 			// HANDLE NULL TERMINATOR RIGHT HERE! (DON'T PROPAGATE THIS ISSUE!)
-			newArray[anArrayLength] = default_value<T>::value;
+			newArray[anArrayLength] = default_value::value<T>();
 		}
 		else
 		{
-			newArray = new T[anArrayLength]{ default_value<T>::value };
+			newArray = new T[anArrayLength]{ default_value::value<T>() };
 
 			_countAlloc = anArrayLength;
 		}

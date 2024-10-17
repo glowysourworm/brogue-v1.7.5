@@ -9,8 +9,19 @@ using namespace brogueHd::backend::model::game;
 
 namespace brogueHd::backend::model::layout
 {
-	struct brogueCellDisplay : hashable
+	template<typename T>
+	struct brogueCellDisplay : gridLocator
 	{
+	public:
+
+		// TODO:  CHANGE THIS TO WORK ON THE WHOLE DISPLAY PROBLEM STARTING WITH BROGUE 1.7.5.
+		static constexpr float CellHeight = 15.0f;
+		static constexpr float CellWidth = 10.0f;
+
+	public:
+
+		T value;
+
 	public:
 
 		char character;
@@ -50,9 +61,9 @@ namespace brogueHd::backend::model::layout
 
 		brogueCellDisplay()
 		{
-			character = default_value<char>::value;
-			foreColor = default_value<color>::value;
-			backColor = default_value<color>::value;
+			character = default_value::value<char>();
+			foreColor = default_value::value<color>();
+			backColor = default_value::value<color>();
 			opacity = 1.0f;
 			needsUpdate = false;
 		}
@@ -81,27 +92,33 @@ namespace brogueHd::backend::model::layout
 
 		bool compare(const brogueCellDisplay& display) const
 		{
-			return character == display.character &&
+			return value == display.value &&
+				   character == display.character &&
 				   foreColor.compare(display.foreColor) &&
 				   backColor.compare(display.backColor) &&
 				   opacity == display.opacity &&
-				   needsUpdate == display.needsUpdate;// &&
+				   needsUpdate == display.needsUpdate &&
+				   column == display.column &&
+				   row == display.row;
 					//lighting.compare(display.lighting);
 		}
 		size_t getHash() const override
 		{
-			return 0;
+			return hashGenerator::generateHash(column, row, character, foreColor, backColor, opacity, needsUpdate);
 		}
 
 	private:
 
 		void copyImpl(const brogueCellDisplay& copy)
 		{
+			value = copy.value;
+			column = copy.column;
+			row = copy.row;
 			character = copy.character;
 			foreColor = copy.foreColor;									// Careful with instances. These are non-unique
 			backColor = copy.backColor;									// Careful with instances. These are non-unique
 			opacity = copy.opacity;
-			needsUpdate = copy.needsUpdate;
+			needsUpdate = copy.needsUpdate;			
 		}
 	};
 }

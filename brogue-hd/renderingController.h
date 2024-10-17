@@ -28,7 +28,7 @@ namespace brogueHd::backend::controller
 
 	private:
 
-		simpleShaderProgram* createMenuView();
+		simpleShaderProgram* createMenuView(gridRect& sceneBoundaryUI);
 		simpleShaderProgram* createHighScoresView();
 		simpleShaderProgram* createSetSeedView();
 		simpleShaderProgram* createOpenGameView();
@@ -73,9 +73,10 @@ namespace brogueHd::backend::controller
 			// Shuts down thread, deletes our program memory
 			_openglRenderer->terminateProgram();
 			
-			simpleShaderProgram* program = createMenuView();
+			gridRect sceneBoundaryUI;
+			simpleShaderProgram* program = createMenuView(sceneBoundaryUI);
 
-			_openglRenderer->setProgram(program);
+			_openglRenderer->setProgram(program, sceneBoundaryUI);
 			_openglRenderer->startProgram();
 		}
 		break;
@@ -90,13 +91,20 @@ namespace brogueHd::backend::controller
 		}
 	}
 
-	simpleShaderProgram* renderingController::createMenuView()
+	simpleShaderProgram* renderingController::createMenuView(gridRect& sceneBoundaryUI)
 	{
 		// Prepare pieces of the render program
 		brogueFlameMenu* mainMenu = new brogueFlameMenu(0, 1, 1, 1, 1, 1, 1);
+
+		// Calculate converted scene boundary
+		sceneBoundaryUI = brogueSceneBuilder::calculateSceneBoundary(mainMenu);
+
+		// Calculate scene's GL data stream
 		simpleDataStream<float>* sceneDataStream = brogueSceneBuilder::prepareSceneDataStream(mainMenu);
-		shaderData vertexShaderData = _resourceController->getShader(shaderResource::brogueBaseVert);
-		shaderData fragmentShaderData = _resourceController->getShader(shaderResource::brogueBaseFrag);
+
+		// Read shaders from the resource cache
+		shaderData vertexShaderData = _resourceController->getShader(shaderResource::brogueFlameMenuVert);
+		shaderData fragmentShaderData = _resourceController->getShader(shaderResource::brogueFlameMenuFrag);
 
 		// (MEMORY!) Create view for the renderer as shader program
 		return brogueSceneBuilder::createSceneShaderProgram(sceneDataStream, vertexShaderData, fragmentShaderData);

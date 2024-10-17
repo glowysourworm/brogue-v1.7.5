@@ -435,7 +435,7 @@ namespace brogueHd::simple
 	template<isHashable K, isHashable V>
 	K simpleHash<K, V>::firstOrDefaultKey(simpleHashPredicate<K, V> predicate)
 	{
-		K result = default_value<K>::value;
+		K result = default_value::value<K>();
 
 		this->iterate([&result, &predicate](K key, V value)
 			{

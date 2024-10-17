@@ -75,6 +75,7 @@ namespace brogueHd::component
 		}
 
 		short left() const
+
 		{
 			return column;
 		}

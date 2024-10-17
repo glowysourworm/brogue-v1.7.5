@@ -70,6 +70,12 @@ namespace brogueHd::frontend::opengl
                 this->attributes->add(vertexAttributeData(0, "vertex", GL_FLOAT_VEC2));
                 //this->attributes->add(vertexAttributeData(1, "texcoord", GL_FLOAT_VEC2));
                 break;
+
+            case shaderResource::brogueFlameMenuVert:
+                this->attributes->add(vertexAttributeData(0, "valueVertex", GL_FLOAT_VEC3));
+                break;
+            case shaderResource::brogueFlameMenuFrag:
+                break;
             default:
                 simpleException::showCstr("Unhandled shaderResource type:  shaderData.h");
             }

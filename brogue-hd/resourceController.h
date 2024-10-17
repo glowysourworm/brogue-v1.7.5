@@ -98,16 +98,22 @@ namespace brogueHd::backend::controller
 			simpleString baseFragSource = fileOperations::readFile(std::string(jsonConfig[brogueHd::ConfigBaseFragmentShader]).c_str());
 			simpleString frameVertSource = fileOperations::readFile(std::string(jsonConfig[brogueHd::ConfigFrameVertexShader]).c_str());
 			simpleString frameFragSource = fileOperations::readFile(std::string(jsonConfig[brogueHd::ConfigFrameFragmentShader]).c_str());
+			simpleString flameMenuVertSource = fileOperations::readFile(std::string(jsonConfig[brogueHd::ConfigFlameMenuVertexShader]).c_str());
+			simpleString flameMenuFragSource = fileOperations::readFile(std::string(jsonConfig[brogueHd::ConfigFlameMenuFragmentShader]).c_str());
 
 			shaderData* baseVert = new shaderData(shaderResource::brogueBaseVert, GL_VERTEX_SHADER, baseVertSource);
 			shaderData* baseFrag = new shaderData(shaderResource::brogueBaseFrag, GL_FRAGMENT_SHADER, baseFragSource);
 			shaderData* frameVert = new shaderData(shaderResource::brogueFrameVert, GL_VERTEX_SHADER, frameVertSource);
 			shaderData* frameFrag = new shaderData(shaderResource::brogueFrameFrag, GL_FRAGMENT_SHADER, frameFragSource);
+			shaderData* flameMenuVert = new shaderData(shaderResource::brogueFlameMenuVert, GL_VERTEX_SHADER, flameMenuVertSource);
+			shaderData* flameMenuFrag = new shaderData(shaderResource::brogueFlameMenuFrag, GL_FRAGMENT_SHADER, flameMenuFragSource);
 
 			_shaderCache->add(shaderResource::brogueBaseVert, baseVert);
 			_shaderCache->add(shaderResource::brogueBaseFrag, baseFrag);
 			_shaderCache->add(shaderResource::brogueFrameVert, frameVert);
 			_shaderCache->add(shaderResource::brogueFrameFrag, frameFrag);
+			_shaderCache->add(shaderResource::brogueFlameMenuVert, flameMenuVert);
+			_shaderCache->add(shaderResource::brogueFlameMenuFrag, flameMenuFrag);
 
 			return true;
 		}

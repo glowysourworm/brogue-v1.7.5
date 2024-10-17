@@ -411,7 +411,7 @@ namespace brogueHd::simple
 				return _array->get(index);
 		}
 
-		return default_value<T>::value;
+		return default_value::value<T>();
 	}
 
 	template<isHashable T>
@@ -453,14 +453,14 @@ namespace brogueHd::simple
 	template<typename TResult>
 	TResult simpleList<T>::maxOf(simpleListSelector<T, TResult> selector) const
 	{
-		TResult max = default_value<T>::value;
+		TResult max = default_value::value<T>();
 		int maxIndex = -1;
 
 		for (int index = 0; index < _count; index++)
 		{
 			TResult current = selector(_array->get(index));
 
-			if (max == default_value<T>::value)
+			if (max == default_value::value<T>())
 			{
 				max = current;
 				maxIndex = index;
@@ -480,14 +480,14 @@ namespace brogueHd::simple
 	template<typename TResult>
 	TResult simpleList<T>::minOf(simpleListSelector<T, TResult> selector) const
 	{
-		TResult min = default_value<T>::value;
+		TResult min = default_value::value<T>();
 		int minIndex = -1;
 
 		for (int index = 0; index < _count; index++)
 		{
 			TResult current = selector(_array->get(index));
 
-			if (min == default_value<T>::value)
+			if (min == default_value::value<T>())
 			{
 				min = current;
 				minIndex = index;
@@ -519,14 +519,14 @@ namespace brogueHd::simple
 	template<typename TResult>
 	T simpleList<T>::withMin(simpleListSelector<T, TResult> selector) const
 	{
-		TResult min = default_value<T>::value;
+		TResult min = default_value::value<T>();
 		int minIndex = -1;
 
 		for (int index = 0; index < _count; index++)
 		{
 			TResult value = selector(_array->get(index));
 
-			if (min == default_value<T>::value)
+			if (min == default_value::value<T>())
 			{
 				min = value;
 				minIndex = index;
@@ -539,21 +539,21 @@ namespace brogueHd::simple
 			}
 		}
 
-		return min == default_value<T>::value ? default_value<T>::value : _array->get(minIndex);
+		return min == default_value::value<T>() ? default_value::value<T>() : _array->get(minIndex);
 	}
 
 	template<isHashable T>
 	template<typename TResult>
 	T simpleList<T>::withMax(simpleListSelector<T, TResult> selector) const
 	{
-		TResult max = default_value<TResult>::value;
+		TResult max = default_value::value<TResult>();
 		int maxIndex = -1;
 
 		for (int index = 0; index < _count; index++)
 		{
 			TResult current = selector(_array->get(index));
 
-			if (max == default_value<TResult>::value)
+			if (max == default_value::value<TResult>())
 			{
 				max = current;
 				maxIndex = index;
@@ -566,8 +566,8 @@ namespace brogueHd::simple
 			}
 		}
 
-		if (max == default_value<TResult>::value)
-			return default_value<T>::ctor();
+		if (max == default_value::value<TResult>())
+			return default_value::value<T>();
 
 		else
 			return _array->get(maxIndex);

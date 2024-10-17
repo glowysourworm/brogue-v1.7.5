@@ -12,7 +12,7 @@ namespace brogueHd::frontend::opengl
 
         simpleUniform()
         {
-            data = default_value<T>::value;
+            data = default_value::value<T>();
         }
         simpleUniform(const simpleUniform<T>& copy)
         {

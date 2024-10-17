@@ -140,7 +140,7 @@ namespace brogueHd::component
         _grid = new T * [relativeBoundary.width];
 
         for (int index = 0; index < relativeBoundary.width; index++)
-            _grid[index] = new T[relativeBoundary.height];
+            _grid[index] = new T[relativeBoundary.height] {default_value::value<T>()};
 
         _relativeBoundary = relativeBoundary;
         _parentBoundary = parentBoundary;
@@ -159,7 +159,14 @@ namespace brogueHd::component
     template<typename T>
     T grid<T>::get(short column, short row) const
     {
-        return _grid[column][row];
+        if (column < _relativeBoundary.column ||
+            row < _relativeBoundary.row ||
+            column > _relativeBoundary.right() ||
+            row > _relativeBoundary.bottom())
+            simpleException::show("Index outside the bounds of the array:  grid.h");
+
+        // Must subtract off the offset to address the primary grid
+        return _grid[column - _relativeBoundary.column][row - _relativeBoundary.row];
     }
 
     template<typename T>
@@ -204,7 +211,7 @@ namespace brogueHd::component
         switch (direction)
         {
         case brogueCompass::None:
-            return default_value<T>::value;
+            return default_value::value<T>();
 
         case brogueCompass::N:
             if (!this->isInBounds(column, row - 1))
@@ -247,7 +254,7 @@ namespace brogueHd::component
 
             return this->get(column + 1, row + 1);
         default:
-            return default_value<T>::value;
+            return default_value::value<T>();
         }
     }
 
@@ -326,7 +333,7 @@ namespace brogueHd::component
     template<typename T>
     bool grid<T>::isDefined(short column, short row) const
     {
-        return this->get(column, row) == default_value<T>::value;
+        return  this->get(column, row) != default_value::value<T>();
     }
 
     template<typename T>
@@ -338,13 +345,14 @@ namespace brogueHd::component
     template<typename T>
     void grid<T>::set(short column, short row, T value)
     {
-        if (!_relativeBoundary.contains(column, row))
+        if (!this->isInBounds(column, row))
             simpleException::showCstr("Grid out of bounds:  grid.cpp");
 
         if (this->isDefined(column, row))
             simpleException::showCstr("Trying to overwrite grid value:  grid.cpp (use remove first)");
 
-        _grid[column][row] = value;
+        // Must subtract off the relative boundary offset to address the primary grid
+        _grid[column - _relativeBoundary.column][row - _relativeBoundary.row] = value;
     }
 
     // Fills grid locations with the given value if they match any terrain flags or map flags.
@@ -395,10 +403,12 @@ namespace brogueHd::component
     {
         T searchValue;
 
-        iterate(this, [](short column, short row)
+        grid<T>* grid = this;
+
+        iterate(this, [&grid](short column, short row)
         {
-            if (aggregateComparator(searchValue, _grid[column, row]))
-                searchValue = _grid[column][row];
+            if (aggregateComparator(searchValue, grid->get(column, row)))
+                searchValue = grid->get(column, row);
         });
 
         return searchValue;
@@ -409,7 +419,7 @@ namespace brogueHd::component
     {
         return this->isEdgeWhere(column, row, [](short acolumn, short arow, T item)
         {
-            return item != default_value<T>::value;
+            return item != default_value::value<T>();
         });
     }
 
@@ -429,14 +439,14 @@ namespace brogueHd::component
         T southEast = this->get(column + 1, row + 1);
         T southWest = this->get(column - 1, row + 1);
 
-        return (north == default_value<T>::value || (north != default_value<T>::value && !predicate(column, row - 1, north))) ||
-                (south == default_value<T>::value || (south != default_value<T>::value && !predicate(column, row + 1, south))) ||
-                (east == default_value<T>::value || (east != default_value<T>::value && !predicate(column + 1, row, east))) ||
-                (west == default_value<T>::value || (west != default_value<T>::value && !predicate(column - 1, row, west))) ||
-                (northEast == default_value<T>::value || (northEast != default_value<T>::value && !predicate(column + 1, row - 1, northEast))) ||
-                (northWest == default_value<T>::value || (northWest != default_value<T>::value && !predicate(column - 1, row - 1, northWest))) ||
-                (southEast == default_value<T>::value || (southEast != default_value<T>::value && !predicate(column + 1, row + 1, southEast))) ||
-                (southWest == default_value<T>::value || (southWest != default_value<T>::value && !predicate(column - 1, row + 1, southWest)));
+        return (north == default_value::value<T>() || (north != default_value::value<T>() && !predicate(column, row - 1, north))) ||
+                (south == default_value::value<T>() || (south != default_value::value<T>() && !predicate(column, row + 1, south))) ||
+                (east == default_value::value<T>() || (east != default_value::value<T>() && !predicate(column + 1, row, east))) ||
+                (west == default_value::value<T>() || (west != default_value::value<T>() && !predicate(column - 1, row, west))) ||
+                (northEast == default_value::value<T>() || (northEast != default_value::value<T>() && !predicate(column + 1, row - 1, northEast))) ||
+                (northWest == default_value::value<T>() || (northWest != default_value::value<T>() && !predicate(column - 1, row - 1, northWest))) ||
+                (southEast == default_value::value<T>() || (southEast != default_value::value<T>() && !predicate(column + 1, row + 1, southEast))) ||
+                (southWest == default_value::value<T>() || (southWest != default_value::value<T>() && !predicate(column - 1, row + 1, southWest)));
     }
 
     template<typename T>
@@ -448,16 +458,16 @@ namespace brogueHd::component
         T west = this->get(column - 1, row);
 
         if (direction == brogueCompass::N)
-            return north == default_value<T>::value || (north != default_value<T>::value && !predicate(column, row - 1, north));
+            return north == default_value::value<T>() || (north != default_value::value<T>() && !predicate(column, row - 1, north));
 
         else if (direction == brogueCompass::S)
-            return south == default_value<T>::value || (south != default_value<T>::value && !predicate(column, row + 1, south));
+            return south == default_value::value<T>() || (south != default_value::value<T>() && !predicate(column, row + 1, south));
 
         else if (direction == brogueCompass::E)
-            return east == default_value<T>::value || (east != default_value<T>::value && !predicate(column + 1, row, east));
+            return east == default_value::value<T>() || (east != default_value::value<T>() && !predicate(column + 1, row, east));
 
         else if (direction == brogueCompass::W)
-            return west == default_value<T>::value || (west != default_value<T>::value && !predicate(column - 1, row, west));
+            return west == default_value::value<T>() || (west != default_value::value<T>() && !predicate(column - 1, row, west));
 
         else
             simpleException::showCstr("Invalid use of direction parameter:  grid.isExposedEdge");

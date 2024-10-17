@@ -53,7 +53,7 @@ namespace brogueHd::component
     {
         return locateRegions(grid, [](short column, short row, T value)
         {
-            return value != default_value<T>::value;
+            return value != default_value::value<T>();
         });
     }
 
@@ -168,7 +168,7 @@ namespace brogueHd::component
             // Find Connected Cells
 
             // N
-            if (north != default_value<T>::value &&
+            if (north != default_value::value<T>() &&
                 !regionConstructor.isDefined(north.column, north.row) &&
                 inclusionPredicate(north.column, north.row, north))
             {
@@ -177,7 +177,7 @@ namespace brogueHd::component
             }
 
             // S
-            if (south != default_value<T>::value &&
+            if (south != default_value::value<T>() &&
                 !regionConstructor.isDefined(south.column, south.row) &&
                 inclusionPredicate(south.column, south.row, south))
             {
@@ -186,7 +186,7 @@ namespace brogueHd::component
             }
 
             // E
-            if (east != default_value<T>::value &&
+            if (east != default_value::value<T>() &&
                 !regionConstructor.isDefined(east.column, east.row) &&
                 inclusionPredicate(east.column, east.row, east))
             {
@@ -195,7 +195,7 @@ namespace brogueHd::component
             }
 
             // W
-            if (west != default_value<T>::value &&
+            if (west != default_value::value<T>() &&
                 !regionConstructor.isDefined(west.column, west.row) &&
                 inclusionPredicate(west.column, west.row, west))
             {

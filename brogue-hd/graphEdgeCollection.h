@@ -210,7 +210,7 @@ namespace brogueHd::component
     template<graphNodeType TNode, graphEdgeType<TNode> TEdge>
     bool graphEdgeCollection<TNode, TEdge>::containsEdge(const TNode& node1, const TNode& node2)
     {
-        return findEdge(node1, node2) != default_value<TEdge>::value;
+        return findEdge(node1, node2) != default_value::value<TEdge>();
     }
 
     template<graphNodeType TNode, graphEdgeType<TNode> TEdge>

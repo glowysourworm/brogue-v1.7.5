@@ -23,6 +23,9 @@ namespace brogueHd::test
 			this->addTest(brogueTestFunction("intInt_OnStack_iterate", std::bind(&simpleHashTests::intInt_OnStack_iterate, this)));
 			this->addTest(brogueTestFunction("intInt_OnHeap_iterate", std::bind(&simpleHashTests::intInt_OnHeap_iterate, this)));
 
+			// simpleHash<shaderResource>
+			this->addTest(brogueTestFunction("cache_Retrieve_Shader_Resources", std::bind(&simpleHashTests::cache_Retrieve_Shader_Resources, this)));
+
 			// simpleArray<simpleString>
 			this->addTest(brogueTestFunction("instantiate_StringString_OnStack", std::bind(&simpleHashTests::instantiate_StringString_OnStack, this)));
 			this->addTest(brogueTestFunction("instantiate_StringString_OnHeap_And_Delete", std::bind(&simpleHashTests::instantiate_StringString_OnHeap_And_Delete, this)));
@@ -101,6 +104,66 @@ namespace brogueHd::test
 
 			theHash->iterate([](int key, int value)
 			{
+				return iterationCallback::iterate;
+			});
+
+			return true;
+		}
+
+		bool cache_Retrieve_Shader_Resources()
+		{
+			simpleHash<shaderResource, simpleString> shaders;
+
+			shaders.add(shaderResource::brogueBaseFrag, "brogueBaseFrag");
+			shaders.add(shaderResource::brogueBaseVert, "brogueBaseVert");
+			shaders.add(shaderResource::brogueFrameFrag, "brogueFrameFrag");
+			shaders.add(shaderResource::brogueFrameVert, "brogueFrameVert");
+			shaders.add(shaderResource::brogueFlameMenuFrag, "brogueFlameMenuFrag");
+			shaders.add(shaderResource::brogueFlameMenuVert, "brogueFlameMenuVert");
+
+			simpleHashTests* that = this;
+
+			shaders.iterate([&that] (shaderResource key, simpleString value)
+			{
+				switch (key)
+				{
+				case shaderResource::brogueBaseFrag:
+					that->testAssert("Invalid Hash Key", [&value] ()
+					{
+						return value == "brogueBaseFrag";
+					});
+					break;
+				case shaderResource::brogueBaseVert:
+					that->testAssert("Invalid Hash Key", [&value] ()
+					{
+						return value == "brogueBaseVert";
+					});
+					break;
+				case shaderResource::brogueFrameFrag:
+					that->testAssert("Invalid Hash Key", [&value] ()
+					{
+						return value == "brogueFrameFrag";
+					});
+					break;
+				case shaderResource::brogueFrameVert:
+					that->testAssert("Invalid Hash Key", [&value] ()
+					{
+						return value == "brogueFrameVert";
+					});
+					break;
+				case shaderResource::brogueFlameMenuFrag:
+					that->testAssert("Invalid Hash Key", [&value] ()
+					{
+						return value == "brogueFlameMenuFrag";
+					});
+					break;
+				case shaderResource::brogueFlameMenuVert:
+					that->testAssert("Invalid Hash Key", [&value] ()
+					{
+						return value == "brogueFlameMenuVert";
+					});
+					break;
+				}
 				return iterationCallback::iterate;
 			});
 

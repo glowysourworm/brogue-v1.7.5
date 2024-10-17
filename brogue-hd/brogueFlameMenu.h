@@ -1,18 +1,17 @@
 #pragma once
 
+#include "brogueModel.h"
 #include "brogueGlobal.h"
 #include "brogueView.h"
-#include "brogueCellDisplay.h"
 
 using namespace brogueHd::backend::model;
 using namespace brogueHd::backend::model::layout;
 
 namespace brogueHd::frontend::ui
 {
-	class brogueFlameMenu : public brogueView
+	class brogueFlameMenu : public brogueView<float>
 	{
 	public:
-		brogueFlameMenu(){};
 		brogueFlameMenu(int padding, 
 						int precision, 
 						int riseSpeed, 
@@ -22,7 +21,12 @@ namespace brogueHd::frontend::ui
 						int updateDelay);
 		~brogueFlameMenu();
 
-	public:
+		void animate();
+
+	protected:
+
+		const float MaxValue = 1.0;
+		const float TextValue = -1.0;
 
 		//
 		// Brogue v1.7.5 (Brian Walker a.k.a. penderprime)
@@ -57,30 +61,79 @@ namespace brogueHd::frontend::ui
 									 int spreadSpeed,
 									 int colorDriftSpeed,
 									 int fadeSpeed,
-									 int updateDelay) : brogueView(gridRect(0, 0, DCOLS, DROWS), gridRect(0, 0, MENU_TITLE_WIDTH, MENU_TITLE_HEIGHT))
+									 int updateDelay)
+
+		: brogueView<float>(gridRect(0, 0, COLS, ROWS), gridRect(0, 0, COLS, ROWS))
 	{
 		brogueFlameMenu* that = this;
 
+		gridRect textBounds((COLS - MENU_TITLE_WIDTH) / 2,
+							(ROWS - MENU_TITLE_HEIGHT) / 2,
+							 MENU_TITLE_WIDTH,
+							 MENU_TITLE_HEIGHT);
+
 		// Transfer rendering to the primary view grid
-		this->getViewBoundary().iterate([&that] (short column, short row)
+		this->getBoundary().iterate([&that, &textBounds] (short column, short row)
 		{
-			if (!that->Title[row][column])
-				return iterationCallback::iterate;
+			brogueCellDisplay<float>* cell = that->get(column, row);
 
-			brogueCellDisplay cell = that->get(column, row);
+			bool isTheText = false;
 
-			// THESE ARE SETUP BACKWARDS FROM USUAL INDICES
-			cell.character = that->Title[row][column];
-			cell.foreColor = color(500, 500, 500, 0, 0, 0, 0, false);
+			if (textBounds.contains(column, row))
+			{
+				isTheText = !(std::isspace(that->Title[row - textBounds.top()][column - textBounds.left()]) > 0);
+			}
 
-			that->update(cell, column, row);
+			// Text Heat Value
+			if (isTheText)
+				cell->value = that->TextValue;
+
+			else if (row == ROWS - 1)
+				cell->value = that->MaxValue;
+
+			else
+				cell->value = 0.0;
 
 			return iterationCallback::iterate;
 		});
 	}
 	brogueFlameMenu::~brogueFlameMenu()
 	{
+		
+	}
+	void brogueFlameMenu::animate()
+	{
+		brogueFlameMenu* that = this;
 
+		// Treat the heat value of 1.0 as max heat
+		this->getBoundary().iterate([&that] (short column, short row)
+		{
+			brogueCellDisplay<float>* cell = that->get(column, row);
+
+			// Transfer heat upwards to the three cells above this one
+			// as an average value
+			//
+
+			if (cell->value == that->TextValue)
+				return iterationCallback::iterate;
+
+			else if (row == ROWS - 1 || row == 0)
+				return iterationCallback::iterate;
+
+			float southWest = 0;
+			float south = that->get(column, row + 1)->value;
+			float southEast = 0;
+
+			if (column - 1 >= 0)
+				southWest = that->get(column - 1, row + 1)->value;
+
+			if (column + 1 < ROWS)
+				southEast = that->get(column + 1, row + 1)->value;
+
+			cell->value = (cell->value + southWest + south + southEast) / 4.0f;
+
+			return iterationCallback::iterate;
+		});
 	}
 }
 

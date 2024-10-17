@@ -13,8 +13,11 @@
 #include "simpleShaderProgram.h"
 #include "simpleLogger.h"
 #include "simpleException.h"
+#include "simpleBoundingBox.h"
+#include "gridRect.h"
 
 using namespace brogueHd::simple;
+using namespace brogueHd::component;
 
 namespace brogueHd::frontend::opengl
 {
@@ -34,7 +37,7 @@ namespace brogueHd::frontend::opengl
 		/// <summary>
 		/// Sets the program pointer for use
 		/// </summary>
-		void setProgram(simpleShaderProgram* program);
+		void setProgram(simpleShaderProgram* program, const gridRect& sceneBoundaryGL);
 
 		/// <summary>
 		/// Starts program rendering thread, and opens window using GLFW
@@ -70,7 +73,9 @@ namespace brogueHd::frontend::opengl
 		static void debugMessage(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
 								 const GLchar* message, const void* userParam);
 
-		const char* getGLErrorString(GLenum error);
+		static const char* getGLErrorString(GLenum error);
+		static const char* getGLTypeString(GLenum errorType);
+		static const char* getGLSourceString(GLenum errorSource);
 
 	private:
 
@@ -79,6 +84,7 @@ namespace brogueHd::frontend::opengl
 	private:
 
 		simpleShaderProgram* _glProgram;
+		gridRect _sceneBoundaryUI;
 
 		bool _initializedGL;
 
@@ -131,7 +137,7 @@ namespace brogueHd::frontend::opengl
 	void openglRenderer::debugMessage(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
 									  const GLchar* message, const void* userParam)
 	{
-		simpleLogger::log("GL Debug:  Source: {} Type: {} Id: {} Severity:{} Message:   {}", source, type, id, severity, message);
+		simpleLogger::log("GL Debug:  Source: {} Type: {} Id: {} Severity:{} Message:   {}", openglRenderer::getGLSourceString(source), openglRenderer::getGLTypeString(type), id, severity, message);
 	}
 
 	void openglRenderer::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -139,8 +145,12 @@ namespace brogueHd::frontend::opengl
 		glfwSetWindowShouldClose(window, GLFW_TRUE);
 	}
 	void openglRenderer::resizeCallback(GLFWwindow* window, int height, int width)
-	{
-		glViewport(0, 0, width, height);
+	{	
+		// This will reset the coordinate system. Probably only needed once if the 
+		// size of the game display or aspect ratio is changed by the user. The window
+		// doesn't matter to the GL backend.
+		// 
+		//glViewport(0, 0, width, height);
 	}
 	void openglRenderer::refreshCallback(GLFWwindow* window)
 	{
@@ -209,13 +219,14 @@ namespace brogueHd::frontend::opengl
 			simpleException::show("Initialization of GLFW failed! Cannot render graphics!");
 		}
 	}
-	void openglRenderer::setProgram(simpleShaderProgram* program)
+	void openglRenderer::setProgram(simpleShaderProgram* program, const gridRect& sceneBoundaryUI)
 	{
 		if (_glProgram != nullptr)
 			simpleException::show("Trying to set a new program to the opengl renderer before terminating the old program.");
 
 		// Shared Program Pointer (the program is acutally built, separating it from the brogueView)
 		_glProgram = program;
+		_sceneBoundaryUI = sceneBoundaryUI;
 	}
 	void openglRenderer::startProgram()
 	{
@@ -256,11 +267,8 @@ namespace brogueHd::frontend::opengl
 		// Full Screen Mode, Primary Monitor
 		//window = glfwCreateWindow(mode->width, mode->height, "Brogue v1.7.5", monitor, NULL);
 
-		int windowWidth = 640;
-		int windowHeight = 480;
-
 		// Windowed Mode
-		GLFWwindow* window = glfwCreateWindow(windowWidth, windowHeight, "Brogue v1.7.5", NULL, NULL);
+		GLFWwindow* window = glfwCreateWindow(_sceneBoundaryUI.width, _sceneBoundaryUI.height, "Brogue v1.7.5", NULL, NULL);
 
 		// Open GL Context
 		glfwMakeContextCurrent(window);
@@ -327,9 +335,23 @@ namespace brogueHd::frontend::opengl
 			return;
 
 		// Initialize the viewport
-		int surfaceWidth, surfaceHeight;
-		glfwGetFramebufferSize(window, &surfaceWidth, &surfaceHeight);
-		glViewport(0, 0, surfaceWidth, surfaceHeight);
+		//int surfaceWidth, surfaceHeight;
+		//glfwGetFramebufferSize(window, &surfaceWidth, &surfaceHeight);
+
+		// Khronos Group:       glViewport(x, y, width, height)
+		// Window Coordinates:  (x_w, y_w), (x, y) - position offsets, (width, height) - window size
+		// GL Coordinates:		(x_nd, y_nd)
+
+		// x_w = (x_nd + 1)(width / 2) + x
+		// y_w = (y_nd + 1)(height / 2) + y
+
+		//float viewportX = (_sceneBoundaryGL.x + 1) * (windowWidth / 2.0f);
+		//float viewportY = (_sceneBoundaryGL.y + 1) * (windowHeight / 2.0f);
+		//float viewportWidth = (_sceneBoundaryGL.width + 1) * (windowWidth / 2.0f);
+		//float viewportHeight = (_sceneBoundaryGL.height + 1) * (windowHeight / 2.0f);
+
+		//glViewport(_sceneBoundaryUI.left(), _sceneBoundaryUI.top(), _sceneBoundaryUI.width, _sceneBoundaryUI.height);
+		glViewport(0, 0, _sceneBoundaryUI.width, _sceneBoundaryUI.height);
 
 		// Main Rendering Loop
 		while (!glfwWindowShouldClose(window))
@@ -372,6 +394,37 @@ namespace brogueHd::frontend::opengl
 		case GL_STACK_OVERFLOW:    return "Stack Overflow";
 		case GL_CONTEXT_LOST:      return "Context Lost";
 		default:                   return "Unknown Error";
+		}
+	}
+	const char* openglRenderer::getGLTypeString(GLenum errorType)
+	{
+		switch (errorType)
+		{
+		case GL_DEBUG_TYPE_ERROR:				return "GL_DEBUG_TYPE_ERROR";
+		case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: return "GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR";
+		case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:	return "GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR";
+		case GL_DEBUG_TYPE_PORTABILITY:			return "GL_DEBUG_TYPE_PORTABILITY";
+		case GL_DEBUG_TYPE_PERFORMANCE:			return "GL_DEBUG_TYPE_PERFORMANCE";
+		case GL_DEBUG_TYPE_MARKER:				return "GL_DEBUG_TYPE_MARKER";
+		case GL_DEBUG_TYPE_PUSH_GROUP:			return "GL_DEBUG_TYPE_PUSH_GROUP";
+		case GL_DEBUG_TYPE_POP_GROUP:			return "GL_DEBUG_TYPE_POP_GROUP";
+		case GL_DEBUG_TYPE_OTHER:				return "GL_DEBUG_TYPE_OTHER";
+		default:
+			return "Unknown Error Type";
+		}
+	}
+	const char* openglRenderer::getGLSourceString(GLenum errorSource)
+	{
+		switch (errorSource)
+		{
+		case GL_DEBUG_SOURCE_API:				return "GL_DEBUG_SOURCE_API";
+		case GL_DEBUG_SOURCE_WINDOW_SYSTEM:		return "GL_DEBUG_SOURCE_WINDOW_SYSTEM";
+		case GL_DEBUG_SOURCE_SHADER_COMPILER:	return "GL_DEBUG_SOURCE_SHADER_COMPILER";
+		case GL_DEBUG_SOURCE_THIRD_PARTY:		return "GL_DEBUG_SOURCE_THIRD_PARTY";
+		case GL_DEBUG_SOURCE_APPLICATION:		return "GL_DEBUG_SOURCE_APPLICATION";
+		case GL_DEBUG_SOURCE_OTHER:				return "GL_DEBUG_SOURCE_OTHER";
+		default:
+			return "Unknown Source Type";
 		}
 	}
 }
