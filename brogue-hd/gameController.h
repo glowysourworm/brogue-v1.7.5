@@ -98,7 +98,7 @@ namespace brogueHd::backend::controller
 		_playbackProcessor = new playbackProcessor();
 		_randomMain = new randomGenerator(RANDOM_GENERATOR_MAIN);
 		_randomCosmetic = new randomGenerator(RANDOM_GENERATOR_COSMETIC);
-		_renderingController = new renderingController(resourceController);
+		_renderingController = new renderingController(resourceController, _randomCosmetic);
 	}
 
 	gameController::~gameController()

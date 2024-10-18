@@ -56,28 +56,38 @@ namespace brogueHd::frontend::opengl
             //
             switch (this->resource)
             {
-                // FRAGMENT SHADERS
-            case shaderResource::brogueBaseFrag:
-                //this->uniforms1i->add(uniformData<int>("sceneBaseTexture", GL_SAMPLER_2D));
-                break;
-            case shaderResource::brogueFrameFrag:
-                //this->uniforms1i->add(uniformData<int>("frameTexture", GL_SAMPLER_2D));
-                break;
-
-                // VERTEX SHADERS
+                
+            // VERTEX SHADERS
             case shaderResource::brogueBaseVert:
+                this->attributes->add(vertexAttributeData(0, "vertex", GL_FLOAT_VEC2));
+                this->attributes->add(vertexAttributeData(1, "texcoord", GL_FLOAT_VEC2));
+                break;
             case shaderResource::brogueFrameVert:
                 this->attributes->add(vertexAttributeData(0, "vertex", GL_FLOAT_VEC2));
-                //this->attributes->add(vertexAttributeData(1, "texcoord", GL_FLOAT_VEC2));
+                this->attributes->add(vertexAttributeData(1, "backgroundColor", GL_FLOAT_VEC3));
+                break;
+            case shaderResource::brogueFrameBlendVert:
+                this->attributes->add(vertexAttributeData(0, "vertex", GL_FLOAT_VEC2));
+                this->attributes->add(vertexAttributeData(1, "texcoord", GL_FLOAT_VEC2));
+                break;
+            case shaderResource::brogueFlameMenuVert:
+                this->attributes->add(vertexAttributeData(0, "vertex", GL_FLOAT_VEC2));
+                this->attributes->add(vertexAttributeData(1, "backgroundColor", GL_FLOAT_VEC3));
                 break;
 
-            case shaderResource::brogueFlameMenuVert:
-                this->attributes->add(vertexAttributeData(0, "valueVertex", GL_FLOAT_VEC3));
+            // FRAGMENT SHADERS
+            case shaderResource::brogueBaseFrag:
+                break;
+            case shaderResource::brogueFrameFrag:
+                this->uniforms1i->add(uniformData<int>("frameTexture", GL_SAMPLER_2D));
+                break;
+            case shaderResource::brogueFrameBlendFrag:
+                this->uniforms1i->add(uniformData<int>("frameBlendTexture", GL_SAMPLER_2D));
                 break;
             case shaderResource::brogueFlameMenuFrag:
                 break;
             default:
-                simpleException::showCstr("Unhandled shaderResource type:  shaderData.h");
+                simpleException::show("Unhandled shaderResource type:  shaderData.h");
             }
         }
         ~shaderData()

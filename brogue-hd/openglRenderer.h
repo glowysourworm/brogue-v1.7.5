@@ -9,7 +9,10 @@
 
 #include <mutex>
 #include <thread>
+#include <functional>
 
+#include "brogueProgram.h"
+#include "simpleQueue.h"
 #include "simpleShaderProgram.h"
 #include "simpleLogger.h"
 #include "simpleException.h"
@@ -21,6 +24,12 @@ using namespace brogueHd::component;
 
 namespace brogueHd::frontend::opengl
 {
+	/// <summary>
+	/// Function that must return a pointer to a new data stream for re-buffering
+	/// </summary>
+	//template<typename T>
+	//using openglRebufferHandler = std::function<simpleDataStream<T>*(int millisecondsLapsed);
+
 	class openglRenderer
 	{
 	public:
@@ -37,7 +46,7 @@ namespace brogueHd::frontend::opengl
 		/// <summary>
 		/// Sets the program pointer for use
 		/// </summary>
-		void setProgram(simpleShaderProgram* program, const gridRect& sceneBoundaryGL);
+		void setProgram(brogueProgram* program);
 
 		/// <summary>
 		/// Starts program rendering thread, and opens window using GLFW
@@ -83,8 +92,7 @@ namespace brogueHd::frontend::opengl
 
 	private:
 
-		simpleShaderProgram* _glProgram;
-		gridRect _sceneBoundaryUI;
+		brogueProgram* _program;
 
 		bool _initializedGL;
 
@@ -96,7 +104,7 @@ namespace brogueHd::frontend::opengl
 	openglRenderer::openglRenderer()
 	{
 		_initializedGL = false;
-		_glProgram = nullptr;
+		_program = nullptr;
 		_thread = nullptr;
 		_threadLock = new std::mutex();
 	}
@@ -110,7 +118,7 @@ namespace brogueHd::frontend::opengl
 			delete _threadLock;
 		}
 
-		if (_glProgram != nullptr)
+		if (_program != nullptr)
 		{
 			terminateProgram();
 		}
@@ -219,18 +227,17 @@ namespace brogueHd::frontend::opengl
 			simpleException::show("Initialization of GLFW failed! Cannot render graphics!");
 		}
 	}
-	void openglRenderer::setProgram(simpleShaderProgram* program, const gridRect& sceneBoundaryUI)
+	void openglRenderer::setProgram(brogueProgram* program)
 	{
-		if (_glProgram != nullptr)
+		if (_program != nullptr)
 			simpleException::show("Trying to set a new program to the opengl renderer before terminating the old program.");
 
 		// Shared Program Pointer (the program is acutally built, separating it from the brogueView)
-		_glProgram = program;
-		_sceneBoundaryUI = sceneBoundaryUI;
+		_program = program;
 	}
 	void openglRenderer::startProgram()
 	{
-		if (_glProgram == nullptr)
+		if (_program == nullptr)
 			simpleException::show("Trying to start program before setting it. Please call setProgram(..)");
 
 		if (_thread != nullptr)
@@ -248,9 +255,9 @@ namespace brogueHd::frontend::opengl
 		_thread->join();
 		_thread = nullptr;
 
-		delete _glProgram;
+		delete _program;
 
-		_glProgram = nullptr;
+		_program = nullptr;
 	}
 	void openglRenderer::destroyGL()
 	{
@@ -267,8 +274,13 @@ namespace brogueHd::frontend::opengl
 		// Full Screen Mode, Primary Monitor
 		//window = glfwCreateWindow(mode->width, mode->height, "Brogue v1.7.5", monitor, NULL);
 
+		// THREAD:  LOCK TO INITIALIZE
+		_threadLock->lock();
+
+		gridRect sceneBoundaryUI = _program->getSceneBoundaryUI();
+
 		// Windowed Mode
-		GLFWwindow* window = glfwCreateWindow(_sceneBoundaryUI.width, _sceneBoundaryUI.height, "Brogue v1.7.5", NULL, NULL);
+		GLFWwindow* window = glfwCreateWindow(sceneBoundaryUI.width, sceneBoundaryUI.height, "Brogue v1.7.5", NULL, NULL);
 
 		// Open GL Context
 		glfwMakeContextCurrent(window);
@@ -281,6 +293,9 @@ namespace brogueHd::frontend::opengl
 
 			glfwDestroyWindow(window);
 			//glfwTerminate();
+
+			// THREAD:  UNLOCK TO RETURN
+			_threadLock->unlock();
 			return;
 		}
 		else
@@ -328,11 +343,15 @@ namespace brogueHd::frontend::opengl
 		//
 		// GL Functions must be called after calling glfwMakeContextCurrent.
 		//
-		_glProgram->compile();		// Declares program and program pieces on GL backend
-		_glProgram->bind(true);		// Activates program and program pieces on GL backend
+		_program->compile();		// Declares program and program pieces on GL backend
+		_program->bind(true);		// Activates program and program pieces on GL backend
 
-		if (_glProgram->hasErrors())
+		if (_program->hasErrors())
+		{
+			// THREAD:  UNLOCK TO RETURN
+			_threadLock->unlock();
 			return;
+		}
 
 		// Initialize the viewport
 		//int surfaceWidth, surfaceHeight;
@@ -351,7 +370,16 @@ namespace brogueHd::frontend::opengl
 		//float viewportHeight = (_sceneBoundaryGL.height + 1) * (windowHeight / 2.0f);
 
 		//glViewport(_sceneBoundaryUI.left(), _sceneBoundaryUI.top(), _sceneBoundaryUI.width, _sceneBoundaryUI.height);
-		glViewport(0, 0, _sceneBoundaryUI.width, _sceneBoundaryUI.height);
+		glViewport(0, 0, sceneBoundaryUI.width, sceneBoundaryUI.height);
+
+		// Initialize Program:  compile() -> bind(true)
+		_program->initialize();
+		_program->hasErrors();						// log errors
+
+		// THREAD:  UNLOCK TO ENTER PRIMARY LOOP
+		_threadLock->unlock();
+
+		int intervalMilliseconds = 100;
 
 		// Main Rendering Loop
 		while (!glfwWindowShouldClose(window))
@@ -359,8 +387,9 @@ namespace brogueHd::frontend::opengl
 			// Update from main thread's brogueView*
 			_threadLock->lock();
 
-			_glProgram->run();
-			_glProgram->hasErrors();	// log errors
+			_program->update(intervalMilliseconds);						// Updates program buffers from the UI view
+			_program->run();							// Run() -> Draws the buffers
+			_program->hasErrors();						// log errors
 
 			GLenum error = glGetError();
 
@@ -372,7 +401,7 @@ namespace brogueHd::frontend::opengl
 			glfwSwapBuffers(window);
 			glfwPollEvents();
 
-			std::this_thread::sleep_for(std::chrono::milliseconds(100));
+			std::this_thread::sleep_for(std::chrono::milliseconds(intervalMilliseconds));
 		}
 
 		// Window could've been destroyed already

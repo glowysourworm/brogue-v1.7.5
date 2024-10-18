@@ -11,7 +11,6 @@ using namespace brogueHd::backend::model::layout;
 
 namespace brogueHd::frontend::ui
 {
-	template<typename T>
 	class brogueView
 	{
 	public:
@@ -19,58 +18,57 @@ namespace brogueHd::frontend::ui
 		brogueView(gridRect sceneBoundary, gridRect viewBoundary);
 		~brogueView();
 
-		brogueCellDisplay<T>* get(short column, short row) const;
+		brogueCellDisplay* get(short column, short row) const;
 
 		gridRect getParentBoundary() const;
 		gridRect getBoundary() const;
 
-		void iterate(gridCallback<brogueCellDisplay<T>*> callback) const;
+		void iterate(gridCallback<brogueCellDisplay*> callback) const;
+
+		virtual void update(int millisecondsLapsed)
+		{
+
+		}
 
 	private:
 
-		grid<brogueCellDisplay<T>*>* _view;
+		grid<brogueCellDisplay*>* _view;
 	};
 
-	template<typename T>
-	brogueView<T>::brogueView(gridRect sceneBoundary, gridRect viewBoundary)
+	brogueView::brogueView(gridRect sceneBoundary, gridRect viewBoundary)
 	{
-		_view = new grid<brogueCellDisplay<T>*>(sceneBoundary, viewBoundary);
+		_view = new grid<brogueCellDisplay*>(sceneBoundary, viewBoundary);
 
-		grid<brogueCellDisplay<T>*>* grid = _view;
+		grid<brogueCellDisplay*>* grid = _view;
 
 		viewBoundary.iterate([&grid] (short column, short row)
 		{
-			grid->set(column, row, new brogueCellDisplay<T>());
+			grid->set(column, row, new brogueCellDisplay());
 			return iterationCallback::iterate;
 		});
 	}
 
-	template<typename T>
-	brogueView<T>::~brogueView()
+	brogueView::~brogueView()
 	{
 		delete _view;
 	}
 
-	template<typename T>
-	brogueCellDisplay<T>* brogueView<T>::get(short column, short row) const
+	brogueCellDisplay* brogueView::get(short column, short row) const
 	{
 		return _view->get(column, row);
 	}
 
-	template<typename T>
-	gridRect brogueView<T>::getBoundary() const
+	gridRect brogueView::getBoundary() const
 	{
 		return _view->getRelativeBoundary();
 	}
 
-	template<typename T>
-	gridRect brogueView<T>::getParentBoundary() const
+	gridRect brogueView::getParentBoundary() const
 	{
 		return _view->getParentBoundary();
 	}
 
-	template<typename T>
-	void brogueView<T>::iterate(gridCallback<brogueCellDisplay<T>*> callback) const
+	void brogueView::iterate(gridCallback<brogueCellDisplay*> callback) const
 	{
 		_view->iterate(callback);
 	}

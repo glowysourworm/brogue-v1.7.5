@@ -4,8 +4,10 @@
 #include "openglRenderer.h"
 #include "gameConstants.h"
 #include "resourceController.h"
+#include "randomGenerator.h"
 #include "brogueFlameMenu.h"
 #include "brogueSceneBuilder.h"
+#include "brogueFlameMenuProgram.h"
 #include <functional>
 #include <stdlib.h>
 
@@ -18,7 +20,7 @@ namespace brogueHd::backend::controller
 	{
 	public:
 
-		renderingController(resourceController* resourceController);
+		renderingController(resourceController* resourceController, randomGenerator* randomGenerator);
 		~renderingController();
 
 		/// <summary>
@@ -28,25 +30,27 @@ namespace brogueHd::backend::controller
 
 	private:
 
-		simpleShaderProgram* createMenuView(gridRect& sceneBoundaryUI);
-		simpleShaderProgram* createHighScoresView();
-		simpleShaderProgram* createSetSeedView();
-		simpleShaderProgram* createOpenGameView();
-		simpleShaderProgram* createGameView();
+		brogueFlameMenuProgram* createMenuView();
+		brogueProgram* createHighScoresView();
+		brogueProgram* createSetSeedView();
+		brogueProgram* createOpenGameView();
+		brogueProgram* createGameView();
 
 	private:
 
 		BrogueGameMode _mode;
 
+		randomGenerator* _randomGenerator;
 		resourceController* _resourceController;
 		openglRenderer* _openglRenderer;
 
 	};
 
-	renderingController::renderingController(resourceController* resourceController)
+	renderingController::renderingController(resourceController* resourceController, randomGenerator* randomGenerator)
 	{
 		_openglRenderer = new openglRenderer();
 		_resourceController = resourceController;
+		_randomGenerator = randomGenerator;
 		_mode = BrogueGameMode::Menu;
 	}
 	renderingController::~renderingController()
@@ -73,10 +77,9 @@ namespace brogueHd::backend::controller
 			// Shuts down thread, deletes our program memory
 			_openglRenderer->terminateProgram();
 			
-			gridRect sceneBoundaryUI;
-			simpleShaderProgram* program = createMenuView(sceneBoundaryUI);
+			brogueFlameMenuProgram* program = createMenuView();
 
-			_openglRenderer->setProgram(program, sceneBoundaryUI);
+			_openglRenderer->setProgram((brogueProgram*)program);
 			_openglRenderer->startProgram();
 		}
 		break;
@@ -91,23 +94,53 @@ namespace brogueHd::backend::controller
 		}
 	}
 
-	simpleShaderProgram* renderingController::createMenuView(gridRect& sceneBoundaryUI)
+	brogueFlameMenuProgram* renderingController::createMenuView()
 	{
 		// Prepare pieces of the render program
-		brogueFlameMenu* mainMenu = new brogueFlameMenu(0, 1, 1, 1, 1, 1, 1);
+		brogueFlameMenu* mainMenu = new brogueFlameMenu(_randomGenerator, 0, 1, 1, 1, 1, 1, 1);
 
 		// Calculate converted scene boundary
-		sceneBoundaryUI = brogueSceneBuilder::calculateSceneBoundary(mainMenu);
+		gridRect sceneBoundaryUI = brogueSceneBuilder::calculateSceneBoundary(mainMenu);
 
 		// Calculate scene's GL data stream
 		simpleDataStream<float>* sceneDataStream = brogueSceneBuilder::prepareSceneDataStream(mainMenu);
+		simpleDataStream<float>* frameDataStream = brogueSceneBuilder::prepareFrameDataStream(mainMenu);
+		simpleDataStream<float>* frameBlendDataStream = brogueSceneBuilder::prepareFrameDataStream(mainMenu);
 
 		// Read shaders from the resource cache
 		shaderData vertexShaderData = _resourceController->getShader(shaderResource::brogueFlameMenuVert);
 		shaderData fragmentShaderData = _resourceController->getShader(shaderResource::brogueFlameMenuFrag);
+		shaderData frameVertexShaderData = _resourceController->getShader(shaderResource::brogueFrameVert);
+		shaderData frameFragmentShaderData = _resourceController->getShader(shaderResource::brogueFrameFrag);
+		shaderData frameBlendVertexShaderData = _resourceController->getShader(shaderResource::brogueFrameBlendVert);
+		shaderData frameBlendFragmentShaderData = _resourceController->getShader(shaderResource::brogueFrameBlendFrag);
 
 		// (MEMORY!) Create view for the renderer as shader program
-		return brogueSceneBuilder::createSceneShaderProgram(sceneDataStream, vertexShaderData, fragmentShaderData);
+		simpleShaderProgram* sceneProgram = brogueSceneBuilder::createSceneShaderProgram(sceneDataStream, vertexShaderData, fragmentShaderData);
+		simpleShaderProgram* frameProgram = brogueSceneBuilder::createFrameShaderProgram(frameDataStream, frameVertexShaderData, frameFragmentShaderData);
+		simpleShaderProgram* frameBlendProgram = brogueSceneBuilder::createSceneShaderProgram(frameBlendDataStream, frameBlendVertexShaderData, frameBlendFragmentShaderData);
+
+		int textureIndex = 0;
+
+		simpleFrameBuffer* frameBuffer = new simpleFrameBuffer(sceneBoundaryUI.width, sceneBoundaryUI.height);
+		simpleTexture frameTexture(NULL, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE0, GL_BGRA, GL_UNSIGNED_BYTE);
+		simpleTexture frameBlendTexture(NULL, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE0, GL_BGRA, GL_UNSIGNED_BYTE);
+
+		// THESE ARE STATICALLY DEFINED:  They depend on the shader file.
+		//
+		simpleUniform<int> frameFragUniform(frameFragmentShaderData.uniforms1i->get(0));
+		simpleUniform<int> frameBlendFragUniform(frameBlendFragmentShaderData.uniforms1i->get(0));
+
+		return new brogueFlameMenuProgram(sceneProgram, 
+										  frameProgram, 
+										  frameBlendProgram, 
+										  frameBuffer,
+										  mainMenu,
+										  frameTexture,
+										  frameBlendTexture, 
+										  frameFragUniform, 
+										  frameBlendFragUniform,
+										  sceneBoundaryUI);
 
 		//signed short flames[COLS][(ROWS + MENU_FLAME_ROW_PADDING)][3]; // red, green and blue
 		//signed short colorSources[MENU_FLAME_COLOR_SOURCE_COUNT][4]; // red, green, blue, and rand, one for each color source (no more than MENU_FLAME_COLOR_SOURCE_COUNT).
@@ -242,19 +275,19 @@ namespace brogueHd::backend::controller
 		//	}
 		//}
 	}
-	simpleShaderProgram* renderingController::createHighScoresView()
+	brogueProgram* renderingController::createHighScoresView()
 	{
 		return nullptr;
 	}
-	simpleShaderProgram* renderingController::createOpenGameView()
+	brogueProgram* renderingController::createOpenGameView()
 	{
 		return nullptr;
 	}
-	simpleShaderProgram* renderingController::createGameView()
+	brogueProgram* renderingController::createGameView()
 	{
 		return nullptr;
 	}
-	simpleShaderProgram* renderingController::createSetSeedView()
+	brogueProgram* renderingController::createSetSeedView()
 	{
 		return nullptr;
 		//// Prompt for seed; default is the previous game's seed.

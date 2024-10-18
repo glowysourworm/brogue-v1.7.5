@@ -38,7 +38,7 @@ namespace brogueHd::frontend::opengl
 		}
 	};
 
-	struct vec2 : hashable
+	struct vec2 : simpleGlData
 	{
 		float x;
 		float y;
@@ -63,9 +63,104 @@ namespace brogueHd::frontend::opengl
 			x = other.x;
 			y = other.y;
 		}
+
+		int getElementSize(GLenum primitiveType) override
+		{
+			switch (primitiveType)
+			{
+			case GL_TRIANGLES:
+				return 1;
+				break;
+			default:
+				simpleException::show("Unhandled primitive GLenum type:  vec2 in simpleGlData.h");
+			}
+		}
+		int getStreamSize(GLenum primitiveType) override
+		{
+			// total # of floats
+			return 2;
+		}
+		void streamBuffer(GLenum primitiveType, simpleDataStream<float>& outputStream) override
+		{
+			switch (primitiveType)
+			{
+			case GL_TRIANGLES:
+				outputStream.write(x);
+				outputStream.write(y);
+				break;
+			default:
+				simpleException::show("Unhandled primitive GLenum type:  vec2 in simpleGlData.h");
+			}
+		}
+
 		size_t getHash() const override
 		{
 			return hashGenerator::generateHash(x, y);
+		}
+	};
+
+	struct vec3 : simpleGlData
+	{
+		float x;
+		float y;
+		float z;
+
+		vec3()
+		{
+			x = -1;
+			y = -1;
+			z = -1;
+		}
+		vec3(const vec3& copy)
+		{
+			x = copy.x;
+			y = copy.y;
+			z = copy.z;
+		}
+		vec3(float ax, float ay, float az)
+		{
+			x = ax;
+			y = ay;
+			z = az;
+		}
+		void operator=(const vec3& other)
+		{
+			x = other.x;
+			y = other.y;
+			z = other.z;
+		}
+		int getElementSize(GLenum primitiveType) override
+		{
+			switch (primitiveType)
+			{
+			case GL_TRIANGLES:
+				return 1;
+				break;
+			default:
+				simpleException::show("Unhandled primitive GLenum type:  vec2 in simpleGlData.h");
+			}
+		}
+		int getStreamSize(GLenum primitiveType) override
+		{
+			// total # of floats
+			return 3;
+		}
+		void streamBuffer(GLenum primitiveType, simpleDataStream<float>& outputStream) override
+		{
+			switch (primitiveType)
+			{
+			case GL_TRIANGLES:
+				outputStream.write(x);
+				outputStream.write(y);
+				outputStream.write(z);
+				break;
+			default:
+				simpleException::show("Unhandled primitive GLenum type:  vec2 in simpleGlData.h");
+			}
+		}
+		size_t getHash() const override
+		{
+			return hashGenerator::generateHash(x, y, z);
 		}
 	};
 
@@ -145,6 +240,14 @@ namespace brogueHd::frontend::opengl
 			top = atop;
 			right = aright;
 			bottom = abottom;
+		}
+		void operator=(const simpleQuad& copy)
+		{
+			primitiveType = copy.primitiveType;
+			left = copy.left;
+			top = copy.top;
+			right = copy.right;
+			bottom = copy.bottom;
 		}
 
 		int getElementSize(GLenum primitiveType) override
@@ -243,7 +346,7 @@ namespace brogueHd::frontend::opengl
 		{
 			name = aname;
 			type = atype;
-			value = default_value<T>::value;
+			value = default_value::value<T>();
 		}
 
 		simpleString name;

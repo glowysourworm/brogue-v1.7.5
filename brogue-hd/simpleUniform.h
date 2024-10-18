@@ -2,6 +2,7 @@
 
 #include "simple.h"
 #include "simplePrimitive.h"
+#include "simpleGlData.h"
 
 namespace brogueHd::frontend::opengl
 {
@@ -14,7 +15,15 @@ namespace brogueHd::frontend::opengl
         {
             data = default_value::value<T>();
         }
+        simpleUniform(const uniformData<int>& udata)
+        {
+            data = udata.value;
+        }
         simpleUniform(const simpleUniform<T>& copy)
+        {
+            data = copy.data;
+        }
+        void operator=(const simpleUniform<T>& copy)
         {
             data = copy.data;
         }

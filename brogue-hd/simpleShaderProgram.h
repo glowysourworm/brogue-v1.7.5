@@ -1,6 +1,7 @@
 #pragma once
 
 #include "simplePrimitive.h"
+#include "simpleVertexArray.h"
 #include "simpleUniform.h"
 #include "simpleList.h"
 #include "simpleString.h"
@@ -24,19 +25,25 @@ namespace brogueHd::frontend::opengl
         void compile();
         void run();
 
+        void draw(int bufferIndex);
+        void drawAll();
+
         template<typename T>
         void bindUniform(simpleUniform<T> uniform);
         void bind(bool bind);
 
-        void declareVAO(simplePrimitive* programVAO);
+        void declareVAO(simpleVertexArray<float>* programVAO);
         void deleteProgram();
 
         bool hasErrors() override;
 
-    protected:
-
-        void draw(int bufferIndex);
-        void drawAll();
+        /// <summary>
+        /// Call to re-buffer the data glBufferData. Must be the exact parameters as when it was built - except
+        /// for length of the buffer (not a good design!).
+        /// </summary>
+        /// <param name="bufferIndex">Index of VAO</param>
+        /// <param name="newBuffer">Data stream for the new buffer (old will be deleted)</param>
+        void reBuffer(int vaoIndex, simpleDataStream<float>* newBuffer);
 
     private:
 
@@ -46,7 +53,7 @@ namespace brogueHd::frontend::opengl
 
         bool _isCompiled;
 
-        simpleList<simplePrimitive*>* _programVAOs;
+        simpleList<simpleVertexArray<float>*>* _programVAOs;
 
         simpleShader _vertexShader;
         simpleShader _fragmentShader;
@@ -54,7 +61,7 @@ namespace brogueHd::frontend::opengl
 
     simpleShaderProgram::simpleShaderProgram(const simpleShader& vertexShader, const simpleShader& fragmentShader)
     {
-        _programVAOs = new simpleList<simplePrimitive*>();
+        _programVAOs = new simpleList<simpleVertexArray<float>*>();
         _vertexShader = vertexShader;
         _fragmentShader = fragmentShader;
         _isCompiled = false;
@@ -97,7 +104,7 @@ namespace brogueHd::frontend::opengl
 
         // Declare: VAO -> VBO
         //
-        _programVAOs->forEach([&handle] (simplePrimitive* vao)
+        _programVAOs->forEach([&handle] (simpleVertexArray<float>* vao)
         {
             vao->glCreate(handle);
 
@@ -169,7 +176,7 @@ namespace brogueHd::frontend::opengl
         if (!this->isBound)
             simpleException::show("Must first call Bind to set the program active");
 
-        _programVAOs->forEach([] (simplePrimitive* vao)
+        _programVAOs->forEach([] (simpleVertexArray<float>* vao)
         {
             vao->bind(true);
             vao->draw();
@@ -191,6 +198,19 @@ namespace brogueHd::frontend::opengl
         this->drawAll();
     }
 
+    void simpleShaderProgram::reBuffer(int vaoIndex, simpleDataStream<float>* newBuffer)
+    {
+        if (!_isCompiled)
+            simpleException::show("Must first call compile before using the GL program");
+
+        if (this->isBound)
+            simpleException::show("Must first call Bind(false) to rebuffer data!");
+
+        _programVAOs->get(vaoIndex)->bind(false);
+        _programVAOs->get(vaoIndex)->reBuffer(newBuffer);
+        _programVAOs->get(vaoIndex)->bind(true);
+    }
+
     void simpleShaderProgram::bind(bool bind)
     {
         if (!_isCompiled)
@@ -208,7 +228,7 @@ namespace brogueHd::frontend::opengl
         this->isBound = bind;
     }
 
-    void simpleShaderProgram::declareVAO(simplePrimitive* programVAO)
+    void simpleShaderProgram::declareVAO(simpleVertexArray<float>* programVAO)
     {
         // Might've had to do with the textures.
         // 

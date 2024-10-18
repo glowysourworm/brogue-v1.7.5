@@ -18,14 +18,18 @@ namespace brogueHd
 		brogueBaseFrag = 1,
 		brogueFrameVert = 2,
 		brogueFrameFrag = 3,
-		brogueFlameMenuVert = 4,
-		brogueFlameMenuFrag = 5
+		brogueFrameBlendVert = 4,
+		brogueFrameBlendFrag = 5,
+		brogueFlameMenuVert = 6,
+		brogueFlameMenuFrag = 7
 	};
 
 	static const char* ConfigBaseVertexShader = "baseVertexShader";
 	static const char* ConfigBaseFragmentShader = "baseFragmentShader";
 	static const char* ConfigFrameVertexShader = "frameVertexShader";
 	static const char* ConfigFrameFragmentShader = "frameFragmentShader";
+	static const char* ConfigFrameBlendVertexShader = "frameBlendVertexShader";
+	static const char* ConfigFrameBlendFragmentShader = "frameBlendFragmentShader";
 	static const char* ConfigFlameMenuVertexShader = "flameMenuVertexShader";
 	static const char* ConfigFlameMenuFragmentShader = "flameMenuFragmentShader";
 

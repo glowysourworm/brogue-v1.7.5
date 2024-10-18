@@ -62,6 +62,17 @@ namespace brogueHd::backend::generator
 		/// </summary>
 		double next();
 
+		/// <summary>
+		/// Scales the next draw from Uniform[0, 1] and keeps private members updated
+		/// </summary>
+		double next(double low, double high);
+
+		/// <summary>
+		/// Creates a random color with random color channels between the two provided. Makes U[0,1] draws
+		/// scaled by the two colors' channels.
+		/// </summary>
+		color nextColor(color low, color high);
+
 	private:
 
 		/// <summary>
@@ -111,6 +122,24 @@ namespace brogueHd::backend::generator
 		return nextRand;
 	}
 
+	double randomGenerator::next(double low, double high)
+	{
+		// Uniform [0,1]
+		double nextRand = rand() / (double)RAND_MAX;
+
+		// Goes with rand()
+		_numbersGenerated++;
+
+		return (nextRand * (high - low)) + low;
+	}
+	color randomGenerator::nextColor(color low, color high)
+	{
+		float red = next(low.red, high.red);
+		float green = next(low.green, high.green);
+		float blue = next(low.blue, high.blue);
+
+		return color(red, green, blue);
+	}
 	void randomGenerator::reset(unsigned long seed)
 	{
 		_seed = seed;

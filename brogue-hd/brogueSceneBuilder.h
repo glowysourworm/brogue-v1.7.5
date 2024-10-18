@@ -3,6 +3,8 @@
 #include "gridDefinitions.h"
 #include "simpleArrayExtension.h"
 #include "brogueCellDisplay.h"
+#include "brogueCellQuad.h"
+#include "brogueImageQuad.h"
 #include "brogueView.h"
 
 #include "coordinateConverter.h"
@@ -27,14 +29,13 @@ namespace brogueHd::frontend::opengl
 		/// GL viewport; but the coordinate space relates to it. Zoom, and offset must be
 		/// first added to the calculation.
 		/// </summary>
-		template<typename T>
-		static gridRect calculateSceneBoundary(const brogueView<T>* view)
+		static gridRect calculateSceneBoundary(const brogueView* view)
 		{
 			gridRect viewBoundary = view->getParentBoundary();
-			gridRect sceneBoundaryUI = gridRect(viewBoundary.left() * brogueCellDisplay<T>::CellWidth,
-												viewBoundary.right() * brogueCellDisplay<T>::CellHeight,
-												viewBoundary.width * brogueCellDisplay<T>::CellWidth,
-												viewBoundary.height * brogueCellDisplay<T>::CellHeight);
+			gridRect sceneBoundaryUI = gridRect(viewBoundary.left() * brogueCellDisplay::CellWidth,
+												viewBoundary.right() * brogueCellDisplay::CellHeight,
+												viewBoundary.width * brogueCellDisplay::CellWidth,
+												viewBoundary.height * brogueCellDisplay::CellHeight);
 
 			return sceneBoundaryUI;
 		}
@@ -43,25 +44,24 @@ namespace brogueHd::frontend::opengl
 		/// (MEMORY!) The scene data is the data from a brogueView. Using quads, this data is streamed out to our simpleDataStream
 		/// object to hold for the GL backend calls.
 		/// </summary>
-		template<typename T>
-		static simpleDataStream<float>* prepareSceneDataStream(const brogueView<T>* view)
+		static simpleDataStream<float>* prepareSceneDataStream(const brogueView* view)
 		{
 			// Starting with the raw data, build a simpleQuad data vector to pass to the simpleDataStream<float>
 			//
 			gridRect sceneBoundary = calculateSceneBoundary(view);
 
-			simpleList<brogueValueQuad> cellQuads;
+			simpleList<brogueCellQuad> cellQuads;
 
-			view->iterate([&sceneBoundary, &cellQuads](short column, short row, brogueCellDisplay<T>* cell)
+			view->iterate([&sceneBoundary, &cellQuads](short column, short row, brogueCellDisplay* cell)
 			{
-				simpleQuad quad = coordinateConverter::createQuadNormalizedXYScene(GL_TRIANGLES, column * brogueCellDisplay<T>::CellWidth,
-																						 row * brogueCellDisplay<T>::CellHeight,
-																						 brogueCellDisplay<T>::CellWidth,
-																						 brogueCellDisplay<T>::CellHeight,
+				simpleQuad quad = coordinateConverter::createQuadNormalizedXYScene(GL_TRIANGLES, column * brogueCellDisplay::CellWidth,
+																						 row * brogueCellDisplay::CellHeight,
+																						 brogueCellDisplay::CellWidth,
+																						 brogueCellDisplay::CellHeight,
 																						 sceneBoundary.width, 
 																						 sceneBoundary.height);
 
-				cellQuads.add(brogueValueQuad(quad, cell->value));
+				cellQuads.add(brogueCellQuad(*cell));
 
 				return iterationCallback::iterate;
 			});
@@ -78,7 +78,7 @@ namespace brogueHd::frontend::opengl
 																			  cellQuads.first().getStreamSize(GL_TRIANGLES));
 
 			// Stream the data for output
-			cellQuads.forEach([&dataStream](brogueValueQuad quad)
+			cellQuads.forEach([&dataStream](brogueCellQuad quad)
 			{
 				quad.streamBuffer(GL_TRIANGLES, *dataStream);
 				return iterationCallback::iterate;
@@ -91,13 +91,9 @@ namespace brogueHd::frontend::opengl
 		/// (MEMORY!) The Frame of the scene is essentially the buffer that owns the scene's rendering output. It must be declared before 
 		/// it is used during rendering.
 		/// </summary>
-		template<typename T>
-		static simpleDataStream<float>* prepareFrameDataStream(const brogueView<T>* view)
+		static simpleDataStream<float>* prepareFrameDataStream(const brogueView* view)
 		{
 			gridRect sceneBoundary = calculateSceneBoundary(view);
-
-			// Frame Data (for the scene)
-			simpleQuad frameQuad = coordinateConverter::createQuadNormalizedXYScene(GL_TRIANGLES, 0, 0, sceneBoundary.width, sceneBoundary.height, sceneBoundary.width, sceneBoundary.height);
 
 			// Create Scene Data Streams
 
@@ -105,11 +101,17 @@ namespace brogueHd::frontend::opengl
 			// Element Length: Total number of elements as seen by OpenGL - depends on the drawing type
 			//
 
+			simpleQuad vertexQuad = coordinateConverter::createQuadNormalizedXYScene(GL_TRIANGLES, 0, 0, sceneBoundary.width, sceneBoundary.height, sceneBoundary.width, sceneBoundary.height);
+			simpleQuad textureQuad = coordinateConverter::createQuadNormalizedUVScene(GL_TRIANGLES, 0, 0, sceneBoundary.width, sceneBoundary.height, sceneBoundary.width, sceneBoundary.height);
+
+			// Use image quad to prepare the stream
+			brogueImageQuad imageQuad(vertexQuad, textureQuad);
+
 			// Frame
-			simpleDataStream<float>* dataStream = new simpleDataStream<float>(1, frameQuad.getElementSize(GL_TRIANGLES), frameQuad.getStreamSize());
+			simpleDataStream<float>* dataStream = new simpleDataStream<float>(1, imageQuad.getElementSize(GL_TRIANGLES), imageQuad.getStreamSize(GL_TRIANGLES));
 
 			// Transfer data to the stream
-			frameQuad.streamBuffer(*dataStream);
+			imageQuad.streamBuffer(GL_TRIANGLES, *dataStream);
 
 			return dataStream;
 		}
@@ -118,7 +120,6 @@ namespace brogueHd::frontend::opengl
 		/// (MEMORY!) Creates the program for working with the frame VAO on the GL backend. This should be used to render scene data to before
 		/// calling routines to show the frame buffer.
 		/// </summary>
-		template<typename T>
 		static simpleShaderProgram* createFrameShaderProgram(simpleDataStream<float>* frameDataStream,
 															 const shaderData& vertexData,
 															 const shaderData& fragmentData)

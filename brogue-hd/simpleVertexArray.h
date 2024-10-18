@@ -26,6 +26,11 @@ namespace brogueHd::frontend::opengl
         void teardown() override;
         void draw() override;
 
+        /// <summary>
+        /// Rebuffers data on the specified VBO (see simpleShaderProgram)
+        /// </summary>
+        void reBuffer(simpleDataStream<T>* stream);
+
         size_t getHash() const override
         {
             return _vertexBuffer->getHash();
@@ -91,10 +96,22 @@ namespace brogueHd::frontend::opengl
     }
 
     template<typename T>
+    void simpleVertexArray<T>::reBuffer(simpleDataStream<T>* stream)
+    {
+        if (!this->isCreated)
+            simpleException::show("simpleVertexArray already deleted from the backend");
+
+        if (this->isBound)
+            simpleException::show("simpleVertexArray must be un-bound before calling rebuffer()");
+
+        _vertexBuffer->reBuffer(stream, true);
+    }
+
+    template<typename T>
     void simpleVertexArray<T>::teardown()
     {
         if (!this->isCreated)
-            simpleException::showCstr("simpleVertexArray already deleted from the backend");
+            simpleException::show("simpleVertexArray already deleted from the backend");
 
         // Teardown vertex buffers
         _vertexBuffer->teardown();
@@ -111,10 +128,10 @@ namespace brogueHd::frontend::opengl
     void simpleVertexArray<T>::draw()
     {
         if (!this->isCreated)
-            simpleException::showCstr("simpleVertexArray already deleted from the backend");
+            simpleException::show("simpleVertexArray already deleted from the backend");
 
         if (!this->isBound)
-            simpleException::showCstr("simpleVertexArray must be bound before calling Draw()");
+            simpleException::show("simpleVertexArray must be bound before calling Draw()");
 
         // Draw Buffer
         glDrawArrays(_primitiveType, 0, _vertexBuffer->getBufferLength());
@@ -124,7 +141,7 @@ namespace brogueHd::frontend::opengl
     void simpleVertexArray<T>::bind(bool bind)
     {
         if (!this->isCreated)
-            simpleException::showCstr("simpleVertexArray already deleted from the backend");
+            simpleException::show("simpleVertexArray already deleted from the backend");
 
         // Bind VAO before using
         if (bind)

@@ -41,6 +41,13 @@ namespace brogueHd::component
 			width = awidth;
 			height = aheight;
 		}
+		void operator=(const gridRect& copy)
+		{
+			column = copy.column;
+			row = copy.row;
+			width = copy.width;
+			height = copy.height;
+		}
 
 		bool operator==(const gridRect& rect) const
 		{
@@ -176,6 +183,19 @@ namespace brogueHd::component
 				{
 					if (callback(i, j) == iterationCallback::breakAndReturn)
 						userBreak = true;
+				}
+			}
+		}
+		void iterateRowsFirst_BottomToTop(gridRectIterator callback) const
+		{
+			bool userBreak = false;
+
+			for (short j = bottom(); j >= top() && !userBreak; j--)
+			{
+				for (short i = left(); i <= right() && !userBreak; i++)
+				{
+						if (callback(i, j) == iterationCallback::breakAndReturn)
+							userBreak = true;
 				}
 			}
 		}

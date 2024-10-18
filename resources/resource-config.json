@@ -3,6 +3,8 @@
 	"baseFragmentShader" : "C:\\Backup\\_Source\\Git\\brogue-v1.7.5\\resources\\opengl\\brogueBase.frag",
 	"frameVertexShader" : "C:\\Backup\\_Source\\Git\\brogue-v1.7.5\\resources\\opengl\\brogueFrame.vert",
 	"frameFragmentShader" : "C:\\Backup\\_Source\\Git\\brogue-v1.7.5\\resources\\opengl\\brogueFrame.frag",
+	"frameBlendVertexShader" : "C:\\Backup\\_Source\\Git\\brogue-v1.7.5\\resources\\opengl\\brogueFrameBlend.vert",
+	"frameBlendFragmentShader" : "C:\\Backup\\_Source\\Git\\brogue-v1.7.5\\resources\\opengl\\brogueFrameBlend.frag",	
 	"flameMenuVertexShader" : "C:\\Backup\\_Source\\Git\\brogue-v1.7.5\\resources\\opengl\\brogueFlameMenu.vert",
 	"flameMenuFragmentShader" : "C:\\Backup\\_Source\\Git\\brogue-v1.7.5\\resources\\opengl\\brogueFlameMenu.frag"
 }

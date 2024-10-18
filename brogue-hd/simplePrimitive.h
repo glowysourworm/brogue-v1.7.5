@@ -63,12 +63,12 @@ namespace brogueHd::frontend::opengl
         /// <summary>
         /// GL handle created by the GL backend
         /// </summary>
-        GLuint getHandle() const
+        virtual GLuint getHandle() const
         {
             return handle;
         }
 
-        bool getIsBound() const
+        virtual bool getIsBound() const
         {
             return isBound;
         }

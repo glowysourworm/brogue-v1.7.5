@@ -24,6 +24,8 @@ namespace brogueHd::frontend::opengl
         simpleTexture(int pixelBuffer, GLsizei width, GLsizei height, GLuint textureIndex, GLenum textureUnit, GLenum pixelFormat, GLenum pixelType);
         ~simpleTexture(){};
 
+        void operator=(const simpleTexture& copy);
+
         void glCreate(GLuint programHandle) override;
         void teardown() override;
         void bind(bool bind) override;
@@ -67,6 +69,10 @@ namespace brogueHd::frontend::opengl
 
     private:
 
+        void copyImpl(const simpleTexture& copy);
+
+    private:
+
         GLenum _textureUnit;
         GLuint _textureIndex;
 
@@ -90,14 +96,7 @@ namespace brogueHd::frontend::opengl
     }
     simpleTexture::simpleTexture(const simpleTexture& copy)
     {
-        _textureUnit = copy.getTextureUnit();
-        _textureIndex = copy.getTextureIndex();
-
-        _pixelBuffer = copy.getPixelBuffer();
-        _width = copy.getWidth();
-        _height = copy.getHeight();
-        _pixelFormat = copy.getPixelFormat();
-        _pixelType = copy.getPixelType();
+        copyImpl(copy);
     }
     simpleTexture::simpleTexture(int pixelBuffer, GLsizei width, GLsizei height, GLuint textureIndex, GLenum textureUnit, GLenum pixelFormat, GLenum pixelType)
     {
@@ -109,6 +108,23 @@ namespace brogueHd::frontend::opengl
         _height = height;
         _pixelFormat = pixelFormat;
         _pixelType = pixelType;
+    }
+
+    void simpleTexture::operator=(const simpleTexture& copy)
+    {
+        copyImpl(copy);
+    }
+
+    void simpleTexture::copyImpl(const simpleTexture& copy)
+    {
+        _textureUnit = copy.getTextureUnit();
+        _textureIndex = copy.getTextureIndex();
+
+        _pixelBuffer = copy.getPixelBuffer();
+        _width = copy.getWidth();
+        _height = copy.getHeight();
+        _pixelFormat = copy.getPixelFormat();
+        _pixelType = copy.getPixelType();
     }
 
     void simpleTexture::glCreate(GLuint programHandle)

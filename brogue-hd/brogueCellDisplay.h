@@ -3,13 +3,14 @@
 #include "light.h"
 #include "color.h"
 #include "simple.h"
+#include "gridLocator.h"
 
 using namespace brogueHd::simple;
+using namespace brogueHd::component;
 using namespace brogueHd::backend::model::game;
 
 namespace brogueHd::backend::model::layout
 {
-	template<typename T>
 	struct brogueCellDisplay : gridLocator
 	{
 	public:
@@ -17,10 +18,6 @@ namespace brogueHd::backend::model::layout
 		// TODO:  CHANGE THIS TO WORK ON THE WHOLE DISPLAY PROBLEM STARTING WITH BROGUE 1.7.5.
 		static constexpr float CellHeight = 15.0f;
 		static constexpr float CellWidth = 10.0f;
-
-	public:
-
-		T value;
 
 	public:
 
@@ -92,8 +89,7 @@ namespace brogueHd::backend::model::layout
 
 		bool compare(const brogueCellDisplay& display) const
 		{
-			return value == display.value &&
-				   character == display.character &&
+			return character == display.character &&
 				   foreColor.compare(display.foreColor) &&
 				   backColor.compare(display.backColor) &&
 				   opacity == display.opacity &&
@@ -111,7 +107,6 @@ namespace brogueHd::backend::model::layout
 
 		void copyImpl(const brogueCellDisplay& copy)
 		{
-			value = copy.value;
 			column = copy.column;
 			row = copy.row;
 			character = copy.character;

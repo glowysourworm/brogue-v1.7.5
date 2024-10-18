@@ -28,6 +28,13 @@ namespace brogueHd::frontend::opengl
         int getBufferLength();
         int calculateAttributeStride();
 
+        /// <summary>
+        /// Sets new data stream object for the buffer. Vertex array attributes must be the same as the old stream.
+        /// </summary>
+        /// <param name="newStream">Pointer to new data stream</param>
+        /// <param name="deleteOld">Calls delete on the old simpleDataStream</param>
+        void reBuffer(simpleDataStream<T>* newStream, bool deleteOld = true);
+
         size_t getHash() const override
         {
             return hashGenerator::generateHash(_bufferIndex, _stream->getHash(), _vertexAttributes->getHash());
@@ -194,6 +201,7 @@ namespace brogueHd::frontend::opengl
         });
 
         this->isCreated = true;
+        this->isBound = true;
     }
 
     template<typename T>
@@ -213,6 +221,29 @@ namespace brogueHd::frontend::opengl
 
         this->handle = NULL;
         this->isCreated = false;
+    }
+
+    template<typename T>
+    void simpleVertexBuffer<T>::reBuffer(simpleDataStream<T>* newStream, bool deleteOld)
+    {
+        if (!this->isCreated)
+            simpleException::show("simpleVertexBuffer not yet created on the GL backend. Call glCreate first.");
+
+        // Apparently, no need to un-bind. GL_INVALID_OPERATION is thrown if the buffer is not bound
+
+        // (MEMORY!) These aren't yet managed. There is a "builder" pattern; but nothing to help manage them. 
+        if (deleteOld)
+            delete _stream;
+
+        // Set new data stream
+        _stream = newStream;
+
+        // Khronos Group:  glBufferData will delete anything that has been allocated on this particular buffer.
+        //
+        glBufferData(GL_ARRAY_BUFFER,
+                    (GLsizeiptr)_stream->getStreamSize(),
+                    _stream->getData(),
+                    GL_STATIC_DRAW);
     }
 
     template<typename T>

@@ -2,17 +2,24 @@
 
 #include "brogueModel.h"
 #include "brogueGlobal.h"
+#include "color.h"
 #include "brogueView.h"
+#include "simpleMath.h"
+#include "randomGenerator.h"
 
+using namespace brogueHd::simple;
+using namespace brogueHd::backend::generator;
 using namespace brogueHd::backend::model;
 using namespace brogueHd::backend::model::layout;
+using namespace brogueHd::backend::model::game;
 
 namespace brogueHd::frontend::ui
 {
-	class brogueFlameMenu : public brogueView<float>
+	class brogueFlameMenu : public brogueView
 	{
 	public:
-		brogueFlameMenu(int padding, 
+		brogueFlameMenu(randomGenerator* randomGenerator,
+						int padding, 
 						int precision, 
 						int riseSpeed, 
 						int spreadSpeed, 
@@ -23,14 +30,57 @@ namespace brogueHd::frontend::ui
 
 		void animate();
 
+		void update(int millisecondsLapsed) override;
+
+	private:
+
+		randomGenerator* _randomGenerator;
+
 	protected:
 
-		const float MaxValue = 1.0;
-		const float TextValue = -1.0;
+		//
+		// Brogue v1.7.5 (Brian Walker a.k.a. penderprime) (preserved as well as possible)
+		//
 
-		//
-		// Brogue v1.7.5 (Brian Walker a.k.a. penderprime)
-		//
+		const float FlameRedThreshold = 0.2;
+		const float FlameBlueThreshold = 0.8;
+		const float FlameMaxValue = 1.0;
+
+		const float TextValue = 100.0;
+
+		const float FlamePrecision = 0.01;
+		const float FlameRiseSpeed = 0.05;
+		const float FlameSpreadSpeed = 0.02;
+		const float FlameColorDriftSpeed = 0.5;
+		const float FlameFadeSpeed = 0.02;
+		const int FlameRowPadding = 2;
+
+		const color FlamePrimaryColor = color(0.2,0.07,0.07);
+		const color FlameSecondaryColor = color(0.07, 0.02, 0.0);
+		const color FlameTitleColor = color(0.09, 0.09, 0.15);
+
+		gridRect textBounds()
+		{
+			return   gridRect((COLS - MENU_TITLE_WIDTH) / 2,
+							  (ROWS - MENU_TITLE_HEIGHT) / 2,
+								MENU_TITLE_WIDTH,
+								MENU_TITLE_HEIGHT);
+		}
+
+	public:
+
+		bool isTheText(short column, short row)
+		{
+
+			gridRect theTextBounds = this->textBounds();
+
+			if (!theTextBounds.contains(column, row))
+				return false;
+
+			return !(std::isspace(this->Title[row - theTextBounds.top()][column - theTextBounds.left()]) > 0);
+		}
+
+	private:
 
 		const char Title[MENU_TITLE_HEIGHT][MENU_TITLE_WIDTH + 1] = {
 			"########   ########       ######         #######   ####     ###  #########",
@@ -55,7 +105,8 @@ namespace brogueHd::frontend::ui
 		};
 	};
 
-	brogueFlameMenu::brogueFlameMenu(int padding,
+	brogueFlameMenu::brogueFlameMenu(randomGenerator* randomGenerator,
+									 int padding,
 									 int precision,
 									 int riseSpeed,
 									 int spreadSpeed,
@@ -63,36 +114,26 @@ namespace brogueHd::frontend::ui
 									 int fadeSpeed,
 									 int updateDelay)
 
-		: brogueView<float>(gridRect(0, 0, COLS, ROWS), gridRect(0, 0, COLS, ROWS))
+		: brogueView(gridRect(0, 0, COLS, ROWS), gridRect(0, 0, COLS, ROWS))
 	{
+		_randomGenerator = randomGenerator;
+
 		brogueFlameMenu* that = this;
 
-		gridRect textBounds((COLS - MENU_TITLE_WIDTH) / 2,
-							(ROWS - MENU_TITLE_HEIGHT) / 2,
-							 MENU_TITLE_WIDTH,
-							 MENU_TITLE_HEIGHT);
-
 		// Transfer rendering to the primary view grid
-		this->getBoundary().iterate([&that, &textBounds] (short column, short row)
+		this->getBoundary().iterate([&that] (short column, short row)
 		{
-			brogueCellDisplay<float>* cell = that->get(column, row);
-
-			bool isTheText = false;
-
-			if (textBounds.contains(column, row))
-			{
-				isTheText = !(std::isspace(that->Title[row - textBounds.top()][column - textBounds.left()]) > 0);
-			}
+			brogueCellDisplay* cell = that->get(column, row);
 
 			// Text Heat Value
-			if (isTheText)
-				cell->value = that->TextValue;
+			if (that->isTheText(column, row))
+				return iterationCallback::iterate;
 
 			else if (row == ROWS - 1)
-				cell->value = that->MaxValue;
+				cell->backColor = color(1, 1, 1);
 
 			else
-				cell->value = 0.0;
+				cell->backColor = color(0, 0, 0);
 
 			return iterationCallback::iterate;
 		});
@@ -101,36 +142,63 @@ namespace brogueHd::frontend::ui
 	{
 		
 	}
+	void brogueFlameMenu::update(int millisecondsLapsed)
+	{
+		this->animate();
+	}
 	void brogueFlameMenu::animate()
 	{
 		brogueFlameMenu* that = this;
+		randomGenerator* randGenerator = _randomGenerator;
 
 		// Treat the heat value of 1.0 as max heat
-		this->getBoundary().iterate([&that] (short column, short row)
+		this->getBoundary().iterateRowsFirst_BottomToTop([&that, &randGenerator] (short column, short row)
 		{
-			brogueCellDisplay<float>* cell = that->get(column, row);
+			brogueCellDisplay* cell = that->get(column, row);
 
 			// Transfer heat upwards to the three cells above this one
 			// as an average value
 			//
 
-			if (cell->value == that->TextValue)
+			// Text Mask:  Initialized to Black
+			//
+			if (that->isTheText(column, row))
 				return iterationCallback::iterate;
 
-			else if (row == ROWS - 1 || row == 0)
-				return iterationCallback::iterate;
+			// Treat the walls and text mask as HOT
+			color southWest = colors::black();
+			color south = colors::black();
+			color southEast = colors::black();
+			color east = colors::black();
+			color west = colors::black();
 
-			float southWest = 0;
-			float south = that->get(column, row + 1)->value;
-			float southEast = 0;
+			if (row + 1 < ROWS)
+			{
+				south = that->get(column, row + 1)->backColor;
 
-			if (column - 1 >= 0)
-				southWest = that->get(column - 1, row + 1)->value;
+				if (column - 1 >= 0)
+				{
+					southWest = that->get(column - 1, row + 1)->backColor;
+					west = that->get(column - 1, row)->backColor;
+				}
 
-			if (column + 1 < ROWS)
-				southEast = that->get(column + 1, row + 1)->value;
+				if (column + 1 < COLS)
+				{
+					southEast = that->get(column + 1, row + 1)->backColor;
+					east = that->get(column + 1, row)->backColor;
+				}				
+			}
 
-			cell->value = (cell->value + southWest + south + southEast) / 4.0f;
+			// Use interpolation to blend the adjacent color values
+			//
+			cell->backColor.interpolate(southWest, 0.3f);
+			cell->backColor.interpolate(south, 0.3f);
+			cell->backColor.interpolate(southEast, 0.3f);
+			cell->backColor.interpolate(east, 0.05f);
+			cell->backColor.interpolate(west, 0.05f);
+
+			// Add some randomness
+			cell->backColor.interpolate(randGenerator->nextColor(colors::getGray(0.8), colors::getGray(1.0)), 0.5);
 
 			return iterationCallback::iterate;
 		});
@@ -316,5 +384,67 @@ void initializeMenuFlames(boolean includeTitle,
 		"                            ##                                            ",
 		"                           ####                                           ",
 	};
+
+const color flameSourceColor = {20, 7, 7, 60, 40, 40, 0, true}; // 8
+const color flameSourceColorSecondary = {7, 2, 0, 10, 0, 0, 0, true};
+
+//const color flameTitleColor = {0, 0, 0, 17, 10, 6, 0, true}; // pale orange
+//const color flameTitleColor = {0, 0, 0, 7, 7, 10, 0, true}; // *pale blue*
+const color flameTitleColor = {0, 0, 0, 9, 9, 15, 0, true}; // *pale blue**
+
+	for (i=0; i<COLS; i++) {
+		for (j=0; j<ROWS; j++) {
+			mask[i][j] = 0;
+		}
+	}
+
+	for (i=0; i<COLS; i++) {
+		for (j=0; j<(ROWS + MENU_FLAME_ROW_PADDING); j++) {
+			colors[i][j] = NULL;
+			for (k=0; k<3; k++) {
+				flames[i][j][k] = 0;
+			}
+		}
+	}
+
+	// Seed source color random components.
+	for (i=0; i<MENU_FLAME_COLOR_SOURCE_COUNT; i++) {
+		for (k=0; k<4; k++) {
+			colorSources[i][k] = rand_range(0, 1000);
+		}
+	}
+
+	// Put some flame source along the bottom row.
+	colorSourceCount = 0;
+	for (i=0; i<COLS; i++) {
+		colorStorage[colorSourceCount] = flameSourceColor;
+		applyColorAverage(&(colorStorage[colorSourceCount]), &flameSourceColorSecondary, 100 - (smoothHiliteGradient(i, COLS - 1) + 25));
+
+		colors[i][(ROWS + MENU_FLAME_ROW_PADDING)-1] = &(colorStorage[colorSourceCount]);
+		colorSourceCount++;
+	}
+
+	if (includeTitle) {
+		// Wreathe the title in flames, and mask it in black.
+		for (i=0; i<MENU_TITLE_WIDTH; i++) {
+			for (j=0; j<MENU_TITLE_HEIGHT; j++) {
+				if (title[j][i] != ' ') {
+					colors[(COLS - MENU_TITLE_WIDTH)/2 + i + MENU_TITLE_OFFSET_X][(ROWS - MENU_TITLE_HEIGHT)/2 + j + MENU_TITLE_OFFSET_Y] = &flameTitleColor;
+					colorSourceCount++;
+					mask[(COLS - MENU_TITLE_WIDTH)/2 + i + MENU_TITLE_OFFSET_X][(ROWS - MENU_TITLE_HEIGHT)/2 + j + MENU_TITLE_OFFSET_Y] = 100;
+				}
+			}
+		}
+
+		// Anti-alias the mask.
+		antiAlias(mask);
+	}
+
+	brogueAssert(colorSourceCount <= MENU_FLAME_COLOR_SOURCE_COUNT);
+
+	// Simulate the background flames for a while
+	for (i=0; i<100; i++) {
+		updateMenuFlames(colors, colorSources, flames);
+	}
 
 */
