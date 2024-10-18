@@ -191,11 +191,9 @@
     <ClInclude Include="brogueImageQuad.h" />
     <ClInclude Include="brogueLevelProfile.h" />
     <ClInclude Include="brogueMacroDeclaration.h" />
-    <ClInclude Include="brogueModel.h" />
     <ClInclude Include="brogueFlameMenuProgram.h" />
     <ClInclude Include="brogueProgram.h" />
     <ClInclude Include="brogueTestFunction.h" />
-    <ClInclude Include="brogueValueQuad.h" />
     <ClInclude Include="simpleBoundingBox.h" />
     <ClInclude Include="simpleExt.h" />
     <ClInclude Include="simpleLogger.h" />

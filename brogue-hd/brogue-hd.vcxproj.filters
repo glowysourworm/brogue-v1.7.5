@@ -524,6 +524,24 @@
     <ClInclude Include="brogueTestFunction.h">
       <Filter>Header Files\unit-test</Filter>
     </ClInclude>
+    <ClInclude Include="brogueCellQuad.h">
+      <Filter>Header Files\frontend\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueFlameMenuProgram.h">
+      <Filter>Header Files\frontend\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueImageQuad.h">
+      <Filter>Header Files\frontend\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueProgram.h">
+      <Filter>Header Files\frontend\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleBoundingBox.h">
+      <Filter>Header Files\frontend\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleQueue.h">
+      <Filter>Header Files\simple</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\resources\model\armor.csv">
@@ -636,6 +654,18 @@
     </None>
     <None Include="..\resources\resource-config.json">
       <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\resources\opengl\brogueFlameMenu.frag">
+      <Filter>Resource Files\opengl</Filter>
+    </None>
+    <None Include="..\resources\opengl\brogueFlameMenu.vert">
+      <Filter>Resource Files\opengl</Filter>
+    </None>
+    <None Include="..\resources\opengl\brogueFrameBlend.frag">
+      <Filter>Resource Files\opengl</Filter>
+    </None>
+    <None Include="..\resources\opengl\brogueFrameBlend.vert">
+      <Filter>Resource Files\opengl</Filter>
     </None>
   </ItemGroup>
 </Project>

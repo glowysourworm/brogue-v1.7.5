@@ -16,7 +16,7 @@ namespace brogueHd::frontend::opengl
 
         int getElementSize(GLenum primitiveType) override
         {
-            // These should probably be tested! :)
+            // Total # of calls to the shader
             switch (primitiveType)
             {
             case GL_TRIANGLES:
@@ -34,41 +34,33 @@ namespace brogueHd::frontend::opengl
 
         void streamBuffer(GLenum primitiveType, simpleDataStream<float>& outputStream) override
         {
+            // (Triangle 1) topLeft, topRight, bottomRight
+
             // Top Left
-            outputStream.write(vertexCoordinates.left);
-            outputStream.write(vertexCoordinates.top);
-            outputStream.write(textureCoordinates.left);
-            outputStream.write(textureCoordinates.top);
+            vertexCoordinates.topLeft.streamBuffer(primitiveType, outputStream);        // vec2
+            textureCoordinates.topLeft.streamBuffer(primitiveType, outputStream);       // vec2
 
             // Top Right
-            outputStream.write(vertexCoordinates.right);
-            outputStream.write(vertexCoordinates.top);
-            outputStream.write(textureCoordinates.right);
-            outputStream.write(textureCoordinates.top);
+            vertexCoordinates.topRight.streamBuffer(primitiveType, outputStream);
+            textureCoordinates.topRight.streamBuffer(primitiveType, outputStream);
 
             // Bottom Left
-            outputStream.write(vertexCoordinates.left);
-            outputStream.write(vertexCoordinates.bottom);
-            outputStream.write(textureCoordinates.left);
-            outputStream.write(textureCoordinates.bottom);
+            vertexCoordinates.bottomRight.streamBuffer(primitiveType, outputStream);
+            textureCoordinates.bottomRight.streamBuffer(primitiveType, outputStream);
+
+            // (Triangle 2) topLeft, bottomRight, bottomLeft
 
             // Bottom Left
-            outputStream.write(vertexCoordinates.left);
-            outputStream.write(vertexCoordinates.bottom);
-            outputStream.write(textureCoordinates.left);
-            outputStream.write(textureCoordinates.bottom);
+            vertexCoordinates.topLeft.streamBuffer(primitiveType, outputStream);
+            textureCoordinates.topLeft.streamBuffer(primitiveType, outputStream);
 
             // Top Right
-            outputStream.write(vertexCoordinates.right);
-            outputStream.write(vertexCoordinates.top);
-            outputStream.write(textureCoordinates.right);
-            outputStream.write(textureCoordinates.top);
+            vertexCoordinates.bottomRight.streamBuffer(primitiveType, outputStream);
+            textureCoordinates.bottomRight.streamBuffer(primitiveType, outputStream);
 
             // Bottom Right
-            outputStream.write(vertexCoordinates.right);
-            outputStream.write(vertexCoordinates.bottom);
-            outputStream.write(textureCoordinates.right);
-            outputStream.write(textureCoordinates.bottom);
+            vertexCoordinates.bottomLeft.streamBuffer(primitiveType, outputStream);
+            textureCoordinates.bottomLeft.streamBuffer(primitiveType, outputStream);
         }
 
     public:

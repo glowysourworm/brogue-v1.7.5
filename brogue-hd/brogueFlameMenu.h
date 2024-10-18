@@ -1,6 +1,5 @@
 #pragma once
 
-#include "brogueModel.h"
 #include "brogueGlobal.h"
 #include "color.h"
 #include "brogueView.h"
@@ -61,28 +60,35 @@ namespace brogueHd::frontend::ui
 
 		gridRect textBounds()
 		{
+			// Took one off of this guy because of the odd width of the title.
+			// It's just the location of the bounding box - to center the text.
+			//
 			return   gridRect((COLS - MENU_TITLE_WIDTH) / 2,
 							  (ROWS - MENU_TITLE_HEIGHT) / 2,
-								MENU_TITLE_WIDTH,
-								MENU_TITLE_HEIGHT);
+							   MENU_TITLE_WIDTH,
+							   MENU_TITLE_HEIGHT);
 		}
 
 	public:
 
 		bool isTheText(short column, short row)
 		{
-
 			gridRect theTextBounds = this->textBounds();
-
+			
 			if (!theTextBounds.contains(column, row))
 				return false;
 
+			// Take off the odd column on the right
+			if (column == theTextBounds.right())
+				return false;
+
+			// THESE INDICIES ARE FLIPPED:  ROW-FIRST
 			return !(std::isspace(this->Title[row - theTextBounds.top()][column - theTextBounds.left()]) > 0);
 		}
 
 	private:
 
-		const char Title[MENU_TITLE_HEIGHT][MENU_TITLE_WIDTH + 1] = {
+		const char Title[MENU_TITLE_HEIGHT][MENU_TITLE_WIDTH] = {
 			"########   ########       ######         #######   ####     ###  #########",
 			" ##   ###   ##   ###    ##     ###     ##      ##   ##       #    ##     #",
 			" ##    ##   ##    ##   ##       ###   ##        #   ##       #    ##     #",
@@ -127,10 +133,10 @@ namespace brogueHd::frontend::ui
 
 			// Text Heat Value
 			if (that->isTheText(column, row))
-				return iterationCallback::iterate;
+				cell->backColor = color(0, 0, 1);
 
-			else if (row == ROWS - 1)
-				cell->backColor = color(1, 1, 1);
+			//else if (row == ROWS - 1)
+			//	cell->backColor = color(1, 1, 1);
 
 			else
 				cell->backColor = color(0, 0, 0);
@@ -191,14 +197,14 @@ namespace brogueHd::frontend::ui
 
 			// Use interpolation to blend the adjacent color values
 			//
-			cell->backColor.interpolate(southWest, 0.3f);
+			//cell->backColor.interpolate(southWest, 0.3f);
 			cell->backColor.interpolate(south, 0.3f);
-			cell->backColor.interpolate(southEast, 0.3f);
-			cell->backColor.interpolate(east, 0.05f);
-			cell->backColor.interpolate(west, 0.05f);
+			//cell->backColor.interpolate(southEast, 0.3f);
+			//cell->backColor.interpolate(east, 0.05f);
+			//cell->backColor.interpolate(west, 0.05f);
 
 			// Add some randomness
-			cell->backColor.interpolate(randGenerator->nextColor(colors::getGray(0.8), colors::getGray(1.0)), 0.5);
+			//cell->backColor.interpolate(randGenerator->nextColor(colors::getGray(0.8), colors::getGray(1.0)), 0.5);
 
 			return iterationCallback::iterate;
 		});

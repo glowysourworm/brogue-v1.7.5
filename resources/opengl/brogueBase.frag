@@ -9,5 +9,5 @@ in vec3 currentBackgroundColor;
 
 void main()
 {
-    outputColor = vec4(currentBackgroundColor, 1.0);
+    outputColor = vec4(currentBackgroundColor.x, currentBackgroundColor.y, currentBackgroundColor.z, 1.0);
 }

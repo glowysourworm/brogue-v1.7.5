@@ -211,52 +211,44 @@ namespace brogueHd::frontend::opengl
 
 	public:
 
-		float left;
-		float top;
-		float right;
-		float bottom;
-		GLenum primitiveType;
+		vec2 topLeft;
+		vec2 topRight;
+		vec2 bottomLeft;
+		vec2 bottomRight;
 
 		simpleQuad()
 		{
-			primitiveType = GL_TRIANGLES;
-			left = 0;
-			top = 0;
-			right = 0;
-			bottom = 0;
+			topLeft = default_value::value<vec2>();
+			topRight = default_value::value<vec2>();
+			bottomLeft = default_value::value<vec2>();
+			bottomRight = default_value::value<vec2>();
 		}
 		simpleQuad(const simpleQuad& copy)
 		{
-			primitiveType = copy.primitiveType;
-			left = copy.left;
-			top = copy.top;
-			right = copy.right;
-			bottom = copy.bottom;
+			topLeft = copy.topLeft;
+			topRight = copy.topRight;
+			bottomLeft = copy.bottomLeft;
+			bottomRight = copy.bottomRight;
 		}
-		simpleQuad(GLenum aprimitiveType, float aleft, float atop, float aright, float abottom)
+		simpleQuad(float left, float top, float right, float bottom)
 		{
-			primitiveType = aprimitiveType;
-			left = aleft;
-			top = atop;
-			right = aright;
-			bottom = abottom;
+			topLeft = vec2(left, top);
+			topRight = vec2(right, top);
+			bottomLeft = vec2(left, bottom);
+			bottomRight = vec2(right, bottom);
 		}
 		void operator=(const simpleQuad& copy)
 		{
-			primitiveType = copy.primitiveType;
-			left = copy.left;
-			top = copy.top;
-			right = copy.right;
-			bottom = copy.bottom;
+			topLeft = copy.topLeft;
+			topRight = copy.topRight;
+			bottomLeft = copy.bottomLeft;
+			bottomRight = copy.bottomRight;
 		}
 
 		int getElementSize(GLenum primitiveType) override
 		{
-			// These should probably be tested! :)
 			switch (primitiveType)
 			{
-			case GL_QUADS:
-				return 4;
 			case GL_TRIANGLES:
 				return 6;
 			default:
@@ -266,11 +258,8 @@ namespace brogueHd::frontend::opengl
 		}
 		int getStreamSize(GLenum primitiveType) override
 		{
-			// Total # of floats
 			switch (primitiveType)
 			{
-			case GL_QUADS:
-				return 8;
 			case GL_TRIANGLES:
 				return 12;
 			default:
@@ -284,36 +273,17 @@ namespace brogueHd::frontend::opengl
 			// These should probably be tested! :)
 			switch (primitiveType)
 			{
-			case GL_QUADS:
-			{
-				// topLeft: [x, y], topRight: [x, y], ...
-				outputStream.write(left);
-				outputStream.write(top);
-				outputStream.write(right);
-				outputStream.write(top);
-				outputStream.write(right);
-				outputStream.write(bottom);
-				outputStream.write(left);
-				outputStream.write(bottom);
-			}
-			break;
 			case GL_TRIANGLES:
 			{
-				// (Triangle 1) topLeft, topRight, bottomRight, (Triangle 2) topLeft, bottomRight, bottomLeft
+				// (Triangle 1) topLeft, topRight, bottomRight 
+				topLeft.streamBuffer(primitiveType, outputStream);
+				topRight.streamBuffer(primitiveType, outputStream);
+				bottomRight.streamBuffer(primitiveType, outputStream);
 
-				outputStream.write(left);
-				outputStream.write(top);
-				outputStream.write(right);
-				outputStream.write(top);
-				outputStream.write(right);
-				outputStream.write(bottom);
-
-				outputStream.write(left);
-				outputStream.write(top);
-				outputStream.write(right);
-				outputStream.write(bottom);
-				outputStream.write(left);
-				outputStream.write(bottom);
+				// (Triangle 2) topLeft, bottomRight, bottomLeft
+				topLeft.streamBuffer(primitiveType, outputStream);
+				bottomRight.streamBuffer(primitiveType, outputStream);
+				bottomLeft.streamBuffer(primitiveType, outputStream);
 			}
 			break;
 			default:
@@ -323,7 +293,7 @@ namespace brogueHd::frontend::opengl
 		}
 		size_t getHash() const override
 		{
-			return hashGenerator::generateHash(left, top, right, bottom);
+			return hashGenerator::generateHash(topLeft, bottomRight);
 		}
 	};
 

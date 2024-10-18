@@ -10,7 +10,6 @@
 #include "coordinateConverter.h"
 #include "simpleShader.h"
 #include "shaderData.h"
-#include "brogueValueQuad.h"
 #include "simpleShaderProgram.h"
 #include "simpleVertexArray.h"
 
@@ -29,7 +28,7 @@ namespace brogueHd::frontend::opengl
 		/// GL viewport; but the coordinate space relates to it. Zoom, and offset must be
 		/// first added to the calculation.
 		/// </summary>
-		static gridRect calculateSceneBoundary(const brogueView* view)
+		static gridRect calculateSceneBoundaryUI(const brogueView* view)
 		{
 			gridRect viewBoundary = view->getParentBoundary();
 			gridRect sceneBoundaryUI = gridRect(viewBoundary.left() * brogueCellDisplay::CellWidth,
@@ -48,20 +47,25 @@ namespace brogueHd::frontend::opengl
 		{
 			// Starting with the raw data, build a simpleQuad data vector to pass to the simpleDataStream<float>
 			//
-			gridRect sceneBoundary = calculateSceneBoundary(view);
+			gridRect sceneBoundary = calculateSceneBoundaryUI(view);
 
 			simpleList<brogueCellQuad> cellQuads;
 
 			view->iterate([&sceneBoundary, &cellQuads](short column, short row, brogueCellDisplay* cell)
 			{
-				simpleQuad quad = coordinateConverter::createQuadNormalizedXYScene(GL_TRIANGLES, column * brogueCellDisplay::CellWidth,
-																						 row * brogueCellDisplay::CellHeight,
-																						 brogueCellDisplay::CellWidth,
-																						 brogueCellDisplay::CellHeight,
-																						 sceneBoundary.width, 
-																						 sceneBoundary.height);
+				if (!cell->backColor.blue)
+					return iterationCallback::iterate;
 
-				cellQuads.add(brogueCellQuad(*cell));
+				simpleQuad quad = coordinateConverter::createQuadNormalizedXYScene(column * brogueCellDisplay::CellWidth,
+																					row * brogueCellDisplay::CellHeight,
+																					brogueCellDisplay::CellWidth,
+																					brogueCellDisplay::CellHeight,
+																					sceneBoundary.width, 
+																					sceneBoundary.height);
+
+				brogueCellQuad cellQuad(*cell, quad);
+
+				cellQuads.add(cellQuad);
 
 				return iterationCallback::iterate;
 			});
@@ -72,7 +76,7 @@ namespace brogueHd::frontend::opengl
 			// Element Length: Total number of elements as seen by OpenGL - depends on the drawing type
 			//
 
-			// Scene Base: Must declare before streaming the data onto it
+			// (MEMORY!) Scene Base: Must declare before streaming the data onto it
 			simpleDataStream<float>* dataStream = new simpleDataStream<float>(cellQuads.count(), 
 																			  cellQuads.first().getElementSize(GL_TRIANGLES), 
 																			  cellQuads.first().getStreamSize(GL_TRIANGLES));
@@ -93,7 +97,7 @@ namespace brogueHd::frontend::opengl
 		/// </summary>
 		static simpleDataStream<float>* prepareFrameDataStream(const brogueView* view)
 		{
-			gridRect sceneBoundary = calculateSceneBoundary(view);
+			gridRect sceneBoundary = calculateSceneBoundaryUI(view);
 
 			// Create Scene Data Streams
 
@@ -101,8 +105,8 @@ namespace brogueHd::frontend::opengl
 			// Element Length: Total number of elements as seen by OpenGL - depends on the drawing type
 			//
 
-			simpleQuad vertexQuad = coordinateConverter::createQuadNormalizedXYScene(GL_TRIANGLES, 0, 0, sceneBoundary.width, sceneBoundary.height, sceneBoundary.width, sceneBoundary.height);
-			simpleQuad textureQuad = coordinateConverter::createQuadNormalizedUVScene(GL_TRIANGLES, 0, 0, sceneBoundary.width, sceneBoundary.height, sceneBoundary.width, sceneBoundary.height);
+			simpleQuad vertexQuad = coordinateConverter::createQuadNormalizedXYScene(0, 0, sceneBoundary.width, sceneBoundary.height, sceneBoundary.width, sceneBoundary.height);
+			simpleQuad textureQuad = coordinateConverter::createQuadNormalizedUVScene(0, 0, sceneBoundary.width, sceneBoundary.height, sceneBoundary.width, sceneBoundary.height);
 
 			// Use image quad to prepare the stream
 			brogueImageQuad imageQuad(vertexQuad, textureQuad);

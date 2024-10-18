@@ -196,7 +196,7 @@ namespace brogueHd
 	#define DEEPEST_LEVEL           40          // how deep the universe goes
 
 	// Flame Menu
-	#define MENU_TITLE_WIDTH	74
+	#define MENU_TITLE_WIDTH	75
 	#define MENU_TITLE_HEIGHT	19
 
 	//#define MACHINES_FACTOR         (1 << FP_BASE)         // use this to adjust machine frequency

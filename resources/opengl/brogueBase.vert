@@ -9,7 +9,7 @@ layout (location = 1) in vec3 backgroundColor;
 // Define a data type to be output by the shader to the next stages
 //
 out vec2 currentVertex;
-out vec2 currentBackgroundColor;
+out vec3 currentBackgroundColor;
 
 void main()
 {

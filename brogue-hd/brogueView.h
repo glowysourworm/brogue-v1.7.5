@@ -3,7 +3,6 @@
 #include "grid.h"
 #include "gridRect.h"
 #include "brogueCellDisplay.h"
-#include "brogueModel.h"
 
 using namespace brogueHd::component;
 using namespace brogueHd::backend::model;
