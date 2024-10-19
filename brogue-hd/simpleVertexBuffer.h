@@ -191,8 +191,7 @@ namespace brogueHd::frontend::opengl
                                   glType, 
                                   glNormalized,
                                   strideBytes,
-                                  NULL);
-                                  //(void*)offsetBytes);           // SEE RogueCreator for the function call. Not sure about void* (!!)
+                                  (void*)offsetBytes);           // This is the offset of the current attribute.
 
             // Increment the data offset
             offsetBytes += currentOffset;

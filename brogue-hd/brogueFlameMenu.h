@@ -41,6 +41,19 @@ namespace brogueHd::frontend::ui
 		// Brogue v1.7.5 (Brian Walker a.k.a. penderprime) (preserved as well as possible)
 		//
 
+		gridRect textBounds()
+		{
+			// Took one off of this guy because of the odd width of the title.
+			// It's just the location of the bounding box - to center the text.
+			//
+			return   gridRect((COLS - MENU_TITLE_WIDTH) / 2,
+							  (ROWS - MENU_TITLE_HEIGHT) / 2,
+							   MENU_TITLE_WIDTH,
+							   MENU_TITLE_HEIGHT);
+		}
+
+	public:
+
 		const float FlameRedThreshold = 0.2;
 		const float FlameBlueThreshold = 0.8;
 		const float FlameMaxValue = 1.0;
@@ -54,22 +67,9 @@ namespace brogueHd::frontend::ui
 		const float FlameFadeSpeed = 0.02;
 		const int FlameRowPadding = 2;
 
-		const color FlamePrimaryColor = color(0.2,0.07,0.07);
-		const color FlameSecondaryColor = color(0.07, 0.02, 0.0);
-		const color FlameTitleColor = color(0.09, 0.09, 0.15);
-
-		gridRect textBounds()
-		{
-			// Took one off of this guy because of the odd width of the title.
-			// It's just the location of the bounding box - to center the text.
-			//
-			return   gridRect((COLS - MENU_TITLE_WIDTH) / 2,
-							  (ROWS - MENU_TITLE_HEIGHT) / 2,
-							   MENU_TITLE_WIDTH,
-							   MENU_TITLE_HEIGHT);
-		}
-
-	public:
+		const color FlamePrimaryColor = color(0.8, 0.1, 0.1);
+		const color FlameSecondaryColor = color(0.7, 0.3, 0.0);
+		const color FlameTitleColor = color(0.1, 0.1, 0.8);
 
 		bool isTheText(short column, short row)
 		{
@@ -131,15 +131,7 @@ namespace brogueHd::frontend::ui
 		{
 			brogueCellDisplay* cell = that->get(column, row);
 
-			// Text Heat Value
-			if (that->isTheText(column, row))
-				cell->backColor = color(0, 0, 1);
-
-			//else if (row == ROWS - 1)
-			//	cell->backColor = color(1, 1, 1);
-
-			else
-				cell->backColor = color(0, 0, 0);
+			cell->backColor = color(0, 0, 0);
 
 			return iterationCallback::iterate;
 		});
@@ -178,33 +170,56 @@ namespace brogueHd::frontend::ui
 			color east = colors::black();
 			color west = colors::black();
 
-			if (row + 1 < ROWS)
+			// Last row
+			if (row == ROWS - 1)
 			{
-				south = that->get(column, row + 1)->backColor;
+				south = colors::getGray(randGenerator->next(0.9, 1));
+				southEast = colors::getGray(randGenerator->next(0.9, 1));
+				southWest = colors::getGray(randGenerator->next(0.9, 1));
+				//south = randGenerator->nextColor(that->FlamePrimaryColor, that->FlameSecondaryColor);
+				//southEast = randGenerator->nextColor(that->FlamePrimaryColor, that->FlameSecondaryColor);
+				//southWest = randGenerator->nextColor(that->FlamePrimaryColor, that->FlameSecondaryColor);
+			}
+
+			// Other rows (pulls up the last row)
+			//
+			else if (row < ROWS - 1)
+			{
+				//color titleColor = that->FlameTitleColor;
+				color titleColor = colors::white();
+
+				// "Wreathe the text in flames..." (@penderprime)
+				//
+				if (that->isTheText(column, row + 1))
+					south = titleColor;
+				else
+					south = that->get(column, row + 1)->backColor;
 
 				if (column - 1 >= 0)
 				{
-					southWest = that->get(column - 1, row + 1)->backColor;
-					west = that->get(column - 1, row)->backColor;
+					southWest = that->isTheText(column - 1, row + 1) ? titleColor : that->get(column - 1, row + 1)->backColor;
+					west = that->isTheText(column - 1, row) ? titleColor : that->get(column - 1, row)->backColor;
 				}
 
 				if (column + 1 < COLS)
 				{
-					southEast = that->get(column + 1, row + 1)->backColor;
-					east = that->get(column + 1, row)->backColor;
+					southEast = that->isTheText(column + 1, row + 1) ? titleColor : that->get(column + 1, row + 1)->backColor;
+					east = that->isTheText(column + 1, row) ? titleColor : that->get(column + 1, row)->backColor;
 				}				
 			}
 
 			// Use interpolation to blend the adjacent color values
 			//
-			//cell->backColor.interpolate(southWest, 0.3f);
-			cell->backColor.interpolate(south, 0.3f);
-			//cell->backColor.interpolate(southEast, 0.3f);
-			//cell->backColor.interpolate(east, 0.05f);
-			//cell->backColor.interpolate(west, 0.05f);
+			cell->backColor.average(0.3f, south, southEast, southWest);
+			//cell->backColor.interpolate(east, 0.1f);
+			//cell->backColor.interpolate(west, 0.1f);
 
 			// Add some randomness
-			//cell->backColor.interpolate(randGenerator->nextColor(colors::getGray(0.8), colors::getGray(1.0)), 0.5);
+			//if (cell->backColor.magnitude() >= 0.1f)
+			//	cell->backColor.interpolate(randGenerator->nextColor(that->FlamePrimaryColor, that->FlameSecondaryColor), 0.1);
+
+			if (cell->backColor.magnitude() < 0.1f)
+				cell->backColor = colors::black();
 
 			return iterationCallback::iterate;
 		});

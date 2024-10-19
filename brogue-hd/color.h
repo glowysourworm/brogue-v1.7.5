@@ -41,6 +41,51 @@ namespace brogueHd::backend::model::game
 			blue = (other.blue * weight) + (blue * (1 - weight));
 		}
 
+		template<typename T = color, typename ... TRest>
+		void average(float weight, const color& next, const TRest&...rest)
+		{
+			color seed(0, 0, 0);
+
+			sum(seed, next, rest...);
+
+			int numberColors = 1 + sizeof...(rest);
+
+			seed.red = seed.red / numberColors;
+			seed.green = seed.green / numberColors;
+			seed.blue = seed.blue / numberColors;
+
+			// Apply using interpolation
+			interpolate(seed, weight);
+		}
+
+	private:
+
+		template<typename T = color, typename ... TRest>
+		void sum(color& output, const color& next, const TRest&...others)
+		{
+			output.red += next.red;
+			output.green += next.green;
+			output.blue += next.blue;
+
+			if (sizeof...(others) > 0)
+				sum(output, others...);
+		}
+
+		template<typename T = color>
+		void sum(color& output, const color& other)
+		{
+			output.red += other.red;
+			output.green += other.green;
+			output.blue += other.blue;
+		}
+
+	public:
+
+		float magnitude() const
+		{
+			return (red + green + blue) / 3.0f;
+		}
+
 		void operator=(const color& color)
 		{
 			red = color.red;

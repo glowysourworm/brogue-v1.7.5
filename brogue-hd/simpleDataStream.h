@@ -18,8 +18,12 @@ namespace brogueHd::frontend::opengl
         simpleDataStream()
         {
             _streamNumberVertices = 0;
-            _array = NULL;
+            _array = nullptr;
             _cursor = 0;
+        }
+        ~simpleDataStream()
+        {
+            delete _array;
         }
 
         /// <summary>

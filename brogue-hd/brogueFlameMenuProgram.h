@@ -175,24 +175,24 @@ namespace brogueHd::frontend::opengl
 	void brogueFlameMenuProgram::update(int millisecondsLapsed)
 	{
 		// Update the rendering
-		//_renderedView->update(millisecondsLapsed);
+		_renderedView->update(millisecondsLapsed);
 
 		// Stream the new data
-		//simpleDataStream<float>* sceneDataStream = brogueSceneBuilder::prepareSceneDataStream(_renderedView);
+		simpleDataStream<float>* sceneDataStream = brogueSceneBuilder::prepareSceneDataStream(_renderedView);
 		//simpleDataStream<float>* frameDataStream = brogueSceneBuilder::prepareFrameDataStream(_renderedView);
 		//simpleDataStream<float>* frameBlendDataStream = brogueSceneBuilder::prepareFrameDataStream(_renderedView);
 
 		// Get rid of old stream / buffer new stream
-		//_sceneProgram->bind(false);
+		_sceneProgram->bind(false);
 		//_frameProgram->bind(false);
 		//_frameBlendProgram->bind(false);
 
-		//_sceneProgram->reBuffer(0, sceneDataStream);
+		_sceneProgram->reBuffer(0, sceneDataStream);
 		//_frameProgram->reBuffer(0, frameDataStream);
 		//_frameBlendProgram->reBuffer(0, frameBlendDataStream);
 
 		// SPECIFIC! (re-design) (MEMORY! deletes old buffer)
-		//_sceneProgram->bind(true);
+		_sceneProgram->bind(true);
 		//_frameProgram->bind(true);
 		//_frameBlendProgram->bind(true);
 	}

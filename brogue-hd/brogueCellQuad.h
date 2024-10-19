@@ -39,7 +39,8 @@ namespace brogueHd::frontend::opengl
 		}
 
 		int getElementSize(GLenum primitiveType) override
-		{
+		{	
+			// Total # of calls to the shader
 			switch (primitiveType)
 			{
 			case GL_TRIANGLES:
@@ -55,7 +56,7 @@ namespace brogueHd::frontend::opengl
 			switch (primitiveType)
 			{
 			case GL_TRIANGLES:
-				return 12;
+				return 30;
 			default:
 				simpleException::show("Unhandled primitive type for GLQuad:  {}", primitiveType);
 				break;
@@ -71,25 +72,25 @@ namespace brogueHd::frontend::opengl
 
 				// (Triangle 1) topLeft, color, topRight, color, bottomRight, color 
 
-				topLeft.streamBuffer(primitiveType, outputStream);
-				//backgroundColor.streamBuffer(primitiveType, outputStream);
+				topLeft.streamBuffer(primitiveType, outputStream);			// vec2
+				backgroundColor.streamBuffer(primitiveType, outputStream);	// vec3
 
 				topRight.streamBuffer(primitiveType, outputStream);
-				//backgroundColor.streamBuffer(primitiveType, outputStream);
+				backgroundColor.streamBuffer(primitiveType, outputStream);
 
 				bottomRight.streamBuffer(primitiveType, outputStream);
-				//backgroundColor.streamBuffer(primitiveType, outputStream);
+				backgroundColor.streamBuffer(primitiveType, outputStream);
 
 				// (Triangle 2) topLeft, color, bottomRight, color, bottomLeft color
 
 				topLeft.streamBuffer(primitiveType, outputStream);
-				//backgroundColor.streamBuffer(primitiveType, outputStream);
+				backgroundColor.streamBuffer(primitiveType, outputStream);
 
 				bottomRight.streamBuffer(primitiveType, outputStream);
-				//backgroundColor.streamBuffer(primitiveType, outputStream);
+				backgroundColor.streamBuffer(primitiveType, outputStream);
 
 				bottomLeft.streamBuffer(primitiveType, outputStream);
-				//backgroundColor.streamBuffer(primitiveType, outputStream);
+				backgroundColor.streamBuffer(primitiveType, outputStream);
 			}
 			break;
 			default:

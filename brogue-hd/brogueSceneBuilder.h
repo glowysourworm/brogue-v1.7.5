@@ -53,9 +53,6 @@ namespace brogueHd::frontend::opengl
 
 			view->iterate([&sceneBoundary, &cellQuads](short column, short row, brogueCellDisplay* cell)
 			{
-				if (!cell->backColor.blue)
-					return iterationCallback::iterate;
-
 				simpleQuad quad = coordinateConverter::createQuadNormalizedXYScene(column * brogueCellDisplay::CellWidth,
 																					row * brogueCellDisplay::CellHeight,
 																					brogueCellDisplay::CellWidth,

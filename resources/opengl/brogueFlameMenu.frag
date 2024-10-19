@@ -2,10 +2,10 @@
 
 // Output of the shader is the RBGA formatted color for the fragment (pixel.. or rasterized unit fragment)
 //
-out vec4 outputColor;
+//out vec4 outputColor;
 
 in vec2 currentVertex;
-//in vec3 currentBackgroundColor;
+in vec3 currentBackgroundColor;
 
 // This is the combined scene texture - which is the scene images rendered with the base lighting
 // applied (ambient + accent)
@@ -14,7 +14,9 @@ in vec2 currentVertex;
 
 void main()
 {
-    outputColor = vec4(1,1,1, 1.0);
+    gl_FragColor = vec4(currentBackgroundColor, 1.0);
+
+    //outputColor = vec4(currentBackgroundColor.x, currentBackgroundColor.y, currentBackgroundColor.z, 1.0);
 
 //    vec3 redPrimaryFlameColor   = vec3(0.8, 0.2, 0.2);
 //    vec3 redSecondaryFlameColor = vec3(0.4, 0.1, 0.0);
