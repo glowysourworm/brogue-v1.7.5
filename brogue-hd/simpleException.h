@@ -3,7 +3,9 @@
 #include "simple.h"
 #include "simpleExt.h"
 //#include "simpleString.h"
+#include <iostream>
 #include <stdexcept>
+#include <stacktrace>
 
 namespace brogueHd::simple
 {
@@ -18,15 +20,17 @@ namespace brogueHd::simple
 
 		static void showCstr(const char* message)
 		{
-			throw std::exception(message);
+			std::cout << message << std::endl;
+			std::cout << std::stacktrace::current() << std::endl;
 
-			throw;
+			throw message;
 		}
 		static void show(const char* message)
 		{
-			throw std::exception(message);
+			std::cout << message << std::endl;
+			std::cout << std::stacktrace::current() << std::endl;
 
-			throw;
+			throw message;
 		}
 
 	public:

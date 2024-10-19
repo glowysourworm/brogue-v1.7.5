@@ -117,64 +117,55 @@ namespace brogueHd::frontend::opengl
             GLboolean glNormalized = false;
             GLsizei currentOffset = 0;
 
+            // NOTES:         Khronos Group
+            //
+            // attributeSize: Element size of the float
+            //
+            // glType:        Data type to read on the GL backend:
+            //
+            //                Specifies the data type of each component in the array. The symbolic 
+            //                constants GL_BYTE, GL_UNSIGNED_BYTE, GL_SHORT, GL_UNSIGNED_SHORT, GL_INT, 
+            //                and GL_UNSIGNED_INT are accepted by glVertexAttribPointer and glVertexAttribIPointer. 
+            //                             
+            //                Additionally GL_HALF_FLOAT, GL_FLOAT, GL_DOUBLE, GL_FIXED, GL_INT_2_10_10_10_REV, 
+            //                GL_UNSIGNED_INT_2_10_10_10_REV and GL_UNSIGNED_INT_10F_11F_11F_REV are accepted by glVertexAttribPointer. 
+            //            
+            //                GL_DOUBLE is also accepted by glVertexAttribLPointer and is the only 
+            //                token accepted by the type parameter for that function. The initial value is GL_FLOAT.
+            //
+            // glNormalized:  Normalized coordinates (?) (NO)
+            // 
+            //                For glVertexAttribPointer, specifies whether fixed-point 
+            //                data values should be normalized (GL_TRUE) or converted 
+            //                directly as fixed-point values (GL_FALSE) when they are accessed.
+            //
+            // currentOffset: Used to lay out this "struct" on the vertex buffer. Total # of bytes
+            //
+
+
             // HANDLE ATTRIBUTES BY DATA TYPE
             switch (attribute.getAttributeType())
             {
+            case GL_FLOAT_VEC4:
+            {
+                attributeSize = 4;
+                glType = GL_FLOAT;
+                glNormalized = false;
+                currentOffset = 4 * sizeof(float);
+            }
             case GL_FLOAT_VEC3:
             {
-                // Element size of the float
                 attributeSize = 3;
-
-                // Data type to read on the GL backend:
-                //
-                // Khronos Group:  Specifies the data type of each component in the array. The symbolic 
-                //                 constants GL_BYTE, GL_UNSIGNED_BYTE, GL_SHORT, GL_UNSIGNED_SHORT, GL_INT, 
-                //                 and GL_UNSIGNED_INT are accepted by glVertexAttribPointer and glVertexAttribIPointer. 
-                //                 
-                //                 Additionally GL_HALF_FLOAT, GL_FLOAT, GL_DOUBLE, GL_FIXED, GL_INT_2_10_10_10_REV, 
-                //                 GL_UNSIGNED_INT_2_10_10_10_REV and GL_UNSIGNED_INT_10F_11F_11F_REV are accepted by glVertexAttribPointer. 
-                //
-                //                 GL_DOUBLE is also accepted by glVertexAttribLPointer and is the only 
-                //                 token accepted by the type parameter for that function. The initial value is GL_FLOAT.
                 glType = GL_FLOAT;
-
-                // Normalized coordinates (?)
-                // 
-                // Khronos Group:  For glVertexAttribPointer, specifies whether fixed-point 
-                //                 data values should be normalized (GL_TRUE) or converted 
-                //                 directly as fixed-point values (GL_FALSE) when they are accessed.
                 glNormalized = false;
-
-                // Setup an offset to be added to the total offset
                 currentOffset = 3 * sizeof(float);
             }
             break;
             case GL_FLOAT_VEC2:
             {
-                // Element size of the vector2
                 attributeSize = 2;
-
-                // Data type to read on the GL backend:
-                //
-                // Khronos Group:  Specifies the data type of each component in the array. The symbolic 
-                //                 constants GL_BYTE, GL_UNSIGNED_BYTE, GL_SHORT, GL_UNSIGNED_SHORT, GL_INT, 
-                //                 and GL_UNSIGNED_INT are accepted by glVertexAttribPointer and glVertexAttribIPointer. 
-                //                 
-                //                 Additionally GL_HALF_FLOAT, GL_FLOAT, GL_DOUBLE, GL_FIXED, GL_INT_2_10_10_10_REV, 
-                //                 GL_UNSIGNED_INT_2_10_10_10_REV and GL_UNSIGNED_INT_10F_11F_11F_REV are accepted by glVertexAttribPointer. 
-                //
-                //                 GL_DOUBLE is also accepted by glVertexAttribLPointer and is the only 
-                //                 token accepted by the type parameter for that function. The initial value is GL_FLOAT.
                 glType = GL_FLOAT;
-
-                // Normalized coordinates (?)
-                // 
-                // Khronos Group:  For glVertexAttribPointer, specifies whether fixed-point 
-                //                 data values should be normalized (GL_TRUE) or converted 
-                //                 directly as fixed-point values (GL_FALSE) when they are accessed.
                 glNormalized = false;
-
-                // Setup an offset to be added to the total offset
                 currentOffset = 2 * sizeof(float);
             }
             break;
@@ -272,6 +263,8 @@ namespace brogueHd::frontend::opengl
                 return stride + (2 * sizeof(float));
             else if (attribute.getAttributeType() == GL_FLOAT_VEC3)
                 return stride + (3 * sizeof(float));
+            else if (attribute.getAttributeType() == GL_FLOAT_VEC4)
+                return stride + (4 * sizeof(float));
             else
                 simpleException::show("Unhandled vertex array attribute data type:  ", attribute.getAttributeType());
         });

@@ -5,10 +5,16 @@
 #include "simplePoint.h"
 #include "simpleException.h"
 
+#include <numbers>
+
 namespace brogueHd::simple
 {
 	class simpleMath
 	{
+	public:
+
+		static constexpr float Pi = std::numbers::pi;
+
 	public:
 
 		template<isNumber TMath>
@@ -54,6 +60,32 @@ namespace brogueHd::simple
 
 			else if (isIntLike<TMath>)
 				return sqrt(x);
+
+			else
+				simpleException::showCstr("Unknown sqrt type simpleMath.h");
+		}
+
+		template<isNumber TMath>
+		static TMath naturalLog(TMath x)
+		{
+			if (isFloatLike<TMath>)
+				return log(static_cast<float>(x));
+
+			else if (isIntLike<TMath>)
+				return log(x);
+
+			else
+				simpleException::showCstr("Unknown sqrt type simpleMath.h");
+		}
+
+		template<isNumber TMath>
+		static TMath sin(TMath x)
+		{
+			if (isFloatLike<TMath>)
+				return sinf(static_cast<float>(x));
+
+			else if (isIntLike<TMath>)
+				return sin(x);
 
 			else
 				simpleException::showCstr("Unknown sqrt type simpleMath.h");

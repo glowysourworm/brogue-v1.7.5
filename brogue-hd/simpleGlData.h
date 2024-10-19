@@ -164,7 +164,7 @@ namespace brogueHd::frontend::opengl
 		}
 	};
 
-	struct vec4 : hashable
+	struct vec4 : simpleGlData
 	{
 		float x;
 		float y;
@@ -198,6 +198,36 @@ namespace brogueHd::frontend::opengl
 			y = other.y;
 			w = other.w;
 			z = other.z;
+		}
+		int getElementSize(GLenum primitiveType) override
+		{
+			switch (primitiveType)
+			{
+			case GL_TRIANGLES:
+				return 1;
+				break;
+			default:
+				simpleException::show("Unhandled primitive GLenum type:  vec2 in simpleGlData.h");
+			}
+		}
+		int getStreamSize(GLenum primitiveType) override
+		{
+			// total # of floats
+			return 4;
+		}
+		void streamBuffer(GLenum primitiveType, simpleDataStream<float>& outputStream) override
+		{
+			switch (primitiveType)
+			{
+			case GL_TRIANGLES:
+				outputStream.write(x);
+				outputStream.write(y);
+				outputStream.write(z);
+				outputStream.write(w);
+				break;
+			default:
+				simpleException::show("Unhandled primitive GLenum type:  vec2 in simpleGlData.h");
+			}
 		}
 		size_t getHash() const override
 		{

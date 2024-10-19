@@ -66,7 +66,7 @@ namespace brogueHd::component
 		/// <summary>
 		/// Sets the value to the grid, clipping it to the max and min values, and handling exceptions
 		/// </summary>
-		void set(short column, short row, T setValue);
+		void set(short column, short row, T setValue, bool overwrite = false);
 
 		/// <summary>
 		/// Searches grid for requested value based on comparison. Each truthy aggregateComparator result will store
@@ -172,36 +172,33 @@ namespace brogueHd::component
     template<typename T>
     T grid<T>::getAdjacentUnsafe(short column, short row, brogueCompass direction) const
     {
-        switch (brogueCompass)
+        switch (direction)
         {
-        case brogueCompass::None:
-            return NULL;
-
         case brogueCompass::N:
-            return this->get(column, row - 1);
+            return this->isInBounds(column, row - 1) ? this->get(column, row - 1) : default_value::value<T>();
 
         case brogueCompass::S:
-            return this->get(column, row + 1);
+            return this->isInBounds(column, row + 1) ? this->get(column, row + 1) : default_value::value<T>();
 
         case brogueCompass::E:
-            return this->get(column + 1, row);
+            return this->isInBounds(column + 1, row) ? this->get(column + 1, row) : default_value::value<T>();
 
         case brogueCompass::W:
-            return this->get(column - 1, row);
+            return this->isInBounds(column - 1, row) ? this->get(column - 1, row) : default_value::value<T>();
 
         case brogueCompass::NW:
-            return this->get(column - 1, row - 1);
+            return this->isInBounds(column - 1, row - 1) ? this->get(column - 1, row - 1) : default_value::value<T>();
 
         case brogueCompass::NE:
-            return this->get(column + 1, row - 1);
+            return this->isInBounds(column + 1, row - 1) ? this->get(column + 1, row - 1) : default_value::value<T>();
 
         case brogueCompass::SW:
-            return this->get(column - 1, row + 1);
+            return this->isInBounds(column - 1, row + 1) ? this->get(column - 1, row + 1) : default_value::value<T>();
 
         case brogueCompass::SE:
-            return this->get(column + 1, row + 1);
+            return this->isInBounds(column + 1, row + 1) ? this->get(column + 1, row + 1) : default_value::value<T>();
         default:
-            return NULL;
+            return default_value::value<T>();
         }
     }
 
@@ -343,12 +340,12 @@ namespace brogueHd::component
     }
 
     template<typename T>
-    void grid<T>::set(short column, short row, T value)
+    void grid<T>::set(short column, short row, T value, bool overwrite)
     {
         if (!this->isInBounds(column, row))
             simpleException::showCstr("Grid out of bounds:  grid.cpp");
 
-        if (this->isDefined(column, row))
+        if (this->isDefined(column, row) && !overwrite)
             simpleException::showCstr("Trying to overwrite grid value:  grid.cpp (use remove first)");
 
         // Must subtract off the relative boundary offset to address the primary grid

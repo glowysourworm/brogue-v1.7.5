@@ -68,10 +68,20 @@ namespace brogueHd::backend::generator
 		double next(double low, double high);
 
 		/// <summary>
+		/// Generates a gaussian random number with the specified parameters
+		/// </summary>
+		double gaussian(double mean, double stdDev, double lowLimit, double highLimit);
+
+		/// <summary>
 		/// Creates a random color with random color channels between the two provided. Makes U[0,1] draws
 		/// scaled by the two colors' channels.
 		/// </summary>
 		color nextColor(color low, color high);
+
+		/// <summary>
+		/// Creates a  random color using color channels near the mean - based on gaussian draws.
+		/// </summary>
+		color nextColorNear(color mean, float stdDev);
 
 	private:
 
@@ -137,8 +147,49 @@ namespace brogueHd::backend::generator
 		float red = next(low.red, high.red);
 		float green = next(low.green, high.green);
 		float blue = next(low.blue, high.blue);
+		float alpha = next(low.alpha, high.alpha);
 
-		return color(red, green, blue);
+		return color(red, green, blue, alpha);
+	}
+	color randomGenerator::nextColorNear(color mean, float stdDev)
+	{
+		float red = gaussian(mean.red, stdDev, 0, 1);
+		float green = gaussian(mean.green, stdDev, 0, 1);
+		float blue = gaussian(mean.blue, stdDev, 0, 1);
+		float alpha = gaussian(mean.alpha, stdDev, 0, 1);
+
+		return color(red, green, blue, alpha);
+	}
+	double randomGenerator::gaussian(double mean, double stdDev, double lowLimit, double highLimit)
+	{
+		// Normal Distribution
+		// 
+		// https://www.alanzucconi.com/2015/09/16/how-to-sample-from-a-gaussian-distribution/
+		
+		double v1, v2, R;
+
+		do
+		{
+			// Generate U[-1, 1] Variables: 2 draws
+			v1 = (2.0 * next()) - 1.0;
+			v2 = (2.0 * next()) - 1.0;
+
+			// Calculate R^2
+			R = v1 * v1 + v2 * v2;
+
+			// Reject points outside the unit circle (RARE)
+		}	while (R >= 1.0f || R == 0.0f);
+
+		// Use inverse CDF methods to calculate the gaussian
+		double normalValue = v1 * simpleMath::sqrt((-2.0 * simpleMath::naturalLog(R)) / R);
+
+		// The resulting gaussian draw
+		double result = (mean + (normalValue * stdDev));
+		
+		// Clip off very rare events
+		float resultClipped = simpleMath::clamp<float>(result, lowLimit, highLimit);
+
+		return resultClipped;
 	}
 	void randomGenerator::reset(unsigned long seed)
 	{

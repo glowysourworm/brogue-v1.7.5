@@ -2,11 +2,13 @@
 
 #include "brogueGlobal.h"
 #include "color.h"
+#include "grid.h"
 #include "brogueView.h"
 #include "simpleMath.h"
 #include "randomGenerator.h"
 
 using namespace brogueHd::simple;
+using namespace brogueHd::component;
 using namespace brogueHd::backend::generator;
 using namespace brogueHd::backend::model;
 using namespace brogueHd::backend::model::layout;
@@ -27,13 +29,16 @@ namespace brogueHd::frontend::ui
 						int updateDelay);
 		~brogueFlameMenu();
 
-		void animate();
+		void animate(int millisecondsLapsed);
 
 		void update(int millisecondsLapsed) override;
 
 	private:
 
 		randomGenerator* _randomGenerator;
+
+		int _animationTime;
+		int _animationPeriod;
 
 	protected:
 
@@ -67,9 +72,11 @@ namespace brogueHd::frontend::ui
 		const float FlameFadeSpeed = 0.02;
 		const int FlameRowPadding = 2;
 
-		const color FlamePrimaryColor = color(0.8, 0.1, 0.1);
-		const color FlameSecondaryColor = color(0.7, 0.3, 0.0);
-		const color FlameTitleColor = color(0.1, 0.1, 0.8);
+		const color FlamePrimaryColor =			color(1.0, 0.1, 0.0, 0.8);
+		const color FlameSecondaryColor =		color(1.0, 0.8, 0.0, 0.8);
+		const color FlameTertiaryColor =		color(1.0, 0.8, 0.8, 0.8);
+
+		const color FlameTitleColor =			color(0.1, 0.1, 1.0, 0.8);
 
 		bool isTheText(short column, short row)
 		{
@@ -87,6 +94,8 @@ namespace brogueHd::frontend::ui
 		}
 
 	private:
+
+		grid<color*>* _heatSources;
 
 		const char Title[MENU_TITLE_HEIGHT][MENU_TITLE_WIDTH] = {
 			"########   ########       ######         #######   ####     ###  #########",
@@ -123,15 +132,38 @@ namespace brogueHd::frontend::ui
 		: brogueView(gridRect(0, 0, COLS, ROWS), gridRect(0, 0, COLS, ROWS))
 	{
 		_randomGenerator = randomGenerator;
+		_animationTime = 0;
+		_animationPeriod = 5000;
+
+		_heatSources = new grid<color*>(gridRect(0, 0, COLS, ROWS), gridRect(0, 0, COLS, ROWS));
 
 		brogueFlameMenu* that = this;
+		grid<color*>* heatSources = _heatSources;
+
+		color flameColors[3] = { this->FlamePrimaryColor, this->FlameSecondaryColor, this->FlameTertiaryColor };
+		color flameTitleColors[2] = { this->FlameTitleColor, this->FlameTertiaryColor };
 
 		// Transfer rendering to the primary view grid
-		this->getBoundary().iterate([&that] (short column, short row)
+		this->getBoundary().iterate([&that, &heatSources, &randomGenerator, &flameColors, &flameTitleColors] (short column, short row)
 		{
-			brogueCellDisplay* cell = that->get(column, row);
+			if (that->isTheText(column, row))
+			{
+				int randIndex = randomGenerator->rand_range(0, 2);
+				color nextColor = randomGenerator->nextColorNear(flameTitleColors[randIndex], 0.1);
 
-			cell->backColor = color(0, 0, 0);
+				heatSources->set(column, row, new color(nextColor), true);
+			}
+
+			else if (row == ROWS - 1)
+			{
+				int randIndex = randomGenerator->rand_range(0, 3);
+				color nextColor = randomGenerator->nextColorNear(flameColors[randIndex], 0.1);
+
+				heatSources->set(column, row, new color(nextColor), true);
+			}
+
+			else
+				heatSources->set(column, row, nullptr, true);
 
 			return iterationCallback::iterate;
 		});
@@ -142,75 +174,130 @@ namespace brogueHd::frontend::ui
 	}
 	void brogueFlameMenu::update(int millisecondsLapsed)
 	{
-		this->animate();
+		this->animate(millisecondsLapsed);
 	}
-	void brogueFlameMenu::animate()
+	void brogueFlameMenu::animate(int millisecondsLapsed)
 	{
 		brogueFlameMenu* that = this;
 		randomGenerator* randGenerator = _randomGenerator;
+		grid<color*>* heatSources = _heatSources;
+
+		// Track animation time through the cycle
+		if (_animationTime >= _animationPeriod)
+			_animationTime = 0;
+
+		_animationTime += millisecondsLapsed;
+
+		float timeValue = _animationTime / (float)_animationPeriod;
+
+		color flameColors[3] = { this->FlamePrimaryColor, this->FlameSecondaryColor, this->FlameTertiaryColor };
+		color flameTitleColors[2] = { this->FlameTitleColor, this->FlameTertiaryColor };
 
 		// Treat the heat value of 1.0 as max heat
-		this->getBoundary().iterateRowsFirst_BottomToTop([&that, &randGenerator] (short column, short row)
+		this->getBoundary().iterateRowsFirst_BottomToTop([&that, &randGenerator, &heatSources, &timeValue, &flameColors, &flameTitleColors] (short column, short row)
 		{
-			brogueCellDisplay* cell = that->get(column, row);
-
 			// Transfer heat upwards to the three cells above this one
 			// as an average value
 			//
+			brogueCellDisplay* cell = that->get(column, row);
 
-			// Text Mask:  Initialized to Black
+			// Animate the Heat Sources
+			//
+			// 
+			// Text Mask:  Heat Sources pulled out by adjacent cells
 			//
 			if (that->isTheText(column, row))
+			{				
+				// Take the previous color, and interpolate between that and the next random draw.
+				//
+				int randIndex = randGenerator->rand_range(0, 2);
+				color nextColor = randGenerator->nextColorNear(flameTitleColors[randIndex], 0.1);
+
+				heatSources->get(column, row)->interpolate(nextColor, 0.1);
+
+				// Mask off the text value (leave as black)
 				return iterationCallback::iterate;
-
-			// Treat the walls and text mask as HOT
-			color southWest = colors::black();
-			color south = colors::black();
-			color southEast = colors::black();
-			color east = colors::black();
-			color west = colors::black();
-
-			// Last row
-			if (row == ROWS - 1)
+			}
+			else if (row == ROWS - 1)
 			{
-				south = colors::getGray(randGenerator->next(0.9, 1));
-				southEast = colors::getGray(randGenerator->next(0.9, 1));
-				southWest = colors::getGray(randGenerator->next(0.9, 1));
-				//south = randGenerator->nextColor(that->FlamePrimaryColor, that->FlameSecondaryColor);
-				//southEast = randGenerator->nextColor(that->FlamePrimaryColor, that->FlameSecondaryColor);
-				//southWest = randGenerator->nextColor(that->FlamePrimaryColor, that->FlameSecondaryColor);
+				int randIndex = randGenerator->rand_range(0, 3);
+				color nextColor = randGenerator->nextColorNear(flameColors[randIndex], 0.1);
+
+				heatSources->get(column, row)->interpolate(nextColor, 0.1);
 			}
 
-			// Other rows (pulls up the last row)
+			// Check for heat sources
+			color* currentSource = heatSources->get(column, row);
+
+			color* southSource = heatSources->getAdjacentUnsafe(column, row, brogueCompass::S);
+			color* southWestSource = heatSources->getAdjacentUnsafe(column, row, brogueCompass::SW);
+			color* southEastSource = heatSources->getAdjacentUnsafe(column, row, brogueCompass::SE);
+
+			// Treat the walls and text mask as HOT
+			color southWest = southWestSource == nullptr ? colors::black() : *southWestSource;
+			color south = southSource == nullptr ? colors::black() : *southSource;
+			color southEast = southEastSource == nullptr ? colors::black() : *southEastSource;
+			//color east = colors::black();
+			//color west = colors::black();
+
+			//// Column Sine-Wave Pseudo-Heat Function
+			////
+			//float width = (float)that->getBoundary().width;
+			//float frequency = 7.0f;																		// Number of "candles" across the bottom
+			//float lowValue = 0.2f;
+			//float triangleLeft = 2 * (column / width);
+			//float triangleRight = (triangleLeft * (lowValue - 1)) + (2 - lowValue);
+			////float timeArg = 0.3f * simpleMath::sin(2 * simpleMath::Pi * timeValue);
+			//float timeArg = 0;
+			//float sinArg = (frequency * ((column / width) * simpleMath::Pi)) + (timeArg);
+			//float sinAmplitude = (column < (width / 2.0f)) ? triangleLeft : triangleRight;
+
+			//// Calculate the heat along the bottom
+			//float heatValue = sinAmplitude * simpleMath::abs(simpleMath::sin(sinArg));
+
+			// Pulls up heat values from the last row
 			//
-			else if (row < ROWS - 1)
+			if (row < ROWS - 1)
 			{
 				//color titleColor = that->FlameTitleColor;
-				color titleColor = colors::white();
+				//color titleColor = colors::getGray(randGenerator->gaussian(heatValue, 0.2, 0, 1));
 
 				// "Wreathe the text in flames..." (@penderprime)
 				//
-				if (that->isTheText(column, row + 1))
-					south = titleColor;
-				else
+				//if (that->isTheText(column, row + 1))
+				//	south = titleColor;
+				//else
+				//	south = that->get(column, row + 1)->backColor;
+
+				if (southSource == nullptr)
 					south = that->get(column, row + 1)->backColor;
 
-				if (column - 1 >= 0)
+				if (southWestSource == nullptr && column - 1 >= 0)
 				{
-					southWest = that->isTheText(column - 1, row + 1) ? titleColor : that->get(column - 1, row + 1)->backColor;
-					west = that->isTheText(column - 1, row) ? titleColor : that->get(column - 1, row)->backColor;
+					southWest = that->get(column - 1, row + 1)->backColor;
+					//west = that->isTheText(column - 1, row) ? *heatSources->get(column - 1, row) : that->get(column - 1, row)->backColor;
 				}
 
-				if (column + 1 < COLS)
+				if (southEastSource == nullptr && column + 1 < COLS)
 				{
-					southEast = that->isTheText(column + 1, row + 1) ? titleColor : that->get(column + 1, row + 1)->backColor;
-					east = that->isTheText(column + 1, row) ? titleColor : that->get(column + 1, row)->backColor;
+					southEast = that->get(column + 1, row + 1)->backColor;
+					//east = that->isTheText(column + 1, row) ? *heatSources->get(column + 1, row) : that->get(column + 1, row)->backColor;
 				}				
 			}
 
+			// Current sources would be the bottom row (only)
+			if (currentSource != nullptr)
+				cell->backColor.averageIn(0.95f, 1.0f, *currentSource);
+
 			// Use interpolation to blend the adjacent color values
 			//
-			cell->backColor.average(0.3f, south, southEast, southWest);
+			else
+			{
+				cell->backColor.averageIn(0.95f, 1.0f, south, southEast, southWest);
+			}
+
+			// 
+
 			//cell->backColor.interpolate(east, 0.1f);
 			//cell->backColor.interpolate(west, 0.1f);
 
@@ -218,7 +305,7 @@ namespace brogueHd::frontend::ui
 			//if (cell->backColor.magnitude() >= 0.1f)
 			//	cell->backColor.interpolate(randGenerator->nextColor(that->FlamePrimaryColor, that->FlameSecondaryColor), 0.1);
 
-			if (cell->backColor.magnitude() < 0.1f)
+			if (cell->backColor.magnitude() < 0.05f)
 				cell->backColor = colors::black();
 
 			return iterationCallback::iterate;

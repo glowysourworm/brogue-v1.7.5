@@ -5,7 +5,7 @@
 //out vec4 outputColor;
 
 in vec2 currentVertex;
-in vec3 currentBackgroundColor;
+in vec4 currentBackgroundColor;
 
 // This is the combined scene texture - which is the scene images rendered with the base lighting
 // applied (ambient + accent)
@@ -14,7 +14,7 @@ in vec3 currentBackgroundColor;
 
 void main()
 {
-    gl_FragColor = vec4(currentBackgroundColor, 1.0);
+    gl_FragColor = currentBackgroundColor;
 
     //outputColor = vec4(currentBackgroundColor.x, currentBackgroundColor.y, currentBackgroundColor.z, 1.0);
 

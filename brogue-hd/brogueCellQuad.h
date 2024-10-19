@@ -13,7 +13,7 @@ namespace brogueHd::frontend::opengl
 	public:
 		brogueCellQuad()
 		{
-			backgroundColor = default_value::value<vec3>();
+			backgroundColor = default_value::value<vec4>();
 			topLeft = default_value::value<vec2>();
 			topRight = default_value::value<vec2>();
 			bottomLeft = default_value::value<vec2>();
@@ -27,7 +27,7 @@ namespace brogueHd::frontend::opengl
 		{
 			// Consider translating these perhaps INTO the cell display - the view bounds.
 			//
-			backgroundColor = vec3(cell.backColor.red, cell.backColor.green, cell.backColor.blue);
+			backgroundColor = vec4(cell.backColor.red, cell.backColor.green, cell.backColor.blue, cell.backColor.alpha);
 			topLeft = quad.topLeft;
 			topRight = vec2(quad.bottomRight.x, quad.topLeft.y);
 			bottomLeft = vec2(quad.topLeft.x, quad.bottomRight.y);
@@ -56,7 +56,7 @@ namespace brogueHd::frontend::opengl
 			switch (primitiveType)
 			{
 			case GL_TRIANGLES:
-				return 30;
+				return 36;
 			default:
 				simpleException::show("Unhandled primitive type for GLQuad:  {}", primitiveType);
 				break;
@@ -73,7 +73,7 @@ namespace brogueHd::frontend::opengl
 				// (Triangle 1) topLeft, color, topRight, color, bottomRight, color 
 
 				topLeft.streamBuffer(primitiveType, outputStream);			// vec2
-				backgroundColor.streamBuffer(primitiveType, outputStream);	// vec3
+				backgroundColor.streamBuffer(primitiveType, outputStream);	// vec4
 
 				topRight.streamBuffer(primitiveType, outputStream);
 				backgroundColor.streamBuffer(primitiveType, outputStream);
@@ -117,7 +117,7 @@ namespace brogueHd::frontend::opengl
 
 	public:
 
-		vec3 backgroundColor;
+		vec4 backgroundColor;
 		vec2 topLeft;
 		vec2 topRight;
 		vec2 bottomLeft;
