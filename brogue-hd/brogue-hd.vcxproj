@@ -194,6 +194,7 @@
     <ClInclude Include="brogueFlameMenuProgram.h" />
     <ClInclude Include="brogueProgram.h" />
     <ClInclude Include="brogueTestFunction.h" />
+    <ClInclude Include="randomRange.h" />
     <ClInclude Include="simpleBoundingBox.h" />
     <ClInclude Include="simpleExt.h" />
     <ClInclude Include="simpleLogger.h" />
@@ -297,7 +298,6 @@
     <ClInclude Include="primsAlgorithm.h" />
     <ClInclude Include="randomGenerator.h" />
     <ClInclude Include="playbackData.h" />
-    <ClInclude Include="randomRange.h" />
     <ClInclude Include="resourceConsole.h" />
     <ClInclude Include="resourceController.h" />
     <ClInclude Include="roomGenerator.h" />

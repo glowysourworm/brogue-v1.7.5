@@ -3,10 +3,10 @@
 #include "lightConstants.h"
 #include "dungeonConstants.h"
 #include "color.h"
+#include "randomRange.h"
 #include "creatureConstants.h"
 #include "creatureBehaviorConstants.h"
 #include "boltConstants.h"
-#include "randomRange.h"
 
 using namespace brogueHd::simple;
 using namespace brogueHd::backend::modelConstant;

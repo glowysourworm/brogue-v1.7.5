@@ -379,7 +379,7 @@ namespace brogueHd::frontend::opengl
 		// THREAD:  UNLOCK TO ENTER PRIMARY LOOP
 		_threadLock->unlock();
 
-		int intervalMilliseconds = 100;
+		int intervalMilliseconds = 10;
 
 		// Main Rendering Loop
 		while (!glfwWindowShouldClose(window))

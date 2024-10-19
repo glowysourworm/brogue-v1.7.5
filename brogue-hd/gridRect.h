@@ -186,6 +186,20 @@ namespace brogueHd::component
 				}
 			}
 		}
+		void iterateAdjacent(short column, short row, gridRectIterator callback) const
+		{
+			for (int columnIndex = column - 1; columnIndex != column + 1; columnIndex++)
+			{
+				for (int rowIndex = row - 1; rowIndex != row + 1; rowIndex++)
+				{
+					if (contains(columnIndex, rowIndex))
+					{
+						if (callback(columnIndex, rowIndex) == iterationCallback::breakAndReturn)
+							return;
+					}
+				}
+			}
+		}
 		void iterateRowsFirst_BottomToTop(gridRectIterator callback) const
 		{
 			bool userBreak = false;

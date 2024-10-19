@@ -500,9 +500,6 @@
     <ClInclude Include="simpleVector.h">
       <Filter>Header Files\simple</Filter>
     </ClInclude>
-    <ClInclude Include="randomRange.h">
-      <Filter>Header Files\simple</Filter>
-    </ClInclude>
     <ClInclude Include="simpleTriangle.h">
       <Filter>Header Files\simple</Filter>
     </ClInclude>
@@ -541,6 +538,9 @@
     </ClInclude>
     <ClInclude Include="simpleQueue.h">
       <Filter>Header Files\simple</Filter>
+    </ClInclude>
+    <ClInclude Include="randomRange.h">
+      <Filter>Header Files\backend\model\game</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

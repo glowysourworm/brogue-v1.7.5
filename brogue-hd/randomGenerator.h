@@ -5,6 +5,7 @@
 #include <random>
 
 using namespace brogueHd::simple;
+using namespace brogueHd::backend::model::game;
 
 namespace brogueHd::backend::generator
 {
@@ -34,7 +35,7 @@ namespace brogueHd::backend::generator
 		/// <summary>
 		/// Returns random from the provided range, using the clumping factor
 		/// </summary>
-		short randClump(randomRange theRange);
+		short randClump(const randomRange& theRange);
 
 		/// <summary>
 		/// Get a random int between lowerBound and upperBound, inclusive, with probability distribution
@@ -53,9 +54,14 @@ namespace brogueHd::backend::generator
 		void fillSequentialList(short* list, short listLength);
 
 		/// <summary>
-		/// Returns random integer between bounds, inclusive.
+		/// Returns random integer between bounds, excluding the upper bound
 		/// </summary>
-		int rand_range(int lowerBound, int upperBound);
+		int randomIndex(int lower, int upper);
+
+		/// <summary>
+		/// Returns a random inteber between the two bounds, including both.
+		/// </summary>
+		int randomRange(int lowerBound, int upperBound);
 
 		/// <summary>
 		/// Generates next double Uniform[0,1] and keeps private members updated
@@ -200,26 +206,17 @@ namespace brogueHd::backend::generator
 		srand(seed);
 	}
 
-	int randomGenerator::range(int upperBound)
+	int randomGenerator::randomIndex(int lowerBound, int upperBound)
 	{
-		// Expand and truncate
-		return (int)(next() * upperBound);
+		int result = lowerBound + (int)(next() * (upperBound - lowerBound));
+
+		// Small chance of hitting the upper bound
+		return simpleMath::clamp(result, lowerBound, upperBound);
 	}
 
-	int randomGenerator::rand_range(int lowerBound, int upperBound)
+	int randomGenerator::randomRange(int lowerBound, int upperBound)
 	{
-		//brogueAssert(lowerBound <= INT_MAX && upperBound <= INT_MAX);
-
-		// TODO:  Refactor this to validate it using assert. There must have been some
-		//		  code path that wasn't using it properly. If we're going to use assert
-		//	      here, then use it. Otherwise, let it pass through; and validate pre-emptively.
-		//
-		if (upperBound <= lowerBound)
-		{
-			return lowerBound;
-		}
-
-		return lowerBound + range(upperBound - lowerBound + 1);
+		return lowerBound + (int)(next() * (upperBound - lowerBound));
 	}
 
 	short randomGenerator::randWeighted(const simpleArray<short>& weights)
@@ -246,10 +243,10 @@ namespace brogueHd::backend::generator
 		return weights.count() - 1;
 	}
 
-	short randomGenerator::randClump(randomRange theRange)
-	{
-		return randClumpedRange(theRange.lowerBound, theRange.upperBound, theRange.clumpFactor);
-	}
+	//short randomGenerator::randClump(const randomRange& theRange)
+	//{
+	//	return randClumpedRange(theRange.lowerBound, theRange.upperBound, theRange.clumpFactor);
+	//}
 
 	// Get a random int between lowerBound and upperBound, inclusive, with probability distribution
 	// affected by clumpFactor.
@@ -261,17 +258,17 @@ namespace brogueHd::backend::generator
 		}
 		if (clumpFactor <= 1)
 		{
-			return rand_range(lowerBound, upperBound);
+			return randomRange(lowerBound, upperBound);
 		}
 
 		short i, total = 0, numSides = (upperBound - lowerBound) / clumpFactor;
 
 		for (i = 0; i < (upperBound - lowerBound) % clumpFactor; i++) {
-			total += rand_range(0, numSides + 1);
+			total += randomRange(0, numSides + 1);
 		}
 
 		for (; i < clumpFactor; i++) {
-			total += rand_range(0, numSides);
+			total += randomRange(0, numSides);
 		}
 
 		return (total + lowerBound);
@@ -282,7 +279,7 @@ namespace brogueHd::backend::generator
 		short i, r, buf;
 		for (i = 0; i < listLength; i++)
 		{
-			r = rand_range(0, listLength - 1);
+			r = randomRange(0, listLength - 1);
 			if (i != r) {
 				buf = list[r];
 				list[r] = list[i];

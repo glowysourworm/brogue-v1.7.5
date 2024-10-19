@@ -1,11 +1,11 @@
 #pragma once
 
-namespace brogueHd::simple
+namespace brogueHd::backend::model::game
 {
-    struct randomRange 
-    {
-        short lowerBound;
-        short upperBound;
-        short clumpFactor;
-    };
+	struct randomRange
+	{
+		short lowerBound;
+		short upperBound;
+		short clumpFactor;
+	};
 }
