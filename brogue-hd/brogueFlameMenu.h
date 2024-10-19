@@ -29,16 +29,7 @@ namespace brogueHd::frontend::ui
 						int updateDelay);
 		~brogueFlameMenu();
 
-		void animate(int millisecondsLapsed);
-
 		void update(int millisecondsLapsed) override;
-
-	private:
-
-		randomGenerator* _randomGenerator;
-
-		int _animationTime;
-		int _animationPeriod;
 
 	protected:
 
@@ -57,33 +48,25 @@ namespace brogueHd::frontend::ui
 							   MENU_TITLE_HEIGHT);
 		}
 
-	protected:
+	private:
 
-		void cycleHeatSources();
+		void animate(int millisecondsLapsed, grid<color*>* heatSources, float weight);
+
+		void animateCheck(int millisecondsLapsed, bool& lowRateRefresh, bool& highRateRefresh);
+
+		void cycleHeatSources(grid<color*>* heatSources, const color& titleNextColor, const color& bottomNextColor, float randomness);
 
 	public:
 
-		const int NumberHorizontalCandles = 10;
+		const float FlameNoise = 0.3;
 
-		const float FlameRedThreshold = 0.2;
-		const float FlameBlueThreshold = 0.8;
-		const float FlameMaxValue = 1.0;
+		const color FlameBottomColor1 =			color(1.0, 0.0, 0.0, 0.5);
+		const color FlameBottomColor2 =			color(1.0, 0.1, 0.1, 0.5);
+		const color FlameBottomColor3 =			color(0.8, 0.1, 0.1, 0.4);
 
-		const float TextValue = 100.0;
-
-		const float FlamePrecision = 0.01;
-		const float FlameRiseSpeed = 0.05;
-		const float FlameSpreadSpeed = 0.02;
-		const float FlameColorDriftSpeed = 0.5;
-		const float FlameFadeSpeed = 0.02;
-		const int FlameRowPadding = 2;
-
-		const color FlamePrimaryColor =			color(1.0, 0.1, 0.0, 0.4);
-		const color FlameSecondaryColor =		color(1.0, 0.4, 0.0, 0.4);
-		const color FlameTertiaryColor =		color(1.0, 0.8, 0.0, 0.4);
-
-		const color FlameTitleColor1 =			color(0.1, 0.1, 1.0, 0.4);
-		const color FlameTitleColor2 =			color(0.1, 0.3, 1.0, 0.3);
+		const color FlameTitleColor1 =			color(0.0, 0.0, 1.0, 0.5);
+		const color FlameTitleColor2 =			color(0.1, 0.1, 1.0, 0.5);
+		const color FlameTitleColor3 =			color(0.1, 0.1, 0.8, 0.5);
 
 		bool isTheText(short column, short row)
 		{
@@ -102,11 +85,17 @@ namespace brogueHd::frontend::ui
 
 	private:
 
-		grid<color*>* _heatSources;
-		grid<color*>* _heatSourcesNext;
+		randomGenerator* _randomGenerator;
 
-		simpleArray<color*>* _titleCandleVector;
-		simpleArray<color*>* _bottomCandleVector;
+		int _animationTimeLow;
+		int _animationTimeHigh;
+		int _animationPeriodLowRate;
+		int _animationPeriodHighRate;
+		bool _animationPeriodHighRateEveryOther;
+
+		grid<color*>* _heatSourcesLowRate;
+		grid<color*>* _heatSourcesHighRate;
+		
 
 		const char Title[MENU_TITLE_HEIGHT][MENU_TITLE_WIDTH] = {
 			"########   ########       ######         #######   ####     ###  #########",
@@ -143,26 +132,23 @@ namespace brogueHd::frontend::ui
 		: brogueView(gridRect(0, 0, COLS, ROWS), gridRect(0, 0, COLS, ROWS))
 	{
 		_randomGenerator = randomGenerator;
-		_animationTime = 0;
-		_animationPeriod = 50;
+		_animationTimeLow = 0;
+		_animationTimeHigh = 0;
+		_animationPeriodLowRate = 2000;
+		_animationPeriodHighRate = 50;
+		_animationPeriodHighRateEveryOther = false;
 
-		_heatSources = new grid<color*>(gridRect(0, 0, COLS, ROWS), gridRect(0, 0, COLS, ROWS));
-		_heatSourcesNext = new grid<color*>(gridRect(0, 0, COLS, ROWS), gridRect(0, 0, COLS, ROWS));
-
-		_titleCandleVector = new simpleArray<color*>(this->NumberHorizontalCandles);
-		_bottomCandleVector = new simpleArray<color*>(this->NumberHorizontalCandles);
-
-		for (int index = 0; index < this->NumberHorizontalCandles; index++)
-		{
-			_titleCandleVector->set(index, new color(0, 0, 0, 0));
-			_bottomCandleVector->set(index, new color(0, 0, 0, 0));
-		}
+		_heatSourcesLowRate = new grid<color*>(gridRect(0, 0, COLS, ROWS), gridRect(0, 0, COLS, ROWS));
+		_heatSourcesHighRate = new grid<color*>(gridRect(0, 0, COLS, ROWS), gridRect(0, 0, COLS, ROWS));
 
 		// Initialize the view
-		cycleHeatSources();
-		animate(_animationPeriod);
-		animate(_animationPeriod);
-		animate(_animationPeriod);
+		cycleHeatSources(_heatSourcesLowRate, this->FlameTitleColor1, this->FlameBottomColor1, this->FlameNoise);
+		cycleHeatSources(_heatSourcesHighRate, this->FlameTitleColor2, this->FlameBottomColor2, this->FlameNoise);
+
+		for (int index = 0; index < _animationPeriodLowRate; index += _animationPeriodHighRate)
+		{
+			update(_animationPeriodLowRate);
+		}
 	}
 	brogueFlameMenu::~brogueFlameMenu()
 	{
@@ -171,77 +157,37 @@ namespace brogueHd::frontend::ui
 		{
 			for (int row = 0; row < ROWS; row++)
 			{
-				if (_heatSources->isDefined(column, row))
-					delete _heatSources->get(column, row);
+				if (_heatSourcesLowRate->isDefined(column, row))
+					delete _heatSourcesLowRate->get(column, row);
 
-				if (_heatSourcesNext->isDefined(column, row))
-					delete _heatSourcesNext->get(column, row);
+				if (_heatSourcesHighRate->isDefined(column, row))
+					delete _heatSourcesHighRate->get(column, row);
 			}
 		}
-
-		for (int index = 0; index < this->NumberHorizontalCandles; index++)
-		{
-			delete _titleCandleVector->get(index);
-			delete _bottomCandleVector->get(index);
-		}
-
 		// Rest of the grid
-		delete _heatSources;
-		delete _heatSourcesNext;
-
-		// Rest of the candle arrays
-		delete _titleCandleVector;
-		delete _bottomCandleVector;
+		delete _heatSourcesLowRate;
+		delete _heatSourcesHighRate;
 	}
 
-	void brogueFlameMenu::cycleHeatSources()
+	void brogueFlameMenu::cycleHeatSources(grid<color*>* heatSources, const color& titleNextColor, const color& bottomNextColor, float randomness)
 	{
 		brogueFlameMenu* that = this;
 		randomGenerator* randGenerator = _randomGenerator;
-		grid<color*>* heatSources = _heatSources;
-		grid<color*>* heatSourcesNext = _heatSourcesNext;
-
-		color titleHeats[2] = { this->FlameTitleColor1,
-								this->FlameTitleColor2 };	// Heat source colors wreathing the title
-
-		color bottomHeats[3] = { this->FlamePrimaryColor,
-								 this->FlameSecondaryColor,
-								 this->FlameTertiaryColor };				// Heat source colors for the candles (bottom row)
-
-		// Cycle the color vector along the bottom
-		for (int index = 0; index < this->NumberHorizontalCandles; index++)
-		{
-			int randIndexTitle = _randomGenerator->randomIndex(0, 2);
-			int randIndexBottom = _randomGenerator->randomIndex(0, 3);
-
-			_titleCandleVector->get(index)->set(titleHeats[randIndexTitle]);
-			_bottomCandleVector->get(index)->set(bottomHeats[randIndexBottom]);
-		}
-
-		simpleArray<color*>* titleVector = _titleCandleVector;
-		simpleArray<color*>* bottomVector = _bottomCandleVector;
 
 		// Transfer rendering to the primary view grid
-		this->getBoundary().iterate([&that, &heatSources, &heatSourcesNext, &titleVector, &bottomVector, &randGenerator] (short column, short row)
+		this->getBoundary().iterate([&that, &heatSources, &titleNextColor, &bottomNextColor, &randGenerator, &randomness] (short column, short row)
 		{	
-			int candleSize = that->getBoundary().width / titleVector->count();
-			int candleIndex = column / candleSize;
-
 			if (that->isTheText(column, row))
 			{
 				// Iterate adjacent cells (to the text)
-				that->getBoundary().iterateAdjacent(column, row, [&candleIndex, &heatSources, &heatSourcesNext, &titleVector, &randGenerator] (short acol, short arow)
+				that->getBoundary().iterateAdjacent(column, row, [&heatSources, &randGenerator, &bottomNextColor, &titleNextColor, &randomness] (short acol, short arow)
 				{
 					if (!heatSources->isDefined(acol, arow))
 					{
 						heatSources->set(acol, arow, new color(0, 0, 0, 0), true);
-						heatSourcesNext->set(acol, arow, new color(0, 0, 0, 0), true);
 					}
 
-					color nextColor = randGenerator->nextColorNear(*titleVector->get(candleIndex), 0.1);
-
-					heatSources->get(acol, arow)->set(*heatSourcesNext->get(acol, arow));
-					heatSourcesNext->get(acol, arow)->set(nextColor);
+					heatSources->get(acol, arow)->set(randGenerator->nextColorNear(titleNextColor, randomness));
 
 					return iterationCallback::iterate;
 				});
@@ -252,13 +198,9 @@ namespace brogueHd::frontend::ui
 				if (!heatSources->isDefined(column, row))
 				{
 					heatSources->set(column, row, new color(0, 0, 0, 0), true);
-					heatSourcesNext->set(column, row, new color(0, 0, 0, 0), true);
 				}
 
-				color nextColor = randGenerator->nextColorNear(*bottomVector->get(candleIndex), 0.1);
-
-				heatSources->get(column, row)->set(*heatSourcesNext->get(column, row));
-				heatSourcesNext->get(column, row)->set(nextColor);
+				heatSources->get(column, row)->set(randGenerator->nextColorNear(bottomNextColor, randomness));
 			}
 
 			return iterationCallback::iterate;
@@ -266,25 +208,73 @@ namespace brogueHd::frontend::ui
 	}
 	void brogueFlameMenu::update(int millisecondsLapsed)
 	{
-		this->animate(millisecondsLapsed);
+		bool lowRateUpdate = false;
+		bool highRateUpdate = false;
+
+		this->animateCheck(millisecondsLapsed, lowRateUpdate, highRateUpdate);
+
+		if (lowRateUpdate)
+			this->animate(millisecondsLapsed, _heatSourcesLowRate, 0.1f);
+
+		if (highRateUpdate)
+			this->animate(millisecondsLapsed, _heatSourcesHighRate, 0.05f);
 	}
-	void brogueFlameMenu::animate(int millisecondsLapsed)
+
+	void brogueFlameMenu::animateCheck(int millisecondsLapsed, bool& lowRateRefresh, bool& highRateRefresh)
+	{
+		_animationTimeLow += millisecondsLapsed;
+		_animationTimeHigh += millisecondsLapsed;
+
+		lowRateRefresh = false;
+		highRateRefresh = false;
+
+		// Check to see if animation needs updated
+		//
+		if (_animationTimeHigh < _animationPeriodHighRate)
+		{
+			return;
+		}
+
+		// High Rate Animation
+		//
+		if (_animationTimeHigh >= _animationPeriodHighRate)
+		{
+			if (_animationPeriodHighRateEveryOther)
+				cycleHeatSources(_heatSourcesHighRate, this->FlameTitleColor2, this->FlameBottomColor2, this->FlameNoise);
+
+			else
+			{
+				cycleHeatSources(_heatSourcesHighRate, this->FlameTitleColor3, this->FlameBottomColor3, this->FlameNoise);
+
+				_animationPeriodHighRateEveryOther = false;
+			}
+
+			// Reset counter
+			_animationTimeHigh = 0;
+
+			highRateRefresh = true;
+		}
+
+		// Low Rate Animation
+		//
+		if (_animationTimeLow > _animationPeriodLowRate)
+		{
+			cycleHeatSources(_heatSourcesLowRate, this->FlameTitleColor1, this->FlameBottomColor1, this->FlameNoise);
+
+			// Reset counter
+			_animationTimeLow = 0;
+
+			lowRateRefresh = true;
+		}
+	}
+
+	void brogueFlameMenu::animate(int millisecondsLapsed, grid<color*>* heatSources, float weight)
 	{
 		brogueFlameMenu* that = this;
 		randomGenerator* randGenerator = _randomGenerator;
-		grid<color*>* heatSources = _heatSources;
-
-		// Track animation time through the cycle
-		if (_animationTime > _animationPeriod)
-		{
-			_animationTime = 0;
-			cycleHeatSources();
-		}
-
-		_animationTime += millisecondsLapsed;
 
 		// Treat the heat value of 1.0 as max heat
-		this->getBoundary().iterateRowsFirst_BottomToTop([&that, &randGenerator, &heatSources] (short column, short row)
+		this->getBoundary().iterateRowsFirst_BottomToTop([&that, &randGenerator, &heatSources, &weight] (short column, short row)
 		{
 			// Transfer heat upwards to the three cells above this one
 			// as an average value
@@ -304,25 +294,40 @@ namespace brogueHd::frontend::ui
 
 			// Check current values before sources
 			//
-			color southWest = southWestSource == nullptr ? colors::black() : *southWestSource;
-			color south = southSource == nullptr ? colors::black() : *southSource;
-			color southEast = southEastSource == nullptr ? colors::black() : *southEastSource;
+			simpleList<color> diffuseColors;
+
+			if (southWestSource != nullptr)
+				diffuseColors.add(*southWestSource);
+
+			if (southSource != nullptr)
+				diffuseColors.add(*southSource);
+
+			if (southEastSource != nullptr)
+				diffuseColors.add(*southEastSource);
 
 			// Check current values before sources
 			//
 			if (row < ROWS - 1)
 			{
-				if (southSource == nullptr)
-					south = that->get(column, row + 1)->backColor;
-
-				if (southWestSource == nullptr && column - 1 >= 0)
+				// S
+				if (that->get(column, row + 1)->backColor != colors::black())
 				{
-					southWest = that->get(column - 1, row + 1)->backColor;
+					if (southSource == nullptr)
+						diffuseColors.add(that->get(column, row + 1)->backColor);
 				}
 
-				if (southEastSource == nullptr && column + 1 < COLS)
+				// SW
+				if (column - 1 >= 0 && that->get(column - 1, row + 1)->backColor != colors::black())
 				{
-					southEast = that->get(column + 1, row + 1)->backColor;
+					if (southWestSource == nullptr)
+						diffuseColors.add(that->get(column - 1, row + 1)->backColor);
+				}
+
+				// SE
+				if (column + 1 < COLS && that->get(column + 1, row + 1)->backColor != colors::black())
+				{
+					if (southEastSource == nullptr)
+						diffuseColors.add(that->get(column + 1, row + 1)->backColor);
 				}
 			}
 
@@ -349,21 +354,21 @@ namespace brogueHd::frontend::ui
 			// Current Source:  Interpolate this value for the next several frames
 			//
 			if (currentSource != nullptr)
-				cell->backColor.interpolate(*currentSource, 0.3);
+				cell->backColor.interpolate(*currentSource, 0.1);
 
 			// Diffusion:  Pull up the values from the adjacent cells - 3 below the current - 
 			//			   using an average.
 			//
 			else
 			{
-				cell->backColor.averageIn(0.7f, 1.0f, south, southEast, southWest);
+				cell->backColor.interpolate(weight, diffuseColors);
 			}
 
 			// Diffusion Threshold:  This value would be the lower limit of the "heat" in the
 			//					     cell - further away from the heat sources.
 			//
-			if (cell->backColor.magnitude() < 0.05f)
-				cell->backColor = colors::black();
+			//if (cell->backColor.magnitude() < 0.05f)
+			//	cell->backColor = colors::black();
 
 			return iterationCallback::iterate;
 		});

@@ -2,6 +2,7 @@
 
 #include "simple.h"
 #include "simpleMath.h"
+#include "simpleList.h"
 
 using namespace brogueHd::simple;
 
@@ -51,6 +52,42 @@ namespace brogueHd::backend::model::game
 			green = (other.green * weight) + (green * (1 - weight));
 			blue = (other.blue * weight) + (blue * (1 - weight));
 			alpha = (other.alpha * weight) + (alpha * (1 - weight));
+		}
+
+		void interpolate(float weight, const simpleList<color>& colors)
+		{
+			color seed(0, 0, 0, 0);
+
+			colors.forEach([&seed] (color acolor)
+			{
+				seed += acolor;
+
+				return iterationCallback::iterate;
+			});
+
+			seed.red /= colors.count();
+			seed.green /= colors.count();
+			seed.blue /= colors.count();
+			seed.alpha /= colors.count();
+
+			interpolate(seed, weight);
+		}
+
+		void averageIn(float selfWeight, float weight, const simpleList<color>& colors)
+		{
+			color seed(0, 0, 0, 0);
+
+			colors.forEach([&seed] (color acolor)
+			{
+				seed += acolor;
+
+				return iterationCallback::iterate;
+			});
+
+			red = (((red * selfWeight) + (seed.red * weight)) / 2.0f) / colors.count();
+			green = (((green * selfWeight) + (seed.green * weight)) / 2.0f) / colors.count();
+			blue = (((blue * selfWeight) + (seed.blue * weight)) / 2.0f) / colors.count();
+			alpha = (((alpha * selfWeight) + (seed.alpha * weight)) / 2.0f) / colors.count();
 		}
 
 		template<typename T = color, typename ... TRest>
@@ -129,12 +166,19 @@ namespace brogueHd::backend::model::game
 			blue = color.blue;
 			alpha = color.alpha;
 		}
-		void operator*(const color& color)
+		void operator*=(const color& color)
 		{
 			red = red * color.red;
 			green = green * color.green;
 			blue = blue * color.blue;
 			alpha = alpha * color.alpha;
+		}
+		void operator+=(const color& color)
+		{
+			red += color.red;
+			green += color.green;
+			blue += color.blue;
+			alpha += color.alpha;
 		}
 		void clamp(color low, color high)
 		{

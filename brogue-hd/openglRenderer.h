@@ -279,6 +279,14 @@ namespace brogueHd::frontend::opengl
 
 		gridRect sceneBoundaryUI = _program->getSceneBoundaryUI();
 
+		// CAREFULLY SET THESE TO WAIT ON GL CALLS (see main loop below)
+		// 
+		// assert(threadSleepTime <= intervalMilliseconds)
+		//
+		int intervalMilliseconds = 10;
+		int threadSleepTime = 2;
+		int loopCounter = 0;
+
 		// Windowed Mode
 		GLFWwindow* window = glfwCreateWindow(sceneBoundaryUI.width, sceneBoundaryUI.height, "Brogue v1.7.5", NULL, NULL);
 
@@ -379,11 +387,18 @@ namespace brogueHd::frontend::opengl
 		// THREAD:  UNLOCK TO ENTER PRIMARY LOOP
 		_threadLock->unlock();
 
-		int intervalMilliseconds = 10;
-
 		// Main Rendering Loop
 		while (!glfwWindowShouldClose(window))
 		{
+			if (loopCounter < intervalMilliseconds)
+			{
+				loopCounter++;
+				continue;
+			}
+
+			// Reset the counter
+			loopCounter = 0;
+
 			// Update from main thread's brogueView*
 			_threadLock->lock();
 
@@ -401,7 +416,7 @@ namespace brogueHd::frontend::opengl
 			glfwSwapBuffers(window);
 			glfwPollEvents();
 
-			std::this_thread::sleep_for(std::chrono::milliseconds(intervalMilliseconds));
+			std::this_thread::sleep_for(std::chrono::milliseconds(threadSleepTime));
 		}
 
 		// Window could've been destroyed already

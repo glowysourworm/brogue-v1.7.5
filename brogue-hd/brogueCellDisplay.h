@@ -16,8 +16,8 @@ namespace brogueHd::backend::model::layout
 	public:
 
 		// TODO:  CHANGE THIS TO WORK ON THE WHOLE DISPLAY PROBLEM STARTING WITH BROGUE 1.7.5.
-		static constexpr float CellHeight = 15.0f;
-		static constexpr float CellWidth = 10.0f;
+		static constexpr float CellHeight = 28.0f;
+		static constexpr float CellWidth = 16.0f;
 
 	public:
 
