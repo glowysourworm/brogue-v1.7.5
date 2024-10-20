@@ -23,6 +23,7 @@ namespace brogueHd::frontend::ui
 		gridRect getBoundary() const;
 
 		void iterate(gridCallback<brogueCellDisplay*> callback) const;
+		void iterateAdjacent(short column, short row, gridCallbackAdjacent<brogueCellDisplay*> callback) const;
 
 		virtual void update(int millisecondsLapsed)
 		{
@@ -70,6 +71,11 @@ namespace brogueHd::frontend::ui
 	void brogueView::iterate(gridCallback<brogueCellDisplay*> callback) const
 	{
 		_view->iterate(callback);
+	}
+
+	void brogueView::iterateAdjacent(short column, short row, gridCallbackAdjacent<brogueCellDisplay*> callback) const
+	{
+		_view->iterateAdjacent(column, row, false, callback);
 	}
 }
 

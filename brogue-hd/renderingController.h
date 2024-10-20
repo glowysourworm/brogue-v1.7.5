@@ -104,41 +104,41 @@ namespace brogueHd::backend::controller
 
 		// Calculate scene's GL data stream
 		simpleDataStream<float>* sceneDataStream = brogueSceneBuilder::prepareSceneDataStream(mainMenu);
-		//simpleDataStream<float>* frameDataStream = brogueSceneBuilder::prepareFrameDataStream(mainMenu);
+		simpleDataStream<float>* frameDataStream = brogueSceneBuilder::prepareFrameDataStream(mainMenu);
 		//simpleDataStream<float>* frameBlendDataStream = brogueSceneBuilder::prepareFrameDataStream(mainMenu);
 
 		// Read shaders from the resource cache
 		shaderData vertexShaderData = _resourceController->getShader(shaderResource::brogueFlameMenuVert);
 		shaderData fragmentShaderData = _resourceController->getShader(shaderResource::brogueFlameMenuFrag);
-		//shaderData frameVertexShaderData = _resourceController->getShader(shaderResource::brogueFrameVert);
-		//shaderData frameFragmentShaderData = _resourceController->getShader(shaderResource::brogueFrameFrag);
+		shaderData frameVertexShaderData = _resourceController->getShader(shaderResource::brogueFrameVert);
+		shaderData frameFragmentShaderData = _resourceController->getShader(shaderResource::brogueFrameFrag);
 		//shaderData frameBlendVertexShaderData = _resourceController->getShader(shaderResource::brogueFrameBlendVert);
 		//shaderData frameBlendFragmentShaderData = _resourceController->getShader(shaderResource::brogueFrameBlendFrag);
 
 		// (MEMORY!) Create view for the renderer as shader program
 		simpleShaderProgram* sceneProgram = brogueSceneBuilder::createSceneShaderProgram(sceneDataStream, vertexShaderData, fragmentShaderData);
-		//simpleShaderProgram* frameProgram = brogueSceneBuilder::createFrameShaderProgram(frameDataStream, frameVertexShaderData, frameFragmentShaderData);
+		simpleShaderProgram* frameProgram = brogueSceneBuilder::createFrameShaderProgram(frameDataStream, frameVertexShaderData, frameFragmentShaderData);
 		//simpleShaderProgram* frameBlendProgram = brogueSceneBuilder::createSceneShaderProgram(frameBlendDataStream, frameBlendVertexShaderData, frameBlendFragmentShaderData);
 
 		int textureIndex = 0;
 
-		//simpleFrameBuffer* frameBuffer = new simpleFrameBuffer(sceneBoundaryUI.width, sceneBoundaryUI.height);
-		//simpleTexture frameTexture(NULL, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE0, GL_BGRA, GL_UNSIGNED_BYTE);
+		simpleFrameBuffer* frameBuffer = new simpleFrameBuffer(sceneBoundaryUI.width, sceneBoundaryUI.height);
+		simpleTexture frameTexture(NULL, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE0, GL_BGRA, GL_UNSIGNED_BYTE);
 		//simpleTexture frameBlendTexture(NULL, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE1, GL_BGRA, GL_UNSIGNED_BYTE);
 
 		// THESE ARE STATICALLY DEFINED:  They depend on the shader file.
 		//
-		//simpleUniform<int> frameFragUniform(frameFragmentShaderData.uniforms1i->get(0));
+		simpleUniform<int> frameFragUniform(frameFragmentShaderData.uniforms1i->get(0));
 		//simpleUniform<int> frameBlendFragUniform(frameBlendFragmentShaderData.uniforms1i->get(0));
 
 		return new brogueFlameMenuProgram(sceneProgram, 
-										  //frameProgram, 
+										  frameProgram, 
 										  //frameBlendProgram, 
-										  //frameBuffer,
+										  frameBuffer,
 										  mainMenu,
-										  //frameTexture,
+										  frameTexture,
 										  //frameBlendTexture, 
-										  //frameFragUniform, 
+										  frameFragUniform, 
 										  //frameBlendFragUniform,
 										  sceneBoundaryUI);
 

@@ -17,13 +17,13 @@ namespace brogueHd::frontend::opengl
 	public:
 		
 		brogueFlameMenuProgram(simpleShaderProgram* sceneProgram,
-								//simpleShaderProgram* frameProgram,
+								simpleShaderProgram* frameProgram,
 								//simpleShaderProgram* frameBlendProgram,
-								//simpleFrameBuffer* frameBuffer,
+								simpleFrameBuffer* frameBuffer,
 								brogueFlameMenu* renderedView,
-								//const simpleTexture& frameTexture,
+								const simpleTexture& frameTexture,
 								//const simpleTexture& frameBlendTexture,
-								//const simpleUniform<int>& frameTextureUniform,
+								const simpleUniform<int>& frameTextureUniform,
 								//const simpleUniform<int>& frameBlendTextureUniform,
 								const gridRect& sceneBoundaryUI);
 		~brogueFlameMenuProgram();
@@ -62,27 +62,27 @@ namespace brogueHd::frontend::opengl
 	};
 
 	brogueFlameMenuProgram::brogueFlameMenuProgram(simpleShaderProgram* sceneProgram,
-												   //simpleShaderProgram* frameProgram,
+												   simpleShaderProgram* frameProgram,
 												   //simpleShaderProgram* frameBlendProgram,
-												   //simpleFrameBuffer* frameBuffer,
+												   simpleFrameBuffer* frameBuffer,
 												   brogueFlameMenu* renderedView,
-												   //const simpleTexture& frameTexture,
+												   const simpleTexture& frameTexture,
 												   //const simpleTexture& frameBlendTexture,
-												   //const simpleUniform<int>& frameTextureUniform,
+												   const simpleUniform<int>& frameTextureUniform,
 												   //const simpleUniform<int>& frameBlendTextureUniform,
 												   const gridRect& sceneBoundaryUI)
 	{
 		_sceneProgram = sceneProgram;
-		//_frameProgram = frameProgram;
+		_frameProgram = frameProgram;
 		//_frameBlendProgram = frameBlendProgram;
 
-		//_frameBuffer = frameBuffer;
+		_frameBuffer = frameBuffer;
 
-		//_frameTexture = frameTexture;
+		_frameTexture = frameTexture;
 		//_frameBlendTexture = frameBlendTexture;
 
 		//_frameBlendTextureUniform = frameBlendTextureUniform;
-		//_frameTextureUniform = frameTextureUniform;
+		_frameTextureUniform = frameTextureUniform;
 
 		_renderedView = renderedView;
 
@@ -98,8 +98,8 @@ namespace brogueHd::frontend::opengl
 		if (!this->isCompiled)
 			simpleException::show("Must first call IGLProgram.Compile() before using the GL program");
 
-		//if (!_frameBuffer->isReady())
-		//	simpleException::show("Framebuffer status not ready for drawing!");
+		if (!_frameBuffer->isReady())
+			simpleException::show("Framebuffer status not ready for drawing!");
 
 		// Procedure:  Two color attachments to the frame buffer - color attachment 1 used for blending
 		//			
@@ -117,11 +117,11 @@ namespace brogueHd::frontend::opengl
 		glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
-		//// Enable the frame buffer
-		//_frameBuffer->bind(true);
+		// Enable the frame buffer
+		_frameBuffer->bind(true);
 
-		//// Activate Color Attachment 1 (Color Attachment 0 was used for blending)
-		//glDrawBuffer(GL_COLOR_ATTACHMENT1);
+		// Activate Color Attachment 1 (Color Attachment 0 was used for blending)
+		glDrawBuffer(GL_COLOR_ATTACHMENT0);
 
 		// Render the VISIBLE scene -> Color Attachment 0
 		_sceneProgram->bind(true);
@@ -138,36 +138,36 @@ namespace brogueHd::frontend::opengl
 
 		//glDisable(GL_BLEND);
 
-		//// Render the frame buffer contents
-		//_frameBuffer->bind(false);
-		//_frameProgram->bind(true);
-		//_frameProgram->drawAll();
+		// Render the frame buffer contents
+		_frameBuffer->bind(false);
+		_frameProgram->bind(true);
+		_frameProgram->drawAll();
 	}
 
 	void brogueFlameMenuProgram::compile()
 	{
 		_sceneProgram->compile();
-		//_frameProgram->compile();
+		_frameProgram->compile();
 		//_frameBlendProgram->compile();
 
-		//// Create the textures:  (NOTE** Program handle not used currently)
-		//_frameTexture.glCreate(_frameProgram->getHandle());
+		// Create the textures:  (NOTE** Program handle not used currently)
+		_frameTexture.glCreate(_frameProgram->getHandle());
 		//_frameBlendTexture.glCreate(_frameBlendProgram->getHandle());
 
-		//// Declare Uniforms
-		//_frameProgram->bind(true);
-		//_frameProgram->bindUniform(_frameTextureUniform);
+		// Declare Uniforms
+		_frameProgram->bind(true);
+		_frameProgram->bindUniform(_frameTextureUniform);
 
 		//_frameBlendProgram->bind(true);
 		//_frameBlendProgram->bindUniform(_frameBlendTextureUniform);
 
-		//// Create Frame buffer:  Uses scene program to render to the frame buffer attached texture
-		//_frameBuffer->glCreate(_sceneProgram->getHandle());
+		// Create Frame buffer:  Uses scene program to render to the frame buffer attached texture
+		_frameBuffer->glCreate(_sceneProgram->getHandle());
 
-		//// Attach texture to frame buffer
-		//_frameBuffer->attachTexture(_frameTexture.getHandle(), GL_COLOR_ATTACHMENT0);
+		// Attach texture to frame buffer
+		_frameBuffer->attachTexture(_frameTexture.getHandle(), GL_COLOR_ATTACHMENT0);
 		//_frameBuffer->attachTexture(_frameBlendTexture.getHandle(), GL_COLOR_ATTACHMENT1);
-		//_frameBuffer->attachRenderBuffer();
+		_frameBuffer->attachRenderBuffer();
 
 		this->isCompiled = true;
 	}
@@ -175,24 +175,24 @@ namespace brogueHd::frontend::opengl
 	void brogueFlameMenuProgram::update(int millisecondsLapsed)
 	{
 		// Update the rendering
-		_renderedView->update(millisecondsLapsed);
+		//_renderedView->update(millisecondsLapsed);
 
 		// Stream the new data
-		simpleDataStream<float>* sceneDataStream = brogueSceneBuilder::prepareSceneDataStream(_renderedView);
+		//simpleDataStream<float>* sceneDataStream = brogueSceneBuilder::prepareSceneDataStream(_renderedView);
 		//simpleDataStream<float>* frameDataStream = brogueSceneBuilder::prepareFrameDataStream(_renderedView);
 		//simpleDataStream<float>* frameBlendDataStream = brogueSceneBuilder::prepareFrameDataStream(_renderedView);
 
 		// Get rid of old stream / buffer new stream
-		_sceneProgram->bind(false);
+		//_sceneProgram->bind(false);
 		//_frameProgram->bind(false);
 		//_frameBlendProgram->bind(false);
 
-		_sceneProgram->reBuffer(0, sceneDataStream);
+		//_sceneProgram->reBuffer(0, sceneDataStream);
 		//_frameProgram->reBuffer(0, frameDataStream);
 		//_frameBlendProgram->reBuffer(0, frameBlendDataStream);
 
 		// SPECIFIC! (re-design) (MEMORY! deletes old buffer)
-		_sceneProgram->bind(true);
+		//_sceneProgram->bind(true);
 		//_frameProgram->bind(true);
 		//_frameBlendProgram->bind(true);
 	}

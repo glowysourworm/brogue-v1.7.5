@@ -72,7 +72,18 @@ namespace brogueHd::frontend::opengl
                 break;
             case shaderResource::brogueFlameMenuVert:
                 this->attributes->add(vertexAttributeData(0, "vertex", GL_FLOAT_VEC2));
-                this->attributes->add(vertexAttributeData(1, "backgroundColor", GL_FLOAT_VEC4));
+                this->attributes->add(vertexAttributeData(1, "tex", GL_FLOAT_VEC2));
+                this->attributes->add(vertexAttributeData(2, "backgroundColor", GL_FLOAT_VEC4));
+
+                this->attributes->add(vertexAttributeData(3, "texN", GL_FLOAT_VEC3));
+                this->attributes->add(vertexAttributeData(4, "texS", GL_FLOAT_VEC3));
+                this->attributes->add(vertexAttributeData(5, "texE", GL_FLOAT_VEC3));
+                this->attributes->add(vertexAttributeData(6, "texW", GL_FLOAT_VEC3));
+
+                this->attributes->add(vertexAttributeData(7, "texNE", GL_FLOAT_VEC3));
+                this->attributes->add(vertexAttributeData(8, "texNW", GL_FLOAT_VEC3));
+                this->attributes->add(vertexAttributeData(9, "texSE", GL_FLOAT_VEC3));
+                this->attributes->add(vertexAttributeData(10, "texSW", GL_FLOAT_VEC3));
                 break;
 
             // FRAGMENT SHADERS

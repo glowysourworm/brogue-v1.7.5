@@ -41,6 +41,13 @@ namespace brogueHd::component
 	using gridCallback = std::function<iterationCallback(short, short, T)>;
 
 	/// <summary>
+	/// Iteration callback that includes the indices. Set the return value to either continue / break. Adds the
+	/// compass for adjacent cells.
+	/// </summary>
+	template<typename T>
+	using gridCallbackAdjacent = std::function<iterationCallback(short, short, brogueCompass, T)>;
+
+	/// <summary>
 	/// Simple predicate decision making function that includes the item coordinates
 	/// </summary>
 	template<typename T>

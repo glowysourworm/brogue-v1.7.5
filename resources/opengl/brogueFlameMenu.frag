@@ -5,15 +5,30 @@
 //out vec4 outputColor;
 
 in vec2 currentVertex;
+in vec2 currentTex;
 in vec4 currentBackgroundColor;
 
-// This is the combined scene texture - which is the scene images rendered with the base lighting
-// applied (ambient + accent)
+in vec3 currentTexN;
+in vec3 currentTexS;
+in vec3 currentTexE;
+in vec3 currentTexW;
+
+in vec3 currentTexNE;
+in vec3 currentTexNW;
+in vec3 currentTexSE;
+in vec3 currentTexSW;
+
+// Try and use a 2D sampler to work with the texture. The adjacent texture coordinates have been
+// added to this shader pipeline to sample adjacent cells on the map.
 //
-//uniform float time;
+//uniform sampler2D frameTexture;
 
 void main()
 {
+    // NOTE:  This coordinate transfer is set up with just basic 2D normalized coordinates. 
+    //
+    //gl_FragColor = texture(frameTexture, currentTex);
+
     gl_FragColor = currentBackgroundColor;
 
     //outputColor = vec4(currentBackgroundColor.x, currentBackgroundColor.y, currentBackgroundColor.z, 1.0);

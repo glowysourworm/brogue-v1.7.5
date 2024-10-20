@@ -237,8 +237,6 @@ namespace brogueHd::frontend::opengl
 
 	struct simpleQuad : simpleGlData
 	{
-		// Memory Layout:  { top-left, top-right, bottom-right, bottom-left }
-
 	public:
 
 		vec2 topLeft;
@@ -324,6 +322,103 @@ namespace brogueHd::frontend::opengl
 		size_t getHash() const override
 		{
 			return hashGenerator::generateHash(topLeft, bottomRight);
+		}
+	};
+
+	struct simpleQuad3 : simpleGlData
+	{
+	public:
+
+		vec3 topLeft;
+		vec3 topRight;
+		vec3 bottomLeft;
+		vec3 bottomRight;
+
+		simpleQuad3()
+		{
+			topLeft = default_value::value<vec3>();
+			topRight = default_value::value<vec3>();
+			bottomLeft = default_value::value<vec3>();
+			bottomRight = default_value::value<vec3>();
+		}
+		simpleQuad3(const simpleQuad3& copy)
+		{
+			topLeft = copy.topLeft;
+			topRight = copy.topRight;
+			bottomLeft = copy.bottomLeft;
+			bottomRight = copy.bottomRight;
+		}
+		simpleQuad3(const simpleQuad& quad, bool inUse)
+		{
+			topLeft = vec3(quad.topLeft.x, quad.topLeft.y, inUse ? 1.0f : 0.0f);
+			topRight = vec3(quad.topRight.x, quad.topRight.y, inUse ? 1.0f : 0.0f);
+			bottomLeft = vec3(quad.bottomLeft.x, quad.bottomLeft.y, inUse ? 1.0f : 0.0f);
+			bottomRight = vec3(quad.bottomRight.x, quad.bottomRight.y, inUse ? 1.0f : 0.0f);
+		}
+		simpleQuad3(float left, float top, float right, float bottom, float atopLeft, float atopRight, float abottomLeft, float abottomRight)
+		{
+			topLeft = vec3(left, top, atopLeft);
+			topRight = vec3(right, top, atopRight);
+			bottomLeft = vec3(left, bottom, abottomLeft);
+			bottomRight = vec3(right, bottom, abottomRight);
+		}
+		void operator=(const simpleQuad3& copy)
+		{
+			topLeft = copy.topLeft;
+			topRight = copy.topRight;
+			bottomLeft = copy.bottomLeft;
+			bottomRight = copy.bottomRight;
+		}
+
+		int getElementSize(GLenum primitiveType) override
+		{
+			switch (primitiveType)
+			{
+			case GL_TRIANGLES:
+				return 6;
+			default:
+				simpleException::show("Unhandled primitive type for GLQuad:  {}", primitiveType);
+				break;
+			}
+		}
+		int getStreamSize(GLenum primitiveType) override
+		{
+			switch (primitiveType)
+			{
+			case GL_TRIANGLES:
+				return 18;
+			default:
+				simpleException::show("Unhandled primitive type for GLQuad:  {}", primitiveType);
+				break;
+			}
+		}
+
+		void streamBuffer(GLenum primitiveType, simpleDataStream<float>& outputStream) override
+		{
+			// These should probably be tested! :)
+			switch (primitiveType)
+			{
+			case GL_TRIANGLES:
+			{
+				// (Triangle 1) topLeft, topRight, bottomRight 
+				topLeft.streamBuffer(primitiveType, outputStream);		// vec3
+				topRight.streamBuffer(primitiveType, outputStream);
+				bottomRight.streamBuffer(primitiveType, outputStream);
+
+				// (Triangle 2) topLeft, bottomRight, bottomLeft
+				topLeft.streamBuffer(primitiveType, outputStream);
+				bottomRight.streamBuffer(primitiveType, outputStream);
+				bottomLeft.streamBuffer(primitiveType, outputStream);
+			}
+			break;
+			default:
+				simpleException::show("Unhandled primitive type for GLQuad:  {}", primitiveType);
+				break;
+			}
+		}
+		size_t getHash() const override
+		{
+			return hashGenerator::generateHash(topLeft, topRight, bottomLeft, bottomRight);
 		}
 	};
 

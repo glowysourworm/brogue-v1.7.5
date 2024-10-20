@@ -114,7 +114,7 @@ namespace brogueHd::component
 		/// <summary>
 		/// Iterates around a specific point by one-cell in all 8 directions
 		/// </summary>
-		void iterateAround(short column, short row, bool withinBounds, gridCallback<T> callback) const;
+		void iterateAdjacent(short column, short row, bool withinBounds, gridCallbackAdjacent<T> callback) const;
 
 		/// <summary>
 		/// Iterates grid within specific boundary constraint
@@ -574,27 +574,43 @@ namespace brogueHd::component
     }
 
     template<typename T>
-    void grid<T>::iterateAround(short column, short row, bool withinBounds, gridCallback<T> callback) const
+    void grid<T>::iterateAdjacent(short column, short row, bool withinBounds, gridCallbackAdjacent<T> callback) const
     {
         short newX, newY;
 
         bool userBreak = false;
 
-        for (short i = column - 1; i < column + 1 && !userBreak; i++)
-        {
-            for (short j = row - 1; j < row + 1 && !userBreak; j++)
-            {
-                if (withinBounds)
-                {
-                    if (this->isInBounds(i, j))
-                        userBreak = callback(i, j, this->get(i, j));
-                }
-                else
-                {
-                    userBreak = callback(i, j, this->get(i, j));
-                }
-            }
-        }
+        // N
+        if (!userBreak && (this->isInBounds(column, row - 1) || !withinBounds))
+            userBreak = callback(column, row - 1, brogueCompass::N, this->getAdjacentUnsafe(column, row, brogueCompass::N));
+
+        // S
+        if (!userBreak && (this->isInBounds(column, row + 1) || !withinBounds))
+            userBreak = callback(column, row + 1, brogueCompass::S, this->getAdjacentUnsafe(column, row, brogueCompass::S));
+
+        // E
+        if (!userBreak && (this->isInBounds(column + 1, row) || !withinBounds))
+            userBreak = callback(column + 1, row, brogueCompass::E, this->getAdjacentUnsafe(column, row, brogueCompass::E));
+
+        // W
+        if (!userBreak && (this->isInBounds(column - 1, row) || !withinBounds))
+            userBreak = callback(column - 1, row, brogueCompass::W, this->getAdjacentUnsafe(column, row, brogueCompass::W));
+
+        // NE
+        if (!userBreak && (this->isInBounds(column + 1, row - 1) || !withinBounds))
+            userBreak = callback(column + 1, row - 1, brogueCompass::NE, this->getAdjacentUnsafe(column, row, brogueCompass::NE));
+
+        // NW
+        if (!userBreak && (this->isInBounds(column - 1, row - 1) || !withinBounds))
+            userBreak = callback(column - 1, row - 1, brogueCompass::NW, this->getAdjacentUnsafe(column, row, brogueCompass::NW));
+
+        // SE
+        if (!userBreak && (this->isInBounds(column + 1, row + 1) || !withinBounds))
+            userBreak = callback(column + 1, row + 1, brogueCompass::SE, this->getAdjacentUnsafe(column, row, brogueCompass::SE));
+
+        // SW
+        if (!userBreak && (this->isInBounds(column - 1, row + 1) || !withinBounds))
+            userBreak = callback(column - 1, row + 1, brogueCompass::SW, this->getAdjacentUnsafe(column, row, brogueCompass::SW));
     }
 
     template<typename T>

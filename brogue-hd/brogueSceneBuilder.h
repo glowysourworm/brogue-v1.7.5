@@ -6,6 +6,7 @@
 #include "brogueCellQuad.h"
 #include "brogueImageQuad.h"
 #include "brogueView.h"
+#include "gridDefinitions.h"
 
 #include "coordinateConverter.h"
 #include "simpleShader.h"
@@ -14,6 +15,7 @@
 #include "simpleVertexArray.h"
 
 using namespace brogueHd::simple;
+using namespace brogueHd::component;
 using namespace brogueHd::backend::model::layout;
 using namespace brogueHd::frontend::ui;
 
@@ -50,17 +52,62 @@ namespace brogueHd::frontend::opengl
 			gridRect sceneBoundary = calculateSceneBoundaryUI(view);
 
 			simpleList<brogueCellQuad> cellQuads;
+			simpleHash<brogueCompass, simpleQuad3> adjacentUVQuads;
 
-			view->iterate([&sceneBoundary, &cellQuads](short column, short row, brogueCellDisplay* cell)
+			view->iterate([&sceneBoundary, &cellQuads, &adjacentUVQuads, &view](short column, short row, brogueCellDisplay* cell)
 			{
-				simpleQuad quad = coordinateConverter::createQuadNormalizedXYScene(column * brogueCellDisplay::CellWidth,
-																					row * brogueCellDisplay::CellHeight,
-																					brogueCellDisplay::CellWidth,
-																					brogueCellDisplay::CellHeight,
-																					sceneBoundary.width, 
-																					sceneBoundary.height);
+				// Calculate adjacent quads in texture coordinates
+				adjacentUVQuads.clear();
 
-				brogueCellQuad cellQuad(*cell, quad);
+				// Get adjacent cell data to send to the GL backend
+				//
+				view->iterateAdjacent(column, row, [&adjacentUVQuads, &sceneBoundary] (short adjColumn, short adjRow, brogueCompass direction, brogueCellDisplay* adjacentCell)
+				{
+					if (adjacentCell == nullptr)
+					{
+						// Use default values to show the cell is empty
+						//
+						adjacentUVQuads.add(direction, default_value::value<simpleQuad3>());
+
+						return iterationCallback::iterate;
+					}
+
+					simpleQuad adjQuad = coordinateConverter::createQuadNormalizedUVScene(adjColumn * brogueCellDisplay::CellWidth,
+																					     adjRow * brogueCellDisplay::CellHeight,
+																						 brogueCellDisplay::CellWidth,
+																						 brogueCellDisplay::CellHeight,
+																						 sceneBoundary.width,
+																						 sceneBoundary.height);
+					// Add on the vec3 data for the quad
+					//
+					adjacentUVQuads.add(direction, simpleQuad3(adjQuad, true));
+
+					return iterationCallback::iterate;
+				});
+
+				simpleQuad vertexQuad = coordinateConverter::createQuadNormalizedXYScene(column * brogueCellDisplay::CellWidth,
+																						row * brogueCellDisplay::CellHeight,
+																						brogueCellDisplay::CellWidth,
+																						brogueCellDisplay::CellHeight,
+																						sceneBoundary.width, 
+																						sceneBoundary.height);
+
+				simpleQuad textureQuad = coordinateConverter::createQuadNormalizedUVScene(column * brogueCellDisplay::CellWidth,
+																							row * brogueCellDisplay::CellHeight,
+																							brogueCellDisplay::CellWidth,
+																							brogueCellDisplay::CellHeight,
+																							sceneBoundary.width,
+																							sceneBoundary.height);
+
+				brogueCellQuad cellQuad(*cell, vertexQuad, textureQuad, 
+										adjacentUVQuads.get(brogueCompass::N),
+										adjacentUVQuads.get(brogueCompass::S),
+										adjacentUVQuads.get(brogueCompass::E),
+										adjacentUVQuads.get(brogueCompass::W),
+										adjacentUVQuads.get(brogueCompass::NE),
+										adjacentUVQuads.get(brogueCompass::NW),
+										adjacentUVQuads.get(brogueCompass::SE),
+										adjacentUVQuads.get(brogueCompass::SW));
 
 				cellQuads.add(cellQuad);
 
