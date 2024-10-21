@@ -14,24 +14,31 @@ namespace brogueHd
 
 	enum shaderResource
 	{
-		brogueBaseVert = 0,
-		brogueBaseFrag = 1,
-		brogueFrameVert = 2,
-		brogueFrameFrag = 3,
-		brogueFrameBlendVert = 4,
-		brogueFrameBlendFrag = 5,
-		brogueFlameMenuVert = 6,
-		brogueFlameMenuFrag = 7
+		colorMaskVert = 0,
+		colorMaskFrag = 1,
+		backgroundColorVert = 2,
+		backgroundColorFrag = 3,
+		diffuseColorUpwardVert = 4,
+		diffuseColorUpwardFrag = 5,
+		mixFrameTexturesVert = 6,
+		mixFrameTexturesFrag = 7
 	};
 
-	static const char* ConfigBaseVertexShader = "baseVertexShader";
-	static const char* ConfigBaseFragmentShader = "baseFragmentShader";
-	static const char* ConfigFrameVertexShader = "frameVertexShader";
-	static const char* ConfigFrameFragmentShader = "frameFragmentShader";
-	static const char* ConfigFrameBlendVertexShader = "frameBlendVertexShader";
-	static const char* ConfigFrameBlendFragmentShader = "frameBlendFragmentShader";
-	static const char* ConfigFlameMenuVertexShader = "flameMenuVertexShader";
-	static const char* ConfigFlameMenuFragmentShader = "flameMenuFragmentShader";
+	enum openglDataStreamType
+	{
+		brogueImageQuad = 0,
+		brogueCellQuad = 1,
+		brogueColorQuad = 2
+	};
+
+	static const char* ConfigColorMaskVertShader = "colorMaskVertexShader";
+	static const char* ConfigColorMaskFragShader = "colorMaskFragmentShader";
+	static const char* ConfigBackgroundColorVertexShader = "backgroundColorVertexShader";
+	static const char* ConfigBackgroundColorFragmentShader = "backgroundColorFragmentShader";
+	static const char* ConfigDiffuseColorUpwardVertexShader = "diffuseColorUpwardVertexShader";
+	static const char* ConfigDiffuseColorUpwardFragmentShader = "diffuseColorUpwardFragmentShader";
+	static const char* ConfigMixFrameTexturesVertexShader = "mixFrameTexturesVertexShader";
+	static const char* ConfigMixFrameTexturesFragmentShader = "mixFrameTexturesFragmentShader";
 
 	static const char* BrogueHighScoresFile = "BrogueHighScores.txt";
 

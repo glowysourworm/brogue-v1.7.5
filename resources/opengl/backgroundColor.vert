@@ -4,12 +4,13 @@
 // attribute is positioned.
 //
 layout (location = 0) in vec2 vertex;
-layout (location = 1) in vec3 backgroundColor;
+layout (location = 2) in vec4 backgroundColor;
+
 
 // Define a data type to be output by the shader to the next stages
 //
 out vec2 currentVertex;
-out vec3 currentBackgroundColor;
+out vec4 currentBackgroundColor;
 
 void main()
 {

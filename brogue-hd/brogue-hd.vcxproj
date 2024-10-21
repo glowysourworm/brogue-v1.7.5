@@ -181,6 +181,7 @@
     <ClInclude Include="boudingBox2D.h" />
     <ClInclude Include="brogueCellQuad.h" />
     <ClInclude Include="brogueColorMap.h" />
+    <ClInclude Include="brogueColorQuad.h" />
     <ClInclude Include="brogueConsole.h" />
     <ClInclude Include="brogueContentGrid.h" />
     <ClInclude Include="brogueCreature.h" />
@@ -203,7 +204,7 @@
     <ClInclude Include="brogueObject.h" />
     <ClInclude Include="broguePlayer.h" />
     <ClInclude Include="brogueRoom.h" />
-    <ClInclude Include="brogueSceneBuilder.h" />
+    <ClInclude Include="brogueProgramBuilder.h" />
     <ClInclude Include="brogueTestPackage.h" />
     <ClInclude Include="cellularAutomataParameters.h" />
     <ClInclude Include="coordinateConverter.h" />
@@ -288,6 +289,7 @@
     <ClInclude Include="machineConstants.h" />
     <ClInclude Include="simplePoint.h" />
     <ClInclude Include="simpleQueue.h" />
+    <ClInclude Include="simpleUniform.h" />
     <ClInclude Include="simpleVector.h" />
     <ClInclude Include="messageData.h" />
     <ClInclude Include="noiseGenerator.h" />
@@ -314,7 +316,6 @@
     <ClInclude Include="simpleShaderProgram.h" />
     <ClInclude Include="simpleString.h" />
     <ClInclude Include="simpleTexture.h" />
-    <ClInclude Include="simpleUniform.h" />
     <ClInclude Include="simpleVertexArray.h" />
     <ClInclude Include="simpleVertexAttribute.h" />
     <ClInclude Include="simpleVertexBuffer.h" />
@@ -358,28 +359,28 @@
     <None Include="..\resources\model\wands.csv" />
     <None Include="..\resources\model\weaponRunicNames.csv" />
     <None Include="..\resources\model\weapons.csv" />
-    <None Include="..\resources\opengl\brogueBase.frag">
+    <None Include="..\resources\opengl\colorMask.frag">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </None>
-    <None Include="..\resources\opengl\brogueBase.vert">
+    <None Include="..\resources\opengl\colorMask.vert">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </None>
-    <None Include="..\resources\opengl\brogueFlameMenu.frag">
+    <None Include="..\resources\opengl\backgroundColor.frag">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </None>
-    <None Include="..\resources\opengl\brogueFlameMenu.vert">
+    <None Include="..\resources\opengl\backgroundColor.vert">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </None>
-    <None Include="..\resources\opengl\brogueFrame.frag">
+    <None Include="..\resources\opengl\diffuseColorUpward.frag">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </None>
-    <None Include="..\resources\opengl\brogueFrame.vert">
+    <None Include="..\resources\opengl\diffuseColorUpward.vert">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </None>
-    <None Include="..\resources\opengl\brogueFrameBlend.frag">
+    <None Include="..\resources\opengl\mixFrameTextures.frag">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </None>
-    <None Include="..\resources\opengl\brogueFrameBlend.vert">
+    <None Include="..\resources\opengl\mixFrameTextures.vert">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </None>
     <None Include="..\resources\resource-config.json" />

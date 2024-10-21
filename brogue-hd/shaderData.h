@@ -1,7 +1,8 @@
 #pragma once
 
 #include "brogueGlobal.h"
-#include "simpleArray.h"
+#include "simpleUniform.h"
+#include "simpleList.h"
 #include "simpleString.h"
 #include "simpleGlData.h"
 #include "gl.h"
@@ -20,37 +21,20 @@ namespace brogueHd::frontend::opengl
         shaderData()
         {
             this->source = nullptr;
-            this->resource = shaderResource::brogueBaseFrag;
+            this->resource = shaderResource::backgroundColorFrag;
             this->type = 0;
-
-            this->attributes = new simpleList<vertexAttributeData>();
-            this->uniforms1 = new simpleList<uniformData<float>>();
-            this->uniforms1i = new simpleList<uniformData<int>>();
-            this->uniforms2 = new simpleList<uniformData<vec2>>();
-            this->uniforms4 = new simpleList<uniformData<vec4>>();
         }
         shaderData(const shaderData& copy)
         {
             this->source = copy.source;
-            this->attributes = copy.attributes;
             this->resource = copy.resource;
             this->type = copy.type;
-            this->uniforms1 = copy.uniforms1;
-            this->uniforms1i = copy.uniforms1i;
-            this->uniforms2 = copy.uniforms2;
-            this->uniforms4 = copy.uniforms4;
         }
         shaderData(shaderResource aresource, GLenum atype, const simpleString& asource)
         {
-            source = new simpleString(asource);
+            source = asource;
             type = atype;
             resource = aresource;
-
-            this->attributes = new simpleList<vertexAttributeData>();
-            this->uniforms1 = new simpleList<uniformData<float>>();
-            this->uniforms1i = new simpleList<uniformData<int>>();
-            this->uniforms2 = new simpleList<uniformData<vec2>>();
-            this->uniforms4 = new simpleList<uniformData<vec4>>();
 
             // Sets up vertex array attributes for this specific shader program
             //
@@ -58,66 +42,56 @@ namespace brogueHd::frontend::opengl
             {
                 
             // VERTEX SHADERS
-            case shaderResource::brogueBaseVert:
-                this->attributes->add(vertexAttributeData(0, "vertex", GL_FLOAT_VEC2));
-                this->attributes->add(vertexAttributeData(1, "backgroundColor", GL_FLOAT_VEC4));
+            case shaderResource::colorMaskVert:
+                this->attributes.add(vertexAttributeData(0, "vertex", GL_FLOAT_VEC2));
+                this->attributes.add(vertexAttributeData(1, "backgroundColor", GL_FLOAT_VEC4));
                 break;
-            case shaderResource::brogueFrameVert:
-                this->attributes->add(vertexAttributeData(0, "vertex", GL_FLOAT_VEC2));
-                this->attributes->add(vertexAttributeData(1, "texcoord", GL_FLOAT_VEC2));
+            case shaderResource::backgroundColorVert:
+                this->attributes.add(vertexAttributeData(0, "vertex", GL_FLOAT_VEC2));
+                this->attributes.add(vertexAttributeData(2, "backgroundColor", GL_FLOAT_VEC4));
                 break;
-            case shaderResource::brogueFrameBlendVert:
-                this->attributes->add(vertexAttributeData(0, "vertex", GL_FLOAT_VEC2));
-                this->attributes->add(vertexAttributeData(1, "texcoord", GL_FLOAT_VEC2));
+            case shaderResource::diffuseColorUpwardVert:
+                this->attributes.add(vertexAttributeData(0, "vertex", GL_FLOAT_VEC2));
+                this->attributes.add(vertexAttributeData(1, "texcoord", GL_FLOAT_VEC2));
+                this->attributes.add(vertexAttributeData(2, "backgroundColor", GL_FLOAT_VEC4));
                 break;
-            case shaderResource::brogueFlameMenuVert:
-                this->attributes->add(vertexAttributeData(0, "vertex", GL_FLOAT_VEC2));
-                this->attributes->add(vertexAttributeData(1, "tex", GL_FLOAT_VEC2));
-                this->attributes->add(vertexAttributeData(2, "backgroundColor", GL_FLOAT_VEC4));
-
-                this->attributes->add(vertexAttributeData(3, "texN", GL_FLOAT_VEC3));
-                this->attributes->add(vertexAttributeData(4, "texS", GL_FLOAT_VEC3));
-                this->attributes->add(vertexAttributeData(5, "texE", GL_FLOAT_VEC3));
-                this->attributes->add(vertexAttributeData(6, "texW", GL_FLOAT_VEC3));
-
-                this->attributes->add(vertexAttributeData(7, "texNE", GL_FLOAT_VEC3));
-                this->attributes->add(vertexAttributeData(8, "texNW", GL_FLOAT_VEC3));
-                this->attributes->add(vertexAttributeData(9, "texSE", GL_FLOAT_VEC3));
-                this->attributes->add(vertexAttributeData(10, "texSW", GL_FLOAT_VEC3));
+            case shaderResource::mixFrameTexturesVert:
+                this->attributes.add(vertexAttributeData(0, "vertex", GL_FLOAT_VEC2));
+                this->attributes.add(vertexAttributeData(1, "texcoord", GL_FLOAT_VEC2));
                 break;
 
             // FRAGMENT SHADERS
-            case shaderResource::brogueBaseFrag:
+            case shaderResource::colorMaskFrag:
+                this->uniforms4.add(simpleUniform<vec4>("maskColor", GL_FLOAT_VEC4, vec4(0, 0, 0, 0)));
                 break;
-            case shaderResource::brogueFrameFrag:
-                this->uniforms1i->add(uniformData<int>("frameTexture", GL_SAMPLER_2D));
+            case shaderResource::backgroundColorFrag:
                 break;
-            case shaderResource::brogueFrameBlendFrag:
-                this->uniforms1i->add(uniformData<int>("frameBlendTexture", GL_SAMPLER_2D));
+            case shaderResource::diffuseColorUpwardFrag:
+                this->uniforms1i.add(simpleUniform<int>("frame0Texture", GL_SAMPLER_2D, 0));
+                this->uniforms1.add(simpleUniform<float>("weight", GL_FLOAT, 0.5));
                 break;
-            case shaderResource::brogueFlameMenuFrag:
+            case shaderResource::mixFrameTexturesFrag:
+                this->uniforms1i.add(simpleUniform<int>("frame0Texture", GL_SAMPLER_2D, 0));
+                this->uniforms1i.add(simpleUniform<int>("frame1Texture", GL_SAMPLER_2D, 1));
+                this->uniforms1.add(simpleUniform<float>("weight", GL_FLOAT, 0.5));
                 break;
             default:
                 simpleException::show("Unhandled shaderResource type:  shaderData.h");
+                break;
             }
         }
         ~shaderData()
         {
-            delete this->attributes;
-            delete this->uniforms1;
-            delete this->uniforms1i;
-            delete this->uniforms2;
-            delete this->uniforms4;
         }
 
-        simpleString* source;
+        simpleString source;
         GLenum type;
         shaderResource resource;
 
-        simpleList<vertexAttributeData>* attributes;
-        simpleList<uniformData<int>>* uniforms1i;
-        simpleList<uniformData<float>>* uniforms1;
-        simpleList<uniformData<vec2>>* uniforms2;
-        simpleList<uniformData<vec4>>* uniforms4;
+        simpleList<vertexAttributeData> attributes;
+        simpleList<simpleUniform<int>> uniforms1i;
+        simpleList<simpleUniform<float>> uniforms1;
+        simpleList<simpleUniform<vec2>> uniforms2;
+        simpleList<simpleUniform<vec4>> uniforms4;
     };
 }

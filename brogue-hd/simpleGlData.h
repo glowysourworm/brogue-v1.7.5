@@ -45,8 +45,8 @@ namespace brogueHd::frontend::opengl
 
 		vec2()
 		{
-			x = -1;
-			y = -1;
+			x = 0;
+			y = 0;
 		}
 		vec2(const vec2& copy)
 		{
@@ -107,9 +107,9 @@ namespace brogueHd::frontend::opengl
 
 		vec3()
 		{
-			x = -1;
-			y = -1;
-			z = -1;
+			x = 0;
+			y = 0;
+			z = 0;
 		}
 		vec3(const vec3& copy)
 		{
@@ -173,10 +173,10 @@ namespace brogueHd::frontend::opengl
 
 		vec4()
 		{
-			x = -1;
-			y = -1;
-			z = -1;
-			w = -1;
+			x = 0;
+			y = 0;
+			z = 0;
+			w = 0;
 		}
 		vec4(const vec4& copy)
 		{
@@ -419,42 +419,6 @@ namespace brogueHd::frontend::opengl
 		size_t getHash() const override
 		{
 			return hashGenerator::generateHash(topLeft, topRight, bottomLeft, bottomRight);
-		}
-	};
-
-	template<isHashable T>
-	struct uniformData : hashable
-	{
-		uniformData()
-		{
-			name = default_value::value<simpleString>();
-			type = default_value::value<GLenum>();
-			value = default_value::value<T>();
-		}
-		uniformData(const uniformData<T>& copy)
-		{
-			name = copy.name;
-			type = copy.type;
-			value = copy.value;
-		}
-		uniformData(const simpleString& aname, GLenum atype)
-		{
-			name = aname;
-			type = atype;
-			value = default_value::value<T>();
-		}
-
-		simpleString name;
-		GLenum type;
-
-		/// <summary>
-		/// NOTE:  Can also be the index of the texture! used for sampler2D
-		/// </summary>
-		T value;
-
-		size_t getHash() const override
-		{
-			return hashGenerator::generateHash(name, type, value);
 		}
 	};
 

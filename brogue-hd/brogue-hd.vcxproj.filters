@@ -88,6 +88,9 @@
     <Filter Include="Header Files\simple">
       <UniqueIdentifier>{27876192-d83a-47bf-a2c2-07eeb972ed3c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\opengl\brogueFlameMenu">
+      <UniqueIdentifier>{7906081a-6a2a-4d0b-b850-d6365885aa6a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="brogue-hd.cpp">
@@ -419,9 +422,6 @@
     <ClInclude Include="simplePrimitive.h">
       <Filter>Header Files\frontend\opengl</Filter>
     </ClInclude>
-    <ClInclude Include="simpleUniform.h">
-      <Filter>Header Files\frontend\opengl</Filter>
-    </ClInclude>
     <ClInclude Include="simpleVertexBuffer.h">
       <Filter>Header Files\frontend\opengl</Filter>
     </ClInclude>
@@ -452,7 +452,7 @@
     <ClInclude Include="coordinateConverter.h">
       <Filter>Header Files\frontend\opengl</Filter>
     </ClInclude>
-    <ClInclude Include="brogueSceneBuilder.h">
+    <ClInclude Include="brogueProgramBuilder.h">
       <Filter>Header Files\frontend\opengl</Filter>
     </ClInclude>
     <ClInclude Include="button.h">
@@ -541,6 +541,12 @@
     </ClInclude>
     <ClInclude Include="randomRange.h">
       <Filter>Header Files\backend\model\game</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueColorQuad.h">
+      <Filter>Header Files\frontend\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleUniform.h">
+      <Filter>Header Files\frontend\opengl</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -640,31 +646,31 @@
     <None Include="..\resources\model\weapons.csv">
       <Filter>Resource Files\model</Filter>
     </None>
-    <None Include="..\resources\opengl\brogueBase.frag">
+    <None Include="..\resources\opengl\colorMask.frag">
       <Filter>Resource Files\opengl</Filter>
     </None>
-    <None Include="..\resources\opengl\brogueBase.vert">
-      <Filter>Resource Files\opengl</Filter>
-    </None>
-    <None Include="..\resources\opengl\brogueFrame.frag">
-      <Filter>Resource Files\opengl</Filter>
-    </None>
-    <None Include="..\resources\opengl\brogueFrame.vert">
+    <None Include="..\resources\opengl\colorMask.vert">
       <Filter>Resource Files\opengl</Filter>
     </None>
     <None Include="..\resources\resource-config.json">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\resources\opengl\brogueFlameMenu.frag">
+    <None Include="..\resources\opengl\diffuseColorUpward.vert">
+      <Filter>Resource Files\opengl\brogueFlameMenu</Filter>
+    </None>
+    <None Include="..\resources\opengl\diffuseColorUpward.frag">
+      <Filter>Resource Files\opengl\brogueFlameMenu</Filter>
+    </None>
+    <None Include="..\resources\opengl\mixFrameTextures.frag">
+      <Filter>Resource Files\opengl\brogueFlameMenu</Filter>
+    </None>
+    <None Include="..\resources\opengl\mixFrameTextures.vert">
+      <Filter>Resource Files\opengl\brogueFlameMenu</Filter>
+    </None>
+    <None Include="..\resources\opengl\backgroundColor.vert">
       <Filter>Resource Files\opengl</Filter>
     </None>
-    <None Include="..\resources\opengl\brogueFlameMenu.vert">
-      <Filter>Resource Files\opengl</Filter>
-    </None>
-    <None Include="..\resources\opengl\brogueFrameBlend.frag">
-      <Filter>Resource Files\opengl</Filter>
-    </None>
-    <None Include="..\resources\opengl\brogueFrameBlend.vert">
+    <None Include="..\resources\opengl\backgroundColor.frag">
       <Filter>Resource Files\opengl</Filter>
     </None>
   </ItemGroup>

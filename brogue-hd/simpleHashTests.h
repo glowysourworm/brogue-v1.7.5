@@ -114,12 +114,14 @@ namespace brogueHd::test
 		{
 			simpleHash<shaderResource, simpleString> shaders;
 
-			shaders.add(shaderResource::brogueBaseFrag, "brogueBaseFrag");
-			shaders.add(shaderResource::brogueBaseVert, "brogueBaseVert");
-			shaders.add(shaderResource::brogueFrameFrag, "brogueFrameFrag");
-			shaders.add(shaderResource::brogueFrameVert, "brogueFrameVert");
-			shaders.add(shaderResource::brogueFlameMenuFrag, "brogueFlameMenuFrag");
-			shaders.add(shaderResource::brogueFlameMenuVert, "brogueFlameMenuVert");
+			shaders.add(shaderResource::backgroundColorFrag, "backgroundColorFrag");
+			shaders.add(shaderResource::backgroundColorVert, "backgroundColorVert");
+			shaders.add(shaderResource::colorMaskFrag, "colorMaskFrag");
+			shaders.add(shaderResource::colorMaskVert, "colorMaskVert");
+			shaders.add(shaderResource::diffuseColorUpwardFrag, "diffuseColorUpwardFrag");
+			shaders.add(shaderResource::diffuseColorUpwardVert, "diffuseColorUpwardVert");
+			shaders.add(shaderResource::mixFrameTexturesFrag, "mixFrameTexturesFrag");
+			shaders.add(shaderResource::mixFrameTexturesVert, "mixFrameTexturesVert");
 
 			simpleHashTests* that = this;
 
@@ -127,40 +129,52 @@ namespace brogueHd::test
 			{
 				switch (key)
 				{
-				case shaderResource::brogueBaseFrag:
+				case shaderResource::backgroundColorFrag:
 					that->testAssert("Invalid Hash Key", [&value] ()
 					{
-						return value == "brogueBaseFrag";
+						return value == "backgroundColorFrag";
 					});
 					break;
-				case shaderResource::brogueBaseVert:
+				case shaderResource::backgroundColorVert:
 					that->testAssert("Invalid Hash Key", [&value] ()
 					{
-						return value == "brogueBaseVert";
+						return value == "backgroundColorVert";
 					});
 					break;
-				case shaderResource::brogueFrameFrag:
+				case shaderResource::colorMaskFrag:
 					that->testAssert("Invalid Hash Key", [&value] ()
 					{
-						return value == "brogueFrameFrag";
+						return value == "colorMaskFrag";
 					});
 					break;
-				case shaderResource::brogueFrameVert:
+				case shaderResource::colorMaskVert:
 					that->testAssert("Invalid Hash Key", [&value] ()
 					{
-						return value == "brogueFrameVert";
+						return value == "colorMaskVert";
 					});
 					break;
-				case shaderResource::brogueFlameMenuFrag:
+				case shaderResource::diffuseColorUpwardFrag:
 					that->testAssert("Invalid Hash Key", [&value] ()
 					{
-						return value == "brogueFlameMenuFrag";
+						return value == "diffuseColorUpwardFrag";
 					});
 					break;
-				case shaderResource::brogueFlameMenuVert:
+				case shaderResource::diffuseColorUpwardVert:
 					that->testAssert("Invalid Hash Key", [&value] ()
 					{
-						return value == "brogueFlameMenuVert";
+						return value == "diffuseColorUpwardVert";
+					});
+					break;
+				case shaderResource::mixFrameTexturesFrag:
+					that->testAssert("Invalid Hash Key", [&value] ()
+					{
+						return value == "mixFrameTexturesFrag";
+					});
+					break;
+				case shaderResource::mixFrameTexturesVert:
+					that->testAssert("Invalid Hash Key", [&value] ()
+					{
+						return value == "mixFrameTexturesVert";
 					});
 					break;
 				}

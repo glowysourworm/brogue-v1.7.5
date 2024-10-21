@@ -2,7 +2,9 @@
 
 #include "brogueGlobal.h"
 #include "simplePrimitive.h"
-#include "simpleList.h"
+#include "simpleGlData.h"
+#include "simpleUniform.h"
+#include "simpleArray.h"
 #include "simpleString.h"
 #include "shaderData.h"
 #include "simpleLogger.h"
@@ -22,7 +24,7 @@ namespace brogueHd::frontend::opengl
         simpleShader();
         simpleShader(const simpleShader& copy);
         simpleShader(const shaderData& data);
-        ~simpleShader(){};
+        ~simpleShader();
 
         void operator=(const simpleShader& copy);
 
@@ -61,10 +63,106 @@ namespace brogueHd::frontend::opengl
             return length > 0;
         }
 
+        template<isOpenGlUniform T>
+        uniformData getUniform(const simpleString& name)
+        {
+            for (int index = 0; index < _uniforms1i->count(); index++)
+            {
+                if (_uniforms1i->get(index).name == name)
+                    return uniformData(_uniforms1i->get(index));
+            }
+
+            for (int index = 0; index < _uniforms1->count(); index++)
+            {
+                if (_uniforms1->get(index).name == name)
+                    return uniformData(_uniforms1->get(index));
+            }
+
+            for (int index = 0; index < _uniforms2->count(); index++)
+            {
+                if (_uniforms2->get(index).name == name)
+                    return uniformData(_uniforms2->get(index));
+            }
+
+            for (int index = 0; index < _uniforms4->count(); index++)
+            {
+                if (_uniforms4->get(index).name == name)
+                    return uniformData(_uniforms4->get(index));
+            }
+
+            return nullptr;
+        }
+
+        template<isOpenGlUniform T>
+        uniformData getUniform(int index)
+        {
+            if (std::same_as<T, int>)
+                return uniformData(_uniforms1i->get(index));
+
+            else if (std::same_as<T, float>)
+                return uniformData(_uniforms1->get(index));
+
+            else if (std::same_as<T, vec2>)
+                return uniformData(_uniforms2->get(index));
+
+            else if (std::same_as<T, vec4>)
+                return uniformData(_uniforms4->get(index));
+
+            else
+                simpleException::show("Unhandled uniform type:  simpleShader.h");
+        }
+
+        template<isOpenGlUniform T>
+        int getUniformCount()
+        {
+            if (std::same_as<T, int>)
+                return _uniforms1i->count();
+
+            else if (std::same_as<T, float>)
+                return _uniforms1->count();
+
+            else if (std::same_as<T, vec2>)
+                return _uniforms2->count();
+
+            else if (std::same_as<T, vec4>)
+                return _uniforms4->count();
+
+            else
+                simpleException::show("Unhandled uniform type:  simpleShader.h");
+        }
+
+    public:
+
+        simpleArray<simpleUniform<int>> getUniforms1i() const
+        {
+            return *_uniforms1i;
+        }
+        simpleArray<simpleUniform<float>> getUniforms1() const
+        {
+            return *_uniforms1;
+        }
+        simpleArray<simpleUniform<vec2>> getUniforms2() const
+        {
+            return *_uniforms2;
+        }
+        simpleArray<simpleUniform<vec4>> getUniforms4() const
+        {
+            return *_uniforms4;
+        }
+
+    private:
+
+        void copyImpl(const simpleShader& copy);
+
     private:
 
         GLenum _shaderType;
         simpleString _source;
+
+        simpleArray<simpleUniform<int>>*    _uniforms1i;
+        simpleArray<simpleUniform<float>>*  _uniforms1;
+        simpleArray<simpleUniform<vec2>>*   _uniforms2;
+        simpleArray<simpleUniform<vec4>>*   _uniforms4;
     };
 
     simpleShader::simpleShader()
@@ -73,16 +171,23 @@ namespace brogueHd::frontend::opengl
         this->isCreated = false;
         this->isBound = false;
 
+        _uniforms1i = new simpleArray<simpleUniform<int>>();
+        _uniforms1 = new simpleArray<simpleUniform<float>>();
+        _uniforms2 = new simpleArray<simpleUniform<vec2>>();
+        _uniforms4 = new simpleArray<simpleUniform<vec4>>();
+
         _shaderType = NULL;
+    }
+    simpleShader::~simpleShader()
+    {
+        delete _uniforms1i;
+        delete _uniforms1;
+        delete _uniforms2;
+        delete _uniforms4;
     }
     simpleShader::simpleShader(const simpleShader& copy)
     {
-        this->handle = NULL;
-        this->isCreated = false;
-        this->isBound = false;
-
-        _shaderType = copy.getShaderType();
-        _source = copy.getSource();
+        copyImpl(copy);
     }
     simpleShader::simpleShader(const shaderData& data)
     {
@@ -90,14 +195,33 @@ namespace brogueHd::frontend::opengl
         this->isCreated = false;
         this->isBound = false;
 
-        _source = *(data.source);
+        _uniforms1i = new simpleArray<simpleUniform<int>>(data.uniforms1i.toArray());
+        _uniforms1 = new simpleArray<simpleUniform<float>>(data.uniforms1.toArray());
+        _uniforms2 = new simpleArray<simpleUniform<vec2>>(data.uniforms2.toArray());
+        _uniforms4 = new simpleArray<simpleUniform<vec4>>(data.uniforms4.toArray());
+
+        _source = data.source;
         _shaderType = data.type;
+    }
+
+    void simpleShader::copyImpl(const simpleShader& copy)
+    {
+        this->handle = NULL;
+        this->isCreated = false;
+        this->isBound = false;
+
+        _shaderType = copy.getShaderType();
+        _source = copy.getSource();
+
+        _uniforms1i = new simpleArray<simpleUniform<int>>(copy.getUniforms1i());
+        _uniforms1 = new simpleArray<simpleUniform<float>>(copy.getUniforms1());
+        _uniforms2 = new simpleArray<simpleUniform<vec2>>(copy.getUniforms2());
+        _uniforms4 = new simpleArray<simpleUniform<vec4>>(copy.getUniforms4());
     }
 
     void simpleShader::operator=(const simpleShader& copy)
     {
-        _shaderType = copy.getShaderType();
-        _source = copy.getSource();
+        copyImpl(copy);
     }
 
     void simpleShader::teardown()

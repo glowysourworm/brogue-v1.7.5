@@ -2,7 +2,7 @@
 
 #include "simplePrimitive.h"
 #include "simpleVertexArray.h"
-#include "simpleUniform.h"
+#include "simpleGlData.h"
 #include "simpleList.h"
 #include "simpleString.h"
 #include "simpleShader.h"
@@ -28,8 +28,6 @@ namespace brogueHd::frontend::opengl
         void draw(int bufferIndex);
         void drawAll();
 
-        template<typename T>
-        void bindUniform(simpleUniform<T> uniform);
         void bind(bool bind);
 
         void declareVAO(simpleVertexArray<float>* programVAO);
@@ -45,7 +43,12 @@ namespace brogueHd::frontend::opengl
         /// <param name="newBuffer">Data stream for the new buffer (old will be deleted)</param>
         void reBuffer(int vaoIndex, simpleDataStream<float>* newBuffer);
 
+        template<isOpenGlUniform T>
+        void bindUniform(const simpleString& name, T nextValue);
+
     private:
+
+        void bindUniforms();
 
         void checkStatus(const char* statusName, GLenum status, bool logOutput = true) const;
 
@@ -110,6 +113,9 @@ namespace brogueHd::frontend::opengl
 
             return iterationCallback::iterate;
         });
+
+        // Bind Uniforms (default values)
+        bindUniforms();
 
         // "Installs the program object as part of the current rendering state"
         glUseProgram(handle);
@@ -238,34 +244,117 @@ namespace brogueHd::frontend::opengl
         _programVAOs->add(programVAO);
     }
 
-    template<typename T>
-    void simpleShaderProgram::bindUniform(simpleUniform<T> uniform)
+    template<isOpenGlUniform T>
+    void simpleShaderProgram::bindUniform(const simpleString& name, T nextValue)
     {
-        //var uniformLocation = GL.GetUniformLocation(this.Handle, uniform.Name);
+        GLint location = -1;
 
-        //switch (uniform.Type)
-        //{
-        //case ActiveUniformType.FloatVec2:
-        //    var vector2 = (Vector2)Convert.ChangeType(uniform.Value, typeof(Vector2));
-        //    GL.Uniform2(uniformLocation, vector2);
-        //    break;
-        //case ActiveUniformType.FloatVec4:
-        //    var vector4 = (Vector4)Convert.ChangeType(uniform.Value, typeof(Vector4));
-        //    GL.Uniform4(uniformLocation, vector4);
-        //    break;
+        // Verify uniform is on this shader
+        if (_vertexShader.getUniform<T>(name) != nullptr)
+        {
+            // Keep track of the uniform value (probably not needed)
+            _vertexShader.getUniform<T>(name)->value = nextValue;
 
-        //    // Not sure about sampler declaration
-        //case ActiveUniformType.Sampler2D:
-        //    var textureIndex = (int)Convert.ChangeType(uniform.Value, typeof(int));
-        //    GL.Uniform1(uniformLocation, textureIndex);
-        //    break;
-        //case ActiveUniformType.Float:
-        //    var floatValue = (float)Convert.ChangeType(uniform.Value, typeof(float));
-        //    GL.Uniform1(uniformLocation, floatValue);
-        //    break;
-        //default:
-        //    throw new GLException("Unhandled Active Uniform Type:  GLShaderProgram.cs");
-        //}
+            location = glGetUniformLocation(this->handle, name.c_str());
+        }
+
+        else if (_fragmentShader.getUniform<T>(name) != nullptr)
+        {
+            // Keep track of the uniform value (probably not needed)
+            _fragmentShader.getUniform<T>(name)->value = nextValue;
+
+            location = glGetUniformLocation(this->handle, name.c_str());
+        }
+
+        if (location != -1)
+        {
+            if (std::same_as<T, int>)
+                glUniform1i(location, nextValue);
+
+            else if (std::same_as<T, float>)
+                glUniform1f(location, (float)nextValue);
+
+            else if (std::same_as<T, vec2>)
+            {
+                vec2 vector = static_cast<vec2>(nextValue);
+                glUniform2f(location, vector.x, vector.y);
+            }
+            else if (std::same_as<T, vec4>)
+            {
+                vec4 vector = static_cast<vec4>(nextValue);
+                glUniform4f(location, vector.x, vector.y, vector.z, vector.w);
+            }
+        }
+    }
+
+    void simpleShaderProgram::bindUniforms()
+    {
+        // Uniform data is stored in each shader
+        //
+
+        // Vertex Shaders: Uniform-1i
+        for (int index = 0; index < _vertexShader.getUniformCount<int>(); index++)
+        {
+            uniformData uniform = _vertexShader.getUniform<int>(index);
+            GLint location = glGetUniformLocation(this->handle, uniform.name.c_str());
+            glUniform1i(location, uniform.valueInt);
+        }
+
+        // Uniform-1 (1f)
+        for (int index = 0; index < _vertexShader.getUniformCount<float>(); index++)
+        {
+            uniformData uniform = _vertexShader.getUniform<float>(index);
+            GLint location = glGetUniformLocation(this->handle, uniform.name.c_str());
+            glUniform1f(location, uniform.valueFloat);
+        }
+
+        // Uniform-2 (2f)
+        for (int index = 0; index < _vertexShader.getUniformCount<vec2>(); index++)
+        {
+            uniformData uniform = _vertexShader.getUniform<vec2>(index);
+            GLint location = glGetUniformLocation(this->handle, uniform.name.c_str());
+            glUniform2f(location, uniform.valueVec2.x, uniform.valueVec2.y);
+        }
+
+        // Uniform-4 (4f)
+        for (int index = 0; index < _vertexShader.getUniformCount<vec4>(); index++)
+        {
+            uniformData uniform = _vertexShader.getUniform<vec4>(index);
+            GLint location = glGetUniformLocation(this->handle, uniform.name.c_str());
+            glUniform4f(location, uniform.valueVec4.x, uniform.valueVec4.y, uniform.valueVec4.z, uniform.valueVec4.w);
+        }
+
+        // Fragment Shaders:  Uniform 1i
+        for (int index = 0; index < _fragmentShader.getUniformCount<int>(); index++)
+        {
+            uniformData uniform = _fragmentShader.getUniform<int>(index);
+            GLint location = glGetUniformLocation(this->handle, uniform.name.c_str());
+            glUniform1i(location, uniform.valueInt);
+        }
+
+        // Uniform-1 (1f)
+        for (int index = 0; index < _fragmentShader.getUniformCount<float>(); index++)
+        {
+            uniformData uniform = _fragmentShader.getUniform<float>(index);
+            GLint location = glGetUniformLocation(this->handle, uniform.name.c_str());
+            glUniform1f(location, uniform.valueFloat);
+        }
+
+        // Uniform-2 (2f)
+        for (int index = 0; index < _fragmentShader.getUniformCount<vec2>(); index++)
+        {
+            uniformData uniform = _fragmentShader.getUniform<vec2>(index);
+            GLint location = glGetUniformLocation(this->handle, uniform.name.c_str());
+            glUniform2f(location, uniform.valueVec2.x, uniform.valueVec2.y);
+        }
+
+        // Uniform-4 (4f)
+        for (int index = 0; index < _fragmentShader.getUniformCount<vec4>(); index++)
+        {
+            uniformData uniform = _fragmentShader.getUniform<vec4>(index);
+            GLint location = glGetUniformLocation(this->handle, uniform.name.c_str());
+            glUniform4f(location, uniform.valueVec4.x, uniform.valueVec4.y, uniform.valueVec4.z, uniform.valueVec4.w);
+        }
     }
 
     void simpleShaderProgram::deleteProgram()

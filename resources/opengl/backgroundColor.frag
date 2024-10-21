@@ -5,9 +5,9 @@
 out vec4 outputColor;
 
 in vec2 currentVertex;
-in vec3 currentBackgroundColor;
+in vec4 currentBackgroundColor;
 
 void main()
 {
-    outputColor = vec4(currentBackgroundColor.x, currentBackgroundColor.y, currentBackgroundColor.z, 1.0);
+    outputColor = currentBackgroundColor;
 }

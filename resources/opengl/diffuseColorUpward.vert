@@ -5,11 +5,14 @@
 //
 layout (location = 0) in vec2 vertex;
 layout (location = 1) in vec2 texcoord;
+layout (location = 2) in vec4 backgroundColor;
+
 
 // Define a data type to be output by the shader to the next stages
 //
 out vec2 currentVertex;
-out vec2 currentTex;
+out vec2 currentTexture;
+out vec4 currentBackgroundColor;
 
 void main()
 {
@@ -26,5 +29,6 @@ void main()
     // Struct data should be copied over for use by the fragment shader
     //
     currentVertex = vertex;
-    currentTex = texcoord;
+    currentTexture = texcoord;
+    currentBackgroundColor = backgroundColor;
 }

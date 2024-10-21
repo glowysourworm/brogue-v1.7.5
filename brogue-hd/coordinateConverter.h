@@ -2,13 +2,78 @@
 
 #include "brogueGlobal.h"
 #include "simpleGlData.h"
+#include "brogueImageQuad.h"
+#include "brogueCellQuad.h"
+#include "brogueColorQuad.h"
 #include "gl.h"
 
 namespace brogueHd::frontend::opengl
 {
 	class coordinateConverter
 	{
+    protected:
+
+        // Not sure what to do with these yet
+        //
+        static const int QuadWidth = brogueCellDisplay::CellWidth;
+        static const int QuadHeight = brogueCellDisplay::CellHeight;
+
     public:
+
+        static brogueImageQuad createBrogueImageQuadScene(const brogueCellDisplay& cell, int column, int row, int sceneWidth, int sceneHeight)
+        {
+            int pixelX = column * coordinateConverter::QuadWidth;
+            int pixelY = row * coordinateConverter::QuadHeight;
+
+            simpleQuad quadXY = coordinateConverter::createQuadNormalizedXYScene(pixelX, pixelY, coordinateConverter::QuadWidth, coordinateConverter::QuadHeight, sceneWidth, sceneHeight);
+            simpleQuad quadUV = coordinateConverter::createQuadNormalizedUVScene(pixelX, pixelY, coordinateConverter::QuadWidth, coordinateConverter::QuadHeight, sceneWidth, sceneHeight);
+
+            return brogueImageQuad(quadXY, quadUV);
+        }
+
+        static brogueCellQuad createBrogueCellQuadScene(const brogueCellDisplay& cell, int column, int row, int sceneWidth, int sceneHeight)
+        {
+            int pixelX = column * coordinateConverter::QuadWidth;
+            int pixelY = row * coordinateConverter::QuadHeight;
+
+            simpleQuad quadXY = coordinateConverter::createQuadNormalizedXYScene(pixelX, pixelY, coordinateConverter::QuadWidth, coordinateConverter::QuadHeight, sceneWidth, sceneHeight);
+            simpleQuad quadUV = coordinateConverter::createQuadNormalizedUVScene(pixelX, pixelY, coordinateConverter::QuadWidth, coordinateConverter::QuadHeight, sceneWidth, sceneHeight);
+
+            return brogueCellQuad(cell, quadXY, quadUV);
+        }
+
+        static brogueColorQuad createBrogueColorQuadScene(const brogueCellDisplay& cell, int column, int row, int sceneWidth, int sceneHeight)
+        {
+            int pixelX = column * coordinateConverter::QuadWidth;
+            int pixelY = row * coordinateConverter::QuadHeight;
+
+            simpleQuad quadXY = coordinateConverter::createQuadNormalizedXYScene(pixelX, pixelY, coordinateConverter::QuadWidth, coordinateConverter::QuadHeight, sceneWidth, sceneHeight);
+            simpleQuad quadUV = coordinateConverter::createQuadNormalizedUVScene(pixelX, pixelY, coordinateConverter::QuadWidth, coordinateConverter::QuadHeight, sceneWidth, sceneHeight);
+
+            return brogueColorQuad(cell, quadXY);
+        }
+
+        static brogueImageQuad createBrogueImageQuadFrame(int offsetColumn, int offsetRow, int sceneWidth, int sceneHeight)
+        {
+            int pixelX = offsetColumn * coordinateConverter::QuadWidth;
+            int pixelY = offsetRow * coordinateConverter::QuadHeight;
+
+            simpleQuad quadXY = coordinateConverter::createQuadNormalizedXYScene(pixelX, pixelY, sceneWidth, sceneHeight, sceneWidth, sceneHeight);
+            simpleQuad quadUV = coordinateConverter::createQuadNormalizedUVScene(pixelX, pixelY, sceneWidth, sceneHeight, sceneWidth, sceneHeight);
+
+            return brogueImageQuad(quadXY, quadUV);
+        }
+
+        static brogueColorQuad createBrogueColorQuadFrame(color theColor, int offsetColumn, int offsetRow, int sceneWidth, int sceneHeight)
+        {
+            int pixelX = offsetColumn * coordinateConverter::QuadWidth;
+            int pixelY = offsetRow * coordinateConverter::QuadHeight;
+
+            simpleQuad quadXY = coordinateConverter::createQuadNormalizedXYScene(pixelX, pixelY, sceneWidth, sceneHeight, sceneWidth, sceneHeight);
+            simpleQuad quadUV = coordinateConverter::createQuadNormalizedUVScene(pixelX, pixelY, sceneWidth, sceneHeight, sceneWidth, sceneHeight);
+
+            return brogueColorQuad(theColor, quadXY);
+        }
 
         /// <summary>
         /// Converts from UI coordinates to XY-Normalized
@@ -63,7 +128,6 @@ namespace brogueHd::frontend::opengl
         /// <summary>
         /// Creates GLQuad from UI coordinates converting to UV-Normalized scene coordinates - used for texture overlays or post-processing
         /// </summary>
-        /// <param name="primitiveType">Eventual draw type for each primitive. e.g. GL_TRIANGLES</param>
         /// <param name="pixelX">UI Pixel X</param>
         /// <param name="pixelY">UI Pixel Y</param>
         /// <param name="sceneWidth">UI scene width</param>

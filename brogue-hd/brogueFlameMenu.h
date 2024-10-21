@@ -141,14 +141,31 @@ namespace brogueHd::frontend::ui
 		_heatSourcesLowRate = new grid<color*>(gridRect(0, 0, COLS, ROWS), gridRect(0, 0, COLS, ROWS));
 		_heatSourcesHighRate = new grid<color*>(gridRect(0, 0, COLS, ROWS), gridRect(0, 0, COLS, ROWS));
 
-		// Initialize the view
-		cycleHeatSources(_heatSourcesLowRate, this->FlameTitleColor1, this->FlameBottomColor1, this->FlameNoise);
-		cycleHeatSources(_heatSourcesHighRate, this->FlameTitleColor2, this->FlameBottomColor2, this->FlameNoise);
+		brogueFlameMenu* that = this;
 
-		for (int index = 0; index < _animationPeriodLowRate; index += _animationPeriodHighRate)
+		// Initialize the view
+		this->iterate([&that] (short column, short row, brogueCellDisplay* cell)
 		{
-			update(_animationPeriodLowRate);
-		}
+			if (that->isTheText(column, row))
+				cell->backColor = colors::blue();
+
+			else if (row == ROWS - 1)
+				cell->backColor = colors::red();
+
+			else
+				cell->backColor = color(0, 0, 0, 0);
+
+			return iterationCallback::iterate;
+		});
+
+		// 
+		//cycleHeatSources(_heatSourcesLowRate, this->FlameTitleColor1, this->FlameBottomColor1, this->FlameNoise);
+		//cycleHeatSources(_heatSourcesHighRate, this->FlameTitleColor2, this->FlameBottomColor2, this->FlameNoise);
+
+		//for (int index = 0; index < _animationPeriodLowRate; index += _animationPeriodHighRate)
+		//{
+		//	update(_animationPeriodLowRate);
+		//}
 	}
 	brogueFlameMenu::~brogueFlameMenu()
 	{

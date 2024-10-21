@@ -94,32 +94,32 @@ namespace brogueHd::backend::controller
 			// Parse the JSON file
 			nlohmann::json jsonConfig = nlohmann::json::parse(configuration.c_str());
 
-			simpleString baseVertSource = fileOperations::readFile(std::string(jsonConfig[brogueHd::ConfigBaseVertexShader]).c_str());
-			simpleString baseFragSource = fileOperations::readFile(std::string(jsonConfig[brogueHd::ConfigBaseFragmentShader]).c_str());
-			simpleString frameVertSource = fileOperations::readFile(std::string(jsonConfig[brogueHd::ConfigFrameVertexShader]).c_str());
-			simpleString frameFragSource = fileOperations::readFile(std::string(jsonConfig[brogueHd::ConfigFrameFragmentShader]).c_str());
-			simpleString frameBlendVertSource = fileOperations::readFile(std::string(jsonConfig[brogueHd::ConfigFrameBlendVertexShader]).c_str());
-			simpleString frameBlendFragSource = fileOperations::readFile(std::string(jsonConfig[brogueHd::ConfigFrameBlendFragmentShader]).c_str());
-			simpleString flameMenuVertSource = fileOperations::readFile(std::string(jsonConfig[brogueHd::ConfigFlameMenuVertexShader]).c_str());
-			simpleString flameMenuFragSource = fileOperations::readFile(std::string(jsonConfig[brogueHd::ConfigFlameMenuFragmentShader]).c_str());
+			simpleString colorMaskVertSource = fileOperations::readFile(std::string(jsonConfig[brogueHd::ConfigColorMaskVertShader]).c_str());
+			simpleString colorMaskFragSource = fileOperations::readFile(std::string(jsonConfig[brogueHd::ConfigColorMaskFragShader]).c_str());
+			simpleString backgroundColorVertSource = fileOperations::readFile(std::string(jsonConfig[brogueHd::ConfigBackgroundColorVertexShader]).c_str());
+			simpleString backgroundColorFragSource = fileOperations::readFile(std::string(jsonConfig[brogueHd::ConfigBackgroundColorFragmentShader]).c_str());
+			simpleString diffuseColorUpwardVertSource = fileOperations::readFile(std::string(jsonConfig[brogueHd::ConfigDiffuseColorUpwardVertexShader]).c_str());
+			simpleString diffuseColorUpwardFragSource = fileOperations::readFile(std::string(jsonConfig[brogueHd::ConfigDiffuseColorUpwardFragmentShader]).c_str());
+			simpleString mixFrameTexturesVertSource = fileOperations::readFile(std::string(jsonConfig[brogueHd::ConfigMixFrameTexturesVertexShader]).c_str());
+			simpleString mixFrameTexturesFragSource = fileOperations::readFile(std::string(jsonConfig[brogueHd::ConfigMixFrameTexturesFragmentShader]).c_str());
 
-			shaderData* baseVert = new shaderData(shaderResource::brogueBaseVert, GL_VERTEX_SHADER, baseVertSource);
-			shaderData* baseFrag = new shaderData(shaderResource::brogueBaseFrag, GL_FRAGMENT_SHADER, baseFragSource);
-			shaderData* frameVert = new shaderData(shaderResource::brogueFrameVert, GL_VERTEX_SHADER, frameVertSource);
-			shaderData* frameFrag = new shaderData(shaderResource::brogueFrameFrag, GL_FRAGMENT_SHADER, frameFragSource);
-			shaderData* frameBlendVert = new shaderData(shaderResource::brogueFrameBlendVert, GL_VERTEX_SHADER, frameBlendVertSource);
-			shaderData* frameBlendFrag = new shaderData(shaderResource::brogueFrameBlendFrag, GL_FRAGMENT_SHADER, frameBlendFragSource);
-			shaderData* flameMenuVert = new shaderData(shaderResource::brogueFlameMenuVert, GL_VERTEX_SHADER, flameMenuVertSource);
-			shaderData* flameMenuFrag = new shaderData(shaderResource::brogueFlameMenuFrag, GL_FRAGMENT_SHADER, flameMenuFragSource);
+			shaderData* colorMaskVert = new shaderData(shaderResource::colorMaskVert, GL_VERTEX_SHADER, colorMaskVertSource);
+			shaderData* colorMaskFrag = new shaderData(shaderResource::colorMaskFrag, GL_FRAGMENT_SHADER, colorMaskFragSource);
+			shaderData* backgroundColorVert = new shaderData(shaderResource::backgroundColorVert, GL_VERTEX_SHADER, backgroundColorVertSource);
+			shaderData* backgroundColorFrag = new shaderData(shaderResource::backgroundColorFrag, GL_FRAGMENT_SHADER, backgroundColorFragSource);
+			shaderData* diffuseColorUpwardVert = new shaderData(shaderResource::diffuseColorUpwardVert, GL_VERTEX_SHADER, diffuseColorUpwardVertSource);
+			shaderData* diffuseColorUpwardFrag = new shaderData(shaderResource::diffuseColorUpwardFrag, GL_FRAGMENT_SHADER, diffuseColorUpwardFragSource);
+			shaderData* mixFrameTexturesVert = new shaderData(shaderResource::mixFrameTexturesVert, GL_VERTEX_SHADER, mixFrameTexturesVertSource);
+			shaderData* mixFrameTexturesFrag = new shaderData(shaderResource::mixFrameTexturesFrag, GL_FRAGMENT_SHADER, mixFrameTexturesFragSource);
 
-			_shaderCache->add(shaderResource::brogueBaseVert, baseVert);
-			_shaderCache->add(shaderResource::brogueBaseFrag, baseFrag);
-			_shaderCache->add(shaderResource::brogueFrameVert, frameVert);
-			_shaderCache->add(shaderResource::brogueFrameFrag, frameFrag);
-			_shaderCache->add(shaderResource::brogueFrameBlendVert, frameBlendVert);
-			_shaderCache->add(shaderResource::brogueFrameBlendFrag, frameBlendFrag);
-			_shaderCache->add(shaderResource::brogueFlameMenuVert, flameMenuVert);
-			_shaderCache->add(shaderResource::brogueFlameMenuFrag, flameMenuFrag);
+			_shaderCache->add(shaderResource::colorMaskVert, colorMaskFrag);
+			_shaderCache->add(shaderResource::colorMaskFrag, colorMaskFrag);
+			_shaderCache->add(shaderResource::backgroundColorVert, backgroundColorVert);
+			_shaderCache->add(shaderResource::backgroundColorFrag, backgroundColorFrag);
+			_shaderCache->add(shaderResource::diffuseColorUpwardVert, diffuseColorUpwardVert);
+			_shaderCache->add(shaderResource::diffuseColorUpwardFrag, diffuseColorUpwardFrag);
+			_shaderCache->add(shaderResource::mixFrameTexturesVert, mixFrameTexturesVert);
+			_shaderCache->add(shaderResource::mixFrameTexturesFrag, mixFrameTexturesFrag);
 
 			return true;
 		}
