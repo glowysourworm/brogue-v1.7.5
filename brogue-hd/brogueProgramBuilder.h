@@ -47,6 +47,18 @@ namespace brogueHd::frontend::opengl
 		/// </summary>
 		static simpleDataStream<float>* createSceneDataStream(const brogueView* view, openglDataStreamType dataType)
 		{
+			return createSceneDataStream(view, dataType, [] (short column, short row, brogueCellDisplay* cell)
+			{
+				return true;
+			});
+		}
+
+		/// <summary>
+		/// (MEMORY!) The scene data is the data from a brogueView. Using quads, this data is streamed out to our simpleDataStream
+		/// object to hold for the GL backend calls.
+		/// </summary>
+		static simpleDataStream<float>* createSceneDataStream(const brogueView* view, openglDataStreamType dataType, gridPredicate<brogueCellDisplay*> inclusionPredicate)
+		{
 			// Starting with the raw data, build a simpleQuad data vector to pass to the simpleDataStream<float>
 			//
 			gridRect sceneBoundary = calculateBoundaryUI(view);
@@ -59,8 +71,11 @@ namespace brogueHd::frontend::opengl
 			// Iterator scope could be removed; but want to be able to handle the root issue. Should be able to copy data
 			// up the stack.
 			//
-			view->iterate([&sceneBoundary, &cellQuads, &colorQuads, &imageQuads, &view, &dataType](short column, short row, brogueCellDisplay* cell)
+			view->iterate([&sceneBoundary, &inclusionPredicate, &cellQuads, &colorQuads, &imageQuads, &view, &dataType](short column, short row, brogueCellDisplay* cell)
 			{
+				if (!inclusionPredicate(column, row, cell))
+					return iterationCallback::iterate;
+
 				switch (dataType)
 				{
 				case openglDataStreamType::brogueImageQuad:

@@ -43,8 +43,10 @@ namespace brogueHd::frontend::opengl
         /// <param name="newBuffer">Data stream for the new buffer (old will be deleted)</param>
         void reBuffer(int vaoIndex, simpleDataStream<float>* newBuffer);
 
-        template<isOpenGlUniform T>
-        void bindUniform(const simpleString& name, T nextValue);
+        void bindUniform1i(const simpleString& name, int uniformValue);
+        void bindUniform1(const simpleString& name, float uniformValue);
+        void bindUniform2(const simpleString& name, vec2 uniformValue);
+        void bindUniform4(const simpleString& name, vec4 uniformValue);
 
     private:
 
@@ -244,117 +246,91 @@ namespace brogueHd::frontend::opengl
         _programVAOs->add(programVAO);
     }
 
-    template<isOpenGlUniform T>
-    void simpleShaderProgram::bindUniform(const simpleString& name, T nextValue)
-    {
-        GLint location = -1;
-
-        // Verify uniform is on this shader
-        if (_vertexShader.getUniform<T>(name) != nullptr)
-        {
-            // Keep track of the uniform value (probably not needed)
-            _vertexShader.getUniform<T>(name)->value = nextValue;
-
-            location = glGetUniformLocation(this->handle, name.c_str());
-        }
-
-        else if (_fragmentShader.getUniform<T>(name) != nullptr)
-        {
-            // Keep track of the uniform value (probably not needed)
-            _fragmentShader.getUniform<T>(name)->value = nextValue;
-
-            location = glGetUniformLocation(this->handle, name.c_str());
-        }
-
-        if (location != -1)
-        {
-            if (std::same_as<T, int>)
-                glUniform1i(location, nextValue);
-
-            else if (std::same_as<T, float>)
-                glUniform1f(location, (float)nextValue);
-
-            else if (std::same_as<T, vec2>)
-            {
-                vec2 vector = static_cast<vec2>(nextValue);
-                glUniform2f(location, vector.x, vector.y);
-            }
-            else if (std::same_as<T, vec4>)
-            {
-                vec4 vector = static_cast<vec4>(nextValue);
-                glUniform4f(location, vector.x, vector.y, vector.z, vector.w);
-            }
-        }
-    }
-
     void simpleShaderProgram::bindUniforms()
     {
         // Uniform data is stored in each shader
         //
 
         // Vertex Shaders: Uniform-1i
-        for (int index = 0; index < _vertexShader.getUniformCount<int>(); index++)
+        for (int index = 0; index < _vertexShader.getUniform1iCount(); index++)
         {
-            uniformData uniform = _vertexShader.getUniform<int>(index);
-            GLint location = glGetUniformLocation(this->handle, uniform.name.c_str());
-            glUniform1i(location, uniform.valueInt);
+            simpleUniform<int> uniform = _vertexShader.getUniform1i(index);
+            bindUniform1i(uniform.name, uniform.value);
         }
 
         // Uniform-1 (1f)
-        for (int index = 0; index < _vertexShader.getUniformCount<float>(); index++)
+        for (int index = 0; index < _vertexShader.getUniform1Count(); index++)
         {
-            uniformData uniform = _vertexShader.getUniform<float>(index);
-            GLint location = glGetUniformLocation(this->handle, uniform.name.c_str());
-            glUniform1f(location, uniform.valueFloat);
+            simpleUniform<float> uniform = _vertexShader.getUniform1(index);
+            bindUniform1(uniform.name, uniform.value);
         }
 
         // Uniform-2 (2f)
-        for (int index = 0; index < _vertexShader.getUniformCount<vec2>(); index++)
+        for (int index = 0; index < _vertexShader.getUniform2Count(); index++)
         {
-            uniformData uniform = _vertexShader.getUniform<vec2>(index);
-            GLint location = glGetUniformLocation(this->handle, uniform.name.c_str());
-            glUniform2f(location, uniform.valueVec2.x, uniform.valueVec2.y);
+            simpleUniform<vec2> uniform = _vertexShader.getUniform2(index);
+            bindUniform2(uniform.name, uniform.value);
         }
 
         // Uniform-4 (4f)
-        for (int index = 0; index < _vertexShader.getUniformCount<vec4>(); index++)
+        for (int index = 0; index < _vertexShader.getUniform4Count(); index++)
         {
-            uniformData uniform = _vertexShader.getUniform<vec4>(index);
-            GLint location = glGetUniformLocation(this->handle, uniform.name.c_str());
-            glUniform4f(location, uniform.valueVec4.x, uniform.valueVec4.y, uniform.valueVec4.z, uniform.valueVec4.w);
+            simpleUniform<vec4> uniform = _vertexShader.getUniform4(index);
+            bindUniform4(uniform.name, uniform.value);
         }
 
         // Fragment Shaders:  Uniform 1i
-        for (int index = 0; index < _fragmentShader.getUniformCount<int>(); index++)
+        for (int index = 0; index < _fragmentShader.getUniform1iCount(); index++)
         {
-            uniformData uniform = _fragmentShader.getUniform<int>(index);
-            GLint location = glGetUniformLocation(this->handle, uniform.name.c_str());
-            glUniform1i(location, uniform.valueInt);
+            simpleUniform<int> uniform = _fragmentShader.getUniform1i(index);
+            bindUniform1i(uniform.name, uniform.value);
         }
 
         // Uniform-1 (1f)
-        for (int index = 0; index < _fragmentShader.getUniformCount<float>(); index++)
+        for (int index = 0; index < _fragmentShader.getUniform1Count(); index++)
         {
-            uniformData uniform = _fragmentShader.getUniform<float>(index);
-            GLint location = glGetUniformLocation(this->handle, uniform.name.c_str());
-            glUniform1f(location, uniform.valueFloat);
+            simpleUniform<float> uniform = _fragmentShader.getUniform1(index);
+            bindUniform1(uniform.name, uniform.value);
         }
 
         // Uniform-2 (2f)
-        for (int index = 0; index < _fragmentShader.getUniformCount<vec2>(); index++)
+        for (int index = 0; index < _fragmentShader.getUniform2Count(); index++)
         {
-            uniformData uniform = _fragmentShader.getUniform<vec2>(index);
-            GLint location = glGetUniformLocation(this->handle, uniform.name.c_str());
-            glUniform2f(location, uniform.valueVec2.x, uniform.valueVec2.y);
+            simpleUniform<vec2> uniform = _fragmentShader.getUniform2(index);
+            bindUniform2(uniform.name, uniform.value);
         }
 
         // Uniform-4 (4f)
-        for (int index = 0; index < _fragmentShader.getUniformCount<vec4>(); index++)
+        for (int index = 0; index < _fragmentShader.getUniform4Count(); index++)
         {
-            uniformData uniform = _fragmentShader.getUniform<vec4>(index);
-            GLint location = glGetUniformLocation(this->handle, uniform.name.c_str());
-            glUniform4f(location, uniform.valueVec4.x, uniform.valueVec4.y, uniform.valueVec4.z, uniform.valueVec4.w);
+            simpleUniform<vec4> uniform = _fragmentShader.getUniform4(index);
+            bindUniform4(uniform.name, uniform.value);
         }
+    }
+    
+    void simpleShaderProgram::bindUniform1i(const simpleString& name, int uniformValue)
+    {
+        GLint location = glGetUniformLocation(this->handle, name.c_str());
+
+        glUniform1i(location, uniformValue);
+    }
+    void simpleShaderProgram::bindUniform1(const simpleString& name, float uniformValue)
+    {
+        GLint location = glGetUniformLocation(this->handle, name.c_str());
+
+        glUniform1f(location, uniformValue);
+    }
+    void simpleShaderProgram::bindUniform2(const simpleString& name, vec2 uniformValue)
+    {
+        GLint location = glGetUniformLocation(this->handle, name.c_str());
+
+        glUniform2f(location, uniformValue.x, uniformValue.y);
+    }
+    void simpleShaderProgram::bindUniform4(const simpleString& name, vec4 uniformValue)
+    {
+        GLint location = glGetUniformLocation(this->handle, name.c_str());
+
+        glUniform4f(location, uniformValue.x, uniformValue.y, uniformValue.z, uniformValue.w);
     }
 
     void simpleShaderProgram::deleteProgram()

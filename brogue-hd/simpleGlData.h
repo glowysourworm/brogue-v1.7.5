@@ -65,6 +65,15 @@ namespace brogueHd::frontend::opengl
 			y = other.y;
 		}
 
+		bool operator==(const vec2& other)
+		{
+			return compare(other);
+		}
+		bool operator!=(const vec2& other)
+		{
+			return !compare(other);
+		}
+
 		int getElementSize(GLenum primitiveType) const override
 		{
 			switch (primitiveType)
@@ -97,6 +106,12 @@ namespace brogueHd::frontend::opengl
 		size_t getHash() const override
 		{
 			return hashGenerator::generateHash(x, y);
+		}
+	private:
+
+		bool compare(const vec2& other)
+		{
+			return x == other.x && y == other.y;
 		}
 	};
 
@@ -200,6 +215,16 @@ namespace brogueHd::frontend::opengl
 			w = other.w;
 			z = other.z;
 		}
+		bool operator==(const vec4& other) const
+		{
+			return compare(other);
+		}
+		bool operator!=(const vec4& other) const
+		{
+			return !compare(other);
+		}
+
+
 		int getElementSize(GLenum primitiveType) const override
 		{
 			switch (primitiveType)
@@ -233,6 +258,16 @@ namespace brogueHd::frontend::opengl
 		size_t getHash() const override
 		{
 			return hashGenerator::generateHash(x, y, z, w);
+		}
+
+	private:
+
+		bool compare(const vec4& other) const
+		{
+			return x == other.x &&
+				   y == other.y &&
+				   z == other.z &&
+				   w == other.w;
 		}
 	};
 

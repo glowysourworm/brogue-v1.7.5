@@ -83,7 +83,14 @@ namespace brogueHd::frontend::opengl
 
 		shaderData* colorMaskVert = resourceController->getShader(shaderResource::colorMaskVert);
 		shaderData* colorMaskFrag = resourceController->getShader(shaderResource::colorMaskFrag);
-		simpleDataStream<float>* colorMaskDataStream = brogueProgramBuilder::createSceneDataStream(mainMenu, openglDataStreamType::brogueColorQuad);
+
+		// Title Text Mask
+		//
+		simpleDataStream<float>* colorMaskDataStream = brogueProgramBuilder::createSceneDataStream(mainMenu, openglDataStreamType::brogueColorQuad, 
+		[&mainMenu](short column, short row, brogueCellDisplay* cell)
+		{
+			return mainMenu->isTheText(column, row) || row == mainMenu->getBoundary().bottom();
+		});
 
 		shaderData* diffuseUpwardVert = resourceController->getShader(shaderResource::diffuseColorUpwardVert);
 		shaderData* diffuseUpwardFrag = resourceController->getShader(shaderResource::diffuseColorUpwardFrag);
@@ -178,6 +185,11 @@ namespace brogueHd::frontend::opengl
 		// Render Output
 		_frameProgram->bind(true);
 		_frameProgram->drawAll();
+
+		// Mask Output
+		_titleMaskProgram->bind(true);
+		_titleMaskProgram->bindUniform4("maskColor", vec4(0, 0, 0, 0));
+		_titleMaskProgram->drawAll();
 
 
 		//glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

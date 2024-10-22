@@ -67,6 +67,7 @@ namespace brogueHd::simple
 		bool areAllWhere(simpleArrayPredicate<T> predicate);
 
 		bool contains(T item);
+		bool any(simpleArrayPredicate<T> predicate);
 
 		template<typename TResult>
 		TResult aggregate(TResult& seedValue, simpleArrayAggregate<T, TResult> aggregator);
@@ -355,6 +356,19 @@ namespace brogueHd::simple
 		{
 			// Comparable T
 			if (item == _array[index])
+				return true;
+		}
+
+		return false;
+	}
+
+
+	template<isHashable T>
+	bool simpleArray<T>::any(simpleArrayPredicate<T> predicate)
+	{
+		for (int index = 0; index < _count; index++)
+		{
+			if (predicate(_array[index]))
 				return true;
 		}
 

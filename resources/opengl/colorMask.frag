@@ -11,9 +11,5 @@ uniform vec4 maskColor;
 
 void main()
 {
-    if (currentBackgroundColor == maskColor)
-        outputColor = vec4(0,0,0,0);
-
-    else
-        outputColor = currentBackgroundColor;
+    outputColor = maskColor;
 }

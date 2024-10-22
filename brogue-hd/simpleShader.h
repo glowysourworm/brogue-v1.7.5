@@ -64,68 +64,86 @@ namespace brogueHd::frontend::opengl
         }
 
         template<isOpenGlUniform T>
-        uniformData getUniform(const simpleString& name)
-        {
-            for (int index = 0; index < _uniforms1i->count(); index++)
-            {
-                if (_uniforms1i->get(index).name == name)
-                    return uniformData(_uniforms1i->get(index));
-            }
-
-            for (int index = 0; index < _uniforms1->count(); index++)
-            {
-                if (_uniforms1->get(index).name == name)
-                    return uniformData(_uniforms1->get(index));
-            }
-
-            for (int index = 0; index < _uniforms2->count(); index++)
-            {
-                if (_uniforms2->get(index).name == name)
-                    return uniformData(_uniforms2->get(index));
-            }
-
-            for (int index = 0; index < _uniforms4->count(); index++)
-            {
-                if (_uniforms4->get(index).name == name)
-                    return uniformData(_uniforms4->get(index));
-            }
-
-            return nullptr;
-        }
-
-        template<isOpenGlUniform T>
-        uniformData getUniform(int index)
+        bool hasUniform(const simpleString& name)
         {
             if (std::same_as<T, int>)
-                return uniformData(_uniforms1i->get(index));
+                return _uniforms1i->any([&name] (simpleUniform<int> item)
+                {
+                    item.name == name;
+                });
 
             else if (std::same_as<T, float>)
-                return uniformData(_uniforms1->get(index));
+                return _uniforms1->any([&name] (simpleUniform<float> item)
+                {
+                    item.name == name;
+                });
 
             else if (std::same_as<T, vec2>)
-                return uniformData(_uniforms2->get(index));
+                return _uniforms2->any([&name] (simpleUniform<vec2> item)
+                {
+                    item.name == name;
+                });
 
             else if (std::same_as<T, vec4>)
-                return uniformData(_uniforms4->get(index));
+                return _uniforms4->any([&name] (simpleUniform<vec4> item)
+                {
+                    item.name == name;
+                });
 
             else
-                simpleException::show("Unhandled uniform type:  simpleShader.h");
+                simpleException::show("Unhandled uniform type simpleShader.h");
+
+            return false;
+        }
+
+        int getUniform1iCount() const
+        {
+            return _uniforms1i->count();
+        }
+        int getUniform1Count() const
+        {
+            return _uniforms1->count();
+        }
+        int getUniform2Count() const
+        {
+            return _uniforms2->count();
+        }
+        int getUniform4Count() const
+        {
+            return _uniforms4->count();
+        }
+
+        simpleUniform<int> getUniform1i(int index) const
+        {
+            return _uniforms1i->get(index);
+        }
+        simpleUniform<float> getUniform1(int index) const
+        {
+            return _uniforms1->get(index);
+        }
+        simpleUniform<vec2> getUniform2(int index) const
+        {
+            return _uniforms2->get(index);
+        }
+        simpleUniform<vec4> getUniform4(int index) const
+        {
+            return _uniforms4->get(index);
         }
 
         template<isOpenGlUniform T>
-        int getUniformCount()
+        simpleUniform<T> getUniform(int index) const
         {
             if (std::same_as<T, int>)
-                return _uniforms1i->count();
-
+                return getUniform1i(index);
+                
             else if (std::same_as<T, float>)
-                return _uniforms1->count();
+                return getUniform1(index);
 
             else if (std::same_as<T, vec2>)
-                return _uniforms2->count();
+                return getUniform2(index);
 
             else if (std::same_as<T, vec4>)
-                return _uniforms4->count();
+                return getUniform4(index);
 
             else
                 simpleException::show("Unhandled uniform type:  simpleShader.h");
