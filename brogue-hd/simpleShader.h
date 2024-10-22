@@ -23,7 +23,7 @@ namespace brogueHd::frontend::opengl
     public:
         simpleShader();
         simpleShader(const simpleShader& copy);
-        simpleShader(const shaderData& data);
+        simpleShader(shaderData* data);
         ~simpleShader();
 
         void operator=(const simpleShader& copy);
@@ -189,19 +189,19 @@ namespace brogueHd::frontend::opengl
     {
         copyImpl(copy);
     }
-    simpleShader::simpleShader(const shaderData& data)
+    simpleShader::simpleShader(shaderData* data)
     {
         this->handle = NULL;
         this->isCreated = false;
         this->isBound = false;
 
-        _uniforms1i = new simpleArray<simpleUniform<int>>(data.uniforms1i.toArray());
-        _uniforms1 = new simpleArray<simpleUniform<float>>(data.uniforms1.toArray());
-        _uniforms2 = new simpleArray<simpleUniform<vec2>>(data.uniforms2.toArray());
-        _uniforms4 = new simpleArray<simpleUniform<vec4>>(data.uniforms4.toArray());
+        _uniforms1i = new simpleArray<simpleUniform<int>>(data->uniforms1i.toArray());
+        _uniforms1 = new simpleArray<simpleUniform<float>>(data->uniforms1.toArray());
+        _uniforms2 = new simpleArray<simpleUniform<vec2>>(data->uniforms2.toArray());
+        _uniforms4 = new simpleArray<simpleUniform<vec4>>(data->uniforms4.toArray());
 
-        _source = data.source;
-        _shaderType = data.type;
+        _source = data->source;
+        _shaderType = data->type;
     }
 
     void simpleShader::copyImpl(const simpleShader& copy)

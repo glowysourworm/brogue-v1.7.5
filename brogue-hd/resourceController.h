@@ -68,7 +68,7 @@ namespace brogueHd::backend::controller
 		/// <summary>
 		/// Gets shader data from the resource controller
 		/// </summary>
-		shaderData getShader(shaderResource resource);
+		shaderData* getShader(shaderResource resource);
 	
 	private:
 
@@ -112,7 +112,7 @@ namespace brogueHd::backend::controller
 			shaderData* mixFrameTexturesVert = new shaderData(shaderResource::mixFrameTexturesVert, GL_VERTEX_SHADER, mixFrameTexturesVertSource);
 			shaderData* mixFrameTexturesFrag = new shaderData(shaderResource::mixFrameTexturesFrag, GL_FRAGMENT_SHADER, mixFrameTexturesFragSource);
 
-			_shaderCache->add(shaderResource::colorMaskVert, colorMaskFrag);
+			_shaderCache->add(shaderResource::colorMaskVert, colorMaskVert);
 			_shaderCache->add(shaderResource::colorMaskFrag, colorMaskFrag);
 			_shaderCache->add(shaderResource::backgroundColorVert, backgroundColorVert);
 			_shaderCache->add(shaderResource::backgroundColorFrag, backgroundColorFrag);
@@ -132,9 +132,9 @@ namespace brogueHd::backend::controller
 		return false;
 	}
 
-	shaderData resourceController::getShader(shaderResource resource)
+	shaderData* resourceController::getShader(shaderResource resource)
 	{
-		return *_shaderCache->get(resource);
+		return _shaderCache->get(resource);
 	}
 
 	brogueScoresFile* resourceController::getHighScores(short& mostRecentLineNumber)

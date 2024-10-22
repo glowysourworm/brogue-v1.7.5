@@ -147,31 +147,39 @@ namespace brogueHd::frontend::opengl
 		{
 			gridRect sceneBoundary = calculateBoundaryUI(view);
 
-			simpleGlData frameData;
-
-			switch (dataType)
-			{
-			case openglDataStreamType::brogueImageQuad:
-				frameData = coordinateConverter::createBrogueImageQuadFrame(0, 0, sceneBoundary.width, sceneBoundary.height);
-				break;
-			case openglDataStreamType::brogueColorQuad:
-				frameData = coordinateConverter::createBrogueColorQuadFrame(colors::black(), 0, 0, sceneBoundary.width, sceneBoundary.height);
-				break;
-			case openglDataStreamType::brogueCellQuad:
-			default:
-				simpleException::show("Unhandled openglDataStreamType:  brogueProgramBuilder.h");
-			}
+			simpleDataStream<float>* dataStream = nullptr;
 
 			// Create Scene Data Streams
 
 			// Element Size:   Total number of primitives (floats) to commit to the stream
 			// Element Length: Total number of elements as seen by OpenGL - depends on the drawing type
 			//
-			
-			simpleDataStream<float>* dataStream = new simpleDataStream<float>(1, frameData.getElementSize(GL_TRIANGLES), frameData.getStreamSize(GL_TRIANGLES));
+			// Issues with polymorphism (simpleGlData)
+			//
+			switch (dataType)
+			{
+			case openglDataStreamType::brogueImageQuad:
+			{
+				brogueImageQuad imageQuad = coordinateConverter::createBrogueImageQuadFrame(0, 0, sceneBoundary.width, sceneBoundary.height);
 
-			// Transfer data to the stream
-			frameData.streamBuffer(GL_TRIANGLES, dataStream);
+				dataStream = new simpleDataStream<float>(1, imageQuad.getElementSize(GL_TRIANGLES), imageQuad.getStreamSize(GL_TRIANGLES));
+
+				imageQuad.streamBuffer(GL_TRIANGLES, dataStream);
+			}
+			break;
+			case openglDataStreamType::brogueColorQuad:
+			{
+				brogueColorQuad colorQuad = coordinateConverter::createBrogueColorQuadFrame(colors::black(), 0, 0, sceneBoundary.width, sceneBoundary.height);
+
+				dataStream = new simpleDataStream<float>(1, colorQuad.getElementSize(GL_TRIANGLES), colorQuad.getStreamSize(GL_TRIANGLES));
+
+				colorQuad.streamBuffer(GL_TRIANGLES, dataStream);
+			}
+			break;
+			case openglDataStreamType::brogueCellQuad:
+			default:
+				simpleException::show("Unhandled openglDataStreamType:  brogueProgramBuilder.h");
+			}
 
 			return dataStream;
 		}
@@ -180,8 +188,8 @@ namespace brogueHd::frontend::opengl
 		/// (MEMORY!) Creates program for rendering the scene's data to a buffer on the GL backend
 		/// </summary>
 		static simpleShaderProgram* createShaderProgram(simpleDataStream<float>* sceneDataStream,
-														const shaderData& vertexData,
-														const shaderData& fragmentData)
+														shaderData* vertexData,
+														shaderData* fragmentData)
 		{
 			// Create Shaders
 			simpleShader vertexShader(vertexData);
@@ -193,12 +201,12 @@ namespace brogueHd::frontend::opengl
 
 			// These are very similar data structures; but please leave this transfer until the GL backend is better understood
 			//
-			simpleList<simpleVertexAttribute> vertexAttributes = vertexData.attributes.select<simpleVertexAttribute>([](vertexAttributeData data)
+			simpleList<simpleVertexAttribute> vertexAttributes = vertexData->attributes.select<simpleVertexAttribute>([](vertexAttributeData data)
 			{
 				return simpleVertexAttribute(data.index, data.name, data.type);
 			});
 
-			simpleList<simpleVertexAttribute> fragmentAttributes = fragmentData.attributes.select<simpleVertexAttribute>([](vertexAttributeData data)
+			simpleList<simpleVertexAttribute> fragmentAttributes = fragmentData->attributes.select<simpleVertexAttribute>([](vertexAttributeData data)
 			{
 				return simpleVertexAttribute(data.index, data.name, data.type);
 			});
