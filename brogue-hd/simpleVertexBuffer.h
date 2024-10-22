@@ -153,6 +153,7 @@ namespace brogueHd::frontend::opengl
                 glNormalized = false;
                 currentOffset = 4 * sizeof(float);
             }
+            break;
             case GL_FLOAT_VEC3:
             {
                 attributeSize = 3;

@@ -114,11 +114,11 @@ namespace brogueHd::frontend::opengl
             return iterationCallback::iterate;
         });
 
-        // Bind Uniforms (default values)
-        bindUniforms();
-
         // "Installs the program object as part of the current rendering state"
         glUseProgram(handle);
+
+        // Bind Uniforms (default values)
+        bindUniforms();
 
         _isCompiled = true;
         this->isBound = true;

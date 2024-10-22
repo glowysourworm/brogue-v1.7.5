@@ -31,10 +31,10 @@ namespace brogueHd::frontend::opengl
 		{
 			bool errors = _heatSourceProgram->hasErrors();
 
-			errors |= _heatDiffuseProgram->hasErrors();
-			errors |= _titleMaskProgram->hasErrors();
-			errors |= _frameProgram->hasErrors();
-			errors |= _frameCopyProgram->hasErrors();
+			//errors |= _heatDiffuseProgram->hasErrors();
+			//errors |= _titleMaskProgram->hasErrors();
+			//errors |= _frameProgram->hasErrors();
+			//errors |= _frameCopyProgram->hasErrors();
 
 			return errors;
 		}
@@ -81,32 +81,32 @@ namespace brogueHd::frontend::opengl
 		shaderData backgroundColorFrag = resourceController->getShader(shaderResource::backgroundColorFrag);
 		simpleDataStream<float>* backgroundColorDataStream = brogueProgramBuilder::createSceneDataStream(mainMenu, openglDataStreamType::brogueColorQuad);
 
-		shaderData colorMaskVert = resourceController->getShader(shaderResource::colorMaskVert);
-		shaderData colorMaskFrag = resourceController->getShader(shaderResource::colorMaskFrag);
-		simpleDataStream<float>* colorMaskDataStream = brogueProgramBuilder::createSceneDataStream(mainMenu, openglDataStreamType::brogueColorQuad);
+		//shaderData colorMaskVert = resourceController->getShader(shaderResource::colorMaskVert);
+		//shaderData colorMaskFrag = resourceController->getShader(shaderResource::colorMaskFrag);
+		//simpleDataStream<float>* colorMaskDataStream = brogueProgramBuilder::createSceneDataStream(mainMenu, openglDataStreamType::brogueColorQuad);
 
-		shaderData diffuseUpwardVert = resourceController->getShader(shaderResource::diffuseColorUpwardVert);
-		shaderData diffuseUpwardFrag = resourceController->getShader(shaderResource::diffuseColorUpwardFrag);
-		simpleDataStream<float>* diffuseUpwardDataStream = brogueProgramBuilder::createSceneDataStream(mainMenu, openglDataStreamType::brogueCellQuad);
+		//shaderData diffuseUpwardVert = resourceController->getShader(shaderResource::diffuseColorUpwardVert);
+		//shaderData diffuseUpwardFrag = resourceController->getShader(shaderResource::diffuseColorUpwardFrag);
+		//simpleDataStream<float>* diffuseUpwardDataStream = brogueProgramBuilder::createSceneDataStream(mainMenu, openglDataStreamType::brogueCellQuad);
 
-		shaderData mixTexturesVert = resourceController->getShader(shaderResource::mixFrameTexturesVert);
-		shaderData mixTexturesFrag = resourceController->getShader(shaderResource::mixFrameTexturesFrag);
-		simpleDataStream<float>* mixTexturesDataStream = brogueProgramBuilder::createFrameDataStream(mainMenu, openglDataStreamType::brogueImageQuad);
+		//shaderData mixTexturesVert = resourceController->getShader(shaderResource::mixFrameTexturesVert);
+		//shaderData mixTexturesFrag = resourceController->getShader(shaderResource::mixFrameTexturesFrag);
+		//simpleDataStream<float>* mixTexturesDataStream = brogueProgramBuilder::createFrameDataStream(mainMenu, openglDataStreamType::brogueImageQuad);
 
-		// Reuse background color shaders - make a new frame data stream for the frame copy
-		simpleDataStream<float>* backgroundColorFrameCopyStream = brogueProgramBuilder::createFrameDataStream(mainMenu, openglDataStreamType::brogueColorQuad);
+		//// Reuse background color shaders - make a new frame data stream for the frame copy
+		//simpleDataStream<float>* backgroundColorFrameCopyStream = brogueProgramBuilder::createFrameDataStream(mainMenu, openglDataStreamType::brogueColorQuad);
 
 		// (MEMORY!)
-		_frameCopyProgram = brogueProgramBuilder::createShaderProgram(backgroundColorFrameCopyStream, backgroundColorVert, backgroundColorFrag);
+		//_frameCopyProgram = brogueProgramBuilder::createShaderProgram(backgroundColorFrameCopyStream, backgroundColorVert, backgroundColorFrag);
 		_heatSourceProgram = brogueProgramBuilder::createShaderProgram(backgroundColorDataStream, backgroundColorVert, backgroundColorFrag);
-		_heatDiffuseProgram = brogueProgramBuilder::createShaderProgram(diffuseUpwardDataStream, diffuseUpwardVert, diffuseUpwardFrag);
-		_titleMaskProgram = brogueProgramBuilder::createShaderProgram(colorMaskDataStream, colorMaskVert, colorMaskFrag);
-		_frameProgram = brogueProgramBuilder::createShaderProgram(mixTexturesDataStream, mixTexturesVert, mixTexturesFrag);
+		//_heatDiffuseProgram = brogueProgramBuilder::createShaderProgram(diffuseUpwardDataStream, diffuseUpwardVert, diffuseUpwardFrag);
+		//_titleMaskProgram = brogueProgramBuilder::createShaderProgram(colorMaskDataStream, colorMaskVert, colorMaskFrag);
+		//_frameProgram = brogueProgramBuilder::createShaderProgram(mixTexturesDataStream, mixTexturesVert, mixTexturesFrag);
 
-		_frameTexture0 = new simpleTexture(NULL, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE0, GL_BGRA, GL_UNSIGNED_BYTE);
-		_frameTexture1 = new simpleTexture(NULL, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE1, GL_BGRA, GL_UNSIGNED_BYTE);
+		//_frameTexture0 = new simpleTexture(NULL, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE0, GL_BGRA, GL_UNSIGNED_BYTE);
+		//_frameTexture1 = new simpleTexture(NULL, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE1, GL_BGRA, GL_UNSIGNED_BYTE);
 
-		_frameBuffer = new simpleFrameBuffer(sceneBoundaryUI.width, sceneBoundaryUI.height);
+		//_frameBuffer = new simpleFrameBuffer(sceneBoundaryUI.width, sceneBoundaryUI.height);
 
 		_sceneBoundaryUI = new gridRect(sceneBoundaryUI);
 	}
@@ -129,8 +129,8 @@ namespace brogueHd::frontend::opengl
 		if (!this->isCompiled)
 			simpleException::show("Must first call IGLProgram.Compile() before using the GL program");
 
-		if (!_frameBuffer->isReady())
-			simpleException::show("Framebuffer status not ready for drawing!");
+		//if (!_frameBuffer->isReady())
+		//	simpleException::show("Framebuffer status not ready for drawing!");
 
 		// Procedure:  
 		//
@@ -155,18 +155,18 @@ namespace brogueHd::frontend::opengl
 		//GL.ClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
 		// Switch to Frame Buffer 1
-		_frameBuffer->bind(true);
+		//_frameBuffer->bind(true);
 
 		// Activate Color Attachment 0
-		glDrawBuffer(GL_COLOR_ATTACHMENT0);
+		//glDrawBuffer(GL_COLOR_ATTACHMENT0);
 
 		// Render the scene -> Color Attachment 0
 		_heatSourceProgram->bind(true);
 		_heatSourceProgram->drawAll();
 
-		_frameBuffer->bind(false);
-		_frameProgram->bind(true);
-		_frameProgram->drawAll();
+		//_frameBuffer->bind(false);
+		//_frameProgram->bind(true);
+		//_frameProgram->drawAll();
 
 
 
@@ -222,20 +222,20 @@ namespace brogueHd::frontend::opengl
 		_heatSourceProgram->compile();
 		//_heatDiffuseProgram->compile();
 		//_titleMaskProgram->compile();
-		_frameProgram->compile();
+		//_frameProgram->compile();
 
-		// Frame Copy Program:  Draws data directly from the previous draw pass.
+		//// Frame Copy Program:  Draws data directly from the previous draw pass.
 
-		// Create the textures:  Texture 1 is used for the direct drawing, Texture 0 for the "color diffusion"
-		//_frameTexture0->glCreate(_heatDiffuseProgram->getHandle());
-		_frameTexture1->glCreate(_heatSourceProgram->getHandle());
+		//// Create the textures:  Texture 1 is used for the direct drawing, Texture 0 for the "color diffusion"
+		////_frameTexture0->glCreate(_heatDiffuseProgram->getHandle());
+		//_frameTexture1->glCreate(_heatSourceProgram->getHandle());
 
-		// Create Frame buffer:  Uses scene program to render to the frame buffer attached texture
-		_frameBuffer->glCreate(_frameProgram->getHandle());
+		//// Create Frame buffer:  Uses scene program to render to the frame buffer attached texture
+		//_frameBuffer->glCreate(_frameProgram->getHandle());
 
-		// Attach texture to frame buffer
-		_frameBuffer->attachTexture(_frameTexture0->getHandle(), GL_COLOR_ATTACHMENT0);
-		_frameBuffer->attachRenderBuffer();
+		//// Attach texture to frame buffer
+		//_frameBuffer->attachTexture(_frameTexture0->getHandle(), GL_COLOR_ATTACHMENT0);
+		//_frameBuffer->attachRenderBuffer();
 
 		//_frameBuffer1->attachTexture(_frameBufferTexture1->getHandle(), GL_COLOR_ATTACHMENT1);
 		//_frameBuffer1->attachRenderBuffer();

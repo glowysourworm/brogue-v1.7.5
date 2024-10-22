@@ -9,8 +9,6 @@ namespace brogueHd::frontend::opengl
 {
 	struct brogueCellQuad : simpleGlData
 	{
-
-	public:
 		brogueCellQuad()
 		{
 			vertexCoordinates = default_value::value<simpleQuad>();
@@ -37,7 +35,7 @@ namespace brogueHd::frontend::opengl
 			copyImpl(copy);
 		}
 
-		int getElementSize(GLenum primitiveType) override
+		int getElementSize(GLenum primitiveType) const override
 		{	
 			// Total # of calls to the shader
 			switch (primitiveType)
@@ -49,7 +47,7 @@ namespace brogueHd::frontend::opengl
 				break;
 			}
 		}
-		int getStreamSize(GLenum primitiveType) override
+		int getStreamSize(GLenum primitiveType) const override
 		{
 			// Total # of floats
 			switch (primitiveType)
@@ -61,7 +59,7 @@ namespace brogueHd::frontend::opengl
 				break;
 			}
 		}
-		void streamBuffer(GLenum primitiveType, simpleDataStream<float>& outputStream) override
+		void streamBuffer(GLenum primitiveType, simpleDataStream<float>* outputStream) const override
 		{
 			switch (primitiveType)
 			{

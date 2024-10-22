@@ -29,6 +29,12 @@ namespace brogueHd::frontend::opengl
             this->source = copy.source;
             this->resource = copy.resource;
             this->type = copy.type;
+
+            this->attributes = copy.attributes;
+            this->uniforms1 = copy.uniforms1;
+            this->uniforms1i = copy.uniforms1i;
+            this->uniforms2 = copy.uniforms2;
+            this->uniforms4 = copy.uniforms4;
         }
         shaderData(shaderResource aresource, GLenum atype, const simpleString& asource)
         {
@@ -48,7 +54,7 @@ namespace brogueHd::frontend::opengl
                 break;
             case shaderResource::backgroundColorVert:
                 this->attributes.add(vertexAttributeData(0, "vertex", GL_FLOAT_VEC2));
-                this->attributes.add(vertexAttributeData(2, "backgroundColor", GL_FLOAT_VEC4));
+                this->attributes.add(vertexAttributeData(1, "backgroundColor", GL_FLOAT_VEC4));
                 break;
             case shaderResource::diffuseColorUpwardVert:
                 this->attributes.add(vertexAttributeData(0, "vertex", GL_FLOAT_VEC2));

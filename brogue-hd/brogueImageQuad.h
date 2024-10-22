@@ -6,7 +6,7 @@ namespace brogueHd::frontend::opengl
 {
 	struct brogueImageQuad : simpleGlData
 	{
-    public:
+        brogueImageQuad(){}
 
         brogueImageQuad(const simpleQuad& vertexCoords, const simpleQuad& textureCoords)
         {
@@ -14,7 +14,7 @@ namespace brogueHd::frontend::opengl
             textureCoordinates = textureCoords;
         }
 
-        int getElementSize(GLenum primitiveType) override
+        int getElementSize(GLenum primitiveType) const override
         {
             // Total # of calls to the shader
             switch (primitiveType)
@@ -26,13 +26,13 @@ namespace brogueHd::frontend::opengl
             }
         }
 
-        int getStreamSize(GLenum primitiveType) override
+        int getStreamSize(GLenum primitiveType) const override
         {
             // 24 TOTAL FLOATS
             return 24;
         }
 
-        void streamBuffer(GLenum primitiveType, simpleDataStream<float>& outputStream) override
+        void streamBuffer(GLenum primitiveType, simpleDataStream<float>* outputStream) const override
         {
             // (Triangle 1) topLeft, topRight, bottomRight
 

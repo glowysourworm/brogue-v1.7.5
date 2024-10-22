@@ -48,7 +48,6 @@ namespace brogueHd::frontend::opengl
             int pixelY = row * coordinateConverter::QuadHeight;
 
             simpleQuad quadXY = coordinateConverter::createQuadNormalizedXYScene(pixelX, pixelY, coordinateConverter::QuadWidth, coordinateConverter::QuadHeight, sceneWidth, sceneHeight);
-            simpleQuad quadUV = coordinateConverter::createQuadNormalizedUVScene(pixelX, pixelY, coordinateConverter::QuadWidth, coordinateConverter::QuadHeight, sceneWidth, sceneHeight);
 
             return brogueColorQuad(cell, quadXY);
         }

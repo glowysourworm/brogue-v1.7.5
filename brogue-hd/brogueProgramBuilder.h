@@ -51,28 +51,30 @@ namespace brogueHd::frontend::opengl
 			//
 			gridRect sceneBoundary = calculateBoundaryUI(view);
 
-			simpleList<simpleGlData> cellData;
+			// Problems with polymorphism:  Copy constructors not working for child structs. May be a struct issue.
+			simpleList<brogueImageQuad> imageQuads;
+			simpleList<brogueCellQuad> cellQuads;
+			simpleList<brogueColorQuad> colorQuads;
 
-			view->iterate([&sceneBoundary, &cellData, &view, &dataType](short column, short row, brogueCellDisplay* cell)
+			// Iterator scope could be removed; but want to be able to handle the root issue. Should be able to copy data
+			// up the stack.
+			//
+			view->iterate([&sceneBoundary, &cellQuads, &colorQuads, &imageQuads, &view, &dataType](short column, short row, brogueCellDisplay* cell)
 			{
-				simpleGlData data;
-
 				switch (dataType)
 				{
 				case openglDataStreamType::brogueImageQuad:
-					data = coordinateConverter::createBrogueImageQuadScene(*cell, column, row, sceneBoundary.width, sceneBoundary.height);
+					imageQuads.add(coordinateConverter::createBrogueImageQuadScene(*cell, column, row, sceneBoundary.width, sceneBoundary.height));
 					break;
 				case openglDataStreamType::brogueCellQuad:
-					data = coordinateConverter::createBrogueCellQuadScene(*cell, column, row, sceneBoundary.width, sceneBoundary.height);
+					cellQuads.add(coordinateConverter::createBrogueCellQuadScene(*cell, column, row, sceneBoundary.width, sceneBoundary.height));
 					break;
 				case openglDataStreamType::brogueColorQuad:
-					data = coordinateConverter::createBrogueColorQuadScene(*cell, column, row, sceneBoundary.width, sceneBoundary.height);
+					colorQuads.add(coordinateConverter::createBrogueColorQuadScene(*cell, column, row, sceneBoundary.width, sceneBoundary.height));
 					break;
 				default:
 					simpleException::show("Unhandled openglDataStreamType:  brogueProgramBuilder.h");
 				}
-
-				cellData.add(data);
 
 				return iterationCallback::iterate;
 			});
@@ -83,17 +85,56 @@ namespace brogueHd::frontend::opengl
 			// Element Length: Total number of elements as seen by OpenGL - depends on the drawing type
 			//
 
-			// (MEMORY!) Scene Base: Must declare before streaming the data onto it
-			simpleDataStream<float>* dataStream = new simpleDataStream<float>(cellData.count(),
-																				cellData.first().getElementSize(GL_TRIANGLES),
-																				cellData.first().getStreamSize(GL_TRIANGLES));
+			simpleDataStream<float>* dataStream = nullptr;
 
-			// Stream the data for output
-			cellData.forEach([&dataStream](simpleGlData data)
+			switch (dataType)
 			{
-				data.streamBuffer(GL_TRIANGLES, *dataStream);
-				return iterationCallback::iterate;
-			});
+			case openglDataStreamType::brogueImageQuad:
+			{
+				// (MEMORY!) Scene Base: Must declare before streaming the data onto it
+				dataStream = new simpleDataStream<float>(imageQuads.count(),
+														 imageQuads.first().getElementSize(GL_TRIANGLES),
+														 imageQuads.first().getStreamSize(GL_TRIANGLES));
+
+				imageQuads.forEach([&dataStream] (brogueImageQuad quad) 
+				{
+					quad.streamBuffer(GL_TRIANGLES, dataStream);
+					return iterationCallback::iterate;
+				});
+			}
+			break;
+			case openglDataStreamType::brogueCellQuad:
+			{
+				// (MEMORY!) Scene Base: Must declare before streaming the data onto it
+				dataStream = new simpleDataStream<float>(cellQuads.count(),
+														cellQuads.first().getElementSize(GL_TRIANGLES),
+														cellQuads.first().getStreamSize(GL_TRIANGLES));
+
+				cellQuads.forEach([&dataStream] (brogueCellQuad quad)
+				{
+					quad.streamBuffer(GL_TRIANGLES, dataStream);
+					return iterationCallback::iterate;
+				});
+			}
+			break;
+			case openglDataStreamType::brogueColorQuad:
+			{
+				// (MEMORY!) Scene Base: Must declare before streaming the data onto it
+				dataStream = new simpleDataStream<float>(colorQuads.count(),
+					colorQuads.first().getElementSize(GL_TRIANGLES),
+					colorQuads.first().getStreamSize(GL_TRIANGLES));
+
+				colorQuads.forEach([&dataStream] (brogueColorQuad quad)
+				{
+					quad.streamBuffer(GL_TRIANGLES, dataStream);
+					return iterationCallback::iterate;
+				});
+			}
+			break;
+			default:
+				simpleException::show("Unhandled openglDataStreamType:  brogueProgramBuilder.h");
+				break;
+			}
 
 			return dataStream;
 		}
@@ -130,7 +171,7 @@ namespace brogueHd::frontend::opengl
 			simpleDataStream<float>* dataStream = new simpleDataStream<float>(1, frameData.getElementSize(GL_TRIANGLES), frameData.getStreamSize(GL_TRIANGLES));
 
 			// Transfer data to the stream
-			frameData.streamBuffer(GL_TRIANGLES, *dataStream);
+			frameData.streamBuffer(GL_TRIANGLES, dataStream);
 
 			return dataStream;
 		}

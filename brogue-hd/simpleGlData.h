@@ -17,21 +17,22 @@ namespace brogueHd::frontend::opengl
 {
 	struct simpleGlData : hashable
 	{
-	public:
+		simpleGlData(){}
+		simpleGlData(const simpleGlData& copy){}
+		~simpleGlData(){}
 
-		virtual int getElementSize(GLenum primitiveType)
+		virtual int getElementSize(GLenum primitiveType) const
 		{
 			return NULL;
 		}
-		virtual int getStreamSize(GLenum primitiveType)
+		virtual int getStreamSize(GLenum primitiveType) const
 		{
 			return 0;
 		}
-		virtual void streamBuffer(GLenum primitiveType, simpleDataStream<float>& outputStream)
+		virtual void streamBuffer(GLenum primitiveType, simpleDataStream<float>* outputStream) const
 		{
 
 		}
-
 		virtual size_t getHash() const override
 		{
 			return 0;
@@ -64,7 +65,7 @@ namespace brogueHd::frontend::opengl
 			y = other.y;
 		}
 
-		int getElementSize(GLenum primitiveType) override
+		int getElementSize(GLenum primitiveType) const override
 		{
 			switch (primitiveType)
 			{
@@ -75,18 +76,18 @@ namespace brogueHd::frontend::opengl
 				simpleException::show("Unhandled primitive GLenum type:  vec2 in simpleGlData.h");
 			}
 		}
-		int getStreamSize(GLenum primitiveType) override
+		int getStreamSize(GLenum primitiveType) const override
 		{
 			// total # of floats
 			return 2;
 		}
-		void streamBuffer(GLenum primitiveType, simpleDataStream<float>& outputStream) override
+		void streamBuffer(GLenum primitiveType, simpleDataStream<float>* outputStream) const override
 		{
 			switch (primitiveType)
 			{
 			case GL_TRIANGLES:
-				outputStream.write(x);
-				outputStream.write(y);
+				outputStream->write(x);
+				outputStream->write(y);
 				break;
 			default:
 				simpleException::show("Unhandled primitive GLenum type:  vec2 in simpleGlData.h");
@@ -129,7 +130,7 @@ namespace brogueHd::frontend::opengl
 			y = other.y;
 			z = other.z;
 		}
-		int getElementSize(GLenum primitiveType) override
+		int getElementSize(GLenum primitiveType) const override
 		{
 			switch (primitiveType)
 			{
@@ -140,19 +141,19 @@ namespace brogueHd::frontend::opengl
 				simpleException::show("Unhandled primitive GLenum type:  vec2 in simpleGlData.h");
 			}
 		}
-		int getStreamSize(GLenum primitiveType) override
+		int getStreamSize(GLenum primitiveType) const override
 		{
 			// total # of floats
 			return 3;
 		}
-		void streamBuffer(GLenum primitiveType, simpleDataStream<float>& outputStream) override
+		void streamBuffer(GLenum primitiveType, simpleDataStream<float>* outputStream) const override
 		{
 			switch (primitiveType)
 			{
 			case GL_TRIANGLES:
-				outputStream.write(x);
-				outputStream.write(y);
-				outputStream.write(z);
+				outputStream->write(x);
+				outputStream->write(y);
+				outputStream->write(z);
 				break;
 			default:
 				simpleException::show("Unhandled primitive GLenum type:  vec2 in simpleGlData.h");
@@ -199,7 +200,7 @@ namespace brogueHd::frontend::opengl
 			w = other.w;
 			z = other.z;
 		}
-		int getElementSize(GLenum primitiveType) override
+		int getElementSize(GLenum primitiveType) const override
 		{
 			switch (primitiveType)
 			{
@@ -210,20 +211,20 @@ namespace brogueHd::frontend::opengl
 				simpleException::show("Unhandled primitive GLenum type:  vec2 in simpleGlData.h");
 			}
 		}
-		int getStreamSize(GLenum primitiveType) override
+		int getStreamSize(GLenum primitiveType) const override
 		{
 			// total # of floats
 			return 4;
 		}
-		void streamBuffer(GLenum primitiveType, simpleDataStream<float>& outputStream) override
+		void streamBuffer(GLenum primitiveType, simpleDataStream<float>* outputStream) const override
 		{
 			switch (primitiveType)
 			{
 			case GL_TRIANGLES:
-				outputStream.write(x);
-				outputStream.write(y);
-				outputStream.write(z);
-				outputStream.write(w);
+				outputStream->write(x);
+				outputStream->write(y);
+				outputStream->write(z);
+				outputStream->write(w);
 				break;
 			default:
 				simpleException::show("Unhandled primitive GLenum type:  vec2 in simpleGlData.h");
@@ -237,8 +238,6 @@ namespace brogueHd::frontend::opengl
 
 	struct simpleQuad : simpleGlData
 	{
-	public:
-
 		vec2 topLeft;
 		vec2 topRight;
 		vec2 bottomLeft;
@@ -273,7 +272,7 @@ namespace brogueHd::frontend::opengl
 			bottomRight = copy.bottomRight;
 		}
 
-		int getElementSize(GLenum primitiveType) override
+		int getElementSize(GLenum primitiveType) const override
 		{
 			switch (primitiveType)
 			{
@@ -284,7 +283,7 @@ namespace brogueHd::frontend::opengl
 				break;
 			}
 		}
-		int getStreamSize(GLenum primitiveType) override
+		int getStreamSize(GLenum primitiveType) const override
 		{
 			switch (primitiveType)
 			{
@@ -296,7 +295,7 @@ namespace brogueHd::frontend::opengl
 			}
 		}
 
-		void streamBuffer(GLenum primitiveType, simpleDataStream<float>& outputStream) override
+		void streamBuffer(GLenum primitiveType, simpleDataStream<float>* outputStream) const override
 		{
 			// These should probably be tested! :)
 			switch (primitiveType)
@@ -370,7 +369,7 @@ namespace brogueHd::frontend::opengl
 			bottomRight = copy.bottomRight;
 		}
 
-		int getElementSize(GLenum primitiveType) override
+		int getElementSize(GLenum primitiveType) const override
 		{
 			switch (primitiveType)
 			{
@@ -381,7 +380,7 @@ namespace brogueHd::frontend::opengl
 				break;
 			}
 		}
-		int getStreamSize(GLenum primitiveType) override
+		int getStreamSize(GLenum primitiveType) const override
 		{
 			switch (primitiveType)
 			{
@@ -393,7 +392,7 @@ namespace brogueHd::frontend::opengl
 			}
 		}
 
-		void streamBuffer(GLenum primitiveType, simpleDataStream<float>& outputStream) override
+		void streamBuffer(GLenum primitiveType, simpleDataStream<float>* outputStream) const override
 		{
 			// These should probably be tested! :)
 			switch (primitiveType)

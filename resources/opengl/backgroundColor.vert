@@ -4,7 +4,7 @@
 // attribute is positioned.
 //
 layout (location = 0) in vec2 vertex;
-layout (location = 2) in vec4 backgroundColor;
+layout (location = 1) in vec4 backgroundColor;
 
 
 // Define a data type to be output by the shader to the next stages

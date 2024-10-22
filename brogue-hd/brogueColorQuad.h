@@ -9,8 +9,6 @@ namespace brogueHd::frontend::opengl
 {
 	struct brogueColorQuad : simpleGlData
 	{
-
-	public:
 		brogueColorQuad()
 		{
 			vertexCoordinates = default_value::value<simpleQuad>();
@@ -43,7 +41,7 @@ namespace brogueHd::frontend::opengl
 			copyImpl(copy);
 		}
 
-		int getElementSize(GLenum primitiveType) override
+		int getElementSize(GLenum primitiveType) const override
 		{
 			// Total # of calls to the shader
 			switch (primitiveType)
@@ -55,19 +53,19 @@ namespace brogueHd::frontend::opengl
 				break;
 			}
 		}
-		int getStreamSize(GLenum primitiveType) override
+		int getStreamSize(GLenum primitiveType) const override
 		{
 			// Total # of floats
 			switch (primitiveType)
 			{
 			case GL_TRIANGLES:
-				return 48;
+				return 36;
 			default:
 				simpleException::show("Unhandled primitive type for GLQuad:  {}", primitiveType);
 				break;
 			}
 		}
-		void streamBuffer(GLenum primitiveType, simpleDataStream<float>& outputStream) override
+		void streamBuffer(GLenum primitiveType, simpleDataStream<float>* outputStream) const override
 		{
 			switch (primitiveType)
 			{
@@ -128,7 +126,6 @@ namespace brogueHd::frontend::opengl
 		void copyImpl(const brogueColorQuad& copy)
 		{
 			backgroundColor = copy.backgroundColor;
-
 			vertexCoordinates = copy.vertexCoordinates;
 		}
 
