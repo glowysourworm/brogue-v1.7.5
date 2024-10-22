@@ -74,6 +74,7 @@ namespace brogueHd::frontend::opengl
                 break;
             case shaderResource::diffuseColorUpwardFrag:
                 this->uniforms1i.add(simpleUniform<int>("frame0Texture", GL_SAMPLER_2D, 0));
+                this->uniforms2.add(simpleUniform<vec2>("cellSize", GL_SAMPLER_2D, vec2(0, 0)));
                 this->uniforms1.add(simpleUniform<float>("weight", GL_FLOAT, 0.5));
                 break;
             case shaderResource::mixFrameTexturesFrag:

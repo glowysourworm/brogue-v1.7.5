@@ -65,6 +65,8 @@ namespace brogueHd::frontend::opengl
 		simpleTexture* _frameTexture0;
 		simpleTexture* _frameTexture1;
 
+		vec2* _cellSize;
+
 		gridRect* _sceneBoundaryUI;
 	};
 
@@ -77,9 +79,22 @@ namespace brogueHd::frontend::opengl
 
 		gridRect sceneBoundaryUI = brogueProgramBuilder::calculateBoundaryUI(mainMenu);
 
+		// This is for the uniform cellSize variable (see fragment shaders)
+		//
+		simpleQuad cellSizeUV = coordinateConverter::createQuadNormalizedUVScene(0, 0, brogueCellDisplay::CellWidth, brogueCellDisplay::CellHeight, sceneBoundaryUI.width, sceneBoundaryUI.height);
+
+		_cellSize = new vec2(cellSizeUV.bottomRight.x - cellSizeUV.topLeft.x, cellSizeUV.topLeft.y - cellSizeUV.bottomRight.y);
+
 		shaderData* backgroundColorVert = resourceController->getShader(shaderResource::backgroundColorVert);
 		shaderData* backgroundColorFrag = resourceController->getShader(shaderResource::backgroundColorFrag);
-		simpleDataStream<float>* backgroundColorDataStream = brogueProgramBuilder::createSceneDataStream(mainMenu, openglDataStreamType::brogueColorQuad);
+
+		// Heat Source
+		//
+		simpleDataStream<float>* heatSourceDataStream = brogueProgramBuilder::createSceneDataStream(mainMenu, openglDataStreamType::brogueColorQuad,
+		[&mainMenu] (short column, short row, brogueCellDisplay* cell)
+		{
+			return mainMenu->isTheText(column, row) || row == mainMenu->getBoundary().bottom();
+		});
 
 		shaderData* colorMaskVert = resourceController->getShader(shaderResource::colorMaskVert);
 		shaderData* colorMaskFrag = resourceController->getShader(shaderResource::colorMaskFrag);
@@ -89,7 +104,7 @@ namespace brogueHd::frontend::opengl
 		simpleDataStream<float>* colorMaskDataStream = brogueProgramBuilder::createSceneDataStream(mainMenu, openglDataStreamType::brogueColorQuad, 
 		[&mainMenu](short column, short row, brogueCellDisplay* cell)
 		{
-			return mainMenu->isTheText(column, row) || row == mainMenu->getBoundary().bottom();
+			return mainMenu->isTheText(column, row);
 		});
 
 		shaderData* diffuseUpwardVert = resourceController->getShader(shaderResource::diffuseColorUpwardVert);
@@ -105,13 +120,13 @@ namespace brogueHd::frontend::opengl
 
 		// (MEMORY!)
 		_frameCopyProgram = brogueProgramBuilder::createShaderProgram(backgroundColorFrameCopyStream, backgroundColorVert, backgroundColorFrag);
-		_heatSourceProgram = brogueProgramBuilder::createShaderProgram(backgroundColorDataStream, backgroundColorVert, backgroundColorFrag);
+		_heatSourceProgram = brogueProgramBuilder::createShaderProgram(heatSourceDataStream, backgroundColorVert, backgroundColorFrag);
 		_heatDiffuseProgram = brogueProgramBuilder::createShaderProgram(diffuseUpwardDataStream, diffuseUpwardVert, diffuseUpwardFrag);
 		_titleMaskProgram = brogueProgramBuilder::createShaderProgram(colorMaskDataStream, colorMaskVert, colorMaskFrag);
 		_frameProgram = brogueProgramBuilder::createShaderProgram(mixTexturesDataStream, mixTexturesVert, mixTexturesFrag);
 
-		_frameTexture0 = new simpleTexture(NULL, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE0, GL_BGRA, GL_UNSIGNED_BYTE);
-		_frameTexture1 = new simpleTexture(NULL, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE1, GL_BGRA, GL_UNSIGNED_BYTE);
+		_frameTexture0 = new simpleTexture(NULL, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+		//_frameTexture1 = new simpleTexture(NULL, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE1, GL_BGRA, GL_UNSIGNED_BYTE);
 
 		_frameBuffer = new simpleFrameBuffer(sceneBoundaryUI.width, sceneBoundaryUI.height);
 
@@ -129,6 +144,7 @@ namespace brogueHd::frontend::opengl
 		delete _frameTexture1;
 		delete _frameBuffer;
 		delete _sceneBoundaryUI;
+		delete _cellSize;
 	}
 
 	void brogueFlameMenuProgram::run()
@@ -160,8 +176,13 @@ namespace brogueHd::frontend::opengl
 		//_sceneProgram->bind(true);
 		//_sceneProgram->drawAll();
 
-		//glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glEnable(GL_BLEND);
 		//GL.ClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
+		// Pre-draw using the heat diffuse program
+		//_heatDiffuseProgram->bind(true);
+		//_heatDiffuseProgram->drawAll();
 
 		// Switch to Frame Buffer 1
 		_frameBuffer->bind(true);
@@ -169,21 +190,29 @@ namespace brogueHd::frontend::opengl
 		// Activate Color Attachment 0
 		glDrawBuffer(GL_COLOR_ATTACHMENT0);
 
-		// Render the scene -> Color Attachment 0
+		// Draw the entire frame -> Color Attachment 0
+		_frameProgram->bind(true);
+		_frameProgram->drawAll();
+
+		// Render the heat sources as usual -> Color Attachment 0
 		_heatSourceProgram->bind(true);
 		_heatSourceProgram->drawAll();
 
-		glDrawBuffer(GL_COLOR_ATTACHMENT1);
+		//glDrawBuffer(GL_COLOR_ATTACHMENT1);
 
+		// Sample Color Attachment 0:  Create the "Diffusion" effect
 		_heatDiffuseProgram->bind(true);
+		_heatDiffuseProgram->bindUniform1("weight", 0.25f);
 		_heatDiffuseProgram->drawAll();
 
-		glDrawBuffer(GL_COLOR_ATTACHMENT0);
+		//glDrawBuffer(GL_COLOR_ATTACHMENT0);
 
+		// Redirect output to show the result
 		_frameBuffer->bind(false);
 
 		// Render Output
 		_frameProgram->bind(true);
+		//_frameProgram->bindUniform1("weight", 0.9f);
 		_frameProgram->drawAll();
 
 		// Mask Output
@@ -249,14 +278,18 @@ namespace brogueHd::frontend::opengl
 
 		// Create the textures:  Texture 1 is used for the direct drawing, Texture 0 for the "color diffusion"
 		_frameTexture0->glCreate(-1);		// Textures don't automatically associate w/ a program
-		_frameTexture1->glCreate(-1);
+		//_frameTexture1->glCreate(-1);
 
 		// Create Frame buffer:  Uses scene program to render to the frame buffer attached texture
 		_frameBuffer->glCreate(-1);			// Frame buffers don't automatically associate w/ a program
 
+		// Cell Size Uniform
+		_heatDiffuseProgram->bind(true);
+		_heatDiffuseProgram->bindUniform2("cellSize", *_cellSize);
+
 		// Attach texture to frame buffer
 		_frameBuffer->attachTexture(_frameTexture0->getHandle(), GL_COLOR_ATTACHMENT0);
-		_frameBuffer->attachTexture(_frameTexture1->getHandle(), GL_COLOR_ATTACHMENT1);
+		//_frameBuffer->attachTexture(_frameTexture1->getHandle(), GL_COLOR_ATTACHMENT1);
 		_frameBuffer->attachRenderBuffer();
 
 		//_frameBuffer1->attachTexture(_frameBufferTexture1->getHandle(), GL_COLOR_ATTACHMENT1);

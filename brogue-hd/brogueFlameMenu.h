@@ -147,10 +147,10 @@ namespace brogueHd::frontend::ui
 		this->iterate([&that] (short column, short row, brogueCellDisplay* cell)
 		{
 			if (that->isTheText(column, row))
-				cell->backColor = colors::blue();
+				cell->backColor = color(0, 0, 1, 0.3);
 
 			else if (row == ROWS - 1)
-				cell->backColor = colors::red();
+				cell->backColor = color(1, 0, 0, 0.3);
 
 			else
 				cell->backColor = color(0, 0, 0, 0);

@@ -390,7 +390,9 @@ namespace brogueHd::frontend::opengl
 		// Main Rendering Loop
 		while (!glfwWindowShouldClose(window))
 		{
-			if (loopCounter < intervalMilliseconds)
+			std::this_thread::sleep_for(std::chrono::milliseconds(threadSleepTime));
+
+			if ((loopCounter * threadSleepTime) < intervalMilliseconds)
 			{
 				loopCounter++;
 				continue;
@@ -416,7 +418,7 @@ namespace brogueHd::frontend::opengl
 			glfwSwapBuffers(window);
 			glfwPollEvents();
 
-			std::this_thread::sleep_for(std::chrono::milliseconds(threadSleepTime));
+			//std::this_thread::sleep_for(std::chrono::milliseconds(threadSleepTime));
 		}
 
 		// Window could've been destroyed already
