@@ -187,18 +187,20 @@ namespace brogueHd::frontend::opengl
 		//_sceneProgram->drawAll();
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glEnable(GL_BLEND);
+		//glEnable(GL_DEPTH_TEST);
 		//GL.ClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
+		_frameBuffer->bind(true);
 
 		// Pre-draw using the heat diffuse program
 		//_heatDiffuseProgram->bind(true);
 		//_heatDiffuseProgram->drawAll();
 
 		// Switch to Frame Buffer -> Color Attachment 0
-		_frameBuffer->bind(true);
+		//_frameBuffer->bind(true);
 
 		// Activate Color Attachment 0
-		glDrawBuffer(GL_COLOR_ATTACHMENT0);
+		//glDrawBuffer(GL_COLOR_ATTACHMENT0);
 
 		// Draw the entire frame -> Color Attachment 0
 		//_frameProgram->bind(true);
@@ -208,6 +210,17 @@ namespace brogueHd::frontend::opengl
 		_heatSourceProgram->bind(true);
 		_heatSourceProgram->drawAll();
 
+		_frameBuffer->bind(false);
+
+		_heatDiffuseProgram->bind(true);
+		_heatDiffuseProgram->bindUniform1i("frame0Texture", 0);		// DON'T CHANGE THIS!!! NEED TO FIND A WAY TO GET THE UNIFORM VALUE FOR THE GL_TEXTURE0!!!
+		_heatDiffuseProgram->bindUniform2("cellSizeUV", *_cellSizeUV);
+		_heatDiffuseProgram->bindUniform1i("cellWidthUI", (int)_cellSizeUI->x);
+		_heatDiffuseProgram->bindUniform1i("cellHeightUI", (int)_cellSizeUI->y);
+		_heatDiffuseProgram->bindUniform2i("sceneSizeUI", *_sceneSizeUI);
+		_heatDiffuseProgram->bindUniform1("weight", 0.8f);
+		_heatDiffuseProgram->drawAll();
+
 		// Sample Color Attachment 0:  Create the "Diffusion" effect
 		//_heatDiffuseProgram->bind(true);
 		//_heatDiffuseProgram->drawAll();
@@ -215,16 +228,14 @@ namespace brogueHd::frontend::opengl
 		//glDrawBuffer(0);
 
 		// Redirect output to show the result
-		_frameBuffer->bind(false);
+		//_frameBuffer->bind(false);
+
+		//glClear(GL_COLOR_BUFFER_BIT);
 
 		// Sample Color Attachment 0:  Create the "Diffusion" effect
-		_heatDiffuseProgram->bind(true);
-		_heatDiffuseProgram->bindUniform2("cellSizeUV", *_cellSizeUV);
-		_heatDiffuseProgram->bindUniform1i("cellWidthUI", (int)_cellSizeUI->x);
-		_heatDiffuseProgram->bindUniform1i("cellHeightUI", (int)_cellSizeUI->y);
-		_heatDiffuseProgram->bindUniform2i("sceneSizeUI", *_sceneSizeUI);
-		_heatDiffuseProgram->bindUniform1("weight", 0.1f);
-		_heatDiffuseProgram->drawAll();
+		//_heatDiffuseProgram->bind(true);
+
+		//_heatDiffuseProgram->drawAll();
 
 		// Render Output
 		//_frameProgram->bind(true);
@@ -321,9 +332,11 @@ namespace brogueHd::frontend::opengl
 		//_frameProgram->bindUniform1i("frame1Texture", _frameTexture1->getHandle());
 
 		// Attach texture to frame buffer
+		_frameBuffer->bind(true);
 		_frameBuffer->attachTexture(_frameTexture0->getHandle(), GL_COLOR_ATTACHMENT0);
 		//_frameBuffer->attachTexture(_frameTexture1->getHandle(), GL_COLOR_ATTACHMENT1);
 		_frameBuffer->attachRenderBuffer();
+		_frameBuffer->bind(false);
 
 		//_frameBuffer1->attachTexture(_frameBufferTexture1->getHandle(), GL_COLOR_ATTACHMENT1);
 		//_frameBuffer1->attachRenderBuffer();

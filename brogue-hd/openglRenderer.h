@@ -325,7 +325,7 @@ namespace brogueHd::frontend::opengl
 			}
 		}
 
-		glfwSwapInterval(intervalMilliseconds);
+		glfwSwapInterval(1);
 
 		// Keyboard Handler
 		glfwSetKeyCallback(window, &openglRenderer::keyCallback);

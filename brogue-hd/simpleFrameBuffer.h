@@ -86,11 +86,13 @@ namespace brogueHd::frontend::opengl
         if (bind)
         {
             glBindFramebuffer(GL_FRAMEBUFFER, this->handle);
+           // glBindRenderbuffer(GL_RENDERBUFFER, this->handle);
         }
 
         else
         {
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
+            //glBindRenderbuffer(GL_RENDERBUFFER, 0);
         }
 
         this->isBound = bind;
@@ -123,7 +125,7 @@ namespace brogueHd::frontend::opengl
         //glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, _sceneWidth, _sceneHeight);
 
         //// Attach the render buffer
-        //glFramebufferRenderbuffer(GL_RENDERBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, _renderBufferHandle);
+        //glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, _renderBufferHandle);
     }
 
     void simpleFrameBuffer::teardown()
