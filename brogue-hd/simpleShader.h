@@ -84,6 +84,12 @@ namespace brogueHd::frontend::opengl
                     item.name == name;
                 });
 
+            else if (std::same_as<T, ivec2>)
+                return _uniforms2i->any([&name] (simpleUniform<ivec2> item)
+                    {
+                        item.name == name;
+                    });
+
             else if (std::same_as<T, vec4>)
                 return _uniforms4->any([&name] (simpleUniform<vec4> item)
                 {
@@ -108,6 +114,10 @@ namespace brogueHd::frontend::opengl
         {
             return _uniforms2->count();
         }
+        int getUniform2iCount() const
+        {
+            return _uniforms2i->count();
+        }
         int getUniform4Count() const
         {
             return _uniforms4->count();
@@ -125,6 +135,10 @@ namespace brogueHd::frontend::opengl
         {
             return _uniforms2->get(index);
         }
+        simpleUniform<ivec2> getUniform2i(int index) const
+        {
+            return _uniforms2i->get(index);
+        }
         simpleUniform<vec4> getUniform4(int index) const
         {
             return _uniforms4->get(index);
@@ -141,6 +155,9 @@ namespace brogueHd::frontend::opengl
 
             else if (std::same_as<T, vec2>)
                 return getUniform2(index);
+
+            else if (std::same_as<T, vec2>)
+                return getUniform2i(index);
 
             else if (std::same_as<T, vec4>)
                 return getUniform4(index);
@@ -163,6 +180,10 @@ namespace brogueHd::frontend::opengl
         {
             return *_uniforms2;
         }
+        simpleArray<simpleUniform<ivec2>> getUniforms2i() const
+        {
+            return *_uniforms2i;
+        }
         simpleArray<simpleUniform<vec4>> getUniforms4() const
         {
             return *_uniforms4;
@@ -180,6 +201,7 @@ namespace brogueHd::frontend::opengl
         simpleArray<simpleUniform<int>>*    _uniforms1i;
         simpleArray<simpleUniform<float>>*  _uniforms1;
         simpleArray<simpleUniform<vec2>>*   _uniforms2;
+        simpleArray<simpleUniform<ivec2>>*   _uniforms2i;
         simpleArray<simpleUniform<vec4>>*   _uniforms4;
     };
 
@@ -192,6 +214,7 @@ namespace brogueHd::frontend::opengl
         _uniforms1i = new simpleArray<simpleUniform<int>>();
         _uniforms1 = new simpleArray<simpleUniform<float>>();
         _uniforms2 = new simpleArray<simpleUniform<vec2>>();
+        _uniforms2i = new simpleArray<simpleUniform<ivec2>>();
         _uniforms4 = new simpleArray<simpleUniform<vec4>>();
 
         _shaderType = NULL;
@@ -201,6 +224,7 @@ namespace brogueHd::frontend::opengl
         delete _uniforms1i;
         delete _uniforms1;
         delete _uniforms2;
+        delete _uniforms2i;
         delete _uniforms4;
     }
     simpleShader::simpleShader(const simpleShader& copy)
@@ -216,6 +240,7 @@ namespace brogueHd::frontend::opengl
         _uniforms1i = new simpleArray<simpleUniform<int>>(data->uniforms1i.toArray());
         _uniforms1 = new simpleArray<simpleUniform<float>>(data->uniforms1.toArray());
         _uniforms2 = new simpleArray<simpleUniform<vec2>>(data->uniforms2.toArray());
+        _uniforms2i = new simpleArray<simpleUniform<ivec2>>(data->uniforms2i.toArray());
         _uniforms4 = new simpleArray<simpleUniform<vec4>>(data->uniforms4.toArray());
 
         _source = data->source;
@@ -234,6 +259,7 @@ namespace brogueHd::frontend::opengl
         _uniforms1i = new simpleArray<simpleUniform<int>>(copy.getUniforms1i());
         _uniforms1 = new simpleArray<simpleUniform<float>>(copy.getUniforms1());
         _uniforms2 = new simpleArray<simpleUniform<vec2>>(copy.getUniforms2());
+        _uniforms2i = new simpleArray<simpleUniform<ivec2>>(copy.getUniforms2i());
         _uniforms4 = new simpleArray<simpleUniform<vec4>>(copy.getUniforms4());
     }
 

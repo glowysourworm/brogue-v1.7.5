@@ -7,14 +7,18 @@ namespace brogueHd::frontend::opengl
 	struct brogueImageQuad : simpleGlData
 	{
         brogueImageQuad(){}
-
-        brogueImageQuad(const simpleQuad& vertexCoords, const simpleQuad& textureCoords)
+        brogueImageQuad(const brogueImageQuad& copy)
         {
-            vertexCoordinates = vertexCoords;
-            textureCoordinates = textureCoords;
+            vertexXY = copy.vertexXY;
+            textureUV = copy.textureUV;
+        }
+        brogueImageQuad(const simpleQuad& avertexXY, const simpleQuad& atextureUV)
+        {
+            vertexXY = avertexXY;
+            textureUV = atextureUV;
         }
 
-        int getElementSize(GLenum primitiveType) const override
+        int getElementVertexSize(GLenum primitiveType) const override
         {
             // Total # of calls to the shader
             switch (primitiveType)
@@ -28,44 +32,55 @@ namespace brogueHd::frontend::opengl
 
         int getStreamSize(GLenum primitiveType) const override
         {
-            // 24 TOTAL FLOATS
-            return 24;
+            switch (primitiveType)
+            {
+            case GL_TRIANGLES:
+                return (24 * sizeof(float));
+            default:
+                simpleException::show("Unhandled primitive type for GLQuad:  {}", primitiveType);
+                break;
+            }
         }
 
-        void streamBuffer(GLenum primitiveType, simpleDataStream<float>* outputStream) const override
+        void streamBuffer(GLenum primitiveType, simpleDataStream* outputStream) const override
         {
             // (Triangle 1) topLeft, topRight, bottomRight
 
             // Top Left
-            vertexCoordinates.topLeft.streamBuffer(primitiveType, outputStream);        // vec2
-            textureCoordinates.topLeft.streamBuffer(primitiveType, outputStream);       // vec2
+            vertexXY.topLeft.streamBuffer(primitiveType, outputStream);        // vec2
+            textureUV.topLeft.streamBuffer(primitiveType, outputStream);       // vec2
 
             // Top Right
-            vertexCoordinates.topRight.streamBuffer(primitiveType, outputStream);
-            textureCoordinates.topRight.streamBuffer(primitiveType, outputStream);
+            vertexXY.topRight.streamBuffer(primitiveType, outputStream);
+            textureUV.topRight.streamBuffer(primitiveType, outputStream);
 
             // Bottom Left
-            vertexCoordinates.bottomRight.streamBuffer(primitiveType, outputStream);
-            textureCoordinates.bottomRight.streamBuffer(primitiveType, outputStream);
+            vertexXY.bottomRight.streamBuffer(primitiveType, outputStream);
+            textureUV.bottomRight.streamBuffer(primitiveType, outputStream);
 
             // (Triangle 2) topLeft, bottomRight, bottomLeft
 
             // Bottom Left
-            vertexCoordinates.topLeft.streamBuffer(primitiveType, outputStream);
-            textureCoordinates.topLeft.streamBuffer(primitiveType, outputStream);
+            vertexXY.topLeft.streamBuffer(primitiveType, outputStream);
+            textureUV.topLeft.streamBuffer(primitiveType, outputStream);
 
             // Top Right
-            vertexCoordinates.bottomRight.streamBuffer(primitiveType, outputStream);
-            textureCoordinates.bottomRight.streamBuffer(primitiveType, outputStream);
+            vertexXY.bottomRight.streamBuffer(primitiveType, outputStream);
+            textureUV.bottomRight.streamBuffer(primitiveType, outputStream);
 
             // Bottom Right
-            vertexCoordinates.bottomLeft.streamBuffer(primitiveType, outputStream);
-            textureCoordinates.bottomLeft.streamBuffer(primitiveType, outputStream);
+            vertexXY.bottomLeft.streamBuffer(primitiveType, outputStream);
+            textureUV.bottomLeft.streamBuffer(primitiveType, outputStream);
+        }
+
+        const char* toString() const override
+        {
+            return vertexXY.toString();
         }
 
     public:
 
-        simpleQuad vertexCoordinates;
-        simpleQuad textureCoordinates;
+        simpleQuad vertexXY;
+        simpleQuad textureUV;
 	};
 }

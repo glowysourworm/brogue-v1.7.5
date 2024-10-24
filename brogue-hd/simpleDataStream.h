@@ -8,16 +8,16 @@ using namespace brogueHd::simple;
 namespace brogueHd::frontend::opengl
 {
     /// <summary>
-    /// Simple class to handle streaming the IGLVector instances more specifically
+    /// Simple class to handle streaming the GL data vector
     /// </summary>
-    template<isHashable T>
 	class simpleDataStream : public hashableObject
 	{
     public:
 
         simpleDataStream()
         {
-            _streamNumberVertices = 0;
+            _streamNumberElements = 0;
+            _numberVerticesPerElement = 0;
             _array = nullptr;
             _cursor = 0;
         }
@@ -29,13 +29,14 @@ namespace brogueHd::frontend::opengl
         /// <summary>
         /// Creates a data stream with storage for N number of elements
         /// </summary>
-        /// <param name="vectorElementNumberVertices">Size of a single element IN # VERTICES</param>
-        /// <param name="vectorStreamSize">Total size of a single stream (BYTES)</param>
-        /// <param name="capacity">Total capacity IN TERMS OF element INSTANCES!</param>
-        simpleDataStream(int capacity, int vectorElementNumberVertices, int vectorStreamSize)
+        /// <param name="numberShaderCallsPerElement">Total number of shader calls (vertices) per element</param>
+        /// <param name="elementByteSize">Total size of a single element in bytes</param>
+        /// <param name="elementCount">Total count in terms of elements</param>
+        simpleDataStream(int elementCount, int numberShaderCallsPerElement, int elementByteSize)
         {
-            _streamNumberVertices = capacity * vectorElementNumberVertices;
-            _array = new simpleArray<T>(capacity * vectorStreamSize);
+            _streamNumberElements = elementCount;
+            _numberVerticesPerElement = numberShaderCallsPerElement;
+            _array = new simpleArray<byte>(elementCount * elementByteSize);
             _cursor = 0;
         }
 
@@ -44,41 +45,49 @@ namespace brogueHd::frontend::opengl
         /// </summary>
         int getStreamSize()
         {
-            return _array->count() * sizeof(T);
+            return _array->count();
         }
 
-        int getStreamNumberVertices()
+        int getStreamNumberElements()
         {
-            return _streamNumberVertices;
+            return _streamNumberElements;
         }
 
-        void write(T primitive)
+        void writeFloat(float primitive)
         {
-            _array->set(_cursor++, primitive);
+            byte floatBytes[sizeof(float)];
+
+            std::memcpy(&floatBytes, &primitive, sizeof(float));
+
+            for (int index = 0; index < sizeof(float); index++)
+                _array->set(_cursor++, floatBytes[index]);
+        }
+        void writeInt(int primitive)
+        {
+            byte intBytes[sizeof(int)];
+
+            std::memcpy(&intBytes, &primitive, sizeof(int));
+
+            for (int index = 0; index < sizeof(int); index++)
+                _array->set(_cursor++, intBytes[index]);
         }
 
-        const T* getData()
+        const byte* getData()
         {
             return _array->getArray();
         }
         
         size_t getHash() const override
         {
-            return hashGenerator::generateHash(_array->getHash(), _cursor, _streamNumberVertices);
+            return hashGenerator::generateHash(_array->getHash(), _cursor, _streamNumberElements);
         }
 
     private:
 
-        simpleArray<T>* _array;
+        simpleArray<byte>* _array;
 
-        /// <summary>
-        /// Stream cursor (per ELEMENT)
-        /// </summary>
         int _cursor;
-
-        /// <summary>
-        /// Number of vertices per ELEMENT
-        /// </summary>
-        int _streamNumberVertices;
+        int _streamNumberElements;
+        int _numberVerticesPerElement;
 	};
 }

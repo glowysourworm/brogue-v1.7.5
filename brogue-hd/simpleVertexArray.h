@@ -29,7 +29,7 @@ namespace brogueHd::frontend::opengl
         /// <summary>
         /// Rebuffers data on the specified VBO (see simpleShaderProgram)
         /// </summary>
-        void reBuffer(simpleDataStream<T>* stream);
+        void reBuffer(simpleDataStream* stream);
 
         size_t getHash() const override
         {
@@ -96,7 +96,7 @@ namespace brogueHd::frontend::opengl
     }
 
     template<typename T>
-    void simpleVertexArray<T>::reBuffer(simpleDataStream<T>* stream)
+    void simpleVertexArray<T>::reBuffer(simpleDataStream* stream)
     {
         if (!this->isCreated)
             simpleException::show("simpleVertexArray already deleted from the backend");

@@ -41,7 +41,7 @@ namespace brogueHd::frontend::opengl
 			copyImpl(copy);
 		}
 
-		int getElementSize(GLenum primitiveType) const override
+		int getElementVertexSize(GLenum primitiveType) const override
 		{
 			// Total # of calls to the shader
 			switch (primitiveType)
@@ -55,17 +55,16 @@ namespace brogueHd::frontend::opengl
 		}
 		int getStreamSize(GLenum primitiveType) const override
 		{
-			// Total # of floats
 			switch (primitiveType)
 			{
 			case GL_TRIANGLES:
-				return 36;
+				return 36 * sizeof(float);
 			default:
 				simpleException::show("Unhandled primitive type for GLQuad:  {}", primitiveType);
 				break;
 			}
 		}
-		void streamBuffer(GLenum primitiveType, simpleDataStream<float>* outputStream) const override
+		void streamBuffer(GLenum primitiveType, simpleDataStream* outputStream) const override
 		{
 			switch (primitiveType)
 			{
@@ -119,6 +118,11 @@ namespace brogueHd::frontend::opengl
 			// Wouldn't worry about hashing the whole data structure
 			//
 			return hashGenerator::generateHash(backgroundColor, vertexCoordinates);
+		}
+
+		const char* toString() const override
+		{
+			return vertexCoordinates.toString();
 		}
 
 	private:

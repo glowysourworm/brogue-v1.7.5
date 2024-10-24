@@ -125,6 +125,19 @@ namespace brogueHd::frontend::opengl
         }
 
         /// <summary>
+        /// Converts from UI coordinates to UV coordinates (NON-NORMALIZED). This is used for texture rectangles / texelFetch. The
+        /// result will be in UV coordinates; but scaled to the scene UI size.
+        /// </summary>
+        /// <param name="pixelX">UI Pixel X</param>
+        /// <param name="pixelY">UI Pixel Y</param>
+        /// <param name="sceneWidth">UI scene width</param>
+        /// <param name="sceneHeight">UI scene height</param>
+        static ivec2 convertToUVScene(int pixelX, int pixelY, int sceneWidth, int sceneHeight)
+        {
+            return ivec2(pixelX, sceneHeight - pixelY);
+        }
+
+        /// <summary>
         /// Creates GLQuad from UI coordinates converting to UV-Normalized scene coordinates - used for texture overlays or post-processing
         /// </summary>
         /// <param name="pixelX">UI Pixel X</param>
@@ -138,6 +151,23 @@ namespace brogueHd::frontend::opengl
             vec2 bottomRight = convertToNormalizedUVScene(pixelX + pixelWidth, pixelY + pixelHeight, sceneWidth, sceneHeight);
 
             return simpleQuad(topLeft.x, topLeft.y, bottomRight.x, bottomRight.y);
+        }
+
+        /// <summary>
+        /// Creates a GL quad that is in UV coordinates; but scaled to the UI size. This is used with texture rectangle / texelFetch.
+        /// </summary>
+        /// <param name="pixelX">UI Pixel X</param>
+        /// <param name="pixelY">UI Pixel Y</param>
+        /// <param name="pixelWidth">UI Pixel Width</param>
+        /// <param name="pixelHeight">UI Pixel Height</param>
+        /// <param name="sceneWidth">UI Pixel scene width</param>
+        /// <param name="sceneHeight">UI Pixel Scene Height</param>
+        static simpleiQuad createQuadUVScene(int pixelX, int pixelY, int pixelWidth, int pixelHeight, int sceneWidth, int sceneHeight)
+        {
+            ivec2 topLeft = convertToUVScene(pixelX, pixelY, sceneWidth, sceneHeight);
+            ivec2 bottomRight = convertToUVScene(pixelX + pixelWidth, pixelY + pixelHeight, sceneWidth, sceneHeight);
+
+            return simpleiQuad(topLeft.x, topLeft.y, bottomRight.x, bottomRight.y);
         }
 	};
 }

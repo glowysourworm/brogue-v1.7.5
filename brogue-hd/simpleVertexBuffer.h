@@ -18,7 +18,7 @@ namespace brogueHd::frontend::opengl
     {
     public:
         simpleVertexBuffer(){}
-        simpleVertexBuffer(int bufferIndex, simpleDataStream<T>* dataStream, const simpleList<simpleVertexAttribute>& vertexAttributes);
+        simpleVertexBuffer(int bufferIndex, simpleDataStream* dataStream, const simpleList<simpleVertexAttribute>& vertexAttributes);
         ~simpleVertexBuffer();
 
         void bind(bool bind) override;
@@ -33,7 +33,7 @@ namespace brogueHd::frontend::opengl
         /// </summary>
         /// <param name="newStream">Pointer to new data stream</param>
         /// <param name="deleteOld">Calls delete on the old simpleDataStream</param>
-        void reBuffer(simpleDataStream<T>* newStream, bool deleteOld = true);
+        void reBuffer(simpleDataStream* newStream, bool deleteOld = true);
 
         size_t getHash() const override
         {
@@ -45,13 +45,13 @@ namespace brogueHd::frontend::opengl
         int _bufferIndex;
 
         // Primary vertex data for the buffer
-        simpleDataStream<T>* _stream;
+        simpleDataStream* _stream;
         simpleList<simpleVertexAttribute>* _vertexAttributes;
     };
 
     template<typename T>
     simpleVertexBuffer<T>::simpleVertexBuffer(int bufferIndex, 
-                                              simpleDataStream<T>* dataStream, 
+                                              simpleDataStream* dataStream, 
                                               const simpleList<simpleVertexAttribute>& vertexAttributes)
     {
         _stream = dataStream;
@@ -170,6 +170,14 @@ namespace brogueHd::frontend::opengl
                 currentOffset = 2 * sizeof(float);
             }
             break;
+            case GL_INT_VEC2:
+            {
+                attributeSize = 2;
+                glType = GL_INT;
+                glNormalized = false;
+                currentOffset = 2 * sizeof(int);
+            }
+            break;
             default:
                 simpleException::show("Unhandled vertex array attribute data type:  ", attribute.getAttributeType());
             }
@@ -215,7 +223,7 @@ namespace brogueHd::frontend::opengl
     }
 
     template<typename T>
-    void simpleVertexBuffer<T>::reBuffer(simpleDataStream<T>* newStream, bool deleteOld)
+    void simpleVertexBuffer<T>::reBuffer(simpleDataStream* newStream, bool deleteOld)
     {
         if (!this->isCreated)
             simpleException::show("simpleVertexBuffer not yet created on the GL backend. Call glCreate first.");
@@ -245,7 +253,7 @@ namespace brogueHd::frontend::opengl
         //
 
         // THIS MUST PRODUCE A WHOLE NUMBER
-        return _stream->getStreamNumberVertices();
+        return _stream->getStreamSize();
         //return _stream->getStreamSize();
         //return _stream.GetStreamSize() / 4;
     }
@@ -262,6 +270,8 @@ namespace brogueHd::frontend::opengl
                 return stride + sizeof(float);
             else if (attribute.getAttributeType() == GL_FLOAT_VEC2)
                 return stride + (2 * sizeof(float));
+            else if (attribute.getAttributeType() == GL_INT_VEC2)
+                return stride + (2 * sizeof(int));
             else if (attribute.getAttributeType() == GL_FLOAT_VEC3)
                 return stride + (3 * sizeof(float));
             else if (attribute.getAttributeType() == GL_FLOAT_VEC4)

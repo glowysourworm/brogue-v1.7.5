@@ -26,6 +26,7 @@ namespace brogueHd::simple
 		simpleString(int count);
 		simpleString(const char character);
 		simpleString(const char* chars);
+		simpleString(const std::string& stdStr);
 		simpleString(const simpleString& copy);
 		~simpleString();
 
@@ -131,6 +132,15 @@ namespace brogueHd::simple
 		_array = new simpleArray<char>(0);
 
 		this->copyImpl(chars);
+	}
+	simpleString::simpleString(const std::string& stdStr)
+	{
+		_array = new simpleArray<char>(stdStr.size());
+
+		for (int index = 0; index < _array->count(); index++)
+		{
+			_array->set(index, stdStr[index]);
+		}
 	}
 	simpleString::simpleString(const simpleString& copy)
 	{

@@ -21,21 +21,37 @@ namespace brogueHd::frontend::opengl
 		simpleGlData(const simpleGlData& copy){}
 		~simpleGlData(){}
 
-		virtual int getElementSize(GLenum primitiveType) const
+		/// <summary>
+		/// Returns the number of vertices (shader calls) per element
+		/// </summary>
+		virtual int getElementVertexSize(GLenum primitiveType) const
 		{
-			return NULL;
+			return 0;
 		}
+
+		/// <summary>
+		/// Returns the total number of bytes for the element's stream
+		/// </summary>
 		virtual int getStreamSize(GLenum primitiveType) const
 		{
 			return 0;
 		}
-		virtual void streamBuffer(GLenum primitiveType, simpleDataStream<float>* outputStream) const
+
+		/// <summary>
+		/// Utilizes the stream's output facility to stream its data bytes to the memory
+		/// holder.
+		/// </summary>
+		virtual void streamBuffer(GLenum primitiveType, simpleDataStream* outputStream) const
 		{
 
 		}
 		virtual size_t getHash() const override
 		{
 			return 0;
+		}
+		virtual const char* toString() const
+		{
+			return "";
 		}
 	};
 
@@ -74,7 +90,7 @@ namespace brogueHd::frontend::opengl
 			return !compare(other);
 		}
 
-		int getElementSize(GLenum primitiveType) const override
+		int getElementVertexSize(GLenum primitiveType) const override
 		{
 			switch (primitiveType)
 			{
@@ -87,16 +103,15 @@ namespace brogueHd::frontend::opengl
 		}
 		int getStreamSize(GLenum primitiveType) const override
 		{
-			// total # of floats
-			return 2;
+			return 2 * sizeof(float);
 		}
-		void streamBuffer(GLenum primitiveType, simpleDataStream<float>* outputStream) const override
+		void streamBuffer(GLenum primitiveType, simpleDataStream* outputStream) const override
 		{
 			switch (primitiveType)
 			{
 			case GL_TRIANGLES:
-				outputStream->write(x);
-				outputStream->write(y);
+				outputStream->writeFloat(x);
+				outputStream->writeFloat(y);
 				break;
 			default:
 				simpleException::show("Unhandled primitive GLenum type:  vec2 in simpleGlData.h");
@@ -107,9 +122,94 @@ namespace brogueHd::frontend::opengl
 		{
 			return hashGenerator::generateHash(x, y);
 		}
+
+		const char* toString() const override
+		{
+			return simpleString(simpleExt::format("vec2({},{})", x, y)).c_str();
+		}
 	private:
 
 		bool compare(const vec2& other)
+		{
+			return x == other.x && y == other.y;
+		}
+	};
+
+	struct ivec2 : simpleGlData
+	{
+		int x;
+		int y;
+
+		ivec2()
+		{
+			x = 0;
+			y = 0;
+		}
+		ivec2(const ivec2& copy)
+		{
+			x = copy.x;
+			y = copy.y;
+		}
+		ivec2(int ax, int ay)
+		{
+			x = ax;
+			y = ay;
+		}
+		void operator=(const ivec2& other)
+		{
+			x = other.x;
+			y = other.y;
+		}
+
+		bool operator==(const ivec2& other)
+		{
+			return compare(other);
+		}
+		bool operator!=(const ivec2& other)
+		{
+			return !compare(other);
+		}
+
+		int getElementVertexSize(GLenum primitiveType) const override
+		{
+			switch (primitiveType)
+			{
+			case GL_TRIANGLES:
+				return 1;
+				break;
+			default:
+				simpleException::show("Unhandled primitive GLenum type:  vec2 in simpleGlData.h");
+			}
+		}
+		int getStreamSize(GLenum primitiveType) const override
+		{
+			// total # of ints
+			return 2 * sizeof(int);
+		}
+		void streamBuffer(GLenum primitiveType, simpleDataStream* outputStream) const override
+		{
+			switch (primitiveType)
+			{
+			case GL_TRIANGLES:
+				outputStream->writeInt(x);
+				outputStream->writeInt(y);
+				break;
+			default:
+				simpleException::show("Unhandled primitive GLenum type:  vec2 in simpleGlData.h");
+			}
+		}
+
+		size_t getHash() const override
+		{
+			return hashGenerator::generateHash(x, y);
+		}
+		const char* toString() const override
+		{
+			return simpleExt::format("vec2({},{})", x, y).c_str();
+		}
+	private:
+
+		bool compare(const ivec2& other)
 		{
 			return x == other.x && y == other.y;
 		}
@@ -145,7 +245,7 @@ namespace brogueHd::frontend::opengl
 			y = other.y;
 			z = other.z;
 		}
-		int getElementSize(GLenum primitiveType) const override
+		int getElementVertexSize(GLenum primitiveType) const override
 		{
 			switch (primitiveType)
 			{
@@ -158,17 +258,16 @@ namespace brogueHd::frontend::opengl
 		}
 		int getStreamSize(GLenum primitiveType) const override
 		{
-			// total # of floats
-			return 3;
+			return 3 * sizeof(float);
 		}
-		void streamBuffer(GLenum primitiveType, simpleDataStream<float>* outputStream) const override
+		void streamBuffer(GLenum primitiveType, simpleDataStream* outputStream) const override
 		{
 			switch (primitiveType)
 			{
 			case GL_TRIANGLES:
-				outputStream->write(x);
-				outputStream->write(y);
-				outputStream->write(z);
+				outputStream->writeFloat(x);
+				outputStream->writeFloat(y);
+				outputStream->writeFloat(z);
 				break;
 			default:
 				simpleException::show("Unhandled primitive GLenum type:  vec2 in simpleGlData.h");
@@ -177,6 +276,10 @@ namespace brogueHd::frontend::opengl
 		size_t getHash() const override
 		{
 			return hashGenerator::generateHash(x, y, z);
+		}
+		const char* toString() const override
+		{
+			return simpleExt::format("vec3({},{},{})", x, y, z).c_str();
 		}
 	};
 
@@ -225,7 +328,7 @@ namespace brogueHd::frontend::opengl
 		}
 
 
-		int getElementSize(GLenum primitiveType) const override
+		int getElementVertexSize(GLenum primitiveType) const override
 		{
 			switch (primitiveType)
 			{
@@ -238,18 +341,17 @@ namespace brogueHd::frontend::opengl
 		}
 		int getStreamSize(GLenum primitiveType) const override
 		{
-			// total # of floats
-			return 4;
+			return 4 * sizeof(float);
 		}
-		void streamBuffer(GLenum primitiveType, simpleDataStream<float>* outputStream) const override
+		void streamBuffer(GLenum primitiveType, simpleDataStream* outputStream) const override
 		{
 			switch (primitiveType)
 			{
 			case GL_TRIANGLES:
-				outputStream->write(x);
-				outputStream->write(y);
-				outputStream->write(z);
-				outputStream->write(w);
+				outputStream->writeFloat(x);
+				outputStream->writeFloat(y);
+				outputStream->writeFloat(z);
+				outputStream->writeFloat(w);
 				break;
 			default:
 				simpleException::show("Unhandled primitive GLenum type:  vec2 in simpleGlData.h");
@@ -258,6 +360,10 @@ namespace brogueHd::frontend::opengl
 		size_t getHash() const override
 		{
 			return hashGenerator::generateHash(x, y, z, w);
+		}
+		const char* toString() const override
+		{
+			return simpleExt::format("vec4({},{},{},{})", x, y, z, w).c_str();
 		}
 
 	private:
@@ -307,7 +413,7 @@ namespace brogueHd::frontend::opengl
 			bottomRight = copy.bottomRight;
 		}
 
-		int getElementSize(GLenum primitiveType) const override
+		int getElementVertexSize(GLenum primitiveType) const override
 		{
 			switch (primitiveType)
 			{
@@ -323,14 +429,106 @@ namespace brogueHd::frontend::opengl
 			switch (primitiveType)
 			{
 			case GL_TRIANGLES:
-				return 12;
+				return 12 * sizeof(float);
 			default:
 				simpleException::show("Unhandled primitive type for GLQuad:  {}", primitiveType);
 				break;
 			}
 		}
 
-		void streamBuffer(GLenum primitiveType, simpleDataStream<float>* outputStream) const override
+		void streamBuffer(GLenum primitiveType, simpleDataStream* outputStream) const override
+		{
+			// These should probably be tested! :)
+			switch (primitiveType)
+			{
+			case GL_TRIANGLES:
+			{
+				// (Triangle 1) topLeft, topRight, bottomRight 
+				topLeft.streamBuffer(primitiveType, outputStream);		// vec2
+				topRight.streamBuffer(primitiveType, outputStream);
+				bottomRight.streamBuffer(primitiveType, outputStream);
+
+				// (Triangle 2) topLeft, bottomRight, bottomLeft
+				topLeft.streamBuffer(primitiveType, outputStream);
+				bottomRight.streamBuffer(primitiveType, outputStream);
+				bottomLeft.streamBuffer(primitiveType, outputStream);
+			}
+			break;
+			default:
+				simpleException::show("Unhandled primitive type for GLQuad:  {}", primitiveType);
+				break;
+			}
+		}
+		size_t getHash() const override
+		{
+			return hashGenerator::generateHash(topLeft, bottomRight);
+		}
+		const char* toString() const override
+		{
+			return simpleExt::format("quad(top={},left={},right={},bottom={})", topLeft.y, topLeft.x, bottomRight.x, bottomRight.y).c_str();
+		}
+	};
+
+	struct simpleiQuad : simpleGlData
+	{
+		ivec2 topLeft;
+		ivec2 topRight;
+		ivec2 bottomLeft;
+		ivec2 bottomRight;
+
+		simpleiQuad()
+		{
+			topLeft = default_value::value<ivec2>();
+			topRight = default_value::value<ivec2>();
+			bottomLeft = default_value::value<ivec2>();
+			bottomRight = default_value::value<ivec2>();
+		}
+		simpleiQuad(const simpleiQuad& copy)
+		{
+			topLeft = copy.topLeft;
+			topRight = copy.topRight;
+			bottomLeft = copy.bottomLeft;
+			bottomRight = copy.bottomRight;
+		}
+		simpleiQuad(int left, int top, int right, int bottom)
+		{
+			topLeft = ivec2(left, top);
+			topRight = ivec2(right, top);
+			bottomLeft = ivec2(left, bottom);
+			bottomRight = ivec2(right, bottom);
+		}
+		void operator=(const simpleiQuad& copy)
+		{
+			topLeft = copy.topLeft;
+			topRight = copy.topRight;
+			bottomLeft = copy.bottomLeft;
+			bottomRight = copy.bottomRight;
+		}
+
+		int getElementVertexSize(GLenum primitiveType) const override
+		{
+			switch (primitiveType)
+			{
+			case GL_TRIANGLES:
+				return 6;
+			default:
+				simpleException::show("Unhandled primitive type for GLQuad:  {}", primitiveType);
+				break;
+			}
+		}
+		int getStreamSize(GLenum primitiveType) const override
+		{
+			switch (primitiveType)
+			{
+			case GL_TRIANGLES:
+				return 12 * sizeof(int);
+			default:
+				simpleException::show("Unhandled primitive type for GLQuad:  {}", primitiveType);
+				break;
+			}
+		}
+
+		void streamBuffer(GLenum primitiveType, simpleDataStream* outputStream) const override
 		{
 			// These should probably be tested! :)
 			switch (primitiveType)
@@ -356,6 +554,10 @@ namespace brogueHd::frontend::opengl
 		size_t getHash() const override
 		{
 			return hashGenerator::generateHash(topLeft, bottomRight);
+		}
+		const char* toString() const override
+		{
+			return simpleExt::format("quad(top={},left={},right={},bottom={})", topLeft.y, topLeft.x, bottomRight.x, bottomRight.y).c_str();
 		}
 	};
 
@@ -404,7 +606,7 @@ namespace brogueHd::frontend::opengl
 			bottomRight = copy.bottomRight;
 		}
 
-		int getElementSize(GLenum primitiveType) const override
+		int getElementVertexSize(GLenum primitiveType) const override
 		{
 			switch (primitiveType)
 			{
@@ -420,14 +622,14 @@ namespace brogueHd::frontend::opengl
 			switch (primitiveType)
 			{
 			case GL_TRIANGLES:
-				return 18;
+				return 18 * sizeof(float);
 			default:
 				simpleException::show("Unhandled primitive type for GLQuad:  {}", primitiveType);
 				break;
 			}
 		}
 
-		void streamBuffer(GLenum primitiveType, simpleDataStream<float>* outputStream) const override
+		void streamBuffer(GLenum primitiveType, simpleDataStream* outputStream) const override
 		{
 			// These should probably be tested! :)
 			switch (primitiveType)
@@ -453,6 +655,10 @@ namespace brogueHd::frontend::opengl
 		size_t getHash() const override
 		{
 			return hashGenerator::generateHash(topLeft, topRight, bottomLeft, bottomRight);
+		}
+		const char* toString() const override
+		{
+			return simpleExt::format("quad(top={},left={},right={},bottom={})", topLeft.y, topLeft.x, bottomRight.x, bottomRight.y).c_str();
 		}
 	};
 

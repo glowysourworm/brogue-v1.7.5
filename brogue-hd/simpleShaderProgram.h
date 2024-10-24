@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "simplePrimitive.h"
 #include "simpleVertexArray.h"
@@ -41,18 +41,21 @@ namespace brogueHd::frontend::opengl
         /// </summary>
         /// <param name="bufferIndex">Index of VAO</param>
         /// <param name="newBuffer">Data stream for the new buffer (old will be deleted)</param>
-        void reBuffer(int vaoIndex, simpleDataStream<float>* newBuffer);
+        void reBuffer(int vaoIndex, simpleDataStream* newBuffer);
 
-        void bindUniform1i(const simpleString& name, int uniformValue);
-        void bindUniform1(const simpleString& name, float uniformValue);
-        void bindUniform2(const simpleString& name, vec2 uniformValue);
-        void bindUniform4(const simpleString& name, vec4 uniformValue);
+        bool bindUniform1i(const simpleString& name, int uniformValue);
+        bool bindUniform1(const simpleString& name, float uniformValue);
+        bool bindUniform2(const simpleString& name, const vec2& uniformValue);
+        bool bindUniform2i(const simpleString& name, const ivec2& uniformValue);
+        bool bindUniform4(const simpleString& name, const vec4& uniformValue);
 
     private:
 
         void bindUniforms();
 
         void checkStatus(const char* statusName, GLenum status, bool logOutput = true) const;
+
+        void outputActives() const;
 
     private:
 
@@ -122,6 +125,9 @@ namespace brogueHd::frontend::opengl
         // Bind Uniforms (default values)
         bindUniforms();
 
+        // Outputs active attributes + uniforms
+        outputActives();
+
         _isCompiled = true;
         this->isBound = true;
     }
@@ -142,6 +148,35 @@ namespace brogueHd::frontend::opengl
             simpleException::show("Unknown status return from glGetProgramiv:  simpleShaderProgram.h");
     }
 
+    void simpleShaderProgram::outputActives() const
+    {
+        GLchar name[256];
+        GLenum properties[3] { GL_NAME_LENGTH , GL_TYPE, GL_ARRAY_SIZE };
+        GLint values[3];
+
+        GLint numActiveAttribs = 0;
+        GLint numActiveUniforms = 0;
+
+        glGetProgramInterfaceiv(this->handle, GL_PROGRAM_INPUT, GL_ACTIVE_RESOURCES, &numActiveAttribs);
+        glGetProgramInterfaceiv(this->handle, GL_UNIFORM, GL_ACTIVE_RESOURCES, &numActiveUniforms);
+
+        for (int attrib = 0; attrib < numActiveAttribs; ++attrib)
+        {
+            glGetProgramResourceiv(this->handle, GL_PROGRAM_INPUT, attrib, 3, &properties[0], 3, NULL, &values[0]);
+            glGetProgramResourceName(this->handle, GL_PROGRAM_INPUT, attrib, values[0], NULL, &name[0]);
+
+            simpleLogger::log("Active Attribute:  Program={} Type={} Attribute={}", this->handle, values[1], simpleString(name).c_str());
+        }
+
+        for (int attrib = 0; attrib < numActiveUniforms; ++attrib)
+        {
+            glGetProgramResourceiv(this->handle, GL_UNIFORM, attrib, 3, &properties[0], 3, NULL, &values[0]);
+            glGetProgramResourceName(this->handle, GL_UNIFORM, attrib, values[0], NULL, &name[0]);
+
+            simpleLogger::log("Active Uniform:  Program={} Type={} Uniform={}", this->handle, values[1], simpleString(name).c_str());
+        }
+    }
+
     bool simpleShaderProgram::hasErrors()
     {
         GLchar* buffer = new GLchar[10000];
@@ -159,6 +194,28 @@ namespace brogueHd::frontend::opengl
         // (Outputs all error logs)
         bool vertexShaderError = _vertexShader.hasErrors();
         bool fragmentShaderError = _fragmentShader.hasErrors();
+
+        // Also check active uniforms
+        bool activeUniformError = false;
+        int count = 0;
+        glGetProgramiv(this->handle, GL_ACTIVE_UNIFORMS, &count);
+
+        int vertexShaderCount = _vertexShader.getUniform1Count() +
+                                _vertexShader.getUniform1iCount() +
+                                _vertexShader.getUniform2iCount() +
+                                _vertexShader.getUniform2Count() +
+                                _vertexShader.getUniform4Count();
+
+        int fragmentShaderCount = _fragmentShader.getUniform1Count() +
+                                    _fragmentShader.getUniform1iCount() +
+                                    _fragmentShader.getUniform2iCount() +
+                                    _fragmentShader.getUniform2Count() +
+                                    _fragmentShader.getUniform4Count();
+
+        activeUniformError = (count != (vertexShaderCount + fragmentShaderCount));
+            
+        //if (activeUniformError)
+        //    simpleLogger::logColor(brogueConsoleColor::Blue, "Active Uniform Count Mismatch (Program={}):  Vertex={}, Fragment={}, glGetProgramiv={}", this->handle, vertexShaderCount, fragmentShaderCount, count);
 
         return length > 0 || vertexShaderError || fragmentShaderError;
     }
@@ -206,7 +263,7 @@ namespace brogueHd::frontend::opengl
         this->drawAll();
     }
 
-    void simpleShaderProgram::reBuffer(int vaoIndex, simpleDataStream<float>* newBuffer)
+    void simpleShaderProgram::reBuffer(int vaoIndex, simpleDataStream* newBuffer)
     {
         if (!_isCompiled)
             simpleException::show("Must first call compile before using the GL program");
@@ -272,6 +329,13 @@ namespace brogueHd::frontend::opengl
             bindUniform2(uniform.name, uniform.value);
         }
 
+        // Uniform-2i (2i)
+        for (int index = 0; index < _vertexShader.getUniform2iCount(); index++)
+        {
+            simpleUniform<ivec2> uniform = _vertexShader.getUniform2i(index);
+            bindUniform2i(uniform.name, uniform.value);
+        }
+
         // Uniform-4 (4f)
         for (int index = 0; index < _vertexShader.getUniform4Count(); index++)
         {
@@ -300,6 +364,13 @@ namespace brogueHd::frontend::opengl
             bindUniform2(uniform.name, uniform.value);
         }
 
+        // Uniform-2i (2i)
+        for (int index = 0; index < _fragmentShader.getUniform2iCount(); index++)
+        {
+            simpleUniform<ivec2> uniform = _fragmentShader.getUniform2i(index);
+            bindUniform2i(uniform.name, uniform.value);
+        }
+
         // Uniform-4 (4f)
         for (int index = 0; index < _fragmentShader.getUniform4Count(); index++)
         {
@@ -308,27 +379,49 @@ namespace brogueHd::frontend::opengl
         }
     }
     
-    void simpleShaderProgram::bindUniform1i(const simpleString& name, int uniformValue)
+    bool simpleShaderProgram::bindUniform1i(const simpleString& name, int uniformValue)
     {
         GLint location = glGetUniformLocation(this->handle, name.c_str());
+
+        if (location == -1)
+            return false;
 
         glUniform1i(location, uniformValue);
     }
-    void simpleShaderProgram::bindUniform1(const simpleString& name, float uniformValue)
+    bool simpleShaderProgram::bindUniform1(const simpleString& name, float uniformValue)
     {
+        
         GLint location = glGetUniformLocation(this->handle, name.c_str());
+
+        if (location == -1)
+            return false;
 
         glUniform1f(location, uniformValue);
     }
-    void simpleShaderProgram::bindUniform2(const simpleString& name, vec2 uniformValue)
+    bool simpleShaderProgram::bindUniform2(const simpleString& name, const vec2& uniformValue)
     {
         GLint location = glGetUniformLocation(this->handle, name.c_str());
 
+        if (location == -1)
+            return false;
+        
         glUniform2f(location, uniformValue.x, uniformValue.y);
     }
-    void simpleShaderProgram::bindUniform4(const simpleString& name, vec4 uniformValue)
+    bool simpleShaderProgram::bindUniform2i(const simpleString& name, const ivec2& uniformValue)
     {
         GLint location = glGetUniformLocation(this->handle, name.c_str());
+
+        if (location == -1)
+            return false;
+
+        glUniform2i(location, uniformValue.x, uniformValue.y);
+    }
+    bool simpleShaderProgram::bindUniform4(const simpleString& name, const vec4& uniformValue)
+    {
+        GLint location = glGetUniformLocation(this->handle, name.c_str());
+
+        if (location == -1)
+            return false;
 
         glUniform4f(location, uniformValue.x, uniformValue.y, uniformValue.z, uniformValue.w);
     }

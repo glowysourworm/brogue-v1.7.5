@@ -15,6 +15,7 @@ namespace brogueHd::frontend::opengl
 							   (std::same_as<T, int> ||
 								std::same_as<T, float> ||
 								std::same_as<T, vec2> ||
+								std::same_as<T, ivec2> ||
 								std::same_as<T, vec3> ||
 								std::same_as<T, vec4>);
 

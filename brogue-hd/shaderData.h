@@ -34,6 +34,7 @@ namespace brogueHd::frontend::opengl
             this->uniforms1 = copy.uniforms1;
             this->uniforms1i = copy.uniforms1i;
             this->uniforms2 = copy.uniforms2;
+            this->uniforms2i = copy.uniforms2i;
             this->uniforms4 = copy.uniforms4;
         }
         shaderData(shaderResource aresource, GLenum atype, const simpleString& asource)
@@ -57,13 +58,13 @@ namespace brogueHd::frontend::opengl
                 this->attributes.add(vertexAttributeData(1, "backgroundColor", GL_FLOAT_VEC4));
                 break;
             case shaderResource::diffuseColorUpwardVert:
-                this->attributes.add(vertexAttributeData(0, "vertex", GL_FLOAT_VEC2));
-                this->attributes.add(vertexAttributeData(1, "texcoord", GL_FLOAT_VEC2));
+                this->attributes.add(vertexAttributeData(0, "vertexXY", GL_FLOAT_VEC2));
+                this->attributes.add(vertexAttributeData(1, "textureUV", GL_FLOAT_VEC2));
                 this->attributes.add(vertexAttributeData(2, "backgroundColor", GL_FLOAT_VEC4));
                 break;
             case shaderResource::mixFrameTexturesVert:
-                this->attributes.add(vertexAttributeData(0, "vertex", GL_FLOAT_VEC2));
-                this->attributes.add(vertexAttributeData(1, "texcoord", GL_FLOAT_VEC2));
+                this->attributes.add(vertexAttributeData(0, "vertexXY", GL_FLOAT_VEC2));
+                this->attributes.add(vertexAttributeData(1, "textureUV", GL_FLOAT_VEC2));
                 break;
 
             // FRAGMENT SHADERS
@@ -73,14 +74,17 @@ namespace brogueHd::frontend::opengl
             case shaderResource::backgroundColorFrag:
                 break;
             case shaderResource::diffuseColorUpwardFrag:
-                this->uniforms1i.add(simpleUniform<int>("frame0Texture", GL_SAMPLER_2D, 0));
-                this->uniforms2.add(simpleUniform<vec2>("cellSize", GL_SAMPLER_2D, vec2(0, 0)));
-                this->uniforms1.add(simpleUniform<float>("weight", GL_FLOAT, 0.5));
+                this->uniforms1i.add(simpleUniform<int>("frame0Texture", GL_SAMPLER_2D, 1));
+                this->uniforms2.add(simpleUniform<vec2>("cellSizeUV", GL_FLOAT_VEC2, vec2(1, 1)));
+                this->uniforms1i.add(simpleUniform<int>("cellHeightUI", GL_INT, 1));
+                this->uniforms1i.add(simpleUniform<int>("cellWidthUI", GL_INT, 2));
+                this->uniforms2i.add(simpleUniform<ivec2>("sceneSizeUI", GL_INT_VEC2, ivec2(1, 1)));
+                this->uniforms1.add(simpleUniform<float>("weight", GL_FLOAT, 0.5f));
                 break;
             case shaderResource::mixFrameTexturesFrag:
-                this->uniforms1i.add(simpleUniform<int>("frame0Texture", GL_SAMPLER_2D, 0));
-                this->uniforms1i.add(simpleUniform<int>("frame1Texture", GL_SAMPLER_2D, 1));
-                this->uniforms1.add(simpleUniform<float>("weight", GL_FLOAT, 0.5));
+                this->uniforms1i.add(simpleUniform<int>("frame0Texture", GL_SAMPLER_2D, 1));        // Should be setting these in YOUR shader program.
+                //this->uniforms1i.add(simpleUniform<int>("frame1Texture", GL_SAMPLER_2D, 1));
+                //this->uniforms1.add(simpleUniform<float>("mixWeight", GL_FLOAT, 0.5));
                 break;
             default:
                 simpleException::show("Unhandled shaderResource type:  shaderData.h");
@@ -99,6 +103,7 @@ namespace brogueHd::frontend::opengl
         simpleList<simpleUniform<int>> uniforms1i;
         simpleList<simpleUniform<float>> uniforms1;
         simpleList<simpleUniform<vec2>> uniforms2;
+        simpleList<simpleUniform<ivec2>> uniforms2i;
         simpleList<simpleUniform<vec4>> uniforms4;
     };
 }
