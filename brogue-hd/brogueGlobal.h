@@ -18,10 +18,12 @@ namespace brogueHd
 		colorMaskFrag = 1,
 		backgroundColorVert = 2,
 		backgroundColorFrag = 3,
-		diffuseColorUpwardVert = 4,
-		diffuseColorUpwardFrag = 5,
-		mixFrameTexturesVert = 6,
-		mixFrameTexturesFrag = 7
+		brogueCellDisplayVert = 4,
+		brogueCellDisplayFrag = 5,
+		diffuseColorUpwardVert = 6,
+		diffuseColorUpwardFrag = 7,
+		mixFrameTexturesVert = 8,
+		mixFrameTexturesFrag = 9
 	};
 
 	enum openglDataStreamType
@@ -31,10 +33,31 @@ namespace brogueHd
 		brogueColorQuad = 2
 	};
 
+	enum openglBrogueCellOutputSelector
+	{
+		/// <summary>
+		/// Outputs a default color for the cell display
+		/// </summary>
+		NoDisplay = 0,
+
+		/// <summary>
+		/// Outputs the contents of the current cell
+		/// </summary>
+		Display = 1,
+
+		/// <summary>
+		/// Outputs the currently drawn contents of the current cell.
+		/// </summary>
+		DisplayCurrentFrame = 2
+	};
+
+
 	static const char* ConfigColorMaskVertShader = "colorMaskVertexShader";
 	static const char* ConfigColorMaskFragShader = "colorMaskFragmentShader";
 	static const char* ConfigBackgroundColorVertexShader = "backgroundColorVertexShader";
 	static const char* ConfigBackgroundColorFragmentShader = "backgroundColorFragmentShader";
+	static const char* ConfigBrogueCellDisplayVertShader = "brogueCellDisplayVertexShader";
+	static const char* ConfigBrogueCellDisplayFragShader = "brogueCellDisplayFragmentShader";
 	static const char* ConfigDiffuseColorUpwardVertexShader = "diffuseColorUpwardVertexShader";
 	static const char* ConfigDiffuseColorUpwardFragmentShader = "diffuseColorUpwardFragmentShader";
 	static const char* ConfigMixFrameTexturesVertexShader = "mixFrameTexturesVertexShader";

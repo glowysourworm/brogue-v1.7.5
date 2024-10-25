@@ -673,5 +673,11 @@
     <None Include="..\resources\opengl\backgroundColor.frag">
       <Filter>Resource Files\opengl</Filter>
     </None>
+    <None Include="..\resources\opengl\brogueCellDisplay.frag">
+      <Filter>Resource Files\opengl</Filter>
+    </None>
+    <None Include="..\resources\opengl\brogueCellDisplay.vert">
+      <Filter>Resource Files\opengl</Filter>
+    </None>
   </ItemGroup>
 </Project>

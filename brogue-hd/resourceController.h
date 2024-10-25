@@ -98,6 +98,8 @@ namespace brogueHd::backend::controller
 			simpleString colorMaskFragSource = fileOperations::readFile(std::string(jsonConfig[brogueHd::ConfigColorMaskFragShader]).c_str());
 			simpleString backgroundColorVertSource = fileOperations::readFile(std::string(jsonConfig[brogueHd::ConfigBackgroundColorVertexShader]).c_str());
 			simpleString backgroundColorFragSource = fileOperations::readFile(std::string(jsonConfig[brogueHd::ConfigBackgroundColorFragmentShader]).c_str());
+			simpleString brogueCellDisplayVertSource = fileOperations::readFile(std::string(jsonConfig[brogueHd::ConfigBrogueCellDisplayVertShader]).c_str());
+			simpleString brogueCellDisplayFragSource = fileOperations::readFile(std::string(jsonConfig[brogueHd::ConfigBrogueCellDisplayFragShader]).c_str());
 			simpleString diffuseColorUpwardVertSource = fileOperations::readFile(std::string(jsonConfig[brogueHd::ConfigDiffuseColorUpwardVertexShader]).c_str());
 			simpleString diffuseColorUpwardFragSource = fileOperations::readFile(std::string(jsonConfig[brogueHd::ConfigDiffuseColorUpwardFragmentShader]).c_str());
 			simpleString mixFrameTexturesVertSource = fileOperations::readFile(std::string(jsonConfig[brogueHd::ConfigMixFrameTexturesVertexShader]).c_str());
@@ -107,6 +109,8 @@ namespace brogueHd::backend::controller
 			shaderData* colorMaskFrag = new shaderData(shaderResource::colorMaskFrag, GL_FRAGMENT_SHADER, colorMaskFragSource);
 			shaderData* backgroundColorVert = new shaderData(shaderResource::backgroundColorVert, GL_VERTEX_SHADER, backgroundColorVertSource);
 			shaderData* backgroundColorFrag = new shaderData(shaderResource::backgroundColorFrag, GL_FRAGMENT_SHADER, backgroundColorFragSource);
+			shaderData* brogueCellDisplayVert = new shaderData(shaderResource::brogueCellDisplayVert, GL_VERTEX_SHADER, brogueCellDisplayVertSource);
+			shaderData* brogueCellDisplayFrag = new shaderData(shaderResource::brogueCellDisplayFrag, GL_FRAGMENT_SHADER, brogueCellDisplayFragSource);
 			shaderData* diffuseColorUpwardVert = new shaderData(shaderResource::diffuseColorUpwardVert, GL_VERTEX_SHADER, diffuseColorUpwardVertSource);
 			shaderData* diffuseColorUpwardFrag = new shaderData(shaderResource::diffuseColorUpwardFrag, GL_FRAGMENT_SHADER, diffuseColorUpwardFragSource);
 			shaderData* mixFrameTexturesVert = new shaderData(shaderResource::mixFrameTexturesVert, GL_VERTEX_SHADER, mixFrameTexturesVertSource);
@@ -116,6 +120,8 @@ namespace brogueHd::backend::controller
 			_shaderCache->add(shaderResource::colorMaskFrag, colorMaskFrag);
 			_shaderCache->add(shaderResource::backgroundColorVert, backgroundColorVert);
 			_shaderCache->add(shaderResource::backgroundColorFrag, backgroundColorFrag);
+			_shaderCache->add(shaderResource::brogueCellDisplayVert, brogueCellDisplayVert);
+			_shaderCache->add(shaderResource::brogueCellDisplayFrag, brogueCellDisplayFrag);
 			_shaderCache->add(shaderResource::diffuseColorUpwardVert, diffuseColorUpwardVert);
 			_shaderCache->add(shaderResource::diffuseColorUpwardFrag, diffuseColorUpwardFrag);
 			_shaderCache->add(shaderResource::mixFrameTexturesVert, mixFrameTexturesVert);

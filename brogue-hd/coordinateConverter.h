@@ -31,7 +31,7 @@ namespace brogueHd::frontend::opengl
             return brogueImageQuad(quadXY, quadUV);
         }
 
-        static brogueCellQuad createBrogueCellQuadScene(const brogueCellDisplay& cell, int column, int row, int sceneWidth, int sceneHeight)
+        static brogueCellQuad createBrogueCellQuadScene(const brogueCellDisplay& cell, int column, int row, int sceneWidth, int sceneHeight, openglBrogueCellOutputSelector outputSelector)
         {
             int pixelX = column * coordinateConverter::QuadWidth;
             int pixelY = row * coordinateConverter::QuadHeight;
@@ -39,7 +39,7 @@ namespace brogueHd::frontend::opengl
             simpleQuad quadXY = coordinateConverter::createQuadNormalizedXYScene(pixelX, pixelY, coordinateConverter::QuadWidth, coordinateConverter::QuadHeight, sceneWidth, sceneHeight);
             simpleQuad quadUV = coordinateConverter::createQuadNormalizedUVScene(pixelX, pixelY, coordinateConverter::QuadWidth, coordinateConverter::QuadHeight, sceneWidth, sceneHeight);
 
-            return brogueCellQuad(cell, quadXY, quadUV);
+            return brogueCellQuad(cell, quadXY, quadUV, outputSelector);
         }
 
         static brogueColorQuad createBrogueColorQuadScene(const brogueCellDisplay& cell, int column, int row, int sceneWidth, int sceneHeight)

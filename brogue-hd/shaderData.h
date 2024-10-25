@@ -57,10 +57,17 @@ namespace brogueHd::frontend::opengl
                 this->attributes.add(vertexAttributeData(0, "vertex", GL_FLOAT_VEC2));
                 this->attributes.add(vertexAttributeData(1, "backgroundColor", GL_FLOAT_VEC4));
                 break;
+            case shaderResource::brogueCellDisplayVert:
+                this->attributes.add(vertexAttributeData(0, "vertexXY", GL_FLOAT_VEC2));
+                this->attributes.add(vertexAttributeData(1, "textureUV", GL_FLOAT_VEC2));
+                this->attributes.add(vertexAttributeData(2, "backgroundColor", GL_FLOAT_VEC4));
+                this->attributes.add(vertexAttributeData(3, "outputSelector", GL_FLOAT));
+                break;
             case shaderResource::diffuseColorUpwardVert:
                 this->attributes.add(vertexAttributeData(0, "vertexXY", GL_FLOAT_VEC2));
                 this->attributes.add(vertexAttributeData(1, "textureUV", GL_FLOAT_VEC2));
                 this->attributes.add(vertexAttributeData(2, "backgroundColor", GL_FLOAT_VEC4));
+                this->attributes.add(vertexAttributeData(3, "outputSelector", GL_FLOAT));
                 break;
             case shaderResource::mixFrameTexturesVert:
                 this->attributes.add(vertexAttributeData(0, "vertexXY", GL_FLOAT_VEC2));
@@ -72,6 +79,9 @@ namespace brogueHd::frontend::opengl
                 this->uniforms4.add(simpleUniform<vec4>("maskColor", GL_FLOAT_VEC4, vec4(0, 0, 0, 0)));
                 break;
             case shaderResource::backgroundColorFrag:
+                break;
+            case shaderResource::brogueCellDisplayFrag:
+                this->uniforms1i.add(simpleUniform<int>("frame0Texture", GL_SAMPLER_2D, 1));        // Usually, this is GL_TEXTURE0 - which corresponds to 0.
                 break;
             case shaderResource::diffuseColorUpwardFrag:
                 this->uniforms1i.add(simpleUniform<int>("frame0Texture", GL_SAMPLER_2D, 1));

@@ -359,6 +359,12 @@
     <None Include="..\resources\model\wands.csv" />
     <None Include="..\resources\model\weaponRunicNames.csv" />
     <None Include="..\resources\model\weapons.csv" />
+    <None Include="..\resources\opengl\brogueCellDisplay.frag">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </None>
+    <None Include="..\resources\opengl\brogueCellDisplay.vert">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </None>
     <None Include="..\resources\opengl\colorMask.frag">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </None>

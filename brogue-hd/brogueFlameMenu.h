@@ -153,7 +153,10 @@ namespace brogueHd::frontend::ui
 				cell->backColor = color(1, 0, 0, 0.3);
 
 			else
+			{
 				cell->backColor = color(0, 0, 0, 0);
+				cell->noDisplay = true;
+			}
 
 			return iterationCallback::iterate;
 		});

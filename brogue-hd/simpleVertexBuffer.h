@@ -170,12 +170,28 @@ namespace brogueHd::frontend::opengl
                 currentOffset = 2 * sizeof(float);
             }
             break;
+            case GL_FLOAT:
+            {
+                attributeSize = 1;
+                glType = GL_FLOAT;
+                glNormalized = false;
+                currentOffset = sizeof(float);
+            }
+            break;
             case GL_INT_VEC2:
             {
                 attributeSize = 2;
                 glType = GL_INT;
                 glNormalized = false;
                 currentOffset = 2 * sizeof(int);
+            }
+            break;
+            case GL_INT:
+            {
+                attributeSize = 1;
+                glType = GL_INT;
+                glNormalized = false;
+                currentOffset = sizeof(int);
             }
             break;
             default:
@@ -268,6 +284,8 @@ namespace brogueHd::frontend::opengl
             // HANDLE ATTRIBUTES BY DATA TYPE
             if (attribute.getAttributeType() == GL_FLOAT)
                 return stride + sizeof(float);
+            else if (attribute.getAttributeType() == GL_INT)
+                return stride + sizeof(int);
             else if (attribute.getAttributeType() == GL_FLOAT_VEC2)
                 return stride + (2 * sizeof(float));
             else if (attribute.getAttributeType() == GL_INT_VEC2)

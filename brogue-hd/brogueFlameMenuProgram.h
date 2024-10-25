@@ -33,8 +33,7 @@ namespace brogueHd::frontend::opengl
 
 			errors |= _heatDiffuseProgram->hasErrors();
 			//errors |= _titleMaskProgram->hasErrors();
-			//errors |= _frameProgram->hasErrors();
-			//errors |= _frameCopyProgram->hasErrors();
+			errors |= _frameProgram->hasErrors();
 
 			return errors;
 		}
@@ -54,7 +53,6 @@ namespace brogueHd::frontend::opengl
 
 		brogueFlameMenu* _renderedView;
 
-		simpleShaderProgram* _frameCopyProgram;
 		simpleShaderProgram* _heatSourceProgram;
 		simpleShaderProgram* _heatDiffuseProgram;
 		simpleShaderProgram* _titleMaskProgram;
@@ -69,6 +67,7 @@ namespace brogueHd::frontend::opengl
 		ivec2* _cellSizeUI;
 		ivec2* _sceneSizeUI;
 
+		bool _firstPass;
 		gridRect* _sceneBoundaryUI;
 	};
 
@@ -89,12 +88,15 @@ namespace brogueHd::frontend::opengl
 		_cellSizeUI = new ivec2(brogueCellDisplay::CellWidth, brogueCellDisplay::CellHeight);
 		_sceneSizeUI = new ivec2(sceneBoundaryUI.width, sceneBoundaryUI.height);
 
-		shaderData* backgroundColorVert = resourceController->getShader(shaderResource::backgroundColorVert);
-		shaderData* backgroundColorFrag = resourceController->getShader(shaderResource::backgroundColorFrag);
+		//shaderData* backgroundColorVert = resourceController->getShader(shaderResource::backgroundColorVert);
+		//shaderData* backgroundColorFrag = resourceController->getShader(shaderResource::backgroundColorFrag);
+
+		shaderData* brogueCellVert = resourceController->getShader(shaderResource::brogueCellDisplayVert);
+		shaderData* brogueCellFrag = resourceController->getShader(shaderResource::brogueCellDisplayFrag);
 
 		// Heat Source
 		//
-		simpleDataStream* heatSourceDataStream = brogueProgramBuilder::createSceneDataStream(mainMenu, openglDataStreamType::brogueColorQuad,
+		simpleDataStream* heatSourceDataStream = brogueProgramBuilder::createSceneDataStream(mainMenu, openglDataStreamType::brogueCellQuad, openglBrogueCellOutputSelector::DisplayCurrentFrame,
 		[&mainMenu] (short column, short row, brogueCellDisplay* cell)
 		{
 			return mainMenu->isTheText(column, row) || row == mainMenu->getBoundary().bottom();
@@ -113,33 +115,32 @@ namespace brogueHd::frontend::opengl
 
 		shaderData* diffuseUpwardVert = resourceController->getShader(shaderResource::diffuseColorUpwardVert);
 		shaderData* diffuseUpwardFrag = resourceController->getShader(shaderResource::diffuseColorUpwardFrag);
-		simpleDataStream* diffuseUpwardDataStream = brogueProgramBuilder::createSceneDataStream(mainMenu, openglDataStreamType::brogueCellQuad);
+		simpleDataStream* diffuseUpwardDataStream = brogueProgramBuilder::createSceneDataStream(mainMenu, openglDataStreamType::brogueCellQuad, openglBrogueCellOutputSelector::NoDisplay);
 
-		//shaderData* mixTexturesVert = resourceController->getShader(shaderResource::mixFrameTexturesVert);
-		//shaderData* mixTexturesFrag = resourceController->getShader(shaderResource::mixFrameTexturesFrag);
-		//simpleDataStream* mixTexturesDataStream = brogueProgramBuilder::createFrameDataStream(mainMenu, openglDataStreamType::brogueImageQuad);
+		shaderData* mixTexturesVert = resourceController->getShader(shaderResource::mixFrameTexturesVert);
+		shaderData* mixTexturesFrag = resourceController->getShader(shaderResource::mixFrameTexturesFrag);
+		simpleDataStream* mixTexturesDataStream = brogueProgramBuilder::createFrameDataStream(mainMenu, openglDataStreamType::brogueImageQuad);
 
-		//// Reuse background color shaders - make a new frame data stream for the frame copy
-		//simpleDataStream* backgroundColorFrameCopyStream = brogueProgramBuilder::createFrameDataStream(mainMenu, openglDataStreamType::brogueColorQuad);
+		// Reuse background color shaders - make a new frame data stream for the frame copy
+		simpleDataStream* backgroundColorFrameCopyStream = brogueProgramBuilder::createFrameDataStream(mainMenu, openglDataStreamType::brogueColorQuad);
 
 		// (MEMORY!)
-		//_frameCopyProgram = brogueProgramBuilder::createShaderProgram(backgroundColorFrameCopyStream, backgroundColorVert, backgroundColorFrag);
-		_heatSourceProgram = brogueProgramBuilder::createShaderProgram(heatSourceDataStream, backgroundColorVert, backgroundColorFrag);
+		_heatSourceProgram = brogueProgramBuilder::createShaderProgram(heatSourceDataStream, brogueCellVert, brogueCellFrag);
 		_heatDiffuseProgram = brogueProgramBuilder::createShaderProgram(diffuseUpwardDataStream, diffuseUpwardVert, diffuseUpwardFrag);
 		//_titleMaskProgram = brogueProgramBuilder::createShaderProgram(colorMaskDataStream, colorMaskVert, colorMaskFrag);
-		//_frameProgram = brogueProgramBuilder::createShaderProgram(mixTexturesDataStream, mixTexturesVert, mixTexturesFrag);
+		_frameProgram = brogueProgramBuilder::createShaderProgram(mixTexturesDataStream, mixTexturesVert, mixTexturesFrag);
 
-		_frameTexture0 = new simpleTexture(NULL, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+		_frameTexture0 = new simpleTexture(NULL, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE0, GL_RGBA, GL_FLOAT);
 		//_frameTexture1 = new simpleTexture(NULL, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE1, GL_RGBA, GL_UNSIGNED_BYTE);
 
 		_frameBuffer = new simpleFrameBuffer(sceneBoundaryUI.width, sceneBoundaryUI.height);
 
+		_firstPass = true;
 		_sceneBoundaryUI = new gridRect(sceneBoundaryUI);
 	}
 
 	brogueFlameMenuProgram::~brogueFlameMenuProgram()
 	{
-		delete _frameCopyProgram;
 		delete _heatSourceProgram;
 		delete _heatDiffuseProgram;
 		delete _titleMaskProgram;
@@ -187,12 +188,15 @@ namespace brogueHd::frontend::opengl
 		//_sceneProgram->drawAll();
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClearColor(0, 0, 0, 0);
+
 		//glEnable(GL_DEPTH_TEST);
 		//GL.ClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-
 		_frameBuffer->bind(true);
-
-		// Pre-draw using the heat diffuse program
+		// Pre-draw the existing frame onto the texture
+		//_frameProgram->bind(true);
+		//_frameProgram->bindUniform1i("frame0Texture", 0);		// DON'T CHANGE THIS!!!
+		//_frameProgram->drawAll();
 		//_heatDiffuseProgram->bind(true);
 		//_heatDiffuseProgram->drawAll();
 
@@ -207,10 +211,13 @@ namespace brogueHd::frontend::opengl
 		//_frameProgram->drawAll();
 
 		// Render the heat sources as usual -> Color Attachment 0
-		_heatSourceProgram->bind(true);
-		_heatSourceProgram->drawAll();
-
-		_frameBuffer->bind(false);
+		//if (_firstPass)
+		//{
+			_heatSourceProgram->bind(true);
+			_heatSourceProgram->bindUniform1i("frame0Texture", 0);
+			_heatSourceProgram->drawAll();
+		//	_firstPass = false;
+		//}
 
 		_heatDiffuseProgram->bind(true);
 		_heatDiffuseProgram->bindUniform1i("frame0Texture", 0);		// DON'T CHANGE THIS!!! NEED TO FIND A WAY TO GET THE UNIFORM VALUE FOR THE GL_TEXTURE0!!!
@@ -218,8 +225,23 @@ namespace brogueHd::frontend::opengl
 		_heatDiffuseProgram->bindUniform1i("cellWidthUI", (int)_cellSizeUI->x);
 		_heatDiffuseProgram->bindUniform1i("cellHeightUI", (int)_cellSizeUI->y);
 		_heatDiffuseProgram->bindUniform2i("sceneSizeUI", *_sceneSizeUI);
-		_heatDiffuseProgram->bindUniform1("weight", 0.8f);
+		_heatDiffuseProgram->bindUniform1("weight", 0.15f);
 		_heatDiffuseProgram->drawAll();
+
+		_frameBuffer->bind(false);
+
+		_frameProgram->bind(true);
+		_frameProgram->bindUniform1i("frame0Texture", 0);		// DON'T CHANGE THIS!!!
+		_frameProgram->drawAll();
+
+		//_heatDiffuseProgram->bind(true);
+		//_heatDiffuseProgram->bindUniform1i("frame0Texture", 0);		// DON'T CHANGE THIS!!! NEED TO FIND A WAY TO GET THE UNIFORM VALUE FOR THE GL_TEXTURE0!!!
+		//_heatDiffuseProgram->bindUniform2("cellSizeUV", *_cellSizeUV);
+		//_heatDiffuseProgram->bindUniform1i("cellWidthUI", (int)_cellSizeUI->x);
+		//_heatDiffuseProgram->bindUniform1i("cellHeightUI", (int)_cellSizeUI->y);
+		//_heatDiffuseProgram->bindUniform2i("sceneSizeUI", *_sceneSizeUI);
+		//_heatDiffuseProgram->bindUniform1("weight", 0.95f);
+		//_heatDiffuseProgram->drawAll();
 
 		// Sample Color Attachment 0:  Create the "Diffusion" effect
 		//_heatDiffuseProgram->bind(true);
@@ -295,19 +317,15 @@ namespace brogueHd::frontend::opengl
 
 	void brogueFlameMenuProgram::compile()
 	{
-		//_frameCopyProgram->compile();
 		_heatSourceProgram->compile();
 		_heatDiffuseProgram->compile();
 		//_titleMaskProgram->compile();
-		//_frameProgram->compile();
+		_frameProgram->compile();
 
-		//_frameCopyProgram->bind(true);
 		_heatSourceProgram->bind(true);
 		_heatDiffuseProgram->bind(true);
 		//_titleMaskProgram->bind(true);
-		//_frameProgram->bind(true);
-
-		// Frame Copy Program:  Draws data directly from the previous draw pass.
+		_frameProgram->bind(true);
 
 		// Create the textures:  Texture 1 is used for the direct drawing, Texture 0 for the "color diffusion"
 		_frameTexture0->glCreate(-1);		// Textures don't automatically associate w/ a program
@@ -318,18 +336,16 @@ namespace brogueHd::frontend::opengl
 
 		// Cell Size Uniform
 		_heatDiffuseProgram->bind(true);
-		//_heatDiffuseProgram->bindUniform1i("frame0Texture", _frameTexture0->getHandle());  // GL_TEXTURE0 "texture unit" Required!
+		//_heatDiffuseProgram->bindUniform1i("frame0Texture", 0);  // GL_TEXTURE0 "texture unit" Required! USE INDEXES!! (During the run)
 		_heatDiffuseProgram->bindUniform2("cellSizeUV", *_cellSizeUV);
 		_heatDiffuseProgram->bindUniform1i("cellWidthUI", (int)_cellSizeUI->x);
 		_heatDiffuseProgram->bindUniform1i("cellHeightUI", (int)_cellSizeUI->y);
 		_heatDiffuseProgram->bindUniform2i("sceneSizeUI", *_sceneSizeUI);
 		_heatDiffuseProgram->bindUniform1("weight", 0.1f);
 
-		//_frameProgram->bind(true);
-		//_frameProgram->bindUniform1i("frame0Texture", _frameTexture0->getHandle());		   // GL_TEXTURE0 "texture unit" Required!
+		_frameProgram->bind(true);
+		//_frameProgram->bindUniform1i("frame0Texture", 0);		   // GL_TEXTURE0 "texture unit" Required! USE INDEXES!! (During the run)
 
-
-		//_frameProgram->bindUniform1i("frame1Texture", _frameTexture1->getHandle());
 
 		// Attach texture to frame buffer
 		_frameBuffer->bind(true);

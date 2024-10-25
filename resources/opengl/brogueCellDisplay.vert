@@ -8,7 +8,6 @@ layout (location = 1) in vec2 textureUV;
 layout (location = 2) in vec4 backgroundColor;
 layout (location = 3) in float outputSelector;
 
-
 // Define a data type to be output by the shader to the next stages
 //
 out vec2 currentVertex;

@@ -45,9 +45,9 @@ namespace brogueHd::frontend::opengl
 		/// (MEMORY!) The scene data is the data from a brogueView. Using quads, this data is streamed out to our simpleDataStream
 		/// object to hold for the GL backend calls.
 		/// </summary>
-		static simpleDataStream* createSceneDataStream(const brogueView* view, openglDataStreamType dataType)
+		static simpleDataStream* createSceneDataStream(const brogueView* view, openglDataStreamType dataType, openglBrogueCellOutputSelector noDisplayOutputSelector)
 		{
-			return createSceneDataStream(view, dataType, [] (short column, short row, brogueCellDisplay* cell)
+			return createSceneDataStream(view, dataType, noDisplayOutputSelector, [] (short column, short row, brogueCellDisplay* cell)
 			{
 				return true;
 			});
@@ -57,7 +57,10 @@ namespace brogueHd::frontend::opengl
 		/// (MEMORY!) The scene data is the data from a brogueView. Using quads, this data is streamed out to our simpleDataStream
 		/// object to hold for the GL backend calls.
 		/// </summary>
-		static simpleDataStream* createSceneDataStream(const brogueView* view, openglDataStreamType dataType, gridPredicate<brogueCellDisplay*> inclusionPredicate)
+		static simpleDataStream* createSceneDataStream(const brogueView* view, 
+													   openglDataStreamType dataType, 
+													   openglBrogueCellOutputSelector noDisplayOutputSelector,
+													   gridPredicate<brogueCellDisplay*> inclusionPredicate)
 		{
 			// Starting with the raw data, build a simpleQuad data vector to pass to the simpleDataStream<float>
 			//
@@ -71,7 +74,8 @@ namespace brogueHd::frontend::opengl
 			// Iterator scope could be removed; but want to be able to handle the root issue. Should be able to copy data
 			// up the stack.
 			//
-			view->iterate([&sceneBoundary, &inclusionPredicate, &cellQuads, &colorQuads, &imageQuads, &view, &dataType](short column, short row, brogueCellDisplay* cell)
+			view->iterate(
+			[&sceneBoundary, &inclusionPredicate, &cellQuads, &colorQuads, &imageQuads, &view, &dataType, &noDisplayOutputSelector](short column, short row, brogueCellDisplay* cell)
 			{
 				if (!inclusionPredicate(column, row, cell))
 					return iterationCallback::iterate;
@@ -82,7 +86,10 @@ namespace brogueHd::frontend::opengl
 					imageQuads.add(coordinateConverter::createBrogueImageQuadScene(*cell, column, row, sceneBoundary.width, sceneBoundary.height));
 					break;
 				case openglDataStreamType::brogueCellQuad:
-					cellQuads.add(coordinateConverter::createBrogueCellQuadScene(*cell, column, row, sceneBoundary.width, sceneBoundary.height));
+					if (cell->noDisplay)
+						cellQuads.add(coordinateConverter::createBrogueCellQuadScene(*cell, column, row, sceneBoundary.width, sceneBoundary.height, noDisplayOutputSelector));
+					else
+						cellQuads.add(coordinateConverter::createBrogueCellQuadScene(*cell, column, row, sceneBoundary.width, sceneBoundary.height, openglBrogueCellOutputSelector::Display));
 					break;
 				case openglDataStreamType::brogueColorQuad:
 					colorQuads.add(coordinateConverter::createBrogueColorQuadScene(*cell, column, row, sceneBoundary.width, sceneBoundary.height));

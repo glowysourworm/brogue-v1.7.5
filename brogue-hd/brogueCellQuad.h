@@ -21,7 +21,8 @@ namespace brogueHd::frontend::opengl
 		}
 		brogueCellQuad(const brogueCellDisplay& cell, 
 					   const simpleQuad& averticesXY, 
-					   const simpleQuad& atextureUV)
+					   const simpleQuad& atextureUV,
+					   openglBrogueCellOutputSelector aoutputSelector)
 		{
 			// Consider translating these perhaps INTO the cell display - the view bounds.
 			//
@@ -29,6 +30,7 @@ namespace brogueHd::frontend::opengl
 			
 			vertexXY = averticesXY;
 			textureUV = atextureUV;
+			outputSelector = aoutputSelector;
 		}
 		void operator=(const brogueCellQuad& copy)
 		{
@@ -53,7 +55,7 @@ namespace brogueHd::frontend::opengl
 			switch (primitiveType)
 			{
 			case GL_TRIANGLES:
-				return (48 * sizeof(float));
+				return (48 * sizeof(float)) + (6 * sizeof(float));
 			default:
 				simpleException::show("Unhandled primitive type for GLQuad:  {}", primitiveType);
 				break;
@@ -73,39 +75,45 @@ namespace brogueHd::frontend::opengl
 				// Triangle 1:  top-left, top-right, bottom-right
 				// Triangle 2:  top-left, bottom-right, bottom-left
 				//
-				// Data:		vertexXY, textureUV, textureUI, color
+				// Data:		vertexXY, textureUV, textureUI, color, outputSelector
 				//
-				// Total Data:  8 floats per vertex * 6 vertices = 48 (floats)
+				// Total Data:  8 floats per vertex * 6 vertices = 48 (floats) (6 ints)
 
 				// Triangle 1: Top Left (32 floats total)
 				vertexXY.topLeft.streamBuffer(primitiveType, outputStream);				// vec2
 				textureUV.topLeft.streamBuffer(primitiveType, outputStream);			// vec2
 				backgroundColor.streamBuffer(primitiveType, outputStream);				// vec4
+				outputStream->writeFloat(outputSelector);								// float
 
 				// Triangle 1:  Top Right
 				vertexXY.topRight.streamBuffer(primitiveType, outputStream);			// vec2
 				textureUV.topRight.streamBuffer(primitiveType, outputStream);			// vec2
 				backgroundColor.streamBuffer(primitiveType, outputStream);				// vec4
+				outputStream->writeFloat(outputSelector);								// float
 
 				// Triangle 1:  Bottom Right
 				vertexXY.bottomRight.streamBuffer(primitiveType, outputStream);			// vec2
 				textureUV.bottomRight.streamBuffer(primitiveType, outputStream);		// vec2
 				backgroundColor.streamBuffer(primitiveType, outputStream);				// vec4
+				outputStream->writeFloat(outputSelector);								// float
 
 				// Triangle 2: Top Left
 				vertexXY.topLeft.streamBuffer(primitiveType, outputStream);				// vec2
 				textureUV.topLeft.streamBuffer(primitiveType, outputStream);			// vec2
 				backgroundColor.streamBuffer(primitiveType, outputStream);				// vec4
+				outputStream->writeFloat(outputSelector);								// float
 
 				// Triangle 2:  Bottom Right
 				vertexXY.bottomRight.streamBuffer(primitiveType, outputStream);			// vec2
 				textureUV.bottomRight.streamBuffer(primitiveType, outputStream);		// vec2
 				backgroundColor.streamBuffer(primitiveType, outputStream);				// vec4
+				outputStream->writeFloat(outputSelector);								// float
 
 				// Triangle 2:  Bottom Left
 				vertexXY.bottomLeft.streamBuffer(primitiveType, outputStream);			// vec2
 				textureUV.bottomLeft.streamBuffer(primitiveType, outputStream);			// vec2
 				backgroundColor.streamBuffer(primitiveType, outputStream);				// vec4
+				outputStream->writeFloat(outputSelector);								// float
 			}
 			break;
 			default:
@@ -134,6 +142,7 @@ namespace brogueHd::frontend::opengl
 			
 			vertexXY = copy.vertexXY;
 			textureUV = copy.textureUV;
+			outputSelector = copy.outputSelector;
 		}
 
 	public:
@@ -142,5 +151,6 @@ namespace brogueHd::frontend::opengl
 		simpleQuad textureUV;
 
 		vec4 backgroundColor;
+		openglBrogueCellOutputSelector outputSelector;
 	};
 }

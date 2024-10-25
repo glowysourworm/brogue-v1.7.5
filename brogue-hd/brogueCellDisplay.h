@@ -25,6 +25,7 @@ namespace brogueHd::backend::model::layout
 		color foreColor;
 		color backColor;
 		float opacity;
+		bool noDisplay;
 		bool needsUpdate;
 
 		//light lighting;
@@ -63,6 +64,7 @@ namespace brogueHd::backend::model::layout
 			backColor = default_value::value<color>();
 			opacity = 1.0f;
 			needsUpdate = false;
+			noDisplay = false;
 		}
 		brogueCellDisplay(const brogueCellDisplay& copy)
 		{
@@ -94,13 +96,14 @@ namespace brogueHd::backend::model::layout
 				   backColor.compare(display.backColor) &&
 				   opacity == display.opacity &&
 				   needsUpdate == display.needsUpdate &&
+				   noDisplay == display.noDisplay &&
 				   column == display.column &&
 				   row == display.row;
 					//lighting.compare(display.lighting);
 		}
 		size_t getHash() const override
 		{
-			return hashGenerator::generateHash(column, row, character, foreColor, backColor, opacity, needsUpdate);
+			return hashGenerator::generateHash(column, row, character, foreColor, backColor, opacity, needsUpdate, noDisplay);
 		}
 
 	private:
@@ -114,6 +117,7 @@ namespace brogueHd::backend::model::layout
 			backColor = copy.backColor;									// Careful with instances. These are non-unique
 			opacity = copy.opacity;
 			needsUpdate = copy.needsUpdate;			
+			noDisplay = copy.noDisplay;
 		}
 	};
 }

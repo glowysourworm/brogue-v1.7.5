@@ -283,8 +283,8 @@ namespace brogueHd::frontend::opengl
 		// 
 		// assert(threadSleepTime <= intervalMilliseconds)
 		//
-		int intervalMilliseconds = 100;
-		int threadSleepTime = 10;
+		int intervalMilliseconds = 10;
+		int threadSleepTime = 5;
 		int loopCounter = 0;
 
 		// Windowed Mode

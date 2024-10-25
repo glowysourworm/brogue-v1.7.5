@@ -121,11 +121,11 @@ namespace brogueHd::frontend::opengl
         // Bind the render buffer
         glBindRenderbuffer(GL_RENDERBUFFER, _renderBufferHandle);
 
-        //// Create the buffer storage
-        //glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, _sceneWidth, _sceneHeight);
+        // Create the buffer storage
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA, _sceneWidth, _sceneHeight);
 
-        //// Attach the render buffer
-        //glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, _renderBufferHandle);
+        // Attach the render buffer
+        //glFramebufferRenderbuffer(GL_RENDERBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, _renderBufferHandle);
     }
 
     void simpleFrameBuffer::teardown()
