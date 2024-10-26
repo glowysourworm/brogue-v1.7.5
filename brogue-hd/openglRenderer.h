@@ -388,9 +388,9 @@ namespace brogueHd::frontend::opengl
 			// Update from main thread's brogueView*
 			_threadLock->lock();
 
-			_program->update(intervalMilliseconds);						// Updates program buffers from the UI view
-			_program->run();							// Run() -> Draws the buffers
-			_program->hasErrors();						// log errors
+			_program->update(intervalMilliseconds);							// Updates program buffers from the UI view
+			_program->run(intervalMilliseconds);							// Run() -> Draws the buffers
+			_program->outputStatus();										// Log Errors to simpleLogger -> std::cout
 
 			GLenum error = glGetError();
 

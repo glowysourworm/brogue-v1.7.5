@@ -24,7 +24,7 @@ namespace brogueHd::frontend::opengl
 
 		void initialize() override;
 		void update(int millisecondsLapsed) override;
-		void run() override;
+		void run(int millisecondsElapsed) override;
 		
 		bool hasErrors() const override
 		{
@@ -75,8 +75,10 @@ namespace brogueHd::frontend::opengl
 		ivec2* _cellSizeUI;
 		ivec2* _sceneSizeUI;
 
-		int _periodCounterMilliseconds;
-		int _periodMilliseconds;
+		int _diffusePeriodMilliseconds;
+		int _diffusePeriodCounterMilliseconds;
+		int _updatePeriodCounterMilliseconds;
+		int _updatePeriodMilliseconds;
 		
 		gridRect* _sceneBoundaryUI;
 
@@ -89,8 +91,10 @@ namespace brogueHd::frontend::opengl
 	{
 		_resourceController = resourceController;
 		_renderedView = mainMenu;
-		_periodCounterMilliseconds = 0;
-		_periodMilliseconds = 100;
+		_diffusePeriodCounterMilliseconds = 0;
+		_diffusePeriodMilliseconds = 10;
+		_updatePeriodMilliseconds = 30;
+		_updatePeriodCounterMilliseconds = 0;
 
 		int textureIndex = 0;
 
@@ -164,7 +168,7 @@ namespace brogueHd::frontend::opengl
 		delete _sceneSizeUI;
 	}
 
-	void brogueFlameMenuProgram::run()
+	void brogueFlameMenuProgram::run(int millisecondsElapsed)
 	{
 		if (!this->isCompiled())
 			simpleException::show("Must first call IGLProgram.Compile() before using the GL program");
@@ -173,7 +177,6 @@ namespace brogueHd::frontend::opengl
 		//
 		if (!_frameBuffer->isReady())
 			return;
-			
 
 		// Procedure:  Framebuffer Feedback
 		//
@@ -194,8 +197,18 @@ namespace brogueHd::frontend::opengl
 		_heatSourceProgram->bind();
 		_heatSourceProgram->draw();
 
-		_heatDiffuseProgram->bind();
-		_heatDiffuseProgram->draw();
+		// Throttle the diffusion rate to be consistent / separated from the 
+		// screen refresh rate.
+		//
+		if (_diffusePeriodCounterMilliseconds > _diffusePeriodMilliseconds)
+		{
+			_heatDiffuseProgram->bind();
+			_heatDiffuseProgram->draw();
+
+			_diffusePeriodCounterMilliseconds = 0;
+		}
+		else
+			_diffusePeriodCounterMilliseconds += millisecondsElapsed;
 
 		_titleMaskProgram->bind();
 		_titleMaskProgram->draw();
@@ -238,7 +251,7 @@ namespace brogueHd::frontend::opengl
 		_heatDiffuseProgram->bindUniform1i("cellWidthUI", (int)_cellSizeUI->x);
 		_heatDiffuseProgram->bindUniform1i("cellHeightUI", (int)_cellSizeUI->y);
 		_heatDiffuseProgram->bindUniform2i("sceneSizeUI", *_sceneSizeUI);
-		_heatDiffuseProgram->bindUniform1("weight", 0.1f);
+		_heatDiffuseProgram->bindUniform1("weight", 0.2f);
 
 		// Frame Program Uniforms
 		_frameProgram->bind();
@@ -253,17 +266,19 @@ namespace brogueHd::frontend::opengl
 
 	void brogueFlameMenuProgram::update(int millisecondsLapsed)
 	{
-		_periodCounterMilliseconds += millisecondsLapsed;
+		_updatePeriodCounterMilliseconds += millisecondsLapsed;
 
 		// Wait until the period has elapsed
 		//
-		if (_periodCounterMilliseconds < _periodMilliseconds)
+		if (_updatePeriodCounterMilliseconds < _updatePeriodMilliseconds)
 			return;
 
 		brogueFlameMenu* mainMenu = _renderedView;
 
+		_frameBuffer->unBind();
+
 		// Update the rendering
-		_renderedView->update(_periodCounterMilliseconds);
+		_renderedView->update(_updatePeriodCounterMilliseconds);
 
 		// Heat Source
 		//
@@ -279,6 +294,6 @@ namespace brogueHd::frontend::opengl
 		_heatSourceProgram->bind();
 		_heatSourceProgram->reBuffer(heatSourceDataStream);
 
-		_periodCounterMilliseconds = 0;
+		_updatePeriodCounterMilliseconds = 0;
 	}
 }

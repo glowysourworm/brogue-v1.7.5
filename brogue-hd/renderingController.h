@@ -86,7 +86,7 @@ namespace brogueHd::backend::controller
 			// Shuts down thread, deletes our program memory
 			_openglRenderer->terminateProgram();
 			
-			_currentView = new brogueFlameMenu(_randomGenerator, 1000);
+			_currentView = new brogueFlameMenu(_randomGenerator, 100);
 			_currentProgram = new brogueFlameMenuProgram(dynamic_cast<brogueFlameMenu*>(_currentView), _resourceController);
 
 			_openglRenderer->setProgram(_currentProgram);

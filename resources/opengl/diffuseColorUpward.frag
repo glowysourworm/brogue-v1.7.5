@@ -19,51 +19,34 @@ uniform float weight;
 
 void main()
 {
-    if (currentTextureUV.y - cellSizeUV.y < 0 ||
-        currentTextureUV.x - cellSizeUV.x < 0 || 
-        currentTextureUV.x + cellSizeUV.x > 1)
+    bool bottom = currentTextureUV.y - cellSizeUV.y < 0;
+    bool left = currentTextureUV.x - cellSizeUV.x < 0;
+    bool right = currentTextureUV.x + cellSizeUV.x > 1;
+
+    // Skip the edges
+    if (bottom || left || right)
         outputColor = texture(frame0Texture, currentTextureUV);
 
     else
     {
-        // (i, j) = floor(uv * (width, height)),
-
-        float texelX = floor(currentTextureUV.x * sceneSizeUI.x);
-        float texelY = floor(currentTextureUV.y * sceneSizeUI.y);
-        float texelY1 = floor((currentTextureUV.y - cellSizeUV.y) * sceneSizeUI.y);
-
-        vec2 dtexel = vec2(1 / texelX, 1 / texelY);
-
-        
-//
         vec2 current = currentTextureUV;
         vec2 south = vec2(currentTextureUV.x, (currentTextureUV.y - cellSizeUV.y));
-//        vec2 southEast = vec2(currentTextureUV.x + cellSizeUV.x, currentTextureUV.y - cellSizeUV.y);
-//        vec2 southWest = vec2(currentTextureUV.x - cellSizeUV.x, currentTextureUV.y - cellSizeUV.y);
+        vec2 southEast = vec2(currentTextureUV.x + cellSizeUV.x, currentTextureUV.y - cellSizeUV.y);
+        vec2 southWest = vec2(currentTextureUV.x - cellSizeUV.x, currentTextureUV.y - cellSizeUV.y);
 
         vec4 southColor = texture(frame0Texture, south);
-//        vec4 southWestColor = texture(frame0Texture, southWest);
-//        vec4 southEastColor = texture(frame0Texture, southEast);
-//
-//        vec4 southColors = mix(southWestColor, southEastColor, 0.5);
-//        southColor = mix(southColors, southColor, 0.5);
+        vec4 southWestColor = texture(frame0Texture, southWest);
+        vec4 southEastColor = texture(frame0Texture, southEast);
 
         vec4 currentColor = texture(frame0Texture, current);
 
-        //vec4 currentColor = textureGather(frame0Texture, currentTextureUV, 0);
+        vec4 southEWColor = mix(southWestColor, southEastColor, 0.5);
 
-//        vec4 currentColor = texelFetch(frame0Texture, ivec2(texelX, texelY), 0);
-//        vec4 southColor = texelFetch(frame0Texture, ivec2(texelX, texelY1), 0);
+        southColor = mix(southColor, southEWColor, weight);
 
-//        vec4 currentColor = texelFetch(frame0Texture, ivec2(currentTextureUV), 0);
-//        vec4 southColor = texelFetch(frame0Texture, ivec2(currentTextureUV), 0);
-
-        vec4 outputColorTest = mix(currentColor, southColor, weight);
-        vec4 difference = outputColorTest - currentColor;
-
-        if (length(outputColorTest) > 0.05)
-            outputColor = outputColorTest;
-        else
-            outputColor = texture(frame0Texture, currentTextureUV);
+        outputColor = mix(currentColor, southColor, weight);
     }
+
+    if (length(abs(outputColor)) < 0.05)
+        outputColor = vec4(0,0,0,0);
 }

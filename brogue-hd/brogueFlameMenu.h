@@ -25,9 +25,12 @@ namespace brogueHd::frontend::ui
 
 		void update(int millisecondsLapsed) override;
 
+		float calculateHeatEnvelope(short column, short row);
+
 	private:
 
-		void nextHeatSource(bool cycleHeatSources);
+		void cycleHeatSources();
+		void nextHeatValues();
 
 	protected:
 
@@ -48,15 +51,16 @@ namespace brogueHd::frontend::ui
 
 	public:
 
-		const float FlameNoise = 0.3;
+		const float FlameNoise = 0.35;
+		const float FlameFade = 0.35;
 
 		const color FlameBottomColor1 =			color(1.0, 0.0, 0.0, 0.5);
-		const color FlameBottomColor2 =			color(1.0, 0.1, 0.1, 0.5);
-		const color FlameBottomColor3 =			color(0.8, 0.1, 0.1, 0.4);
+		const color FlameBottomColor2 =			color(1.0, 0.2, 0.1, 0.5);
+		const color FlameBottomColor3 =			color(0.1, 0.0, 0.0, 0.5);
 
-		const color FlameTitleColor1 =			color(0.0, 0.0, 1.0, 0.5);
-		const color FlameTitleColor2 =			color(0.1, 0.1, 1.0, 0.5);
-		const color FlameTitleColor3 =			color(0.1, 0.1, 0.8, 0.5);
+		const color FlameTitleColor1 =			color(0.0, 0.0, 1.0, 0.3);
+		const color FlameTitleColor2 =			color(0.0, 0.0, 0.1, 0.3);
+		const color FlameTitleColor3 =			color(0.8, 0.8, 1.0, 0.3);
 
 		const color BottomHeatSources[3] = { FlameBottomColor1, FlameBottomColor2, FlameBottomColor3 };
 		const color TitleHeatSources[3] = { FlameTitleColor1, FlameTitleColor2, FlameTitleColor3 };
@@ -79,6 +83,8 @@ namespace brogueHd::frontend::ui
 	private:
 
 		randomGenerator* _randomGenerator;
+
+		grid<color>* _heatSourceGrid;
 
 		int _fadePeriodMilliconds;
 		int _periodCounter;
@@ -114,11 +120,14 @@ namespace brogueHd::frontend::ui
 		_randomGenerator = randomGenerator;
 		_fadePeriodMilliconds = fadePeriodMilliseconds;
 		_periodCounter = 0;
+		_heatSourceGrid = new grid<color>(this->getParentBoundary(), this->getParentBoundary());
 
-		nextHeatSource(true);
+		cycleHeatSources();
+		nextHeatValues();
 	}
 	brogueFlameMenu::~brogueFlameMenu()
 	{
+		delete _heatSourceGrid;
 	}
 	void brogueFlameMenu::update(int millisecondsLapsed)
 	{
@@ -127,53 +136,107 @@ namespace brogueHd::frontend::ui
 		//
 		_periodCounter += millisecondsLapsed;
 
-		bool cycleHeatSources = _periodCounter >= _fadePeriodMilliconds;
+		bool cycleSources = _periodCounter >= _fadePeriodMilliconds;
 
-		nextHeatSource(cycleHeatSources);
+		if (cycleSources)
+			cycleHeatSources();
 
-		if (cycleHeatSources)
+		nextHeatValues();
+
+		if (cycleSources)
 			_periodCounter = 0;
 	}
-	void brogueFlameMenu::nextHeatSource(bool cycleHeatSources)
+
+	float brogueFlameMenu::calculateHeatEnvelope(short column, short row)
+	{
+		// Column Sine-Wave Pseudo-Heat Function
+		//
+		float width = (float)this->getBoundary().width;
+		float frequency = 7.0f;																		// Number of "candles" across the bottom
+		float lowValue = 0.2f;
+		float triangleLeft = 2 * (column / width);
+		float triangleRight = (triangleLeft * (lowValue - 1)) + (2 - lowValue);
+		//float timeArg = 0.3f * simpleMath::sin(2 * simpleMath::Pi * timeValue);
+		float timeArg = 0;
+		float sinArg = (frequency * ((column / width) * simpleMath::Pi)) + (timeArg);
+		float sinAmplitude = (column < (width / 2.0f)) ? triangleLeft : triangleRight;
+
+		// Calculate the heat along the bottom
+		float heatValue = sinAmplitude * simpleMath::abs(simpleMath::sin(sinArg));
+
+		return heatValue;
+	}
+
+	void brogueFlameMenu::cycleHeatSources()
 	{
 		brogueFlameMenu* that = this;
 		randomGenerator* randGenerator = _randomGenerator;
+		grid<color>* heatSourceGrid = _heatSourceGrid;
 
-		this->iterate([&that, &randGenerator, &cycleHeatSources] (short column, short row, brogueCellDisplay* cell)
+		_heatSourceGrid->iterate([&that, &randGenerator, &heatSourceGrid] (short column, short row, color currentHeatSource)
 		{
-			// Column Sine-Wave Pseudo-Heat Function
-			//
-			float width = (float)that->getBoundary().width;
-			float frequency = 7.0f;																		// Number of "candles" across the bottom
-			float lowValue = 0.2f;
-			float triangleLeft = 2 * (column / width);
-			float triangleRight = (triangleLeft * (lowValue - 1)) + (2 - lowValue);
-			//float timeArg = 0.3f * simpleMath::sin(2 * simpleMath::Pi * timeValue);
-			float timeArg = 0;
-			float sinArg = (frequency * ((column / width) * simpleMath::Pi)) + (timeArg);
-			float sinAmplitude = (column < (width / 2.0f)) ? triangleLeft : triangleRight;
-
-			// Calculate the heat along the bottom
-			float heatValue = sinAmplitude * simpleMath::abs(simpleMath::sin(sinArg));
-
-			color black = colors::black();
+			color nextColor;
 
 			if (that->isTheText(column, row))
 			{
-				if (cycleHeatSources)
-					cell->backColor =  color(0, 0, 1, 1);
+				int nextIndex = randGenerator->randomIndex(0, 3);
+				nextColor = randGenerator->nextColorNear(that->TitleHeatSources[nextIndex], that->FlameNoise);
+				nextColor.alpha = that->calculateHeatEnvelope(column, row);
 
-				else
-					cell->backColor.interpolate(black, 0.5f);
+				// Mix this color with the current cell color to blend smoothly
+				nextColor.interpolate(that->get(column, row)->backColor, 1 - that->FlameFade);
+			}
+			else if (row == ROWS - 1)
+			{
+				int nextIndex = randGenerator->randomIndex(0, 3);
+				nextColor = randGenerator->nextColorNear(that->BottomHeatSources[nextIndex], that->FlameNoise);
+				nextColor.alpha = that->calculateHeatEnvelope(column, row);
+
+				// Mix this color with the current cell color to blend smoothly
+				nextColor.interpolate(that->get(column, row)->backColor, 1 - that->FlameFade);
+			}
+			else
+			{
+				nextColor = colors::black();
+			}
+
+			heatSourceGrid->set(column, row, nextColor, true);
+
+			return iterationCallback::iterate;
+		});
+
+		// Smooth out the random noise across the bottom row
+		//
+		for (int index = 1; index < this->getParentBoundary().width - 1; index++)
+		{
+			color left = _heatSourceGrid->get(index - 1, this->getParentBoundary().height - 1);
+			color right = _heatSourceGrid->get(index + 1, this->getParentBoundary().height - 1);
+			color current = _heatSourceGrid->get(index, this->getParentBoundary().height - 1);
+
+			current.averageIn(1, 1, left, right);
+
+			// Not using heap memory except for the copy with the grid (grid<>.get returns a copy)
+			_heatSourceGrid->set(index, this->getParentBoundary().height - 1, current, true);
+		}
+	}
+	void brogueFlameMenu::nextHeatValues()
+	{
+		brogueFlameMenu* that = this;
+		randomGenerator* randGenerator = _randomGenerator;
+		grid<color>* heatSourceGrid = _heatSourceGrid;
+
+		this->iterate([&that, &randGenerator, &heatSourceGrid] (short column, short row, brogueCellDisplay* cell)
+		{
+			if (that->isTheText(column, row))
+			{
+				color next = heatSourceGrid->get(column, row);
+				cell->backColor.interpolate(next, that->FlameFade);
 			}
 
 			else if (row == ROWS - 1)
 			{
-				if (cycleHeatSources)
-					cell->backColor = color(1, 0, 0, 1);
-
-				else
-					cell->backColor.interpolate(black, 0.5f);
+				color next = heatSourceGrid->get(column, row);
+				cell->backColor.interpolate(next, that->FlameFade);
 			}
 
 			else

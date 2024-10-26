@@ -35,7 +35,7 @@ namespace brogueHd::frontend::opengl
 		/// <summary>
 		/// Runs the opengl program(s) for one draw pass
 		/// </summary>
-		virtual void run()
+		virtual void run(int millisecondsElapsed)
 		{
 
 		}
