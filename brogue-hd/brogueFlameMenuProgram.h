@@ -75,7 +75,7 @@ namespace brogueHd::frontend::opengl
 		ivec2* _cellSizeUI;
 		ivec2* _sceneSizeUI;
 
-		int _periodCounter;
+		int _periodCounterMilliseconds;
 		int _periodMilliseconds;
 		
 		gridRect* _sceneBoundaryUI;
@@ -89,7 +89,7 @@ namespace brogueHd::frontend::opengl
 	{
 		_resourceController = resourceController;
 		_renderedView = mainMenu;
-		_periodCounter = 0;
+		_periodCounterMilliseconds = 0;
 		_periodMilliseconds = 100;
 
 		int textureIndex = 0;
@@ -112,7 +112,7 @@ namespace brogueHd::frontend::opengl
 		simpleDataStream* heatSourceDataStream = brogueProgramBuilder::createSceneDataStream(mainMenu, openglDataStreamType::brogueCellQuad, openglBrogueCellOutputSelector::DisplayCurrentFrame,
 		[&mainMenu] (short column, short row, brogueCellDisplay* cell)
 		{
-			return true; /*mainMenu->isTheText(column, row) || row == mainMenu->getBoundary().bottom();*/
+			return mainMenu->isTheText(column, row) || row == mainMenu->getBoundary().bottom();
 		});
 
 		shaderData* colorMaskVert = resourceController->getShader(shaderResource::colorMaskVert);
@@ -253,19 +253,17 @@ namespace brogueHd::frontend::opengl
 
 	void brogueFlameMenuProgram::update(int millisecondsLapsed)
 	{
-		_periodCounter += millisecondsLapsed;
+		_periodCounterMilliseconds += millisecondsLapsed;
 
 		// Wait until the period has elapsed
 		//
-		if (_periodCounter < _periodMilliseconds)
+		if (_periodCounterMilliseconds < _periodMilliseconds)
 			return;
-
-		_periodCounter = 0;
 
 		brogueFlameMenu* mainMenu = _renderedView;
 
 		// Update the rendering
-		_renderedView->update(millisecondsLapsed);
+		_renderedView->update(_periodCounterMilliseconds);
 
 		// Heat Source
 		//
@@ -274,11 +272,13 @@ namespace brogueHd::frontend::opengl
 																							 openglBrogueCellOutputSelector::DisplayCurrentFrame,
 		[&mainMenu] (short column, short row, brogueCellDisplay* cell)
 		{
-			return true; /*mainMenu->isTheText(column, row) || row == mainMenu->getBoundary().bottom();*/
+			return mainMenu->isTheText(column, row) || row == mainMenu->getBoundary().bottom();
 		});
 
 		// (MEMORY! deletes old buffer)
 		_heatSourceProgram->bind();
 		_heatSourceProgram->reBuffer(heatSourceDataStream);
+
+		_periodCounterMilliseconds = 0;
 	}
 }

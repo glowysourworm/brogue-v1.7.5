@@ -284,8 +284,6 @@ namespace brogueHd::frontend::opengl
 		// assert(threadSleepTime <= intervalMilliseconds)
 		//
 		int intervalMilliseconds = 10;
-		int threadSleepTime = 5;
-		int loopCounter = 0;
 
 		// Windowed Mode
 		GLFWwindow* window = glfwCreateWindow(sceneBoundaryUI.width, sceneBoundaryUI.height, "Brogue v1.7.5", NULL, NULL);
@@ -385,16 +383,7 @@ namespace brogueHd::frontend::opengl
 		// Main Rendering Loop
 		while (!glfwWindowShouldClose(window))
 		{
-			std::this_thread::sleep_for(std::chrono::milliseconds(threadSleepTime));
-
-			if ((loopCounter * threadSleepTime) < intervalMilliseconds)
-			{
-				loopCounter++;
-				continue;
-			}
-
-			// Reset the counter
-			loopCounter = 0;
+			std::this_thread::sleep_for(std::chrono::milliseconds(intervalMilliseconds));
 
 			// Update from main thread's brogueView*
 			_threadLock->lock();
