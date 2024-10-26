@@ -20,16 +20,14 @@ namespace brogueHd::frontend::ui
 	{
 	public:
 		brogueFlameMenu(randomGenerator* randomGenerator,
-						int padding, 
-						int precision, 
-						int riseSpeed, 
-						int spreadSpeed, 
-						int colorDriftSpeed, 
-						int fadeSpeed, 
-						int updateDelay);
+						int fadePeriodMilliseconds);
 		~brogueFlameMenu();
 
 		void update(int millisecondsLapsed) override;
+
+	private:
+
+		void nextHeatSource(bool cycleHeatSources);
 
 	protected:
 
@@ -48,14 +46,6 @@ namespace brogueHd::frontend::ui
 							   MENU_TITLE_HEIGHT);
 		}
 
-	private:
-
-		void animate(int millisecondsLapsed, grid<color*>* heatSources, float weight);
-
-		void animateCheck(int millisecondsLapsed, bool& lowRateRefresh, bool& highRateRefresh);
-
-		void cycleHeatSources(grid<color*>* heatSources, const color& titleNextColor, const color& bottomNextColor, float randomness);
-
 	public:
 
 		const float FlameNoise = 0.3;
@@ -67,6 +57,9 @@ namespace brogueHd::frontend::ui
 		const color FlameTitleColor1 =			color(0.0, 0.0, 1.0, 0.5);
 		const color FlameTitleColor2 =			color(0.1, 0.1, 1.0, 0.5);
 		const color FlameTitleColor3 =			color(0.1, 0.1, 0.8, 0.5);
+
+		const color BottomHeatSources[3] = { FlameBottomColor1, FlameBottomColor2, FlameBottomColor3 };
+		const color TitleHeatSources[3] = { FlameTitleColor1, FlameTitleColor2, FlameTitleColor3 };
 
 		bool isTheText(short column, short row)
 		{
@@ -87,15 +80,8 @@ namespace brogueHd::frontend::ui
 
 		randomGenerator* _randomGenerator;
 
-		int _animationTimeLow;
-		int _animationTimeHigh;
-		int _animationPeriodLowRate;
-		int _animationPeriodHighRate;
-		bool _animationPeriodHighRateEveryOther;
-
-		grid<color*>* _heatSourcesLowRate;
-		grid<color*>* _heatSourcesHighRate;
-		
+		int _fadePeriodMilliconds;
+		int _periodCounter;
 
 		const char Title[MENU_TITLE_HEIGHT][MENU_TITLE_WIDTH] = {
 			"########   ########       ######         #######   ####     ###  #########",
@@ -121,274 +107,80 @@ namespace brogueHd::frontend::ui
 	};
 
 	brogueFlameMenu::brogueFlameMenu(randomGenerator* randomGenerator,
-									 int padding,
-									 int precision,
-									 int riseSpeed,
-									 int spreadSpeed,
-									 int colorDriftSpeed,
-									 int fadeSpeed,
-									 int updateDelay)
+									 int fadePeriodMilliseconds)
 
 		: brogueView(gridRect(0, 0, COLS, ROWS), gridRect(0, 0, COLS, ROWS))
 	{
 		_randomGenerator = randomGenerator;
-		_animationTimeLow = 0;
-		_animationTimeHigh = 0;
-		_animationPeriodLowRate = 2000;
-		_animationPeriodHighRate = 50;
-		_animationPeriodHighRateEveryOther = false;
+		_fadePeriodMilliconds = fadePeriodMilliseconds;
+		_periodCounter = 0;
 
-		_heatSourcesLowRate = new grid<color*>(gridRect(0, 0, COLS, ROWS), gridRect(0, 0, COLS, ROWS));
-		_heatSourcesHighRate = new grid<color*>(gridRect(0, 0, COLS, ROWS), gridRect(0, 0, COLS, ROWS));
+		nextHeatSource(true);
+	}
+	brogueFlameMenu::~brogueFlameMenu()
+	{
+	}
+	void brogueFlameMenu::update(int millisecondsLapsed)
+	{
+		// Heat source fade over the fade period; and then they're cycled to the next
+		// color.
+		//
+		_periodCounter += millisecondsLapsed;
 
+		bool cycleHeatSources = _periodCounter >= _fadePeriodMilliconds;
+
+		nextHeatSource(cycleHeatSources);
+
+		if (cycleHeatSources)
+			_periodCounter = 0;
+	}
+	void brogueFlameMenu::nextHeatSource(bool cycleHeatSources)
+	{
 		brogueFlameMenu* that = this;
+		randomGenerator* randGenerator = _randomGenerator;
 
-		// Initialize the view
-		this->iterate([&that] (short column, short row, brogueCellDisplay* cell)
+		this->iterate([&that, &randGenerator, &cycleHeatSources] (short column, short row, brogueCellDisplay* cell)
 		{
+			// Column Sine-Wave Pseudo-Heat Function
+			//
+			float width = (float)that->getBoundary().width;
+			float frequency = 7.0f;																		// Number of "candles" across the bottom
+			float lowValue = 0.2f;
+			float triangleLeft = 2 * (column / width);
+			float triangleRight = (triangleLeft * (lowValue - 1)) + (2 - lowValue);
+			//float timeArg = 0.3f * simpleMath::sin(2 * simpleMath::Pi * timeValue);
+			float timeArg = 0;
+			float sinArg = (frequency * ((column / width) * simpleMath::Pi)) + (timeArg);
+			float sinAmplitude = (column < (width / 2.0f)) ? triangleLeft : triangleRight;
+
+			// Calculate the heat along the bottom
+			float heatValue = sinAmplitude * simpleMath::abs(simpleMath::sin(sinArg));
+
+			color black = colors::black();
+
 			if (that->isTheText(column, row))
-				cell->backColor = color(0, 0, 1, 0.3);
+			{
+				if (cycleHeatSources)
+					cell->backColor =  color(0, 0, 1, 1);
+
+				else
+					cell->backColor.interpolate(black, 0.5f);
+			}
 
 			else if (row == ROWS - 1)
-				cell->backColor = color(1, 0, 0, 0.3);
+			{
+				if (cycleHeatSources)
+					cell->backColor = color(1, 0, 0, 1);
+
+				else
+					cell->backColor.interpolate(black, 0.5f);
+			}
 
 			else
 			{
 				cell->backColor = color(0, 0, 0, 0);
 				cell->noDisplay = true;
 			}
-
-			return iterationCallback::iterate;
-		});
-
-		// 
-		//cycleHeatSources(_heatSourcesLowRate, this->FlameTitleColor1, this->FlameBottomColor1, this->FlameNoise);
-		//cycleHeatSources(_heatSourcesHighRate, this->FlameTitleColor2, this->FlameBottomColor2, this->FlameNoise);
-
-		//for (int index = 0; index < _animationPeriodLowRate; index += _animationPeriodHighRate)
-		//{
-		//	update(_animationPeriodLowRate);
-		//}
-	}
-	brogueFlameMenu::~brogueFlameMenu()
-	{
-		// colors new'd in the ctor
-		for (int column = 0; column < COLS; column++)
-		{
-			for (int row = 0; row < ROWS; row++)
-			{
-				if (_heatSourcesLowRate->isDefined(column, row))
-					delete _heatSourcesLowRate->get(column, row);
-
-				if (_heatSourcesHighRate->isDefined(column, row))
-					delete _heatSourcesHighRate->get(column, row);
-			}
-		}
-		// Rest of the grid
-		delete _heatSourcesLowRate;
-		delete _heatSourcesHighRate;
-	}
-
-	void brogueFlameMenu::cycleHeatSources(grid<color*>* heatSources, const color& titleNextColor, const color& bottomNextColor, float randomness)
-	{
-		brogueFlameMenu* that = this;
-		randomGenerator* randGenerator = _randomGenerator;
-
-		// Transfer rendering to the primary view grid
-		this->getBoundary().iterate([&that, &heatSources, &titleNextColor, &bottomNextColor, &randGenerator, &randomness] (short column, short row)
-		{	
-			if (that->isTheText(column, row))
-			{
-				// Iterate adjacent cells (to the text)
-				that->getBoundary().iterateAdjacent(column, row, [&heatSources, &randGenerator, &bottomNextColor, &titleNextColor, &randomness] (short acol, short arow)
-				{
-					if (!heatSources->isDefined(acol, arow))
-					{
-						heatSources->set(acol, arow, new color(0, 0, 0, 0), true);
-					}
-
-					heatSources->get(acol, arow)->set(randGenerator->nextColorNear(titleNextColor, randomness));
-
-					return iterationCallback::iterate;
-				});
-			}
-
-			else if (row == ROWS - 1)
-			{
-				if (!heatSources->isDefined(column, row))
-				{
-					heatSources->set(column, row, new color(0, 0, 0, 0), true);
-				}
-
-				heatSources->get(column, row)->set(randGenerator->nextColorNear(bottomNextColor, randomness));
-			}
-
-			return iterationCallback::iterate;
-		});
-	}
-	void brogueFlameMenu::update(int millisecondsLapsed)
-	{
-		bool lowRateUpdate = false;
-		bool highRateUpdate = false;
-
-		this->animateCheck(millisecondsLapsed, lowRateUpdate, highRateUpdate);
-
-		if (lowRateUpdate)
-			this->animate(millisecondsLapsed, _heatSourcesLowRate, 0.1f);
-
-		if (highRateUpdate)
-			this->animate(millisecondsLapsed, _heatSourcesHighRate, 0.05f);
-	}
-
-	void brogueFlameMenu::animateCheck(int millisecondsLapsed, bool& lowRateRefresh, bool& highRateRefresh)
-	{
-		_animationTimeLow += millisecondsLapsed;
-		_animationTimeHigh += millisecondsLapsed;
-
-		lowRateRefresh = false;
-		highRateRefresh = false;
-
-		// Check to see if animation needs updated
-		//
-		if (_animationTimeHigh < _animationPeriodHighRate)
-		{
-			return;
-		}
-
-		// High Rate Animation
-		//
-		if (_animationTimeHigh >= _animationPeriodHighRate)
-		{
-			if (_animationPeriodHighRateEveryOther)
-				cycleHeatSources(_heatSourcesHighRate, this->FlameTitleColor2, this->FlameBottomColor2, this->FlameNoise);
-
-			else
-			{
-				cycleHeatSources(_heatSourcesHighRate, this->FlameTitleColor3, this->FlameBottomColor3, this->FlameNoise);
-
-				_animationPeriodHighRateEveryOther = false;
-			}
-
-			// Reset counter
-			_animationTimeHigh = 0;
-
-			highRateRefresh = true;
-		}
-
-		// Low Rate Animation
-		//
-		if (_animationTimeLow > _animationPeriodLowRate)
-		{
-			cycleHeatSources(_heatSourcesLowRate, this->FlameTitleColor1, this->FlameBottomColor1, this->FlameNoise);
-
-			// Reset counter
-			_animationTimeLow = 0;
-
-			lowRateRefresh = true;
-		}
-	}
-
-	void brogueFlameMenu::animate(int millisecondsLapsed, grid<color*>* heatSources, float weight)
-	{
-		brogueFlameMenu* that = this;
-		randomGenerator* randGenerator = _randomGenerator;
-
-		// Treat the heat value of 1.0 as max heat
-		this->getBoundary().iterateRowsFirst_BottomToTop([&that, &randGenerator, &heatSources, &weight] (short column, short row)
-		{
-			// Transfer heat upwards to the three cells above this one
-			// as an average value
-			//
-			brogueCellDisplay* cell = that->get(column, row);
-
-			// Text Mask:  Just skip this one
-			if (that->isTheText(column, row))
-				return iterationCallback::iterate;
-
-			// Check for heat sources
-			color* currentSource = heatSources->get(column, row);
-
-			color* southSource = heatSources->getAdjacentUnsafe(column, row, brogueCompass::S);
-			color* southWestSource = heatSources->getAdjacentUnsafe(column, row, brogueCompass::SW);
-			color* southEastSource = heatSources->getAdjacentUnsafe(column, row, brogueCompass::SE);
-
-			// Check current values before sources
-			//
-			simpleList<color> diffuseColors;
-
-			if (southWestSource != nullptr)
-				diffuseColors.add(*southWestSource);
-
-			if (southSource != nullptr)
-				diffuseColors.add(*southSource);
-
-			if (southEastSource != nullptr)
-				diffuseColors.add(*southEastSource);
-
-			// Check current values before sources
-			//
-			if (row < ROWS - 1)
-			{
-				// S
-				if (that->get(column, row + 1)->backColor != colors::black())
-				{
-					if (southSource == nullptr)
-						diffuseColors.add(that->get(column, row + 1)->backColor);
-				}
-
-				// SW
-				if (column - 1 >= 0 && that->get(column - 1, row + 1)->backColor != colors::black())
-				{
-					if (southWestSource == nullptr)
-						diffuseColors.add(that->get(column - 1, row + 1)->backColor);
-				}
-
-				// SE
-				if (column + 1 < COLS && that->get(column + 1, row + 1)->backColor != colors::black())
-				{
-					if (southEastSource == nullptr)
-						diffuseColors.add(that->get(column + 1, row + 1)->backColor);
-				}
-			}
-
-			//color east = colors::black();
-			//color west = colors::black();
-
-			//// Column Sine-Wave Pseudo-Heat Function
-			////
-			//float width = (float)that->getBoundary().width;
-			//float frequency = 7.0f;																		// Number of "candles" across the bottom
-			//float lowValue = 0.2f;
-			//float triangleLeft = 2 * (column / width);
-			//float triangleRight = (triangleLeft * (lowValue - 1)) + (2 - lowValue);
-			////float timeArg = 0.3f * simpleMath::sin(2 * simpleMath::Pi * timeValue);
-			//float timeArg = 0;
-			//float sinArg = (frequency * ((column / width) * simpleMath::Pi)) + (timeArg);
-			//float sinAmplitude = (column < (width / 2.0f)) ? triangleLeft : triangleRight;
-
-			//// Calculate the heat along the bottom
-			//float heatValue = sinAmplitude * simpleMath::abs(simpleMath::sin(sinArg));
-
-
-
-			// Current Source:  Interpolate this value for the next several frames
-			//
-			if (currentSource != nullptr)
-				cell->backColor.interpolate(*currentSource, 0.1);
-
-			// Diffusion:  Pull up the values from the adjacent cells - 3 below the current - 
-			//			   using an average.
-			//
-			else
-			{
-				cell->backColor.interpolate(weight, diffuseColors);
-			}
-
-			// Diffusion Threshold:  This value would be the lower limit of the "heat" in the
-			//					     cell - further away from the heat sources.
-			//
-			//if (cell->backColor.magnitude() < 0.05f)
-			//	cell->backColor = colors::black();
 
 			return iterationCallback::iterate;
 		});

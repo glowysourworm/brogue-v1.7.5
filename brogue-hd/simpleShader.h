@@ -1,8 +1,9 @@
 #pragma once
 
 #include "brogueGlobal.h"
-#include "simplePrimitive.h"
+#include "simpleGlObject.h"
 #include "simpleGlData.h"
+#include "openglHelper.h"
 #include "simpleUniform.h"
 #include "simpleArray.h"
 #include "simpleString.h"
@@ -18,7 +19,7 @@ namespace brogueHd::frontend::opengl
     /// Representation of a shader shared by the GPU. This contains the shader handle and data needed to
     /// compile the shader at runtime.
     /// </summary>
-    struct simpleShader : public simplePrimitive
+    struct simpleShader : public simpleGlObject
     {
     public:
         simpleShader();
@@ -29,8 +30,12 @@ namespace brogueHd::frontend::opengl
         void operator=(const simpleShader& copy);
 
         void glCreate(GLuint programHandle) override;
-        void bind(bool bind) override;
         void teardown() override;
+
+        bool isCreated() const override
+        {
+            return openglHelper::getShaderCreated(this->handle);
+        }
 
         simpleString getSource() const
         {
@@ -46,21 +51,14 @@ namespace brogueHd::frontend::opengl
             return _source.getHash();
         }
 
-        bool hasErrors() override
+        bool hasErrors() const override
         {
-            GLchar* buffer = new GLchar[10000];
-            GLsizei  length = 0;
+            return openglHelper::getShaderCompilerError(this->handle);
+        }
 
-            // Check info log for the errors
-            glGetShaderInfoLog(this->handle, 10000, &length, buffer);
-
-            // For now, just show the exception from the shader
-            if (length > 0)
-                simpleLogger::logColor(brogueConsoleColor::Red, buffer);
-
-            delete[] buffer;
-
-            return length > 0;
+        void showErrors() const override
+        {
+            openglHelper::outputShaderInfoLog(this->handle);
         }
 
         template<isOpenGlUniform T>
@@ -207,10 +205,6 @@ namespace brogueHd::frontend::opengl
 
     simpleShader::simpleShader()
     {
-        this->handle = NULL;
-        this->isCreated = false;
-        this->isBound = false;
-
         _uniforms1i = new simpleArray<simpleUniform<int>>();
         _uniforms1 = new simpleArray<simpleUniform<float>>();
         _uniforms2 = new simpleArray<simpleUniform<vec2>>();
@@ -234,8 +228,6 @@ namespace brogueHd::frontend::opengl
     simpleShader::simpleShader(shaderData* data)
     {
         this->handle = NULL;
-        this->isCreated = false;
-        this->isBound = false;
 
         _uniforms1i = new simpleArray<simpleUniform<int>>(data->uniforms1i.toArray());
         _uniforms1 = new simpleArray<simpleUniform<float>>(data->uniforms1.toArray());
@@ -250,8 +242,6 @@ namespace brogueHd::frontend::opengl
     void simpleShader::copyImpl(const simpleShader& copy)
     {
         this->handle = NULL;
-        this->isCreated = false;
-        this->isBound = false;
 
         _shaderType = copy.getShaderType();
         _source = copy.getSource();
@@ -270,19 +260,17 @@ namespace brogueHd::frontend::opengl
 
     void simpleShader::teardown()
     {
-        if (!this->isCreated)
-            simpleException::showCstr("simpleShader already deleted from the backend");
+        if (!this->isCreated())
+            simpleException::show("simpleShader already deleted from the backend");
 
         // Deletes the shader object from the GL backend
         glDeleteShader(this->handle);
-
-        this->isCreated = false;
     }
 
     void simpleShader::glCreate(GLuint programHandle)
     {
-        if (this->isCreated)
-            simpleException::showCstr("simpleShader already created on the backend");
+        if (this->isCreated())
+            simpleException::show("simpleShader already created on the backend");
 
         // Declare the shader on the GL backend
         this->handle = glCreateShader(_shaderType);
@@ -296,12 +284,5 @@ namespace brogueHd::frontend::opengl
 
         // Compile the shader and check for errors
         glCompileShader(this->handle);
-
-        this->isCreated = true;
-    }
-
-    void simpleShader::bind(bool bind)
-    {
-
     }
 }

@@ -419,7 +419,7 @@
     <ClInclude Include="simpleShaderProgram.h">
       <Filter>Header Files\frontend\opengl</Filter>
     </ClInclude>
-    <ClInclude Include="simplePrimitive.h">
+    <ClInclude Include="simpleGlObject.h">
       <Filter>Header Files\frontend\opengl</Filter>
     </ClInclude>
     <ClInclude Include="simpleVertexBuffer.h">
@@ -546,6 +546,9 @@
       <Filter>Header Files\frontend\opengl</Filter>
     </ClInclude>
     <ClInclude Include="simpleUniform.h">
+      <Filter>Header Files\frontend\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="openglHelper.h">
       <Filter>Header Files\frontend\opengl</Filter>
     </ClInclude>
   </ItemGroup>

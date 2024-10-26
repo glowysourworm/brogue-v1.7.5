@@ -1,13 +1,14 @@
 #pragma once
 
-#include "simplePrimitive.h"
+#include "simple.h"
+#include "simpleGlObject.h"
 #include "gridRect.h"
 
 using namespace brogueHd::component;
 
 namespace brogueHd::frontend::opengl
 {
-	class brogueProgram : simplePrimitive
+	class brogueProgram : hashableObject
 	{
 	public:
 
@@ -32,11 +33,32 @@ namespace brogueHd::frontend::opengl
 		}
 
 		/// <summary>
-		/// Runs the opengl program for one draw pass
+		/// Runs the opengl program(s) for one draw pass
 		/// </summary>
 		virtual void run()
 		{
 
+		}
+
+		/// <summary>
+		/// Outputs status for program objects to simpleLogger
+		/// </summary>
+		virtual void outputStatus() const
+		{
+
+		}
+
+		virtual bool isCompiled() const
+		{
+			return false;
+		}
+
+		/// <summary>
+		/// Returns true if there are errors in the program; and the sequence must be halted.
+		/// </summary>
+		virtual bool hasErrors() const
+		{
+			return false;
 		}
 
 		/// <summary>
@@ -47,77 +69,5 @@ namespace brogueHd::frontend::opengl
 		{
 			return default_value::value<gridRect>();
 		}
-
-    public:  // simplePrimitive
-
-        /// <summary>
-        /// Function that declares the primitive on the backend (shader, program, uniform, ...). This
-        /// must be inherited and extended in child classes.
-        /// </summary>
-		virtual void glCreate(GLuint programHandle) override
-		{
-
-		}
-
-		virtual void compile()
-		{
-
-		}
-
-        /// <summary>
-        /// Binds / Unbinds the primitive to be the active component on the GL backend. Must bind before running
-        /// program.
-        /// </summary>
-		virtual void bind(bool bind) override
-		{
-
-		}
-
-        /// <summary>
-        /// Draws the primitive by calling the GL backend
-        /// </summary>
-		virtual void draw() override
-		{
-
-		}
-
-        /// <summary>
-        /// Calls GL backend to remove created objects
-        /// </summary>
-		virtual void teardown() override
-		{
-
-		}
-
-        /// <summary>
-        /// Checks GL backend for errors; and forwards them on.
-        /// </summary>
-        /// <returns></returns>
-		virtual bool hasErrors() override
-		{
-			return false;
-		}
-
-        /// <summary>
-        /// GL handle created by the GL backend
-        /// </summary>
-		virtual GLuint getHandle() const override
-		{
-			return 0;
-		}
-
-		virtual bool getIsBound() const override
-		{
-			return false;
-		}
-
-		virtual size_t getHash() const override
-		{
-			return 0;
-		}
-
-	protected:
-
-		bool isCompiled;
 	};
 }

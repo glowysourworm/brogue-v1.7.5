@@ -351,8 +351,7 @@ namespace brogueHd::frontend::opengl
 		//
 		// GL Functions must be called after calling glfwMakeContextCurrent.
 		//
-		_program->compile();		// Declares program and program pieces on GL backend
-		_program->bind(true);		// Activates program and program pieces on GL backend
+		_program->initialize();		// Declares program and program pieces on GL backend
 
 		if (_program->hasErrors())
 		{
@@ -379,10 +378,6 @@ namespace brogueHd::frontend::opengl
 
 		//glViewport(_sceneBoundaryUI.left(), _sceneBoundaryUI.top(), _sceneBoundaryUI.width, _sceneBoundaryUI.height);
 		glViewport(0, 0, sceneBoundaryUI.width, sceneBoundaryUI.height);
-
-		// Initialize Program:  compile() -> bind(true)
-		_program->initialize();
-		_program->hasErrors();						// log errors
 
 		// THREAD:  UNLOCK TO ENTER PRIMARY LOOP
 		_threadLock->unlock();
@@ -417,8 +412,6 @@ namespace brogueHd::frontend::opengl
 
 			glfwSwapBuffers(window);
 			glfwPollEvents();
-
-			//std::this_thread::sleep_for(std::chrono::milliseconds(threadSleepTime));
 		}
 
 		// Window could've been destroyed already

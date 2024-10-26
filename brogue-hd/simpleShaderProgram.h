@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "simplePrimitive.h"
+#include "simpleGlObject.h"
 #include "simpleVertexArray.h"
 #include "simpleGlData.h"
 #include "simpleList.h"
@@ -15,33 +15,40 @@ using namespace brogueHd::simple;
 
 namespace brogueHd::frontend::opengl
 {
-    class simpleShaderProgram : public simplePrimitive
+    class simpleShaderProgram : public simpleGlObject
     {
     public:
 
-        simpleShaderProgram(const simpleShader& vertexShader, const simpleShader& fragmentShader);
+        simpleShaderProgram(const simpleShader& vertexShader, const simpleShader& fragmentShader, simpleVertexArray<float>* programVAO);
         ~simpleShaderProgram();
 
         void compile();
-        void run();
-
-        void draw(int bufferIndex);
-        void drawAll();
-
-        void bind(bool bind);
-
-        void declareVAO(simpleVertexArray<float>* programVAO);
+        void draw();
+        void bind() override;
         void deleteProgram();
 
-        bool hasErrors() override;
+        bool isCreated() const override
+        {
+            return openglHelper::getProgramCreated(this->handle);
+        }
+        bool isBound() const override
+        {
+            return openglHelper::getActiveProgram() == this->handle;
+        }
+        bool hasErrors() const override
+        {
+            return openglHelper::getProgramError(this->handle);
+        }
+        void showErrors() const override
+        {
+            openglHelper::outputProgramInfoLog(this->handle);
+        }
 
         /// <summary>
-        /// Call to re-buffer the data glBufferData. Must be the exact parameters as when it was built - except
-        /// for length of the buffer (not a good design!).
+        /// Call to re-buffer the data glNamedBufferSubData. Will delete the old stream.
         /// </summary>
         /// <param name="bufferIndex">Index of VAO</param>
-        /// <param name="newBuffer">Data stream for the new buffer (old will be deleted)</param>
-        void reBuffer(int vaoIndex, simpleDataStream* newBuffer);
+        void reBuffer(simpleDataStream* newBuffer);
 
         bool bindUniform1i(const simpleString& name, int uniformValue);
         bool bindUniform1(const simpleString& name, float uniformValue);
@@ -53,39 +60,32 @@ namespace brogueHd::frontend::opengl
 
         void bindUniforms();
 
-        void checkStatus(const char* statusName, GLenum status, bool logOutput = true) const;
-
-        void outputActives() const;
-
     private:
 
         bool _isCompiled;
 
-        simpleList<simpleVertexArray<float>*>* _programVAOs;
+        simpleVertexArray<float>* _programVAO;
 
         simpleShader _vertexShader;
         simpleShader _fragmentShader;
     };
 
-    simpleShaderProgram::simpleShaderProgram(const simpleShader& vertexShader, const simpleShader& fragmentShader)
+    simpleShaderProgram::simpleShaderProgram(const simpleShader& vertexShader, const simpleShader& fragmentShader, simpleVertexArray<float>* programVAO)
     {
-        _programVAOs = new simpleList<simpleVertexArray<float>*>();
+        _programVAO = programVAO;
         _vertexShader = vertexShader;
         _fragmentShader = fragmentShader;
         _isCompiled = false;
     }
     simpleShaderProgram::~simpleShaderProgram()
     {
-        delete _programVAOs;
+        delete _programVAO;
     }
 
     void simpleShaderProgram::compile()
     {
         if (_isCompiled)
             simpleException::showCstr("Already called simpleShaderProgram::compile");
-
-        if (_programVAOs->count() == 0)
-            simpleException::showCstr("simpleShaderProgram must have a VAO attached before compiling");
 
         // Procedure
         //
@@ -108,199 +108,55 @@ namespace brogueHd::frontend::opengl
         // Link the program
         glLinkProgram(this->handle);
 
-        GLuint handle = this->handle;
-
         // Declare: VAO -> VBO
         //
-        _programVAOs->forEach([&handle] (simpleVertexArray<float>* vao)
-        {
-            vao->glCreate(handle);
-
-            return iterationCallback::iterate;
-        });
+        _programVAO->glCreate(this->handle);
 
         // "Installs the program object as part of the current rendering state"
-        glUseProgram(handle);
+        glUseProgram(this->handle);
 
         // Bind Uniforms (default values)
         bindUniforms();
 
-        // Outputs active attributes + uniforms
-        outputActives();
+        // Show output for this program:  errors, actives, etc...
+        openglHelper::outputShaderInfoLog(_vertexShader.getHandle());
+        openglHelper::outputShaderInfoLog(_fragmentShader.getHandle());
+        openglHelper::outputProgramInfoLog(this->handle);
+        openglHelper::outputProgramParameters(this->handle);
 
         _isCompiled = true;
-        this->isBound = true;
     }
 
-    void simpleShaderProgram::checkStatus(const char* statusName, GLenum status, bool logOutput) const
-    {
-        GLint result;
-
-        glGetProgramiv(this->handle, status, &result);
-
-        if (result == GL_FALSE)
-            simpleLogger::logColor(brogueConsoleColor::Red, "{}:  {}", statusName, "Error!");
-
-        else if (result == GL_TRUE)
-            simpleLogger::log("{}:  {}", statusName, "Ok!");
-
-        else
-            simpleException::show("Unknown status return from glGetProgramiv:  simpleShaderProgram.h");
-    }
-
-    void simpleShaderProgram::outputActives() const
-    {
-        GLchar name[256];
-        GLenum properties[3] { GL_NAME_LENGTH , GL_TYPE, GL_ARRAY_SIZE };
-        GLint values[3];
-
-        GLint numActiveAttribs = 0;
-        GLint numActiveUniforms = 0;
-
-        glGetProgramInterfaceiv(this->handle, GL_PROGRAM_INPUT, GL_ACTIVE_RESOURCES, &numActiveAttribs);
-        glGetProgramInterfaceiv(this->handle, GL_UNIFORM, GL_ACTIVE_RESOURCES, &numActiveUniforms);
-
-        for (int attrib = 0; attrib < numActiveAttribs; ++attrib)
-        {
-            glGetProgramResourceiv(this->handle, GL_PROGRAM_INPUT, attrib, 3, &properties[0], 3, NULL, &values[0]);
-            glGetProgramResourceName(this->handle, GL_PROGRAM_INPUT, attrib, values[0], NULL, &name[0]);
-
-            simpleLogger::log("Active Attribute:  Program={} Type={} Attribute={}", this->handle, values[1], simpleString(name).c_str());
-        }
-
-        for (int attrib = 0; attrib < numActiveUniforms; ++attrib)
-        {
-            glGetProgramResourceiv(this->handle, GL_UNIFORM, attrib, 3, &properties[0], 3, NULL, &values[0]);
-            glGetProgramResourceName(this->handle, GL_UNIFORM, attrib, values[0], NULL, &name[0]);
-
-            simpleLogger::log("Active Uniform:  Program={} Type={} Uniform={}", this->handle, values[1], simpleString(name).c_str());
-        }
-    }
-
-    bool simpleShaderProgram::hasErrors()
-    {
-        GLchar* buffer = new GLchar[10000];
-        GLsizei  length = 0;
-
-        // Check info log for the errors
-        glGetProgramInfoLog(this->handle, 10000, &length, buffer);
-
-        // For now, just show the exception from the shader
-        if (length > 0)
-            simpleLogger::logColor(brogueConsoleColor::Red, buffer);
-
-        delete[] buffer;
-
-        // (Outputs all error logs)
-        bool vertexShaderError = _vertexShader.hasErrors();
-        bool fragmentShaderError = _fragmentShader.hasErrors();
-
-        // Also check active uniforms
-        bool activeUniformError = false;
-        int count = 0;
-        glGetProgramiv(this->handle, GL_ACTIVE_UNIFORMS, &count);
-
-        int vertexShaderCount = _vertexShader.getUniform1Count() +
-                                _vertexShader.getUniform1iCount() +
-                                _vertexShader.getUniform2iCount() +
-                                _vertexShader.getUniform2Count() +
-                                _vertexShader.getUniform4Count();
-
-        int fragmentShaderCount = _fragmentShader.getUniform1Count() +
-                                    _fragmentShader.getUniform1iCount() +
-                                    _fragmentShader.getUniform2iCount() +
-                                    _fragmentShader.getUniform2Count() +
-                                    _fragmentShader.getUniform4Count();
-
-        activeUniformError = (count != (vertexShaderCount + fragmentShaderCount));
-            
-        //if (activeUniformError)
-        //    simpleLogger::logColor(brogueConsoleColor::Blue, "Active Uniform Count Mismatch (Program={}):  Vertex={}, Fragment={}, glGetProgramiv={}", this->handle, vertexShaderCount, fragmentShaderCount, count);
-
-        return length > 0 || vertexShaderError || fragmentShaderError;
-    }
-
-    void simpleShaderProgram::draw(int bufferIndex)
+    void simpleShaderProgram::draw()
     {
         if (!_isCompiled)
             simpleException::showCstr("Must first call IGLProgram.Compile() before using the GL program");
 
-        if (!this->isBound)
-            simpleException::showCstr("Must first call Bind to set the program active");
+        if (!this->isBound())
+            simpleException::showCstr("Must first call bind to set the program active");
 
-        simplePrimitive* programVAO = _programVAOs->get(bufferIndex);
-        programVAO->bind(true);
-        programVAO->draw();
+        _programVAO->bind();
+        _programVAO->draw();
     }
 
-    void simpleShaderProgram::drawAll()
-    {
-        if (!_isCompiled)
-            simpleException::showCstr("Must first call compile before using the GL program");
-
-        if (!this->isBound)
-            simpleException::show("Must first call Bind to set the program active");
-
-        _programVAOs->forEach([] (simpleVertexArray<float>* vao)
-        {
-            vao->bind(true);
-            vao->draw();
-            return iterationCallback::iterate;
-        });
-    }
-
-    void simpleShaderProgram::run()
+    void simpleShaderProgram::reBuffer(simpleDataStream* newBuffer)
     {
         if (!_isCompiled)
             simpleException::show("Must first call compile before using the GL program");
 
-        if (!this->isBound)
-            simpleException::show("Must first call Bind to set the program active");
+        if (!this->isBound())
+            simpleException::show("Must first call Bind(true) to rebuffer data!");
 
-        glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-
-        this->drawAll();
+        _programVAO->bind();
+        _programVAO->reBuffer(this->handle, newBuffer);
     }
 
-    void simpleShaderProgram::reBuffer(int vaoIndex, simpleDataStream* newBuffer)
+    void simpleShaderProgram::bind()
     {
         if (!_isCompiled)
             simpleException::show("Must first call compile before using the GL program");
 
-        if (this->isBound)
-            simpleException::show("Must first call Bind(false) to rebuffer data!");
-
-        _programVAOs->get(vaoIndex)->bind(false);
-        _programVAOs->get(vaoIndex)->reBuffer(newBuffer);
-        _programVAOs->get(vaoIndex)->bind(true);
-    }
-
-    void simpleShaderProgram::bind(bool bind)
-    {
-        if (!_isCompiled)
-            simpleException::show("Must first call compile before using the GL program");
-
-        if (bind)
-        {
-            glUseProgram(this->handle);
-        }
-        else
-        {
-            glUseProgram(0);
-        }
-
-        this->isBound = bind;
-    }
-
-    void simpleShaderProgram::declareVAO(simpleVertexArray<float>* programVAO)
-    {
-        // Might've had to do with the textures.
-        // 
-        //if (_isCompiled)
-        //    simpleException::showCstr("Must first compile before declaring VAO");
-
-        _programVAOs->add(programVAO);
+        glUseProgram(this->handle);
     }
 
     void simpleShaderProgram::bindUniforms()
@@ -429,7 +285,7 @@ namespace brogueHd::frontend::opengl
     void simpleShaderProgram::deleteProgram()
     {
         if (!_isCompiled)
-            simpleException::showCstr("Must first call compile before using the GL program");
+            simpleException::show("Must first call compile before using the GL program");
 
         // Procedure
         //
@@ -448,11 +304,7 @@ namespace brogueHd::frontend::opengl
         _fragmentShader.teardown();
 
         // Teardown the VAO
-        _programVAOs->forEach([] (simplePrimitive* vao)
-        {
-            vao->teardown();
-            return iterationCallback::iterate;
-        });
+        _programVAO->teardown();
 
         // Deactivate the program on the backend before deleting
         glUseProgram(NULL);
@@ -461,6 +313,5 @@ namespace brogueHd::frontend::opengl
         glDeleteProgram(this->handle);
 
         _isCompiled = false;
-        this->isBound = false;
     }
 }

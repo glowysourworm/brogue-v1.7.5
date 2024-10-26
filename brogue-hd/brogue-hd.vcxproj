@@ -195,6 +195,7 @@
     <ClInclude Include="brogueFlameMenuProgram.h" />
     <ClInclude Include="brogueProgram.h" />
     <ClInclude Include="brogueTestFunction.h" />
+    <ClInclude Include="openglHelper.h" />
     <ClInclude Include="randomRange.h" />
     <ClInclude Include="simpleBoundingBox.h" />
     <ClInclude Include="simpleExt.h" />
@@ -214,7 +215,7 @@
     <ClInclude Include="shaderData.h" />
     <ClInclude Include="simpleDataStream.h" />
     <ClInclude Include="simpleFrameBuffer.h" />
-    <ClInclude Include="simplePrimitive.h" />
+    <ClInclude Include="simpleGlObject.h" />
     <ClInclude Include="khrplatform.h" />
     <ClInclude Include="simpleArrayTests.h" />
     <ClInclude Include="simpleComponentTests.h" />

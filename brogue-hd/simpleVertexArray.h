@@ -1,6 +1,7 @@
 #pragma once
 
-#include "simplePrimitive.h"
+#include "openglHelper.h"
+#include "simpleGlObject.h"
 #include "simpleVertexBuffer.h"
 #include "simpleException.h"
 #include "gl.h"
@@ -14,7 +15,7 @@ namespace brogueHd::frontend::opengl
     /// that are stored on the GL backend
     /// </summary>
     template<typename T>
-    class simpleVertexArray : public simplePrimitive
+    class simpleVertexArray : public simpleGlObject
     {
     public:
         simpleVertexArray();
@@ -22,14 +23,27 @@ namespace brogueHd::frontend::opengl
         ~simpleVertexArray();
 
         void glCreate(GLuint programHandle) override;
-        void bind(bool bind) override;
+        void bind() override;
         void teardown() override;
-        void draw() override;
+
+        bool isCreated() const override
+        {
+            return this->handle != simpleGlObject::HandleNull && openglHelper::getVAOCreated(this->handle);
+        }
+        bool isBound() const override
+        {
+            return openglHelper::getVAOBinding(this->handle);
+        }
+
+        /// <summary>
+        /// Draws the contents of the VAO's vertex buffer (currently only a single VBO per VAO)
+        /// </summary>
+        void draw();
 
         /// <summary>
         /// Rebuffers data on the specified VBO (see simpleShaderProgram)
         /// </summary>
-        void reBuffer(simpleDataStream* stream);
+        void reBuffer(GLuint programHandle, simpleDataStream* stream);
 
         size_t getHash() const override
         {
@@ -54,9 +68,6 @@ namespace brogueHd::frontend::opengl
     {
         _primitiveType = primitiveType;
         _vertexBuffer = vertexBuffer;
-
-        this->isBound = false;
-        this->isCreated = false;
     }
 
     template<typename T>
@@ -69,8 +80,8 @@ namespace brogueHd::frontend::opengl
     template<typename T>
     void simpleVertexArray<T>::glCreate(GLuint programHandle)
     {
-        if (this->isCreated)
-            simpleException::showCstr("simpleVertexArray already created in the backend");
+        if (this->isCreated())
+            simpleException::show("simpleVertexArray already created in the backend");
 
         // Procedure:  Create / Draw / Teardown several vertex buffers
         //
@@ -91,26 +102,26 @@ namespace brogueHd::frontend::opengl
         //
         _vertexBuffer->glCreate(programHandle);
 
-        this->isCreated = true;
-        this->isBound = true;
+        if (!this->isCreated())
+            simpleException::show("simpleVertexArray error creating the VAO");
     }
 
     template<typename T>
-    void simpleVertexArray<T>::reBuffer(simpleDataStream* stream)
+    void simpleVertexArray<T>::reBuffer(GLuint programHandle, simpleDataStream* stream)
     {
-        if (!this->isCreated)
+        if (!this->isCreated())
             simpleException::show("simpleVertexArray already deleted from the backend");
 
-        if (this->isBound)
-            simpleException::show("simpleVertexArray must be un-bound before calling rebuffer()");
+        if (!this->isBound())
+            simpleException::show("simpleVertexArray must be bound before calling rebuffer()");
 
-        _vertexBuffer->reBuffer(stream, true);
+        _vertexBuffer->reBuffer(programHandle, stream, true);
     }
 
     template<typename T>
     void simpleVertexArray<T>::teardown()
     {
-        if (!this->isCreated)
+        if (!this->isCreated())
             simpleException::show("simpleVertexArray already deleted from the backend");
 
         // Teardown vertex buffers
@@ -119,41 +130,29 @@ namespace brogueHd::frontend::opengl
         // Delete this vertex array
         glDeleteVertexArrays(1, &this->handle);
 
-        this->isCreated = false;
-        this->isBound = false;
-        this->handle = NULL;
+        this->handle = simpleGlObject::HandleNull;
     }
 
     template<typename T>
     void simpleVertexArray<T>::draw()
     {
-        if (!this->isCreated)
+        if (!this->isCreated())
             simpleException::show("simpleVertexArray already deleted from the backend");
 
-        if (!this->isBound)
-            simpleException::show("simpleVertexArray must be bound before calling Draw()");
+        if (!this->isBound())
+            simpleException::show("simpleVertexArray must be bound before calling draw()");
 
         // Draw Buffer
         glDrawArrays(_primitiveType, 0, _vertexBuffer->getBufferLength());
     }
 
     template<typename T>
-    void simpleVertexArray<T>::bind(bool bind)
+    void simpleVertexArray<T>::bind()
     {
-        if (!this->isCreated)
+        if (!this->isCreated())
             simpleException::show("simpleVertexArray already deleted from the backend");
 
         // Bind VAO before using
-        if (bind)
-        {
-            glBindVertexArray(this->handle);
-        }
-
-        else
-        {
-            glBindVertexArray(NULL);
-        }
-
-        this->isBound = bind;
+        glBindVertexArray(this->handle);
     }
 }

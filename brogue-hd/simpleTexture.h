@@ -1,7 +1,7 @@
 #pragma once
 
 #include "simple.h"
-#include "simplePrimitive.h"
+#include "simpleGlObject.h"
 #include "simpleException.h"
 #include "gl.h"
 
@@ -9,7 +9,7 @@ using namespace brogueHd::simple;
 
 namespace brogueHd::frontend::opengl
 {
-    struct simpleTexture : public simplePrimitive
+    struct simpleTexture : public simpleGlObject
     {
     public:
 
@@ -28,7 +28,16 @@ namespace brogueHd::frontend::opengl
 
         void glCreate(GLuint programHandle) override;
         void teardown() override;
-        void bind(bool bind) override;
+        void bind() override;
+
+        bool isCreated() const override
+        {
+            return this->handle != simpleGlObject::HandleNull && openglHelper::getTextureCreated(this->handle);
+        }
+        bool isBound() const override
+        {
+            return openglHelper::getTextureBinding(this->handle);
+        }
 
         GLenum getTextureUnit() const
         {
@@ -129,8 +138,8 @@ namespace brogueHd::frontend::opengl
 
     void simpleTexture::glCreate(GLuint programHandle)
     {
-        if (this->isCreated)
-            simpleException::showCstr("simpleTexture already created in the backend");
+        if (this->isCreated())
+            simpleException::show("simpleTexture already created in the backend");
 
         // Procedure
         //
@@ -168,35 +177,29 @@ namespace brogueHd::frontend::opengl
 
         glGenerateTextureMipmap(this->handle);
 
-        this->isCreated = true;
-        this->isBound = true;
+        if (!this->isCreated())
+            simpleException::show("simpleTexture problem creating on the backend");
     }
 
     void simpleTexture::teardown()
     {
-        if (!this->isCreated)
-            simpleException::showCstr("GLTexture already deleted from the backend");
+        if (!this->isCreated())
+            simpleException::show("GLTexture already deleted from the backend");
 
         glDeleteTextures(1, &_textureIndex);
 
-        this->isCreated = false;
-        this->isBound = false;
-        this->handle = NULL;
+        if (this->isCreated())
+            simpleException::show("GLTexture problem deleting from the backend");
+
+        this->handle = simpleGlObject::HandleNull;
     }
 
-    void simpleTexture::bind(bool bind)
+    void simpleTexture::bind()
     {
-        if (!this->isCreated)
-            simpleException::showCstr("GLTexture already deleted from the backend");
+        if (!this->isCreated())
+            simpleException::showCstr("GLTexture not yet created before calling bind()");
 
-        if (bind)
-        {
-            glActiveTexture(_textureUnit);
-            glBindTexture(GL_TEXTURE_2D, this->handle);
-        }
-        else
-            glBindTexture(GL_TEXTURE_2D, NULL);
-
-        this->isBound = bind;
+        glActiveTexture(_textureUnit);
+        glBindTexture(GL_TEXTURE_2D, this->handle);
     }   
 }

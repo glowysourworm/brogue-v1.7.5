@@ -236,9 +236,7 @@ namespace brogueHd::frontend::opengl
 			simpleVertexBuffer<float>* programVBO = new simpleVertexBuffer<float>(vertexBufferIndex++, sceneDataStream, vertexAttributes);
 			simpleVertexArray<float>* programVAO = new simpleVertexArray<float>(GL_TRIANGLES, programVBO);
 
-			simpleShaderProgram* program = new simpleShaderProgram(vertexShader, fragmentShader);
-
-			program->declareVAO(programVAO);
+			simpleShaderProgram* program = new simpleShaderProgram(vertexShader, fragmentShader, programVAO);
 
 			return program;
 		}

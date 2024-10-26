@@ -1,7 +1,8 @@
 #pragma once
 
+#include "openglHelper.h"
 #include "simpleArray.h"
-#include "simplePrimitive.h"
+#include "simpleGlObject.h"
 #include "simpleDataStream.h"
 #include "simpleVertexAttribute.h"
 #include "simpleException.h"
@@ -14,31 +15,44 @@ namespace brogueHd::frontend::opengl
     /// Corresponds to the VBO vertex buffer object on the GL backend
     /// </summary>
     template<typename T>
-    class simpleVertexBuffer : public simplePrimitive
+    class simpleVertexBuffer : public simpleGlObject
     {
     public:
         simpleVertexBuffer(){}
         simpleVertexBuffer(int bufferIndex, simpleDataStream* dataStream, const simpleList<simpleVertexAttribute>& vertexAttributes);
         ~simpleVertexBuffer();
 
-        void bind(bool bind) override;
-        void glCreate(GLuint handle) override;
+        void bind() override;
+        void glCreate(GLuint programHandle) override;
         void teardown() override;
 
+        bool isCreated() const override
+        {
+            return this->handle != simpleGlObject::HandleNull && openglHelper::getVBOCreated(this->handle);
+        }
+        bool isBound() const override
+        {
+            return openglHelper::getActiveVBO() == this->handle;
+        }
+
         int getBufferLength();
-        int calculateAttributeStride();
 
         /// <summary>
         /// Sets new data stream object for the buffer. Vertex array attributes must be the same as the old stream.
         /// </summary>
         /// <param name="newStream">Pointer to new data stream</param>
         /// <param name="deleteOld">Calls delete on the old simpleDataStream</param>
-        void reBuffer(simpleDataStream* newStream, bool deleteOld = true);
+        void reBuffer(GLuint programHandle, simpleDataStream* newStream, bool deleteOld = true);
 
         size_t getHash() const override
         {
             return hashGenerator::generateHash(_bufferIndex, _stream->getHash(), _vertexAttributes->getHash());
         }
+
+    private:
+
+        int calculateAttributeStride();
+        void createVertexAttributes(GLuint programHandle);
 
     private:
 
@@ -71,8 +85,8 @@ namespace brogueHd::frontend::opengl
     template<typename T>
     void simpleVertexBuffer<T>::glCreate(GLuint programHandle)
     {
-        if (this->isCreated)
-            simpleException::showCstr("simpleVertexBuffer already created in the backend");
+        if (this->isCreated())
+            simpleException::show("simpleVertexBuffer already created in the backend");
 
         // Procedure
         //
@@ -91,11 +105,20 @@ namespace brogueHd::frontend::opengl
         
         // COPY DATA TO GPU BUFFER:  This is one of the ways to take application memory to the GPU. 
         //
-        glBufferData(GL_ARRAY_BUFFER,
-                    (GLsizeiptr)_stream->getStreamSize(),
-                    _stream->getData(),
-                    GL_STATIC_DRAW);
+        glNamedBufferData(this->handle,
+                            (GLsizeiptr)_stream->getStreamSize(),
+                            _stream->getData(),
+                            GL_DYNAMIC_DRAW);
 
+        createVertexAttributes(programHandle);
+
+        if (!this->isCreated())
+            simpleException::show("simpleVertexBuffer creation error");
+    }
+
+    template<typename T>
+    void simpleVertexBuffer<T>::createVertexAttributes(GLuint programHandle)
+    {
         // SETUP VERTEX ATTRIBUTE POINTERS:
         //
         // *** Each "in" variable in the vertex shader is being read from the glBufferData float[] input.
@@ -107,7 +130,7 @@ namespace brogueHd::frontend::opengl
         int offsetBytes = 0;
         int strideBytes = calculateAttributeStride();
 
-        _vertexAttributes->forEach([&programHandle, &offsetBytes, &strideBytes](simpleVertexAttribute attribute)
+        _vertexAttributes->forEach([&programHandle, &offsetBytes, &strideBytes] (simpleVertexAttribute attribute)
         {
             // Get the attribute handle for the input variable
             GLuint attributeHandle = glGetAttribLocation(programHandle, attribute.getName().c_str());
@@ -203,48 +226,40 @@ namespace brogueHd::frontend::opengl
 
             // Declare the attribute array configuration
             glVertexAttribPointer(attribute.getIndex(),
-                                  attributeSize,
-                                  glType, 
-                                  glNormalized,
-                                  strideBytes,
-                                  (void*)offsetBytes);           // This is the offset of the current attribute.
+                                    attributeSize,
+                                    glType,
+                                    glNormalized,
+                                    strideBytes,
+                                    (void*)offsetBytes);           // This is the offset of the current attribute.
 
             // Increment the data offset
             offsetBytes += currentOffset;
 
             return iterationCallback::iterate;
         });
-
-        this->isCreated = true;
-        this->isBound = true;
     }
 
     template<typename T>
     void simpleVertexBuffer<T>::teardown()
     {
-        if (!this->isCreated)
-            simpleException::showCstr("simpleVertexBuffer already deleted from the backend");
+        if (!this->isCreated())
+            simpleException::show("simpleVertexBuffer already deleted from the backend");
 
-        // Bind the CURRENT buffer to a null pointer to detach the buffer from the GL
-        glBindBuffer(GL_ARRAY_BUFFER, NULL);
-
-        // Apply vertex attributes
-        glDisableVertexAttribArray(_bufferIndex);
-
-        // Now, delete THIS buffer
+        // Deleting (likely) takes care of other resources
         glDeleteBuffers(1, &this->handle);
 
-        this->handle = NULL;
-        this->isCreated = false;
+        if (this->isCreated())
+            simpleException::show("Error deleting simpleVertexBuffer");
     }
 
     template<typename T>
-    void simpleVertexBuffer<T>::reBuffer(simpleDataStream* newStream, bool deleteOld)
+    void simpleVertexBuffer<T>::reBuffer(GLuint programHandle, simpleDataStream* newStream, bool deleteOld)
     {
-        if (!this->isCreated)
+        if (!this->isCreated())
             simpleException::show("simpleVertexBuffer not yet created on the GL backend. Call glCreate first.");
 
-        // Apparently, no need to un-bind. GL_INVALID_OPERATION is thrown if the buffer is not bound
+        if (newStream->getStreamSize() != _stream->getStreamSize())
+            simpleException::show("Trying to call glBufferSubData with a different sized data stream. Please check your data stream output.");
 
         // (MEMORY!) These aren't yet managed. There is a "builder" pattern; but nothing to help manage them. 
         if (deleteOld)
@@ -253,12 +268,15 @@ namespace brogueHd::frontend::opengl
         // Set new data stream
         _stream = newStream;
 
+        // Need to try named buffer. Active buffer should find the right buffer index; but it was having .. trouble.
+        glNamedBufferSubData(this->handle, (GLintptr)0, (GLsizeiptr)_stream->getStreamSize(), (void*)_stream->getData());
+
         // Khronos Group:  glBufferData will delete anything that has been allocated on this particular buffer.
         //
-        glBufferData(GL_ARRAY_BUFFER,
-                    (GLsizeiptr)_stream->getStreamSize(),
-                    _stream->getData(),
-                    GL_STATIC_DRAW);
+        //glBufferData(GL_ARRAY_BUFFER,
+        //            (GLsizeiptr)_stream->getStreamSize(), 
+        //            _stream->getData(),
+        //            GL_DYNAMIC_DRAW);
     }
 
     template<typename T>
@@ -270,8 +288,6 @@ namespace brogueHd::frontend::opengl
 
         // THIS MUST PRODUCE A WHOLE NUMBER
         return _stream->getStreamSize();
-        //return _stream->getStreamSize();
-        //return _stream.GetStreamSize() / 4;
     }
 
     template<typename T>
@@ -300,18 +316,12 @@ namespace brogueHd::frontend::opengl
     }
 
     template<typename T>
-    void simpleVertexBuffer<T>::bind(bool bind)
+    void simpleVertexBuffer<T>::bind()
     {
-        if (!this->isCreated)
-            simpleException::showCstr("GLVertexBuffer already deleted from the backend");
+        if (!this->isCreated())
+            simpleException::show("GLVertexBuffer already deleted from the backend");
 
         // Bind VBO before using
-        if (bind)
-            glBindBuffer(GL_ARRAY_BUFFER, this->handle);
-
-        else
-            glBindBuffer(GL_ARRAY_BUFFER, NULL);
-
-        this->isBound = bind;
+        glBindBuffer(GL_ARRAY_BUFFER, this->handle);
     }
 }
