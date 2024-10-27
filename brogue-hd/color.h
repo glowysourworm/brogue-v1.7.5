@@ -46,6 +46,16 @@ namespace brogueHd::backend::model::game
 			blue = copy.blue;
 			alpha = copy.alpha;
 		}
+
+		static color interpolate(const color& color1, const color& color2, float weight)
+		{
+			color result = color1;
+
+			result.interpolate(color2, weight);
+
+			return result;
+		}
+
 		void interpolate(const color& other, float weight)
 		{
 			red = (other.red * weight) + (red * (1 - weight));

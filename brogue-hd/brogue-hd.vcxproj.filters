@@ -551,6 +551,12 @@
     <ClInclude Include="openglHelper.h">
       <Filter>Header Files\frontend\opengl</Filter>
     </ClInclude>
+    <ClInclude Include="brogueButtonMenu.h">
+      <Filter>Header Files\frontend\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueButton.h">
+      <Filter>Header Files\frontend\ui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\resources\model\armor.csv">

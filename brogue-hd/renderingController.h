@@ -32,7 +32,7 @@ namespace brogueHd::backend::controller
 		BrogueGameMode _mode;
 
 		brogueProgram* _currentProgram;
-		brogueView* _currentView;
+		simpleList<brogueView*>* _currentViews;
 
 		randomGenerator* _randomGenerator;
 		resourceController* _resourceController;
@@ -47,26 +47,30 @@ namespace brogueHd::backend::controller
 		_randomGenerator = randomGenerator;
 		_mode = BrogueGameMode::Menu;
 
-		_currentView = nullptr;
+		_currentViews = new simpleList<brogueView*>();
 		_currentProgram = nullptr;
 	}
 	renderingController::~renderingController()
 	{
 		delete _openglRenderer;
 
-		if (_currentView != nullptr)
-			delete _currentView;
+		for (int index = 0; index < _currentViews->count(); index++)
+		{
+			delete _currentViews->get(index);
+		}
 
-		if (_currentProgram != nullptr)
-			delete _currentProgram;
+		delete _currentViews;
+		delete _currentProgram;
 	}
 
 	void renderingController::setViewMode(BrogueGameMode mode)
 	{
 		_mode = mode;
 
-		if (_currentView != nullptr)
-			delete _currentView;
+		for (int index = 0; index < _currentViews->count(); index++)
+		{
+			delete _currentViews->get(index);
+		}
 
 		if (_currentProgram != nullptr)
 			delete _currentProgram;
@@ -86,8 +90,26 @@ namespace brogueHd::backend::controller
 			// Shuts down thread, deletes our program memory
 			_openglRenderer->terminateProgram();
 			
-			_currentView = new brogueFlameMenu(_randomGenerator, 100);
-			_currentProgram = new brogueFlameMenuProgram(dynamic_cast<brogueFlameMenu*>(_currentView), _resourceController);
+			simpleList<buttonData> buttons;
+
+			// Pulled from Brogue v1.7.5
+			color gradient1(0.22, 0.14, 0.29, 0.5);
+			color gradient2(0.11, 0.06, 0.15, 0.5);
+			
+
+			buttons.add(buttonData("New Game", gradient1, gradient2));
+			buttons.add(buttonData("Open Game", gradient1, gradient2));
+			buttons.add(buttonData("View Recording", gradient1, gradient2));
+			buttons.add(buttonData("High Scores", gradient1, gradient2));
+			buttons.add(buttonData("Quit", gradient1, gradient2));
+
+			brogueFlameMenu* titleView = new brogueFlameMenu(_randomGenerator, 100);
+			brogueButtonMenu* mainMenu = new brogueButtonMenu(buttons, 1, titleView->getParentBoundary(), gridRect(COLS - 26, ROWS - 12, 24, 11));
+
+			_currentProgram = new brogueFlameMenuProgram(titleView, mainMenu, _resourceController);
+
+			_currentViews->add(titleView);
+			_currentViews->add(mainMenu);
 
 			_openglRenderer->setProgram(_currentProgram);
 			_openglRenderer->startProgram();

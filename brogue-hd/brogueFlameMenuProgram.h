@@ -5,6 +5,7 @@
 #include "simpleTexture.h"
 #include "simpleFrameBuffer.h"
 #include "brogueFlameMenu.h"
+#include "brogueButtonMenu.h"
 #include "brogueProgramBuilder.h"
 #include "resourceController.h"
 
@@ -18,8 +19,9 @@ namespace brogueHd::frontend::opengl
 	{
 	public:
 		
-		brogueFlameMenuProgram(brogueFlameMenu* mainMenu,
-							   resourceController* resourceController);
+		brogueFlameMenuProgram(brogueFlameMenu* titleView,
+								brogueButtonMenu* mainMenu,
+								resourceController* resourceController);
 		~brogueFlameMenuProgram();
 
 		void initialize() override;
@@ -60,8 +62,10 @@ namespace brogueHd::frontend::opengl
 
 	private:
 
-		brogueFlameMenu* _renderedView;
+		brogueFlameMenu* _titleView;
+		brogueButtonMenu* _mainMenu;
 
+		simpleShaderProgram* _mainMenuProgram;
 		simpleShaderProgram* _heatSourceProgram;
 		simpleShaderProgram* _heatDiffuseProgram;
 		simpleShaderProgram* _titleMaskProgram;
@@ -86,11 +90,13 @@ namespace brogueHd::frontend::opengl
 		resourceController* _resourceController;
 	};
 
-	brogueFlameMenuProgram::brogueFlameMenuProgram(brogueFlameMenu* mainMenu,
+	brogueFlameMenuProgram::brogueFlameMenuProgram(brogueFlameMenu* titleView,
+												   brogueButtonMenu* mainMenu,
 												   resourceController* resourceController)
 	{
 		_resourceController = resourceController;
-		_renderedView = mainMenu;
+		_titleView = titleView;
+		_mainMenu = mainMenu;
 		_diffusePeriodCounterMilliseconds = 0;
 		_diffusePeriodMilliseconds = 10;
 		_updatePeriodMilliseconds = 30;
@@ -98,7 +104,7 @@ namespace brogueHd::frontend::opengl
 
 		int textureIndex = 0;
 
-		gridRect sceneBoundaryUI = brogueProgramBuilder::calculateBoundaryUI(mainMenu);
+		gridRect sceneBoundaryUI = brogueProgramBuilder::calculateBoundaryUI(titleView);
 
 		// This is for the uniform cellSize variable (see fragment shaders)
 		//
@@ -113,10 +119,10 @@ namespace brogueHd::frontend::opengl
 
 		// Heat Source
 		//
-		simpleDataStream* heatSourceDataStream = brogueProgramBuilder::createSceneDataStream(mainMenu, openglDataStreamType::brogueCellQuad, openglBrogueCellOutputSelector::DisplayCurrentFrame,
-		[&mainMenu] (short column, short row, brogueCellDisplay* cell)
+		simpleDataStream* heatSourceDataStream = brogueProgramBuilder::createSceneDataStream(titleView, openglDataStreamType::brogueCellQuad, openglBrogueCellOutputSelector::DisplayCurrentFrame,
+		[&titleView] (short column, short row, brogueCellDisplay* cell)
 		{
-			return mainMenu->isTheText(column, row) || row == mainMenu->getBoundary().bottom();
+			return titleView->isTheText(column, row) || row == titleView->getBoundary().bottom();
 		});
 
 		shaderData* colorMaskVert = resourceController->getShader(shaderResource::colorMaskVert);
@@ -124,24 +130,28 @@ namespace brogueHd::frontend::opengl
 
 		// Title Text Mask
 		//
-		simpleDataStream* colorMaskDataStream = brogueProgramBuilder::createSceneDataStream(mainMenu, openglDataStreamType::brogueColorQuad, openglBrogueCellOutputSelector::NoDisplay,
-		[&mainMenu](short column, short row, brogueCellDisplay* cell)
+		simpleDataStream* colorMaskDataStream = brogueProgramBuilder::createSceneDataStream(titleView, openglDataStreamType::brogueColorQuad, openglBrogueCellOutputSelector::NoDisplay,
+		[&titleView](short column, short row, brogueCellDisplay* cell)
 		{
-			return mainMenu->isTheText(column, row);
+			return titleView->isTheText(column, row);
 		});
 
 		shaderData* diffuseUpwardVert = resourceController->getShader(shaderResource::diffuseColorUpwardVert);
 		shaderData* diffuseUpwardFrag = resourceController->getShader(shaderResource::diffuseColorUpwardFrag);
-		simpleDataStream* diffuseUpwardDataStream = brogueProgramBuilder::createSceneDataStream(mainMenu, openglDataStreamType::brogueCellQuad, openglBrogueCellOutputSelector::NoDisplay);
+		simpleDataStream* diffuseUpwardDataStream = brogueProgramBuilder::createSceneDataStream(titleView, openglDataStreamType::brogueCellQuad, openglBrogueCellOutputSelector::NoDisplay);
 
 		shaderData* mixTexturesVert = resourceController->getShader(shaderResource::mixFrameTexturesVert);
 		shaderData* mixTexturesFrag = resourceController->getShader(shaderResource::mixFrameTexturesFrag);
-		simpleDataStream* mixTexturesDataStream = brogueProgramBuilder::createFrameDataStream(mainMenu, openglDataStreamType::brogueImageQuad);
+		simpleDataStream* mixTexturesDataStream = brogueProgramBuilder::createFrameDataStream(titleView, openglDataStreamType::brogueImageQuad);
 
 		// Reuse background color shaders - make a new frame data stream for the frame copy
-		simpleDataStream* backgroundColorFrameCopyStream = brogueProgramBuilder::createFrameDataStream(mainMenu, openglDataStreamType::brogueColorQuad);
+		simpleDataStream* backgroundColorFrameCopyStream = brogueProgramBuilder::createFrameDataStream(titleView, openglDataStreamType::brogueColorQuad);
+
+		// Main Menu:
+		simpleDataStream* mainMenuDataStream = brogueProgramBuilder::createSceneDataStream(mainMenu, openglDataStreamType::brogueCellQuad, openglBrogueCellOutputSelector::DisplayCurrentFrame);
 
 		// (MEMORY!)
+		_mainMenuProgram = brogueProgramBuilder::createShaderProgram(mainMenuDataStream, brogueCellVert, brogueCellFrag);
 		_heatSourceProgram = brogueProgramBuilder::createShaderProgram(heatSourceDataStream, brogueCellVert, brogueCellFrag);
 		_heatDiffuseProgram = brogueProgramBuilder::createShaderProgram(diffuseUpwardDataStream, diffuseUpwardVert, diffuseUpwardFrag);
 		_titleMaskProgram = brogueProgramBuilder::createShaderProgram(colorMaskDataStream, colorMaskVert, colorMaskFrag);
@@ -191,6 +201,9 @@ namespace brogueHd::frontend::opengl
 		glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glClearColor(0, 0, 0, 0);
 
+		glEnable(GL_BLEND);
+		//glBlendFunc(GL_SRC_COLOR, GL_SRC_COLOR);
+
 		_frameBuffer->bind();
 		
 		// Render the heat sources as usual -> Color Attachment 0
@@ -213,21 +226,27 @@ namespace brogueHd::frontend::opengl
 		_titleMaskProgram->bind();
 		_titleMaskProgram->draw();
 
+		// Switch back to default GL frame buffer
 		_frameBuffer->unBind();
 
 		_frameProgram->bind();
 		_frameProgram->draw();
+
+		_mainMenuProgram->bind();
+		_mainMenuProgram->draw();
 
 		glFlush();
 	}
 
 	void brogueFlameMenuProgram::initialize()
 	{
+		_mainMenuProgram->compile();
 		_heatSourceProgram->compile();
 		_heatDiffuseProgram->compile();
 		_titleMaskProgram->compile();
 		_frameProgram->compile();
 
+		_mainMenuProgram->bind();
 		_heatSourceProgram->bind();
 		_heatDiffuseProgram->bind();
 		_titleMaskProgram->bind();
@@ -239,9 +258,13 @@ namespace brogueHd::frontend::opengl
 		// Create Frame buffer:  Uses scene program to render to the frame buffer attached texture
 		_frameBuffer->glCreate(-1);			// Frame buffers don't automatically associate w/ a program
 
+		// Main Menu Uniforms
+		_mainMenuProgram->bind();
+		_mainMenuProgram->bindUniform1i("frame0Texture", 0);     // GL_TEXTURE0 "texture unit" Required! USE INDEXES!! (During the run)
+
 		// Heat Source Uniforms
 		_heatSourceProgram->bind();
-		_heatSourceProgram->bindUniform1i("frame0Texture", 0);
+		_heatSourceProgram->bindUniform1i("frame0Texture", 0);   // GL_TEXTURE0 "texture unit" Required! USE INDEXES!! (During the run)
 
 		// Heat Diffuse Uniform
 		// DON'T CHANGE THIS!!! NEED TO FIND A WAY TO GET THE UNIFORM VALUE FOR THE GL_TEXTURE0!!!
@@ -273,21 +296,21 @@ namespace brogueHd::frontend::opengl
 		if (_updatePeriodCounterMilliseconds < _updatePeriodMilliseconds)
 			return;
 
-		brogueFlameMenu* mainMenu = _renderedView;
+		brogueFlameMenu* titleView = _titleView;
 
 		_frameBuffer->unBind();
 
 		// Update the rendering
-		_renderedView->update(_updatePeriodCounterMilliseconds);
+		_titleView->update(_updatePeriodCounterMilliseconds);
 
 		// Heat Source
 		//
-		simpleDataStream* heatSourceDataStream = brogueProgramBuilder::createSceneDataStream(mainMenu, 
+		simpleDataStream* heatSourceDataStream = brogueProgramBuilder::createSceneDataStream(titleView,
 																							 openglDataStreamType::brogueCellQuad, 
 																							 openglBrogueCellOutputSelector::DisplayCurrentFrame,
-		[&mainMenu] (short column, short row, brogueCellDisplay* cell)
+		[&titleView] (short column, short row, brogueCellDisplay* cell)
 		{
-			return mainMenu->isTheText(column, row) || row == mainMenu->getBoundary().bottom();
+			return titleView->isTheText(column, row) || row == titleView->getBoundary().bottom();
 		});
 
 		// (MEMORY! deletes old buffer)

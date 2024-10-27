@@ -1,8 +1,10 @@
 #pragma once
 
-#include "simple.h"
+#include "simpleArray.h"
 #include "color.h"
-#include "brogueGlobal.h"
+
+using namespace brogueHd::simple;
+using namespace brogueHd::backend::model::game;
 
 namespace brogueHd::backend::model::game
 {
@@ -10,47 +12,103 @@ namespace brogueHd::backend::model::game
 	{
 	public:
 
-		char theString[COLS * 2];
-		color theColors[COLS * 2];
-
 		colorString()
 		{
+			_characters = new simpleArray<char>();
+			_colors = new simpleArray<color>();
 		}
 		colorString(const char* message, color foreColor)
 		{
-			// Initialize arrays
-			updateAll(message, foreColor);
+			_characters = new simpleArray<char>(message, strnlen_s(message, COLS * 2));
+			_colors = new simpleArray<color>(_characters->count());
 		}
-
-		void update(short index, char character, color color)
+		colorString(const colorString& copy)
 		{
-			theString[index] = character;
-			theColors[index] = color;
+			copyImpl(copy);
 		}
-
-		void updateAll(const char* message, color foreColor)
+		~colorString()
 		{
-			for (short index = 0; index < COLS * 2 && index < sizeof(message); index++)
-			{
-				theString[index] = message[index];
-				theColors[index] = foreColor;
-			}
+			delete _characters;
+			delete _colors;
 		}
-
+		void operator=(const colorString& copy)
+		{
+			copyImpl(copy);
+		}
+		bool operator==(const colorString& other)
+		{
+			return compare(other);
+		}
+		bool operator!=(const colorString& other)
+		{
+			return !compare(other);
+		}
+		char getChar(short index) const
+		{
+			return _characters->get(index);
+		}
+		color getColor(short index) const
+		{
+			return _colors->get(index);
+		}
+		void set(short index, char character, color color)
+		{
+			_characters->set(index, character);
+			_colors->set(index, color);
+		}
+		void setColor(short index, color color)
+		{
+			_colors->set(index, color);
+		}
+		int getCount() const
+		{
+			return _characters->count();
+		}
 		size_t getHash() const override
 		{
-			size_t hash = 0;
+			size_t characterHash = _characters->getHash();
+			size_t colorHash = _colors->getHash();
 
-			for (int index = 0; index < COLS * 2; index++)
+			return hashGenerator::combineHash(characterHash, colorHash);
+		}
+
+	private:
+
+		void copyImpl(const colorString& copy)
+		{
+			delete _characters;
+			delete _colors;
+
+			_characters = new simpleArray<char>(copy.getCount());
+			_colors = new simpleArray<color>(copy.getCount());
+
+			for (int index = 0; index < copy.getCount(); index++)
 			{
-				if (hash == 0)
-					hash = hashGenerator::generateHash(theString[index], theColors[index]);
+				_characters->set(index, copy.getChar(index));
+				_colors->set(index, copy.getColor(index));
+			}
+		}
 
-				else
-					hash = hashGenerator::combineHash(hash, theString[index], theColors[index]);
+		bool compare(const colorString& other)
+		{
+			if (this->getCount() != other.getCount())
+				return false;
+
+			for (int index = 0; index < other.getCount(); index++)
+			{
+				if (this->getChar(index) != other.getChar(index))
+					return false;
+
+				if (this->getColor(index) != other.getColor(index))
+					return false;
 			}
 
-			return hash;
+			return true;
 		}
+
+	private:
+
+		simpleArray<char>* _characters;
+		simpleArray<color>* _colors;
 	};
 }

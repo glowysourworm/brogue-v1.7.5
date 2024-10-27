@@ -20,7 +20,7 @@ void main()
     if (currentOutputSelector == 1)
         outputColor = currentBackgroundColor;
 
-    // Display Frame buffer
+    // Display Frame buffer (DisplayCurrentFrame)
     //
     else if (currentOutputSelector == 2)
         outputColor = texture(frame0Texture, currentTextureUV);

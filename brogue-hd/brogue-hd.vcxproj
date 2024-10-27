@@ -179,6 +179,8 @@
     <ClInclude Include="accretionTile.h" />
     <ClInclude Include="boltConstants.h" />
     <ClInclude Include="boudingBox2D.h" />
+    <ClInclude Include="brogueButton.h" />
+    <ClInclude Include="brogueButtonMenu.h" />
     <ClInclude Include="brogueCellQuad.h" />
     <ClInclude Include="brogueColorMap.h" />
     <ClInclude Include="brogueColorQuad.h" />

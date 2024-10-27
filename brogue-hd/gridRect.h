@@ -186,6 +186,36 @@ namespace brogueHd::component
 				}
 			}
 		}
+
+		void iterateBoundary(gridRectIterator callback) const
+		{
+			bool userBreak = false;
+
+			for (short i = left(); i <= right() && !userBreak; i++)
+			{
+				if (callback(i, top()) == iterationCallback::breakAndReturn)
+					userBreak = true;
+			}
+
+			for (short i = left(); i <= right() && !userBreak; i++)
+			{
+				if (callback(i, bottom()) == iterationCallback::breakAndReturn)
+					userBreak = true;
+			}
+
+			for (short j = top() + 1; j <= bottom() - 1 && !userBreak; j++)
+			{
+				if (callback(left(), j) == iterationCallback::breakAndReturn)
+					userBreak = true;
+
+				if (userBreak)
+					break;
+
+				if (callback(right(), j) == iterationCallback::breakAndReturn)
+					userBreak = true;
+			}
+		}
+
 		void iterateAdjacent(short column, short row, gridRectIterator callback) const
 		{
 			for (int columnIndex = column - 1; columnIndex != column + 1; columnIndex++)
