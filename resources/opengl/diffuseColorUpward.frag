@@ -6,15 +6,15 @@ out vec4 outputColor;
 
 in vec2 currentVertex;
 in vec2 currentTextureUV;
+in vec2 currentGlyphUV;
+in vec4 currentForegroundColor;
 in vec4 currentBackgroundColor;
 in float currentOutputSelector;
 
 // Try and use a 2D sampler to work with the texture. The active texture should be the 0th texture.
 uniform sampler2D frame0Texture;
-uniform int cellWidthUI;
-uniform int cellHeightUI;
+uniform sampler2D fontTexture;
 uniform vec2 cellSizeUV;
-uniform ivec2 sceneSizeUI;
 uniform float weight;
 
 void main()

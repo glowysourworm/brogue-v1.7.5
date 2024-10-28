@@ -49,6 +49,8 @@ namespace brogueHd::simple
 		int search(const char* search) const;
 		int search(const simpleString& search) const;
 
+		bool endsWith(const char* chars) const;
+
 		void set(int index, char value);
 		void clear();
 
@@ -233,6 +235,27 @@ namespace brogueHd::simple
 		//}
 
 		//return stream;
+	}
+
+	bool simpleString::endsWith(const char* chars) const
+	{
+		if (chars == nullptr)
+			simpleException::show("Trying to compare a string with a nullptr:  simpleString::endsWith");
+
+		simpleString charsStr(chars);
+
+		if (charsStr.count() > this->count())
+			return false;
+
+		int difference = this->count() - charsStr.count();
+
+		for (int index = charsStr.count() - 1; index >= 0; index--)
+		{
+			if (this->get(index + difference) != charsStr.get(index))
+				return false;
+		}
+
+		return true;
 	}
 
 	bool simpleString::compare(const simpleString& other) const

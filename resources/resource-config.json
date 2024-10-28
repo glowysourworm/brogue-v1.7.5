@@ -8,5 +8,6 @@
 	"diffuseColorUpwardVertexShader": "C:\\Backup\\_Source\\Git\\brogue-v1.7.5\\resources\\opengl\\diffuseColorUpward.vert",
 	"diffuseColorUpwardFragmentShader": "C:\\Backup\\_Source\\Git\\brogue-v1.7.5\\resources\\opengl\\diffuseColorUpward.frag",
 	"mixFrameTexturesVertexShader": "C:\\Backup\\_Source\\Git\\brogue-v1.7.5\\resources\\opengl\\mixFrameTextures.vert",
-	"mixFrameTexturesFragmentShader": "C:\\Backup\\_Source\\Git\\brogue-v1.7.5\\resources\\opengl\\mixFrameTextures.frag"
+	"mixFrameTexturesFragmentShader": "C:\\Backup\\_Source\\Git\\brogue-v1.7.5\\resources\\opengl\\mixFrameTextures.frag",
+	"fontGlyphDirectory": "C:\\Backup\\_Source\\Git\\brogue-v1.7.5\\resources\\fonts\\"
 }

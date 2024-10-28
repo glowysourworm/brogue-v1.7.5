@@ -79,11 +79,11 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <AllProjectIncludesArePublic>true</AllProjectIncludesArePublic>
-    <IncludePath>C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\include;$(IncludePath)</IncludePath>
-    <ReferencePath>C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\lib-vc2022;$(ReferencePath)</ReferencePath>
-    <SourcePath>C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\include;$(SourcePath)</SourcePath>
-    <LibraryPath>C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\lib-vc2022;$(LibraryPath)</LibraryPath>
-    <ExecutablePath>C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\lib-vc2022;$(ExecutablePath)</ExecutablePath>
+    <IncludePath>C:\Backup\_Source\Git\zlib-1.3.1;C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\include;C:\Backup\_Source\Git\brogue-v1.7.5\vendor\bitmap;C:\Backup\_Source\Git\zlib-1.3.1\build;$(IncludePath)</IncludePath>
+    <ReferencePath>C:\Backup\_Source\Git\zlib-1.3.1\build\Debug;C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\lib-vc2022;$(ReferencePath)</ReferencePath>
+    <SourcePath>C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\include;C:\Backup\_Source\Git\brogue-v1.7.5\vendor\bitmap;C:\Backup\_Source\Git\zlib-1.3.1;C:\Backup\_Source\Git\zlib-1.3.1\build;$(SourcePath)</SourcePath>
+    <LibraryPath>C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\lib-vc2022;C:\Backup\_Source\Git\zlib-1.3.1\build\Debug;$(LibraryPath)</LibraryPath>
+    <ExecutablePath>C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\lib-vc2022;C:\Backup\_Source\Git\zlib-1.3.1\build\Debug;$(ExecutablePath)</ExecutablePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -127,11 +127,11 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;GLFW_INCLUDE_NONE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;GLFW_INCLUDE_NONE;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\include;C:\Backup\_Source\Git\brogue-v1.7.5\vendor\bitmap;C:\Backup\_Source\Git\zlib-1.3.1;C:\Backup\_Source\Git\zlib-1.3.1\build;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard_C>stdclatest</LanguageStandard_C>
       <DisableSpecificWarnings>4267;4244;4104;4101;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
@@ -141,8 +141,8 @@
       <ImportLibrary>
       </ImportLibrary>
       <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\lib-vc2022;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glfw3dll.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\lib-vc2022;C:\Backup\_Source\Git\zlib-1.3.1\build\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glfw3dll.lib;opengl32.lib;zlibd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ProjectReference>
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
@@ -172,10 +172,13 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\vendor\libspng\spng.c" />
     <ClCompile Include="brogue-hd.cpp" />
     <ClCompile Include="gl.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\vendor\bitmap\bitmap_image.hpp" />
+    <ClInclude Include="..\vendor\libspng\spng.h" />
     <ClInclude Include="accretionTile.h" />
     <ClInclude Include="boltConstants.h" />
     <ClInclude Include="boudingBox2D.h" />
@@ -197,6 +200,7 @@
     <ClInclude Include="brogueFlameMenuProgram.h" />
     <ClInclude Include="brogueProgram.h" />
     <ClInclude Include="brogueTestFunction.h" />
+    <ClInclude Include="brogueGlyphMap.h" />
     <ClInclude Include="openglHelper.h" />
     <ClInclude Include="randomRange.h" />
     <ClInclude Include="simpleBoundingBox.h" />
@@ -210,7 +214,7 @@
     <ClInclude Include="brogueProgramBuilder.h" />
     <ClInclude Include="brogueTestPackage.h" />
     <ClInclude Include="cellularAutomataParameters.h" />
-    <ClInclude Include="coordinateConverter.h" />
+    <ClInclude Include="openglCoordinateConverter.h" />
     <ClInclude Include="fileOperations.h" />
     <ClInclude Include="gl.h" />
     <ClInclude Include="json.hpp" />
@@ -393,6 +397,21 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </None>
     <None Include="..\resources\resource-config.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\resources\fonts\font-1.bmp" />
+    <Image Include="..\resources\fonts\font-10.bmp" />
+    <Image Include="..\resources\fonts\font-11.bmp" />
+    <Image Include="..\resources\fonts\font-12.bmp" />
+    <Image Include="..\resources\fonts\font-13.bmp" />
+    <Image Include="..\resources\fonts\font-2.bmp" />
+    <Image Include="..\resources\fonts\font-3.bmp" />
+    <Image Include="..\resources\fonts\font-4.bmp" />
+    <Image Include="..\resources\fonts\font-5.bmp" />
+    <Image Include="..\resources\fonts\font-6.bmp" />
+    <Image Include="..\resources\fonts\font-7.bmp" />
+    <Image Include="..\resources\fonts\font-8.bmp" />
+    <Image Include="..\resources\fonts\font-9.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -12,6 +12,7 @@
 #include "shaderData.h"
 #include "colorConstants.h"
 
+#include "bitmap_image.hpp"
 #include "json.hpp"
 
 #include <string>
@@ -69,19 +70,27 @@ namespace brogueHd::backend::controller
 		/// Gets shader data from the resource controller
 		/// </summary>
 		shaderData* getShader(shaderResource resource);
+
+		bitmap_image* getFontGlyphs(int zoomLevel)
+		{
+			return _fontGlyphs->get(zoomLevel);
+		}
 	
 	private:
 
 		simpleHash<shaderResource, shaderData*>* _shaderCache;
+		simpleHash<int, bitmap_image*>* _fontGlyphs;
 	};
 
 	resourceController::resourceController()
 	{
 		_shaderCache = new simpleHash<shaderResource, shaderData*>();
+		_fontGlyphs = new simpleHash<int, bitmap_image*>();
 	}
 	resourceController::~resourceController()
 	{
 		delete _shaderCache;
+		delete _fontGlyphs;
 	}
 
 	bool resourceController::initialize(const char* resourceConfigFile)
@@ -126,6 +135,18 @@ namespace brogueHd::backend::controller
 			_shaderCache->add(shaderResource::diffuseColorUpwardFrag, diffuseColorUpwardFrag);
 			_shaderCache->add(shaderResource::mixFrameTexturesVert, mixFrameTexturesVert);
 			_shaderCache->add(shaderResource::mixFrameTexturesFrag, mixFrameTexturesFrag);
+
+			simpleString fontDir = std::string(jsonConfig[brogueHd::ConfigFontGlyphDirectory]).c_str();
+
+			for (int index = MIN_ZOOM; index <= MAX_ZOOM; index++)
+			{
+				simpleString fileName = simpleExt::format(brogueHd::FontGlyphFileNameFormat, index).c_str();
+				simpleString fullPath = fileOperations::filePathConcat(fontDir, fileName);
+
+				bitmap_image* glyphSheet = new bitmap_image(fullPath.c_str());
+
+				_fontGlyphs->add(index, glyphSheet);
+			}
 
 			return true;
 		}

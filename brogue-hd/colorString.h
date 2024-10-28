@@ -14,13 +14,19 @@ namespace brogueHd::backend::model::game
 
 		colorString()
 		{
-			_characters = new simpleArray<char>();
+			_characters = new simpleArray<int>();
 			_colors = new simpleArray<color>();
 		}
 		colorString(const char* message, color foreColor)
 		{
-			_characters = new simpleArray<char>(message, strnlen_s(message, COLS * 2));
+			_characters = new simpleArray<int>(strnlen_s(message, COLS * 2));
 			_colors = new simpleArray<color>(_characters->count());
+
+			for (int index = 0; index < _characters->count(); index++)
+			{
+				// int should include unicode characters
+				_characters->set(index, (int)message[index]);
+			}
 		}
 		colorString(const colorString& copy)
 		{
@@ -79,7 +85,7 @@ namespace brogueHd::backend::model::game
 			delete _characters;
 			delete _colors;
 
-			_characters = new simpleArray<char>(copy.getCount());
+			_characters = new simpleArray<int>(copy.getCount());
 			_colors = new simpleArray<color>(copy.getCount());
 
 			for (int index = 0; index < copy.getCount(); index++)
@@ -108,7 +114,7 @@ namespace brogueHd::backend::model::game
 
 	private:
 
-		simpleArray<char>* _characters;
+		simpleArray<int>* _characters;
 		simpleArray<color>* _colors;
 	};
 }

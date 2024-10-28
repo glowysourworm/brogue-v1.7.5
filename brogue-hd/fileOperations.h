@@ -2,6 +2,7 @@
 
 #include "simpleString.h"
 #include "simpleException.h"
+#include <iostream>
 #include <fstream>
 #include <strstream>
 
@@ -12,7 +13,18 @@ namespace brogueHd::component
 	class fileOperations
 	{
 	public:
+		
+		static simpleString filePathConcat(const simpleString& path1, const simpleString& path2)
+		{
+			simpleString result(path1);
 
+			if (!result.endsWith("\\"))
+				result.append("\\");
+
+			result.append(path2);
+
+			return result;
+		}
 		static bool fileExists(const char* filename)
 		{
 			return fileExists(simpleString(filename));

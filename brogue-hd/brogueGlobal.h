@@ -63,6 +63,10 @@ namespace brogueHd
 	static const char* ConfigMixFrameTexturesVertexShader = "mixFrameTexturesVertexShader";
 	static const char* ConfigMixFrameTexturesFragmentShader = "mixFrameTexturesFragmentShader";
 
+	static const char* ConfigFontGlyphDirectory = "fontGlyphDirectory";
+
+	static const char* FontGlyphFileNameFormat = "font-{}.bmp";
+
 	static const char* BrogueHighScoresFile = "BrogueHighScores.txt";
 
 	/*
@@ -113,6 +117,12 @@ namespace brogueHd
 		Global Macros:  These are preprocessed #define statements for all Rogue macros
 
 	*/
+
+	#define MIN_ZOOM	1
+	#define MAX_ZOOM	13
+
+	#define GLYPH_SHEET_COLUMNS		16
+	#define GLYPH_SHEET_ROWS		14
 
 	// <windows.h> has a conflict with std::byte. That was rather frustrating. Please use char* or
 	//			   std unless you have to deal with windows libraries. 
@@ -253,31 +263,31 @@ namespace brogueHd
 
 	//#ifdef USE_UNICODE
 
-	//#define FLOOR_CHAR		0x00b7
-	//#define LIQUID_CHAR		'~'
-	//#define CHASM_CHAR		0x2237
-	//#define TRAP_CHAR		0x25c7
-	//#define FIRE_CHAR		0x22CF
-	//#define GRASS_CHAR		'"'
-	//#define BRIDGE_CHAR		'='
-	//#define DESCEND_CHAR	'>'
-	//#define ASCEND_CHAR		'<'
-	//#define WALL_CHAR		'#'
-	//#define DOOR_CHAR		'+'
-	//#define OPEN_DOOR_CHAR	'\''
-	//#define ASH_CHAR		'\''
-	//#define BONES_CHAR		','
-	//#define MUD_CHAR		','
-	//#define WEB_CHAR		':'
-	////#define FOLIAGE_CHAR	0x03A8 // lower-case psi
-	//#define FOLIAGE_CHAR	0x2648 // Aries symbol
-	//#define VINE_CHAR       ':'
-	//#define ALTAR_CHAR		'|'
-	//#define LEVER_CHAR      '/'
-	//#define LEVER_PULLED_CHAR '\\'
-	//#define STATUE_CHAR		0x00df
-	//#define VENT_CHAR		'='
-	//#define DEWAR_CHAR      '&'
+	#define FLOOR_CHAR		0x00b7
+	#define LIQUID_CHAR		'~'
+	#define CHASM_CHAR		0x2237
+	#define TRAP_CHAR		0x25c7
+	#define FIRE_CHAR		0x22CF
+	#define GRASS_CHAR		'"'
+	#define BRIDGE_CHAR		'='
+	#define DESCEND_CHAR	'>'
+	#define ASCEND_CHAR		'<'
+	#define WALL_CHAR		'#'
+	#define DOOR_CHAR		'+'
+	#define OPEN_DOOR_CHAR	'\''
+	#define ASH_CHAR		'\''
+	#define BONES_CHAR		','
+	#define MUD_CHAR		','
+	#define WEB_CHAR		':'
+	//#define FOLIAGE_CHAR	0x03A8 // lower-case psi
+	#define FOLIAGE_CHAR	0x2648 // Aries symbol
+	#define VINE_CHAR       ':'
+	#define ALTAR_CHAR		'|'
+	#define LEVER_CHAR      '/'
+	#define LEVER_PULLED_CHAR '\\'
+	#define STATUE_CHAR		0x00df
+	#define VENT_CHAR		'='
+	#define DEWAR_CHAR      '&'
 
 	//#define TRAMPLED_FOLIAGE_CHAR	'"'		// 0x2034 // 0x2037
 

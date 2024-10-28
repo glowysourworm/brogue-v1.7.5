@@ -4,10 +4,12 @@
 #include "color.h"
 #include "simple.h"
 #include "gridLocator.h"
+#include "brogueGlyphMap.h"
 
 using namespace brogueHd::simple;
 using namespace brogueHd::component;
 using namespace brogueHd::backend::model::game;
+using namespace brogueHd::frontend::ui;
 
 namespace brogueHd::backend::model::layout
 {
@@ -21,7 +23,7 @@ namespace brogueHd::backend::model::layout
 
 	public:
 
-		char character;
+		int character;
 		color foreColor;
 		color backColor;
 		float opacity;
@@ -59,7 +61,9 @@ namespace brogueHd::backend::model::layout
 
 		brogueCellDisplay()
 		{
-			character = default_value::value<char>();
+			// Use empty character static value from the glyph map
+			//
+			character = brogueGlyphMap::Empty;
 			foreColor = default_value::value<color>();
 			backColor = default_value::value<color>();
 			opacity = 1.0f;

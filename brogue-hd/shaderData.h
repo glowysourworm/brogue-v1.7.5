@@ -58,16 +58,13 @@ namespace brogueHd::frontend::opengl
                 this->attributes.add(vertexAttributeData(1, "backgroundColor", GL_FLOAT_VEC4));
                 break;
             case shaderResource::brogueCellDisplayVert:
-                this->attributes.add(vertexAttributeData(0, "vertexXY", GL_FLOAT_VEC2));
-                this->attributes.add(vertexAttributeData(1, "textureUV", GL_FLOAT_VEC2));
-                this->attributes.add(vertexAttributeData(2, "backgroundColor", GL_FLOAT_VEC4));
-                this->attributes.add(vertexAttributeData(3, "outputSelector", GL_FLOAT));
-                break;
             case shaderResource::diffuseColorUpwardVert:
                 this->attributes.add(vertexAttributeData(0, "vertexXY", GL_FLOAT_VEC2));
                 this->attributes.add(vertexAttributeData(1, "textureUV", GL_FLOAT_VEC2));
-                this->attributes.add(vertexAttributeData(2, "backgroundColor", GL_FLOAT_VEC4));
-                this->attributes.add(vertexAttributeData(3, "outputSelector", GL_FLOAT));
+                this->attributes.add(vertexAttributeData(2, "glyphUV", GL_FLOAT_VEC2));
+                this->attributes.add(vertexAttributeData(3, "foregroundColor", GL_FLOAT_VEC4));
+                this->attributes.add(vertexAttributeData(4, "backgroundColor", GL_FLOAT_VEC4));
+                this->attributes.add(vertexAttributeData(5, "outputSelector", GL_FLOAT));
                 break;
             case shaderResource::mixFrameTexturesVert:
                 this->attributes.add(vertexAttributeData(0, "vertexXY", GL_FLOAT_VEC2));
@@ -81,14 +78,13 @@ namespace brogueHd::frontend::opengl
             case shaderResource::backgroundColorFrag:
                 break;
             case shaderResource::brogueCellDisplayFrag:
-                this->uniforms1i.add(simpleUniform<int>("frame0Texture", GL_SAMPLER_2D, 1));        // Usually, this is GL_TEXTURE0 - which corresponds to 0.
+                this->uniforms1i.add(simpleUniform<int>("frame0Texture", GL_SAMPLER_2D, 0));        // Usually, this is GL_TEXTURE0 - which corresponds to 0.
+                this->uniforms1i.add(simpleUniform<int>("fontTexture", GL_SAMPLER_2D, 1));          // Usually, this is GL_TEXTURE1 - which corresponds to 1.
                 break;
             case shaderResource::diffuseColorUpwardFrag:
-                this->uniforms1i.add(simpleUniform<int>("frame0Texture", GL_SAMPLER_2D, 1));
+                this->uniforms1i.add(simpleUniform<int>("frame0Texture", GL_SAMPLER_2D, 0));        // Usually, this is GL_TEXTURE0 - which corresponds to 0.
+                this->uniforms1i.add(simpleUniform<int>("fontTexture", GL_SAMPLER_2D, 1));          // Usually, this is GL_TEXTURE1 - which corresponds to 1.
                 this->uniforms2.add(simpleUniform<vec2>("cellSizeUV", GL_FLOAT_VEC2, vec2(1, 1)));
-                this->uniforms1i.add(simpleUniform<int>("cellHeightUI", GL_INT, 1));
-                this->uniforms1i.add(simpleUniform<int>("cellWidthUI", GL_INT, 2));
-                this->uniforms2i.add(simpleUniform<ivec2>("sceneSizeUI", GL_INT_VEC2, ivec2(1, 1)));
                 this->uniforms1.add(simpleUniform<float>("weight", GL_FLOAT, 0.5f));
                 break;
             case shaderResource::mixFrameTexturesFrag:

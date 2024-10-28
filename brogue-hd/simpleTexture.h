@@ -163,7 +163,7 @@ namespace brogueHd::frontend::opengl
         // Apply the pixel data to the backend
         glTexImage2D(GL_TEXTURE_2D,
                      TEXTURE_MIPMAP_LEVEL,
-                     GL_RGBA,                      // I believe this is the format used in the shader (some kind of 4-vector)
+                     _pixelFormat,                      // I believe this is the format used in the shader (some kind of 4-vector)
                      _width, _height, 0,           // border:  "Should always be set to zero" ....?
                      _pixelFormat,                 // This should be the format used in OUR pixel data array
                      _pixelType,

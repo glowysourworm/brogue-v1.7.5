@@ -91,13 +91,34 @@
     <Filter Include="Resource Files\opengl\brogueFlameMenu">
       <UniqueIdentifier>{7906081a-6a2a-4d0b-b850-d6365885aa6a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\vendor\glad">
+      <UniqueIdentifier>{a827b833-d13a-4a84-af33-2d5c692ec556}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\vendor\glad">
+      <UniqueIdentifier>{221d9d1f-975e-4d00-8d54-1d15672c0ffc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\vendor\bitmap">
+      <UniqueIdentifier>{0b111b1a-1f8d-4be7-a68d-84b96278e42c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\fonts">
+      <UniqueIdentifier>{b31fb0b6-fb36-4708-8e1b-d1bd2719bde9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\vendor\libspng">
+      <UniqueIdentifier>{e5c0e86f-ca4f-4957-90ef-e2f8997ccc36}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\vendor\libspng">
+      <UniqueIdentifier>{38d7d05c-db86-41fb-b8cb-de20991d4f59}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="brogue-hd.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="gl.c">
-      <Filter>Source Files\vendor</Filter>
+      <Filter>Source Files\vendor\glad</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vendor\libspng\spng.c">
+      <Filter>Source Files\vendor\libspng</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -410,12 +431,6 @@
     <ClInclude Include="brogueView.h">
       <Filter>Header Files\frontend\ui</Filter>
     </ClInclude>
-    <ClInclude Include="gl.h">
-      <Filter>Header Files\vendor</Filter>
-    </ClInclude>
-    <ClInclude Include="khrplatform.h">
-      <Filter>Header Files\vendor</Filter>
-    </ClInclude>
     <ClInclude Include="simpleShaderProgram.h">
       <Filter>Header Files\frontend\opengl</Filter>
     </ClInclude>
@@ -449,7 +464,7 @@
     <ClInclude Include="simpleGlData.h">
       <Filter>Header Files\frontend\opengl</Filter>
     </ClInclude>
-    <ClInclude Include="coordinateConverter.h">
+    <ClInclude Include="openglCoordinateConverter.h">
       <Filter>Header Files\frontend\opengl</Filter>
     </ClInclude>
     <ClInclude Include="brogueProgramBuilder.h">
@@ -460,9 +475,6 @@
     </ClInclude>
     <ClInclude Include="shaderData.h">
       <Filter>Header Files\frontend\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="json.hpp">
-      <Filter>Header Files\vendor</Filter>
     </ClInclude>
     <ClInclude Include="fileOperations.h">
       <Filter>Header Files\component</Filter>
@@ -556,6 +568,24 @@
     </ClInclude>
     <ClInclude Include="brogueButton.h">
       <Filter>Header Files\frontend\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="khrplatform.h">
+      <Filter>Header Files\vendor\glad</Filter>
+    </ClInclude>
+    <ClInclude Include="gl.h">
+      <Filter>Header Files\vendor\glad</Filter>
+    </ClInclude>
+    <ClInclude Include="json.hpp">
+      <Filter>Header Files\vendor\glad</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vendor\bitmap\bitmap_image.hpp">
+      <Filter>Header Files\vendor\bitmap</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueGlyphMap.h">
+      <Filter>Header Files\frontend\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vendor\libspng\spng.h">
+      <Filter>Header Files\vendor\libspng</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -688,5 +718,46 @@
     <None Include="..\resources\opengl\brogueCellDisplay.vert">
       <Filter>Resource Files\opengl</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\resources\fonts\font-1.bmp">
+      <Filter>Resource Files\fonts</Filter>
+    </Image>
+    <Image Include="..\resources\fonts\font-2.bmp">
+      <Filter>Resource Files\fonts</Filter>
+    </Image>
+    <Image Include="..\resources\fonts\font-3.bmp">
+      <Filter>Resource Files\fonts</Filter>
+    </Image>
+    <Image Include="..\resources\fonts\font-4.bmp">
+      <Filter>Resource Files\fonts</Filter>
+    </Image>
+    <Image Include="..\resources\fonts\font-5.bmp">
+      <Filter>Resource Files\fonts</Filter>
+    </Image>
+    <Image Include="..\resources\fonts\font-6.bmp">
+      <Filter>Resource Files\fonts</Filter>
+    </Image>
+    <Image Include="..\resources\fonts\font-7.bmp">
+      <Filter>Resource Files\fonts</Filter>
+    </Image>
+    <Image Include="..\resources\fonts\font-8.bmp">
+      <Filter>Resource Files\fonts</Filter>
+    </Image>
+    <Image Include="..\resources\fonts\font-9.bmp">
+      <Filter>Resource Files\fonts</Filter>
+    </Image>
+    <Image Include="..\resources\fonts\font-10.bmp">
+      <Filter>Resource Files\fonts</Filter>
+    </Image>
+    <Image Include="..\resources\fonts\font-11.bmp">
+      <Filter>Resource Files\fonts</Filter>
+    </Image>
+    <Image Include="..\resources\fonts\font-12.bmp">
+      <Filter>Resource Files\fonts</Filter>
+    </Image>
+    <Image Include="..\resources\fonts\font-13.bmp">
+      <Filter>Resource Files\fonts</Filter>
+    </Image>
   </ItemGroup>
 </Project>

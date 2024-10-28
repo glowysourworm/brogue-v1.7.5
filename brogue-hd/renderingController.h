@@ -37,12 +37,13 @@ namespace brogueHd::backend::controller
 		randomGenerator* _randomGenerator;
 		resourceController* _resourceController;
 		openglRenderer* _openglRenderer;
-
+		brogueGlyphMap* _glyphMap;
 	};
 
 	renderingController::renderingController(resourceController* resourceController, randomGenerator* randomGenerator)
 	{
 		_openglRenderer = new openglRenderer();
+		_glyphMap = new brogueGlyphMap();
 		_resourceController = resourceController;
 		_randomGenerator = randomGenerator;
 		_mode = BrogueGameMode::Menu;
@@ -53,6 +54,7 @@ namespace brogueHd::backend::controller
 	renderingController::~renderingController()
 	{
 		delete _openglRenderer;
+		delete _glyphMap;
 
 		for (int index = 0; index < _currentViews->count(); index++)
 		{
@@ -106,7 +108,7 @@ namespace brogueHd::backend::controller
 			brogueFlameMenu* titleView = new brogueFlameMenu(_randomGenerator, 100);
 			brogueButtonMenu* mainMenu = new brogueButtonMenu(buttons, 1, titleView->getParentBoundary(), gridRect(COLS - 26, ROWS - 12, 24, 11));
 
-			_currentProgram = new brogueFlameMenuProgram(titleView, mainMenu, _resourceController);
+			_currentProgram = new brogueFlameMenuProgram(titleView, mainMenu, _resourceController, _glyphMap);
 
 			_currentViews->add(titleView);
 			_currentViews->add(mainMenu);
