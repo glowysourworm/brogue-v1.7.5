@@ -131,7 +131,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\include;C:\Backup\_Source\Git\brogue-v1.7.5\vendor\bitmap;C:\Backup\_Source\Git\zlib-1.3.1;C:\Backup\_Source\Git\zlib-1.3.1\build;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\include;C:\Backup\_Source\Git\brogue-v1.7.5\vendor\libspng;C:\Backup\_Source\Git\zlib-1.3.1;C:\Backup\_Source\Git\zlib-1.3.1\build;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard_C>stdclatest</LanguageStandard_C>
       <DisableSpecificWarnings>4267;4244;4104;4101;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
@@ -142,7 +142,7 @@
       </ImportLibrary>
       <SubSystem>Console</SubSystem>
       <AdditionalLibraryDirectories>C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\lib-vc2022;C:\Backup\_Source\Git\zlib-1.3.1\build\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glfw3dll.lib;opengl32.lib;zlibd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glfw3dll.lib;opengl32.lib;zlibd.lib;zlibstaticd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ProjectReference>
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
@@ -172,14 +172,12 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\vendor\libspng\spng.c" />
     <ClCompile Include="brogue-hd.cpp" />
     <ClCompile Include="gl.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\vendor\bitmap\bitmap_image.hpp" />
-    <ClInclude Include="..\vendor\libspng\spng.h" />
     <ClInclude Include="accretionTile.h" />
+    <ClInclude Include="bitmap.h" />
     <ClInclude Include="boltConstants.h" />
     <ClInclude Include="boudingBox2D.h" />
     <ClInclude Include="brogueButton.h" />
@@ -294,6 +292,8 @@
     <ClInclude Include="light.h" />
     <ClInclude Include="lightConstants.h" />
     <ClInclude Include="machineConstants.h" />
+    <ClInclude Include="simpleBitmap.h" />
+    <ClInclude Include="simplePixel.h" />
     <ClInclude Include="simplePoint.h" />
     <ClInclude Include="simpleQueue.h" />
     <ClInclude Include="simpleUniform.h" />

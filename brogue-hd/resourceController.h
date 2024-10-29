@@ -9,10 +9,10 @@
 
 #include "simpleEnumString.h"
 #include "simpleString.h"
+#include "simpleBitmap.h"
 #include "shaderData.h"
 #include "colorConstants.h"
 
-#include "bitmap_image.hpp"
 #include "json.hpp"
 
 #include <string>
@@ -71,7 +71,7 @@ namespace brogueHd::backend::controller
 		/// </summary>
 		shaderData* getShader(shaderResource resource);
 
-		bitmap_image* getFontGlyphs(int zoomLevel)
+		simpleBitmap* getFontGlyphs(int zoomLevel)
 		{
 			return _fontGlyphs->get(zoomLevel);
 		}
@@ -79,13 +79,13 @@ namespace brogueHd::backend::controller
 	private:
 
 		simpleHash<shaderResource, shaderData*>* _shaderCache;
-		simpleHash<int, bitmap_image*>* _fontGlyphs;
+		simpleHash<int, simpleBitmap*>* _fontGlyphs;
 	};
 
 	resourceController::resourceController()
 	{
 		_shaderCache = new simpleHash<shaderResource, shaderData*>();
-		_fontGlyphs = new simpleHash<int, bitmap_image*>();
+		_fontGlyphs = new simpleHash<int, simpleBitmap*>();
 	}
 	resourceController::~resourceController()
 	{
@@ -143,7 +143,7 @@ namespace brogueHd::backend::controller
 				simpleString fileName = simpleExt::format(brogueHd::FontGlyphFileNameFormat, index).c_str();
 				simpleString fullPath = fileOperations::filePathConcat(fontDir, fileName);
 
-				bitmap_image* glyphSheet = new bitmap_image(fullPath.c_str());
+				simpleBitmap* glyphSheet = simpleBitmap::fromFile(fullPath);
 
 				_fontGlyphs->add(index, glyphSheet);
 			}

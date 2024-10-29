@@ -10,6 +10,8 @@
 
 #include <functional>
 
+using namespace brogueHd::simple;
+
 using namespace brogueHd;
 using namespace brogueHd::console;
 using namespace brogueHd::component;

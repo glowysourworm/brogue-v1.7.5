@@ -97,17 +97,8 @@
     <Filter Include="Source Files\vendor\glad">
       <UniqueIdentifier>{221d9d1f-975e-4d00-8d54-1d15672c0ffc}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\vendor\bitmap">
-      <UniqueIdentifier>{0b111b1a-1f8d-4be7-a68d-84b96278e42c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Resource Files\fonts">
       <UniqueIdentifier>{b31fb0b6-fb36-4708-8e1b-d1bd2719bde9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\vendor\libspng">
-      <UniqueIdentifier>{e5c0e86f-ca4f-4957-90ef-e2f8997ccc36}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\vendor\libspng">
-      <UniqueIdentifier>{38d7d05c-db86-41fb-b8cb-de20991d4f59}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -116,9 +107,6 @@
     </ClCompile>
     <ClCompile Include="gl.c">
       <Filter>Source Files\vendor\glad</Filter>
-    </ClCompile>
-    <ClCompile Include="..\vendor\libspng\spng.c">
-      <Filter>Source Files\vendor\libspng</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -578,14 +566,17 @@
     <ClInclude Include="json.hpp">
       <Filter>Header Files\vendor\glad</Filter>
     </ClInclude>
-    <ClInclude Include="..\vendor\bitmap\bitmap_image.hpp">
-      <Filter>Header Files\vendor\bitmap</Filter>
-    </ClInclude>
     <ClInclude Include="brogueGlyphMap.h">
       <Filter>Header Files\frontend\ui</Filter>
     </ClInclude>
-    <ClInclude Include="..\vendor\libspng\spng.h">
-      <Filter>Header Files\vendor\libspng</Filter>
+    <ClInclude Include="simpleBitmap.h">
+      <Filter>Header Files\simple</Filter>
+    </ClInclude>
+    <ClInclude Include="bitmap.h">
+      <Filter>Header Files\global</Filter>
+    </ClInclude>
+    <ClInclude Include="simplePixel.h">
+      <Filter>Header Files\simple</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

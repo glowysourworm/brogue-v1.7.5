@@ -2,6 +2,7 @@
 
 #include "brogueCellDisplay.h"
 #include "brogueProgram.h"
+#include "simpleBitmap.h"
 #include "simpleShaderProgram.h"
 #include "simpleTexture.h"
 #include "simpleFrameBuffer.h"
@@ -10,6 +11,7 @@
 #include "brogueProgramBuilder.h"
 #include "resourceController.h"
 
+using namespace brogueHd::simple;
 using namespace brogueHd::backend::controller;
 using namespace brogueHd::frontend::opengl;
 using namespace brogueHd::frontend::ui;
@@ -182,10 +184,10 @@ namespace brogueHd::frontend::opengl
 		_frameTexture0 = new simpleTexture(NULL, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE0, GL_RGBA, GL_FLOAT);
 
 		// Font Glyphs:  Going to load the max zoom for now
-		bitmap_image* glyphSheet = _resourceController->getFontGlyphs(MAX_ZOOM);
+		simpleBitmap* glyphSheet = _resourceController->getFontGlyphs(MAX_ZOOM);
 
 		// void* @_@ (No really good way to own this one until we do it ourselves for each and every data type, that WE own)
-		_fontTexture = new simpleTexture(NULL, glyphSheet->width(), glyphSheet->height(), textureIndex++, GL_TEXTURE1, GL_RGBA, GL_UNSIGNED_BYTE);
+		_fontTexture = new simpleTexture(glyphSheet->getRawBuffer(), glyphSheet->width(), glyphSheet->height(), textureIndex++, GL_TEXTURE1, GL_RGBA, GL_UNSIGNED_BYTE);
 
 		_frameBuffer = new simpleFrameBuffer(sceneBoundaryUI.width, sceneBoundaryUI.height);
 	}
