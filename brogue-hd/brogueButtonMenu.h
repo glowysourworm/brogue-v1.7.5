@@ -55,7 +55,7 @@ namespace brogueHd::frontend::ui
 		// Border
 		this->getBoundary().iterate([&that] (short column, short row)
 		{
-			that->get(column, row)->backColor = color(0.1, 0.1, 0.1, 0.1);
+			that->get(column, row)->backColor = color(0.1, 0.1, 0.1, 0.8);
 
 			return iterationCallback::iterate;
 		});
@@ -77,6 +77,7 @@ namespace brogueHd::frontend::ui
 				else
 					nextColor = color::interpolate(data.background1, data.background2, (2 * ((menuColumn) - (bounds.width / 2.0f))) / (float)bounds.width);
 
+				nextColor.alpha = 1.0;
 
 				that->get(column, row)->backColor = nextColor;
 

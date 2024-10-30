@@ -202,9 +202,11 @@
     <ClInclude Include="openglHelper.h" />
     <ClInclude Include="randomRange.h" />
     <ClInclude Include="simpleBoundingBox.h" />
+    <ClInclude Include="simpleBuffer.h" />
     <ClInclude Include="simpleExt.h" />
     <ClInclude Include="simpleLogger.h" />
     <ClInclude Include="brogueMachine.h" />
+    <ClInclude Include="simpleMaskedInt32.h" />
     <ClInclude Include="simpleMath.h" />
     <ClInclude Include="brogueObject.h" />
     <ClInclude Include="broguePlayer.h" />
@@ -294,6 +296,7 @@
     <ClInclude Include="machineConstants.h" />
     <ClInclude Include="simpleBitmap.h" />
     <ClInclude Include="simplePixel.h" />
+    <ClInclude Include="simplePixelFilter.h" />
     <ClInclude Include="simplePoint.h" />
     <ClInclude Include="simpleQueue.h" />
     <ClInclude Include="simpleUniform.h" />

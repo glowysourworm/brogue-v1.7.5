@@ -39,6 +39,7 @@ namespace brogueHd::frontend::opengl
 			errors |= _heatDiffuseProgram->hasErrors();
 			errors |= _titleMaskProgram->hasErrors();
 			errors |= _frameProgram->hasErrors();
+			errors |= _mainMenuProgram->hasErrors();
 
 			return errors;
 		}
@@ -49,14 +50,16 @@ namespace brogueHd::frontend::opengl
 			_heatDiffuseProgram->showErrors();
 			_titleMaskProgram->showErrors();
 			_frameProgram->showErrors();
+			_mainMenuProgram->showErrors();
 		}
 
 		bool isCompiled() const override
 		{
-			return _heatSourceProgram->isCreated() &&
+			return _frameProgram->isCreated() &&
 				   _heatDiffuseProgram->isCreated() &&
 				   _titleMaskProgram->isCreated() &&
-				   _frameProgram->isCreated();
+				   _frameProgram->isCreated() &&
+				   _mainMenuProgram->isCreated();
 		}
 
 		gridRect getSceneBoundaryUI() const override
@@ -118,7 +121,9 @@ namespace brogueHd::frontend::opengl
 		delete _heatDiffuseProgram;
 		delete _titleMaskProgram;
 		delete _frameProgram;
+		delete _mainMenuProgram;
 		delete _frameTexture0;
+		delete _fontTexture;
 		delete _frameBuffer;
 		delete _programBuilder;
 	}
@@ -187,7 +192,7 @@ namespace brogueHd::frontend::opengl
 		simpleBitmap* glyphSheet = _resourceController->getFontGlyphs(MAX_ZOOM);
 
 		// void* @_@ (No really good way to own this one until we do it ourselves for each and every data type, that WE own)
-		_fontTexture = new simpleTexture(glyphSheet->getRawBuffer(), glyphSheet->width(), glyphSheet->height(), textureIndex++, GL_TEXTURE1, GL_RGBA, GL_UNSIGNED_BYTE);
+		_fontTexture = new simpleTexture(glyphSheet->getBuffer(), glyphSheet->pixelWidth(), glyphSheet->pixelHeight(), textureIndex++, GL_TEXTURE1, GL_RGBA, GL_UNSIGNED_BYTE);
 
 		_frameBuffer = new simpleFrameBuffer(sceneBoundaryUI.width, sceneBoundaryUI.height);
 	}
@@ -198,7 +203,7 @@ namespace brogueHd::frontend::opengl
 			simpleException::show("Must first call IGLProgram.Compile() before using the GL program");
 
 		// Have to wait until the FrameBuffer is ready (skip draw passes)
-		//
+		
 		if (!_frameBuffer->isReady())
 			return;
 
@@ -214,10 +219,6 @@ namespace brogueHd::frontend::opengl
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glClearColor(0, 0, 0, 0);
-
-		// TODO:  Fix transparency
-		//glEnable(GL_BLEND);
-		//glBlendFunc(GL_SRC_COLOR, GL_SRC_COLOR);
 
 		_frameBuffer->bind();
 		
@@ -247,8 +248,14 @@ namespace brogueHd::frontend::opengl
 		_frameProgram->bind();
 		_frameProgram->draw();
 
+		// TODO:  Fix transparency for the rest of the frame buffer (above)
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 		_mainMenuProgram->bind();
 		_mainMenuProgram->draw();
+
+		glDisable(GL_BLEND);
 
 		glFlush();
 	}
@@ -259,26 +266,28 @@ namespace brogueHd::frontend::opengl
 
 		openglCoordinateConverter coordinateConverter = _programBuilder->createCoordinateConverter(sceneBoundaryUI.width, sceneBoundaryUI.height);
 
+		simpleQuad cellQuad = coordinateConverter.createQuadNormalizedUVScene(0, 0, brogueCellDisplay::CellWidth, brogueCellDisplay::CellHeight);
+
 		_mainMenuProgram->compile();
+		_frameProgram->compile();
 		_heatSourceProgram->compile();
 		_heatDiffuseProgram->compile();
 		_titleMaskProgram->compile();
-		_frameProgram->compile();
 
 		_mainMenuProgram->bind();
+		_frameProgram->bind();
 		_heatSourceProgram->bind();
 		_heatDiffuseProgram->bind();
 		_titleMaskProgram->bind();
-		_frameProgram->bind();
 
 		// Create the textures:  Texture 1 is used for the direct drawing, Texture 0 for the "color diffusion"
 		_frameTexture0->glCreate(-1);		// Textures don't automatically associate w/ a program
 		_fontTexture->glCreate(-1);
 
-		// Copy data over from the font glyph sheet
-		bitmap_image* glyphSheet = _resourceController->getFontGlyphs(MAX_ZOOM);
+		//Copy data over from the font glyph sheet
+		simpleBitmap* glyphSheet = _resourceController->getFontGlyphs(MAX_ZOOM);
 
-		// Create Frame buffer:  Uses scene program to render to the frame buffer attached texture
+		//Create Frame buffer:  Uses scene program to render to the frame buffer attached texture
 		_frameBuffer->glCreate(-1);			// Frame buffers don't automatically associate w/ a program
 
 		// Main Menu Uniforms
@@ -288,14 +297,15 @@ namespace brogueHd::frontend::opengl
 
 		// Heat Source Uniforms
 		_heatSourceProgram->bind();
-		_heatSourceProgram->bindUniform1i("frame0Texture", 0);   // GL_TEXTURE0 "texture unit" Required! USE INDEXES!! (During the run)
+		_heatSourceProgram->bindUniform1i("frame0Texture", 0);       // GL_TEXTURE0 "texture unit" Required! USE INDEXES!! (During the run)
+		_heatSourceProgram->bindUniform1i("fontTexture", 1);		 // GL_TEXTURE1 "texture unit" Required! USE INDEXES!! (During the run)
 
 		// Heat Diffuse Uniform
 		// DON'T CHANGE THIS!!! NEED TO FIND A WAY TO GET THE UNIFORM VALUE FOR THE GL_TEXTURE0!!!
 		_heatDiffuseProgram->bind();
 		_heatDiffuseProgram->bindUniform1i("frame0Texture", 0);  // GL_TEXTURE0 "texture unit" Required! USE INDEXES!! (During the run)
-		_heatDiffuseProgram->bindUniform1i("fontTexture", 1);  // GL_TEXTURE0 "texture unit" Required! USE INDEXES!! (During the run)
-		_heatDiffuseProgram->bindUniform2("cellSizeUV", coordinateConverter.convertToNormalizedUVScene(0, 0));		// Gives the size of one cell
+		_heatDiffuseProgram->bindUniform1i("fontTexture", 1);    // GL_TEXTURE0 "texture unit" Required! USE INDEXES!! (During the run)
+		_heatDiffuseProgram->bindUniform2("cellSizeUV", vec2(cellQuad.getWidth(), cellQuad.getHeight()));		// Gives the size of one cell
 		_heatDiffuseProgram->bindUniform1("weight", 0.2f);
 
 		// Frame Program Uniforms

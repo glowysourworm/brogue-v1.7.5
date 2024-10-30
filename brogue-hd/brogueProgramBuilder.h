@@ -90,8 +90,8 @@ namespace brogueHd::frontend::opengl
 
 	openglCoordinateConverter brogueProgramBuilder::createCoordinateConverter(int sceneWidth, int sceneHeight) const
 	{
-		int glyphSheetWidth = _resourceController->getFontGlyphs(MAX_ZOOM)->width();
-		int glyphSheetHeight = _resourceController->getFontGlyphs(MAX_ZOOM)->height();
+		int glyphSheetWidth = _resourceController->getFontGlyphs(MAX_ZOOM)->pixelWidth();
+		int glyphSheetHeight = _resourceController->getFontGlyphs(MAX_ZOOM)->pixelHeight();
 
 		float glyphWidth = glyphSheetWidth / (float)_glyphMap->GlyphSheetColumns;
 		float glyphHeight = glyphSheetHeight / (float)_glyphMap->GlyphSheetRows;

@@ -13,7 +13,6 @@ in float currentOutputSelector;
 
 // Current Framebuffer
 //
-uniform sampler2D frame0Texture;
 uniform sampler2D fontTexture;
 
 void main()
@@ -24,23 +23,9 @@ void main()
     //
     vec4 glyphColor = texture(fontTexture, currentGlyphUV);
 
-    // Dipslay Cell
-    //
-    if (currentOutputSelector == 1)
-    {
-        if (glyphColor.x > 0.85 && glyphColor.y > 0.85 && glyphColor.z > 0.85)
-            outputColor = currentForegroundColor;
-        else
-            outputColor = currentBackgroundColor;
-    }
+    //if (glyphColor.x > 0)
+        outputColor = glyphColor;
 
-    // Display Frame buffer (DisplayCurrentFrame)
-    //
-    else if (currentOutputSelector == 2)
-        outputColor = texture(frame0Texture, currentTextureUV);
-
-    // No Display
-    else
-        outputColor = vec4(0, 0, 0, 0);
-        
+    //else
+    //    outputColor = currentForegroundColor;
 }

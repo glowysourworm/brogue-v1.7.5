@@ -26,6 +26,7 @@ namespace brogueHd::backend::model::game
 			{
 				// int should include unicode characters
 				_characters->set(index, (int)message[index]);
+				_colors->set(index, foreColor);
 			}
 		}
 		colorString(const colorString& copy)

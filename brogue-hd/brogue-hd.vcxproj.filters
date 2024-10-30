@@ -578,6 +578,15 @@
     <ClInclude Include="simplePixel.h">
       <Filter>Header Files\simple</Filter>
     </ClInclude>
+    <ClInclude Include="simpleMaskedInt32.h">
+      <Filter>Header Files\simple</Filter>
+    </ClInclude>
+    <ClInclude Include="simplePixelFilter.h">
+      <Filter>Header Files\simple</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleBuffer.h">
+      <Filter>Header Files\simple</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\resources\model\armor.csv">

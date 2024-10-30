@@ -1,4 +1,4 @@
-#version 330 core
+#version 430 core
 
 // The layout keyword shows where - in terms of array "stride index" - the
 // attribute is positioned.

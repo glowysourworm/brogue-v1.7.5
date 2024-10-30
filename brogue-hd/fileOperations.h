@@ -1,10 +1,12 @@
 #pragma once
 
+#include "simpleBuffer.h"
 #include "simpleString.h"
 #include "simpleException.h"
 #include <iostream>
 #include <fstream>
 #include <strstream>
+#include <filesystem>
 
 using namespace brogueHd::simple;
 
@@ -29,13 +31,17 @@ namespace brogueHd::component
 		{
 			return fileExists(simpleString(filename));
 		}
-		static simpleString readFile(const char* filename)
+		static simpleBuffer* bufferFile(const simpleString& fileName)
 		{
-			return readFile(simpleString(filename));
+			return bufferFile(fileName.c_str());
 		}
-		static void writeFile(const char* filename, const simpleString& contents)
+		static simpleString readTextFile(const char* filename)
 		{
-			writeFile(simpleString(filename), contents);
+			return readTextFile(simpleString(filename));
+		}
+		static void writeTextFile(const char* filename, const simpleString& contents)
+		{
+			writeTextFile(simpleString(filename), contents);
 		}
 		static bool fileExists(const simpleString& filename)
 		{
@@ -56,7 +62,32 @@ namespace brogueHd::component
 
 			return result;
 		}
-		static simpleString readFile(const simpleString& filename)
+		static simpleBuffer* bufferFile(const char* filename)
+		{
+			try
+			{
+				size_t fileSize = std::filesystem::file_size(filename);
+
+				if (fileSize <= 0)
+					return nullptr;
+
+				char* bufferIn = new char[fileSize];
+
+				std::ifstream stream(filename);
+
+				stream.get(bufferIn, fileSize);
+				stream.close();
+
+				return new simpleBuffer(bufferIn, fileSize, false);
+			}
+			catch (std::exception& ex)
+			{
+				simpleException::show("Error trying to read file:  {}:  {}", filename, ex.what());
+			}
+
+			return nullptr;
+		}
+		static simpleString readTextFile(const simpleString& filename)
 		{
 			try
 			{
@@ -84,7 +115,7 @@ namespace brogueHd::component
 
 			return simpleString("");
 		}
-		static void writeFile(const simpleString& filename, const simpleString& contents)
+		static void writeTextFile(const simpleString& filename, const simpleString& contents)
 		{
 			try
 			{

@@ -8,6 +8,9 @@
 #include <iostream>
 #include <string>
 
+#include "simpleBitmap.h"
+#include "simplePixelFilter.h"
+
 #include <functional>
 
 using namespace brogueHd::simple;

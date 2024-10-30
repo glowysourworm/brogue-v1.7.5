@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <cstdint>
 
@@ -15,9 +15,75 @@ namespace brogueHd
 	// DWORD = unsigned long
 	// LONG  = long
 	// WORD  = unsigned short
-	// CIEXYZTRIPLE = RBG TRIPLE (called CIEXYZ) (I renamed this simplePixel, and added the alpha channel)
+	// CIEXYZTRIPLE = RBG TRIPLE (of type CIEXYZ) I renamed this to a struct "ColorSpace" (see below) (24 bytes total)
 	// FXPT2DOT30   = long
 	//
+
+	/*
+	
+		BMP Primary Format
+	
+		Structure name 			Optional 		Size 			Purpose 									Comments
+
+		BMP file header 		No 				14 bytes 		To store general information about the		Not needed after the file is loaded in memory
+																bitmap image file 						
+		DIB header 				No 				Fixed-size		(7 different versions exist) 				To store detailed information about the bitmap 
+																										    image and define the pixel format.
+
+		Extra bit masks 		Yes 			12 or 16 bytes	To define the pixel format 					Present only in case the DIB header is the 
+																											BITMAPINFOHEADER and the Compression Method 
+																											member is set to either BI_BITFIELDS or 
+																											BI_ALPHABITFIELDS.
+
+		Color table 			Semi-optional 	Variable size 	To define colors used by the bitmap image   Mandatory for color depths ≤ 8 bits
+																data (Pixel array) 	
+
+		Gap1 					Yes 			Variable size 	Structure alignment 						An artifact of the File offset to Pixel array 
+																											in the Bitmap file header
+
+		Pixel array 			No 				Variable size 	To define the actual values of the pixels 	The pixel format is defined by the DIB header or 
+																											Extra bit masks. Each row in the Pixel array is 
+																											padded to a multiple of 4 bytes in size.
+
+		Gap2 					Yes 			Variable size 	Structure alignment 						An artifact of the ICC profile data offset field 
+																											in the DIB header.
+
+		ICC color profile 		Yes 			Variable size 	To define the color profile for color		Can also contain a path to an external file 		
+																management 									containing the color profile. When loaded in memory 
+																											as "non-packed DIB", it is located between the color 
+																											table and Gap1.
+	*/
+
+
+	/// <summary>
+	/// This is the structure for the DIB header for the color space bV5CSType. It is a 24 byte structure - which
+	/// was also known as CIEXYZTRIPLE.
+	/// </summary>
+	struct DIBColorSpace
+	{
+		int32_t R_x;			// NOT FINISHED!!!  THE ONLINE SPEC SAID 24 BYTES, BUT 24 / 9 ISN'T A WHOLE NUMBER
+								//					SO, THIS HAS TO BE FIGURED OUT.
+		int32_t R_y;
+		int32_t R_z;
+
+		int32_t G_x;
+		int32_t G_y;
+		int32_t G_z;
+
+		int32_t B_x;
+		int32_t B_y;
+		int32_t B_z;
+	};
+
+	struct BitmapOptionalMasks
+	{
+		uint32_t red;
+		uint32_t green;
+		uint32_t blue;
+		uint32_t alpha;
+
+		bool alphaUsed;
+	};
 
 	/*
 	
@@ -90,6 +156,8 @@ namespace brogueHd
 						components of each pixel are specified in the bV5RedMask, bV5GreenMask, and bV5BlueMask members. 
 						This is valid when used with 16- and 32-bpp bitmaps.
 
+		BI_ALPHABITFIELDS (ALSO!!) (PLEASE CHECK MSFT HEADER)
+
 		BI_JPEG 		Specifies that the image is compressed using the JPEG file Interchange Format. JPEG compression 
 						trades off compression against loss; it can achieve a compression ratio of 20:1 with little noticeable loss.
 
@@ -103,6 +171,11 @@ namespace brogueHd
 	/// </summary>
 	struct BitmapFileHeader
 	{
+		/// <summary>
+		/// Bitmap header size constant (14 bytes) - no matter which parts are used.
+		/// </summary>
+		static const uint32_t HEADER_SIZE = 14;
+
 		/// <summary>
 		/// See explanations of these 2-character signatures on wikipedia. The BM signature
 		/// is the default standard signature. 
@@ -129,19 +202,19 @@ namespace brogueHd
 		BMPSignature SignatureDecoded;
 
 		// The actual ASCII Signature
-		int16_t Signature;
+		uint16_t Signature;
 
 		// 4 bytes (Size of the BMP file in bytes)
-		int32_t FileSize;
+		uint32_t FileSize;
 
 		// 2 bytes (Reserved - set to 0)
-		int16_t Reserved1;
+		uint16_t Reserved1;
 
 		// 2 bytes (Reserved - set to 0)
-		int16_t Reserved2;
+		uint16_t Reserved2;
 
 		// 4 bytes (Pointer to image data in the file)
-		int32_t ImageDataOffset;
+		uint32_t ImageDataOffset;
 	};
 
 	enum BitmapPixelFormat : int
@@ -160,64 +233,64 @@ namespace brogueHd
 	struct BITMAPV5HEADER {
 
 		/// <summary>
-		/// Size of this header in bytes
+		/// Size of this header in bytes (This field is 4 bytes)
 		/// </summary>
-		unsigned long        bV5Size;					
+		uint32_t				bV5Size;					
 
 		/// <summary>
-		/// The width of the bitmap, in pixels. If bV5Compression is BI_JPEG or BI_PNG, 
+		/// (4 byte field) The width of the bitmap, in pixels. If bV5Compression is BI_JPEG or BI_PNG, 
 		/// the bV5Width member specifies the width of the decompressed JPEG or PNG image in pixels.
 		/// </summary>
-		long				 bV5Width;					
+		uint32_t				bV5Width;
 
 		/// <summary>
-		/// The height of the bitmap, in pixels. If the value of bV5Height is positive, the bitmap 
+		/// (4 byte field) The height of the bitmap, in pixels. If the value of bV5Height is positive, the bitmap 
 		/// is a bottom-up DIB and its origin is the lower-left corner. If bV5Height value is negative, 
 		/// the bitmap is a top-down DIB and its origin is the upper-left corner. If bV5Height is negative, 
 		/// indicating a top - down DIB, bV5Compression must be either BI_RGB or BI_BITFIELDS.Top - down 
 		/// DIBs cannot be compressed. If bV5Compression is BI_JPEG or BI_PNG, the bV5Height member specifies 
 		/// the height of the decompressed JPEG or PNG image in pixels.
 		/// </summary>
-		long				 bV5Height;					
+		uint32_t				bV5Height;
 
 		/// <summary>
-		/// The number of planes for the target device. This value must be set to 1.
+		/// (2 byte field) The number of planes for the target device. This value must be set to 1.
 		/// </summary>
-		unsigned short       bV5Planes;
+		uint16_t				bV5Planes;
 
 		/// <summary>
-		/// The number of bits that define each pixel and the maximum number of colors in the bitmap.
+		/// (2 byte field) The number of bits that define each pixel and the maximum number of colors in the bitmap.
 		/// This member can be one of the following values. (See above bitmap.h for explanation of formats)
 		/// </summary>
-		unsigned short       bV5BitCount;
+		uint16_t				bV5BitCount;
 
 		/// <summary>
-		/// Specifies that the bitmap is not compressed. The bV5RedMask, bV5GreenMask, and bV5BlueMask 
+		/// (4 byte field) Specifies that the bitmap is not compressed. The bV5RedMask, bV5GreenMask, and bV5BlueMask 
 		/// members specify the red, green, and blue components of each pixel. This is valid when used 
 		/// with 16- and 32-bpp bitmaps. This member can be one of the following values.
 		/// </summary>
-		unsigned long        bV5Compression;
+		uint32_t				bV5Compression;
 
 		/// <summary>
-		/// The size, in bytes, of the image. This may be set to zero for BI_RGB bitmaps. If bV5Compression 
+		/// (4 byte field) The size, in bytes, of the image. This may be set to zero for BI_RGB bitmaps. If bV5Compression 
 		/// is BI_JPEG or BI_PNG, bV5SizeImage is the size of the JPEG or PNG image buffer.
 		/// </summary>
-		unsigned long        bV5SizeImage;
+		uint32_t				bV5SizeImage;
 
 		/// <summary>
-		/// The horizontal resolution, in pixels-per-meter, of the target device for the bitmap. An application 
+		/// (4 byte field) The horizontal resolution, in pixels-per-meter, of the target device for the bitmap. An application 
 		/// can use this value to select a bitmap from a resource group that best matches the characteristics of 
 		/// the current device.
 		/// </summary>
-		long				 bV5XPelsPerMeter;
+		uint32_t				bV5XPelsPerMeter;
 
 		/// <summary>
-		/// The vertical resolution, in pixels-per-meter, of the target device for the bitmap.
+		/// (4 byte field) The vertical resolution, in pixels-per-meter, of the target device for the bitmap.
 		/// </summary>
-		long				 bV5YPelsPerMeter;
+		uint32_t				bV5YPelsPerMeter;
 
 		/// <summary>
-		/// The number of color indexes in the color table that are actually used by the bitmap. If this value is 
+		/// (4 byte field) The number of color indexes in the color table that are actually used by the bitmap. If this value is 
 		/// zero, the bitmap uses the maximum number of colors corresponding to the value of the bV5BitCount member 
 		/// for the compression mode specified by bV5Compression.If bV5ClrUsed is nonzero and bV5BitCount is less 
 		/// than 16, the bV5ClrUsed member specifies the actual number of colors the graphics engine or device 
@@ -226,38 +299,40 @@ namespace brogueHd
 		/// color palette starts immediately following the BITMAPV5HEADER.If bV5ClrUsed is nonzero, the color table 
 		/// is used on palettized devices, and bV5ClrUsed specifies the number of entries.
 		/// </summary>
-		unsigned long        bV5ClrUsed;
+		uint32_t				bV5ClrUsed;
 
 		/// <summary>
-		/// The number of color indexes that are required for displaying the bitmap. If this value is zero, all colors are required.
+		/// (4 byte field) The number of color indexes that are required for displaying the bitmap. If this value is zero, all colors are required.
 		/// </summary>
-		unsigned long        bV5ClrImportant;
+		uint32_t				bV5ClrImportant;
 
 		/// <summary>
-		/// Color mask that specifies the red component of each pixel, valid only if bV5Compression is set to BI_BITFIELDS.
+		/// (4 byte field) Color mask that specifies the red component of each pixel, valid only if bV5Compression is set to BI_BITFIELDS.
 		/// </summary>
-		unsigned long        bV5RedMask;
+		uint32_t				bV5RedMask;
 
 		/// <summary>
-		/// Color mask that specifies the green component of each pixel, valid only if bV5Compression is set to BI_BITFIELDS.
+		/// (4 byte field) Color mask that specifies the green component of each pixel, valid only if bV5Compression is set to BI_BITFIELDS.
 		/// </summary>
-		unsigned long        bV5GreenMask;
+		uint32_t				bV5GreenMask;
 
 		/// <summary>
-		/// Color mask that specifies the blue component of each pixel, valid only if bV5Compression is set to BI_BITFIELDS.
+		/// (4 byte field) Color mask that specifies the blue component of each pixel, valid only if bV5Compression is set to BI_BITFIELDS.
 		/// </summary>
-		unsigned long        bV5BlueMask;
+		uint32_t				bV5BlueMask;
 
 		/// <summary>
-		/// Color mask that specifies the alpha component of each pixel.
+		/// (4 byte field) Color mask that specifies the alpha component of each pixel.
 		/// </summary>
-		unsigned long        bV5AlphaMask;
+		uint32_t				bV5AlphaMask;
 
 		/// <summary>
-		/// The color space of the DIB. The following table specifies the values for bV5CSType. (See online for MSFT's table)
+		/// (4 byte field) The color space of the DIB. The following table specifies the values for bV5CSType. (See online for MSFT's table)
 		/// </summary>
-		unsigned long        bV5CSType;
-		// CIEXYZTRIPLE bV5Endpoints;			// See MSFT's explanation. This involves the color space for the bitmap. 
+		uint32_t				bV5CSType;
+
+
+		DIBColorSpace		 bV5Endpoints;			// See MSFT's explanation. This involves the color space for the bitmap. 
 		unsigned long        bV5GammaRed;
 		unsigned long        bV5GammaGreen;
 		unsigned long        bV5GammaBlue;

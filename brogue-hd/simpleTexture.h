@@ -3,6 +3,7 @@
 #include "simple.h"
 #include "simpleGlObject.h"
 #include "simpleException.h"
+#include "simpleBuffer.h"
 #include "gl.h"
 
 using namespace brogueHd::simple;
@@ -21,7 +22,7 @@ namespace brogueHd::frontend::opengl
 
         simpleTexture();
         simpleTexture(const simpleTexture& copy);
-        simpleTexture(int pixelBuffer, GLsizei width, GLsizei height, GLuint textureIndex, GLenum textureUnit, GLenum pixelFormat, GLenum pixelType);
+        simpleTexture(simpleBuffer* pixelBuffer, GLsizei width, GLsizei height, GLuint textureIndex, GLenum textureUnit, GLenum pixelFormat, GLenum pixelType);
         ~simpleTexture(){};
 
         void operator=(const simpleTexture& copy);
@@ -48,7 +49,7 @@ namespace brogueHd::frontend::opengl
             return _textureIndex;
         }
 
-        int getPixelBuffer() const
+        simpleBuffer* getPixelBuffer() const
         {
             return _pixelBuffer;
         }
@@ -85,7 +86,7 @@ namespace brogueHd::frontend::opengl
         GLenum _textureUnit;
         GLuint _textureIndex;
 
-        int _pixelBuffer;
+        simpleBuffer* _pixelBuffer;
         GLsizei _width;
         GLsizei _height;
         GLenum _pixelFormat;
@@ -107,7 +108,7 @@ namespace brogueHd::frontend::opengl
     {
         copyImpl(copy);
     }
-    simpleTexture::simpleTexture(int pixelBuffer, GLsizei width, GLsizei height, GLuint textureIndex, GLenum textureUnit, GLenum pixelFormat, GLenum pixelType)
+    simpleTexture::simpleTexture(simpleBuffer* pixelBuffer, GLsizei width, GLsizei height, GLuint textureIndex, GLenum textureUnit, GLenum pixelFormat, GLenum pixelType)
     {
         _textureUnit = textureUnit;
         _textureIndex = textureIndex;
@@ -164,10 +165,10 @@ namespace brogueHd::frontend::opengl
         glTexImage2D(GL_TEXTURE_2D,
                      TEXTURE_MIPMAP_LEVEL,
                      _pixelFormat,                      // I believe this is the format used in the shader (some kind of 4-vector)
-                     _width, _height, 0,           // border:  "Should always be set to zero" ....?
-                     _pixelFormat,                 // This should be the format used in OUR pixel data array
+                     _width, _height, 0,                // border:  "Should always be set to zero" ....?
+                     _pixelFormat,                      // This should be the format used in OUR pixel data array
                      _pixelType,
-                     (void*)_pixelBuffer);                // Pixel data in byte array
+                     _pixelBuffer == nullptr ? NULL : _pixelBuffer->getBuffer());                // Pixel data in byte array
 
         // SETTING THESE TO DEFAULTS (TODO)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);

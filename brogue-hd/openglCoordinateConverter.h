@@ -27,7 +27,7 @@ namespace brogueHd::frontend::opengl
         /// <param name="sceneHeight">Height of the scene (or view) in UI coordinates</param>
         /// <param name="glyphSheetWidth">Width of the glyph sheet in UI coordinates</param>
         /// <param name="glyphSheetHeight">Height of the glyph sheet in UI coordinates</param>
-        openglCoordinateConverter(int cellQuadWidthUI, int cellQuadHeightUI, int glyphQuadWidthUI, int glyphQuadHeightUI, int sceneWidth, int sceneHeight, int glyphSheetWidth, int glyphSheetHeight);
+        openglCoordinateConverter(float cellQuadWidthUI, float cellQuadHeightUI, float glyphQuadWidthUI, float glyphQuadHeightUI, int sceneWidth, int sceneHeight, int glyphSheetWidth, int glyphSheetHeight);
         ~openglCoordinateConverter();
 
         brogueImageQuad createBrogueImageQuadScene(const brogueCellDisplay& cell, int column, int row);
@@ -42,7 +42,7 @@ namespace brogueHd::frontend::opengl
         /// </summary>
         /// <param name="pixelX">UI-coordinate X</param>
         /// <param name="pixelY">UI-coordinate Y</param>
-        vec2 convertToNormalizedXYScene(int pixelX, int pixelY);
+        vec2 convertToNormalizedXYScene(float pixelX, float pixelY);
 
         /// <summary>
         /// Creates Quad from UI coordinates converting to XY-Normalized
@@ -52,7 +52,7 @@ namespace brogueHd::frontend::opengl
         /// <param name="pixelY">UI-coordinate Y</param>
         /// <param name="pixelWidth">UI-coordinate Width</param>
         /// <param name="pixelHeight">UI-coordinate Height</param>
-        simpleQuad createQuadNormalizedXYScene(int pixelX, int pixelY, int pixelWidth, int pixelHeight);
+        simpleQuad createQuadNormalizedXYScene(float pixelX, float pixelY, float pixelWidth, float pixelHeight);
 
         /// <summary>
         /// Converts from UI coordinates to UV-Normalized scene coordinates - used for texture overlays or post-processing
@@ -60,7 +60,7 @@ namespace brogueHd::frontend::opengl
         /// <param name="pixelX">UI Pixel X</param>
         /// <param name="pixelY">UI Pixel Y</param>
         /// <returns>UV coordinates with respect to the scene</returns>
-        vec2 convertToNormalizedUVScene(int pixelX, int pixelY);
+        vec2 convertToNormalizedUVScene(float pixelX, float pixelY);
 
         /// <summary>
         /// Converts from UI coordinates to UV coordinates (NON-NORMALIZED). This is used for texture rectangles / texelFetch. The
@@ -68,7 +68,7 @@ namespace brogueHd::frontend::opengl
         /// </summary>
         /// <param name="pixelX">UI Pixel X</param>
         /// <param name="pixelY">UI Pixel Y</param>
-        ivec2 convertToUVScene(int pixelX, int pixelY);
+        ivec2 convertToUVScene(float pixelX, float pixelY);
 
         /// <summary>
         /// Creates GLQuad from UI coordinates converting to UV-Normalized scene coordinates - used for texture overlays or post-processing
@@ -76,7 +76,7 @@ namespace brogueHd::frontend::opengl
         /// <param name="pixelX">UI Pixel X</param>
         /// <param name="pixelY">UI Pixel Y</param>
         /// <returns>UV coordinate GLQuad with respect to the scene</returns>
-        simpleQuad createQuadNormalizedUVScene(int pixelX, int pixelY, int pixelWidth, int pixelHeight);
+        simpleQuad createQuadNormalizedUVScene(float pixelX, float pixelY, float pixelWidth, float pixelHeight);
 
         /// <summary>
         /// Creates a GL quad that is in UV coordinates; but scaled to the UI size. This is used with texture rectangle / texelFetch.
@@ -85,14 +85,14 @@ namespace brogueHd::frontend::opengl
         /// <param name="pixelY">UI Pixel Y</param>
         /// <param name="pixelWidth">UI Pixel Width</param>
         /// <param name="pixelHeight">UI Pixel Height</param>
-        simpleiQuad createQuadUVScene(int pixelX, int pixelY, int pixelWidth, int pixelHeight);
+        simpleiQuad createQuadUVScene(float pixelX, float pixelY, float pixelWidth, float pixelHeight);
 
     private:
 
-        int _cellQuadWidthUI;
-        int _cellQuadHeightUI;
-        int _glyphQuadWidthUI;
-        int _glyphQuadHeightUI;
+        float _cellQuadWidthUI;
+        float _cellQuadHeightUI;
+        float _glyphQuadWidthUI;
+        float _glyphQuadHeightUI;
         int _sceneWidth;
         int _sceneHeight;
         int _glyphSheetWidth;
@@ -101,7 +101,7 @@ namespace brogueHd::frontend::opengl
         brogueGlyphMap* _glyphMap;
 	};
 
-    openglCoordinateConverter::openglCoordinateConverter(int cellQuadWidthUI, int cellQuadHeightUI, int glyphQuadWidthUI, int glyphQuadHeightUI, int sceneWidth, int sceneHeight, int glyphSheetWidth, int glyphSheetHeight)
+    openglCoordinateConverter::openglCoordinateConverter(float cellQuadWidthUI, float cellQuadHeightUI, float glyphQuadWidthUI, float glyphQuadHeightUI, int sceneWidth, int sceneHeight, int glyphSheetWidth, int glyphSheetHeight)
     {
         _cellQuadWidthUI = cellQuadWidthUI;
         _cellQuadHeightUI = cellQuadHeightUI;
@@ -122,8 +122,8 @@ namespace brogueHd::frontend::opengl
 
     brogueImageQuad openglCoordinateConverter::createBrogueImageQuadScene(const brogueCellDisplay& cell, int column, int row)
     {
-        int pixelX = column * _cellQuadWidthUI;
-        int pixelY = row * _cellQuadHeightUI;
+        float pixelX = column * _cellQuadWidthUI;
+        float pixelY = row * _cellQuadHeightUI;
 
         simpleQuad quadXY = createQuadNormalizedXYScene(pixelX, pixelY, _cellQuadWidthUI, _cellQuadHeightUI);
         simpleQuad quadUV = createQuadNormalizedUVScene(pixelX, pixelY, _cellQuadWidthUI, _cellQuadHeightUI);
@@ -133,8 +133,8 @@ namespace brogueHd::frontend::opengl
 
     brogueCellQuad openglCoordinateConverter::createBrogueCellQuadScene(const brogueCellDisplay& cell, int column, int row, openglBrogueCellOutputSelector outputSelector)
     {
-        int pixelX = column * _cellQuadWidthUI;
-        int pixelY = row * _cellQuadHeightUI;
+        float pixelX = column * _cellQuadWidthUI;
+        float pixelY = row * _cellQuadHeightUI;
 
         gridLocator glyphLocation = _glyphMap->getGlyphLocation(cell.character);
 
@@ -147,8 +147,8 @@ namespace brogueHd::frontend::opengl
 
     brogueColorQuad openglCoordinateConverter::createBrogueColorQuadScene(const brogueCellDisplay& cell, int column, int row)
     {
-        int pixelX = column * _cellQuadWidthUI;
-        int pixelY = row * _cellQuadHeightUI;
+        float pixelX = column * _cellQuadWidthUI;
+        float pixelY = row * _cellQuadHeightUI;
 
         simpleQuad quadXY = createQuadNormalizedXYScene(pixelX, pixelY, _cellQuadWidthUI, _cellQuadHeightUI);
 
@@ -157,8 +157,8 @@ namespace brogueHd::frontend::opengl
 
     brogueImageQuad openglCoordinateConverter::createBrogueImageQuadFrame(int offsetColumn, int offsetRow)
     {
-        int pixelX = offsetColumn * _cellQuadWidthUI;
-        int pixelY = offsetRow * _cellQuadHeightUI;
+        float pixelX = offsetColumn * _cellQuadWidthUI;
+        float pixelY = offsetRow * _cellQuadHeightUI;
 
         simpleQuad quadXY = createQuadNormalizedXYScene(pixelX, pixelY, _sceneWidth, _sceneHeight);
         simpleQuad quadUV = createQuadNormalizedUVScene(pixelX, pixelY, _sceneWidth, _sceneHeight);
@@ -168,8 +168,8 @@ namespace brogueHd::frontend::opengl
 
     brogueColorQuad openglCoordinateConverter::createBrogueColorQuadFrame(color theColor, int offsetColumn, int offsetRow)
     {
-        int pixelX = offsetColumn * _cellQuadWidthUI;
-        int pixelY = offsetRow * _cellQuadHeightUI;
+        float pixelX = offsetColumn * _cellQuadWidthUI;
+        float pixelY = offsetRow * _cellQuadHeightUI;
 
         simpleQuad quadXY = createQuadNormalizedXYScene(pixelX, pixelY, _sceneWidth, _sceneHeight);
         simpleQuad quadUV = createQuadNormalizedUVScene(pixelX, pixelY, _sceneWidth, _sceneHeight);
@@ -184,7 +184,7 @@ namespace brogueHd::frontend::opengl
     /// <param name="pixelY">UI-coordinate Y</param>
     /// <param name="sceneWidth">UI Width</param>
     /// <param name="sceneHeight">UI Height</param>
-    vec2 openglCoordinateConverter::convertToNormalizedXYScene(int pixelX, int pixelY)
+    vec2 openglCoordinateConverter::convertToNormalizedXYScene(float pixelX, float pixelY)
     {
         float normalizedY = ((pixelY / (float)_sceneHeight) * -2.0f) + 1.0f;
         float normalizedX = ((pixelX / (float)_sceneWidth) * 2.0f) - 1.0f;
@@ -202,7 +202,7 @@ namespace brogueHd::frontend::opengl
     /// <param name="pixelHeight">UI-coordinate Height</param>
     /// <param name="sceneWidth">UI Width</param>
     /// <param name="sceneHeight">UI Height</param>
-    simpleQuad openglCoordinateConverter::createQuadNormalizedXYScene(int pixelX, int pixelY, int pixelWidth, int pixelHeight)
+    simpleQuad openglCoordinateConverter::createQuadNormalizedXYScene(float pixelX, float pixelY, float pixelWidth, float pixelHeight)
     {
         vec2 topLeft = convertToNormalizedXYScene(pixelX, pixelY);
         vec2 bottomRight = convertToNormalizedXYScene(pixelX + pixelWidth, pixelY + pixelHeight);
@@ -218,7 +218,7 @@ namespace brogueHd::frontend::opengl
     /// <param name="sceneWidth">UI scene width</param>
     /// <param name="sceneHeight">UI scene height</param>
     /// <returns>UV coordinates with respect to the scene</returns>
-    vec2 openglCoordinateConverter::convertToNormalizedUVScene(int pixelX, int pixelY)
+    vec2 openglCoordinateConverter::convertToNormalizedUVScene(float pixelX, float pixelY)
     {
         // Have to invert the Y coordinate to work with the texture
         float normalizedU = pixelX / (float)_sceneWidth;
@@ -235,7 +235,7 @@ namespace brogueHd::frontend::opengl
     /// <param name="pixelY">UI Pixel Y</param>
     /// <param name="sceneWidth">UI scene width</param>
     /// <param name="sceneHeight">UI scene height</param>
-    ivec2 openglCoordinateConverter::convertToUVScene(int pixelX, int pixelY)
+    ivec2 openglCoordinateConverter::convertToUVScene(float pixelX, float pixelY)
     {
         return ivec2(pixelX, _sceneHeight - pixelY);
     }
@@ -248,7 +248,7 @@ namespace brogueHd::frontend::opengl
     /// <param name="sceneWidth">UI scene width</param>
     /// <param name="sceneHeight">UI scene height</param>
     /// <returns>UV coordinate GLQuad with respect to the scene</returns>
-    simpleQuad openglCoordinateConverter::createQuadNormalizedUVScene(int pixelX, int pixelY, int pixelWidth, int pixelHeight)
+    simpleQuad openglCoordinateConverter::createQuadNormalizedUVScene(float pixelX, float pixelY, float pixelWidth, float pixelHeight)
     {
         vec2 topLeft = convertToNormalizedUVScene(pixelX, pixelY);
         vec2 bottomRight = convertToNormalizedUVScene(pixelX + pixelWidth, pixelY + pixelHeight);
@@ -265,7 +265,7 @@ namespace brogueHd::frontend::opengl
     /// <param name="pixelHeight">UI Pixel Height</param>
     /// <param name="sceneWidth">UI Pixel scene width</param>
     /// <param name="sceneHeight">UI Pixel Scene Height</param>
-    simpleiQuad openglCoordinateConverter::createQuadUVScene(int pixelX, int pixelY, int pixelWidth, int pixelHeight)
+    simpleiQuad openglCoordinateConverter::createQuadUVScene(float pixelX, float pixelY, float pixelWidth, float pixelHeight)
     {
         ivec2 topLeft = convertToUVScene(pixelX, pixelY);
         ivec2 bottomRight = convertToUVScene(pixelX + pixelWidth, pixelY + pixelHeight);

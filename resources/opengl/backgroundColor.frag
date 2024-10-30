@@ -1,4 +1,4 @@
-#version 330 core
+#version 430 core
 
 // Output of the shader is the RBGA formatted color for the fragment (pixel.. or rasterized unit fragment)
 //

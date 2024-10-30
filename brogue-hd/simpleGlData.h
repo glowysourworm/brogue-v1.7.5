@@ -413,6 +413,14 @@ namespace brogueHd::frontend::opengl
 			bottomRight = copy.bottomRight;
 		}
 
+		float getWidth()
+		{
+			return bottomRight.x - topLeft.x;
+		}
+		float getHeight()
+		{
+			return  topLeft.y - bottomRight.y;
+		}
 		int getElementVertexSize(GLenum primitiveType) const override
 		{
 			switch (primitiveType)
