@@ -28,8 +28,8 @@ void main()
     //
     if (currentOutputSelector == 1)
     {
-        if (glyphColor.x > 0.85 && glyphColor.y > 0.85 && glyphColor.z > 0.85)
-            outputColor = currentForegroundColor;
+        if (glyphColor.x > 0.5 && glyphColor.y > 0.5 && glyphColor.z > 0.5 && glyphColor.w > 0.5)
+            outputColor = mix(glyphColor, currentForegroundColor, 0.5);
         else
             outputColor = currentBackgroundColor;
     }

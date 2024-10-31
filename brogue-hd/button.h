@@ -22,13 +22,15 @@ namespace brogueHd
 
 		buttonData()
 		{
-
+			textAlignment = brogueTextAlignment::Left;
 		}
-		buttonData(const char* buttonText, color gradient1, color gradient2)
+		buttonData(const char* buttonText, color gradient1, color gradient2, brogueTextAlignment alignment, short ahotKeyIndex)
 		{
 			text = colorString(buttonText, colors::white());
 			background1 = gradient1;
 			background2 = gradient2;
+			hotkeyIndex = ahotKeyIndex;
+			textAlignment = alignment;
 		}
 		buttonData(const buttonData& copy)
 		{
@@ -48,7 +50,7 @@ namespace brogueHd
 		}
 
 		colorString text;			// button label; can include color escapes
-		signed long hotkey[10];		// up to 10 hotkeys to trigger the button
+		short hotkeyIndex;			// Hot key index
 		color background1;			// background of the button; further gradient-ized when displayed
 		color background2;			// (gradient background)
 		short opacity;				// further reduced by 50% if not enabled
@@ -72,6 +74,7 @@ namespace brogueHd
 			background2 = copy.background2;
 			opacity = copy.opacity;
 			textAlignment = copy.textAlignment;
+			hotkeyIndex = copy.hotkeyIndex;
 		}
 
 		bool compare(const buttonData& other)
@@ -80,7 +83,8 @@ namespace brogueHd
 				   background1 == other.background1 &&
 				   background2 == other.background2 &&
 				   opacity == other.opacity &&
-				   textAlignment == other.textAlignment;
+				   textAlignment == other.textAlignment &&
+				   hotkeyIndex == other.hotkeyIndex;
 		}
 	};
 

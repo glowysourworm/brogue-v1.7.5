@@ -143,7 +143,7 @@ namespace brogueHd::backend::controller
 
 			for (int index = MIN_ZOOM; index <= MAX_ZOOM; index++)
 			{
-				simpleString fileName = simpleExt::format(brogueHd::FontGlyphFileNameFormat, index).c_str();
+				simpleString fileName = simpleExt::format(brogueHd::FontGlyphFileNameFormat_RGBA24_UNSIGNED, index).c_str();
 				simpleString fullPath = fileOperations::filePathConcat(fontDir, fileName);
 
 				simpleBitmap* glyphSheet = simpleBitmap::fromFile(fullPath);

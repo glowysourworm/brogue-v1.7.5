@@ -21,10 +21,13 @@ namespace brogueHd::simple
 		/// </summary>
 		simpleBitmap();
 		simpleBitmap(simpleBuffer* fileBuffer,
-					 simpleBuffer* colorDataBuffer,
-					 BitmapFileHeader* signature,
-					 BITMAPV5HEADER* dibHeader,
-					 BitmapOptionalMasks* optionalMasks);
+					simpleBuffer* colorDataBuffer,
+					BitmapFileHeader* signature,
+					BITMAPCOREHEADER* coreHeader,
+					BITMAPV5HEADER* dibHeader,
+					BitmapOptionalMasks* optionalMasks,
+					uint32_t resolvedWidth,
+					uint32_t resolvedHeight);
 		simpleBitmap(const simpleBitmap& copy);
 		~simpleBitmap();
 
@@ -35,16 +38,21 @@ namespace brogueHd::simple
 
 		int pixelWidth() const
 		{
-			return _dibHeader->bV5Width;
+			return _resolvedWidth;
 		}
 		int pixelHeight() const
 		{
-			return _dibHeader->bV5Height;
+			return _resolvedHeight;
 		}
 
 		simpleBuffer* getBuffer() const
 		{
 			return _fileBuffer;
+		}
+
+		simpleBuffer* getColorDataBuffer() const
+		{
+			return _colorDataBuffer;
 		}
 
 	protected:
@@ -53,13 +61,13 @@ namespace brogueHd::simple
 		{
 			return _signatureHeader;
 		}
+		BITMAPCOREHEADER* getCoreHeader() const
+		{
+			return _coreHeader;
+		}
 		BITMAPV5HEADER* getDIBHeader() const
 		{
 			return _dibHeader;
-		}
-		simpleBuffer* getColorDataBuffer() const
-		{
-			return _colorDataBuffer;
 		}
 		BitmapOptionalMasks* getOptionalMasks() const
 		{
@@ -74,6 +82,7 @@ namespace brogueHd::simple
 	private:
 
 		static BitmapFileHeader* decodeSignature(simpleBuffer* fileBuffer);
+		static BITMAPCOREHEADER* decodeCoreHeader(simpleBuffer* fileBuffer);
 		static BITMAPV5HEADER* decodeHeader(simpleBuffer* fileBuffer);
 		static BitmapOptionalMasks* decodeOptionalMasks(simpleBuffer* fileBuffer, int offset, bool includeAlpha);
 
@@ -84,6 +93,7 @@ namespace brogueHd::simple
 		// Bitmap Format: (see bitmap.h) [ Signature Header, DIB Header, Optional Bitmasks, Optional Color Table, Optional Gap1, Pixel Array, ...]
 
 		BitmapFileHeader*	 _signatureHeader;
+		BITMAPCOREHEADER*	 _coreHeader;		// In case of old versions, this will be tried in the header section as well.
 		BITMAPV5HEADER*		 _dibHeader;			
 		BitmapOptionalMasks* _optionalMasks;
 
@@ -92,12 +102,16 @@ namespace brogueHd::simple
 		simpleBuffer* _fileBuffer;
 		simpleBuffer* _colorDataBuffer;
 
+		uint32_t _resolvedWidth;
+		uint32_t _resolvedHeight;
+
 	};
 
 	simpleBitmap::simpleBitmap()
 	{
 		_signatureHeader = nullptr;
 		_dibHeader = nullptr;
+		_coreHeader = nullptr;
 		_fileBuffer = nullptr;
 		_colorDataBuffer = nullptr;
 		_optionalMasks = nullptr;
@@ -105,27 +119,37 @@ namespace brogueHd::simple
 	simpleBitmap::simpleBitmap(simpleBuffer* fileBuffer,
 							   simpleBuffer* colorDataBuffer,
 							   BitmapFileHeader* signature,
+							   BITMAPCOREHEADER* coreHeader,
 							   BITMAPV5HEADER* dibHeader,
-							   BitmapOptionalMasks* optionalMasks)
+							   BitmapOptionalMasks* optionalMasks,
+							   uint32_t resolvedWidth,
+							   uint32_t resolvedHeight)
 	{
 		_fileBuffer = fileBuffer;
 		_colorDataBuffer = colorDataBuffer;
 		_signatureHeader = signature;
+		_coreHeader = coreHeader;
 		_dibHeader = dibHeader;
 		_optionalMasks = optionalMasks;
+		_resolvedWidth = resolvedWidth;
+		_resolvedHeight = resolvedHeight;
 	}
 	simpleBitmap::simpleBitmap(const simpleBitmap& copy)
 	{
 		_signatureHeader = copy.getSignature();
 		_dibHeader = copy.getDIBHeader();
+		_coreHeader = copy.getCoreHeader();
 		_colorDataBuffer = copy.getColorDataBuffer();
 		_fileBuffer = copy.getBuffer();
 		_optionalMasks = copy.getOptionalMasks();
+		_resolvedWidth = copy.pixelWidth();
+		_resolvedHeight = copy.pixelHeight();
 	}
 	simpleBitmap::~simpleBitmap()
 	{
 		delete _signatureHeader;
 		delete _dibHeader;
+		delete _coreHeader;
 		delete _fileBuffer;
 		delete _colorDataBuffer;
 	}
@@ -138,9 +162,9 @@ namespace brogueHd::simple
 	simpleBitmap* simpleBitmap::fromFile(const simpleString& filename)
 	{
 		uintmax_t fileSize = 0;
-		size_t colorDataBufferSize;
-		char* fileBufferIn;
-		char* colorDataBufferIn;
+		size_t colorDataBufferSize = 0;
+		char* fileBufferIn = nullptr;
+		char* colorDataBufferIn = nullptr;
 
 		try
 		{
@@ -172,40 +196,100 @@ namespace brogueHd::simple
 			//							  There are some extra bit masks depending on the DIB's setting.
 			//
 			BitmapFileHeader* signature = decodeSignature(fileBuffer);
+			BITMAPCOREHEADER* coreHeader = decodeCoreHeader(fileBuffer);
 			BITMAPV5HEADER* dibHeader = decodeHeader(fileBuffer);
 
-			//// Color Table:  32-bit words, one per pixel (see bitmap.h for more documentation)
-			////
+			uint32_t resolvedWidth = dibHeader->bV5Width;
+			uint32_t resolvedHeight = dibHeader->bV5Height;
+
+			// Try recovering the image data just using the data offest
+			if (signature->ImageDataOffset > 0 && signature->ImageDataOffset < fileSize)
+			{
+				colorDataBufferSize = fileSize - signature->ImageDataOffset;
+
+				if (colorDataBufferSize % 4 != 0)
+					simpleException::show("Invalid bitmap file decoding:  Image Data alignment not aligned to 4 byte value");
+
+				colorDataBufferIn = new char[colorDataBufferSize];
+
+				if (resolvedWidth < fileSize && resolvedHeight < fileSize)
+				{
+					if (resolvedWidth * resolvedHeight * 4 != colorDataBufferSize)
+						simpleException::show("Invalid bitmap file decoding:  Image Data doesn't align with header values");
+				}
+
+				// Re-calculate the height and width of the image; and correct the dib header.
+				// ASSUMING FORMAT 32-bits (R8, G8, B8, A8)
+				if (resolvedWidth < fileSize)
+					resolvedHeight = (uint32_t)(colorDataBufferSize / 4.0f / (float)resolvedWidth);
+
+				else if (resolvedHeight < fileSize)
+					resolvedWidth = (uint32_t)(colorDataBufferSize / 4.0f / (float)resolvedHeight);
+
+				// Try BITMAP CORE HEADER:
+				if (resolvedWidth * resolvedHeight * 4 != colorDataBufferSize)
+				{
+					resolvedWidth = coreHeader->bcWidth;
+					resolvedHeight = coreHeader->bcHeight;
+
+					if (resolvedWidth < fileSize)
+						resolvedHeight = (uint16_t)(colorDataBufferSize / 4.0f / (float)resolvedWidth);
+
+					else if (resolvedHeight < fileSize)
+						resolvedWidth = (uint16_t)(colorDataBufferSize / 4.0f / (float)resolvedHeight);
+
+					else
+						simpleException::show("Invalid bitmap file decoding:  Image Data doesn't align with header values");
+				}
+				
+				//if (resolvedWidth * resolvedHeight * 4 != colorDataBufferSize)
+				//	simpleException::show("Invalid bitmap file decoding:  Image Data doesn't align with header values");
+
+				// Direct Buffer Copy
+				for (int index = signature->ImageDataOffset; index < fileSize; index++)
+				{
+					colorDataBufferIn[index - signature->ImageDataOffset] = fileBufferIn[index];
+				}
+			}
+			else
+				simpleException::show("Invalid bitmap file decoding:  Either corrupt file or improper use of DIB header");
+			
+
 			//colorDataBufferSize = dibHeader->bV5Width * dibHeader->bV5Height * 4;
-			//colorDataBufferIn = new char[colorDataBufferSize];	
 
-			//uint32_t extraBitmaskHeader = 0;
+			//uint32_t extraMaskHeaderSize = fileSize - colorDataBufferSize - dibHeader->bV5Size - BitmapFileHeader::HEADER_SIZE;
 
-			//// Check for compression flag:
+			//// We're still trying to learn the different format (happen-stances). So, if we know the 
+			//// pixel size of the bitmap, and the file sizes, we can then try and locate the image data.
 			////
-			//if (dibHeader->bV5Compression == BI_BITFIELDS)
-			//	extraBitmaskHeader = 12;
-
-			//// Try accounting for the file pieces
-			//uint32_t extraSpace = fileSize - colorDataBufferSize - dibHeader->bV5Size - BitmapFileHeader::HEADER_SIZE - extraBitmaskHeader;
-			//
-			//if (extraSpace > 0)
+			//// This would be the case for either compressed / uncompressed bitmaps.
+			////
+			//if (extraMaskHeaderSize <= 16)
 			//{
-			//	if (extraSpace == 4)
-			//		simpleException::show("Extra bitmask located:  Check for BI_ALPHABITFIELDS.");
+			//	// Check for compression flag:
+			//	//
+			//	if (dibHeader->bV5Compression == BI_BITFIELDS)
+			//	{
+			//		if (extraMaskHeaderSize == 16)
+			//			simpleException::show("Invalid bitmap file decoding:  The compression header supposes BI_ALPHABITFIELDS, not BI_BITFIELDS");
+			//	}
 
-			//	else
-			//		simpleException::show("Invalid bitmap file decoding:  Either corrupt file or improper use of DIB header");
+			//	// Color Table:  32-bit words, one per pixel (see bitmap.h for more documentation)
+			//	//
+			//	colorDataBufferSize = dibHeader->bV5Width * dibHeader->bV5Height * 4;
+			//	colorDataBufferIn = new char[colorDataBufferSize];
 			//}
 
+			//else
+			//{
+			//	simpleException::show("Invalid bitmap file decoding:  Either corrupt file or improper use of DIB header");
+			//}
+			//
 			//BitmapOptionalMasks* optionalMasks = decodeOptionalMasks(fileBuffer, BitmapFileHeader::HEADER_SIZE + dibHeader->bV5Size, false);
 
-			//// Direct Buffer Copy
-			//std::copy_n(&fileBufferIn[BitmapFileHeader::HEADER_SIZE + dibHeader->bV5Size + extraBitmaskHeader], colorDataBufferSize, colorDataBufferIn);
+			simpleBuffer* colorDataBuffer = new simpleBuffer(colorDataBufferIn, colorDataBufferSize, true);
 
-			//simpleBuffer* colorDataBuffer = new simpleBuffer(colorDataBufferIn, colorDataBufferSize, true);
-
-			return new simpleBitmap(fileBuffer, nullptr, signature, dibHeader, nullptr);
+			return new simpleBitmap(fileBuffer, colorDataBuffer, signature, coreHeader, dibHeader, nullptr, resolvedWidth, resolvedHeight);
 		}
 		catch (std::exception& ex)
 		{
@@ -222,30 +306,30 @@ namespace brogueHd::simple
 		try
 		{
 			// Size of the image data should be one pixel = one word (32-bits)
-			simpleArray<simplePixel> colorData(_colorDataBuffer->getBufferSize() / 4);
+			//simpleArray<simplePixel> colorData(_colorDataBuffer->getBufferSize() / 4);
 			
-			// Decode the pixel data - applying the filter to the data
-			decodeColorData(filter, colorData);
+			//// Decode the pixel data - applying the filter to the data
+			//decodeColorData(filter, colorData);
 
-			// Create an output buffer
-			char* buffer = new char[_colorDataBuffer->getBufferSize()];
+			//// Create an output buffer
+			//char* buffer = new char[_colorDataBuffer->getBufferSize()];
 
-			// Create a simpleBuffer to help with the output encoding
-			simpleBuffer outputBuffer(buffer, _colorDataBuffer->getBufferSize(), true);
+			//// Create a simpleBuffer to help with the output encoding
+			//simpleBuffer outputBuffer(buffer, _colorDataBuffer->getBufferSize(), true);
 
-			// Encode all the pixel data to the stream - checking word alignment
-			for (int index = 0; index < colorData.count(); index++)
-			{
-				outputBuffer.encode32(index * 4, colorData.get(index).getRGBA());
-			}
+			//// Encode all the pixel data to the stream - checking word alignment
+			//for (int index = 0; index < colorData.count(); index++)
+			//{
+			//	outputBuffer.encode32(index * 4, colorData.get(index).getRGBA());
+			//}
 
 			std::ofstream stream(filename.c_str());
 
-			stream.write(buffer, _colorDataBuffer->getBufferSize());
+			stream.write(_fileBuffer->getBuffer(), _fileBuffer->getBufferSize());
 			stream.flush();
 			stream.close();
 
-			delete [] buffer;
+			//delete [] buffer;
 		}
 		catch (std::exception& ex)
 		{
@@ -280,9 +364,26 @@ namespace brogueHd::simple
 
 		// Reserved data not needed:  Just grab these data points at their specified offsets
 		//
-		header->Signature = fileBuffer->decode16(0, simpleBuffer::byte1);
+		header->Signature = fileBuffer->decode16(0);
 		header->FileSize = fileBuffer->decode32(2);
 		header->ImageDataOffset = fileBuffer->decode32(10);
+
+		return header;
+	}
+	BITMAPCOREHEADER* simpleBitmap::decodeCoreHeader(simpleBuffer* fileBuffer)
+	{
+		BITMAPCOREHEADER* header = new BITMAPCOREHEADER();
+
+		// See bitmap.h or wikipedia documentation online. This could be part of the DIB header; but
+		// it would be the older (oldest) format to carry information about the BMP file. The newer
+		// ones were put right over the top of the older ones; and they have different field types (!)
+		uint32_t offset = 14;
+
+		header->bcSize = fileBuffer->decode32(offset);
+		header->bcWidth = fileBuffer->decode16(offset + 4);
+		header->bcHeight = fileBuffer->decode16(offset + 6);
+		header->bcPlanes = fileBuffer->decode16(offset + 8);
+		header->bcBitCount = fileBuffer->decode16(offset + 10);
 
 		return header;
 	}
@@ -316,12 +417,12 @@ namespace brogueHd::simple
 		cursor += 4;
 
 		// Color Planes (2 bytes)
-		header->bV5Planes = fileBuffer->decode16(cursor, simpleBuffer::bufferByte::byte1);
+		header->bV5Planes = fileBuffer->decode16(cursor);
 
 		cursor += 2;
 
 		// Bits Per Pixel (2 bytes)
-		header->bV5BitCount = fileBuffer->decode16(cursor, simpleBuffer::bufferByte::byte1);
+		header->bV5BitCount = fileBuffer->decode16(cursor);
 
 		cursor += 2;
 

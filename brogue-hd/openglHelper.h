@@ -181,5 +181,14 @@ namespace brogueHd::frontend::opengl
 				simpleLogger::log("Active Uniform:  Program={} Type={} Uniform={}", programHandle, values[1], simpleString(name).c_str());
 			}
 		}
+
+		static void outputMaxTextureUnits()
+		{
+			GLint maxUnits = 0;
+
+			glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &maxUnits);
+
+			simpleLogger::log("OpenGL GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS (active textures):  {}", maxUnits);
+		}
 	};
 }

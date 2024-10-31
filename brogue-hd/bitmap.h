@@ -228,7 +228,19 @@ namespace brogueHd
 	};
 
 	/// <summary>
-	/// MSFT's Header, modified for our data types
+	/// MSFT / OSX shared header, modified with our data types - which follow the standard. This
+	/// should be the oldest MSFT standard - with differing values for the field entries (!).
+	/// </summary>
+	struct BITMAPCOREHEADER {
+		uint32_t    bcSize;                 // The size of this header
+		uint16_t    bcWidth;				// The width of the image in pixels
+		uint16_t    bcHeight;				// The height of the image in pixels
+		uint16_t    bcPlanes;				// The number of color planes in the image
+		uint16_t    bcBitCount;				// The number of bits per pixel
+	};
+	
+	/// <summary>
+	/// MSFT's Header, modified with the proper data types - which follow the standard.
 	/// </summary>
 	struct BITMAPV5HEADER {
 

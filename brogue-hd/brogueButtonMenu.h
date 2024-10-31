@@ -4,6 +4,7 @@
 #include "gridRect.h"
 #include "button.h"
 #include "simpleHash.h"
+#include "simpleException.h"
 
 using namespace brogueHd::component;
 using namespace brogueHd::simple;
@@ -68,6 +69,22 @@ namespace brogueHd::frontend::ui
 				short menuRow = row - bounds.row;
 				int textIndex = column - bounds.column;
 
+				int textBeginIndex = 0;
+
+				switch (data.textAlignment)
+				{
+					case brogueTextAlignment::Left:
+					break;
+					case brogueTextAlignment::Right:
+					textBeginIndex = bounds.right() - data.text.getCount() - bounds.column;
+					break;
+					case brogueTextAlignment::Center:
+					textBeginIndex = ((bounds.right() - data.text.getCount() - bounds.column) / 2) + 1;
+					break;
+					default:
+						simpleException::show("Unhandled brogueTextAlignment:  brogueButtonMenu.h");
+				}
+
 				color nextColor;
 				
 				// Create button gradient
@@ -83,8 +100,12 @@ namespace brogueHd::frontend::ui
 
 				if (textIndex < data.text.getCount())
 				{
-					that->get(column, row)->foreColor = data.text.getColor(textIndex);
-					that->get(column, row)->character = data.text.getChar(textIndex);
+					if (data.hotkeyIndex == textIndex)
+						that->get(column + textBeginIndex, row)->foreColor = colors::yellow();
+					else
+						that->get(column + textBeginIndex, row)->foreColor = data.text.getColor(textIndex);
+
+					that->get(column + textBeginIndex, row)->character = data.text.getChar(textIndex);
 				}
 
 				return iterationCallback::iterate;

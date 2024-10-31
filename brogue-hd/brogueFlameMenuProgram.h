@@ -10,6 +10,7 @@
 #include "brogueButtonMenu.h"
 #include "brogueProgramBuilder.h"
 #include "resourceController.h"
+#include <SDL_surface.h>
 
 using namespace brogueHd::simple;
 using namespace brogueHd::backend::controller;
@@ -128,11 +129,35 @@ namespace brogueHd::frontend::opengl
 		delete _programBuilder;
 	}
 
+	void flipSurface(SDL_Surface* surface)
+	{
+		SDL_LockSurface(surface);
+
+		int pitch = surface->pitch; // row size
+		char* temp = new char[pitch]; // intermediate buffer
+		char* pixels = (char*)surface->pixels;
+
+		for (int i = 0; i < surface->h / 2; ++i) {
+			// get pointers to the two rows to swap
+			char* row1 = pixels + i * pitch;
+			char* row2 = pixels + (surface->h - i - 1) * pitch;
+
+			// swap rows
+			memcpy(temp, row1, pitch);
+			memcpy(row1, row2, pitch);
+			memcpy(row2, temp, pitch);
+		}
+
+		delete[] temp;
+
+		SDL_UnlockSurface(surface);
+	}
+
 	void brogueFlameMenuProgram::init()
 	{
 		gridRect sceneBoundaryUI = getSceneBoundaryUI();
 
-		openglCoordinateConverter coordinateConverter = _programBuilder->createCoordinateConverter(sceneBoundaryUI.width, sceneBoundaryUI.height);
+		brogueCoordinateConverter coordinateConverter = _programBuilder->createCoordinateConverter(sceneBoundaryUI.width, sceneBoundaryUI.height);
 
 		int textureIndex = 0;
 
@@ -141,7 +166,7 @@ namespace brogueHd::frontend::opengl
 
 		// This is for the uniform cellSize variable (see fragment shaders)
 		//
-		simpleQuad cellSizeUV = coordinateConverter.createQuadNormalizedUVScene(0, 0, brogueCellDisplay::CellWidth, brogueCellDisplay::CellHeight);
+		simpleQuad cellSizeUV = coordinateConverter.getViewConverter().createQuadNormalizedUV(0, 0, brogueCellDisplay::CellWidth, brogueCellDisplay::CellHeight);
 
 		shaderData* brogueCellVert = _resourceController->getShader(shaderResource::brogueCellDisplayVert);
 		shaderData* brogueCellFrag = _resourceController->getShader(shaderResource::brogueCellDisplayFrag);
@@ -186,13 +211,17 @@ namespace brogueHd::frontend::opengl
 		_titleMaskProgram = _programBuilder->createShaderProgram(colorMaskDataStream, colorMaskVert, colorMaskFrag);
 		_frameProgram = _programBuilder->createShaderProgram(mixTexturesDataStream, mixTexturesVert, mixTexturesFrag);
 
-		_frameTexture0 = new simpleTexture(NULL, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE0, GL_RGBA, GL_FLOAT);
+		_frameTexture0 = new simpleTexture(nullptr, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE0, GL_RGBA, GL_RGBA, 4, GL_FLOAT);
 
 		// Font Glyphs:  Going to load the max zoom for now
 		simpleBitmap* glyphSheet = _resourceController->getFontGlyphs(MAX_ZOOM);
+		
+		SDL_Surface* glyphSurface = SDL_LoadBMP("C:\\Backup\\_Source\\Git\\brogue-v1.7.5\\resources\\fonts\\font-13-RGBA24-unsigned.bmp");
+
+		flipSurface(glyphSurface);
 
 		// void* @_@ (No really good way to own this one until we do it ourselves for each and every data type, that WE own)
-		_fontTexture = new simpleTexture(glyphSheet->getBuffer(), glyphSheet->pixelWidth(), glyphSheet->pixelHeight(), textureIndex++, GL_TEXTURE1, GL_RGBA, GL_UNSIGNED_BYTE);
+		_fontTexture = new simpleTexture(glyphSurface, glyphSheet->pixelWidth(), glyphSheet->pixelHeight(), textureIndex++, GL_TEXTURE1, GL_RGBA, GL_RGBA8, 4, GL_UNSIGNED_BYTE);
 
 		_frameBuffer = new simpleFrameBuffer(sceneBoundaryUI.width, sceneBoundaryUI.height);
 	}
@@ -253,6 +282,8 @@ namespace brogueHd::frontend::opengl
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 		_mainMenuProgram->bind();
+		_mainMenuProgram->bindUniform1i("frame0Texture", 0);
+		_mainMenuProgram->bindUniform1i("fontTexture", 1);
 		_mainMenuProgram->draw();
 
 		glDisable(GL_BLEND);
@@ -264,9 +295,9 @@ namespace brogueHd::frontend::opengl
 	{
 		gridRect sceneBoundaryUI = getSceneBoundaryUI();
 
-		openglCoordinateConverter coordinateConverter = _programBuilder->createCoordinateConverter(sceneBoundaryUI.width, sceneBoundaryUI.height);
+		brogueCoordinateConverter coordinateConverter = _programBuilder->createCoordinateConverter(sceneBoundaryUI.width, sceneBoundaryUI.height);
 
-		simpleQuad cellQuad = coordinateConverter.createQuadNormalizedUVScene(0, 0, brogueCellDisplay::CellWidth, brogueCellDisplay::CellHeight);
+		simpleQuad cellQuad = coordinateConverter.getViewConverter().createQuadNormalizedUV(0, 0, brogueCellDisplay::CellWidth, brogueCellDisplay::CellHeight);
 
 		_mainMenuProgram->compile();
 		_frameProgram->compile();
@@ -283,6 +314,8 @@ namespace brogueHd::frontend::opengl
 		// Create the textures:  Texture 1 is used for the direct drawing, Texture 0 for the "color diffusion"
 		_frameTexture0->glCreate(-1);		// Textures don't automatically associate w/ a program
 		_fontTexture->glCreate(-1);
+
+		openglHelper::outputMaxTextureUnits();
 
 		//Copy data over from the font glyph sheet
 		simpleBitmap* glyphSheet = _resourceController->getFontGlyphs(MAX_ZOOM);

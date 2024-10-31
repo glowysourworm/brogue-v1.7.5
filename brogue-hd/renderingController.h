@@ -99,11 +99,11 @@ namespace brogueHd::backend::controller
 			color gradient2(0.11, 0.06, 0.15, 0.5);
 			
 
-			buttons.add(buttonData("New Game", gradient1, gradient2));
-			buttons.add(buttonData("Open Game", gradient1, gradient2));
-			buttons.add(buttonData("View Recording", gradient1, gradient2));
-			buttons.add(buttonData("High Scores", gradient1, gradient2));
-			buttons.add(buttonData("Quit", gradient1, gradient2));
+			buttons.add(buttonData("New Game", gradient1, gradient2, brogueTextAlignment::Center, 0));
+			buttons.add(buttonData("Open Game", gradient1, gradient2, brogueTextAlignment::Center, 0));
+			buttons.add(buttonData("View Recording", gradient1, gradient2, brogueTextAlignment::Center, 0));
+			buttons.add(buttonData("High Scores", gradient1, gradient2, brogueTextAlignment::Center, 0));
+			buttons.add(buttonData("Quit", gradient1, gradient2, brogueTextAlignment::Center, 0));
 
 			brogueFlameMenu* titleView = new brogueFlameMenu(_randomGenerator, 100);
 			brogueButtonMenu* mainMenu = new brogueButtonMenu(buttons, 1, titleView->getParentBoundary(), gridRect(COLS - 26, ROWS - 12, 24, 11));

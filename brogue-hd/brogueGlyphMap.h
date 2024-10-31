@@ -15,12 +15,10 @@ namespace brogueHd::frontend::ui
 		static const int GlyphSheetColumns = 16;
 		static const int GlyphSheetRows = 14;
 
-	protected:
-
 		/// <summary>
 		/// For some reason, the glyph sheets were made with a row offset. Could be missing glyphs.
 		/// </summary>
-		static const int GlyphSheetRowOffset = 3;
+		static const int GlyphSheetRowOffset = 2;
 
 	public:
 

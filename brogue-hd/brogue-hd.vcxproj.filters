@@ -452,7 +452,7 @@
     <ClInclude Include="simpleGlData.h">
       <Filter>Header Files\frontend\opengl</Filter>
     </ClInclude>
-    <ClInclude Include="openglCoordinateConverter.h">
+    <ClInclude Include="brogueCoordinateConverter.h">
       <Filter>Header Files\frontend\opengl</Filter>
     </ClInclude>
     <ClInclude Include="brogueProgramBuilder.h">
@@ -587,6 +587,9 @@
     <ClInclude Include="simpleBuffer.h">
       <Filter>Header Files\simple</Filter>
     </ClInclude>
+    <ClInclude Include="openglQuadConverter.h">
+      <Filter>Header Files\frontend\opengl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\resources\model\armor.csv">
@@ -718,6 +721,7 @@
     <None Include="..\resources\opengl\brogueCellDisplay.vert">
       <Filter>Resource Files\opengl</Filter>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\resources\fonts\font-1.bmp">

@@ -6,6 +6,9 @@
 #include "simpleBuffer.h"
 #include "gl.h"
 
+#include <SDL_surface.h>
+
+
 using namespace brogueHd::simple;
 
 namespace brogueHd::frontend::opengl
@@ -22,7 +25,15 @@ namespace brogueHd::frontend::opengl
 
         simpleTexture();
         simpleTexture(const simpleTexture& copy);
-        simpleTexture(simpleBuffer* pixelBuffer, GLsizei width, GLsizei height, GLuint textureIndex, GLenum textureUnit, GLenum pixelFormat, GLenum pixelType);
+        simpleTexture(SDL_Surface* pixelBuffer,
+                      GLsizei width, 
+                      GLsizei height, 
+                      GLuint textureIndex, 
+                      GLenum textureUnit, 
+                      GLenum pixelFormat, 
+                      GLenum pixelInternalFormat,
+                      GLuint pixelAlignment,
+                      GLenum pixelType);
         ~simpleTexture(){};
 
         void operator=(const simpleTexture& copy);
@@ -49,7 +60,7 @@ namespace brogueHd::frontend::opengl
             return _textureIndex;
         }
 
-        simpleBuffer* getPixelBuffer() const
+        SDL_Surface* getPixelBuffer() const
         {
             return _pixelBuffer;
         }
@@ -65,6 +76,14 @@ namespace brogueHd::frontend::opengl
         {
             return _pixelFormat;
         }
+        GLenum getPixelInternalFormat() const
+        {
+            return _pixelInternalFormat;
+        }
+        GLuint getPixelAlignment() const
+        {
+            return _pixelAlignment;
+        }
         GLenum getPixelType() const
         {
             return _pixelType;
@@ -74,7 +93,7 @@ namespace brogueHd::frontend::opengl
 
         size_t getHash() const override
         {
-            return hashGenerator::generateHash(_textureUnit, _textureIndex, _pixelBuffer, _width, _height, _pixelFormat, _pixelType);
+            return hashGenerator::generateHash(_textureUnit, _textureIndex, _pixelBuffer, _width, _height, _pixelFormat, _pixelInternalFormat, _pixelAlignment, _pixelType);
         }
 
     private:
@@ -86,10 +105,12 @@ namespace brogueHd::frontend::opengl
         GLenum _textureUnit;
         GLuint _textureIndex;
 
-        simpleBuffer* _pixelBuffer;
+        SDL_Surface* _pixelBuffer;
         GLsizei _width;
         GLsizei _height;
         GLenum _pixelFormat;
+        GLenum _pixelInternalFormat;
+        GLuint _pixelAlignment;
         GLenum _pixelType;
     };
       
@@ -108,7 +129,15 @@ namespace brogueHd::frontend::opengl
     {
         copyImpl(copy);
     }
-    simpleTexture::simpleTexture(simpleBuffer* pixelBuffer, GLsizei width, GLsizei height, GLuint textureIndex, GLenum textureUnit, GLenum pixelFormat, GLenum pixelType)
+    simpleTexture::simpleTexture(SDL_Surface* pixelBuffer,
+                                    GLsizei width,
+                                    GLsizei height,
+                                    GLuint textureIndex,
+                                    GLenum textureUnit,
+                                    GLenum pixelFormat,
+                                    GLenum pixelInternalFormat,
+                                    GLuint pixelAlignment,
+                                    GLenum pixelType)
     {
         _textureUnit = textureUnit;
         _textureIndex = textureIndex;
@@ -117,6 +146,8 @@ namespace brogueHd::frontend::opengl
         _width = width;
         _height = height;
         _pixelFormat = pixelFormat;
+        _pixelInternalFormat = pixelInternalFormat;
+        _pixelAlignment = pixelAlignment;
         _pixelType = pixelType;
     }
 
@@ -134,6 +165,8 @@ namespace brogueHd::frontend::opengl
         _width = copy.getWidth();
         _height = copy.getHeight();
         _pixelFormat = copy.getPixelFormat();
+        _pixelInternalFormat = copy.getPixelInternalFormat();
+        _pixelAlignment = copy.getPixelAlignment();
         _pixelType = copy.getPixelType();
     }
 
@@ -161,14 +194,22 @@ namespace brogueHd::frontend::opengl
         // Bind the texture to apply changes
         glBindTexture(GL_TEXTURE_2D, this->handle);
 
+        // Sets the pixel alignment (related to stride) for the texture bitmap. This needs to be set according to the 
+        // bitmap format. (1 = byte, 2, 4, and 8) are accepted values. 4 would be the typical word alignment.
+        //glPixelStorei(GL_UNPACK_ALIGNMENT, _pixelAlignment);
+
         // Apply the pixel data to the backend
-        glTexImage2D(GL_TEXTURE_2D,
-                     TEXTURE_MIPMAP_LEVEL,
-                     _pixelFormat,                      // I believe this is the format used in the shader (some kind of 4-vector)
-                     _width, _height, 0,                // border:  "Should always be set to zero" ....?
-                     _pixelFormat,                      // This should be the format used in OUR pixel data array
-                     _pixelType,
-                     _pixelBuffer == nullptr ? NULL : _pixelBuffer->getBuffer());                // Pixel data in byte array
+        glTextureImage2DEXT(this->handle, 
+                            GL_TEXTURE_2D,
+                            TEXTURE_MIPMAP_LEVEL, 
+                            _pixelInternalFormat,          // specific pixel format
+                            _width, _height, 0,            // width, height, border (set = 0)
+                            _pixelFormat,                  // symbolic (base) pixel format
+                            _pixelType,
+                            _pixelBuffer != nullptr ? _pixelBuffer->pixels : NULL);                // Pixel data in byte array
+
+        //if (_pixelBuffer != nullptr)
+        //    glTextureSubImage2DEXT(this->handle, GL_TEXTURE_2D, TEXTURE_MIPMAP_LEVEL, 0, 0, _width, _height, _pixelFormat, _pixelType, _pixelBuffer->getBuffer());
 
         // SETTING THESE TO DEFAULTS (TODO)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);

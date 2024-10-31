@@ -37,6 +37,7 @@ namespace brogueHd::simple
 
 		uint8_t  decode8(int offset, bufferByte byteNumber);
 		uint16_t decode16(int offset, bufferByte byteNumber);
+		uint16_t decode16(int offset);
 		uint32_t decode32(int offset);
 
 		void encode8(int offset, bufferByte byteNumber, uint8_t value);
@@ -117,6 +118,15 @@ namespace brogueHd::simple
 		uint32_t word = getWord(offset);
 
 		return word & getMask(byteNumber) | word & getMask((bufferByte)(byteNumber + 1));
+	}
+	uint16_t simpleBuffer::decode16(int offset)
+	{
+		if (_checkWordAlignment &&
+			(offset % this->WordSize != 0))
+			simpleException::show("Word alignment incorrect:  simpleBuffer.h");
+
+		return (uint16_t)(_buffer[offset]) |
+			   (uint16_t)(_buffer[offset + 1] << 8);
 	}
 	uint32_t simpleBuffer::decode32(int offset)
 	{
