@@ -106,7 +106,7 @@ namespace brogueHd::backend::controller
 			buttons.add(buttonData("Quit", gradient1, gradient2, brogueTextAlignment::Center, 0));
 
 			brogueFlameMenu* titleView = new brogueFlameMenu(_randomGenerator, 100);
-			brogueButtonMenu* mainMenu = new brogueButtonMenu(buttons, 1, titleView->getParentBoundary(), gridRect(COLS - 26, ROWS - 12, 24, 11));
+			brogueButtonMenu* mainMenu = new brogueButtonMenu(buttons, 1, titleView->getSceneBoundary(), gridRect(COLS - 26, ROWS - 12, 24, 11));
 
 			_currentProgram = new brogueFlameMenuProgram(titleView, mainMenu, _resourceController, _glyphMap);
 

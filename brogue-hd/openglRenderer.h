@@ -13,6 +13,8 @@
 
 #include "brogueProgram.h"
 #include "simpleQueue.h"
+#include "simpleKeyState.h"
+#include "simpleMouseState.h"
 #include "simpleShaderProgram.h"
 #include "simpleLogger.h"
 #include "simpleException.h"
@@ -29,6 +31,10 @@ namespace brogueHd::frontend::opengl
 	/// </summary>
 	//template<typename T>
 	//using openglRebufferHandler = std::function<simpleDataStream<T>*(int millisecondsLapsed);
+
+	// Initialized on thread_start, and deleted after the main loop
+	static simpleKeyState* KeyState;
+	static simpleMouseState* MouseState;
 
 	class openglRenderer
 	{
@@ -72,6 +78,10 @@ namespace brogueHd::frontend::opengl
 
 		static void errorCallback(int error, const char* message);
 		static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+		static void mousePositionCallback(GLFWwindow* window, double xpos, double ypos);
+		static void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
+		static void mouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
+
 		static void resizeCallback(GLFWwindow* window, int height, int width);
 		static void refreshCallback(GLFWwindow* window);
 		static void windowCloseCallback(GLFWwindow* window);
@@ -85,6 +95,10 @@ namespace brogueHd::frontend::opengl
 		static const char* getGLErrorString(GLenum error);
 		static const char* getGLTypeString(GLenum errorType);
 		static const char* getGLSourceString(GLenum errorSource);
+
+	public:
+
+
 
 	private:
 
@@ -150,7 +164,33 @@ namespace brogueHd::frontend::opengl
 
 	void openglRenderer::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 	{
-		glfwSetWindowShouldClose(window, GLFW_TRUE);
+		if (action == GLFW_PRESS || action == GLFW_REPEAT)
+		{
+			if (!opengl::KeyState->hasKey(key))
+				opengl::KeyState->addKey(key);
+		}
+		else if (action == GLFW_RELEASE)
+		{
+			opengl::KeyState->removeKey(key);
+		}
+		else
+			simpleException::show("Unknown GLFW key callback action {}:  openglRenderer::keyCallback", action);
+
+		opengl::KeyState->setModifiers(mods);
+	}
+	void openglRenderer::mousePositionCallback(GLFWwindow* window, double xpos, double ypos)
+	{
+		opengl::MouseState->updatePosition(xpos, ypos);
+	}
+	void openglRenderer::mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
+	{
+		opengl::MouseState->updateButtons(glfwGetMouseButton(window,GLFW_MOUSE_BUTTON_LEFT),
+											glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT),
+											glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE));
+	}		
+	void openglRenderer::mouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
+	{
+		opengl::MouseState->updateScroll(xoffset, yoffset);
 	}
 	void openglRenderer::resizeCallback(GLFWwindow* window, int height, int width)
 	{	
@@ -328,6 +368,11 @@ namespace brogueHd::frontend::opengl
 		// Keyboard Handler
 		glfwSetKeyCallback(window, &openglRenderer::keyCallback);
 
+		// Mouse Handlers
+		glfwSetCursorPosCallback(window, mousePositionCallback);
+		glfwSetMouseButtonCallback(window, mouseButtonCallback);		
+		glfwSetScrollCallback(window, mouseScrollCallback);
+
 		// Window Resize Callback
 		glfwSetFramebufferSizeCallback(window, &openglRenderer::resizeCallback);
 
@@ -353,6 +398,8 @@ namespace brogueHd::frontend::opengl
 
 		if (_program->hasErrors())
 		{
+			_program->outputStatus();
+
 			// THREAD:  UNLOCK TO RETURN
 			_threadLock->unlock();
 			return;
@@ -377,10 +424,14 @@ namespace brogueHd::frontend::opengl
 		//glViewport(_sceneBoundaryUI.left(), _sceneBoundaryUI.top(), _sceneBoundaryUI.width, _sceneBoundaryUI.height);
 		glViewport(0, 0, sceneBoundaryUI.width, sceneBoundaryUI.height);
 
+		// Keyboard / Mouse State
+		opengl::KeyState = new simpleKeyState();
+		opengl::MouseState = new simpleMouseState();
+
 		// THREAD:  UNLOCK TO ENTER PRIMARY LOOP
 		_threadLock->unlock();
 
-		// Main Rendering Loop
+		// Main Rendering Loop (haven't seen any issues with this on the other thread.)
 		while (!glfwWindowShouldClose(window))
 		{
 			std::this_thread::sleep_for(std::chrono::milliseconds(intervalMilliseconds));
@@ -388,9 +439,11 @@ namespace brogueHd::frontend::opengl
 			// Update from main thread's brogueView*
 			_threadLock->lock();
 
-			_program->update(intervalMilliseconds);							// Updates program buffers from the UI view
-			_program->run(intervalMilliseconds);							// Run() -> Draws the buffers
-			_program->outputStatus();										// Log Errors to simpleLogger -> std::cout
+			simpleMouseState mouseState(*opengl::MouseState);
+
+			_program->update(mouseState, intervalMilliseconds);							// Updates program buffers from the UI view
+			_program->run(intervalMilliseconds);										// Run() -> Draws the buffers
+			_program->outputStatus();													// Log Errors to simpleLogger -> std::cout
 
 			GLenum error = glGetError();
 
@@ -402,6 +455,10 @@ namespace brogueHd::frontend::opengl
 			glfwSwapBuffers(window);
 			glfwPollEvents();
 		}
+
+		// Keyboard / Mouse State (cleanup)
+		delete opengl::KeyState;
+		delete opengl::MouseState;
 
 		// Window could've been destroyed already
 		//

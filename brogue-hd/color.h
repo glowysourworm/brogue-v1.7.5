@@ -229,14 +229,15 @@ namespace brogueHd::backend::model::game
 	struct colors
 	{
 	public:
-		static color black()	{ return color(0, 0, 0, 1); };
-		static color red()		{ return color(1, 0, 0, 1); };
-		static color orange()	{ return color(1, 0.5, 0, 1); };
-		static color yellow()	{ return color(1, 1, 0, 1); };
-		static color green()	{ return color(0, 1, 0, 1); };
-		static color blue()		{ return color(0, 0, 1, 1); };
-		static color purple()	{ return color(1, 0, 1, 1); };
-		static color white()	{ return color(1, 1, 1, 1); };
+		static color transparent()  { return color(0, 0, 0, 0); };
+		static color black()		{ return color(0, 0, 0, 1); };
+		static color red()			{ return color(1, 0, 0, 1); };
+		static color orange()		{ return color(1, 0.5, 0, 1); };
+		static color yellow()		{ return color(1, 1, 0, 1); };
+		static color green()		{ return color(0, 1, 0, 1); };
+		static color blue()			{ return color(0, 0, 1, 1); };
+		static color purple()		{ return color(1, 0, 1, 1); };
+		static color white()		{ return color(1, 1, 1, 1); };
 
 	public:
 

@@ -1,6 +1,9 @@
 #pragma once
 
 #include "brogueView.h"
+#include "brogueViewContainer.h"
+#include "brogueButton.h"
+#include "simpleMouseState.h"
 #include "gridRect.h"
 #include "button.h"
 #include "simpleHash.h"
@@ -11,25 +14,19 @@ using namespace brogueHd::simple;
 
 namespace brogueHd::frontend::ui
 {
-	class brogueButtonMenu : public brogueView
+	class brogueButtonMenu : public brogueViewContainer
 	{
 	public:
 
 		brogueButtonMenu(const simpleList<buttonData>& buttons, int padding, gridRect sceneBoundary, gridRect viewBoundary);
 		~brogueButtonMenu();
 
-		virtual void update(int millisecondsLapsed) override;
-
-	private:
-
-		simpleHash<buttonData, gridRect>* _buttons;
+		virtual void update(const brogueMouseState& mouseState, int millisecondsLapsed) override;
 	};
 
 	brogueButtonMenu::brogueButtonMenu(const simpleList<buttonData>& buttons, int padding, gridRect sceneBoundary, gridRect viewBoundary) 
-		: brogueView(sceneBoundary, viewBoundary)
+		: brogueViewContainer(sceneBoundary, viewBoundary)
 	{
-		_buttons = new simpleHash<buttonData, gridRect>();
-
 		for (int index = 0; index < buttons.count(); index++)
 		{
 			gridRect boundary(viewBoundary.column + padding, 
@@ -40,16 +37,15 @@ namespace brogueHd::frontend::ui
 			if (boundary.width < buttons.get(index).text.getCount())
 				simpleException::show("Button text too large for the button boundary:  brogueButtonMenu.h");
 
-			_buttons->add(buttons.get(index), boundary);
+			this->addView((brogueView*)new brogueButton(buttons.get(index), sceneBoundary, boundary));
 		}
 
-		update(0);
+		update(default_value::value<brogueMouseState>(), 0);
 	}
 	brogueButtonMenu::~brogueButtonMenu()
 	{
-		delete _buttons;
 	}
-	void brogueButtonMenu::update(int millisecondsLapsed)
+	void brogueButtonMenu::update(const brogueMouseState& mouseState, int millisecondsLapsed)
 	{
 		brogueButtonMenu* that = this;
 
@@ -61,55 +57,10 @@ namespace brogueHd::frontend::ui
 			return iterationCallback::iterate;
 		});
 
-		_buttons->iterate([&that] (buttonData data, gridRect bounds)
+		// brogueButton -> update()
+		this->iterateViews([&mouseState, &millisecondsLapsed] (brogueView* button)
 		{
-			bounds.iterate([&that, &data, &bounds] (short column, short row)
-			{
-				short menuColumn = column - bounds.column;
-				short menuRow = row - bounds.row;
-				int textIndex = column - bounds.column;
-
-				int textBeginIndex = 0;
-
-				switch (data.textAlignment)
-				{
-					case brogueTextAlignment::Left:
-					break;
-					case brogueTextAlignment::Right:
-					textBeginIndex = bounds.right() - data.text.getCount() - bounds.column;
-					break;
-					case brogueTextAlignment::Center:
-					textBeginIndex = ((bounds.right() - data.text.getCount() - bounds.column) / 2) + 1;
-					break;
-					default:
-						simpleException::show("Unhandled brogueTextAlignment:  brogueButtonMenu.h");
-				}
-
-				color nextColor;
-				
-				// Create button gradient
-				//
-				if ((column - bounds.column) < (bounds.width / 2.0f))
-					nextColor = color::interpolate(data.background1, data.background2, (bounds.width - (2 * (menuColumn))) / (float)bounds.width);
-				else
-					nextColor = color::interpolate(data.background1, data.background2, (2 * ((menuColumn) - (bounds.width / 2.0f))) / (float)bounds.width);
-
-				nextColor.alpha = 1.0;
-
-				that->get(column, row)->backColor = nextColor;
-
-				if (textIndex < data.text.getCount())
-				{
-					if (data.hotkeyIndex == textIndex)
-						that->get(column + textBeginIndex, row)->foreColor = colors::yellow();
-					else
-						that->get(column + textBeginIndex, row)->foreColor = data.text.getColor(textIndex);
-
-					that->get(column + textBeginIndex, row)->character = data.text.getChar(textIndex);
-				}
-
-				return iterationCallback::iterate;
-			});
+			button->update(mouseState, millisecondsLapsed);
 			
 			return iterationCallback::iterate;
 		});

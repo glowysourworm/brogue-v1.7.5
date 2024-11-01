@@ -1,6 +1,7 @@
 #pragma once
 
 #include "simple.h"
+#include "simpleMouseState.h"
 #include "simpleGlObject.h"
 #include "gridRect.h"
 
@@ -24,10 +25,19 @@ namespace brogueHd::frontend::opengl
 		}
 
 		/// <summary>
+		/// Returns true if the program requires update.
+		/// </summary>
+		/// <param name="millisecondsLapsed">Number of milliseconds lapsed since the last update</param>
+		virtual bool shouldUpdate(const simpleMouseState& mouseState, int millisecondsLapsed)
+		{
+			return false;
+		}
+
+		/// <summary>
 		/// Updates the opengl program by calling the necessary routines to stream / buffer data
 		/// </summary>
 		/// <param name="millisecondsLapsed">Number of milliseconds lapsed since the last update</param>
-		virtual void update(int millisecondsLapsed)
+		virtual void update(const simpleMouseState& mouseState, int millisecondsLapsed)
 		{
 
 		}

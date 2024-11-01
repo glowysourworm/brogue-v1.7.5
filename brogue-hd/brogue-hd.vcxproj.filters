@@ -100,6 +100,12 @@
     <Filter Include="Resource Files\fonts">
       <UniqueIdentifier>{b31fb0b6-fb36-4708-8e1b-d1bd2719bde9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\frontend\opengl\program">
+      <UniqueIdentifier>{01a23ab6-f2ad-4a28-ae52-8a218a5a9f3d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\frontend\opengl\streamObjects">
+      <UniqueIdentifier>{9f9496fd-d86e-46ef-9f09-5ca04c15e747}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="brogue-hd.cpp">
@@ -419,50 +425,8 @@
     <ClInclude Include="brogueView.h">
       <Filter>Header Files\frontend\ui</Filter>
     </ClInclude>
-    <ClInclude Include="simpleShaderProgram.h">
-      <Filter>Header Files\frontend\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="simpleGlObject.h">
-      <Filter>Header Files\frontend\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="simpleVertexBuffer.h">
-      <Filter>Header Files\frontend\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="simpleDataStream.h">
-      <Filter>Header Files\frontend\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="simpleVertexAttribute.h">
-      <Filter>Header Files\frontend\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="simpleVertexArray.h">
-      <Filter>Header Files\frontend\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="simpleTexture.h">
-      <Filter>Header Files\frontend\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="simpleFrameBuffer.h">
-      <Filter>Header Files\frontend\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="simpleShader.h">
-      <Filter>Header Files\frontend\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="boudingBox2D.h">
-      <Filter>Header Files\frontend\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="simpleGlData.h">
-      <Filter>Header Files\frontend\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="brogueCoordinateConverter.h">
-      <Filter>Header Files\frontend\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="brogueProgramBuilder.h">
-      <Filter>Header Files\frontend\opengl</Filter>
-    </ClInclude>
     <ClInclude Include="button.h">
       <Filter>Header Files\frontend\ui</Filter>
-    </ClInclude>
-    <ClInclude Include="shaderData.h">
-      <Filter>Header Files\frontend\opengl</Filter>
     </ClInclude>
     <ClInclude Include="fileOperations.h">
       <Filter>Header Files\component</Filter>
@@ -521,32 +485,11 @@
     <ClInclude Include="brogueTestFunction.h">
       <Filter>Header Files\unit-test</Filter>
     </ClInclude>
-    <ClInclude Include="brogueCellQuad.h">
-      <Filter>Header Files\frontend\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="brogueFlameMenuProgram.h">
-      <Filter>Header Files\frontend\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="brogueImageQuad.h">
-      <Filter>Header Files\frontend\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="brogueProgram.h">
-      <Filter>Header Files\frontend\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="simpleBoundingBox.h">
-      <Filter>Header Files\frontend\opengl</Filter>
-    </ClInclude>
     <ClInclude Include="simpleQueue.h">
       <Filter>Header Files\simple</Filter>
     </ClInclude>
     <ClInclude Include="randomRange.h">
       <Filter>Header Files\backend\model\game</Filter>
-    </ClInclude>
-    <ClInclude Include="brogueColorQuad.h">
-      <Filter>Header Files\frontend\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="simpleUniform.h">
-      <Filter>Header Files\frontend\opengl</Filter>
     </ClInclude>
     <ClInclude Include="openglHelper.h">
       <Filter>Header Files\frontend\opengl</Filter>
@@ -587,8 +530,92 @@
     <ClInclude Include="simpleBuffer.h">
       <Filter>Header Files\simple</Filter>
     </ClInclude>
-    <ClInclude Include="openglQuadConverter.h">
+    <ClInclude Include="brogueViewContainer.h">
+      <Filter>Header Files\frontend\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleKeyState.h">
       <Filter>Header Files\frontend\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleMouseState.h">
+      <Filter>Header Files\frontend\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueFlameMenuProgram.h">
+      <Filter>Header Files\frontend\opengl\program</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueProgramBuilder.h">
+      <Filter>Header Files\frontend\opengl\program</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueProgram.h">
+      <Filter>Header Files\frontend\opengl\program</Filter>
+    </ClInclude>
+    <ClInclude Include="openglQuadConverter.h">
+      <Filter>Header Files\frontend\opengl\program</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleShaderProgram.h">
+      <Filter>Header Files\frontend\opengl\program</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleGlData.h">
+      <Filter>Header Files\frontend\opengl\streamObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleGlObject.h">
+      <Filter>Header Files\frontend\opengl\streamObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleShader.h">
+      <Filter>Header Files\frontend\opengl\streamObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleTexture.h">
+      <Filter>Header Files\frontend\opengl\streamObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleUniform.h">
+      <Filter>Header Files\frontend\opengl\streamObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleVertexArray.h">
+      <Filter>Header Files\frontend\opengl\streamObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleVertexAttribute.h">
+      <Filter>Header Files\frontend\opengl\streamObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleVertexBuffer.h">
+      <Filter>Header Files\frontend\opengl\streamObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleFrameBuffer.h">
+      <Filter>Header Files\frontend\opengl\streamObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleDataStream.h">
+      <Filter>Header Files\frontend\opengl\streamObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleBoundingBox.h">
+      <Filter>Header Files\frontend\opengl\streamObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="shaderData.h">
+      <Filter>Header Files\frontend\opengl\streamObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueCellQuad.h">
+      <Filter>Header Files\frontend\opengl\streamObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueColorQuad.h">
+      <Filter>Header Files\frontend\opengl\streamObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueImageQuad.h">
+      <Filter>Header Files\frontend\opengl\streamObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="boudingBox2D.h">
+      <Filter>Header Files\frontend\opengl\streamObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueCoordinateConverter.h">
+      <Filter>Header Files\frontend\opengl\program</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueViewProgram.h">
+      <Filter>Header Files\frontend\opengl\program</Filter>
+    </ClInclude>
+    <ClInclude Include="simplePeriodCounter.h">
+      <Filter>Header Files\frontend\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueDataStream.h">
+      <Filter>Header Files\frontend\opengl\program</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueMouseState.h">
+      <Filter>Header Files\frontend\opengl\program</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

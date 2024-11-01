@@ -128,6 +128,11 @@ namespace brogueHd::component
 			return true;
 		}
 
+		bool contains(const gridLocator& location) const
+		{
+			return contains(location.column, location.row);
+		}
+
 		bool contains(const gridRect& rect) const
 		{
 			if (!contains(rect.left(), rect.top()))

@@ -4,6 +4,7 @@
 #include "color.h"
 #include "grid.h"
 #include "brogueView.h"
+#include "brogueMouseState.h"
 #include "simpleMath.h"
 #include "randomGenerator.h"
 
@@ -23,7 +24,8 @@ namespace brogueHd::frontend::ui
 						int fadePeriodMilliseconds);
 		~brogueFlameMenu();
 
-		void update(int millisecondsLapsed) override;
+		void update(const brogueMouseState& mouseState, int millisecondsLapsed) override;
+		bool shouldUpdate(const brogueMouseState& mouseState, int millisecondsLapsed) override;
 
 		float calculateHeatEnvelope(short column, short row);
 
@@ -120,7 +122,7 @@ namespace brogueHd::frontend::ui
 		_randomGenerator = randomGenerator;
 		_fadePeriodMilliconds = fadePeriodMilliseconds;
 		_periodCounter = 0;
-		_heatSourceGrid = new grid<color>(this->getParentBoundary(), this->getParentBoundary());
+		_heatSourceGrid = new grid<color>(this->getSceneBoundary(), this->getSceneBoundary());
 
 		cycleHeatSources();
 		nextHeatValues();
@@ -129,7 +131,11 @@ namespace brogueHd::frontend::ui
 	{
 		delete _heatSourceGrid;
 	}
-	void brogueFlameMenu::update(int millisecondsLapsed)
+	bool brogueFlameMenu::shouldUpdate(const brogueMouseState& mouseState, int millisecondsLapsed)
+	{
+		return true;
+	}
+	void brogueFlameMenu::update(const brogueMouseState& mouseState, int millisecondsLapsed)
 	{
 		// Heat source fade over the fade period; and then they're cycled to the next
 		// color.
@@ -207,16 +213,16 @@ namespace brogueHd::frontend::ui
 
 		// Smooth out the random noise across the bottom row
 		//
-		for (int index = 1; index < this->getParentBoundary().width - 1; index++)
+		for (int index = 1; index < this->getSceneBoundary().width - 1; index++)
 		{
-			color left = _heatSourceGrid->get(index - 1, this->getParentBoundary().height - 1);
-			color right = _heatSourceGrid->get(index + 1, this->getParentBoundary().height - 1);
-			color current = _heatSourceGrid->get(index, this->getParentBoundary().height - 1);
+			color left = _heatSourceGrid->get(index - 1, this->getSceneBoundary().height - 1);
+			color right = _heatSourceGrid->get(index + 1, this->getSceneBoundary().height - 1);
+			color current = _heatSourceGrid->get(index, this->getSceneBoundary().height - 1);
 
 			current.averageIn(1, 1, left, right);
 
 			// Not using heap memory except for the copy with the grid (grid<>.get returns a copy)
-			_heatSourceGrid->set(index, this->getParentBoundary().height - 1, current, true);
+			_heatSourceGrid->set(index, this->getSceneBoundary().height - 1, current, true);
 		}
 	}
 	void brogueFlameMenu::nextHeatValues()

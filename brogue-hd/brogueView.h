@@ -2,6 +2,7 @@
 
 #include "grid.h"
 #include "gridRect.h"
+#include "brogueMouseState.h"
 #include "brogueCellDisplay.h"
 
 using namespace brogueHd::component;
@@ -17,17 +18,48 @@ namespace brogueHd::frontend::ui
 		brogueView(gridRect sceneBoundary, gridRect viewBoundary);
 		~brogueView();
 
-		brogueCellDisplay* get(short column, short row) const;
-
-		gridRect getParentBoundary() const;
+		gridRect getSceneBoundary() const;
 		gridRect getBoundary() const;
 
-		void iterate(gridCallback<brogueCellDisplay*> callback) const;
-		void iterateAdjacent(short column, short row, gridCallbackAdjacent<brogueCellDisplay*> callback) const;
+		/// <summary>
+		/// (TODO: MOVE THIS) Calculates the view's boundary is UI coordinates. This is not the same as the
+		/// GL viewport; but the coordinate space relates to it. Zoom, and offset must be
+		/// first added to the calculation.
+		/// </summary>
+		gridRect calculateSceneBoundaryUI() const
+		{
+			gridRect sceneBoundary = getSceneBoundary();
+			gridRect boundaryUI = gridRect(sceneBoundary.left() * brogueCellDisplay::CellWidth,
+											sceneBoundary.top() * brogueCellDisplay::CellHeight,
+											sceneBoundary.width * brogueCellDisplay::CellWidth,
+											sceneBoundary.height * brogueCellDisplay::CellHeight);
 
-		virtual void update(int millisecondsLapsed)
+			return boundaryUI;
+		}
+		gridRect calculateViewBoundaryUI() const
+		{
+			gridRect viewBoundary = getBoundary();
+			gridRect boundaryUI = gridRect(viewBoundary.left() * brogueCellDisplay::CellWidth,
+											viewBoundary.top() * brogueCellDisplay::CellHeight,
+											viewBoundary.width * brogueCellDisplay::CellWidth,
+											viewBoundary.height * brogueCellDisplay::CellHeight);
+
+			return boundaryUI;
+		}
+
+		virtual brogueCellDisplay* get(short column, short row) const;
+
+		virtual void iterate(gridCallback<brogueCellDisplay*> callback) const;
+		virtual void iterateAdjacent(short column, short row, gridCallbackAdjacent<brogueCellDisplay*> callback) const;
+
+		virtual void update(const brogueMouseState& mouseState, int millisecondsLapsed)
 		{
 
+		}
+
+		virtual bool shouldUpdate(const brogueMouseState& mouseState, int millisecondsLapsed)
+		{
+			return false;
 		}
 
 	private:
@@ -63,7 +95,7 @@ namespace brogueHd::frontend::ui
 		return _view->getRelativeBoundary();
 	}
 
-	gridRect brogueView::getParentBoundary() const
+	gridRect brogueView::getSceneBoundary() const
 	{
 		return _view->getParentBoundary();
 	}

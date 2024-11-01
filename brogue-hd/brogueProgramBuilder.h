@@ -1,5 +1,6 @@
 #pragma once
 
+#include "brogueView.h"
 #include "gridDefinitions.h"
 #include "simpleArrayExtension.h"
 #include "brogueCellDisplay.h"
@@ -30,13 +31,6 @@ namespace brogueHd::frontend::opengl
 
 		brogueProgramBuilder(resourceController* resourceController, brogueGlyphMap* glyphMap);
 		~brogueProgramBuilder();
-
-		/// <summary>
-		/// Calculates the view's boundary is UI coordinates. This is not the same as the
-		/// GL viewport; but the coordinate space relates to it. Zoom, and offset must be
-		/// first added to the calculation.
-		/// </summary>
-		gridRect calculateBoundaryUI(const brogueView* view);
 
 		/// <summary>
 		/// (MEMORY!) The scene data is the data from a brogueView. Using quads, this data is streamed out to our simpleDataStream
@@ -70,7 +64,7 @@ namespace brogueHd::frontend::opengl
 		/// <summary>
 		/// Creates a coordinate converter for openGL backend coordinate transformations
 		/// </summary>
-		brogueCoordinateConverter createCoordinateConverter(int viewWidth, int viewHeight) const;
+		brogueCoordinateConverter createCoordinateConverter(int sceneWidth, int sceneHeight) const;
 
 	private:
 
@@ -88,7 +82,7 @@ namespace brogueHd::frontend::opengl
 	{
 	}
 
-	brogueCoordinateConverter brogueProgramBuilder::createCoordinateConverter(int viewWidth, int viewHeight) const
+	brogueCoordinateConverter brogueProgramBuilder::createCoordinateConverter(int sceneWidth, int sceneHeight) const
 	{
 		int glyphSheetWidth = _resourceController->getFontGlyphs(MAX_ZOOM)->pixelWidth();
 		int glyphSheetHeight = _resourceController->getFontGlyphs(MAX_ZOOM)->pixelHeight();
@@ -97,20 +91,9 @@ namespace brogueHd::frontend::opengl
 		float glyphHeight = glyphSheetHeight / (float)(_glyphMap->GlyphSheetRows + _glyphMap->GlyphSheetRowOffset);
 
 		openglQuadConverter glyphMap(glyphWidth, glyphHeight, glyphSheetWidth, glyphSheetHeight);
-		openglQuadConverter viewMap(brogueCellDisplay::CellWidth, brogueCellDisplay::CellHeight, viewWidth, viewHeight);
+		openglQuadConverter viewMap(brogueCellDisplay::CellWidth, brogueCellDisplay::CellHeight, sceneWidth, sceneHeight);
 
 		return brogueCoordinateConverter(glyphMap, viewMap);
-	}
-
-	gridRect brogueProgramBuilder::calculateBoundaryUI(const brogueView* view)
-	{
-		gridRect viewBoundary = view->getParentBoundary();
-		gridRect boundaryUI = gridRect(viewBoundary.left() * brogueCellDisplay::CellWidth,
-										viewBoundary.right() * brogueCellDisplay::CellHeight,
-										viewBoundary.width * brogueCellDisplay::CellWidth,
-										viewBoundary.height * brogueCellDisplay::CellHeight);
-
-		return boundaryUI;
 	}
 
 	simpleDataStream* brogueProgramBuilder::createSceneDataStream(const brogueView* view, openglDataStreamType dataType, openglBrogueCellOutputSelector noDisplayOutputSelector)
@@ -122,17 +105,17 @@ namespace brogueHd::frontend::opengl
 	}
 
 	simpleDataStream* brogueProgramBuilder::createSceneDataStream(const brogueView* view,
-													openglDataStreamType dataType, 
-													openglBrogueCellOutputSelector noDisplayOutputSelector,
-													gridPredicate<brogueCellDisplay*> inclusionPredicate)
+																	openglDataStreamType dataType, 
+																	openglBrogueCellOutputSelector noDisplayOutputSelector,
+																	gridPredicate<brogueCellDisplay*> inclusionPredicate)
 	{
 		// Starting with the raw data, build a simpleQuad data vector to pass to the simpleDataStream<float>
 		//
-		gridRect sceneBoundary = calculateBoundaryUI(view);
+		gridRect sceneBoundaryUI = view->calculateSceneBoundaryUI();
 
 		// Create coordinate converter for this view
 		//
-		brogueCoordinateConverter coordinateConverter = createCoordinateConverter(sceneBoundary.width, sceneBoundary.height);
+		brogueCoordinateConverter coordinateConverter = createCoordinateConverter(sceneBoundaryUI.width, sceneBoundaryUI.height);
 
 		// Problems with polymorphism:  Copy constructors not working for child structs. May be a struct issue.
 		simpleList<brogueImageQuad> imageQuads;
@@ -143,7 +126,7 @@ namespace brogueHd::frontend::opengl
 		// up the stack.
 		//
 		view->iterate(
-		[&sceneBoundary, &inclusionPredicate, &cellQuads, &colorQuads, &imageQuads, &view, &dataType, &coordinateConverter, &noDisplayOutputSelector](short column, short row, brogueCellDisplay* cell)
+		[&sceneBoundaryUI, &inclusionPredicate, &cellQuads, &colorQuads, &imageQuads, &view, &dataType, &coordinateConverter, &noDisplayOutputSelector](short column, short row, brogueCellDisplay* cell)
 		{
 			if (!inclusionPredicate(column, row, cell))
 				return iterationCallback::iterate;
@@ -231,11 +214,11 @@ namespace brogueHd::frontend::opengl
 
 	simpleDataStream* brogueProgramBuilder::createFrameDataStream(const brogueView* view, openglDataStreamType dataType)
 	{
-		gridRect sceneBoundary = calculateBoundaryUI(view);
+		gridRect sceneBoundaryUI = view->calculateSceneBoundaryUI();
 
 		// Create coordinate converter for this view
 		//
-		brogueCoordinateConverter coordinateConverter = createCoordinateConverter(sceneBoundary.width, sceneBoundary.height);
+		brogueCoordinateConverter coordinateConverter = createCoordinateConverter(sceneBoundaryUI.width, sceneBoundaryUI.height);
 
 		simpleDataStream* dataStream = nullptr;
 
