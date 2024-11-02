@@ -4,6 +4,7 @@
 #include "simpleList.h"
 #include "simpleString.h"
 #include "color.h"
+#include "simpleFileEntry.h"
 
 using namespace brogueHd::simple;
 using namespace brogueHd::backend::model::game;
@@ -28,6 +29,14 @@ namespace brogueHd::frontend::ui
 			return gridRect(COLS - 26, ROWS - 12, 24, 11);
 		}
 
+		static gridRect getOpenMenuSelectorBoundary()
+		{
+			int width = COLS / 3;
+			int height = ROWS / 2;
+
+			return gridRect((COLS - width) / 2, (ROWS - height) / 2, width, height);
+		}
+
 		static gridRect getPaddedBoundary(const gridRect& boundary, int padding)
 		{
 			return gridRect(boundary.column + padding,
@@ -41,6 +50,8 @@ namespace brogueHd::frontend::ui
 			// Pulled from Brogue v1.7.5
 			color gradient1(0.22, 0.14, 0.29, 0.5);
 			color gradient2(0.11, 0.06, 0.15, 0.5);
+			color active1(0.7, 0.7, 0.7, 0.4);
+			color active2(0.7, 0.7, 0.7, 0.4);
 
 			gridRect sceneBounds = getBrogueSceneBoundary();
 			gridRect menuBounds = getMainMenuSelectorBoundary();
@@ -50,12 +61,12 @@ namespace brogueHd::frontend::ui
 			color menuColor2(0, 0, 0, 0.2f);
 
 			// Menu Background
-			brogueUIData menuData(menuBounds, menuColor1, menuColor2, brogueGradientType::Circular, 1);
+			brogueUIData* menuData = new brogueUIData(menuBounds, menuColor1, menuColor2, brogueGradientType::Circular);
 
 			// Header (None)
-			brogueUIData headerData(menuData); // This should probably have an "EMPTY" default somewhere
+			brogueUIData* headerData = new brogueUIData(*menuData); // This should probably have an "EMPTY" default somewhere
 
-			simpleList<brogueUIData> buttons;
+			simpleList<brogueUIData*> buttons;
 			int buttonPadding = 1;
 
 			for (int index = 0; index < 5; index++)
@@ -66,18 +77,114 @@ namespace brogueHd::frontend::ui
 								  1);
 
 				if (index == 0)
-					buttons.add(brogueUIData(boundary, colorString("New Game"), gradient1, gradient2, brogueTextAlignment::Center, 0, 0));
+					buttons.add(new brogueUIData(boundary, colorString("New Game"), gradient1, gradient2, active1, active2, brogueGradientType::Horizontal, brogueTextAlignment::Center));
 				else if (index == 1)
-					buttons.add(brogueUIData(boundary, colorString("Open Game"), gradient1, gradient2, brogueTextAlignment::Center, 0, 0));
+					buttons.add(new brogueUIData(boundary, colorString("Open Game"), gradient1, gradient2, active1, active2, brogueGradientType::Horizontal, brogueTextAlignment::Center));
 				else if (index == 2)
-					buttons.add(brogueUIData(boundary, colorString("View Recording"), gradient1, gradient2, brogueTextAlignment::Center, 0, 0));
+					buttons.add(new brogueUIData(boundary, colorString("View Recording"), gradient1, gradient2, active1, active2, brogueGradientType::Horizontal, brogueTextAlignment::Center));
 				else if (index == 3)
-					buttons.add(brogueUIData(boundary, colorString("High Scores"), gradient1, gradient2, brogueTextAlignment::Center, 0, 0));
+					buttons.add(new brogueUIData(boundary, colorString("High Scores"), gradient1, gradient2, active1, active2, brogueGradientType::Horizontal, brogueTextAlignment::Center));
 				else if (index == 4)
-					buttons.add(brogueUIData(boundary, colorString("Quit"), gradient1, gradient2, brogueTextAlignment::Center, 0, 0));
+					buttons.add(new brogueUIData(boundary, colorString("Quit"), gradient1, gradient2, active1, active2, brogueGradientType::Horizontal, brogueTextAlignment::Center));
+
+				buttons.get(index)->setUIParameters('\0', 0, true, true);
 			}
 			
 			return new brogueButtonMenu(menuData, buttons, headerData, false, sceneBounds, menuBounds);
+		}
+
+		static brogueButtonMenu* createOpenGameSelector(const simpleList<simpleFileEntry>& gameFiles)
+		{
+			gridRect sceneBounds = getBrogueSceneBoundary();
+			gridRect menuBounds = getOpenMenuSelectorBoundary();
+			gridRect paddedBounds = getPaddedBoundary(menuBounds, 1);
+
+			// Pulled from Brogue v1.7.5
+			color menuColor1(0.067, 0.059, 0.149, 0.8f);
+			color menuColor2(0.067, 0.059, 0.149, 0.8f);
+			color active1(0.7, 0.7, 0.7, 0.4);
+			color active2(0.7, 0.7, 0.7, 0.4);
+
+			// Menu Background
+			brogueUIData* menuData = new brogueUIData(menuBounds, menuColor1, menuColor2, brogueGradientType::Circular);
+
+			// Header (None)
+			gridRect headerBounds(menuBounds.column, menuBounds.row, menuBounds.width, 1);
+			brogueUIData* headerData = new brogueUIData(headerBounds, colorString("Open Saved Game", colors::yellow()), menuColor1, menuColor2, brogueTextAlignment::Center);
+
+			headerData->setUIParameters('\0', -1, false, true);
+
+			simpleList<brogueUIData*> buttons;
+			int listSpacer = 1;
+			
+			for (int index = 0; index < gameFiles.count(); index++)
+			{
+				gridRect boundary(paddedBounds.column, paddedBounds.row + index + listSpacer, paddedBounds.width,1);
+
+				simpleString fileName = gameFiles.get(index).fileNameWithoutExtension;
+				simpleString fileNameTrimmed;
+
+				if (fileName.count() > ((paddedBounds.width / 2.0f) - 3))
+					fileNameTrimmed = fileName.subString(0, (paddedBounds.width / 2.0f) - 3);
+
+				char offsetChar[2]{};
+				simpleString result = "";
+
+				offsetChar[0] = (char)((int)'a' + index);
+				offsetChar[1] = '\0';
+
+				// Format the result
+				int column = paddedBounds.left();
+				while (column < paddedBounds.right())
+				{
+					int textIndex = column - paddedBounds.left();
+
+					if (textIndex == 0)
+					{
+						result.append(offsetChar);
+						column++;
+					}
+					else if (textIndex == 1)
+					{
+						result.append(") ");
+						column += 2;
+					}
+					else if (textIndex == 3)
+					{
+						if (fileNameTrimmed.count() > 0)
+						{
+							result.append(fileNameTrimmed);
+							result.append("...");
+
+							column += fileNameTrimmed.count() + 3;
+						}
+						else
+						{
+							result.append(fileName);
+
+							column += fileName.count();
+						}
+					}
+
+					// Date -> break;
+					else
+					{
+						int space = paddedBounds.width - textIndex - gameFiles.get(index).writeTimeShort.count() - 1;
+						result.appendPadding(' ', space);
+						result.append(gameFiles.get(index).writeTimeShort);
+						break;
+					}
+				}
+
+				brogueUIData* data = new brogueUIData(boundary, colorString(result.c_str(), colors::white()), menuColor1, menuColor2, active1, active2, brogueGradientType::Horizontal, brogueTextAlignment::Left);
+
+				// Hotkey is the first letter a), b), etc..
+				data->setUIParameters('\0', 0, true, true);
+
+				buttons.add(data);
+			}
+
+			return new brogueButtonMenu(menuData, buttons, headerData, true, sceneBounds, menuBounds);
 		}
 	};
 }

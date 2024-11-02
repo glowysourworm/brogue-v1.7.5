@@ -4,6 +4,7 @@
 #include "color.h"
 #include "grid.h"
 #include "brogueView.h"
+#include "brogueUIData.h"
 #include "brogueMouseState.h"
 #include "simpleMath.h"
 #include "randomGenerator.h"
@@ -117,7 +118,7 @@ namespace brogueHd::frontend::ui
 	brogueFlameMenu::brogueFlameMenu(randomGenerator* randomGenerator,
 									 int fadePeriodMilliseconds)
 
-		: brogueView(gridRect(0, 0, COLS, ROWS), gridRect(0, 0, COLS, ROWS))
+		: brogueView(new brogueUIData(gridRect(0, 0, COLS, ROWS)), gridRect(0, 0, COLS, ROWS), gridRect(0, 0, COLS, ROWS))
 	{
 		_randomGenerator = randomGenerator;
 		_fadePeriodMilliconds = fadePeriodMilliseconds;

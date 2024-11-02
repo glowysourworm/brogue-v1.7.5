@@ -91,16 +91,19 @@ namespace brogueHd::simple
 				showError("Invalid use of concept constraints:  simpleExt::format");
 		}
 
-		static const char* formatDate(time_t time)
+		static std::string formatDate(time_t time, bool shortFormat)
 		{
 			char buffer[80];
 			tm timeValue;
 
 			localtime_s(&timeValue, &time);
 
-			std::strftime(buffer, 80, "%Y-%m-%d-%H:%M:%S", &timeValue);
+			if (shortFormat)
+				std::strftime(buffer, 80, "%Y/%m/%d", &timeValue);
+			else
+				std::strftime(buffer, 80, "%Y/%m/%d %H:%M:%S", &timeValue);
 
-			return buffer;
+			return std::string(buffer);
 		}
 	};
 }

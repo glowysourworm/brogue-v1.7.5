@@ -4,7 +4,7 @@
 #include "playbackData.h"
 #include "gameData.h"
 #include "brogueColorMap.h"
-#include "fileOperations.h"
+#include "simpleFileIO.h"
 #include "keyProcessor.h"
 
 #include "simpleEnumString.h"
@@ -78,11 +78,19 @@ namespace brogueHd::backend::controller
 		{
 			return _fontGlyphs->get(zoomLevel);
 		}
+
+		simpleString* getGamesDirectory() const
+		{
+			return _gameDirectory;
+		}
 	
 	private:
 
 		simpleHash<shaderResource, shaderData*>* _shaderCache;
 		simpleHash<int, simpleBitmap*>* _fontGlyphs;
+
+		simpleString* _gameDirectory;
+
 	};
 
 	resourceController::resourceController()
@@ -94,28 +102,31 @@ namespace brogueHd::backend::controller
 	{
 		delete _shaderCache;
 		delete _fontGlyphs;
+		delete _gameDirectory;
 	}
 
 	bool resourceController::initialize(const char* resourceConfigFile)
 	{
 		// Read config file contents
-		simpleString configuration = fileOperations::readTextFile(resourceConfigFile);
+		simpleString configuration = simpleFileIO::readTextFile(resourceConfigFile);
 
 		try
 		{
 			// Parse the JSON file
 			nlohmann::json jsonConfig = nlohmann::json::parse(configuration.c_str());
 
-			simpleString colorMaskVertSource = fileOperations::readTextFile(std::string(jsonConfig[brogueHd::ConfigColorMaskVertShader]).c_str());
-			simpleString colorMaskFragSource = fileOperations::readTextFile(std::string(jsonConfig[brogueHd::ConfigColorMaskFragShader]).c_str());
-			simpleString backgroundColorVertSource = fileOperations::readTextFile(std::string(jsonConfig[brogueHd::ConfigBackgroundColorVertexShader]).c_str());
-			simpleString backgroundColorFragSource = fileOperations::readTextFile(std::string(jsonConfig[brogueHd::ConfigBackgroundColorFragmentShader]).c_str());
-			simpleString brogueCellDisplayVertSource = fileOperations::readTextFile(std::string(jsonConfig[brogueHd::ConfigBrogueCellDisplayVertShader]).c_str());
-			simpleString brogueCellDisplayFragSource = fileOperations::readTextFile(std::string(jsonConfig[brogueHd::ConfigBrogueCellDisplayFragShader]).c_str());
-			simpleString diffuseColorUpwardVertSource = fileOperations::readTextFile(std::string(jsonConfig[brogueHd::ConfigDiffuseColorUpwardVertexShader]).c_str());
-			simpleString diffuseColorUpwardFragSource = fileOperations::readTextFile(std::string(jsonConfig[brogueHd::ConfigDiffuseColorUpwardFragmentShader]).c_str());
-			simpleString mixFrameTexturesVertSource = fileOperations::readTextFile(std::string(jsonConfig[brogueHd::ConfigMixFrameTexturesVertexShader]).c_str());
-			simpleString mixFrameTexturesFragSource = fileOperations::readTextFile(std::string(jsonConfig[brogueHd::ConfigMixFrameTexturesFragmentShader]).c_str());
+			const char* resConfig = brogueHd::ConfigResourceConfig;
+
+			simpleString colorMaskVertSource = simpleFileIO::readTextFile(std::string(jsonConfig[resConfig][brogueHd::ConfigColorMaskVertShader]).c_str());
+			simpleString colorMaskFragSource = simpleFileIO::readTextFile(std::string(jsonConfig[resConfig][brogueHd::ConfigColorMaskFragShader]).c_str());
+			simpleString backgroundColorVertSource = simpleFileIO::readTextFile(std::string(jsonConfig[resConfig][brogueHd::ConfigBackgroundColorVertexShader]).c_str());
+			simpleString backgroundColorFragSource = simpleFileIO::readTextFile(std::string(jsonConfig[resConfig][brogueHd::ConfigBackgroundColorFragmentShader]).c_str());
+			simpleString brogueCellDisplayVertSource = simpleFileIO::readTextFile(std::string(jsonConfig[resConfig][brogueHd::ConfigBrogueCellDisplayVertShader]).c_str());
+			simpleString brogueCellDisplayFragSource = simpleFileIO::readTextFile(std::string(jsonConfig[resConfig][brogueHd::ConfigBrogueCellDisplayFragShader]).c_str());
+			simpleString diffuseColorUpwardVertSource = simpleFileIO::readTextFile(std::string(jsonConfig[resConfig][brogueHd::ConfigDiffuseColorUpwardVertexShader]).c_str());
+			simpleString diffuseColorUpwardFragSource = simpleFileIO::readTextFile(std::string(jsonConfig[resConfig][brogueHd::ConfigDiffuseColorUpwardFragmentShader]).c_str());
+			simpleString mixFrameTexturesVertSource = simpleFileIO::readTextFile(std::string(jsonConfig[resConfig][brogueHd::ConfigMixFrameTexturesVertexShader]).c_str());
+			simpleString mixFrameTexturesFragSource = simpleFileIO::readTextFile(std::string(jsonConfig[resConfig][brogueHd::ConfigMixFrameTexturesFragmentShader]).c_str());
 
 			shaderData* colorMaskVert = new shaderData(shaderResource::colorMaskVert, GL_VERTEX_SHADER, colorMaskVertSource);
 			shaderData* colorMaskFrag = new shaderData(shaderResource::colorMaskFrag, GL_FRAGMENT_SHADER, colorMaskFragSource);
@@ -139,17 +150,19 @@ namespace brogueHd::backend::controller
 			_shaderCache->add(shaderResource::mixFrameTexturesVert, mixFrameTexturesVert);
 			_shaderCache->add(shaderResource::mixFrameTexturesFrag, mixFrameTexturesFrag);
 
-			simpleString fontDir = std::string(jsonConfig[brogueHd::ConfigFontGlyphDirectory]).c_str();
+			simpleString fontDir = std::string(jsonConfig[resConfig][brogueHd::ConfigFontGlyphDirectory]).c_str();
 
 			for (int index = MIN_ZOOM; index <= MAX_ZOOM; index++)
 			{
 				simpleString fileName = simpleExt::format(brogueHd::FontGlyphFileNameFormat_RGBA24_UNSIGNED, index).c_str();
-				simpleString fullPath = fileOperations::filePathConcat(fontDir, fileName);
+				simpleString fullPath = simpleFileIO::filePathConcat(fontDir, fileName);
 
 				simpleBitmap* glyphSheet = simpleBitmap::fromFile(fullPath);
 
 				_fontGlyphs->add(index, glyphSheet);
 			}
+
+			_gameDirectory = new simpleString(std::string(jsonConfig[brogueHd::ConfigSavedGameDirectory]).c_str());
 
 			return true;
 		}

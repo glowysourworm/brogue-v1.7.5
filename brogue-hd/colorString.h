@@ -49,6 +49,9 @@ namespace brogueHd::backend::model::game
 		}
 		colorString(const colorString& copy)
 		{
+			_characters = nullptr;
+			_colors = nullptr;
+
 			copyImpl(copy);
 		}
 		~colorString()

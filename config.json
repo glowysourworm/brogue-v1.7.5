@@ -1,0 +1,18 @@
+{
+	"savedGameDirectory" : "C:\\Backup\\_programs\\Rogue-likes\\Brogue-windows-v1.7.5",
+	
+	"resourceConfig" : {
+		
+		"colorMaskVertexShader": "C:\\Backup\\_Source\\Git\\brogue-v1.7.5\\resources\\opengl\\colorMask.vert",
+		"colorMaskFragmentShader": "C:\\Backup\\_Source\\Git\\brogue-v1.7.5\\resources\\opengl\\colorMask.frag",
+		"backgroundColorVertexShader": "C:\\Backup\\_Source\\Git\\brogue-v1.7.5\\resources\\opengl\\backgroundColor.vert",
+		"backgroundColorFragmentShader": "C:\\Backup\\_Source\\Git\\brogue-v1.7.5\\resources\\opengl\\backgroundColor.frag",
+		"brogueCellDisplayVertexShader": "C:\\Backup\\_Source\\Git\\brogue-v1.7.5\\resources\\opengl\\brogueCellDisplay.vert",
+		"brogueCellDisplayFragmentShader": "C:\\Backup\\_Source\\Git\\brogue-v1.7.5\\resources\\opengl\\brogueCellDisplay.frag",
+		"diffuseColorUpwardVertexShader": "C:\\Backup\\_Source\\Git\\brogue-v1.7.5\\resources\\opengl\\diffuseColorUpward.vert",
+		"diffuseColorUpwardFragmentShader": "C:\\Backup\\_Source\\Git\\brogue-v1.7.5\\resources\\opengl\\diffuseColorUpward.frag",
+		"mixFrameTexturesVertexShader": "C:\\Backup\\_Source\\Git\\brogue-v1.7.5\\resources\\opengl\\mixFrameTextures.vert",
+		"mixFrameTexturesFragmentShader": "C:\\Backup\\_Source\\Git\\brogue-v1.7.5\\resources\\opengl\\mixFrameTextures.frag",
+		"fontGlyphDirectory": "C:\\Backup\\_Source\\Git\\brogue-v1.7.5\\resources\\fonts\\"
+	}
+}

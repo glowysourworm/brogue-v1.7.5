@@ -2,6 +2,7 @@
 
 #include "grid.h"
 #include "gridRect.h"
+#include "brogueUIData.h"
 #include "brogueMouseState.h"
 #include "brogueCellDisplay.h"
 
@@ -16,7 +17,7 @@ namespace brogueHd::frontend::ui
 	{
 	public:
 		
-		brogueView(gridRect sceneBoundary, gridRect viewBoundary);
+		brogueView(brogueUIData* data, const gridRect& sceneBoundary, const gridRect& viewBoundary);
 		~brogueView();
 
 		gridRect getSceneBoundary() const;
@@ -63,14 +64,29 @@ namespace brogueHd::frontend::ui
 			return false;
 		}
 
+		void setVisiblity(bool isVisible)
+		{
+			_uiData->setVisiblity(isVisible);
+		}
+
+	protected:
+
+		brogueUIData* getUIData() const
+		{
+			return _uiData;
+		}
+
 	private:
 
 		grid<brogueCellDisplay*>* _view;
+
+		brogueUIData* _uiData;
 	};
 
-	brogueView::brogueView(gridRect sceneBoundary, gridRect viewBoundary)
+	brogueView::brogueView(brogueUIData* data, const gridRect& sceneBoundary, const gridRect& viewBoundary)
 	{
 		_view = new grid<brogueCellDisplay*>(sceneBoundary, viewBoundary);
+		_uiData = data;
 
 		grid<brogueCellDisplay*>* grid = _view;
 
@@ -84,6 +100,7 @@ namespace brogueHd::frontend::ui
 	brogueView::~brogueView()
 	{
 		delete _view;
+		delete _uiData;
 	}
 
 	brogueCellDisplay* brogueView::get(short column, short row) const

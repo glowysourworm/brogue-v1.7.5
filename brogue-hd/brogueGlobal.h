@@ -55,6 +55,9 @@ namespace brogueHd
 		DisplayCurrentFrame = 2
 	};
 
+	// {} -> savedGamesDirectory, resourceConfig { ... }, ...
+
+	static const char* ConfigResourceConfig = "resourceConfig";
 
 	static const char* ConfigColorMaskVertShader = "colorMaskVertexShader";
 	static const char* ConfigColorMaskFragShader = "colorMaskFragmentShader";
@@ -67,13 +70,15 @@ namespace brogueHd
 	static const char* ConfigMixFrameTexturesVertexShader = "mixFrameTexturesVertexShader";
 	static const char* ConfigMixFrameTexturesFragmentShader = "mixFrameTexturesFragmentShader";
 
+	static const char* ConfigSavedGameDirectory = "savedGameDirectory";
 	static const char* ConfigFontGlyphDirectory = "fontGlyphDirectory";
 
 	static const char* FontGlyphFileNameFormat = "font-{}.bmp";
 	static const char* FontGlyphFileNameFormat_RGBA24_UNSIGNED = "font-{}-RGBA24-unsigned.bmp";
 	static const char* FontGlyphFileNameFormat_RGBA32F = "font-{}-RGBA32F.bmp";
-
+	
 	static const char* BrogueHighScoresFile = "BrogueHighScores.txt";
+
 
 	/*
 	

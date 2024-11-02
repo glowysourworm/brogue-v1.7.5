@@ -18,7 +18,7 @@ namespace brogueHd::frontend::ui
 	{
 	public:
 
-		brogueViewContainer(gridRect sceneBoundary, gridRect viewBoundary);
+		brogueViewContainer(brogueUIData* uiData, const gridRect& sceneBoundary, const gridRect& viewBoundary);
 		~brogueViewContainer();
 
 		void addView(brogueView* view);
@@ -38,8 +38,8 @@ namespace brogueHd::frontend::ui
 		simpleList<brogueView*>* _childViews;
 	};
 
-	brogueViewContainer::brogueViewContainer(gridRect sceneBoundary, gridRect viewBoundary)
-		: brogueView(sceneBoundary, viewBoundary)
+	brogueViewContainer::brogueViewContainer(brogueUIData* uiData, const gridRect& sceneBoundary, const gridRect& viewBoundary)
+		: brogueView(uiData, sceneBoundary, viewBoundary)
 	{
 		_childViews = new simpleList<brogueView*>();
 	}

@@ -10,6 +10,7 @@
 #include "brogueUIBuilder.h"
 #include <functional>
 #include <stdlib.h>
+#include "simpleFileIO.h"
 
 using namespace brogueHd::backend::controller;
 using namespace brogueHd::frontend::opengl;
@@ -91,11 +92,22 @@ namespace brogueHd::backend::controller
 			// Shuts down thread, deletes our program memory
 			_openglRenderer->terminateProgram();
 			
+			simpleList<simpleFileEntry> gameFiles = simpleFileIO::readDirectory(_resourceController->getGamesDirectory()->c_str(), ".broguesave");
+
 			brogueFlameMenu* titleView = new brogueFlameMenu(_randomGenerator, 100);
 			brogueButtonMenu* mainMenu = brogueUIBuilder::createMainMenuSelector();
+			brogueButtonMenu* openMenu = brogueUIBuilder::createOpenGameSelector(gameFiles);
 
 			// Main Menu:  brogueCellQuad, full scene (its view coordinates)
 			brogueDataStream<brogueButtonMenu>* mainMenuStream =
+				new brogueDataStream<brogueButtonMenu>(_resourceController,
+					_glyphMap,
+					openglDataStreamType::brogueCellQuad,
+					openglBrogueCellOutputSelector::Display,
+					false);
+
+			// Open Menu:  brogueCellQuad, full scene (its view coordinates)
+			brogueDataStream<brogueButtonMenu>* openMenuStream =
 				new brogueDataStream<brogueButtonMenu>(_resourceController,
 					_glyphMap,
 					openglDataStreamType::brogueCellQuad,
@@ -109,8 +121,16 @@ namespace brogueHd::backend::controller
 														mainMenuStream,
 														true);
 
+			brogueViewProgram<brogueButtonMenu>* openMenuProgram =
+				new brogueViewProgram<brogueButtonMenu>(openMenu, _resourceController, _glyphMap,
+					shaderResource::brogueCellDisplayVert,
+					shaderResource::brogueCellDisplayFrag,
+					openMenuStream,
+					true);
+
 			_container->setBackground(new brogueFlameMenuProgram(titleView, mainMenu, _resourceController, _glyphMap));
-			_container->addUIProgram(mainMenuProgram);
+			_container->addUIProgram(mainMenuProgram, false);
+			_container->addUIProgram(openMenuProgram, true);
 
 			_openglRenderer->setProgram(_container);
 			_openglRenderer->startProgram();

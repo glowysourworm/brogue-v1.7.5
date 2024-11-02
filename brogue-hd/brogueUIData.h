@@ -1,7 +1,10 @@
 #pragma once
 #include "colorString.h"
 #include "color.h"
+#include "colorGradient.h"
 #include "gridLocator.h"
+
+using namespace brogueHd::backend::model::game;
 
 namespace brogueHd::frontend::ui
 {
@@ -12,141 +15,146 @@ namespace brogueHd::frontend::ui
 		Right = 2
 	};
 
-	enum brogueGradientType
-	{
-		Horizontal = 0,
-		Vertical = 1,
-		Circular = 2
-	};
-
 	struct brogueUIData : hashable
 	{
-		brogueUIData(){};
+		brogueUIData()
+		{
+			_text = nullptr;
+			_boundary = nullptr;
+			_background = nullptr;
+			_hoverBackground = nullptr;
+			_alignment = brogueTextAlignment::Left;
+			_hotkeyChar = 'a';
+			_hotkeyIndex = -1;
+			_padding = 0;
+
+			_hasMouseInteraction = false;
+			_isVisible = false;
+		};
 		brogueUIData(const brogueUIData& copy)
 		{
-			text = copy.text;
-			gradient1 = copy.gradient1;
-			gradient2 = copy.gradient2;
-			alignment = copy.alignment;
-			padding = copy.padding;
-			hotkeyIndex = copy.hotkeyIndex;
-			boundary = copy.boundary;
-			paddedBoundary = copy.paddedBoundary;
-			gradientType = copy.gradientType;
+			_text = copy.getText();
+			_boundary = copy.getBoundary();
+			_background = copy.getBackground();
+			_hoverBackground = copy.getHoverBackground();
+			_alignment = copy.getAlignment();
+			_hotkeyChar = copy.getHotkeyChar();
+			_hotkeyIndex = copy.getHotkeyIndex();
+			_padding = copy.getPadding();
+			_hasMouseInteraction = copy.getHasMouseInteraction();
+			_isVisible = copy.getIsVisible();
 		}
-		brogueUIData(const gridRect& aboundary, const color& background, int apadding)
+		~brogueUIData()
 		{
-			text = colorString("", colors::white());
-			gradient1 = background;
-			gradient2 = background;
-			alignment = brogueTextAlignment::Left;
-			gradientType = brogueGradientType::Horizontal;
-			padding = apadding;
-			hotkeyIndex = -1;
-			boundary = aboundary;
-			paddedBoundary = gridRect(aboundary);
+			delete _text;
+			delete _boundary;
+			delete _background;
+			delete _hoverBackground;
 		}
-		brogueUIData(const gridRect& aboundary, const color& background1, const color& background2, brogueGradientType agradientType, int apadding)
-		{
-			text = colorString("", colors::white());
-			gradient1 = background1;
-			gradient2 = background2;
-			alignment = brogueTextAlignment::Left;
-			gradientType = agradientType;
-			padding = apadding;
-			hotkeyIndex = -1;
-			boundary = aboundary;
-			paddedBoundary = gridRect(aboundary);
-		}
-		brogueUIData(const gridRect& aboundary,  const char* atext, const color& agradient1, const color& agradient2, brogueTextAlignment aalignment)
-		{
-			text = colorString(atext, colors::white());
-			gradient1 = agradient1;
-			gradient2 = agradient2;
-			alignment = aalignment;
-			gradientType = brogueGradientType::Horizontal;
-			padding = 0;
-			hotkeyIndex = -1;
-			boundary = aboundary;
-			paddedBoundary = gridRect(aboundary);
+		brogueUIData(const gridRect& boundary)
+			: brogueUIData(boundary, colors::transparent(), colors::transparent())
+		{}
+		brogueUIData(const gridRect& boundary, const color& background)
+			: brogueUIData(boundary, background, background)
+		{}
+		brogueUIData(const gridRect& boundary, const color& background1, const color& background2, brogueGradientType gradientType)
+			: brogueUIData(boundary, background1, background2, background1, background2, gradientType)
+		{}
+		brogueUIData(const gridRect& boundary, const color& background, const color& mouseHoverBackground)
+			: brogueUIData(boundary, background, background,  mouseHoverBackground, mouseHoverBackground, brogueGradientType::Horizontal)
+		{}
+		brogueUIData(const gridRect& boundary, 
+					 const color& background1, 
+					 const color& background2, 
+					 const color& mouseBackground1, 
+					 const color& mouseBackground2, 
+					 brogueGradientType gradientType)
+			: brogueUIData(boundary, "", background1, background2, mouseBackground1, mouseBackground2, gradientType, brogueTextAlignment::Left)
+		{}
 
-		}
-		brogueUIData(const gridRect& aboundary, const colorString& atext, const color& abackground, brogueTextAlignment aalignment, brogueGradientType agradientType, int apadding, int ahotkeyIndex)
+		brogueUIData(const gridRect& boundary, 
+					 const colorString& text, 
+					 const color& gradient1, 
+					 const color& gradient2, 
+					 brogueTextAlignment alignment)
+			: brogueUIData(boundary, text, gradient1, gradient2, gradient1, gradient2, brogueGradientType::Horizontal, alignment)
+		{}
+		brogueUIData(const gridRect& boundary, 
+					 const colorString& text, 
+					 const color& gradient1, 
+					 const color& gradient2, 
+					 const color& mouseBackground1,
+					 const color& mouseBackground2,
+					 brogueGradientType gradientType,
+					 brogueTextAlignment alignment)
 		{
-			text = atext;
-			gradient1 = abackground;
-			gradient2 = abackground;
-			alignment = aalignment;
-			gradientType = agradientType;
-			padding = apadding;
-			hotkeyIndex = ahotkeyIndex;
-			boundary = aboundary;
-			paddedBoundary = gridRect(aboundary.column + apadding, aboundary.row + apadding, aboundary.width - (2 * apadding), aboundary.height - (2 * apadding));
-		}
-		brogueUIData(const gridRect& aboundary, const colorString& atext, const color& agradient1, const color& agradient2, brogueTextAlignment aalignment, int apadding, int ahotkeyIndex)
-		{
-			text = atext;
-			gradient1 = agradient1;
-			gradient2 = agradient2;
-			alignment = aalignment;
-			gradientType = brogueGradientType::Horizontal;
-			padding = apadding;
-			hotkeyIndex = ahotkeyIndex;
-			boundary = aboundary;
-			paddedBoundary = gridRect(aboundary.column + apadding, aboundary.row + apadding, aboundary.width - (2 * apadding), aboundary.height - (2 * apadding));
+			_boundary = new gridRect(boundary);
+			_text = new colorString(text);
+			_background = new colorGradient(gradient1, gradient2, gradientType);
+			_hoverBackground = new colorGradient(mouseBackground1, mouseBackground2, gradientType);
+			_alignment = alignment;
+			_hotkeyChar = '\0';
+			_hotkeyIndex = -1;
+			_padding = 0;
+			_hasMouseInteraction = false;
+			_isVisible = false;
 		}
 
-		color calculateGradient(const gridLocator& location)
+	public:
+
+		/// <summary>
+		/// Sets ancillary parameters (that wouldn't fit nicely into the ctor's)
+		/// </summary>
+		void setUIParameters(char hotkey, int hotkeyIndex, bool hasMouseInteraction, bool isVisible)
 		{
-			return calculateGradient(location.column, location.row);
+			_hotkeyChar = hotkey;
+			_hotkeyIndex = hotkeyIndex;
+			_hasMouseInteraction = hasMouseInteraction;
+			_isVisible = isVisible;
 		}
 
-		color calculateGradient(int column, int row)
+		void setVisiblity(bool isVisible)
 		{
-			short menuColumn = column - boundary.column;
-			short menuRow = row - boundary.row;
+			_isVisible = isVisible;
+		}
 
-			switch (gradientType)
-			{
-			case brogueGradientType::Horizontal:
-			{
-				if (menuColumn < (boundary.width / 2.0f))
-					return color::interpolate(gradient1, gradient2, (boundary.width - (2 * (menuColumn))) / (float)boundary.width);
-				else
-					return color::interpolate(gradient1, gradient2, (2 * ((menuColumn) - (boundary.width / 2.0f))) / (float)boundary.width);
-			}
-			break;
-			case brogueGradientType::Vertical:
-			{
-				if (menuRow < (boundary.height / 2.0f))
-					return color::interpolate(gradient1, gradient2, (boundary.height - (2 * (menuRow))) / (float)boundary.height);
-				else
-					return color::interpolate(gradient1, gradient2, (2 * ((menuRow) - (boundary.height / 2.0f))) / (float)boundary.height);
-			}
-			break;
-			case brogueGradientType::Circular:
-			{
-				// This was made slightly non-linear to match Brogue v1.7.5
-				//
-				float dx = simpleMath::abs(column - boundary.centerX()) / ((float)boundary.width / 2.0f);
-				float dy = simpleMath::abs(row - boundary.centerY()) / ((float)boundary.height / 2.0f);
-				float weight = simpleMath::sqrt((dx * dx) + (dy * dy));
+		bool getVisibility()
+		{
+			return _isVisible;
+		}
 
-				return color::interpolate(gradient1, gradient2, weight);
-			}
-			break;
-			default:
-				simpleException::show("Unhandled brogueGradientType:  brogueUIData.h");
-			}
+		gridRect getBounds() const
+		{
+			return *_boundary;
+		}
+
+		colorString getColorString() const
+		{
+			return *_text;
+		}
+
+	public:
+
+		color calculateGradient(const gridLocator& location, bool isMouseOver)
+		{
+			return calculateGradient(location.column, location.row, isMouseOver);
+		}
+
+		color calculateGradient(int column, int row, bool isMouseOver)
+		{
+			if (isMouseOver && _hasMouseInteraction)
+				return calculateGradientImpl(column, row, _hoverBackground);
+			else
+				return calculateGradientImpl(column, row, _background);
 		}
 
 		color getTextColor(int column, int row)
 		{
 			int textIndex = calculateTextOffset();
-			int offsetColumn = column - boundary.column;
+			int offsetColumn = column - _boundary->column;
 
-			if (offsetColumn >= textIndex && offsetColumn - textIndex < text.getCount())
-				return text.getColor(offsetColumn - textIndex);
+			if (offsetColumn >= textIndex && offsetColumn - textIndex < _text->getCount())
+				return _text->getColor(offsetColumn - textIndex);
 
 			else
 				return colors::transparent();
@@ -155,50 +163,79 @@ namespace brogueHd::frontend::ui
 		char getText(int column, int row)
 		{
 			int textIndex = calculateTextOffset();
-			int offsetColumn = column - boundary.column;
+			int offsetColumn = column - _boundary->column;
 
-			if (offsetColumn >= textIndex && offsetColumn - textIndex < text.getCount())
-				return text.getChar(offsetColumn - textIndex);
+			if (offsetColumn >= textIndex && offsetColumn - textIndex < _text->getCount())
+				return _text->getChar(offsetColumn - textIndex);
 			else
 				return colorString::Empty;
 		}
 
 		bool getIsHotkey(int column, int row)
 		{
-			if (hotkeyIndex == -1)
+			if (_hotkeyIndex == -1)
 				return false;
 
 			int textIndex = calculateTextOffset();
-			int offsetColumn = column - boundary.column;
+			int offsetColumn = column - _boundary->column;
 
-			return offsetColumn - textIndex == hotkeyIndex;
+			return offsetColumn - textIndex == _hotkeyIndex;
 		}
 
-		gridRect boundary;
-		gridRect paddedBoundary;
-		int padding;
-		colorString text;
-		color gradient1;
-		color gradient2;
-		brogueTextAlignment alignment;
-		brogueGradientType gradientType;
-		int hotkeyIndex;
-
 	private:
+
+		color calculateGradientImpl(int column, int row, colorGradient* gradient)
+		{
+			short menuColumn = column - _boundary->column;
+			short menuRow = row - _boundary->row;
+
+			switch (gradient->gradientType)
+			{
+			case brogueGradientType::Horizontal:
+			{
+				if (menuColumn < (_boundary->width / 2.0f))
+					return gradient->getColor((_boundary->width - (2 * (menuColumn))) / (float)_boundary->width);
+				else
+					return gradient->getColor((2 * ((menuColumn)-(_boundary->width / 2.0f))) / (float)_boundary->width);
+			}
+			break;
+			case brogueGradientType::Vertical:
+			{
+				if (menuRow < (_boundary->height / 2.0f))
+					return gradient->getColor((_boundary->height - (2 * (menuRow))) / (float)_boundary->height);
+				else
+					return gradient->getColor((2 * ((menuRow)-(_boundary->height / 2.0f))) / (float)_boundary->height);
+			}
+			break;
+			case brogueGradientType::Circular:
+			{
+				// This was made slightly non-linear to match Brogue v1.7.5
+				//
+				float dx = simpleMath::abs(column - _boundary->centerX()) / ((float)_boundary->width / 2.0f);
+				float dy = simpleMath::abs(row - _boundary->centerY()) / ((float)_boundary->height / 2.0f);
+				float weight = simpleMath::sqrt((dx * dx) + (dy * dy));
+
+				return gradient->getColor(weight);
+			}
+			break;
+			default:
+				simpleException::show("Unhandled brogueGradientType:  brogueUIData.h");
+			}
+		}
 
 		int calculateTextOffset()
 		{
 			int textBeginIndex = 0;
 
-			switch (alignment)
+			switch (_alignment)
 			{
 			case brogueTextAlignment::Left:
 				break;
 			case brogueTextAlignment::Right:
-				textBeginIndex = boundary.right() - text.getCount() - boundary.column;
+				textBeginIndex = _boundary->right() - _text->getCount() - _boundary->column;
 				break;
 			case brogueTextAlignment::Center:
-				textBeginIndex = ((boundary.right() - text.getCount() - boundary.column) / 2) + 1;
+				textBeginIndex = ((_boundary->right() - _text->getCount() - _boundary->column) / 2) + 1;
 				break;
 			default:
 				simpleException::show("Unhandled brogueTextAlignment:  brogueUIData.h");
@@ -206,5 +243,62 @@ namespace brogueHd::frontend::ui
 
 			return textBeginIndex;
 		}
+
+	protected:
+
+		colorString* getText() const
+		{
+			return _text;
+		}
+		gridRect* getBoundary() const
+		{
+			return _boundary;
+		}
+		colorGradient* getBackground() const
+		{
+			return _background;
+		}
+		colorGradient* getHoverBackground() const
+		{
+			return _hoverBackground;
+		}
+		brogueTextAlignment getAlignment() const
+		{
+			return _alignment;
+		}
+		char getHotkeyChar() const
+		{
+			return _hotkeyChar;
+		}
+		int getHotkeyIndex() const
+		{
+			return _hotkeyIndex;
+		}
+		int getPadding() const
+		{
+			return _padding;
+		}
+		bool getIsVisible() const
+		{
+			return _isVisible;
+		}
+		bool getHasMouseInteraction() const
+		{
+			return _hasMouseInteraction;
+		}
+
+	private:
+
+		colorString* _text;
+		gridRect* _boundary;
+		colorGradient* _background;
+		colorGradient* _hoverBackground;
+		brogueTextAlignment _alignment;
+		char _hotkeyChar;
+		int _hotkeyIndex;
+		int _padding;
+
+		bool _hasMouseInteraction;
+		bool _isVisible;
 	};
 }

@@ -425,9 +425,6 @@
     <ClInclude Include="brogueView.h">
       <Filter>Header Files\frontend\ui</Filter>
     </ClInclude>
-    <ClInclude Include="fileOperations.h">
-      <Filter>Header Files\component</Filter>
-    </ClInclude>
     <ClInclude Include="simple.h">
       <Filter>Header Files\simple</Filter>
     </ClInclude>
@@ -625,6 +622,15 @@
     </ClInclude>
     <ClInclude Include="brogueUIBuilder.h">
       <Filter>Header Files\frontend\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleFileEntry.h">
+      <Filter>Header Files\simple</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleFileIO.h">
+      <Filter>Header Files\simple</Filter>
+    </ClInclude>
+    <ClInclude Include="colorGradient.h">
+      <Filter>Header Files\backend\model\game</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

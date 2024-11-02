@@ -12,11 +12,13 @@ namespace brogueHd::frontend::opengl
 		~brogueProgramContainer();
 
 		void setBackground(brogueProgram* backgroundProgram);
-		void addUIProgram(brogueProgram* uiProgram);
+		void addUIProgram(brogueProgram* uiProgram, bool isActive);
 
 		brogueProgram* getBackgroundProgram();
 		brogueProgram* getUIProgram(int index);
 		int getUIProgramCount();
+		void activateUIProgram(int index);
+		void deactivateUIProgram(int index);
 
 		void initialize();
 		void run(int millisecondsLapsed);
@@ -34,12 +36,12 @@ namespace brogueHd::frontend::opengl
 	private:
 
 		brogueProgram* _backgroundProgram;
-		simpleList<brogueProgram*>* _uiPrograms;
+		simpleHash<brogueProgram*, bool>* _uiPrograms;
 	};
 
 	brogueProgramContainer::brogueProgramContainer()
 	{
-		_uiPrograms = new simpleList<brogueProgram*>();
+		_uiPrograms = new simpleHash<brogueProgram*, bool>();
 	}
 
 	brogueProgramContainer::~brogueProgramContainer()
@@ -52,9 +54,9 @@ namespace brogueHd::frontend::opengl
 		_backgroundProgram = backgroundProgram;
 	}
 
-	void brogueProgramContainer::addUIProgram(brogueProgram* uiProgram)
+	void brogueProgramContainer::addUIProgram(brogueProgram* uiProgram, bool isActive)
 	{	
-		_uiPrograms->add(uiProgram);
+		_uiPrograms->add(uiProgram, isActive);
 	}
 
 	brogueProgram* brogueProgramContainer::getBackgroundProgram()
@@ -64,19 +66,27 @@ namespace brogueHd::frontend::opengl
 
 	brogueProgram* brogueProgramContainer::getUIProgram(int index)
 	{
-		return _uiPrograms->get(index);
+		return _uiPrograms->getAt(index)->key;
 	}
 
 	int brogueProgramContainer::getUIProgramCount()
 	{
 		return _uiPrograms->count();
 	}
+	void brogueProgramContainer::activateUIProgram(int index)
+	{
+		_uiPrograms->getAt(index)->value = true;
+	}
+	void brogueProgramContainer::deactivateUIProgram(int index)
+	{
+		_uiPrograms->getAt(index)->value = false;
+	}
 
 	void brogueProgramContainer::initialize()
 	{
 		_backgroundProgram->initialize();
 
-		_uiPrograms->forEach([] (brogueProgram* program)
+		_uiPrograms->iterate([] (brogueProgram* program, bool isActive)
 		{
 			program->initialize();
 
@@ -88,9 +98,10 @@ namespace brogueHd::frontend::opengl
 	{
 		_backgroundProgram->run(millisecondsLapsed);
 
-		_uiPrograms->forEach([&millisecondsLapsed] (brogueProgram* program)
+		_uiPrograms->iterate([&millisecondsLapsed] (brogueProgram* program, bool isActive)
 		{
-			program->run(millisecondsLapsed);
+			if (isActive)
+				program->run(millisecondsLapsed);
 
 			return iterationCallback::iterate;
 		});
@@ -100,7 +111,7 @@ namespace brogueHd::frontend::opengl
 	{
 		_backgroundProgram->outputStatus();
 
-		_uiPrograms->forEach([] (brogueProgram* program)
+		_uiPrograms->iterate([] (brogueProgram* program, bool isActive)
 		{
 			program->outputStatus();
 
@@ -112,7 +123,7 @@ namespace brogueHd::frontend::opengl
 	{
 		bool hasErrors = _backgroundProgram->hasErrors();
 
-		_uiPrograms->forEach([&hasErrors] (brogueProgram* program)
+		_uiPrograms->iterate([&hasErrors] (brogueProgram* program, bool isActive)
 		{
 			hasErrors |= program->hasErrors();
 
@@ -127,10 +138,13 @@ namespace brogueHd::frontend::opengl
 		if (_backgroundProgram->shouldUpdate(mouseState, millisecondsLapsed))
 			_backgroundProgram->update(mouseState, millisecondsLapsed);
 
-		_uiPrograms->forEach([&mouseState, &millisecondsLapsed] (brogueProgram* program)
+		_uiPrograms->iterate([&mouseState, &millisecondsLapsed] (brogueProgram* program, bool isActive)
 		{
-			if (program->shouldUpdate(mouseState, millisecondsLapsed))
-				program->update(mouseState, millisecondsLapsed);
+			if (isActive)
+			{
+				if (program->shouldUpdate(mouseState, millisecondsLapsed))
+					program->update(mouseState, millisecondsLapsed);
+			}
 
 			return iterationCallback::iterate;
 		});
@@ -140,9 +154,13 @@ namespace brogueHd::frontend::opengl
 	{
 		bool result = false;
 
-		_uiPrograms->forEach([&result, &mouseState, &millisecondsLapsed] (brogueProgram* program)
+		_uiPrograms->iterate([&mouseState, &millisecondsLapsed, &result] (brogueProgram* program, bool isActive)
 		{
-			result |= program->shouldUpdate(mouseState, millisecondsLapsed);
+			if (isActive)
+			{
+				result |= program->shouldUpdate(mouseState, millisecondsLapsed);
+			}
+
 
 			return iterationCallback::iterate;
 		});

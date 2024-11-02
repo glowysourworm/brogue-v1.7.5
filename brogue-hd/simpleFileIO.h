@@ -7,12 +7,13 @@
 #include <fstream>
 #include <strstream>
 #include <filesystem>
+#include "simpleFileEntry.h"
+#include <filesystem>
+#include <regex>
 
-using namespace brogueHd::simple;
-
-namespace brogueHd::component
+namespace brogueHd::simple
 {
-	class fileOperations
+	class simpleFileIO
 	{
 	public:
 		
@@ -129,6 +130,51 @@ namespace brogueHd::component
 			{
 				simpleException::show("Error trying to write file:  {}:  {}", filename.c_str(), ex.what());
 			}
+		}
+		static simpleList<simpleFileEntry> readDirectory(const char* path)
+		{
+			return readDirectory(path, "*.*");
+		}
+		static simpleList<simpleFileEntry> readDirectory(const char* path, const char* search)
+		{
+			simpleList<simpleFileEntry> result;
+
+			try
+			{
+				// Using directory iterator
+				struct stat entry;
+
+				// Regex
+				const char* fileNameRegex = "/^[a-zA-Z0-9](?:[a-zA-Z0-9 ._-]*[a-zA-Z0-9])?\.[a-zA-Z0-9_-]+$/";
+
+				// Using "experimental" filesystem libraries (also "auto")
+				for (const auto& entry : std::filesystem::directory_iterator(path)) 
+				{
+					if (!entry.is_directory())
+					{
+						// Huh.
+						auto utcTime = std::chrono::file_clock::to_utc(entry.last_write_time());
+						auto sysTime = std::chrono::utc_clock::to_sys(utcTime);
+						time_t writeTime = std::chrono::system_clock::to_time_t(sysTime);
+
+						std::string filePath = entry.path().string();
+						std::string fileName = entry.path().filename().string();
+						std::string fileNameWOExt = entry.path().filename().replace_extension().string();
+						std::regex searchRegex(search, strnlen_s(search, 100));
+						
+						if (std::regex_search(fileName, searchRegex))
+						{
+							result.add(simpleFileEntry(filePath.c_str(), fileName.c_str(), fileNameWOExt.c_str(), writeTime, (size_t)entry.file_size()));
+						}
+					}
+				}
+			}
+			catch (std::exception& ex)
+			{
+				simpleException::show("Error trying to read directory:  {}", path);
+			}
+
+			return result;
 		}
 	};
 }

@@ -56,6 +56,7 @@ namespace brogueHd::simple
 
 		void append(const simpleString& other);
 		void append(const char* chars);
+		void appendPadding(char padChar, int length);
 		void insert(int index, const char* replacement);
 		void insert(int index, const simpleString& replacement);
 		void remove(int index, int count);
@@ -329,6 +330,16 @@ namespace brogueHd::simple
 			delete _array;
 
 			_array = newArray;
+		}
+	}
+	void simpleString::appendPadding(char padChar, int length)
+	{
+		// TODO: Figure out how to create an empty space string without garbage 
+		//		 and / or heap corruption.
+		//
+		for (int index = 0; index < length; index++)
+		{
+			this->append(" ");
 		}
 	}
 

@@ -15,31 +15,22 @@ namespace brogueHd::frontend::ui
 	{
 	public:
 
-		brogueButton(const brogueUIData& data, gridRect sceneBoundary, gridRect viewBoundary);
+		brogueButton(brogueUIData* data, const gridRect& sceneBoundary, const gridRect& viewBoundary);
 		~brogueButton();
 
 		virtual void update(const brogueMouseState& mouseState, int millisecondsLapsed) override;
 		virtual bool shouldUpdate(const brogueMouseState& mouseState, int millisecondsLapsed) override;
-
-	private:
-
-		brogueUIData* _buttonData;
 	};
 
-	brogueButton::brogueButton(const brogueUIData& data, gridRect sceneBoundary, gridRect viewBoundary) : brogueView(sceneBoundary, viewBoundary)
+	brogueButton::brogueButton(brogueUIData* data, const gridRect& sceneBoundary, const gridRect& viewBoundary)
+		: brogueView(data, sceneBoundary, viewBoundary)
 	{
-		if (data.text.getCount() > viewBoundary.width)
-			simpleException::show("Length of text is greater than button width:  brogueButton.h");
-
-		_buttonData = new brogueUIData(data);
-
 		// Initialize the view
 		//
 		update(default_value::value<brogueMouseState>(), 0);
 	}
 	brogueButton::~brogueButton()
 	{
-		delete _buttonData;
 	}
 	bool brogueButton::shouldUpdate(const brogueMouseState& mouseState, int millisecondsLapsed)
 	{
@@ -48,7 +39,7 @@ namespace brogueHd::frontend::ui
 	void brogueButton::update(const brogueMouseState& mouseState, int millisecondsLapsed)
 	{
 		gridRect bounds = this->getBoundary();
-		brogueUIData data = *_buttonData;
+		brogueUIData* data = this->getUIData();
 		brogueButton* that = this;
 
 		// Check mouse hover
@@ -56,20 +47,14 @@ namespace brogueHd::frontend::ui
 
 		this->getBoundary().iterate([&that, &data, &bounds, &mouseState, &mouseHover] (short column, short row)
 		{
-			color nextColor = data.calculateGradient(column, row);
-			color highlightColor(0.7, 0.7, 0.7, 0.7);
+			color nextColor = data->calculateGradient(column, row, mouseHover);
 
-			nextColor.alpha = 1.0;
-
-			if (mouseHover)
-				nextColor.interpolate(highlightColor, 0.5);
-
-			if (data.getIsHotkey(column, row))
+			if (data->getIsHotkey(column, row))
 				that->get(column, row)->foreColor = colors::yellow();
 			else
-				that->get(column, row)->foreColor = data.getTextColor(column, row);
+				that->get(column, row)->foreColor = data->getTextColor(column, row);
 
-			that->get(column, row)->character = data.getText(column, row);
+			that->get(column, row)->character = data->getText(column, row);
 			that->get(column, row)->backColor = nextColor;
 
 			return iterationCallback::iterate;

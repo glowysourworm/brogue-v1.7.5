@@ -19,53 +19,53 @@ namespace brogueHd::frontend::ui
 	{
 	public:
 
-		brogueButtonMenu(const brogueUIData& menu,
-						 const simpleList<brogueUIData>& buttons,
-						 const brogueUIData& header,
-						 bool useHeader, gridRect sceneBoundary, gridRect viewBoundary);
+		brogueButtonMenu(brogueUIData* menuData,
+						 const simpleList<brogueUIData*>& buttons,
+						 brogueUIData* header,
+						 bool useHeader,
+						 const gridRect& sceneBoundary,
+						 const gridRect& viewBoundary);
 		~brogueButtonMenu();
 
 		virtual void update(const brogueMouseState& mouseState, int millisecondsLapsed) override;
-
-	private:
-
-		brogueUIData* _menuData;
 	};
 
-	brogueButtonMenu::brogueButtonMenu(const brogueUIData& menu,
-									   const simpleList<brogueUIData>& buttons,
-									   const brogueUIData& header,
-									   bool useHeader, gridRect sceneBoundary, gridRect viewBoundary)
-		: brogueViewContainer(sceneBoundary, viewBoundary)
+	brogueButtonMenu::brogueButtonMenu(brogueUIData* menuData,
+									   const simpleList<brogueUIData*>& buttons,
+									   brogueUIData* header,
+									   bool useHeader,
+									   const gridRect& sceneBoundary,
+									   const gridRect& viewBoundary)
+		: brogueViewContainer(menuData, sceneBoundary, viewBoundary)
 	{
-		_menuData = new brogueUIData(menu);
-
 		// Header View
 		if (useHeader)
-			this->addView((brogueView*)new brogueText(header, sceneBoundary, header.boundary));
+			this->addView((brogueView*)new brogueText(header, sceneBoundary, header->getBounds()));
 
 		// Vertical Buttons
 		for (int index = 0; index < buttons.count(); index++)
 		{
 			// Button View
-			this->addView((brogueView*)new brogueButton(buttons.get(index), sceneBoundary, buttons.get(index).boundary));
+			this->addView((brogueView*)new brogueButton(buttons.get(index), sceneBoundary, buttons.get(index)->getBounds()));
 		}
 
 		update(default_value::value<brogueMouseState>(), 0);
 	}
 	brogueButtonMenu::~brogueButtonMenu()
 	{
-		delete _menuData;
 	}
 	void brogueButtonMenu::update(const brogueMouseState& mouseState, int millisecondsLapsed)
 	{
 		brogueButtonMenu* that = this;
-		brogueUIData menuData = *_menuData;
+		brogueUIData* menuData = this->getUIData();
+
+		// Check mouse hover
+		bool mouseHover = this->getBoundary().contains(mouseState.getLocation());
 
 		// Background
-		this->getBoundary().iterate([&that, &menuData] (short column, short row)
+		this->getBoundary().iterate([&that, &menuData, &mouseHover] (short column, short row)
 		{
-			that->get(column, row)->backColor = menuData.calculateGradient(column, row);
+			that->get(column, row)->backColor = menuData->calculateGradient(column, row, mouseHover);
 
 			return iterationCallback::iterate;
 		});

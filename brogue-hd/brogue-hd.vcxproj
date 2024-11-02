@@ -207,12 +207,14 @@
     <ClInclude Include="brogueTestFunction.h" />
     <ClInclude Include="brogueGlyphMap.h" />
     <ClInclude Include="brogueViewContainer.h" />
+    <ClInclude Include="colorGradient.h" />
     <ClInclude Include="openglQuadConverter.h" />
     <ClInclude Include="openglHelper.h" />
     <ClInclude Include="randomRange.h" />
     <ClInclude Include="simpleBoundingBox.h" />
     <ClInclude Include="simpleBuffer.h" />
     <ClInclude Include="simpleExt.h" />
+    <ClInclude Include="simpleFileEntry.h" />
     <ClInclude Include="simpleKeyState.h" />
     <ClInclude Include="simpleLogger.h" />
     <ClInclude Include="brogueMachine.h" />
@@ -225,7 +227,7 @@
     <ClInclude Include="brogueTestPackage.h" />
     <ClInclude Include="cellularAutomataParameters.h" />
     <ClInclude Include="brogueCoordinateConverter.h" />
-    <ClInclude Include="fileOperations.h" />
+    <ClInclude Include="simpleFileIO.h" />
     <ClInclude Include="gl.h" />
     <ClInclude Include="json.hpp" />
     <ClInclude Include="shaderData.h" />
