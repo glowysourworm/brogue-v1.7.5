@@ -12,10 +12,28 @@ namespace brogueHd::backend::model::game
 	{
 	public:
 
+		// Character that corresponds to the empty char and also works with the
+		// glyph sheets.
+		static const char Empty = ' ';
+
+	public:
+
 		colorString()
 		{
 			_characters = new simpleArray<int>();
 			_colors = new simpleArray<color>();
+		}
+		colorString(const char* message)
+		{
+			_characters = new simpleArray<int>(strnlen_s(message, COLS * 2));
+			_colors = new simpleArray<color>(_characters->count());
+
+			for (int index = 0; index < _characters->count(); index++)
+			{
+				// int should include unicode characters
+				_characters->set(index, (int)message[index]);
+				_colors->set(index, colors::white());
+			}
 		}
 		colorString(const char* message, color foreColor)
 		{

@@ -186,6 +186,9 @@
     <ClInclude Include="brogueDataStream.h" />
     <ClInclude Include="brogueMouseState.h" />
     <ClInclude Include="brogueProgramContainer.h" />
+    <ClInclude Include="brogueText.h" />
+    <ClInclude Include="brogueUIBuilder.h" />
+    <ClInclude Include="brogueUIData.h" />
     <ClInclude Include="brogueViewProgram.h" />
     <ClInclude Include="brogueColorMap.h" />
     <ClInclude Include="brogueColorQuad.h" />
@@ -273,7 +276,6 @@
     <ClInclude Include="brogueMessageQueue.h" />
     <ClInclude Include="brogueRememberedCell.h" />
     <ClInclude Include="brogueView.h" />
-    <ClInclude Include="button.h" />
     <ClInclude Include="brogueCellDisplay.h" />
     <ClInclude Include="gridCell.h" />
     <ClInclude Include="color.h" />

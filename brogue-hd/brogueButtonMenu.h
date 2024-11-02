@@ -3,9 +3,10 @@
 #include "brogueView.h"
 #include "brogueViewContainer.h"
 #include "brogueButton.h"
+#include "brogueText.h"
 #include "brogueMouseState.h"
 #include "gridRect.h"
-#include "button.h"
+#include "brogueUIData.h"
 #include "simpleHash.h"
 #include "simpleException.h"
 
@@ -18,46 +19,58 @@ namespace brogueHd::frontend::ui
 	{
 	public:
 
-		brogueButtonMenu(const simpleList<buttonData>& buttons, int padding, gridRect sceneBoundary, gridRect viewBoundary);
+		brogueButtonMenu(const brogueUIData& menu,
+						 const simpleList<brogueUIData>& buttons,
+						 const brogueUIData& header,
+						 bool useHeader, gridRect sceneBoundary, gridRect viewBoundary);
 		~brogueButtonMenu();
 
 		virtual void update(const brogueMouseState& mouseState, int millisecondsLapsed) override;
+
+	private:
+
+		brogueUIData* _menuData;
 	};
 
-	brogueButtonMenu::brogueButtonMenu(const simpleList<buttonData>& buttons, int padding, gridRect sceneBoundary, gridRect viewBoundary) 
+	brogueButtonMenu::brogueButtonMenu(const brogueUIData& menu,
+									   const simpleList<brogueUIData>& buttons,
+									   const brogueUIData& header,
+									   bool useHeader, gridRect sceneBoundary, gridRect viewBoundary)
 		: brogueViewContainer(sceneBoundary, viewBoundary)
 	{
+		_menuData = new brogueUIData(menu);
+
+		// Header View
+		if (useHeader)
+			this->addView((brogueView*)new brogueText(header, sceneBoundary, header.boundary));
+
+		// Vertical Buttons
 		for (int index = 0; index < buttons.count(); index++)
 		{
-			gridRect boundary(viewBoundary.column + padding, 
-							  viewBoundary.row + padding + (index * 2), 
-							  viewBoundary.width - (2 * padding), 
-							  1);
-
-			if (boundary.width < buttons.get(index).text.getCount())
-				simpleException::show("Button text too large for the button boundary:  brogueButtonMenu.h");
-
-			this->addView((brogueView*)new brogueButton(buttons.get(index), sceneBoundary, boundary));
+			// Button View
+			this->addView((brogueView*)new brogueButton(buttons.get(index), sceneBoundary, buttons.get(index).boundary));
 		}
 
 		update(default_value::value<brogueMouseState>(), 0);
 	}
 	brogueButtonMenu::~brogueButtonMenu()
 	{
+		delete _menuData;
 	}
 	void brogueButtonMenu::update(const brogueMouseState& mouseState, int millisecondsLapsed)
 	{
 		brogueButtonMenu* that = this;
+		brogueUIData menuData = *_menuData;
 
-		// Border
-		this->getBoundary().iterate([&that] (short column, short row)
+		// Background
+		this->getBoundary().iterate([&that, &menuData] (short column, short row)
 		{
-			that->get(column, row)->backColor = color(0.1, 0.1, 0.1, 0.8);
+			that->get(column, row)->backColor = menuData.calculateGradient(column, row);
 
 			return iterationCallback::iterate;
 		});
 
-		// brogueButton -> update()
+		// Header + Buttons
 		this->iterateViews([&mouseState, &millisecondsLapsed] (brogueView* button)
 		{
 			button->update(mouseState, millisecondsLapsed);

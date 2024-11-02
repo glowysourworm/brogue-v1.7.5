@@ -2,7 +2,7 @@
 
 #include "brogueView.h"
 #include "gridRect.h"
-#include "button.h"
+#include "brogueUIData.h"
 #include "brogueMouseState.h"
 #include "simpleException.h"
 
@@ -15,7 +15,7 @@ namespace brogueHd::frontend::ui
 	{
 	public:
 
-		brogueButton(const buttonData& data, gridRect sceneBoundary, gridRect viewBoundary);
+		brogueButton(const brogueUIData& data, gridRect sceneBoundary, gridRect viewBoundary);
 		~brogueButton();
 
 		virtual void update(const brogueMouseState& mouseState, int millisecondsLapsed) override;
@@ -23,15 +23,15 @@ namespace brogueHd::frontend::ui
 
 	private:
 
-		buttonData* _buttonData;
+		brogueUIData* _buttonData;
 	};
 
-	brogueButton::brogueButton(const buttonData& data, gridRect sceneBoundary, gridRect viewBoundary) : brogueView(sceneBoundary, viewBoundary)
+	brogueButton::brogueButton(const brogueUIData& data, gridRect sceneBoundary, gridRect viewBoundary) : brogueView(sceneBoundary, viewBoundary)
 	{
 		if (data.text.getCount() > viewBoundary.width)
 			simpleException::show("Length of text is greater than button width:  brogueButton.h");
 
-		_buttonData = new buttonData(data);
+		_buttonData = new brogueUIData(data);
 
 		// Initialize the view
 		//
@@ -48,7 +48,7 @@ namespace brogueHd::frontend::ui
 	void brogueButton::update(const brogueMouseState& mouseState, int millisecondsLapsed)
 	{
 		gridRect bounds = this->getBoundary();
-		buttonData data = *_buttonData;
+		brogueUIData data = *_buttonData;
 		brogueButton* that = this;
 
 		// Check mouse hover
@@ -56,52 +56,21 @@ namespace brogueHd::frontend::ui
 
 		this->getBoundary().iterate([&that, &data, &bounds, &mouseState, &mouseHover] (short column, short row)
 		{
-			short menuColumn = column - bounds.column;
-			short menuRow = row - bounds.row;
-			int textIndex = column - bounds.column;
-
-			int textBeginIndex = 0;
-
-			switch (data.textAlignment)
-			{
-			case brogueTextAlignment::Left:
-				break;
-			case brogueTextAlignment::Right:
-				textBeginIndex = bounds.right() - data.text.getCount() - bounds.column;
-				break;
-			case brogueTextAlignment::Center:
-				textBeginIndex = ((bounds.right() - data.text.getCount() - bounds.column) / 2) + 1;
-				break;
-			default:
-				simpleException::show("Unhandled brogueTextAlignment:  brogueButtonMenu.h");
-			}
-
-			color nextColor;
+			color nextColor = data.calculateGradient(column, row);
 			color highlightColor(0.7, 0.7, 0.7, 0.7);
-
-			// Create button gradient
-			//
-			if ((column - bounds.column) < (bounds.width / 2.0f))
-				nextColor = color::interpolate(data.background1, data.background2, (bounds.width - (2 * (menuColumn))) / (float)bounds.width);
-			else
-				nextColor = color::interpolate(data.background1, data.background2, (2 * ((menuColumn)-(bounds.width / 2.0f))) / (float)bounds.width);
 
 			nextColor.alpha = 1.0;
 
 			if (mouseHover)
 				nextColor.interpolate(highlightColor, 0.5);
 
+			if (data.getIsHotkey(column, row))
+				that->get(column, row)->foreColor = colors::yellow();
+			else
+				that->get(column, row)->foreColor = data.getTextColor(column, row);
+
+			that->get(column, row)->character = data.getText(column, row);
 			that->get(column, row)->backColor = nextColor;
-
-			if (textIndex < data.text.getCount())
-			{
-				if (data.hotkeyIndex == textIndex)
-					that->get(column + textBeginIndex, row)->foreColor = colors::yellow();
-				else
-					that->get(column + textBeginIndex, row)->foreColor = data.text.getColor(textIndex);
-
-				that->get(column + textBeginIndex, row)->character = data.text.getChar(textIndex);
-			}
 
 			return iterationCallback::iterate;
 		});

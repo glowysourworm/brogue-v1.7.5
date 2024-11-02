@@ -425,9 +425,6 @@
     <ClInclude Include="brogueView.h">
       <Filter>Header Files\frontend\ui</Filter>
     </ClInclude>
-    <ClInclude Include="button.h">
-      <Filter>Header Files\frontend\ui</Filter>
-    </ClInclude>
     <ClInclude Include="fileOperations.h">
       <Filter>Header Files\component</Filter>
     </ClInclude>
@@ -619,6 +616,15 @@
     </ClInclude>
     <ClInclude Include="brogueProgramContainer.h">
       <Filter>Header Files\frontend\opengl\program</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueText.h">
+      <Filter>Header Files\frontend\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueUIData.h">
+      <Filter>Header Files\frontend\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueUIBuilder.h">
+      <Filter>Header Files\frontend\ui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -7,6 +7,7 @@
 #include "randomGenerator.h"
 #include "brogueFlameMenu.h"
 #include "brogueFlameMenuProgram.h"
+#include "brogueUIBuilder.h"
 #include <functional>
 #include <stdlib.h>
 
@@ -90,21 +91,8 @@ namespace brogueHd::backend::controller
 			// Shuts down thread, deletes our program memory
 			_openglRenderer->terminateProgram();
 			
-			simpleList<buttonData> buttons;
-
-			// Pulled from Brogue v1.7.5
-			color gradient1(0.22, 0.14, 0.29, 0.5);
-			color gradient2(0.11, 0.06, 0.15, 0.5);
-			
-
-			buttons.add(buttonData("New Game", gradient1, gradient2, brogueTextAlignment::Center, 0));
-			buttons.add(buttonData("Open Game", gradient1, gradient2, brogueTextAlignment::Center, 0));
-			buttons.add(buttonData("View Recording", gradient1, gradient2, brogueTextAlignment::Center, 0));
-			buttons.add(buttonData("High Scores", gradient1, gradient2, brogueTextAlignment::Center, 0));
-			buttons.add(buttonData("Quit", gradient1, gradient2, brogueTextAlignment::Center, 0));
-
 			brogueFlameMenu* titleView = new brogueFlameMenu(_randomGenerator, 100);
-			brogueButtonMenu* mainMenu = new brogueButtonMenu(buttons, 1, titleView->getSceneBoundary(), gridRect(COLS - 26, ROWS - 12, 24, 11));
+			brogueButtonMenu* mainMenu = brogueUIBuilder::createMainMenuSelector();
 
 			// Main Menu:  brogueCellQuad, full scene (its view coordinates)
 			brogueDataStream<brogueButtonMenu>* mainMenuStream =

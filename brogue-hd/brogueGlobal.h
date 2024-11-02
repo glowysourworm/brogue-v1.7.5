@@ -5,6 +5,10 @@
 #include <string.h>
 #include <stdint.h>
 
+#include "gridRect.h"
+
+using namespace brogueHd::component;
+
 namespace brogueHd
 {
 	/*	

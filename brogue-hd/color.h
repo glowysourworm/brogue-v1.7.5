@@ -10,6 +10,7 @@ namespace brogueHd::backend::model::game
 {
 	struct color : hashable
 	{
+
 	public:
 
 		// base RGB components: (0, 1) -> (0, 255)

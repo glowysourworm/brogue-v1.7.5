@@ -51,7 +51,6 @@ namespace brogueHd::frontend::opengl
 
 	private:
 
-		//brogueViewProgram<brogueButtonMenu>* _mainMenuProgram;
 		brogueViewProgram<brogueFlameMenu>* _heatSourceProgram;
 		brogueViewProgram<brogueFlameMenu>* _heatDiffuseProgram;
 		brogueViewProgram<brogueFlameMenu>* _titleMaskProgram;
@@ -73,13 +72,6 @@ namespace brogueHd::frontend::opengl
 	{
 		_diffuseCounter = new simplePeriodCounter(10);
 		_updateCounter = new simplePeriodCounter(30);
-
-		//brogueDataStream<brogueButtonMenu>* mainMenuStream = 
-		//	new brogueDataStream<brogueButtonMenu>(resourceController, 
-		//											glyphMap, 
-		//											openglDataStreamType::brogueCellQuad, 
-		//											openglBrogueCellOutputSelector::Display, 
-		//											false);
 
 		heatSourceDataStream* heatSourceStream =
 			new heatSourceDataStream(resourceController,
@@ -108,12 +100,6 @@ namespace brogueHd::frontend::opengl
 				openglBrogueCellOutputSelector::NoDisplay,
 				true);
 
-
-		//// Main Menu:  brogueCellQuad, full scene (its view coordinates)
-		//_mainMenuProgram = new brogueViewProgram<brogueButtonMenu>(mainMenu, resourceController, glyphMap,
-		//															 shaderResource::brogueCellDisplayVert, 
-		//															 shaderResource::brogueCellDisplayFrag, 
-		//															 mainMenuStream);
 
 		// Heat Sources:  brogueCellQuad, full scene (its view coordinates), using inclusion predicate mask
 		_heatSourceProgram = new brogueViewProgram<brogueFlameMenu>(titleView, resourceController, glyphMap,
@@ -170,7 +156,6 @@ namespace brogueHd::frontend::opengl
 		delete _heatDiffuseProgram;
 		delete _titleMaskProgram;
 		delete _frameProgram;
-		//delete _mainMenuProgram;
 		delete _frameTexture0;
 		delete _fontTexture;
 		delete _frameBuffer;
@@ -240,11 +225,6 @@ namespace brogueHd::frontend::opengl
 		//Create Frame buffer:  Uses scene program to render to the frame buffer attached texture
 		_frameBuffer->glCreate(-1);			// Frame buffers don't automatically associate w/ a program
 
-		// Main Menu Uniforms
-		//_mainMenuProgram->getProgram()->bind();
-		//_mainMenuProgram->getProgram()->bindUniform1i("frame0Texture", 0);     // GL_TEXTURE0 "texture unit" Required! USE INDEXES!! (During the run)
-		//_mainMenuProgram->getProgram()->bindUniform1i("fontTexture", 1);		 // GL_TEXTURE1 "texture unit" Required! USE INDEXES!! (During the run)
-
 		// Heat Source Uniforms
 		_heatSourceProgram->getProgram()->bind();
 		_heatSourceProgram->getProgram()->bindUniform1i("frame0Texture", 0);       // GL_TEXTURE0 "texture unit" Required! USE INDEXES!! (During the run)
@@ -278,7 +258,6 @@ namespace brogueHd::frontend::opengl
 	bool brogueFlameMenuProgram::hasErrors() const
 	{
 		return _heatSourceProgram->hasErrors() ||
-				//_mainMenuProgram->hasErrors() ||
 				_heatDiffuseProgram->hasErrors() ||
 				_titleMaskProgram->hasErrors() ||
 				_frameProgram->hasErrors();
@@ -286,7 +265,6 @@ namespace brogueHd::frontend::opengl
 	void brogueFlameMenuProgram::outputStatus() const
 	{
 		_heatSourceProgram->outputStatus();
-		//_mainMenuProgram->outputStatus();
 		_heatDiffuseProgram->outputStatus();
 		_titleMaskProgram->outputStatus();
 		_frameProgram->outputStatus();
@@ -294,7 +272,6 @@ namespace brogueHd::frontend::opengl
 	bool brogueFlameMenuProgram::isCompiled() const
 	{
 		return _heatSourceProgram->isCompiled() &&
-			   //_mainMenuProgram->isCompiled() &&
 			   _heatDiffuseProgram->isCompiled() &&
 			   _titleMaskProgram->isCompiled() &&
 			   _frameProgram->isCompiled();
@@ -308,9 +285,5 @@ namespace brogueHd::frontend::opengl
 		// Check programs
 		if (_heatSourceProgram->shouldUpdate(mouseState, millisecondsLapsed))
 			_heatSourceProgram->update(mouseState, millisecondsLapsed);
-
-		//// Main Menu (mouse hover)
-		//if (_mainMenuProgram->shouldUpdate(mouseState, millisecondsLapsed))
-		//	_mainMenuProgram->update(mouseState, millisecondsLapsed);
 	}
 }
