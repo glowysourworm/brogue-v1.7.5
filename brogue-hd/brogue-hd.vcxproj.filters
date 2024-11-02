@@ -617,6 +617,9 @@
     <ClInclude Include="brogueMouseState.h">
       <Filter>Header Files\frontend\opengl\program</Filter>
     </ClInclude>
+    <ClInclude Include="brogueProgramContainer.h">
+      <Filter>Header Files\frontend\opengl\program</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\resources\model\armor.csv">

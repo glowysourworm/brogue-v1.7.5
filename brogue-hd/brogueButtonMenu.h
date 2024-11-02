@@ -3,7 +3,7 @@
 #include "brogueView.h"
 #include "brogueViewContainer.h"
 #include "brogueButton.h"
-#include "simpleMouseState.h"
+#include "brogueMouseState.h"
 #include "gridRect.h"
 #include "button.h"
 #include "simpleHash.h"

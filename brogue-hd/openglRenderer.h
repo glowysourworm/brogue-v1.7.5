@@ -20,6 +20,7 @@
 #include "simpleException.h"
 #include "simpleBoundingBox.h"
 #include "gridRect.h"
+#include "brogueProgramContainer.h"
 
 using namespace brogueHd::simple;
 using namespace brogueHd::component;
@@ -52,7 +53,7 @@ namespace brogueHd::frontend::opengl
 		/// <summary>
 		/// Sets the program pointer for use
 		/// </summary>
-		void setProgram(brogueProgram* program);
+		void setProgram(brogueProgramContainer* program);
 
 		/// <summary>
 		/// Starts program rendering thread, and opens window using GLFW
@@ -106,7 +107,7 @@ namespace brogueHd::frontend::opengl
 
 	private:
 
-		brogueProgram* _program;
+		brogueProgramContainer* _program;
 
 		bool _initializedGL;
 
@@ -267,7 +268,7 @@ namespace brogueHd::frontend::opengl
 			simpleException::show("Initialization of GLFW failed! Cannot render graphics!");
 		}
 	}
-	void openglRenderer::setProgram(brogueProgram* program)
+	void openglRenderer::setProgram(brogueProgramContainer* program)
 	{
 		if (_program != nullptr)
 			simpleException::show("Trying to set a new program to the opengl renderer before terminating the old program.");
@@ -294,10 +295,6 @@ namespace brogueHd::frontend::opengl
 
 		_thread->join();
 		_thread = nullptr;
-
-		delete _program;
-
-		_program = nullptr;
 	}
 	void openglRenderer::destroyGL()
 	{
@@ -398,7 +395,7 @@ namespace brogueHd::frontend::opengl
 
 		if (_program->hasErrors())
 		{
-			_program->outputStatus();
+			_program->showErrors();
 
 			// THREAD:  UNLOCK TO RETURN
 			_threadLock->unlock();
@@ -443,7 +440,7 @@ namespace brogueHd::frontend::opengl
 
 			_program->update(mouseState, intervalMilliseconds);							// Updates program buffers from the UI view
 			_program->run(intervalMilliseconds);										// Run() -> Draws the buffers
-			_program->outputStatus();													// Log Errors to simpleLogger -> std::cout
+			_program->showErrors();														// Log Errors to simpleLogger -> std::cout
 
 			GLenum error = glGetError();
 

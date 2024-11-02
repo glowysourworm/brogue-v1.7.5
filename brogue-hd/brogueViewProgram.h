@@ -26,7 +26,8 @@ namespace brogueHd::frontend::opengl
 						  brogueGlyphMap* glyphMap,
 						  shaderResource vertexShader,
 						  shaderResource fragmentShader,
-						  brogueDataStream<T>* dataStream)
+						  brogueDataStream<T>* dataStream,
+						  bool useAlphaBlending)
 		{
 			_view = view;
 			_vertexShader = resourceController->getShader(vertexShader);
@@ -34,6 +35,7 @@ namespace brogueHd::frontend::opengl
 			_programBuilder = new brogueProgramBuilder(resourceController, glyphMap);
 			_program = nullptr;
 			_dataStream = dataStream;
+			_useAlphaBlending = useAlphaBlending;
 		}
 		~brogueViewProgram()
 		{
@@ -79,6 +81,7 @@ namespace brogueHd::frontend::opengl
 		shaderData* _vertexShader;
 		shaderData* _fragmentShader;
 		brogueDataStream<T>* _dataStream;
+		bool _useAlphaBlending;
 	};
 
 	template<isBrogueView T>
@@ -125,8 +128,17 @@ namespace brogueHd::frontend::opengl
 	template<isBrogueView T>
 	void brogueViewProgram<T>::run(int millisecondsElapsed)
 	{
+		if (_useAlphaBlending)
+		{
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		}
+
 		_program->bind();
 		_program->draw();
+
+		if (_useAlphaBlending)
+			glDisable(GL_BLEND);
 	}
 
 	template<isBrogueView T>

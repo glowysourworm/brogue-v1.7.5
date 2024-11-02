@@ -5,6 +5,7 @@
 #include "brogueMouseState.h"
 
 using namespace brogueHd::simple;
+using namespace brogueHd::frontend::opengl;
 
 namespace brogueHd::frontend::ui
 {

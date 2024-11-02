@@ -185,6 +185,7 @@
     <ClInclude Include="brogueCellQuad.h" />
     <ClInclude Include="brogueDataStream.h" />
     <ClInclude Include="brogueMouseState.h" />
+    <ClInclude Include="brogueProgramContainer.h" />
     <ClInclude Include="brogueViewProgram.h" />
     <ClInclude Include="brogueColorMap.h" />
     <ClInclude Include="brogueColorQuad.h" />

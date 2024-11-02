@@ -3,7 +3,7 @@
 #include "brogueView.h"
 #include "gridRect.h"
 #include "button.h"
-#include "simpleMouseState.h"
+#include "brogueMouseState.h"
 #include "simpleException.h"
 
 using namespace brogueHd::component;

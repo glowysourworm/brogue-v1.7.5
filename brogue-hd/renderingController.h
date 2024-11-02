@@ -31,8 +31,7 @@ namespace brogueHd::backend::controller
 
 		BrogueGameMode _mode;
 
-		brogueProgram* _currentProgram;
-		simpleList<brogueView*>* _currentViews;
+		brogueProgramContainer* _container;
 
 		randomGenerator* _randomGenerator;
 		resourceController* _resourceController;
@@ -48,34 +47,33 @@ namespace brogueHd::backend::controller
 		_randomGenerator = randomGenerator;
 		_mode = BrogueGameMode::Menu;
 
-		_currentViews = new simpleList<brogueView*>();
-		_currentProgram = nullptr;
+		_container = new brogueProgramContainer();
 	}
 	renderingController::~renderingController()
 	{
 		delete _openglRenderer;
 		delete _glyphMap;
 
-		for (int index = 0; index < _currentViews->count(); index++)
+		for (int index = 0; index < _container->getUIProgramCount(); index++)
 		{
-			delete _currentViews->get(index);
+			delete _container->getUIProgram(index);
 		}
 
-		delete _currentViews;
-		delete _currentProgram;
+		delete _container->getBackgroundProgram();
+		delete _container;
 	}
 
 	void renderingController::setViewMode(BrogueGameMode mode)
 	{
 		_mode = mode;
 
-		for (int index = 0; index < _currentViews->count(); index++)
+		for (int index = 0; index < _container->getUIProgramCount(); index++)
 		{
-			delete _currentViews->get(index);
+			delete _container->getUIProgram(index);
 		}
 
-		if (_currentProgram != nullptr)
-			delete _currentProgram;
+		if (_container->getBackgroundProgram() != nullptr)
+			delete _container->getBackgroundProgram();
 
 		if (!_openglRenderer->isInitializedGL())
 			_openglRenderer->initializeOpenGL();
@@ -108,12 +106,25 @@ namespace brogueHd::backend::controller
 			brogueFlameMenu* titleView = new brogueFlameMenu(_randomGenerator, 100);
 			brogueButtonMenu* mainMenu = new brogueButtonMenu(buttons, 1, titleView->getSceneBoundary(), gridRect(COLS - 26, ROWS - 12, 24, 11));
 
-			_currentProgram = new brogueFlameMenuProgram(titleView, mainMenu, _resourceController, _glyphMap);
+			// Main Menu:  brogueCellQuad, full scene (its view coordinates)
+			brogueDataStream<brogueButtonMenu>* mainMenuStream =
+				new brogueDataStream<brogueButtonMenu>(_resourceController,
+					_glyphMap,
+					openglDataStreamType::brogueCellQuad,
+					openglBrogueCellOutputSelector::Display,
+					false);
+			
+			brogueViewProgram<brogueButtonMenu>* mainMenuProgram = 
+				new brogueViewProgram<brogueButtonMenu>(mainMenu, _resourceController, _glyphMap,
+														shaderResource::brogueCellDisplayVert,
+														shaderResource::brogueCellDisplayFrag,
+														mainMenuStream,
+														true);
 
-			_currentViews->add(titleView);
-			_currentViews->add(mainMenu);
+			_container->setBackground(new brogueFlameMenuProgram(titleView, mainMenu, _resourceController, _glyphMap));
+			_container->addUIProgram(mainMenuProgram);
 
-			_openglRenderer->setProgram(_currentProgram);
+			_openglRenderer->setProgram(_container);
 			_openglRenderer->startProgram();
 		}
 		break;
