@@ -83,6 +83,11 @@ namespace brogueHd::backend::controller
 		{
 			return _gameDirectory;
 		}
+
+		simpleString* getPlaybackDirectory() const
+		{
+			return _playbackDirectory;
+		}
 	
 	private:
 
@@ -90,6 +95,7 @@ namespace brogueHd::backend::controller
 		simpleHash<int, simpleBitmap*>* _fontGlyphs;
 
 		simpleString* _gameDirectory;
+		simpleString* _playbackDirectory;
 
 	};
 
@@ -97,12 +103,15 @@ namespace brogueHd::backend::controller
 	{
 		_shaderCache = new simpleHash<shaderResource, shaderData*>();
 		_fontGlyphs = new simpleHash<int, simpleBitmap*>();
+		_gameDirectory = nullptr;
+		_playbackDirectory = nullptr;
 	}
 	resourceController::~resourceController()
 	{
 		delete _shaderCache;
 		delete _fontGlyphs;
 		delete _gameDirectory;
+		delete _playbackDirectory;
 	}
 
 	bool resourceController::initialize(const char* resourceConfigFile)
@@ -163,6 +172,7 @@ namespace brogueHd::backend::controller
 			}
 
 			_gameDirectory = new simpleString(std::string(jsonConfig[brogueHd::ConfigSavedGameDirectory]).c_str());
+			_playbackDirectory = new simpleString(std::string(jsonConfig[brogueHd::ConfigPlaybackDirectory]).c_str());
 
 			return true;
 		}

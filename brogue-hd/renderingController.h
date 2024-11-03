@@ -95,10 +95,12 @@ namespace brogueHd::backend::controller
 			_openglRenderer->terminateProgram();
 			
 			simpleDirectoryEntry gameFiles = simpleFileIO::readDirectory(_resourceController->getGamesDirectory()->c_str(), ".broguesave");
+			simpleDirectoryEntry recordingFiles = simpleFileIO::readDirectory(_resourceController->getPlaybackDirectory()->c_str(), ".broguerec");
 
 			brogueFlameMenu* titleView = new brogueFlameMenu(_randomGenerator, 100);
-			brogueButtonMenu* mainMenu = brogueUIBuilder::createMainMenuSelector();
-			brogueButtonMenu* openMenu = brogueUIBuilder::createOpenGameSelector(gameFiles);
+			brogueButtonMenu* mainMenu = brogueUIBuilder::createMainMenuButtons();
+			brogueButtonMenu* openMenu = brogueUIBuilder::createMainMenuSelector(gameFiles);
+			brogueButtonMenu* playbackMenu = brogueUIBuilder::createMainMenuSelector(recordingFiles);
 
 			// Main Menu:  brogueCellQuad, full scene (its view coordinates)
 			brogueDataStream<brogueButtonMenu>* mainMenuStream =
@@ -110,6 +112,14 @@ namespace brogueHd::backend::controller
 
 			// Open Menu:  brogueCellQuad, full scene (its view coordinates)
 			brogueDataStream<brogueButtonMenu>* openMenuStream =
+				new brogueDataStream<brogueButtonMenu>(_resourceController,
+					_glyphMap,
+					openglDataStreamType::brogueCellQuad,
+					openglBrogueCellOutputSelector::Display,
+					false);
+
+			// Playback Menu:  brogueCellQuad, full scene (its view coordinates)
+			brogueDataStream<brogueButtonMenu>* playbackMenuStream =
 				new brogueDataStream<brogueButtonMenu>(_resourceController,
 					_glyphMap,
 					openglDataStreamType::brogueCellQuad,
@@ -130,9 +140,17 @@ namespace brogueHd::backend::controller
 					openMenuStream,
 					true);
 
+			brogueViewProgram<brogueButtonMenu>* playbackMenuProgram =
+				new brogueViewProgram<brogueButtonMenu>(playbackMenu, _resourceController, _glyphMap,
+					shaderResource::brogueCellDisplayVert,
+					shaderResource::brogueCellDisplayFrag,
+					playbackMenuStream,
+					true);
+
 			_container->setBackground(new brogueFlameMenuProgram(titleView, mainMenu, _resourceController, _glyphMap));
-			_container->addUIProgram(mainMenuProgram, true);
+			_container->addUIProgram(mainMenuProgram, false);
 			_container->addUIProgram(openMenuProgram, false);
+			_container->addUIProgram(playbackMenuProgram, true);
 
 			_openglRenderer->setProgram(_container);
 			_openglRenderer->startProgram();

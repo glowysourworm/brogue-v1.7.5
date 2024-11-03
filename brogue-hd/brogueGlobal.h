@@ -71,6 +71,7 @@ namespace brogueHd
 	static const char* ConfigMixFrameTexturesFragmentShader = "mixFrameTexturesFragmentShader";
 
 	static const char* ConfigSavedGameDirectory = "savedGameDirectory";
+	static const char* ConfigPlaybackDirectory = "playbackDirectory";
 	static const char* ConfigFontGlyphDirectory = "fontGlyphDirectory";
 
 	static const char* FontGlyphFileNameFormat = "font-{}.bmp";
