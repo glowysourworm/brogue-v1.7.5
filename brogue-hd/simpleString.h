@@ -159,10 +159,16 @@ namespace brogueHd::simple
 
 	void simpleString::operator=(const simpleString& copy)
 	{
+		// Pin down array value
+		_array = new simpleArray<char>(0);
+
 		this->copyImpl(copy);
 	}
 	void simpleString::operator=(const char* copy)
 	{
+		// Pin down array value
+		_array = new simpleArray<char>(0);
+
 		this->copyImpl(copy);
 	}
 

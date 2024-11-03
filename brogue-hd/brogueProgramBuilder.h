@@ -2,7 +2,6 @@
 
 #include "brogueView.h"
 #include "gridDefinitions.h"
-#include "simpleArrayExtension.h"
 #include "brogueCellDisplay.h"
 #include "brogueCellQuad.h"
 #include "brogueImageQuad.h"

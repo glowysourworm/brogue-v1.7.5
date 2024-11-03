@@ -12,19 +12,19 @@ namespace brogueHd::simple
 	/// Definition of simple predicate for any key-value map
 	/// </summary>
 	template<isHashable K, isHashable V>
-	using simpleHashPredicate = std::function<bool(K key, V value)>;
+	using simpleHashPredicate = std::function<bool(const K& key, const V& value)>;
 
 	/// <summary>
 	/// Definition of simple predicate for any key-value map
 	/// </summary>
 	template<isHashable K, isHashable V>
-	using simpleHashCallback = std::function<iterationCallback(K key, V value)>;
+	using simpleHashCallback = std::function<iterationCallback(const K &key, const V& value)>;
 
 	/// <summary>
 	/// Definition of selector for the value type
 	/// </summary>
 	template<isHashable K, isHashable V, typename VResult>
-	using simpleHashSelector = std::function<VResult(V value)>;
+	using simpleHashSelector = std::function<VResult(const V& value)>;
 
 	template<isHashable K, isHashable V>
 	struct simplePair : hashable
@@ -33,7 +33,7 @@ namespace brogueHd::simple
 		V value;
 
 		simplePair() {}
-		simplePair(K akey, V avalue)
+		simplePair(const K& akey, const V& avalue)
 		{
 			key = akey;
 			value = avalue;
@@ -60,25 +60,25 @@ namespace brogueHd::simple
 		simpleHash();
 		~simpleHash();
 
-		V operator[](K key) const;
+		V& operator[](const K& key) const;
 
-		V get(K key) const;
-		void add(K key, V value);
-		void set(K key, V value);
+		V& get(const K& key) const;
+		void add(const K& key, const V& value);
+		void set(const K& key, const V& value);
 
 		simplePair<K, V>* getAt(int index);
 
-		bool contains(K key) const;
+		bool contains(const K& key) const;
 		int count() const;
 
-		bool remove(K key);
+		bool remove(const K& key);
 		void clear();
 
 		void iterate(simpleHashCallback<K, V> callback) const;
 
 	private:
 
-		size_t calculateHashCode(K key) const;
+		size_t calculateHashCode(const K& key) const;
 		size_t calculateBucketIndex(int hashCode) const;
 		void rehash(size_t newSize);
 
@@ -86,8 +86,8 @@ namespace brogueHd::simple
 
 		bool any(simpleHashPredicate<K, V> predicate);
 		void forEach(simpleHashCallback<K, V> callback);
-		K firstKey(simpleHashPredicate<K, V> predicate);
-		K firstOrDefaultKey(simpleHashPredicate<K, V> predicate);
+		K& firstKey(simpleHashPredicate<K, V> predicate);
+		K& firstOrDefaultKey(simpleHashPredicate<K, V> predicate);
 		simpleList<simplePair<K, V>> removeWhere(simpleHashPredicate<K, V> predicate);
 
 		template<typename VResult>
@@ -157,7 +157,7 @@ namespace brogueHd::simple
 	}
 
 	template<isHashable K, isHashable V>
-	V simpleHash<K, V>::get(K key) const
+	V& simpleHash<K, V>::get(const K& key) const
 	{
 		size_t hashCode = this->calculateHashCode(key);
 		size_t bucketIndex = this->calculateBucketIndex(hashCode);
@@ -179,13 +179,13 @@ namespace brogueHd::simple
 	}
 
 	template<isHashable K, isHashable V>
-	V simpleHash<K, V>::operator[](K key) const
+	V& simpleHash<K, V>::operator[](const K& key) const
 	{
 		return this->get(key);
 	}
 
 	template<isHashable K, isHashable V>
-	void simpleHash<K, V>::add(K key, V value)
+	void simpleHash<K, V>::add(const K& key, const V& value)
 	{
 		if (this->contains(key))
 			simpleException::showCstr("Trying to add duplicate value to simpleHash table. Use set(...)");
@@ -222,7 +222,7 @@ namespace brogueHd::simple
 	}
 
 	template<isHashable K, isHashable V>
-	void simpleHash<K, V>::set(K key, V value)
+	void simpleHash<K, V>::set(const K& key, const V& value)
 	{
 		if (!this->contains(key))
 			simpleException::showCstr("Trying to set value for a key-value pair that doesn't exist. Use add(...)");
@@ -247,7 +247,7 @@ namespace brogueHd::simple
 	}
 
 	template<isHashable K, isHashable V>
-	bool simpleHash<K, V>::remove(K key)
+	bool simpleHash<K, V>::remove(const K& key)
 	{
 		size_t hashCode = this->calculateHashCode(key);
 		size_t bucketIndex = this->calculateBucketIndex(hashCode);
@@ -291,7 +291,7 @@ namespace brogueHd::simple
 	}
 
 	template<isHashable K, isHashable V>
-	size_t simpleHash<K, V>::calculateHashCode(K key) const
+	size_t simpleHash<K, V>::calculateHashCode(const K& key) const
 	{
 		return hashGenerator::generateHash(key);
 	}
@@ -303,7 +303,7 @@ namespace brogueHd::simple
 	}
 
 	template<isHashable K, isHashable V>
-	bool simpleHash<K, V>::contains(K key) const
+	bool simpleHash<K, V>::contains(const K& key) const
 	{
 		size_t hashCode = this->calculateHashCode(key);
 		size_t bucketIndex = this->calculateBucketIndex(hashCode);
@@ -419,7 +419,7 @@ namespace brogueHd::simple
 	}
 
 	template<isHashable K, isHashable V>
-	K simpleHash<K, V>::firstKey(simpleHashPredicate<K, V> predicate)
+	K& simpleHash<K, V>::firstKey(simpleHashPredicate<K, V> predicate)
 	{
 		K result = NULL;
 
@@ -445,7 +445,7 @@ namespace brogueHd::simple
 	}
 
 	template<isHashable K, isHashable V>
-	K simpleHash<K, V>::firstOrDefaultKey(simpleHashPredicate<K, V> predicate)
+	K& simpleHash<K, V>::firstOrDefaultKey(simpleHashPredicate<K, V> predicate)
 	{
 		K result = default_value::value<K>();
 

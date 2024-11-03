@@ -93,7 +93,7 @@ namespace brogueHd::frontend::ui
 			return new brogueButtonMenu(menuData, buttons, headerData, false, sceneBounds, menuBounds);
 		}
 
-		static brogueButtonMenu* createOpenGameSelector(const simpleList<simpleFileEntry>& gameFiles)
+		static brogueButtonMenu* createOpenGameSelector(const simpleDirectoryEntry& gameFiles)
 		{
 			gridRect sceneBounds = getBrogueSceneBoundary();
 			gridRect menuBounds = getOpenMenuSelectorBoundary();
@@ -116,12 +116,14 @@ namespace brogueHd::frontend::ui
 
 			simpleList<brogueUIData*> buttons;
 			int listSpacer = 1;
+
+			simpleList<simpleFileEntry*> gameFilesSorted = gameFiles.sort();
 			
-			for (int index = 0; index < gameFiles.count(); index++)
+			for (int index = 0; index < gameFilesSorted.count(); index++)
 			{
 				gridRect boundary(paddedBounds.column, paddedBounds.row + index + listSpacer, paddedBounds.width,1);
 
-				simpleString fileName = gameFiles.get(index).fileNameWithoutExtension;
+				simpleString fileName = *(gameFilesSorted.get(index)->getFileNameWithoutExtension());
 				simpleString fileNameTrimmed;
 
 				if (fileName.count() > ((paddedBounds.width / 2.0f) - 3))
@@ -169,9 +171,9 @@ namespace brogueHd::frontend::ui
 					// Date -> break;
 					else
 					{
-						int space = paddedBounds.width - textIndex - gameFiles.get(index).writeTimeShort.count() - 1;
+						int space = paddedBounds.width - textIndex - gameFilesSorted.get(index)->getWriteTimeShort()->count() - 1;
 						result.appendPadding(' ', space);
-						result.append(gameFiles.get(index).writeTimeShort);
+						result.append(*(gameFilesSorted.get(index)->getWriteTimeShort()));
 						break;
 					}
 				}

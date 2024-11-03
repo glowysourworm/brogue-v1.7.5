@@ -2,7 +2,6 @@
 
 #include "brogueTestPackage.h"
 #include "simpleArray.h"
-#include "simpleArrayExtension.h"
 #include "simpleList.h"
 #include "simpleHash.h"
 #include "simpleBST.h"

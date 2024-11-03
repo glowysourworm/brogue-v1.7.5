@@ -3,11 +3,13 @@
 #include "simpleBuffer.h"
 #include "simpleString.h"
 #include "simpleException.h"
+#include "simpleFileEntry.h"
+#include "simpleDirectoryEntry.h"
+#include "simpleList.h"
 #include <iostream>
 #include <fstream>
 #include <strstream>
 #include <filesystem>
-#include "simpleFileEntry.h"
 #include <filesystem>
 #include <regex>
 
@@ -131,13 +133,13 @@ namespace brogueHd::simple
 				simpleException::show("Error trying to write file:  {}:  {}", filename.c_str(), ex.what());
 			}
 		}
-		static simpleList<simpleFileEntry> readDirectory(const char* path)
+		static simpleDirectoryEntry readDirectory(const char* path)
 		{
 			return readDirectory(path, "*.*");
 		}
-		static simpleList<simpleFileEntry> readDirectory(const char* path, const char* search)
+		static simpleDirectoryEntry readDirectory(const char* path, const char* search)
 		{
-			simpleList<simpleFileEntry> result;
+			simpleDirectoryEntry result;
 
 			try
 			{
@@ -162,12 +164,19 @@ namespace brogueHd::simple
 						std::string fileNameWOExt = entry.path().filename().replace_extension().string();
 						std::regex searchRegex(search, strnlen_s(search, 100));
 						
+						if (filePath.size() <= 0 ||
+							fileName.size() <= 0 ||
+							fileNameWOExt.size() <= 0)
+							continue;
+
 						if (std::regex_search(fileName, searchRegex))
 						{
-							result.add(simpleFileEntry(filePath.c_str(), fileName.c_str(), fileNameWOExt.c_str(), writeTime, (size_t)entry.file_size()));
+							result.addFile(filePath.c_str(), fileName.c_str(), fileNameWOExt.c_str(), writeTime, (size_t)entry.file_size());
 						}
 					}
 				}
+
+				return result;
 			}
 			catch (std::exception& ex)
 			{

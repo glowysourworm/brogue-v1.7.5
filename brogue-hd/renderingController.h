@@ -92,7 +92,7 @@ namespace brogueHd::backend::controller
 			// Shuts down thread, deletes our program memory
 			_openglRenderer->terminateProgram();
 			
-			simpleList<simpleFileEntry> gameFiles = simpleFileIO::readDirectory(_resourceController->getGamesDirectory()->c_str(), ".broguesave");
+			simpleDirectoryEntry gameFiles = simpleFileIO::readDirectory(_resourceController->getGamesDirectory()->c_str(), ".broguesave");
 
 			brogueFlameMenu* titleView = new brogueFlameMenu(_randomGenerator, 100);
 			brogueButtonMenu* mainMenu = brogueUIBuilder::createMainMenuSelector();

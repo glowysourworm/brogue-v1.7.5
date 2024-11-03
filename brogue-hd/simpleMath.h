@@ -105,6 +105,19 @@ namespace brogueHd::simple
 		}
 
 		template<isNumber TMath>
+		static TMath floor(TMath x)
+		{
+			if (isFloatLike<TMath>)
+				return floorf(static_cast<float>(x));
+
+			else if (isIntLike<TMath>)
+				return floor(x);
+
+			else
+				simpleException::showCstr("Unknown sqrt type simpleMath.h");
+		}
+
+		template<isNumber TMath>
 		static TMath clamp(TMath x, TMath low, TMath high)
 		{
 			if (x < low)

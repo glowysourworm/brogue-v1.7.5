@@ -213,6 +213,7 @@
     <ClInclude Include="randomRange.h" />
     <ClInclude Include="simpleBoundingBox.h" />
     <ClInclude Include="simpleBuffer.h" />
+    <ClInclude Include="simpleDirectoryEntry.h" />
     <ClInclude Include="simpleExt.h" />
     <ClInclude Include="simpleFileEntry.h" />
     <ClInclude Include="simpleKeyState.h" />
@@ -329,7 +330,6 @@
     <ClInclude Include="renderingController.h" />
     <ClInclude Include="simple.h" />
     <ClInclude Include="simpleArray.h" />
-    <ClInclude Include="simpleArrayExtension.h" />
     <ClInclude Include="simpleBST.h" />
     <ClInclude Include="simpleHash.h" />
     <ClInclude Include="simpleHashTests.h" />

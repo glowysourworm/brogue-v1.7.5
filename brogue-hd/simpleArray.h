@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "simple.h"
 #include "simpleException.h"
@@ -13,26 +13,32 @@ namespace brogueHd::simple
 	/// </summary>
 	/// <param name="value">callback (current) value</param>
 	template<isHashable T>
-	using simpleArrayCallback = std::function<iterationCallback(T item)>;
+	using simpleArrayCallback = std::function<iterationCallback(const T& item)>;
 
 	/// <summary>
 	/// Definition of a simple decision predicate
 	/// </summary>
 	template<isHashable T>
-	using simpleArrayPredicate = std::function<bool(T item)>;
+	using simpleArrayPredicate = std::function<bool(const T& item)>;
 
 	/// <summary>
 	/// Aggregate uses a callback with the current value of iteration. Setting the return 
 	/// value will forward the aggregate. (e.g. aggregate = simpleArrayAggregate(aggregate, currentValue))
 	/// </summary>
 	template<isHashable T, typename TResult>
-	using simpleArrayAggregate = std::function<TResult(TResult, T)>;
+	using simpleArrayAggregate = std::function<TResult(const TResult& aggregator, const T& current)>;
+
+	/// <summary>
+	/// Delegate used to compare two array items
+	/// </summary>
+	template<isHashable T>
+	using simpleArrayComparer = std::function<int(const T& item1, const T& item2)>;
 
 	/// <summary>
 	/// Selector delegate that transforms T->TResult by use of user function
 	/// </summary>
 	template<isHashable T, typename TResult>
-	using simpleArraySelector = std::function<TResult(T)>;
+	using simpleArraySelector = std::function<TResult(const T& item)>;
 
 	template<isHashable T>
 	class simpleArray : public hashableObject
@@ -47,8 +53,8 @@ namespace brogueHd::simple
 
 		int count() const;
 
-		T get(int index) const;
-		void set(int index, T value);
+		T& get(int index) const;
+		void set(int index, const T& value);
 
 		void operator=(const simpleArray<T>& other);
 
@@ -63,14 +69,19 @@ namespace brogueHd::simple
 	public:
 
 		void forEach(simpleArrayCallback<T> callback);
-		bool areAll(T value);
+		bool areAll(const T& value);
 		bool areAllWhere(simpleArrayPredicate<T> predicate);
 
-		bool contains(T item);
+		bool contains(const T& item);
 		bool any(simpleArrayPredicate<T> predicate);
 
 		template<typename TResult>
 		TResult aggregate(TResult& seedValue, simpleArrayAggregate<T, TResult> aggregator);
+
+		template<isHashable TResult>
+		simpleArray<TResult> select(simpleArraySelector<T, TResult> selector);
+
+		simpleArray<T> whereArray(simpleArrayPredicate<T> predicate);
 
 	private:
 
@@ -226,7 +237,7 @@ namespace brogueHd::simple
 	}
 
 	template<isHashable T>
-	T simpleArray<T>::get(int index) const
+	T& simpleArray<T>::get(int index) const
 	{
 		if (index >= _count)
 			simpleException::showCstr("Index is outside the bounds of the array: simpleArray.h");
@@ -235,7 +246,7 @@ namespace brogueHd::simple
 	}
 
 	template<isHashable T>
-	void simpleArray<T>::set(int index, T value)
+	void simpleArray<T>::set(int index, const T& value)
 	{
 		if (index >= _count)
 			simpleException::showCstr("Index is outside the bounds of the array: simpleArray.h");
@@ -327,7 +338,7 @@ namespace brogueHd::simple
 	}
 
 	template<isHashable T>
-	bool simpleArray<T>::areAll(T value)
+	bool simpleArray<T>::areAll(const T& value)
 	{
 		for (int index = 0; index < _count; index++)
 		{
@@ -350,7 +361,7 @@ namespace brogueHd::simple
 	}
 
 	template<isHashable T>
-	bool simpleArray<T>::contains(T item)
+	bool simpleArray<T>::contains(const T& item)
 	{
 		for (int index = 0; index < _count; index++)
 		{
@@ -385,5 +396,45 @@ namespace brogueHd::simple
 		}
 
 		return seedValue;
+	}
+
+	template<isHashable T>
+	simpleArray<T> simpleArray<T>::whereArray(simpleArrayPredicate<T> predicate)
+	{
+		int count = 0;
+
+		// Count first
+		for (int index = 0; index < this->count(); index++)
+		{
+			if (predicate(this->get(index)))
+				count++;
+		}
+
+		// Allocate the new array
+		simpleArray<T> result(count);
+
+		count = 0;
+
+		for (int index = 0; index < this->count(); index++)
+		{
+			if (predicate(this->get(index)))
+				result.set(count++, this->get(index));
+		}
+
+		return result;
+	}
+
+	template<isHashable T>
+	template<isHashable TResult>
+	simpleArray<TResult> simpleArray<T>::select(simpleArraySelector<T, TResult> selector)
+	{
+		simpleArray<TResult> result(this->count());
+
+		for (int index = 0; index < this->count(); index++)
+		{
+			result.set(index, selector(this->get(index)));
+		}
+
+		return result;
 	}
 }

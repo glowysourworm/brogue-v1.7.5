@@ -431,9 +431,6 @@
     <ClInclude Include="simpleArray.h">
       <Filter>Header Files\simple</Filter>
     </ClInclude>
-    <ClInclude Include="simpleArrayExtension.h">
-      <Filter>Header Files\simple</Filter>
-    </ClInclude>
     <ClInclude Include="simpleBST.h">
       <Filter>Header Files\simple</Filter>
     </ClInclude>
@@ -631,6 +628,9 @@
     </ClInclude>
     <ClInclude Include="colorGradient.h">
       <Filter>Header Files\backend\model\game</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleDirectoryEntry.h">
+      <Filter>Header Files\simple</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
