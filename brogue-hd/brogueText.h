@@ -34,9 +34,10 @@ namespace brogueHd::frontend::ui
 		brogueUIData* data = this->getUIData();
 		brogueText* that = this;
 
-		// Check mouse hover
-		bool mouseHover = this->getBoundary().contains(mouseState.getLocation());
+		// Check mouse hover (Render Boundary)
+		bool mouseHover = this->isMouseOver(mouseState);
 
+		// Iterate THIS Boundary:  apply mouse data
 		this->getBoundary().iterate([&that, &data, &bounds, &mouseState, &mouseHover] (short column, short row)
 		{
 			short menuColumn = column - bounds.column;

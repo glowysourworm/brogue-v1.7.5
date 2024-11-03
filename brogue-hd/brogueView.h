@@ -23,6 +23,7 @@ namespace brogueHd::frontend::ui
 		gridRect getSceneBoundary() const;
 		gridRect getBoundary() const;
 		gridRect getPaddedBoundary() const;
+		gridRect getRenderBoundary() const;
 
 		/// <summary>
 		/// (TODO: MOVE THIS) Calculates the view's boundary is UI coordinates. This is not the same as the
@@ -64,15 +65,22 @@ namespace brogueHd::frontend::ui
 		{
 			return false;
 		}
-
-		void setVisiblity(bool isVisible)
+		
+		virtual void incrementRenderOffset(short columnOffset, short rowOffset)
 		{
-			_uiData->setVisiblity(isVisible);
+			gridLocator offset = _uiData->getRenderOffset();
+
+			_uiData->setRenderOffset(offset.column + columnOffset, offset.row + rowOffset);
 		}
 
-		bool getVisibility() const
+		gridLocator getRenderOffset() const
 		{
-			return _uiData->getVisibility();
+			return _uiData->getRenderOffset();
+		}
+
+		bool isMouseOver(const brogueMouseState& mouseState)
+		{
+			return this->getRenderBoundary().contains(mouseState.getLocation());
 		}
 
 	protected:
@@ -125,6 +133,15 @@ namespace brogueHd::frontend::ui
 	gridRect brogueView::getSceneBoundary() const
 	{
 		return _view->getParentBoundary();
+	}
+	gridRect brogueView::getRenderBoundary() const
+	{
+		gridRect boundary = _uiData->getPaddedBoundary();
+		gridLocator offset = _uiData->getRenderOffset();
+
+		boundary.translate(-1 * offset.column, -1 * offset.row);
+
+		return boundary;
 	}
 
 	void brogueView::iterate(gridCallback<brogueCellDisplay*> callback) const

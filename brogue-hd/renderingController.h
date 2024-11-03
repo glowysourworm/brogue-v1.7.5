@@ -131,8 +131,8 @@ namespace brogueHd::backend::controller
 					true);
 
 			_container->setBackground(new brogueFlameMenuProgram(titleView, mainMenu, _resourceController, _glyphMap));
-			_container->addUIProgram(mainMenuProgram, false);
-			_container->addUIProgram(openMenuProgram, true);
+			_container->addUIProgram(mainMenuProgram, true);
+			_container->addUIProgram(openMenuProgram, false);
 
 			_openglRenderer->setProgram(_container);
 			_openglRenderer->startProgram();

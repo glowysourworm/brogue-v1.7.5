@@ -442,6 +442,9 @@ namespace brogueHd::frontend::opengl
 			_program->run(intervalMilliseconds);										// Run() -> Draws the buffers
 			_program->showErrors();														// Log Errors to simpleLogger -> std::cout
 
+			// Scroll data has already been consumed by the view tree
+			opengl::MouseState->resetScroll();
+
 			GLenum error = glGetError();
 
 			if (error)

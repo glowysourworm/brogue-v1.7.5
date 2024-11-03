@@ -2,6 +2,7 @@
 
 #include "simpleList.h"
 #include "gridRect.h"
+#include "gridLocator.h"
 #include "gridDefinitions.h"
 #include "brogueView.h"
 #include "brogueMouseState.h"
@@ -36,15 +37,34 @@ namespace brogueHd::frontend::ui
 
 		virtual void iterate(gridCallback<brogueCellDisplay*> callback) const override;
 		void iterateAdjacent(short column, short row, gridCallbackAdjacent<brogueCellDisplay*> callback) const override;
-
 		void iterateViews(simpleListCallback<brogueView*> callback) const;
+
+	protected:
+
+		virtual void incrementRenderOffset(short columnOffset, short rowOffset) override
+		{
+			// Increment Child Views
+			for (int index = 0; index < _childViews->count(); index++)
+			{
+				_childViews->get(index)->incrementRenderOffset(columnOffset, rowOffset);
+			}
+
+			// Increment This View
+			brogueView::incrementRenderOffset(columnOffset, rowOffset);
+		}
+
+		int getViewCount() const
+		{
+			return _childViews->count();
+		}
 
 	private:
 
 		simpleList<brogueView*>* _childViews;
 	};
 
-	brogueViewContainer::brogueViewContainer(brogueUIData* uiData, const gridRect& sceneBoundary, const gridRect& viewBoundary) : brogueView(uiData, sceneBoundary, viewBoundary)
+	brogueViewContainer::brogueViewContainer(brogueUIData* uiData, const gridRect& sceneBoundary, const gridRect& viewBoundary) 
+		: brogueView(uiData, sceneBoundary, viewBoundary)
 	{
 		_childViews = new simpleList<brogueView*>();
 	}
@@ -54,13 +74,20 @@ namespace brogueHd::frontend::ui
 	}
 	brogueCellDisplay* brogueViewContainer::get(short column, short row) const
 	{
+		// Check padding first
+		if (!this->getPaddedBoundary().contains(column, row))
+			return brogueView::get(column, row);
+
 		for (int index = 0; index < _childViews->count(); index++)
 		{
-			// Check child view boundaries
-			if (_childViews->get(index)->getBoundary().contains(column, row))
+			// This offset should be shared with the container (but it's better to check and be sure)
+			gridLocator offset = _childViews->get(index)->getRenderOffset();
+
+			// Check child view boundaries (this will be an improper child view)
+			if (_childViews->get(index)->getBoundary().contains(offset.column + column, offset.row + row))
 			{
-				if (_childViews->get(index)->getVisibility())
-					return _childViews->get(index)->get(column, row);
+				// Retrieve as if from normal boundaries (go ahead an show the improper child)
+				return _childViews->get(index)->get(offset.column + column, offset.row + row);
 			}
 		}
 
@@ -96,15 +123,12 @@ namespace brogueHd::frontend::ui
 	{
 		bool childViewInvalidated = false;
 
-		// Check child views first (for performance)
+		// Check child views first (for performance) (NOTE:  This function updates mouse related data; and must be run on child views)
 		_childViews->forEach([&mouseState, &millisecondsLapsed, &childViewInvalidated] (brogueView* view)
 		{
-			childViewInvalidated = view->shouldUpdate(mouseState, millisecondsLapsed);
+			childViewInvalidated |= view->shouldUpdate(mouseState, millisecondsLapsed);
 
-			if (childViewInvalidated)
-				return iterationCallback::breakAndReturn;
-			else
-				return iterationCallback::iterate;
+			return iterationCallback::iterate;
 		});
 
 		return childViewInvalidated || this->getBoundary().contains(mouseState.getLocation());

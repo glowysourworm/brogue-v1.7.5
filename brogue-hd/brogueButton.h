@@ -34,17 +34,18 @@ namespace brogueHd::frontend::ui
 	}
 	bool brogueButton::shouldUpdate(const brogueMouseState& mouseState, int millisecondsLapsed)
 	{
-		return this->getBoundary().contains(mouseState.getLocation());
+		return this->isMouseOver(mouseState);
 	}
 	void brogueButton::update(const brogueMouseState& mouseState, int millisecondsLapsed)
 	{
 		// Check mouse hover
-		bool mouseHover = this->getBoundary().contains(mouseState.getLocation());
+		bool mouseHover = this->isMouseOver(mouseState);
 
 		gridRect bounds = this->getBoundary();
 		brogueUIData* data = this->getUIData();
 		brogueButton* that = this;
 
+		// Iterate THIS boundary:  Apply mouse data from the render boundary
 		this->getBoundary().iterate([&that, &data, &bounds, &mouseState, &mouseHover] (short column, short row)
 		{
 			color nextColor = data->calculateGradient(column, row, mouseHover);

@@ -24,6 +24,7 @@ namespace brogueHd::frontend::ui
 			_text = nullptr;
 			_boundary = nullptr;
 			_background = nullptr;
+			_renderOffset = nullptr;
 			_hoverBackground = nullptr;
 			_alignment = brogueTextAlignment::Left;
 			_hotkeyChar = 'a';
@@ -39,6 +40,7 @@ namespace brogueHd::frontend::ui
 			_boundary = copy.getBoundary();
 			_background = copy.getBackground();
 			_hoverBackground = copy.getHoverBackground();
+			_renderOffset = copy.getRenderOffsetPtr();
 			_alignment = copy.getAlignment();
 			_hotkeyChar = copy.getHotkeyChar();
 			_hotkeyIndex = copy.getHotkeyIndex();
@@ -52,6 +54,7 @@ namespace brogueHd::frontend::ui
 			delete _boundary;
 			delete _background;
 			delete _hoverBackground;
+			delete _renderOffset;
 		}
 		brogueUIData(const gridRect& boundary)
 			: brogueUIData(boundary, colors::transparent(), colors::transparent())
@@ -94,6 +97,7 @@ namespace brogueHd::frontend::ui
 			_text = new colorString(text);
 			_background = new colorGradient(gradient1, gradient2, gradientType);
 			_hoverBackground = new colorGradient(mouseBackground1, mouseBackground2, gradientType);
+			_renderOffset = new gridLocator(0,0);
 			_alignment = alignment;
 			_hotkeyChar = '\0';
 			_hotkeyIndex = -1;
@@ -114,16 +118,6 @@ namespace brogueHd::frontend::ui
 			_hasMouseInteraction = hasMouseInteraction;
 			_isVisible = isVisible;
 			_padding = padding;
-		}
-
-		void setVisiblity(bool isVisible)
-		{
-			_isVisible = isVisible;
-		}
-
-		bool getVisibility()
-		{
-			return _isVisible;
 		}
 
 		gridRect getBounds() const
@@ -191,6 +185,17 @@ namespace brogueHd::frontend::ui
 							_boundary->row + _padding, 
 							_boundary->width - (2 * _padding),
 							_boundary->height - (2 * _padding));
+		}
+
+		gridLocator getRenderOffset() const
+		{
+			return *_renderOffset;
+		}
+
+		void setRenderOffset(short column, short row)
+		{
+			_renderOffset->column = column;
+			_renderOffset->row = row;
 		}
 
 	private:
@@ -273,6 +278,10 @@ namespace brogueHd::frontend::ui
 		{
 			return _hoverBackground;
 		}
+		gridLocator* getRenderOffsetPtr() const
+		{
+			return _renderOffset;
+		}
 		brogueTextAlignment getAlignment() const
 		{
 			return _alignment;
@@ -302,6 +311,7 @@ namespace brogueHd::frontend::ui
 
 		colorString* _text;
 		gridRect* _boundary;
+		gridLocator* _renderOffset;
 		colorGradient* _background;
 		colorGradient* _hoverBackground;
 		brogueTextAlignment _alignment;
