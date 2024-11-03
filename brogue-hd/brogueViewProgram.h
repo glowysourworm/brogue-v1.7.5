@@ -62,10 +62,10 @@ namespace brogueHd::frontend::opengl
 		{
 			gridRect sceneBoundaryUI = _view->calculateSceneBoundaryUI();
 
-			brogueCoordinateConverter converter =  _programBuilder->createCoordinateConverter(sceneBoundaryUI.width, sceneBoundaryUI.height);
+			brogueCoordinateConverter converter =  _programBuilder->createCoordinateConverter(sceneBoundaryUI.width, sceneBoundaryUI.height, _view->getZoomLevel());
 
 			return converter.getViewConverter()
-							.createQuadNormalizedUV(0, 0, brogueCellDisplay::CellWidth, brogueCellDisplay::CellHeight);
+							.createQuadNormalizedUV(0, 0, brogueCellDisplay::CellWidth(_view->getZoomLevel()), brogueCellDisplay::CellHeight(_view->getZoomLevel()));
 		}
 
 		simpleShaderProgram* getProgram() const

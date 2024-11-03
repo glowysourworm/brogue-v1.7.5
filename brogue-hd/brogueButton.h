@@ -34,7 +34,7 @@ namespace brogueHd::frontend::ui
 	}
 	bool brogueButton::shouldUpdate(const brogueMouseState& mouseState, int millisecondsLapsed)
 	{
-		return this->isMouseOver(mouseState);
+		return this->getUIData()->getHasMouseInteraction() && this->isMouseOver(mouseState);
 	}
 	void brogueButton::update(const brogueMouseState& mouseState, int millisecondsLapsed)
 	{

@@ -10,7 +10,7 @@
 #include "simpleFrameBuffer.h"
 #include "simplePeriodCounter.h"
 #include "brogueFlameMenu.h"
-#include "brogueButtonMenu.h"
+#include "brogueListView.h"
 #include "brogueProgramBuilder.h"
 #include "brogueViewProgram.h"
 #include "resourceController.h"
@@ -31,7 +31,7 @@ namespace brogueHd::frontend::opengl
 	public:
 		
 		brogueFlameMenuProgram(brogueFlameMenu* titleView,
-								brogueButtonMenu* mainMenu,
+								brogueListView* mainMenu,
 								resourceController* resourceController,
 								brogueGlyphMap* glyphMap);
 		~brogueFlameMenuProgram();
@@ -66,7 +66,7 @@ namespace brogueHd::frontend::opengl
 	};
 
 	brogueFlameMenuProgram::brogueFlameMenuProgram(brogueFlameMenu* titleView,
-												   brogueButtonMenu* mainMenu,
+													brogueListView* mainMenu,
 												   resourceController* resourceController,
 												   brogueGlyphMap* glyphMap)
 	{
@@ -136,10 +136,10 @@ namespace brogueHd::frontend::opengl
 		_frameTexture0 = new simpleTexture(nullptr, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE0, GL_RGBA, GL_RGBA, 4, GL_FLOAT);
 
 		// Font Glyphs:  Going to load the max zoom for now
-		simpleBitmap* glyphSheet = resourceController->getFontGlyphs(MAX_ZOOM);
+		simpleBitmap* glyphSheet = resourceController->getFontGlyphs(MAX_ZOOM - 1);
 
 		// TODO: Decide whether to fully incorporate SDL and replace GLFW.
-		SDL_Surface* glyphSurface = IMG_Load("C:\\Backup\\_Source\\Git\\brogue-v1.7.5\\resources\\fonts\\font-13-RGBA24-unsigned.bmp");
+		SDL_Surface* glyphSurface = IMG_Load("C:\\Backup\\_Source\\Git\\brogue-v1.7.5\\resources\\fonts\\font-12-RGBA24-unsigned.bmp");
 
 		// TODO: Fix this
 		openglHelper::flipSurface(glyphSurface);

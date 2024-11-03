@@ -1,6 +1,7 @@
 {
 	"savedGameDirectory" : "C:\\Backup\\_programs\\Rogue-likes\\Brogue-windows-v1.7.5",
 	"playbackDirectory" : "C:\\Backup\\_programs\\Rogue-likes\\Brogue-windows-v1.7.5",
+	"highScoresFile" : "C:\\Backup\\_programs\\Rogue-likes\\Brogue-windows-v1.7.5\\BrogueHighScores.txt",
 	"resourceConfig" : {
 		
 		"colorMaskVertexShader": "C:\\Backup\\_Source\\Git\\brogue-v1.7.5\\resources\\opengl\\colorMask.vert",

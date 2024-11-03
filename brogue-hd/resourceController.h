@@ -4,12 +4,14 @@
 #include "playbackData.h"
 #include "gameData.h"
 #include "brogueColorMap.h"
+#include "brogueScoreEntry.h"
 #include "simpleFileIO.h"
 #include "keyProcessor.h"
 
 #include "simpleEnumString.h"
 #include "simpleString.h"
 #include "simpleBitmap.h"
+#include "simpleList.h"
 #include "shaderData.h"
 #include "colorConstants.h"
 
@@ -44,7 +46,15 @@ namespace brogueHd::backend::controller
 		/// <summary>
 		/// Gets array of high score entries from file
 		/// </summary>
-		brogueScoresFile* getHighScores(short& mostRecentLineNumber);
+		brogueScoreEntry* getHighScore(int index)
+		{
+			return _highScores->get(index);
+		}
+
+		int getHighScoreCount() const
+		{
+			return _highScores->count();
+		}
 
 		/// <summary>
 		/// Loads colors.csv file
@@ -88,12 +98,16 @@ namespace brogueHd::backend::controller
 		{
 			return _playbackDirectory;
 		}
+
+	private:
+
+		void loadHighScores(const char* path);
 	
 	private:
 
 		simpleHash<shaderResource, shaderData*>* _shaderCache;
 		simpleHash<int, simpleBitmap*>* _fontGlyphs;
-
+		simpleList<brogueScoreEntry*>* _highScores;
 		simpleString* _gameDirectory;
 		simpleString* _playbackDirectory;
 
@@ -103,6 +117,7 @@ namespace brogueHd::backend::controller
 	{
 		_shaderCache = new simpleHash<shaderResource, shaderData*>();
 		_fontGlyphs = new simpleHash<int, simpleBitmap*>();
+		_highScores = new simpleList<brogueScoreEntry*>();
 		_gameDirectory = nullptr;
 		_playbackDirectory = nullptr;
 	}
@@ -112,6 +127,7 @@ namespace brogueHd::backend::controller
 		delete _fontGlyphs;
 		delete _gameDirectory;
 		delete _playbackDirectory;
+		delete _highScores;
 	}
 
 	bool resourceController::initialize(const char* resourceConfigFile)
@@ -174,6 +190,8 @@ namespace brogueHd::backend::controller
 			_gameDirectory = new simpleString(std::string(jsonConfig[brogueHd::ConfigSavedGameDirectory]).c_str());
 			_playbackDirectory = new simpleString(std::string(jsonConfig[brogueHd::ConfigPlaybackDirectory]).c_str());
 
+			loadHighScores(std::string(jsonConfig[brogueHd::ConfigHighScoresFile]).c_str());
+
 			return true;
 		}
 		catch (std::exception& ex)
@@ -190,60 +208,6 @@ namespace brogueHd::backend::controller
 		return _shaderCache->get(resource);
 	}
 
-	brogueScoresFile* resourceController::getHighScores(short& mostRecentLineNumber)
-	{
-		try
-		{
-			brogueScoresFile* scoresFile;
-			std::fstream stream;
-
-			stream.open(brogueHd::BrogueHighScoresFile, std::fstream::in);
-
-
-			// Initialize Scores (EMPTY FILE)
-			if (!stream.good())
-			{
-				stream.open("BrogueHighScores.txt", std::fstream::out);
-
-				// Initialize
-				scoresFile = new brogueScoresFile();
-
-				//for (int index = 0; index < HIGH_SCORES_COUNT; index++)
-				//{
-				//	char description[COLS] = "Died to the great penderprime...";
-
-				//	scoresFile->add(brogueScoreEntry(10000, time(0), description));
-				//}
-
-				// Create empty file
-				scoresFile->serialize(stream);
-
-				stream.close();
-
-				return scoresFile;
-			}
-
-			// Read Scores
-			scoresFile = brogueScoresFile::deserialize(stream);
-
-			// Close the file
-			stream.close();
-
-			// Sort Scores (TODO?)
-
-			// Most Recent (TODO?)
-
-			return scoresFile;
-		}
-		catch (std::exception& ex)
-		{
-			simpleException::showCstr("Failed to read high scores file.");
-			throw ex;
-		}
-
-		return nullptr;
-	}
-
 	gameData* resourceController::loadGame(const char* path)
 	{
 		return nullptr;
@@ -252,6 +216,34 @@ namespace brogueHd::backend::controller
 	playbackData* resourceController::loadPlayback(const char* path)
 	{
 		return nullptr;
+	}
+
+	void resourceController::loadHighScores(const char* path)
+	{
+		try
+		{
+			// Need some fake data
+			simpleList<brogueScoreEntry*> unsorted;
+
+			for (int index = 0; index < 20; index++)
+			{
+				brogueScoreEntry* entry = new brogueScoreEntry(rand(), std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()), "Killed by a Dragon");
+
+				unsorted.add(entry);
+			}
+
+			simpleList<brogueScoreEntry*> sorted = unsorted.sort([] (brogueScoreEntry* item1, brogueScoreEntry* item2)
+			{
+				return brogueScoreEntry::compare(*item1, *item2);
+			});
+
+			for (int index = 0; index < sorted.count(); index++)
+				_highScores->add(sorted.get(index));
+		}
+		catch (std::exception& ex)
+		{
+			simpleException::show("Error reading high scores file:  {}", ex.what());
+		}
 	}
 
 	void resourceController::loadKeymap(keyProcessor& processor)

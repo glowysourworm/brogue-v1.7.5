@@ -20,11 +20,11 @@ namespace brogueHd::frontend::ui
 	public:
 
 		brogueListView(brogueUIData* menuData,
-						 const simpleList<brogueUIData*>& buttons,
-						 brogueUIData* header,
-						 bool useHeader,
-						 const gridRect& sceneBoundary,
-						 const gridRect& viewBoundary);
+					   const simpleList<brogueUIData*>& items,
+					   brogueUIData* header,
+					   brogueUIData* footer,
+					   const gridRect& sceneBoundary,
+					   const gridRect& viewBoundary);
 		~brogueListView();
 
 		virtual void update(const brogueMouseState& mouseState, int millisecondsLapsed) override;
@@ -36,32 +36,37 @@ namespace brogueHd::frontend::ui
 	private:
 
 		brogueText* _header;
+		brogueText* _footer;
 	};
 
 	brogueListView::brogueListView(brogueUIData* menuData,
-									   const simpleList<brogueUIData*>& buttons,
-									   brogueUIData* header,
-									   bool useHeader,
-									   const gridRect& sceneBoundary,
-									   const gridRect& viewBoundary)
+									const simpleList<brogueUIData*>& items,
+									brogueUIData* header,
+									brogueUIData* footer,
+									const gridRect& sceneBoundary,
+									const gridRect& viewBoundary)
 		: brogueViewContainer(menuData, sceneBoundary, viewBoundary)
 	{
 		// Header View
-		if (useHeader)
+		if (header != nullptr)
 			_header = new brogueText(header, sceneBoundary, header->getBounds());
 
 		// Vertical Buttons
-		for (int index = 0; index < buttons.count(); index++)
+		for (int index = 0; index < items.count(); index++)
 		{
 			// Button View
-			this->addView((brogueView*)new brogueButton(buttons.get(index), sceneBoundary, buttons.get(index)->getBounds()));
+			this->addView((brogueView*)new brogueButton(items.get(index), sceneBoundary, items.get(index)->getBounds()));
 		}
+
+		if (footer != nullptr)
+			_footer = new brogueText(footer, sceneBoundary, footer->getBounds());
 
 		update(default_value::value<brogueMouseState>(), 0);
 	}
 	brogueListView::~brogueListView()
 	{
 		delete _header;
+		delete _footer;
 	}
 	brogueCellDisplay* brogueListView::get(short column, short row) const
 	{
@@ -71,15 +76,23 @@ namespace brogueHd::frontend::ui
 			return _header->get(column, row);
 		}
 
+		if (_footer != nullptr && _footer->getBoundary().contains(column, row))
+		{
+			return _footer->get(column, row);
+		}
+
 		return brogueViewContainer::get(column, row);
 	}
 	bool brogueListView::shouldUpdate(const brogueMouseState& mouseState, int millisecondsLapsed)
 	{
+		// No Mouse Interaction
+		bool hasMouseInteraction = this->getUIData()->getHasMouseInteraction();
+
 		// Check mouse hover
 		bool mouseHover = this->isMouseOver(mouseState);
 
 		// Check mouse scroll
-		bool scrollUpdate = mouseState.getScrollPending() && mouseHover;
+		bool scrollUpdate = hasMouseInteraction && mouseState.getScrollPending() && mouseHover;
 
 		if (scrollUpdate)
 		{
@@ -106,8 +119,11 @@ namespace brogueHd::frontend::ui
 		}
 			
 
-		// Check just the header, then pass through to the base class
+		// Check the header, the footer, then pass through to the base class
 		bool shouldUpdate = _header == nullptr ? false : _header->shouldUpdate(mouseState, millisecondsLapsed);
+
+		// Check the footer
+		shouldUpdate |= _footer == nullptr ? false : _footer->shouldUpdate(mouseState, millisecondsLapsed);
 		
 		// Base class (child views)
 		bool childUpdates = brogueViewContainer::shouldUpdate(mouseState, millisecondsLapsed);
@@ -116,7 +132,7 @@ namespace brogueHd::frontend::ui
 	}
 	void brogueListView::update(const brogueMouseState& mouseState, int millisecondsLapsed)
 	{
-		brogueButtonMenu* that = this;
+		brogueListView* that = this;
 		brogueUIData* menuData = this->getUIData();
 
 		// Check mouse hover
@@ -134,12 +150,16 @@ namespace brogueHd::frontend::ui
 		if (_header != nullptr)
 			_header->update(mouseState, millisecondsLapsed);
 
-		// Buttons
-		this->iterateViews([&that, &mouseState, &millisecondsLapsed] (brogueView* button)
+		// Items
+		this->iterateViews([&that, &mouseState, &millisecondsLapsed] (brogueView* item)
 		{
-			button->update(mouseState, millisecondsLapsed);
+			item->update(mouseState, millisecondsLapsed);
 			
 			return iterationCallback::iterate;
 		});
+
+		// Footer
+		if (_footer != nullptr)
+			_footer->update(mouseState, millisecondsLapsed);
 	}
 }

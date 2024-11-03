@@ -33,20 +33,20 @@ namespace brogueHd::frontend::ui
 		gridRect calculateSceneBoundaryUI() const
 		{
 			gridRect sceneBoundary = getSceneBoundary();
-			gridRect boundaryUI = gridRect(sceneBoundary.left() * brogueCellDisplay::CellWidth,
-											sceneBoundary.top() * brogueCellDisplay::CellHeight,
-											sceneBoundary.width * brogueCellDisplay::CellWidth,
-											sceneBoundary.height * brogueCellDisplay::CellHeight);
+			gridRect boundaryUI = gridRect(sceneBoundary.left() * brogueCellDisplay::CellWidth(_uiData->getZoomLevel()),
+											sceneBoundary.top() * brogueCellDisplay::CellHeight(_uiData->getZoomLevel()),
+											sceneBoundary.width * brogueCellDisplay::CellWidth(_uiData->getZoomLevel()),
+											sceneBoundary.height * brogueCellDisplay::CellHeight(_uiData->getZoomLevel()));
 
 			return boundaryUI;
 		}
 		gridRect calculateViewBoundaryUI() const
 		{
 			gridRect viewBoundary = getBoundary();
-			gridRect boundaryUI = gridRect(viewBoundary.left() * brogueCellDisplay::CellWidth,
-											viewBoundary.top() * brogueCellDisplay::CellHeight,
-											viewBoundary.width * brogueCellDisplay::CellWidth,
-											viewBoundary.height * brogueCellDisplay::CellHeight);
+			gridRect boundaryUI = gridRect(viewBoundary.left() * brogueCellDisplay::CellWidth(_uiData->getZoomLevel()),
+											viewBoundary.top() * brogueCellDisplay::CellHeight(_uiData->getZoomLevel()),
+											viewBoundary.width * brogueCellDisplay::CellWidth(_uiData->getZoomLevel()),
+											viewBoundary.height * brogueCellDisplay::CellHeight(_uiData->getZoomLevel()));
 
 			return boundaryUI;
 		}
@@ -81,6 +81,11 @@ namespace brogueHd::frontend::ui
 		bool isMouseOver(const brogueMouseState& mouseState)
 		{
 			return this->getRenderBoundary().contains(mouseState.getLocation());
+		}
+
+		int getZoomLevel() const
+		{
+			return _uiData->getZoomLevel();
 		}
 
 	protected:

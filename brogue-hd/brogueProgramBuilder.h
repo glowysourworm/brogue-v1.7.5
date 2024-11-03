@@ -63,7 +63,7 @@ namespace brogueHd::frontend::opengl
 		/// <summary>
 		/// Creates a coordinate converter for openGL backend coordinate transformations
 		/// </summary>
-		brogueCoordinateConverter createCoordinateConverter(int sceneWidth, int sceneHeight) const;
+		brogueCoordinateConverter createCoordinateConverter(int sceneWidth, int sceneHeight, int zoomLevel) const;
 
 	private:
 
@@ -81,16 +81,16 @@ namespace brogueHd::frontend::opengl
 	{
 	}
 
-	brogueCoordinateConverter brogueProgramBuilder::createCoordinateConverter(int sceneWidth, int sceneHeight) const
+	brogueCoordinateConverter brogueProgramBuilder::createCoordinateConverter(int sceneWidth, int sceneHeight, int zoomLevel) const
 	{
-		int glyphSheetWidth = _resourceController->getFontGlyphs(MAX_ZOOM)->pixelWidth();
-		int glyphSheetHeight = _resourceController->getFontGlyphs(MAX_ZOOM)->pixelHeight();
+		int glyphSheetWidth = _resourceController->getFontGlyphs(zoomLevel)->pixelWidth();
+		int glyphSheetHeight = _resourceController->getFontGlyphs(zoomLevel)->pixelHeight();
 
 		float glyphWidth = glyphSheetWidth / (float)_glyphMap->GlyphSheetColumns;
 		float glyphHeight = glyphSheetHeight / (float)(_glyphMap->GlyphSheetRows + _glyphMap->GlyphSheetRowOffset);
 
 		openglQuadConverter glyphMap(glyphWidth, glyphHeight, glyphSheetWidth, glyphSheetHeight);
-		openglQuadConverter viewMap(brogueCellDisplay::CellWidth, brogueCellDisplay::CellHeight, sceneWidth, sceneHeight);
+		openglQuadConverter viewMap(brogueCellDisplay::CellWidth(zoomLevel), brogueCellDisplay::CellHeight(zoomLevel), sceneWidth, sceneHeight);
 
 		return brogueCoordinateConverter(glyphMap, viewMap);
 	}
@@ -114,7 +114,7 @@ namespace brogueHd::frontend::opengl
 
 		// Create coordinate converter for this view
 		//
-		brogueCoordinateConverter coordinateConverter = createCoordinateConverter(sceneBoundaryUI.width, sceneBoundaryUI.height);
+		brogueCoordinateConverter coordinateConverter = createCoordinateConverter(sceneBoundaryUI.width, sceneBoundaryUI.height, view->getZoomLevel());
 
 		// Problems with polymorphism:  Copy constructors not working for child structs. May be a struct issue.
 		simpleList<brogueImageQuad> imageQuads;
@@ -217,7 +217,7 @@ namespace brogueHd::frontend::opengl
 
 		// Create coordinate converter for this view
 		//
-		brogueCoordinateConverter coordinateConverter = createCoordinateConverter(sceneBoundaryUI.width, sceneBoundaryUI.height);
+		brogueCoordinateConverter coordinateConverter = createCoordinateConverter(sceneBoundaryUI.width, sceneBoundaryUI.height, view->getZoomLevel());
 
 		simpleDataStream* dataStream = nullptr;
 

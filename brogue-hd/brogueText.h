@@ -17,6 +17,7 @@ namespace brogueHd::frontend::ui
 		~brogueText();
 
 		virtual void update(const brogueMouseState& mouseState, int millisecondsLapsed) override;
+		virtual bool shouldUpdate(const brogueMouseState& mouseState, int millisecondsLapsed) override;
 	};
 
 	brogueText::brogueText(brogueUIData* data, const gridRect& sceneBoundary, const gridRect& viewBoundary)
@@ -27,7 +28,10 @@ namespace brogueHd::frontend::ui
 	brogueText::~brogueText()
 	{
 	}
-
+	bool brogueText::shouldUpdate(const brogueMouseState& mouseState, int millisecondsLapsed)
+	{
+		return this->getUIData()->getHasMouseInteraction() && this->isMouseOver(mouseState);
+	}
 	void brogueText::update(const brogueMouseState& mouseState, int millisecondsLapsed)
 	{
 		gridRect bounds = this->getBoundary();

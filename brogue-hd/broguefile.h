@@ -17,58 +17,6 @@ namespace brogueHd::backend::model::io
 		char date[100];
 	} fileEntry;
 
-	struct brogueScoreEntry : hashable
-	{
-	public:
-
-		long int score;
-		time_t dateTime;
-		char description[COLS];
-
-		brogueScoreEntry() {}
-		brogueScoreEntry(long int score, time_t dateTime, char description[COLS])
-		{
-			this->score = score;
-			this->dateTime = dateTime;
-
-			//STRCPY(this->description, description, COLS);
-		}
-		~brogueScoreEntry()
-		{
-
-		}
-
-		void serialize(std::ostream& stream)
-		{
-			// Fields (IN ORDER)
-			//stream.write(reinterpret_cast<char*>(this->score), SIZEOF(long int));
-			//stream.write(reinterpret_cast<char*>(this->dateTime), SIZEOF(time_t));
-			//stream.write(reinterpret_cast<char*>(this->description), SIZEOF(char) * COLS);
-		}
-
-		static brogueScoreEntry deserialize(std::istream& stream)
-		{
-			brogueScoreEntry result;
-
-			//stream.read(reinterpret_cast<char*>(&result.score), SIZEOF(long int));
-			//stream.read(reinterpret_cast<char*>(&result.dateTime), SIZEOF(time_t));
-			//stream.read(reinterpret_cast<char*>(&result.description), SIZEOF(char) * COLS);
-
-			return result;
-		}
-
-		size_t getHash() const override
-		{
-			size_t hash = hashGenerator::generateHash(score, dateTime);
-
-			for (int index = 0; index < COLS; index++)
-				hash = hashGenerator::combineHash(hash, description[index]);
-
-			return hash;
-		}
-
-	};
-
 	/// <summary>
 	/// Simple keymap used to customize key processor functionality
 	/// </summary>
@@ -152,55 +100,5 @@ namespace brogueHd::backend::model::io
 
 			return result;
 		}
-	};
-
-	struct brogueScoresFile 
-	{
-
-		unsigned long scoreCount;
-		simpleList<brogueScoreEntry> scoreList;
-
-		brogueScoresFile()
-		{
-
-		}
-		~brogueScoresFile()
-		{
-
-		}
-
-		void add(brogueScoreEntry entry)
-		{
-			//scoreList.add(entry);
-		}
-
-		void serialize(std::ostream& stream)
-		{
-			//// Fields (IN ORDER)
-			//stream.write(reinterpret_cast<char*>(this->scoreCount), SIZEOF(unsigned long));
-
-			//// Event List
-			//for (int index = 0; index < scoreCount; index++)
-			//{
-			//	scoreList[index].serialize(stream);
-			//}
-		}
-
-		static brogueScoresFile* deserialize(std::istream& stream)
-		{
-			brogueScoresFile* result = new brogueScoresFile();
-
-			//// Fields (IN ORDER)
-			//stream.read(reinterpret_cast<char*>(&result->scoreCount), SIZEOF(unsigned long));
-
-			//// Event List
-			//for (int index = 0; index < result->scoreCount; index++)
-			//{
-			//	result->scoreList.add(brogueScoreEntry::deserialize(stream));
-			//}
-
-			return result;
-		}
-
 	};
 }

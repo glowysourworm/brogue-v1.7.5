@@ -72,13 +72,13 @@ namespace brogueHd
 
 	static const char* ConfigSavedGameDirectory = "savedGameDirectory";
 	static const char* ConfigPlaybackDirectory = "playbackDirectory";
+	static const char* ConfigHighScoresFile = "highScoresFile";
 	static const char* ConfigFontGlyphDirectory = "fontGlyphDirectory";
 
 	static const char* FontGlyphFileNameFormat = "font-{}.bmp";
 	static const char* FontGlyphFileNameFormat_RGBA24_UNSIGNED = "font-{}-RGBA24-unsigned.bmp";
 	static const char* FontGlyphFileNameFormat_RGBA32F = "font-{}-RGBA32F.bmp";
-	
-	static const char* BrogueHighScoresFile = "BrogueHighScores.txt";
+
 
 
 	/*

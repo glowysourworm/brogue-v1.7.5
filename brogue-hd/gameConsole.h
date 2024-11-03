@@ -66,20 +66,20 @@ namespace brogueHd::console
 	}
 	void gameConsole::printScores(std::ostream& stream)
 	{
-		short mostRecent = 0;
+		//short mostRecent = 0;
 
-		brogueScoresFile* scoreFile = _resourceController->getHighScores(mostRecent);
+		//brogueScoresFile* scoreFile = _resourceController->getHighScores(mostRecent);
 
-		for (int i = 0; i < scoreFile->scoreCount; i++)
-		{
-			// Convert file time to readable string
-			const char* dateStr = simpleExt::formatDate(scoreFile->scoreList.get(i).dateTime, false).c_str();
+		//for (int i = 0; i < scoreFile->scoreCount; i++)
+		//{
+		//	// Convert file time to readable string
+		//	const char* dateStr = simpleExt::formatDate(scoreFile->scoreList.get(i).dateTime, false).c_str();
 
-			// Output to stream (console)
-			stream << simpleExt::format("{}\t{}\t{}", scoreFile->scoreList.get(i).score, dateStr, scoreFile->scoreList.get(i).description) << std::endl;
-		}
+		//	// Output to stream (console)
+		//	stream << simpleExt::format("{}\t{}\t{}", scoreFile->scoreList.get(i).score, dateStr, scoreFile->scoreList.get(i).description) << std::endl;
+		//}
 
-		delete scoreFile;
+		//delete scoreFile;
 	}
 
 	brogueConsoleReturn gameConsole::command(simpleString input, std::ostream& stream)

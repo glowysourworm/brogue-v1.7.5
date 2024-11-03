@@ -30,6 +30,7 @@ namespace brogueHd::frontend::ui
 			_hotkeyChar = 'a';
 			_hotkeyIndex = -1;
 			_padding = 0;
+			_zoomLevel = 0;
 
 			_hasMouseInteraction = false;
 			_isVisible = false;
@@ -45,6 +46,7 @@ namespace brogueHd::frontend::ui
 			_hotkeyChar = copy.getHotkeyChar();
 			_hotkeyIndex = copy.getHotkeyIndex();
 			_padding = copy.getPadding();
+			_zoomLevel = copy.getZoomLevel();
 			_hasMouseInteraction = copy.getHasMouseInteraction();
 			_isVisible = copy.getIsVisible();
 		}
@@ -56,35 +58,44 @@ namespace brogueHd::frontend::ui
 			delete _hoverBackground;
 			delete _renderOffset;
 		}
-		brogueUIData(const gridRect& boundary)
-			: brogueUIData(boundary, colors::transparent(), colors::transparent())
+		brogueUIData(const gridRect& boundary, int zoomLevel)
+			: brogueUIData(boundary, zoomLevel, colors::transparent(), colors::transparent())
 		{}
-		brogueUIData(const gridRect& boundary, const color& background)
-			: brogueUIData(boundary, background, background)
+		brogueUIData(const gridRect& boundary, int zoomLevel, const color& background)
+			: brogueUIData(boundary, zoomLevel, background, background)
 		{}
-		brogueUIData(const gridRect& boundary, const color& background1, const color& background2, brogueGradientType gradientType)
-			: brogueUIData(boundary, background1, background2, background1, background2, gradientType)
+		brogueUIData(const gridRect& boundary, int zoomLevel, const color& background1, const color& background2, brogueGradientType gradientType)
+			: brogueUIData(boundary, zoomLevel, background1, background2, background1, background2, gradientType)
 		{}
-		brogueUIData(const gridRect& boundary, const color& background, const color& mouseHoverBackground)
-			: brogueUIData(boundary, background, background,  mouseHoverBackground, mouseHoverBackground, brogueGradientType::Horizontal)
+		brogueUIData(const gridRect& boundary, int zoomLevel, const color& background, const color& mouseHoverBackground)
+			: brogueUIData(boundary, zoomLevel, background, background,  mouseHoverBackground, mouseHoverBackground, brogueGradientType::Horizontal)
 		{}
 		brogueUIData(const gridRect& boundary, 
+					 int zoomLevel,
 					 const color& background1, 
 					 const color& background2, 
 					 const color& mouseBackground1, 
 					 const color& mouseBackground2, 
 					 brogueGradientType gradientType)
-			: brogueUIData(boundary, "", background1, background2, mouseBackground1, mouseBackground2, gradientType, brogueTextAlignment::Left)
+			: brogueUIData(boundary, zoomLevel, "", background1, background2, mouseBackground1, mouseBackground2, gradientType, brogueTextAlignment::Left)
 		{}
-
+		brogueUIData(const gridRect& boundary,
+					 int zoomLevel,
+					 const colorString& text,
+					 const color& background,
+					 brogueTextAlignment alignment)
+			: brogueUIData(boundary, zoomLevel, text, background, background, background, background, brogueGradientType::Horizontal, alignment)
+		{}
 		brogueUIData(const gridRect& boundary, 
+					 int zoomLevel,
 					 const colorString& text, 
 					 const color& gradient1, 
 					 const color& gradient2, 
 					 brogueTextAlignment alignment)
-			: brogueUIData(boundary, text, gradient1, gradient2, gradient1, gradient2, brogueGradientType::Horizontal, alignment)
+			: brogueUIData(boundary, zoomLevel, text, gradient1, gradient2, gradient1, gradient2, brogueGradientType::Horizontal, alignment)
 		{}
 		brogueUIData(const gridRect& boundary, 
+					 int zoomLevel,
 					 const colorString& text, 
 					 const color& gradient1, 
 					 const color& gradient2, 
@@ -102,6 +113,7 @@ namespace brogueHd::frontend::ui
 			_hotkeyChar = '\0';
 			_hotkeyIndex = -1;
 			_padding = 0;
+			_zoomLevel = zoomLevel;
 			_hasMouseInteraction = false;
 			_isVisible = false;
 		}
@@ -111,13 +123,14 @@ namespace brogueHd::frontend::ui
 		/// <summary>
 		/// Sets ancillary parameters (that wouldn't fit nicely into the ctor's)
 		/// </summary>
-		void setUIParameters(char hotkey, int hotkeyIndex, bool hasMouseInteraction, bool isVisible, int padding)
+		void setUIParameters(char hotkey, int hotkeyIndex, bool hasMouseInteraction, bool isVisible, int padding, int zoomLevel)
 		{
 			_hotkeyChar = hotkey;
 			_hotkeyIndex = hotkeyIndex;
 			_hasMouseInteraction = hasMouseInteraction;
 			_isVisible = isVisible;
 			_padding = padding;
+			_zoomLevel = zoomLevel;
 		}
 
 		gridRect getBounds() const
@@ -196,6 +209,15 @@ namespace brogueHd::frontend::ui
 		{
 			_renderOffset->column = column;
 			_renderOffset->row = row;
+		}
+
+		int getZoomLevel() const
+		{
+			return _zoomLevel;
+		}
+		bool getHasMouseInteraction() const
+		{
+			return _hasMouseInteraction;
 		}
 
 	private:
@@ -302,10 +324,6 @@ namespace brogueHd::frontend::ui
 		{
 			return _isVisible;
 		}
-		bool getHasMouseInteraction() const
-		{
-			return _hasMouseInteraction;
-		}
 
 	private:
 
@@ -318,6 +336,7 @@ namespace brogueHd::frontend::ui
 		char _hotkeyChar;
 		int _hotkeyIndex;
 		int _padding;
+		int _zoomLevel;
 
 		bool _hasMouseInteraction;
 		bool _isVisible;

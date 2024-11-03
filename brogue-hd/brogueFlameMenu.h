@@ -22,7 +22,8 @@ namespace brogueHd::frontend::ui
 	{
 	public:
 		brogueFlameMenu(randomGenerator* randomGenerator,
-						int fadePeriodMilliseconds);
+						int fadePeriodMilliseconds,
+						int zoomLevel);
 		~brogueFlameMenu();
 
 		void update(const brogueMouseState& mouseState, int millisecondsLapsed) override;
@@ -116,9 +117,10 @@ namespace brogueHd::frontend::ui
 	};
 
 	brogueFlameMenu::brogueFlameMenu(randomGenerator* randomGenerator,
-									 int fadePeriodMilliseconds)
+									 int fadePeriodMilliseconds,
+									 int zoomLevel)
 
-		: brogueView(new brogueUIData(gridRect(0, 0, COLS, ROWS)), gridRect(0, 0, COLS, ROWS), gridRect(0, 0, COLS, ROWS))
+		: brogueView(new brogueUIData(gridRect(0, 0, COLS, ROWS), zoomLevel), gridRect(0, 0, COLS, ROWS), gridRect(0, 0, COLS, ROWS))
 	{
 		_randomGenerator = randomGenerator;
 		_fadePeriodMilliconds = fadePeriodMilliseconds;

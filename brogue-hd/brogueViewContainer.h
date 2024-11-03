@@ -131,7 +131,7 @@ namespace brogueHd::frontend::ui
 			return iterationCallback::iterate;
 		});
 
-		return childViewInvalidated || this->getBoundary().contains(mouseState.getLocation());
+		return childViewInvalidated || (this->isMouseOver(mouseState) && this->getUIData()->getHasMouseInteraction());
 	}
 	void brogueViewContainer::update(const brogueMouseState& mouseState, int millisecondsLapsed)
 	{

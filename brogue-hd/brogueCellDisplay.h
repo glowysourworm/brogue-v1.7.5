@@ -18,8 +18,56 @@ namespace brogueHd::backend::model::layout
 	public:
 
 		// TODO:  CHANGE THIS TO WORK ON THE WHOLE DISPLAY PROBLEM STARTING WITH BROGUE 1.7.5.
-		static constexpr float CellHeight = 31.06f;	// See font glyphs
-		static constexpr float CellWidth = 19.0f;
+		//
+		// Glyph Sheet:  16 Columns x 17 Rows
+		//
+		// (Probably just going to need some more "embedded-into-the-ui-components" design)
+		//
+		static float CellWidth(int zoomLevel)
+		{
+			// Must derive these from dividing the glyph sheet into a grid
+			switch (zoomLevel)
+			{
+				case 1:	return 0;
+				case 2: return 0;
+				case 3: return 0;
+				case 4: return 0;
+				case 5: return 0;
+				case 6: return 0;
+				case 7: return 0;
+				case 8: return 0;
+				case 9: return 0;
+				case 10: return 0;
+				case 11: return 0;
+				case 12: return 18.0f;
+				case 13: return 19.0f;
+				default:
+					simpleException::show("Invalid zoom level:  brogueCellDisplay::CellWidth");
+			}
+		}
+
+		static float CellHeight(int zoomLevel)
+		{
+			// Must derive these from dividing the glyph sheet into a grid
+			switch (zoomLevel)
+			{
+			case 1:	return 0;
+			case 2: return 0;
+			case 3: return 0;
+			case 4: return 0;
+			case 5: return 0;
+			case 6: return 0;
+			case 7: return 0;
+			case 8: return 0;
+			case 9: return 0;
+			case 10: return 0;
+			case 11: return 0;
+			case 12: return 31.06f;
+			case 13: return 31.06f;
+			default:
+				simpleException::show("Invalid zoom level:  brogueCellDisplay::CellHeight");
+			}
+		}
 
 	public:
 
