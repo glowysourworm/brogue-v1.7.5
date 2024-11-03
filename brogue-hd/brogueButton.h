@@ -11,7 +11,7 @@ using namespace brogueHd::simple;
 
 namespace brogueHd::frontend::ui
 {
-	class brogueButton : brogueView
+	class brogueButton : public brogueView
 	{
 	public:
 
@@ -38,12 +38,12 @@ namespace brogueHd::frontend::ui
 	}
 	void brogueButton::update(const brogueMouseState& mouseState, int millisecondsLapsed)
 	{
+		// Check mouse hover
+		bool mouseHover = this->getBoundary().contains(mouseState.getLocation());
+
 		gridRect bounds = this->getBoundary();
 		brogueUIData* data = this->getUIData();
 		brogueButton* that = this;
-
-		// Check mouse hover
-		bool mouseHover = this->getBoundary().contains(mouseState.getLocation());
 
 		this->getBoundary().iterate([&that, &data, &bounds, &mouseState, &mouseHover] (short column, short row)
 		{

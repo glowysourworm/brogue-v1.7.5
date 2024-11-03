@@ -1,8 +1,11 @@
 #pragma once
 
 #include "brogueView.h"
+#include "gridRect.h"
 #include "colorString.h"
 #include "brogueUIData.h"
+
+using namespace brogueHd::component;
 
 namespace brogueHd::frontend::ui
 {

@@ -632,6 +632,9 @@
     <ClInclude Include="simpleDirectoryEntry.h">
       <Filter>Header Files\simple</Filter>
     </ClInclude>
+    <ClInclude Include="simpleOpenGl.h">
+      <Filter>Header Files\frontend\opengl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\resources\model\armor.csv">

@@ -28,6 +28,14 @@ namespace brogueHd::frontend::ui
 		~brogueButtonMenu();
 
 		virtual void update(const brogueMouseState& mouseState, int millisecondsLapsed) override;
+		virtual bool shouldUpdate(const brogueMouseState& mouseState, int millisecondsLapsed) override;
+
+		// Override needed to check for the header
+		virtual brogueCellDisplay* get(short column, short row) const override;
+
+	private:
+
+		brogueText* _header;
 	};
 
 	brogueButtonMenu::brogueButtonMenu(brogueUIData* menuData,
@@ -40,7 +48,7 @@ namespace brogueHd::frontend::ui
 	{
 		// Header View
 		if (useHeader)
-			this->addView((brogueView*)new brogueText(header, sceneBoundary, header->getBounds()));
+			_header = new brogueText(header, sceneBoundary, header->getBounds());
 
 		// Vertical Buttons
 		for (int index = 0; index < buttons.count(); index++)
@@ -53,6 +61,42 @@ namespace brogueHd::frontend::ui
 	}
 	brogueButtonMenu::~brogueButtonMenu()
 	{
+		delete _header;
+	}
+	brogueCellDisplay* brogueButtonMenu::get(short column, short row) const
+	{
+		// Check for header boundaries (header should be left visible)
+		if (_header != nullptr && _header->getBoundary().contains(column, row))
+		{
+			return _header->get(column, row);
+		}
+
+		return brogueViewContainer::get(column, row);
+	}
+	bool brogueButtonMenu::shouldUpdate(const brogueMouseState& mouseState, int millisecondsLapsed)
+	{
+		// Check mouse hover
+		bool mouseHover = this->getBoundary().contains(mouseState.getLocation());
+
+		// Check mouse scroll
+		if (mouseState.getScrollPending() && mouseState.getIsScrollUp() && mouseHover)
+			return true;
+
+		brogueButtonMenu* that = this;
+		bool result = false;
+
+		// Header + Buttons
+		this->iterateViews([&that, &mouseState, &millisecondsLapsed, &result] (brogueView* button)
+		{
+			result |= button->shouldUpdate(mouseState, millisecondsLapsed);
+
+			if (result)
+				return iterationCallback::breakAndReturn;
+			else
+				return iterationCallback::iterate;
+		});
+
+		return result;
 	}
 	void brogueButtonMenu::update(const brogueMouseState& mouseState, int millisecondsLapsed)
 	{
@@ -71,8 +115,12 @@ namespace brogueHd::frontend::ui
 		});
 
 		// Header + Buttons
-		this->iterateViews([&mouseState, &millisecondsLapsed] (brogueView* button)
+		this->iterateViews([&that, &mouseState, &millisecondsLapsed] (brogueView* button)
 		{
+			// Set Visibility
+			bool visibility = that->getPaddedBoundary().contains(button->getBoundary());
+
+			button->setVisiblity(visibility);
 			button->update(mouseState, millisecondsLapsed);
 			
 			return iterationCallback::iterate;

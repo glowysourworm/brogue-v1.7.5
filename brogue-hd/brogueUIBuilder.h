@@ -5,6 +5,7 @@
 #include "simpleString.h"
 #include "color.h"
 #include "simpleFileEntry.h"
+#include "simpleDirectoryEntry.h"
 
 using namespace brogueHd::simple;
 using namespace brogueHd::backend::model::game;
@@ -87,7 +88,7 @@ namespace brogueHd::frontend::ui
 				else if (index == 4)
 					buttons.add(new brogueUIData(boundary, colorString("Quit"), gradient1, gradient2, active1, active2, brogueGradientType::Horizontal, brogueTextAlignment::Center));
 
-				buttons.get(index)->setUIParameters('\0', 0, true, true);
+				buttons.get(index)->setUIParameters('\0', 0, true, true, 0);
 			}
 			
 			return new brogueButtonMenu(menuData, buttons, headerData, false, sceneBounds, menuBounds);
@@ -107,21 +108,21 @@ namespace brogueHd::frontend::ui
 
 			// Menu Background
 			brogueUIData* menuData = new brogueUIData(menuBounds, menuColor1, menuColor2, brogueGradientType::Circular);
+			menuData->setUIParameters('\0', -1, true, true, 1);
 
 			// Header (None)
-			gridRect headerBounds(menuBounds.column, menuBounds.row, menuBounds.width, 1);
+			gridRect headerBounds(paddedBounds.column, paddedBounds.row, paddedBounds.width, 1);
 			brogueUIData* headerData = new brogueUIData(headerBounds, colorString("Open Saved Game", colors::yellow()), menuColor1, menuColor2, brogueTextAlignment::Center);
 
-			headerData->setUIParameters('\0', -1, false, true);
+			headerData->setUIParameters('\0', -1, false, true, 0);
 
 			simpleList<brogueUIData*> buttons;
-			int listSpacer = 1;
 
 			simpleList<simpleFileEntry*> gameFilesSorted = gameFiles.sort();
 			
 			for (int index = 0; index < gameFilesSorted.count(); index++)
 			{
-				gridRect boundary(paddedBounds.column, paddedBounds.row + index + listSpacer, paddedBounds.width,1);
+				gridRect boundary(paddedBounds.column, paddedBounds.row + index + 1, paddedBounds.width,1);
 
 				simpleString fileName = *(gameFilesSorted.get(index)->getFileNameWithoutExtension());
 				simpleString fileNameTrimmed;
@@ -181,7 +182,7 @@ namespace brogueHd::frontend::ui
 				brogueUIData* data = new brogueUIData(boundary, colorString(result.c_str(), colors::white()), menuColor1, menuColor2, active1, active2, brogueGradientType::Horizontal, brogueTextAlignment::Left);
 
 				// Hotkey is the first letter a), b), etc..
-				data->setUIParameters('\0', 0, true, true);
+				data->setUIParameters('\0', 0, true, true, 0);
 
 				buttons.add(data);
 			}

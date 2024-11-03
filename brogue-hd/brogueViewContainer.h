@@ -1,11 +1,17 @@
 #pragma once
 
 #include "simpleList.h"
+#include "gridRect.h"
+#include "gridDefinitions.h"
 #include "brogueView.h"
 #include "brogueMouseState.h"
+#include "brogueCellDisplay.h"
+#include "brogueUIData.h"
 
+using namespace brogueHd::component;
 using namespace brogueHd::simple;
 using namespace brogueHd::frontend::opengl;
+using namespace brogueHd::backend::model::layout;
 
 namespace brogueHd::frontend::ui
 {
@@ -38,8 +44,7 @@ namespace brogueHd::frontend::ui
 		simpleList<brogueView*>* _childViews;
 	};
 
-	brogueViewContainer::brogueViewContainer(brogueUIData* uiData, const gridRect& sceneBoundary, const gridRect& viewBoundary)
-		: brogueView(uiData, sceneBoundary, viewBoundary)
+	brogueViewContainer::brogueViewContainer(brogueUIData* uiData, const gridRect& sceneBoundary, const gridRect& viewBoundary) : brogueView(uiData, sceneBoundary, viewBoundary)
 	{
 		_childViews = new simpleList<brogueView*>();
 	}
@@ -54,7 +59,8 @@ namespace brogueHd::frontend::ui
 			// Check child view boundaries
 			if (_childViews->get(index)->getBoundary().contains(column, row))
 			{
-				return _childViews->get(index)->get(column, row);
+				if (_childViews->get(index)->getVisibility())
+					return _childViews->get(index)->get(column, row);
 			}
 		}
 

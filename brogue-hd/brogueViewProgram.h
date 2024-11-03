@@ -101,7 +101,9 @@ namespace brogueHd::frontend::opengl
 		gridRect sceneBoundary = this->getSceneBoundaryUI();
 
 		brogueMouseState mouseStateUI((mouseState.getX() / sceneBoundary.width) * _view->getSceneBoundary().width,
-									  (mouseState.getY() / sceneBoundary.height) * _view->getSceneBoundary().height);
+									  (mouseState.getY() / sceneBoundary.height) * _view->getSceneBoundary().height,
+									  mouseState.getScrolldYPending() != 0 || mouseState.getScrolldXPending() != 0,
+									  mouseState.getScrolldYPending() != 0);
 
 		return _view->shouldUpdate(mouseStateUI, millisecondsLapsed);
 	}
@@ -112,7 +114,9 @@ namespace brogueHd::frontend::opengl
 		gridRect sceneBoundary = this->getSceneBoundaryUI();
 
 		brogueMouseState mouseStateUI((mouseState.getX() / sceneBoundary.width) * _view->getSceneBoundary().width,
-									  (mouseState.getY() / sceneBoundary.height) * _view->getSceneBoundary().height);
+										(mouseState.getY() / sceneBoundary.height) * _view->getSceneBoundary().height,
+										mouseState.getScrolldYPending() != 0 || mouseState.getScrolldXPending() != 0,
+										mouseState.getScrolldYPending() != 0);
 
 		// View will present new data
 		_view->update(mouseStateUI, millisecondsLapsed);

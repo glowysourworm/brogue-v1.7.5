@@ -6,12 +6,10 @@
 #include "brogueFlameMenu.h"
 #include "brogueProgramBuilder.h"
 #include "simpleDataStream.h"
+#include "simpleOpenGl.h"
 
 namespace brogueHd::frontend::opengl
 {
-	template<typename T>
-	concept isBrogueView = std::convertible_to<T, brogueView>;
-
 	template<isBrogueView T>
 	class brogueDataStream
 	{

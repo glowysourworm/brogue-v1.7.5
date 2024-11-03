@@ -23,12 +23,13 @@ void main()
     //         should be a transparent color. So, we'll skip it if it's transparent.
     //
     vec4 glyphColor = texture(fontTexture, currentGlyphUV);
+    float glyphThreshold = 0.03;
 
     // Dipslay Cell
     //
     if (currentOutputSelector == 1)
     {
-        if (glyphColor.x > 0.5 && glyphColor.y > 0.5 && glyphColor.z > 0.5 && glyphColor.w > 0.5)
+        if (glyphColor.x > glyphThreshold && glyphColor.y > glyphThreshold && glyphColor.z > glyphThreshold && glyphColor.w > glyphThreshold)
             outputColor = mix(glyphColor, currentForegroundColor, 0.5);
         else
             outputColor = currentBackgroundColor;

@@ -1,8 +1,10 @@
 #pragma once
-#include "colorString.h"
+
 #include "color.h"
 #include "colorGradient.h"
+#include "colorString.h"
 #include "gridLocator.h"
+#include "gridRect.h"
 
 using namespace brogueHd::backend::model::game;
 
@@ -105,12 +107,13 @@ namespace brogueHd::frontend::ui
 		/// <summary>
 		/// Sets ancillary parameters (that wouldn't fit nicely into the ctor's)
 		/// </summary>
-		void setUIParameters(char hotkey, int hotkeyIndex, bool hasMouseInteraction, bool isVisible)
+		void setUIParameters(char hotkey, int hotkeyIndex, bool hasMouseInteraction, bool isVisible, int padding)
 		{
 			_hotkeyChar = hotkey;
 			_hotkeyIndex = hotkeyIndex;
 			_hasMouseInteraction = hasMouseInteraction;
 			_isVisible = isVisible;
+			_padding = padding;
 		}
 
 		void setVisiblity(bool isVisible)
@@ -180,6 +183,14 @@ namespace brogueHd::frontend::ui
 			int offsetColumn = column - _boundary->column;
 
 			return offsetColumn - textIndex == _hotkeyIndex;
+		}
+
+		gridRect getPaddedBoundary() const
+		{
+			return gridRect(_boundary->column + _padding, 
+							_boundary->row + _padding, 
+							_boundary->width - (2 * _padding),
+							_boundary->height - (2 * _padding));
 		}
 
 	private:

@@ -22,6 +22,7 @@ namespace brogueHd::frontend::ui
 
 		gridRect getSceneBoundary() const;
 		gridRect getBoundary() const;
+		gridRect getPaddedBoundary() const;
 
 		/// <summary>
 		/// (TODO: MOVE THIS) Calculates the view's boundary is UI coordinates. This is not the same as the
@@ -69,6 +70,11 @@ namespace brogueHd::frontend::ui
 			_uiData->setVisiblity(isVisible);
 		}
 
+		bool getVisibility() const
+		{
+			return _uiData->getVisibility();
+		}
+
 	protected:
 
 		brogueUIData* getUIData() const
@@ -112,7 +118,10 @@ namespace brogueHd::frontend::ui
 	{
 		return _view->getRelativeBoundary();
 	}
-
+	gridRect brogueView::getPaddedBoundary() const
+	{
+		return _uiData->getPaddedBoundary();
+	}
 	gridRect brogueView::getSceneBoundary() const
 	{
 		return _view->getParentBoundary();

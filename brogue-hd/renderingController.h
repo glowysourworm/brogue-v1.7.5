@@ -8,6 +8,8 @@
 #include "brogueFlameMenu.h"
 #include "brogueFlameMenuProgram.h"
 #include "brogueUIBuilder.h"
+#include "brogueDataStream.h"
+#include "simpleOpenGl.h"
 #include <functional>
 #include <stdlib.h>
 #include "simpleFileIO.h"
