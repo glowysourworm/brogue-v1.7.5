@@ -195,7 +195,8 @@ namespace brogueHd::frontend::ui
 			gridRect sceneBounds = getBrogueSceneBoundary();
 
 			// Pulled from Brogue v1.7.5
-			color menuColor(0,0,0,0.5);
+			color menuColor(0,0,0,0.85);
+			color footerColor(0.596f, 0.494f, 0.996f, 1);
 
 			// Menu Background
 			brogueUIData* menuData = new brogueUIData(sceneBounds, zoomLevel, menuColor);
@@ -219,11 +220,14 @@ namespace brogueHd::frontend::ui
 				gridRect boundary(sceneBounds.column, sceneBounds.row + index + menuPadding, sceneBounds.width, 1);
 
 				simpleString preamble = simpleExt::format("{}) ", index + 1);
-				simpleString score = simpleExt::toString(entry->getScore());
+				simpleString score = simpleExt::toString(entry->getScore());	
 				simpleString dateAndDescr = simpleExt::format("{} {}", entry->getDate()->c_str(), entry->getDescription()->c_str());
 
-				// Static Length of 10 (?)
-				score.appendPadding(' ', 10 - score.count());
+				// Size to line up scores (5)
+				preamble.appendPadding(' ', 5 - preamble.count());
+
+				// Scores (15)
+				score.appendPadding(' ', 15 - score.count() - preamble.count());
 
 				simpleString formattedEntry = simpleExt::format("{}{}{}", preamble.c_str(), score.c_str(), dateAndDescr.c_str());
 
@@ -235,8 +239,8 @@ namespace brogueHd::frontend::ui
 			}
 
 			// Footer
-			gridRect footerBounds(sceneBounds.column, sceneBounds.row - 1, sceneBounds.width, 1);
-			brogueUIData* footerData = new brogueUIData(footerBounds, zoomLevel, colorString("Press space to continue.", colors::blue()), menuColor, brogueTextAlignment::Center);
+			gridRect footerBounds(sceneBounds.column, sceneBounds.height - 1, sceneBounds.width, 1);
+			brogueUIData* footerData = new brogueUIData(footerBounds, zoomLevel, colorString("Press space to continue.", footerColor), menuColor, brogueTextAlignment::Center);
 
 			footerData->setUIParameters('\0', -1, false, true, 0, zoomLevel);
 

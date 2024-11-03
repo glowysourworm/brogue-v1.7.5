@@ -80,6 +80,7 @@ namespace brogueHd::frontend::opengl
             case shaderResource::brogueCellDisplayFrag:
                 this->uniforms1i.add(simpleUniform<int>("frame0Texture", GL_SAMPLER_2D, 0));        // Usually, this is GL_TEXTURE0 - which corresponds to 0.
                 this->uniforms1i.add(simpleUniform<int>("fontTexture", GL_SAMPLER_2D, 1));          // Usually, this is GL_TEXTURE1 - which corresponds to 1.
+                this->uniforms1.add(simpleUniform<float>("glyphThreshold", GL_FLOAT, 0.05));
                 break;
             case shaderResource::diffuseColorUpwardFrag:
                 this->uniforms1i.add(simpleUniform<int>("frame0Texture", GL_SAMPLER_2D, 0));        // Usually, this is GL_TEXTURE0 - which corresponds to 0.

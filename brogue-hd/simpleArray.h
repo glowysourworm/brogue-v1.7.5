@@ -189,7 +189,7 @@ namespace brogueHd::simple
 	void simpleArray<T>::reAllocate(const T* anArray, int anArrayLength)
 	{
 		if (anArray == nullptr)
-			simpleException::showCstr("Trying to allocate from a null array:  simpleArray::reAllocate");
+			simpleException::show("Trying to allocate from a null array:  simpleArray::reAllocate");
 
 		// Free old memory
 		//
@@ -240,7 +240,7 @@ namespace brogueHd::simple
 	T& simpleArray<T>::get(int index) const
 	{
 		if (index >= _count)
-			simpleException::showCstr("Index is outside the bounds of the array: simpleArray.h");
+			simpleException::show("Index is outside the bounds of the array: simpleArray.h");
 
 		return _array[index];
 	}
@@ -249,7 +249,7 @@ namespace brogueHd::simple
 	void simpleArray<T>::set(int index, const T& value)
 	{
 		if (index >= _count)
-			simpleException::showCstr("Index is outside the bounds of the array: simpleArray.h");
+			simpleException::show("Index is outside the bounds of the array: simpleArray.h");
 
 		_array[index] = value;
 	}

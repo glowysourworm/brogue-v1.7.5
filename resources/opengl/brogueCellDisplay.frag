@@ -15,6 +15,7 @@ in float currentOutputSelector;
 //
 uniform sampler2D frame0Texture;
 uniform sampler2D fontTexture;
+uniform float glyphThreshold;
 
 void main()
 {
@@ -23,7 +24,6 @@ void main()
     //         should be a transparent color. So, we'll skip it if it's transparent.
     //
     vec4 glyphColor = texture(fontTexture, currentGlyphUV);
-    float glyphThreshold = 0.03;
 
     // Dipslay Cell
     //

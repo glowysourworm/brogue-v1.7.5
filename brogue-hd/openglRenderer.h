@@ -148,7 +148,7 @@ namespace brogueHd::frontend::opengl
 	{
 		// THREAD SAFETY:  The std::cout is the only shared static object on this execution stack. Pretty sure it is thread safe.
 		//
-		simpleLogger::logColor(brogueConsoleColor::Red, "GLFW Error {} {}", simpleExt::toString(error), message);
+		simpleLogger::logColor(brogueConsoleColor::Red, "GLFW Error {} {}", simpleExt::toString(error).c_str(), message);
 	}
 	void openglRenderer::forceLastErrorGLFW()
 	{

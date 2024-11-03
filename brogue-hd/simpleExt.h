@@ -25,23 +25,21 @@ namespace brogueHd::simple
 	private:
 
 		template<isNumber T>
-		static std::string toStringImpl(const T& param)
+		static void toStringImpl(const T& param, std::string& result)
 		{
-			return std::to_string(param);
+			result = std::to_string(param);
 		}
 
 		template<isChar T>
-		static std::string toStringImpl(const T& param)
+		static void toStringImpl(const T& param, std::string& result)
 		{
-			std::string result;
 			result += param;
-			return result;
 		}
 
 		template<isStringLike T>
-		static std::string toStringImpl(const T& param)
+		static void toStringImpl(const T& param, std::string& result)
 		{
-			return std::string(param);
+			result = std::string(param);
 		}
 
 	public:
@@ -51,8 +49,10 @@ namespace brogueHd::simple
 		{
 			// Format String (recurse)
 			std::string result(formatStr);
-			std::string paramStr = simpleExt::toStringImpl(param);
+			std::string paramStr;
 			std::string replaceStr = "{}";
+
+			simpleExt::toStringImpl(param, paramStr);
 
 			// Find!
 			size_t index = result.find(replaceStr.c_str());
@@ -77,18 +77,22 @@ namespace brogueHd::simple
 		}
 
 		template<isStringConvertible T>
-		static const char* toString(const T& param)
+		static std::string toString(const T& param)
 		{
+			std::string result;
+
 			if (isNumber<T>)
 			{
-				return simpleExt::toStringImpl(param).c_str();
+				simpleExt::toStringImpl(param, result);
 			}
 			else if (isStringLike<T>)
 			{
-				return simpleExt::toStringImpl(param).c_str();
+				simpleExt::toStringImpl(param, result);
 			}
 			else
 				showError("Invalid use of concept constraints:  simpleExt::format");
+
+			return result;
 		}
 
 		static std::string formatDate(time_t time, bool shortFormat)
@@ -99,9 +103,9 @@ namespace brogueHd::simple
 			localtime_s(&timeValue, &time);
 
 			if (shortFormat)
-				std::strftime(buffer, 80, "%Y/%m/%d", &timeValue);
+				std::strftime(buffer, 80, "%m/%d/%Y", &timeValue);
 			else
-				std::strftime(buffer, 80, "%Y/%m/%d %H:%M:%S", &timeValue);
+				std::strftime(buffer, 80, "%m/%d/%Y %H:%M:%S", &timeValue);
 
 			return std::string(buffer);
 		}

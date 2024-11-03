@@ -94,7 +94,7 @@ namespace brogueHd::backend::controller
 			// Shuts down thread, deletes our program memory
 			_openglRenderer->terminateProgram();
 			
-			int zoomLevel = 12;
+			int zoomLevel = 9;
 
 			simpleDirectoryEntry gameFiles = simpleFileIO::readDirectory(_resourceController->getGamesDirectory()->c_str(), ".broguesave");
 			simpleDirectoryEntry recordingFiles = simpleFileIO::readDirectory(_resourceController->getPlaybackDirectory()->c_str(), ".broguerec");

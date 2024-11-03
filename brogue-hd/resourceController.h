@@ -225,7 +225,7 @@ namespace brogueHd::backend::controller
 			// Need some fake data
 			simpleList<brogueScoreEntry*> unsorted;
 
-			for (int index = 0; index < 20; index++)
+			for (int index = 0; index < 30; index++)
 			{
 				brogueScoreEntry* entry = new brogueScoreEntry(rand(), std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()), "Killed by a Dragon");
 

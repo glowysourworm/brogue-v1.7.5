@@ -36,9 +36,9 @@ namespace brogueHd::backend::model::layout
 				case 6: return 0;
 				case 7: return 0;
 				case 8: return 0;
-				case 9: return 0;
-				case 10: return 0;
-				case 11: return 0;
+				case 9: return 15.0f;
+				case 10: return 16.0f;
+				case 11: return 17.0f;
 				case 12: return 18.0f;
 				case 13: return 19.0f;
 				default:
@@ -59,9 +59,9 @@ namespace brogueHd::backend::model::layout
 			case 6: return 0;
 			case 7: return 0;
 			case 8: return 0;
-			case 9: return 0;
-			case 10: return 0;
-			case 11: return 0;
+			case 9: return 25.412f;
+			case 10: return 27.294f;
+			case 11: return 29.176f;
 			case 12: return 31.06f;
 			case 13: return 31.06f;
 			default:
