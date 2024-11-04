@@ -1,6 +1,5 @@
 #pragma once
 
-#include "brogueGlobal.h"
 #include "broguefile.h"
 #include "simpleString.h"
 

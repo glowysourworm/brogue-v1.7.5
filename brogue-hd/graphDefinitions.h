@@ -1,9 +1,11 @@
 #pragma once
 
-#include "graphNode.h"
 #include "graphEdge.h"
+#include "graphNode.h"
+#include "gridLocator.h"
 #include "gridLocatorEdge.h"
 #include <functional>
+#include <type_traits>
 
 namespace brogueHd::component
 {

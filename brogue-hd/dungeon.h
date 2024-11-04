@@ -1,7 +1,7 @@
 #pragma once
 
-#include "simple.h"
 #include "dungeonConstants.h"
+#include "simple.h"
 
 using namespace brogueHd::simple;
 using namespace brogueHd::backend::modelConstant;
@@ -53,14 +53,14 @@ namespace brogueHd::backend::model::game
 		bool operator==(const brogueRoomInfo& info) const
 		{
 			return type == info.type &&
-				   frequency == info.frequency &&
-				   corridorChance == info.corridorChance;
+				frequency == info.frequency &&
+				corridorChance == info.corridorChance;
 		}
 		bool operator!=(const brogueRoomInfo& info) const
 		{
 			return type != info.type ||
-				   frequency != info.frequency ||
-				   corridorChance != info.corridorChance;
+				frequency != info.frequency ||
+				corridorChance != info.corridorChance;
 		}
 
 		size_t getHash() const override

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "simple.h"
 #include "graphEdge.h"
 #include "gridLocator.h"
+#include "simple.h"
 #include "simplePoint.h"
 
 using namespace brogueHd::simple;
@@ -28,15 +28,15 @@ namespace brogueHd::component
 		bool operator==(const gridLocatorEdge& edge) const
 		{
 			return node1 == edge.node1 &&
-				   node2 == edge.node2;
+				node2 == edge.node2;
 		}
 
 		bool operator!=(const gridLocatorEdge& edge) const
 		{
 			return node1 != edge.node1 ||
-				   node2 != edge.node2;
+				node2 != edge.node2;
 		}
-		
+
 		/// <summary>
 		/// Returns the graph weight (distance) for this edge
 		/// </summary>
@@ -49,10 +49,10 @@ namespace brogueHd::component
 		bool isEquivalent(simplePoint<T> point1, simplePoint<T> point2)
 		{
 			return (node1.column == point1.x &&
-				    node1.row == point1.y &&
-				    node2.column == point2.x &&
-				    node2.row == point2.y) ||
-				   (node1.column == point2.x &&
+				node1.row == point1.y &&
+				node2.column == point2.x &&
+				node2.row == point2.y) ||
+				(node1.column == point2.x &&
 					node1.row == point2.y &&
 					node2.column == point1.x &&
 					node2.row == point1.y);

@@ -1,11 +1,11 @@
 #pragma once
 
-#include "levelData.h"
-#include "brogueLevel.h"
 #include "brogueCreature.h"
-#include "broguePlayer.h"
-#include "brogueCellDisplay.h"
+#include "brogueItem.h"
+#include "brogueLevel.h"
 #include "brogueMessageQueue.h"
+#include "broguePlayer.h"
+#include "color.h"
 #include "playerCharacter.h"
 #include "simpleList.h"
 
@@ -75,36 +75,36 @@ namespace brogueHd::backend::model
 
 	private:
 
-//		char displayedMessage[MESSAGE_LINES][COLS * 2];
-//		boolean messageConfirmed[MESSAGE_LINES];
-//		char combatText[COLS * 2];
-//		short messageArchivePosition;
-//		char messageArchive[MESSAGE_ARCHIVE_LINES][COLS * 2];
-//
-//		char currentFilePath[BROGUE_FILENAME_MAX];
-//
-//		char displayDetail[DCOLS][DROWS];		// used to make certain per-cell data accessible to external code (e.g. terminal adaptations)
-//
-//#ifdef AUDIT_RNG
-//		FILE* RNGLogFile;
-//#endif
+		//		char displayedMessage[MESSAGE_LINES][COLS * 2];
+		//		boolean messageConfirmed[MESSAGE_LINES];
+		//		char combatText[COLS * 2];
+		//		short messageArchivePosition;
+		//		char messageArchive[MESSAGE_ARCHIVE_LINES][COLS * 2];
+		//
+		//		char currentFilePath[BROGUE_FILENAME_MAX];
+		//
+		//		char displayDetail[DCOLS][DROWS];		// used to make certain per-cell data accessible to external code (e.g. terminal adaptations)
+		//
+		//#ifdef AUDIT_RNG
+		//		FILE* RNGLogFile;
+		//#endif
 
-		//unsigned char inputRecordBuffer[INPUT_RECORD_BUFFER + 100];
-		//unsigned short locationInRecordingBuffer;
-		//unsigned long randomNumbersGenerated;
-		//unsigned long positionInPlaybackFile;
-		//unsigned long lengthOfPlaybackFile;
-		//unsigned long recordingLocation;
-		//unsigned long maxLevelChanges;
-		//char annotationPathname[BROGUE_FILENAME_MAX];	// pathname of annotation file
-		//unsigned long gameSeed;
+				//unsigned char inputRecordBuffer[INPUT_RECORD_BUFFER + 100];
+				//unsigned short locationInRecordingBuffer;
+				//unsigned long randomNumbersGenerated;
+				//unsigned long positionInPlaybackFile;
+				//unsigned long lengthOfPlaybackFile;
+				//unsigned long recordingLocation;
+				//unsigned long maxLevelChanges;
+				//char annotationPathname[BROGUE_FILENAME_MAX];	// pathname of annotation file
+				//unsigned long gameSeed;
 
-		//// Console / Game related declarations
-		//playerCharacter rogue;
-		////brogueConsole currentConsole;
+				//// Console / Game related declarations
+				//playerCharacter rogue;
+				////brogueConsole currentConsole;
 
-		//boolean serverMode = false;
-		//boolean noMenu = false;
+				//boolean serverMode = false;
+				//boolean noMenu = false;
 	};
 
 	brogueGame::brogueGame(bool serverMode, bool noMenu)

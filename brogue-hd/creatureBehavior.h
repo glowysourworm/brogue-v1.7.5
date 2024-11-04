@@ -1,6 +1,5 @@
 #pragma once
 
-#include "brogueGlobal.h"
 #include "creatureBehaviorConstants.h"
 
 using namespace brogueHd::backend::modelConstant;

@@ -1,12 +1,10 @@
 #pragma once
 
 #include "creatureBehaviorConstants.h"
-#include "dungeonFeature.h"
-#include "machineConstants.h"
+#include "dungeonConstants.h"
 #include "linearGenerationParameters.h"
 
 using namespace brogueHd::backend::modelConstant;
-using namespace brogueHd::backend::model::game;
 using namespace brogueHd::backend::model::construction;
 
 namespace brogueHd::backend::model::gameTemplate

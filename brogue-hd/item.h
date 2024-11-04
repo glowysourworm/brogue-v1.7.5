@@ -1,11 +1,12 @@
 #pragma once
 
 #include "color.h"
-#include "itemConstants.h"
 #include "creatureConstants.h"
+#include "itemConstants.h"
 
 #include "randomRange.h"
 
+#include "brogueGlobal.h"
 #include "simpleString.h"
 
 using namespace brogueHd::simple;
@@ -27,7 +28,7 @@ namespace brogueHd::backend::model::game
 
 		// Damage left to base class (see throwing v.s. melee)
 		randomRange damage;
-		
+
 		// Inventory color: NOT brogueObject color definition.
 		color inventoryColor;
 

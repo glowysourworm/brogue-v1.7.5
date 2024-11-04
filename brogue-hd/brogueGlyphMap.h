@@ -1,6 +1,7 @@
 #pragma once
 
-#include "grid.h"
+#include "gridLocator.h"
+#include "simpleException.h"
 #include "simpleHash.h"
 
 using namespace brogueHd::simple;
@@ -22,41 +23,41 @@ namespace brogueHd::frontend::ui
 
 	public:
 
-		static const int Empty						= (int)' ';
+		static const int Empty = (int)' ';
 
-		static const int FloorUnicode				= 0x00b7;
-		static const int ChasmUnicode				= 0x2237;
-		static const int TrapUnicode				= 0x25c7;
-		static const int FireUnicode				= 0x22CF;
-		static const int FoliageUnicode				= 0x2648;
-		static const int StatueUnicode				= 0x00df;
+		static const int FloorUnicode = 0x00b7;
+		static const int ChasmUnicode = 0x2237;
+		static const int TrapUnicode = 0x25c7;
+		static const int FireUnicode = 0x22CF;
+		static const int FoliageUnicode = 0x2648;
+		static const int StatueUnicode = 0x00df;
 
-		static const int AmuletUnicode				= 0x2640;
-		static const int ScrollUnicode				= 0x266A;
-		static const int RingUnicode				= 0x26AA;
-		static const int CharmUnicode				= 0x03DF;
-		static const int WeaponUnicode				= 0x2191;
-		static const int GemUnicode					= 0x25cf;
-		static const int TotemUnicode				= 0x26b2;
+		static const int AmuletUnicode = 0x2640;
+		static const int ScrollUnicode = 0x266A;
+		static const int RingUnicode = 0x26AA;
+		static const int CharmUnicode = 0x03DF;
+		static const int WeaponUnicode = 0x2191;
+		static const int GemUnicode = 0x25cf;
+		static const int TotemUnicode = 0x26b2;
 
-		static const int TurretUnicode				= 0x25cf;
-		static const int UnicornUnicode				= 0x00da;
-		static const int ElectricCrystalUnicode		= 0x00A4;
+		static const int TurretUnicode = 0x25cf;
+		static const int UnicornUnicode = 0x00da;
+		static const int ElectricCrystalUnicode = 0x00A4;
 
-		static const int UpArrowUnicode				= 0x2191;
-		static const int DownArrowUnicode			= 0x2193;
-		static const int LeftArrowUnicode			= 0x2190;
-		static const int RightArrowUnicode			= 0x2192;
-		static const int UpTriangleUnicode			= 0x2206;
-		static const int DownTriangleUnicode		= 0x2207;
-		static const int OmegaUnicode				= 0x03A9;
-		static const int ThetaUnicode				= 0x03B8;
-		static const int LambdaUnicode				= 0x03BB;
-		static const int KoppaUnicode				= 0x03DF;
-		static const int LozengeUnicode				= 0x29EB;
-		static const int CrossProductUnicode		= 0x2A2F;
-		static const int BadMagicUnicode			= 0x29F2;
-		static const int GoodMagicUnicode			= 0x29F3;
+		static const int UpArrowUnicode = 0x2191;
+		static const int DownArrowUnicode = 0x2193;
+		static const int LeftArrowUnicode = 0x2190;
+		static const int RightArrowUnicode = 0x2192;
+		static const int UpTriangleUnicode = 0x2206;
+		static const int DownTriangleUnicode = 0x2207;
+		static const int OmegaUnicode = 0x03A9;
+		static const int ThetaUnicode = 0x03B8;
+		static const int LambdaUnicode = 0x03BB;
+		static const int KoppaUnicode = 0x03DF;
+		static const int LozengeUnicode = 0x29EB;
+		static const int CrossProductUnicode = 0x2A2F;
+		static const int BadMagicUnicode = 0x29F2;
+		static const int GoodMagicUnicode = 0x29F3;
 
 	public:
 
@@ -64,7 +65,7 @@ namespace brogueHd::frontend::ui
 		~brogueGlyphMap();
 
 		gridLocator getGlyphLocation(int character);
-		
+
 	protected:
 
 		void initialize();
@@ -231,7 +232,7 @@ namespace brogueHd::frontend::ui
 			simpleException::show("Glyph not found:  brogueGlyph::getGlyphLocation");
 
 		// Forgot the offset while setting these up
-		gridLocator location  = _glyphLocations->get(character);
+		gridLocator location = _glyphLocations->get(character);
 
 		return gridLocator(location.column, location.row + this->GlyphSheetRowOffset);
 	}

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "gridLocator.h"
 #include "simpleGlData.h"
 
 namespace brogueHd::frontend::opengl

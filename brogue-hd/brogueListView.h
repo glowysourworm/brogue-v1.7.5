@@ -1,14 +1,17 @@
 #pragma once
 
+#include "brogueButton.h"
+#include "brogueCellDisplay.h"
+#include "brogueMouseState.h"
+#include "brogueText.h"
+#include "brogueUIConstants.h"
+#include "brogueUIData.h"
+#include "brogueUIResponseData.h"
 #include "brogueView.h"
 #include "brogueViewContainer.h"
-#include "brogueButton.h"
-#include "brogueText.h"
-#include "brogueMouseState.h"
 #include "gridRect.h"
-#include "brogueUIData.h"
-#include "simpleHash.h"
-#include "simpleException.h"
+#include "simple.h"
+#include "simpleList.h"
 
 using namespace brogueHd::component;
 using namespace brogueHd::simple;
@@ -19,7 +22,8 @@ namespace brogueHd::frontend::ui
 	{
 	public:
 
-		brogueListView(brogueUIData* menuData,
+		brogueListView(brogueUIView viewName,
+					   brogueUIData* menuData,
 					   const simpleList<brogueUIData*>& items,
 					   brogueUIData* header,
 					   brogueUIData* footer,
@@ -28,7 +32,7 @@ namespace brogueHd::frontend::ui
 		~brogueListView();
 
 		virtual void update(const brogueMouseState& mouseState, int millisecondsLapsed) override;
-		virtual bool shouldUpdate(const brogueMouseState& mouseState, int millisecondsLapsed) override;
+		virtual brogueUIResponseData& checkUpdate(const brogueMouseState& mouseState, int millisecondsLapsed) override;
 
 		// Override needed to check for the header
 		virtual brogueCellDisplay* get(short column, short row) const override;
@@ -39,27 +43,28 @@ namespace brogueHd::frontend::ui
 		brogueText* _footer;
 	};
 
-	brogueListView::brogueListView(brogueUIData* menuData,
-									const simpleList<brogueUIData*>& items,
-									brogueUIData* header,
-									brogueUIData* footer,
-									const gridRect& sceneBoundary,
-									const gridRect& viewBoundary)
-		: brogueViewContainer(menuData, sceneBoundary, viewBoundary)
+	brogueListView::brogueListView(brogueUIView viewName,
+								   brogueUIData* menuData,
+								   const simpleList<brogueUIData*>& items,
+								   brogueUIData* header,
+								   brogueUIData* footer,
+								   const gridRect& sceneBoundary,
+								   const gridRect& viewBoundary)
+		: brogueViewContainer(viewName, menuData, sceneBoundary, viewBoundary)
 	{
 		// Header View
 		if (header != nullptr)
-			_header = new brogueText(header, sceneBoundary, header->getBounds());
+			_header = new brogueText(brogueUIView::Unnamed, header, sceneBoundary, header->getBounds());
 
 		// Vertical Buttons
 		for (int index = 0; index < items.count(); index++)
 		{
 			// Button View
-			this->addView((brogueView*)new brogueButton(items.get(index), sceneBoundary, items.get(index)->getBounds()));
+			this->addView((brogueView*)new brogueButton(brogueUIView::Unnamed, items.get(index), sceneBoundary, items.get(index)->getBounds()));
 		}
 
 		if (footer != nullptr)
-			_footer = new brogueText(footer, sceneBoundary, footer->getBounds());
+			_footer = new brogueText(brogueUIView::Unnamed, footer, sceneBoundary, footer->getBounds());
 
 		update(default_value::value<brogueMouseState>(), 0);
 	}
@@ -83,18 +88,22 @@ namespace brogueHd::frontend::ui
 
 		return brogueViewContainer::get(column, row);
 	}
-	bool brogueListView::shouldUpdate(const brogueMouseState& mouseState, int millisecondsLapsed)
+	brogueUIResponseData& brogueListView::checkUpdate(const brogueMouseState& mouseState, int millisecondsLapsed)
 	{
-		// No Mouse Interaction
-		bool hasMouseInteraction = this->getUIData()->getHasMouseInteraction();
+		brogueUIResponseData response;
+
+		response.sender = this->getViewName();
+
+		// Mouse Interaction
+		response.mouseUsed = this->getUIData()->getHasMouseInteraction();
 
 		// Check mouse hover
-		bool mouseHover = this->isMouseOver(mouseState);
+		response.mouseHover = this->isMouseOver(mouseState);
 
 		// Check mouse scroll
-		bool scrollUpdate = hasMouseInteraction && mouseState.getScrollPending() && mouseHover;
+		response.mouseScroll = mouseState.getScrollPending() && response.mouseHover;
 
-		if (scrollUpdate)
+		if (response.mouseScroll && response.mouseUsed)
 		{
 			if (!mouseState.getIsScrollUp())
 			{
@@ -117,18 +126,18 @@ namespace brogueHd::frontend::ui
 					this->incrementRenderOffset(0, -1);
 			}
 		}
-			
+
 
 		// Check the header, the footer, then pass through to the base class
-		bool shouldUpdate = _header == nullptr ? false : _header->shouldUpdate(mouseState, millisecondsLapsed);
+		response.shouldUpdate |= _header == nullptr ? false : _header->checkUpdate(mouseState, millisecondsLapsed).shouldUpdate;
 
 		// Check the footer
-		shouldUpdate |= _footer == nullptr ? false : _footer->shouldUpdate(mouseState, millisecondsLapsed);
-		
-		// Base class (child views)
-		bool childUpdates = brogueViewContainer::shouldUpdate(mouseState, millisecondsLapsed);
+		response.shouldUpdate |= _footer == nullptr ? false : _footer->checkUpdate(mouseState, millisecondsLapsed).shouldUpdate;
 
-		return shouldUpdate || childUpdates || scrollUpdate;
+		// Base class (child views)
+		response.shouldUpdate = brogueViewContainer::checkUpdate(mouseState, millisecondsLapsed).shouldUpdate;
+
+		return response;
 	}
 	void brogueListView::update(const brogueMouseState& mouseState, int millisecondsLapsed)
 	{
@@ -154,7 +163,7 @@ namespace brogueHd::frontend::ui
 		this->iterateViews([&that, &mouseState, &millisecondsLapsed] (brogueView* item)
 		{
 			item->update(mouseState, millisecondsLapsed);
-			
+
 			return iterationCallback::iterate;
 		});
 

@@ -1,13 +1,20 @@
 #pragma once
 
-#include <filesystem>
-#include <fstream>
 #include "bitmap.h"
-#include "simpleString.h"
+#include "color.h"
+#include "simple.h"
 #include "simpleArray.h"
 #include "simpleBuffer.h"
+#include "simpleException.h"
+#include "simpleMaskedInt32.h"
 #include "simplePixel.h"
 #include "simplePixelFilter.h"
+#include "simpleString.h"
+#include <cstdint>
+#include <exception>
+#include <filesystem>
+#include <fstream>
+#include <iosfwd>
 
 namespace brogueHd::simple
 {
@@ -21,13 +28,13 @@ namespace brogueHd::simple
 		/// </summary>
 		simpleBitmap();
 		simpleBitmap(simpleBuffer* fileBuffer,
-					simpleBuffer* colorDataBuffer,
-					BitmapFileHeader* signature,
-					BITMAPCOREHEADER* coreHeader,
-					BITMAPV5HEADER* dibHeader,
-					BitmapOptionalMasks* optionalMasks,
-					uint32_t resolvedWidth,
-					uint32_t resolvedHeight);
+					 simpleBuffer* colorDataBuffer,
+					 BitmapFileHeader* signature,
+					 BITMAPCOREHEADER* coreHeader,
+					 BITMAPV5HEADER* dibHeader,
+					 BitmapOptionalMasks* optionalMasks,
+					 uint32_t resolvedWidth,
+					 uint32_t resolvedHeight);
 		simpleBitmap(const simpleBitmap& copy);
 		~simpleBitmap();
 
@@ -92,9 +99,9 @@ namespace brogueHd::simple
 
 		// Bitmap Format: (see bitmap.h) [ Signature Header, DIB Header, Optional Bitmasks, Optional Color Table, Optional Gap1, Pixel Array, ...]
 
-		BitmapFileHeader*	 _signatureHeader;
-		BITMAPCOREHEADER*	 _coreHeader;		// In case of old versions, this will be tried in the header section as well.
-		BITMAPV5HEADER*		 _dibHeader;			
+		BitmapFileHeader* _signatureHeader;
+		BITMAPCOREHEADER* _coreHeader;		// In case of old versions, this will be tried in the header section as well.
+		BITMAPV5HEADER* _dibHeader;
 		BitmapOptionalMasks* _optionalMasks;
 
 	private:
@@ -176,7 +183,7 @@ namespace brogueHd::simple
 			fileBufferIn = new char[fileSize];
 
 			std::ifstream stream(filename.c_str());
-			
+
 			stream.get(fileBufferIn, fileSize);
 			stream.close();
 
@@ -241,7 +248,7 @@ namespace brogueHd::simple
 					else
 						simpleException::show("Invalid bitmap file decoding:  Image Data doesn't align with header values");
 				}
-				
+
 				//if (resolvedWidth * resolvedHeight * 4 != colorDataBufferSize)
 				//	simpleException::show("Invalid bitmap file decoding:  Image Data doesn't align with header values");
 
@@ -253,7 +260,7 @@ namespace brogueHd::simple
 			}
 			else
 				simpleException::show("Invalid bitmap file decoding:  Either corrupt file or improper use of DIB header");
-			
+
 
 			//colorDataBufferSize = dibHeader->bV5Width * dibHeader->bV5Height * 4;
 
@@ -307,7 +314,7 @@ namespace brogueHd::simple
 		{
 			// Size of the image data should be one pixel = one word (32-bits)
 			//simpleArray<simplePixel> colorData(_colorDataBuffer->getBufferSize() / 4);
-			
+
 			//// Decode the pixel data - applying the filter to the data
 			//decodeColorData(filter, colorData);
 
@@ -359,7 +366,7 @@ namespace brogueHd::simple
 		else if (fileBuffer->getChar(0) == 'P' && fileBuffer->getChar(1) == 'T')
 			header->SignatureDecoded = BitmapFileHeader::BMPSignature::PT;
 
-		else 
+		else
 			simpleException::show("Unhandled bitmap signature type:  simpleBitmap.h");
 
 		// Reserved data not needed:  Just grab these data points at their specified offsets

@@ -128,7 +128,6 @@
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;GLFW_INCLUDE_NONE;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AdditionalIncludeDirectories>C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\include;C:\Backup\_Source\Git\brogue-v1.7.5\packages\sdl2.nuget.2.30.8\build\native\include;C:\Backup\_Source\Git\brogue-v1.7.5\packages\sdl2_image.nuget.2.8.2\build\native\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -186,6 +185,7 @@
     <ClInclude Include="brogueDataStream.h" />
     <ClInclude Include="brogueMouseState.h" />
     <ClInclude Include="brogueProgramContainer.h" />
+    <ClInclude Include="brogueProgramController.h" />
     <ClInclude Include="brogueScoreEntry.h" />
     <ClInclude Include="brogueText.h" />
     <ClInclude Include="brogueUIBuilder.h" />
@@ -211,6 +211,8 @@
     <ClInclude Include="colorGradient.h" />
     <ClInclude Include="openglQuadConverter.h" />
     <ClInclude Include="openglHelper.h" />
+    <ClInclude Include="brogueUIConstants.h" />
+    <ClInclude Include="programControlData.h" />
     <ClInclude Include="randomRange.h" />
     <ClInclude Include="simpleBoundingBox.h" />
     <ClInclude Include="simpleBuffer.h" />
@@ -309,7 +311,6 @@
     <ClInclude Include="machineConstants.h" />
     <ClInclude Include="simpleBitmap.h" />
     <ClInclude Include="simpleMouseState.h" />
-    <ClInclude Include="simpleOpenGl.h" />
     <ClInclude Include="simplePeriodCounter.h" />
     <ClInclude Include="simplePixel.h" />
     <ClInclude Include="simplePixelFilter.h" />
@@ -350,8 +351,10 @@
     <ClInclude Include="terrainGenerator.h" />
     <ClInclude Include="simpleTriangle.h" />
     <ClInclude Include="simpleGlData.h" />
+    <ClInclude Include="brogueUIResponseData.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\config.json" />
     <None Include="..\resources\model\armor.csv" />
     <None Include="..\resources\model\armorRunicNames.csv" />
     <None Include="..\resources\model\blueprint.csv" />

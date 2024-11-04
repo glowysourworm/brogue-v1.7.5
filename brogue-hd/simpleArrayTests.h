@@ -1,8 +1,11 @@
 #pragma once
 
+#include "brogueTestFunction.h"
 #include "brogueTestPackage.h"
+#include "simple.h"
 #include "simpleArray.h"
 #include "simpleString.h"
+#include <functional>
 
 using namespace brogueHd::simple;
 
@@ -57,7 +60,7 @@ namespace brogueHd::test
 
 			theArray.set(2, 3);
 
-			this->testAssert("intArray_OnStack_Set_Get", [&theArray]()
+			this->testAssert("intArray_OnStack_Set_Get", [&theArray] ()
 			{
 				return theArray.get(2) == 3;
 			});
@@ -71,7 +74,7 @@ namespace brogueHd::test
 
 			theArray->set(2, 3);
 
-			this->testAssert("intArray_OnHeap_Set_Get_Delete", [&theArray]()
+			this->testAssert("intArray_OnHeap_Set_Get_Delete", [&theArray] ()
 			{
 				return theArray->get(2) == 3;
 			});
@@ -85,7 +88,7 @@ namespace brogueHd::test
 		{
 			simpleArray<int> theArray(10);
 
-			theArray.forEach([](int number)
+			theArray.forEach([] (int number)
 			{
 				return iterationCallback::iterate;
 			});
@@ -97,7 +100,7 @@ namespace brogueHd::test
 		{
 			simpleArray<int>* theArray = new simpleArray<int>(10);
 
-			theArray->forEach([](int number)
+			theArray->forEach([] (int number)
 			{
 				return iterationCallback::iterate;
 			});
@@ -129,7 +132,7 @@ namespace brogueHd::test
 
 			theArray.set(2, "some string");
 
-			this->testAssert("stringArray_OnStack_Set_Get", [&theArray]()
+			this->testAssert("stringArray_OnStack_Set_Get", [&theArray] ()
 			{
 				return theArray.get(2) == "some string";
 			});
@@ -143,7 +146,7 @@ namespace brogueHd::test
 
 			theArray->set(2, "some string");
 
-			this->testAssert("stringArray_OnHeap_Set_Get_Delete", [&theArray]()
+			this->testAssert("stringArray_OnHeap_Set_Get_Delete", [&theArray] ()
 			{
 				return theArray->get(2) == "some string";
 			});
@@ -157,7 +160,7 @@ namespace brogueHd::test
 		{
 			simpleArray<simpleString> theArray(10);
 
-			theArray.forEach([](simpleString str)
+			theArray.forEach([] (simpleString str)
 			{
 				return iterationCallback::iterate;
 			});
@@ -169,7 +172,7 @@ namespace brogueHd::test
 		{
 			simpleArray<simpleString>* theArray = new simpleArray<simpleString>(7);
 
-			theArray->forEach([](simpleString str)
+			theArray->forEach([] (simpleString str)
 			{
 				return iterationCallback::iterate;
 			});

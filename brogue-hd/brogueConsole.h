@@ -3,6 +3,7 @@
 #include "brogueGlobal.h"
 #include "simpleArray.h"
 #include "simpleString.h"
+#include <iosfwd>
 #include <iostream>
 
 using namespace brogueHd::simple;
@@ -51,11 +52,11 @@ namespace brogueHd::console
 
 		switch (choice)
 		{
-		case 1: return brogueConsoleReturn::Completed_SetMode_Game;
-		case 2: return brogueConsoleReturn::Completed_SetMode_Dev;
-		case 3: return brogueConsoleReturn::Completed_SetMode_Resource;
-		default:
-			return brogueConsoleReturn::Exit;
+			case 1: return brogueConsoleReturn::Completed_SetMode_Game;
+			case 2: return brogueConsoleReturn::Completed_SetMode_Dev;
+			case 3: return brogueConsoleReturn::Completed_SetMode_Resource;
+			default:
+				return brogueConsoleReturn::Exit;
 		}
 	}
 	void brogueConsole::printHelp(std::ostream& stream)

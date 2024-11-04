@@ -2,8 +2,9 @@
 
 #include "brogueLevel.h"
 #include "brogueMessageQueue.h"
-#include "openglRenderer.h"
+#include "brogueProgramController.h"
 #include "brogueView.h"
+#include "openglRenderer.h"
 #include "randomGenerator.h"
 
 using namespace brogueHd::backend::model;
@@ -17,7 +18,7 @@ namespace brogueHd::frontend::renderer
 	{
 	public:
 
-		levelRenderer(brogueLevel* level, brogueMessageQueue* messageQueue, randomGenerator* randomGenerator);
+		levelRenderer(brogueProgramController* programController, brogueLevel* level, brogueMessageQueue* messageQueue, randomGenerator* randomGenerator);
 		~levelRenderer();
 
 		/// <summary>
@@ -59,7 +60,8 @@ namespace brogueHd::frontend::renderer
 		brogueView* _flavorMessageView;			// Flavor text bar
 	};
 
-	levelRenderer::levelRenderer(brogueLevel* level, brogueMessageQueue* messageQueue, randomGenerator* randomGenerator)
+	levelRenderer::levelRenderer(brogueProgramController* programController, brogueLevel* level, brogueMessageQueue* messageQueue, randomGenerator* randomGenerator)
+		: openglRenderer(programController)
 	{
 		//brogueAssert(randomGenerator->checkId(RANDOM_GENERATOR_COSMETIC))
 

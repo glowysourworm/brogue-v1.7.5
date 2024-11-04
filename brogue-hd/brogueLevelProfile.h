@@ -1,8 +1,13 @@
 #pragma once
 
+#include "brogueGlobal.h"
 #include "dungeon.h"
+#include "dungeonConstants.h"
 #include "randomGenerator.h"
+#include "simpleException.h"
 #include "simpleHash.h"
+#include "simpleList.h"
+#include "simpleMath.h"
 
 using namespace brogueHd::simple;
 using namespace brogueHd::backend::generator;
@@ -66,7 +71,7 @@ namespace brogueHd::backend::model
 	brogueLevelProfile::brogueLevelProfile(const randomGenerator* randomGenerator, short depth, levelTypes type)
 	{
 		if (depth == 1 && type != levelTypes::DP_BASIC_FIRST_ROOM)
-			simpleException::showCstr("Invalid first level type:  brogueLevelProfile.cpp");
+			simpleException::show("Invalid first level type:  brogueLevelProfile.cpp");
 
 		_roomInfo = new simpleHash<roomTypes, brogueRoomInfo>();
 		_levelType = type;
@@ -162,29 +167,29 @@ namespace brogueHd::backend::model
 		// Additional adjustment for first room
 		switch (roomType)
 		{
-		case roomTypes::CrossRoom:
-			roomFrequency += 20 * (100 - descentPercent) / 100;
-			break;
-		case roomTypes::SmallSymmetricalCrossRoom:
-			roomFrequency += 10 * (100 - descentPercent) / 100;
-			break;
-		case roomTypes::SmallRoom:
-			break;
-		case roomTypes::CircularRoom:
-			roomFrequency += 7 * (100 - descentPercent) / 100;
-			break;
-		case roomTypes::ChunkyRoom:
-			break;
-		case roomTypes::Cave:
-			roomFrequency += 10 * (100 - descentPercent) / 100;
-			break;
-		case roomTypes::Cavern:
-			roomFrequency += 50 * descentPercent / 100;
-			break;
-		case roomTypes::MainEntranceRoom:
-			break;
-		default:
-			break;
+			case roomTypes::CrossRoom:
+				roomFrequency += 20 * (100 - descentPercent) / 100;
+				break;
+			case roomTypes::SmallSymmetricalCrossRoom:
+				roomFrequency += 10 * (100 - descentPercent) / 100;
+				break;
+			case roomTypes::SmallRoom:
+				break;
+			case roomTypes::CircularRoom:
+				roomFrequency += 7 * (100 - descentPercent) / 100;
+				break;
+			case roomTypes::ChunkyRoom:
+				break;
+			case roomTypes::Cave:
+				roomFrequency += 10 * (100 - descentPercent) / 100;
+				break;
+			case roomTypes::Cavern:
+				roomFrequency += 50 * descentPercent / 100;
+				break;
+			case roomTypes::MainEntranceRoom:
+				break;
+			default:
+				break;
 		}
 
 		corridorFrequency += 80 * (100 - descentPercent) / 100;
@@ -201,13 +206,13 @@ namespace brogueHd::backend::model
 	brogueRoomInfo brogueLevelProfile::getRandomRoomInfo()
 	{
 		simpleList<short> weights = _roomInfo->selectFromValues<short>([] (brogueRoomInfo info)
-			{
-				return info.frequency;
-			});
+		{
+			return info.frequency;
+		});
 
 		short randomIndex = _randomGenerator->randWeighted(weights.toArray());
 
-		return _roomInfo->getAt(randomIndex).value;
+		return _roomInfo->getAt(randomIndex)->value;
 
 		return brogueRoomInfo();
 	}

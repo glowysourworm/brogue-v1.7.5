@@ -1,6 +1,6 @@
 #pragma once
 
-#include "brogueGlobal.h"
+#include <cstdio>
 #include <exception>
 
 namespace brogueHd::backend::model::io

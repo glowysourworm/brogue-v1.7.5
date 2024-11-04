@@ -1,9 +1,9 @@
 #pragma once
 
 #include "brogueObject.h"
-#include "itemConstants.h"
 #include "item.h"
-#include <functional>
+#include "itemConstants.h"
+#include <type_traits>
 
 using namespace brogueHd::backend::model::game;
 
@@ -34,7 +34,7 @@ namespace brogueHd::backend::model
 		T getDetail() const;
 
 	private:
-		
+
 		itemBase _detail;
 	};
 

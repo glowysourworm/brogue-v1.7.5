@@ -1,8 +1,7 @@
 #pragma once
 
-#include "brogueGlobal.h"
-#include "brogueObject.h"
 #include "brogueItem.h"
+#include "brogueObject.h"
 #include "creature.h"
 
 using namespace brogueHd::backend::model::creature;
@@ -22,7 +21,7 @@ namespace brogueHd::backend::model
 		short poisonAmount;                 // number of points of damage per turn from poison
 
 		bool hasMutation;
-		mutation mutation;					
+		mutation mutation;
 
 		short ticksUntilTurn;				// how long before the creature gets its next move
 

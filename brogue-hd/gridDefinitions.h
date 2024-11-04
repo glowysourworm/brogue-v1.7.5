@@ -1,9 +1,9 @@
 #pragma once
 
-#include "simple.h"
 #include "gridLocator.h"
-#include <array>
+#include "simple.h"
 #include <functional>
+#include <type_traits>
 
 namespace brogueHd::component
 {

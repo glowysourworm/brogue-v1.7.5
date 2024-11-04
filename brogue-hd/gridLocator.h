@@ -1,8 +1,10 @@
 #pragma once
 
 #include "graphNode.h"
-#include "simpleMath.h"
+#include "simple.h"
 #include "simpleExt.h"
+#include "simpleMath.h"
+#include <string>
 
 using namespace brogueHd::simple;
 
@@ -65,11 +67,9 @@ namespace brogueHd::component
 			return gridLocator(-1, -1);
 		}
 
-		virtual const char* getString() const
+		virtual void getString(std::string& result) const
 		{
-			std::string result = simpleExt::format("Column={}, Row={}", column, row);
-
-			return result.c_str();
+			result = simpleExt::format("Column={}, Row={}", column, row);
 		}
 
 		size_t getHash() const override

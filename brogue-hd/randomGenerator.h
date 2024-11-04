@@ -1,8 +1,10 @@
 #pragma once
 
-#include "simpleArray.h"
+#include "color.h"
 #include "randomRange.h"
-#include <random>
+#include "simpleArray.h"
+#include "simpleMath.h"
+#include <cstdlib>
 
 using namespace brogueHd::simple;
 using namespace brogueHd::backend::model::game;
@@ -171,7 +173,7 @@ namespace brogueHd::backend::generator
 		// Normal Distribution
 		// 
 		// https://www.alanzucconi.com/2015/09/16/how-to-sample-from-a-gaussian-distribution/
-		
+
 		double v1, v2, R;
 
 		do
@@ -184,14 +186,14 @@ namespace brogueHd::backend::generator
 			R = v1 * v1 + v2 * v2;
 
 			// Reject points outside the unit circle (RARE)
-		}	while (R >= 1.0f || R == 0.0f);
+		} while (R >= 1.0f || R == 0.0f);
 
 		// Use inverse CDF methods to calculate the gaussian
 		double normalValue = v1 * simpleMath::sqrt((-2.0 * simpleMath::naturalLog(R)) / R);
 
 		// The resulting gaussian draw
 		double result = (mean + (normalValue * stdDev));
-		
+
 		// Clip off very rare events
 		float resultClipped = simpleMath::clamp<float>(result, lowLimit, highLimit);
 

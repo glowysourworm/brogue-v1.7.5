@@ -1,8 +1,9 @@
 #pragma once
 
 #include "brogueGlobal.h"
-#include "messageData.h"
 #include "color.h"
+#include "messageData.h"
+#include "simple.h"
 #include "simpleList.h"
 
 using namespace brogueHd::simple;
@@ -61,7 +62,7 @@ namespace brogueHd::backend::model
 	brogueMessageQueue::brogueMessageQueue()
 	{
 		// TODO: get these from catalogs
-		color whiteBrogue(255, 255, 255, 0, 0, 0, 0, false);
+		color whiteBrogue(1, 1, 1, 1);
 
 		//_messages = new simpleList<messageData>();
 		_flavorMessage = messageData("You are here...", whiteBrogue, true);
@@ -87,11 +88,11 @@ namespace brogueHd::backend::model
 		{
 			// Auto-confirm all messages
 			_messages->forEach([] (messageData amessage)
-				{
-					amessage.confirmed = true;
+			{
+				amessage.confirmed = true;
 
-					return iterationCallback::iterate;
-				});
+				return iterationCallback::iterate;
+			});
 
 			// Reset the message index
 			_currentMessageIndex = 0;

@@ -3,6 +3,7 @@
 #include "simple.h"
 #include "simpleExt.h"
 #include "simpleString.h"
+#include <corecrt.h>
 
 using namespace brogueHd::simple;
 
@@ -12,7 +13,7 @@ namespace brogueHd::backend::model::io
 	{
 	public:
 
-		brogueScoreEntry() 
+		brogueScoreEntry()
 		{
 			_score = 0;
 			_date = nullptr;

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "simple.h"
 #include "color.h"
+#include "simple.h"
 
 using namespace brogueHd::simple;
 using namespace brogueHd::backend::model::game;
@@ -16,26 +16,26 @@ namespace brogueHd::backend::model
 	{
 	public:
 
-		brogueObject(){}
+		brogueObject() {}
 
 	public:
-		
+
 		bool operator==(const brogueObject& other) const
 		{
 			return character == other.character &&
-				   foreColor == other.foreColor &&
-				   backColor == other.backColor &&
-				   opacity == other.opacity;
+				foreColor == other.foreColor &&
+				backColor == other.backColor &&
+				opacity == other.opacity;
 		}
 
 		bool operator!=(const brogueObject& other) const
 		{
 			return character != other.character ||
-				   foreColor != other.foreColor ||
-				   backColor != other.backColor ||
-				   opacity != other.opacity;
+				foreColor != other.foreColor ||
+				backColor != other.backColor ||
+				opacity != other.opacity;
 		}
-		size_t getHash() const override 
+		size_t getHash() const override
 		{
 			return hashGenerator::generateHash(character, opacity);
 		}

@@ -4,8 +4,8 @@
 #include "simpleExt.h"
 //#include "simpleString.h"
 #include <iostream>
-#include <stdexcept>
 #include <stacktrace>
+#include <string>
 
 namespace brogueHd::simple
 {

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "simple.h"
 #include "color.h"
+#include "simple.h"
 
 namespace brogueHd::backend::model::game
 {

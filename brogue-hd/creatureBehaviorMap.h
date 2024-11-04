@@ -1,10 +1,10 @@
 #pragma once
 
-#include "grid.h"
-#include "gridLocator.h"
 #include "brogueCell.h"
 #include "brogueObject.h"
 #include "creatureBehavior.h"
+#include "grid.h"
+#include "gridLocator.h"
 #include "simpleList.h"
 
 using namespace brogueHd::component;
@@ -17,20 +17,20 @@ namespace brogueHd::backend::model::creature
 	{
 	public:
 
-		creatureBehaviorMap(){};
-		~creatureBehaviorMap(){};
+		creatureBehaviorMap() {};
+		~creatureBehaviorMap() {};
 
 		/// <summary>
 		/// Updates creature behavior maps based on gloabl maps. Should be run each turn.
 		/// </summary>
-		void update(grid<brogueCell>* layoutGrid, grid<brogueObject>* contentGrid){};
+		void update(grid<brogueCell>* layoutGrid, grid<brogueObject>* contentGrid) {};
 
 	private:
 
 		creatureBehavior* _behavior;
 
 		/*	Creature States
-		 
+
 			MONSTER_SLEEPING,
 			MONSTER_TRACKING_SCENT,
 			MONSTER_WANDERING,
@@ -39,14 +39,14 @@ namespace brogueHd::backend::model::creature
 		*/
 
 		/*  Creature Modes
-		
+
 			MODE_NORMAL,
 			MODE_PERM_FLEEING
 
 		*/
 
-		grid<bool>*	 _visibilityMap;
-		grid<bool>*  _visibilityMapLastTurn;	// Map from last turn
+		grid<bool>* _visibilityMap;
+		grid<bool>* _visibilityMapLastTurn;	// Map from last turn
 		grid<short>* _goalMap;					// This map varies depending on the creature (also, friendly or enemy, "mapToMe")
 		grid<short>* _fleeMap;
 		grid<short>* _scentMap;

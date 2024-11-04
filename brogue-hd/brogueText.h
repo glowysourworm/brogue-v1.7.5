@@ -1,9 +1,13 @@
 #pragma once
 
-#include "brogueView.h"
-#include "gridRect.h"
-#include "colorString.h"
+#include "brogueMouseState.h"
+#include "brogueUIConstants.h"
 #include "brogueUIData.h"
+#include "brogueUIResponseData.h"
+#include "brogueView.h"
+#include "color.h"
+#include "gridRect.h"
+#include "simple.h"
 
 using namespace brogueHd::component;
 
@@ -13,24 +17,32 @@ namespace brogueHd::frontend::ui
 	{
 	public:
 
-		brogueText(brogueUIData* data, const gridRect& sceneBoundary, const gridRect& viewBoundary);
+		brogueText(brogueUIView viewName, brogueUIData* data, const gridRect& sceneBoundary, const gridRect& viewBoundary);
 		~brogueText();
 
 		virtual void update(const brogueMouseState& mouseState, int millisecondsLapsed) override;
-		virtual bool shouldUpdate(const brogueMouseState& mouseState, int millisecondsLapsed) override;
+		virtual brogueUIResponseData& checkUpdate(const brogueMouseState& mouseState, int millisecondsLapsed) override;
 	};
 
-	brogueText::brogueText(brogueUIData* data, const gridRect& sceneBoundary, const gridRect& viewBoundary)
-		: brogueView(data, sceneBoundary, viewBoundary)
+	brogueText::brogueText(brogueUIView viewName, brogueUIData* data, const gridRect& sceneBoundary, const gridRect& viewBoundary)
+		: brogueView(viewName, data, sceneBoundary, viewBoundary)
 	{
 		update(default_value::value<brogueMouseState>(), 0);
 	}
 	brogueText::~brogueText()
 	{
 	}
-	bool brogueText::shouldUpdate(const brogueMouseState& mouseState, int millisecondsLapsed)
+	brogueUIResponseData& brogueText::checkUpdate(const brogueMouseState& mouseState, int millisecondsLapsed)
 	{
-		return this->getUIData()->getHasMouseInteraction() && this->isMouseOver(mouseState);
+		brogueUIResponseData response;
+
+		response.sender = this->getViewName();
+		response.mouseHover = this->isMouseOver(mouseState);
+		response.mouseUsed = this->getUIData()->getHasMouseInteraction();
+		response.mouseLeft = mouseState.getMouseLeft();
+		response.shouldUpdate = (response.mouseHover || response.mouseLeft) && response.mouseUsed;
+
+		return response;
 	}
 	void brogueText::update(const brogueMouseState& mouseState, int millisecondsLapsed)
 	{

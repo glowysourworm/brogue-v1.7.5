@@ -1,11 +1,11 @@
 #pragma once
 
-#include "broguePlayer.h"
-#include "brogueItem.h"
 #include "brogueCreature.h"
+#include "brogueItem.h"
 #include "brogueObject.h"
-#include "simpleList.h"
+#include "broguePlayer.h"
 #include "grid.h"
+#include "simpleList.h"
 
 using namespace brogueHd::simple;
 using namespace brogueHd::component;

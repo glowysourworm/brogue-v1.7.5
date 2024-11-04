@@ -1,11 +1,19 @@
 #pragma once
-#include "brogueListView.h"
 #include "brogueGlobal.h"
+#include "brogueListView.h"
+#include "brogueScoreEntry.h"
+#include "brogueUIConstants.h"
+#include "brogueUIData.h"
+#include "color.h"
+#include "colorGradient.h"
+#include "colorString.h"
+#include "gridRect.h"
+#include "resourceController.h"
+#include "simpleDirectoryEntry.h"
+#include "simpleExt.h"
+#include "simpleFileEntry.h"
 #include "simpleList.h"
 #include "simpleString.h"
-#include "color.h"
-#include "simpleFileEntry.h"
-#include "simpleDirectoryEntry.h"
 
 using namespace brogueHd::simple;
 using namespace brogueHd::backend::model::game;
@@ -22,7 +30,7 @@ namespace brogueHd::frontend::ui
 		/// </summary>
 		static gridRect getBrogueSceneBoundary()
 		{
-			return gridRect(0,0,COLS,ROWS);
+			return gridRect(0, 0, COLS, ROWS);
 		}
 
 		static gridRect getMainMenuSelectorBoundary()
@@ -90,11 +98,11 @@ namespace brogueHd::frontend::ui
 
 				buttons.get(index)->setUIParameters('\0', 0, true, true, 0, zoomLevel);
 			}
-			
-			return new brogueListView(menuData, buttons, headerData, nullptr, sceneBounds, menuBounds);
+
+			return new brogueListView(brogueUIView::MainMenuSelector, menuData, buttons, headerData, nullptr, sceneBounds, menuBounds);
 		}
 
-		static brogueListView* createMainMenuSelector(const simpleDirectoryEntry& files, int zoomLevel)
+		static brogueListView* createMainMenuSelector(brogueUIView viewName, const simpleDirectoryEntry& files, int zoomLevel)
 		{
 			gridRect sceneBounds = getBrogueSceneBoundary();
 			gridRect menuBounds = getOpenMenuSelectorBoundary();
@@ -119,10 +127,10 @@ namespace brogueHd::frontend::ui
 			simpleList<brogueUIData*> buttons;
 
 			simpleList<simpleFileEntry*> filesSorted = files.sort();
-			
+
 			for (int index = 0; index < filesSorted.count(); index++)
 			{
-				gridRect boundary(paddedBounds.column, paddedBounds.row + index + 1, paddedBounds.width,1);
+				gridRect boundary(paddedBounds.column, paddedBounds.row + index + 1, paddedBounds.width, 1);
 
 				simpleString fileName = *(filesSorted.get(index)->getFileNameWithoutExtension());
 				simpleString fileNameTrimmed;
@@ -187,7 +195,7 @@ namespace brogueHd::frontend::ui
 				buttons.add(data);
 			}
 
-			return new brogueListView(menuData, buttons, headerData, nullptr, sceneBounds, menuBounds);
+			return new brogueListView(viewName, menuData, buttons, headerData, nullptr, sceneBounds, menuBounds);
 		}
 
 		static brogueListView* createHighScoresView(resourceController* resourceController, int zoomLevel)
@@ -195,7 +203,7 @@ namespace brogueHd::frontend::ui
 			gridRect sceneBounds = getBrogueSceneBoundary();
 
 			// Pulled from Brogue v1.7.5
-			color menuColor(0,0,0,0.85);
+			color menuColor(0, 0, 0, 0.85);
 			color footerColor(0.596f, 0.494f, 0.996f, 1);
 
 			// Menu Background
@@ -220,7 +228,7 @@ namespace brogueHd::frontend::ui
 				gridRect boundary(sceneBounds.column, sceneBounds.row + index + menuPadding, sceneBounds.width, 1);
 
 				simpleString preamble = simpleExt::format("{}) ", index + 1);
-				simpleString score = simpleExt::toString(entry->getScore());	
+				simpleString score = simpleExt::toString(entry->getScore());
 				simpleString dateAndDescr = simpleExt::format("{} {}", entry->getDate()->c_str(), entry->getDescription()->c_str());
 
 				// Size to line up scores (5)
@@ -244,7 +252,7 @@ namespace brogueHd::frontend::ui
 
 			footerData->setUIParameters('\0', -1, false, true, 0, zoomLevel);
 
-			return new brogueListView(menuData, items, headerData, footerData, sceneBounds, sceneBounds);
+			return new brogueListView(brogueUIView::HighScoresView, menuData, items, headerData, footerData, sceneBounds, sceneBounds);
 		}
 	};
 }

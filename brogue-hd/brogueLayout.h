@@ -6,6 +6,11 @@
 #include "grid.h"
 #include "simpleList.h"
 
+#include "brogueCell.h"
+#include "brogueGlobal.h"
+#include "gridDefinitions.h"
+#include "gridRect.h"
+#include "simple.h"
 #include <functional>
 
 using namespace brogueHd::simple;
@@ -106,26 +111,26 @@ namespace brogueHd::backend::model
 
 	void brogueLayout::iterateAdjacentCells(short column, short row, gridCallback<brogueCell*> callback)
 	{
-		_mainGrid->iterateAround(column, row, true, [&callback] (short column, short row, brogueCell* item)
-			{
-				return callback(column, row, item);
-			});
+		_mainGrid->iterateAdjacent(column, row, true, [&callback] (short column, short row, brogueCompass direction, brogueCell* item)
+		{
+			return callback(column, row, item);
+		});
 	}
 
 	brogueCell* brogueLayout::firstAdjacent(short column, short row, gridPredicate<brogueCell*> predicate)
 	{
 		brogueCell* result;
 
-		_mainGrid->iterateAround(column, row, true, [&predicate, &result] (short acolumn, short arow, brogueCell* cell)
+		_mainGrid->iterateAdjacent(column, row, true, [&predicate, &result] (short acolumn, short arow, brogueCompass direction, brogueCell* cell)
+		{
+			if (predicate(acolumn, arow, cell))
 			{
-				if (predicate(acolumn, arow, cell))
-				{
-					result = cell;
-					return iterationCallback::breakAndReturn;
-				}
+				result = cell;
+				return iterationCallback::breakAndReturn;
+			}
 
-				return iterationCallback::iterate;
-			});
+			return iterationCallback::iterate;
+		});
 
 		return result;
 	}

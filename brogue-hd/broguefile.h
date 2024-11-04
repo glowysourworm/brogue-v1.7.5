@@ -1,11 +1,9 @@
 #pragma once
 
-#include "simple.h"
-#include "brogueGlobal.h"
 #include "gameConstants.h"
+#include "simple.h"
 #include "simpleList.h"
-#include <iostream>
-#include <time.h>
+#include <iosfwd>
 
 using namespace brogueHd::simple;
 using namespace brogueHd::backend::modelConstant;
@@ -68,7 +66,7 @@ namespace brogueHd::backend::model::io
 		}
 	};
 
-	struct brogueEventFile 
+	struct brogueEventFile
 	{
 		unsigned long eventCount;
 		simpleList<brogueEvent> eventList;

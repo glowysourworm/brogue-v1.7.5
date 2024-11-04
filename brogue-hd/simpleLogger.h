@@ -3,6 +3,7 @@
 #include "simple.h"
 #include "simpleExt.h"
 #include <iostream>
+#include <string>
 
 namespace brogueHd::simple
 {

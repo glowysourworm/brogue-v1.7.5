@@ -1,8 +1,9 @@
 ﻿#pragma once
 
 #include "simple.h"
-#include "simpleException.h"
 #include "simpleArray.h"
+#include "simpleException.h"
+#include "simpleMath.h"
 #include <functional>
 
 namespace brogueHd::simple
@@ -247,9 +248,9 @@ namespace brogueHd::simple
 
 		// Use doubling method: Always multiply size by 2 until {MaxElementIncrement} is reached
 		//
-		int newSize = (_array->count() == 0) ? 10 : (_array->count() >= this->ArrayIncrement) ? 
-													(_array->count() + this->ArrayIncrement) :
-													 _array->count() * 2;
+		int newSize = (_array->count() == 0) ? 10 : (_array->count() >= this->ArrayIncrement) ?
+			(_array->count() + this->ArrayIncrement) :
+			_array->count() * 2;
 
 		// Copy over the data
 		simpleArray<T>* newArray = new simpleArray<T>(newSize);

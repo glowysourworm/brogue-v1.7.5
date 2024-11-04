@@ -1,7 +1,8 @@
 #pragma once
 
+#include "gridLocator.h"
 #include "simple.h"
-#include "gridDefinitions.h"
+#include <functional>
 
 namespace brogueHd::component
 {
@@ -52,17 +53,17 @@ namespace brogueHd::component
 		bool operator==(const gridRect& rect) const
 		{
 			return column == rect.column &&
-				   row == rect.row &&
-				   width == rect.width &&
-				   height == rect.height;
+				row == rect.row &&
+				width == rect.width &&
+				height == rect.height;
 		}
 
 		bool operator!=(const gridRect& rect) const
 		{
 			return column != rect.column ||
-				   row != rect.row ||
-				   width != rect.width ||
-				   height != rect.height;
+				row != rect.row ||
+				width != rect.width ||
+				height != rect.height;
 		}
 		virtual size_t getHash() const override
 		{
@@ -243,8 +244,8 @@ namespace brogueHd::component
 			{
 				for (short i = left(); i <= right() && !userBreak; i++)
 				{
-						if (callback(i, j) == iterationCallback::breakAndReturn)
-							userBreak = true;
+					if (callback(i, j) == iterationCallback::breakAndReturn)
+						userBreak = true;
 				}
 			}
 		}

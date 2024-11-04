@@ -2,6 +2,8 @@
 
 #include <concepts>
 
+#include "gl.h"
+#include "gl.h"
 #include "simple.h"
 #include "simpleGlData.h"
 #include "simpleString.h"
@@ -11,13 +13,13 @@ using namespace brogueHd::simple;
 namespace brogueHd::frontend::opengl
 {
 	template<typename T>
-	concept isOpenGlUniform =	isHashable<T> &&
-							   (std::same_as<T, int> ||
-								std::same_as<T, float> ||
-								std::same_as<T, vec2> ||
-								std::same_as<T, ivec2> ||
-								std::same_as<T, vec3> ||
-								std::same_as<T, vec4>);
+	concept isOpenGlUniform = isHashable<T> &&
+								(std::same_as<T, int> ||
+								 std::same_as<T, float> ||
+								 std::same_as<T, vec2> ||
+								 std::same_as<T, ivec2> ||
+								 std::same_as<T, vec3> ||
+								 std::same_as<T, vec4>);
 
 
 	template<isOpenGlUniform T>

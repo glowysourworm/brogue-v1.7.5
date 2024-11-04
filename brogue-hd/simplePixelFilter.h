@@ -1,7 +1,9 @@
 #pragma once
 
-#include "simplePixel.h"
 #include "color.h"
+#include "simpleMaskedInt32.h"
+#include "simplePixel.h"
+#include <cstdint>
 
 using namespace brogueHd::backend::model::game;
 
@@ -11,8 +13,8 @@ namespace brogueHd::simple
 	{
 	public:
 
-		simplePixelFilter(){};
-		~simplePixelFilter(){};
+		simplePixelFilter() {};
+		~simplePixelFilter() {};
 
 		virtual simplePixel apply(const simplePixel& input) const
 		{
@@ -24,8 +26,8 @@ namespace brogueHd::simple
 	{
 	public:
 
-		simpleMapColorFilter(){};
-		~simpleMapColorFilter(){};
+		simpleMapColorFilter() {};
+		~simpleMapColorFilter() {};
 		simpleMapColorFilter(const color& inputColor, const color& outputColor)
 		{
 			_inputColor = inputColor;

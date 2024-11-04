@@ -1,11 +1,10 @@
 #pragma once
 
-#include "brogueTestPackage.h"
-#include "simpleArray.h"
-#include "simpleList.h"
-#include "simpleHash.h"
-#include "simpleBST.h"
 #include "brogueObject.h"
+#include "brogueTestFunction.h"
+#include "brogueTestPackage.h"
+#include "simpleHash.h"
+#include <functional>
 
 using namespace brogueHd::backend::model;
 using namespace brogueHd::simple;

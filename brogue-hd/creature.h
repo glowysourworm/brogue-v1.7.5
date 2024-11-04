@@ -1,12 +1,12 @@
 #pragma once
 
-#include "lightConstants.h"
-#include "dungeonConstants.h"
+#include "brogueGlobal.h"
 #include "color.h"
-#include "randomRange.h"
-#include "creatureConstants.h"
 #include "creatureBehaviorConstants.h"
-#include "boltConstants.h"
+#include "creatureConstants.h"
+#include "dungeonConstants.h"
+#include "lightConstants.h"
+#include "randomRange.h"
 
 using namespace brogueHd::simple;
 using namespace brogueHd::backend::modelConstant;
@@ -14,7 +14,7 @@ using namespace brogueHd::backend::model::game;
 
 namespace brogueHd::backend::model::creature
 {
-	struct creatureWords 
+	struct creatureWords
 	{
 		char flavorText[COLS * 5];
 		char absorbing[40];
@@ -43,7 +43,7 @@ namespace brogueHd::backend::model::creature
 		hordeFlags flags;
 	};
 
-	struct mutation 
+	struct mutation
 	{
 		char title[100];
 		const color* textColor;
@@ -62,7 +62,7 @@ namespace brogueHd::backend::model::creature
 		char description[1000];
 	};
 
-	struct creatureClass 
+	struct creatureClass
 	{
 		char name[30];
 		short frequency;

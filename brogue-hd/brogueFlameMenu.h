@@ -1,13 +1,19 @@
 #pragma once
 
+#include "brogueCellDisplay.h"
 #include "brogueGlobal.h"
+#include "brogueMouseState.h"
+#include "brogueUIConstants.h"
+#include "brogueUIData.h"
+#include "brogueUIResponseData.h"
+#include "brogueView.h"
 #include "color.h"
 #include "grid.h"
-#include "brogueView.h"
-#include "brogueUIData.h"
-#include "brogueMouseState.h"
-#include "simpleMath.h"
+#include "gridRect.h"
 #include "randomGenerator.h"
+#include "simple.h"
+#include "simpleMath.h"
+#include <cctype>
 
 using namespace brogueHd::simple;
 using namespace brogueHd::component;
@@ -21,13 +27,14 @@ namespace brogueHd::frontend::ui
 	class brogueFlameMenu : public brogueView
 	{
 	public:
-		brogueFlameMenu(randomGenerator* randomGenerator,
+		brogueFlameMenu(brogueUIView viewName,
+						randomGenerator* randomGenerator,
 						int fadePeriodMilliseconds,
 						int zoomLevel);
 		~brogueFlameMenu();
 
 		void update(const brogueMouseState& mouseState, int millisecondsLapsed) override;
-		bool shouldUpdate(const brogueMouseState& mouseState, int millisecondsLapsed) override;
+		brogueUIResponseData& checkUpdate(const brogueMouseState& mouseState, int millisecondsLapsed) override;
 
 		float calculateHeatEnvelope(short column, short row);
 
@@ -49,22 +56,22 @@ namespace brogueHd::frontend::ui
 			//
 			return   gridRect((COLS - MENU_TITLE_WIDTH) / 2,
 							  (ROWS - MENU_TITLE_HEIGHT) / 2,
-							   MENU_TITLE_WIDTH,
-							   MENU_TITLE_HEIGHT);
+							  MENU_TITLE_WIDTH,
+							  MENU_TITLE_HEIGHT);
 		}
 
 	public:
 
-		const float FlameNoise = 0.35;
-		const float FlameFade = 0.35;
+		const float FlameNoise = 0.35f;
+		const float FlameFade = 0.35f;
 
-		const color FlameBottomColor1 =			color(1.0, 0.0, 0.0, 0.5);
-		const color FlameBottomColor2 =			color(1.0, 0.2, 0.1, 0.5);
-		const color FlameBottomColor3 =			color(0.1, 0.0, 0.0, 0.5);
+		const color FlameBottomColor1 = color(1.0f, 0.0f, 0.0f, 0.5f);
+		const color FlameBottomColor2 = color(1.0f, 0.2f, 0.1f, 0.5f);
+		const color FlameBottomColor3 = color(0.1f, 0.0f, 0.0f, 0.5f);
 
-		const color FlameTitleColor1 =			color(0.0, 0.0, 1.0, 0.3);
-		const color FlameTitleColor2 =			color(0.0, 0.0, 0.1, 0.3);
-		const color FlameTitleColor3 =			color(0.8, 0.8, 1.0, 0.3);
+		const color FlameTitleColor1 = color(0.0f, 0.0f, 1.0f, 0.3f);
+		const color FlameTitleColor2 = color(0.0f, 0.0f, 0.1f, 0.3f);
+		const color FlameTitleColor3 = color(0.8f, 0.8f, 1.0f, 0.3f);
 
 		const color BottomHeatSources[3] = { FlameBottomColor1, FlameBottomColor2, FlameBottomColor3 };
 		const color TitleHeatSources[3] = { FlameTitleColor1, FlameTitleColor2, FlameTitleColor3 };
@@ -72,7 +79,7 @@ namespace brogueHd::frontend::ui
 		bool isTheText(short column, short row)
 		{
 			gridRect theTextBounds = this->textBounds();
-			
+
 			if (!theTextBounds.contains(column, row))
 				return false;
 
@@ -116,11 +123,12 @@ namespace brogueHd::frontend::ui
 		};
 	};
 
-	brogueFlameMenu::brogueFlameMenu(randomGenerator* randomGenerator,
+	brogueFlameMenu::brogueFlameMenu(brogueUIView viewName,
+									 randomGenerator* randomGenerator,
 									 int fadePeriodMilliseconds,
 									 int zoomLevel)
 
-		: brogueView(new brogueUIData(gridRect(0, 0, COLS, ROWS), zoomLevel), gridRect(0, 0, COLS, ROWS), gridRect(0, 0, COLS, ROWS))
+		: brogueView(viewName, new brogueUIData(gridRect(0, 0, COLS, ROWS), zoomLevel), gridRect(0, 0, COLS, ROWS), gridRect(0, 0, COLS, ROWS))
 	{
 		_randomGenerator = randomGenerator;
 		_fadePeriodMilliconds = fadePeriodMilliseconds;
@@ -134,9 +142,17 @@ namespace brogueHd::frontend::ui
 	{
 		delete _heatSourceGrid;
 	}
-	bool brogueFlameMenu::shouldUpdate(const brogueMouseState& mouseState, int millisecondsLapsed)
+	brogueUIResponseData& brogueFlameMenu::checkUpdate(const brogueMouseState& mouseState, int millisecondsLapsed)
 	{
-		return true;
+		brogueUIResponseData response;
+
+		response.sender = this->getViewName();
+		response.mouseHover = this->isMouseOver(mouseState);
+		response.mouseUsed = this->getUIData()->getHasMouseInteraction();
+		response.mouseLeft = mouseState.getMouseLeft();
+		response.shouldUpdate = (response.mouseHover || response.mouseLeft) && response.mouseUsed;
+
+		return response;
 	}
 	void brogueFlameMenu::update(const brogueMouseState& mouseState, int millisecondsLapsed)
 	{

@@ -1,11 +1,13 @@
 #pragma once
 
+#include "brogueUIConstants.h"
+#include "brogueUIResponseData.h"
+#include "gridRect.h"
 #include "simple.h"
 #include "simpleMouseState.h"
-#include "simpleGlObject.h"
-#include "gridRect.h"
 
 using namespace brogueHd::component;
+using namespace brogueHd::frontend::ui;
 
 namespace brogueHd::frontend::opengl
 {
@@ -13,8 +15,12 @@ namespace brogueHd::frontend::opengl
 	{
 	public:
 
-		brogueProgram(){};
-		~brogueProgram(){};
+		brogueProgram(brogueUIProgram programName, bool isActive)
+		{
+			_programName = programName;
+			_isActive = isActive;
+		};
+		~brogueProgram() {};
 
 		/// <summary>
 		/// Calls necessary routines to initialize the opengl program
@@ -28,9 +34,15 @@ namespace brogueHd::frontend::opengl
 		/// Returns true if the program requires update.
 		/// </summary>
 		/// <param name="millisecondsLapsed">Number of milliseconds lapsed since the last update</param>
-		virtual bool shouldUpdate(const simpleMouseState& mouseState, int millisecondsLapsed)
+		virtual brogueUIResponseData& checkUpdate(const simpleMouseState& mouseState, int millisecondsLapsed)
 		{
-			return false;
+			brogueUIResponseData defaultResponse;
+
+			defaultResponse.program = _programName;
+			defaultResponse.sender = brogueUIView::Unnamed;
+			defaultResponse.shouldUpdate = false;
+
+			return defaultResponse;
 		}
 
 		/// <summary>
@@ -79,5 +91,23 @@ namespace brogueHd::frontend::opengl
 		{
 			return default_value::value<gridRect>();
 		}
+
+		brogueUIProgram getProgramName() const
+		{
+			return _programName;
+		}
+		bool getIsActive() const
+		{
+			return _isActive;
+		}
+		void setIsActive(bool active)
+		{
+			_isActive = active;
+		}
+
+	private:
+
+		brogueUIProgram _programName;
+		bool _isActive;
 	};
 }

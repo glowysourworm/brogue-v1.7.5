@@ -1,13 +1,16 @@
 #pragma once
 
-#include "simpleList.h"
-#include "gridRect.h"
-#include "gridLocator.h"
-#include "gridDefinitions.h"
-#include "brogueView.h"
-#include "brogueMouseState.h"
 #include "brogueCellDisplay.h"
+#include "brogueMouseState.h"
+#include "brogueUIConstants.h"
 #include "brogueUIData.h"
+#include "brogueUIResponseData.h"
+#include "brogueView.h"
+#include "gridDefinitions.h"
+#include "gridLocator.h"
+#include "gridRect.h"
+#include "simple.h"
+#include "simpleList.h"
 
 using namespace brogueHd::component;
 using namespace brogueHd::simple;
@@ -25,13 +28,13 @@ namespace brogueHd::frontend::ui
 	{
 	public:
 
-		brogueViewContainer(brogueUIData* uiData, const gridRect& sceneBoundary, const gridRect& viewBoundary);
+		brogueViewContainer(brogueUIView viewName, brogueUIData* uiData, const gridRect& sceneBoundary, const gridRect& viewBoundary);
 		~brogueViewContainer();
 
 		void addView(brogueView* view);
 
 		virtual void update(const brogueMouseState& mouseState, int millisecondsLapsed) override;
-		virtual bool shouldUpdate(const brogueMouseState& mouseState, int millisecondsLapsed) override;
+		virtual brogueUIResponseData& checkUpdate(const brogueMouseState& mouseState, int millisecondsLapsed) override;
 
 		virtual brogueCellDisplay* get(short column, short row) const override;
 
@@ -63,8 +66,8 @@ namespace brogueHd::frontend::ui
 		simpleList<brogueView*>* _childViews;
 	};
 
-	brogueViewContainer::brogueViewContainer(brogueUIData* uiData, const gridRect& sceneBoundary, const gridRect& viewBoundary) 
-		: brogueView(uiData, sceneBoundary, viewBoundary)
+	brogueViewContainer::brogueViewContainer(brogueUIView viewName, brogueUIData* uiData, const gridRect& sceneBoundary, const gridRect& viewBoundary)
+		: brogueView(viewName, uiData, sceneBoundary, viewBoundary)
 	{
 		_childViews = new simpleList<brogueView*>();
 	}
@@ -119,19 +122,35 @@ namespace brogueHd::frontend::ui
 	{
 		_childViews->add(view);
 	}
-	bool brogueViewContainer::shouldUpdate(const brogueMouseState& mouseState, int millisecondsLapsed)
+	brogueUIResponseData& brogueViewContainer::checkUpdate(const brogueMouseState& mouseState, int millisecondsLapsed)
 	{
-		bool childViewInvalidated = false;
+		// Use container's response data to aggregate the child views
+		brogueUIResponseData response;
 
 		// Check child views first (for performance) (NOTE:  This function updates mouse related data; and must be run on child views)
-		_childViews->forEach([&mouseState, &millisecondsLapsed, &childViewInvalidated] (brogueView* view)
+		_childViews->forEach([&mouseState, &millisecondsLapsed, &response] (brogueView* view)
 		{
-			childViewInvalidated |= view->shouldUpdate(mouseState, millisecondsLapsed);
+			brogueUIResponseData childResponse = view->checkUpdate(mouseState, millisecondsLapsed);
+
+			if (childResponse.shouldUpdate)
+				response = childResponse;
 
 			return iterationCallback::iterate;
 		});
 
-		return childViewInvalidated || (this->isMouseOver(mouseState) && this->getUIData()->getHasMouseInteraction());
+		// Set the repsonse view name to the container
+		response.sender = this->getViewName();
+
+		// Override with this container (wait for the caller to get child data)
+		if (this->isMouseOver(mouseState) && this->getUIData()->getHasMouseInteraction())
+		{
+			response.mouseHover = true;
+			response.mouseLeft = mouseState.getMouseLeft();
+			response.mouseUsed = mouseState.getMouseLeft();
+			response.shouldUpdate = true;
+		}
+
+		return response;
 	}
 	void brogueViewContainer::update(const brogueMouseState& mouseState, int millisecondsLapsed)
 	{
@@ -150,7 +169,7 @@ namespace brogueHd::frontend::ui
 	}
 	void brogueViewContainer::iterateViews(simpleListCallback<brogueView*> callback) const
 	{
-		_childViews->forEach([&callback](brogueView* view)
+		_childViews->forEach([&callback] (brogueView* view)
 		{
 			return callback(view);
 		});

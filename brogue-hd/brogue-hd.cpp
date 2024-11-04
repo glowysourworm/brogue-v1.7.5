@@ -1,17 +1,14 @@
 #include "brogueGlobal.h"
-#include "brogueMacroDeclaration.h"
-#include "gameConsole.h"
 #include "developerConsole.h"
+#include "gameConsole.h"
 #include "resourceConsole.h"
 #include "resourceController.h"
-#include "simpleHash.h"
 #include <iostream>
-#include <string>
 
-#include "simpleBitmap.h"
-#include "simplePixelFilter.h"
 
-#include <functional>
+#include "brogueConsole.h"
+#include "simpleString.h"
+#include <SDL_main.h>
 
 using namespace brogueHd::simple;
 
@@ -54,40 +51,40 @@ int main(int argc, char* argv[])
 
 			switch (returnValue)
 			{
-			case brogueConsoleReturn::Continue:
-			case brogueConsoleReturn::Completed:
-				currentConsole = defaultConsole;
-				break;
-			case brogueConsoleReturn::Completed_SetMode_Game:
-			{
-				if (currentConsole != defaultConsole)
-					delete currentConsole;
+				case brogueConsoleReturn::Continue:
+				case brogueConsoleReturn::Completed:
+					currentConsole = defaultConsole;
+					break;
+				case brogueConsoleReturn::Completed_SetMode_Game:
+				{
+					if (currentConsole != defaultConsole)
+						delete currentConsole;
 
-				currentConsole = new gameConsole(brogueResourceController);
-			}
-			break;
-			case brogueConsoleReturn::Completed_SetMode_Dev:
-			{
-				if (currentConsole != defaultConsole)
-					delete currentConsole;
-
-				currentConsole = new developerConsole();
-			}
-			break;
-			case brogueConsoleReturn::Completed_SetMode_Resource:
-			{
-				if (currentConsole != defaultConsole)
-					delete currentConsole;
-
-				currentConsole = new resourceConsole(brogueResourceController);
-			}
-			break;
-			case brogueConsoleReturn::CompletedWithError:
+					currentConsole = new gameConsole(brogueResourceController);
+				}
 				break;
-			case brogueConsoleReturn::Exit:
-			default:
-				iterate = false;
+				case brogueConsoleReturn::Completed_SetMode_Dev:
+				{
+					if (currentConsole != defaultConsole)
+						delete currentConsole;
+
+					currentConsole = new developerConsole();
+				}
 				break;
+				case brogueConsoleReturn::Completed_SetMode_Resource:
+				{
+					if (currentConsole != defaultConsole)
+						delete currentConsole;
+
+					currentConsole = new resourceConsole(brogueResourceController);
+				}
+				break;
+				case brogueConsoleReturn::CompletedWithError:
+					break;
+				case brogueConsoleReturn::Exit:
+				default:
+					iterate = false;
+					break;
 			}
 		}
 

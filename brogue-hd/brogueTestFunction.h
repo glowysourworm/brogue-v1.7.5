@@ -2,6 +2,7 @@
 
 #include "simple.h"
 #include "simpleString.h"
+#include <functional>
 
 using namespace brogueHd::simple;
 

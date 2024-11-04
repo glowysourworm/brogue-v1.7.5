@@ -1,6 +1,5 @@
 #pragma once
 
-#include "color.h"
 
 namespace brogueHd::backend::modelConstant
 {

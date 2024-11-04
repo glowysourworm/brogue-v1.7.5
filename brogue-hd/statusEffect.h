@@ -1,8 +1,6 @@
 #pragma once
 
 #include "color.h"
-#include "creature.h"
-#include "creatureBehavior.h"
 #include "statusEffectConstants.h"
 
 using namespace brogueHd::backend::modelConstant;

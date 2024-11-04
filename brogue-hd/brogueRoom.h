@@ -1,9 +1,9 @@
 #pragma once
 
-#include "simple.h"
+#include "brogueCell.h"
 #include "gridLocator.h"
 #include "gridRegion.h"
-#include "brogueCell.h"
+#include "simple.h"
 
 using namespace brogueHd::component;
 using namespace brogueHd::backend::model::layout;
@@ -27,7 +27,7 @@ namespace brogueHd::backend::model
 			_connectionPointW = connectionPointW;
 		}
 
-		~brogueRoom(){};
+		~brogueRoom() {};
 
 	public:
 

@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 
 namespace brogueHd::frontend::opengl
 {
@@ -19,7 +20,7 @@ namespace brogueHd::frontend::opengl
 			_period = copy.getPeriod();
 			_counter = copy.getCounter();
 		}
-		~simplePeriodCounter(){}
+		~simplePeriodCounter() {}
 
 		uint32_t getPeriod() const
 		{
@@ -30,17 +31,24 @@ namespace brogueHd::frontend::opengl
 			return _counter;
 		}
 
-		bool update(int lapsed)
+		bool update(int lapsed, bool autoReset = true)
 		{
 			_counter += lapsed;
 
 			if (_counter >= _period)
 			{
-				_counter = 0;
+				if (autoReset)
+					reset();
+
 				return true;
 			}
 
 			return false;
+		}
+
+		void reset()
+		{
+			_counter = 0;
 		}
 
 	private:

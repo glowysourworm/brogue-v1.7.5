@@ -1,7 +1,10 @@
 #pragma once
 
 #include "playbackData.h"
+#include "simpleException.h"
+#include <exception>
 #include <fstream>
+#include <iosfwd>
 
 using namespace brogueHd::backend::model::io;
 
@@ -57,7 +60,7 @@ namespace brogueHd::backend::processor
 			_playbackData->filePath = filePath;
 
 			// Read the event list from file
-			_playbackData->recordedEvents = brogueEventFile::deserialize(fileStream);
+			//_playbackData->recordedEvents = brogueEventFile::deserialize(fileStream);
 
 			fileStream.close();
 		}

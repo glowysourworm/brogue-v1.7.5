@@ -1,13 +1,17 @@
 #pragma once
 
 #include "grid.h"
-#include "gridRect.h"
 #include "gridDefinitions.h"
-#include "simpleException.h"
-#include "simpleBST.h"
-#include "simpleHash.h"
+#include "gridRect.h"
+#include "simple.h"
 #include "simpleArray.h"
+#include "simpleBST.h"
+#include "simpleException.h"
+#include "simpleHash.h"
+#include "simpleList.h"
+#include "simpleMath.h"
 #include <functional>
+#include <limits>
 
 using namespace brogueHd::simple;
 
@@ -42,27 +46,27 @@ namespace brogueHd::component
 	template<typename T>
 	using dijkstraLocatorCallback = std::function<T(short column, short row)>;
 
-    template<isGridLocator T>
+	template<isGridLocator T>
 	class dijkstra
 	{
 
 	public:
 
-        /// <summary>
-        /// Creates an instance of dijkstra's map component with the specified, declarative, delegates and constraints.
-        /// </summary>
-        /// <param name="mapCostPredicate">Delegate used to fetch a cost for the specified column / row of the grid</param>
-        /// <param name="mapPredicate">Delegate used to mask off areas of the map from the entire algorithm. Set to TRUE to ALLOW use of the location for the algorithm.</param>
+		/// <summary>
+		/// Creates an instance of dijkstra's map component with the specified, declarative, delegates and constraints.
+		/// </summary>
+		/// <param name="mapCostPredicate">Delegate used to fetch a cost for the specified column / row of the grid</param>
+		/// <param name="mapPredicate">Delegate used to mask off areas of the map from the entire algorithm. Set to TRUE to ALLOW use of the location for the algorithm.</param>
 		dijkstra(gridRect parentBoundary,
-				 gridRect relativeBoundary,
-				 bool obeyCardinalMovement,
-				 dijkstraPredicate mapPredicate,
-				 dijkstraCostCallback mapCostPredicate,
-				 dijkstraLocatorCallback<T> locatorCallback);
+			gridRect relativeBoundary,
+			bool obeyCardinalMovement,
+			dijkstraPredicate mapPredicate,
+			dijkstraCostCallback mapCostPredicate,
+			dijkstraLocatorCallback<T> locatorCallback);
 
-        ~dijkstra();
+		~dijkstra();
 
-        void initialize(T source, const simpleArray<T>& targets);
+		void initialize(T source, const simpleArray<T>& targets);
 
 		/// <summary>
 		/// Runs Dijkstra's algorithm ONCE. WILL NOT RE-RUN.
@@ -124,25 +128,25 @@ namespace brogueHd::component
 
 		gridRect _parentBoundary;						// The larger of the two boundaries. Each grid<> instance should
 		gridRect _relativeBoundary;						// use the larger parent boundary. Relative boundary is used to 
-														// limit usage of the grid.
+		// limit usage of the grid.
 
 		T _sourceLocation;
 		simpleArray<T>* _targetLocations;
 
-        grid<short>* _outputMap;
+		grid<short>* _outputMap;
 
 		grid<bool>* _visitedMap;                        // Visited locations on the map
 		grid<bool>* _locationMap;                       // Locations that have been added to the frontier
 
-        // Frontier BST for the map
+		// Frontier BST for the map
 		simpleBST<float, simpleHash<T, T>*>* _frontier;
 
 		// These maps are stored per target location
 		simpleHash<T, simpleArray<T>>* _completedPaths;	// Stack allocated arrays
 		simpleHash<T, bool>* _validPaths;
 
-        bool _initialized = false;
-        bool _finished = false;
+		bool _initialized = false;
+		bool _finished = false;
 		bool _obeyCardinalMovement = false;
 	};
 
@@ -177,7 +181,7 @@ namespace brogueHd::component
 		delete _locationMap;
 
 		// Must delete the allocated hash table memory
-		_frontier->iterate([](float key, simpleHash<T, T>* value)
+		_frontier->iterate([] (float key, simpleHash<T, T>* value)
 		{
 			delete value; // -> ~simpleBSTNode()
 
@@ -194,7 +198,7 @@ namespace brogueHd::component
 		_targetLocations = new simpleArray<T>(targets);
 
 		// Clear out the frontier
-		_frontier->iterate([](float key, simpleHash<T, T>* value)
+		_frontier->iterate([] (float key, simpleHash<T, T>* value)
 		{
 			// MEMORY!
 			delete value;
@@ -256,10 +260,10 @@ namespace brogueHd::component
 
 		// Iterate while any target not reached (AND) not visited
 		while (!_visitedMap->get(column, row) &&
-				goalDict.any([](T key, bool value)
-				{
-					return !value;
-				}))
+			goalDict.any([] (T key, bool value)
+		{
+			return !value;
+		}))
 		{
 			// Set current parameters
 			float currentWeight = _outputMap->get(column, row);
@@ -329,7 +333,7 @@ namespace brogueHd::component
 			lastLocator = _locatorCallback(column, row);
 
 			// Get locator from the goal dictionary
-			T goalLocator = goalDict.firstOrDefaultKey([&lastLocator](T key, bool value)
+			T goalLocator = goalDict.firstOrDefaultKey([&lastLocator] (T key, bool value)
 			{
 				return key.column == lastLocator.column && key.row == lastLocator.row;
 			});
@@ -351,14 +355,14 @@ namespace brogueHd::component
 				T nextNode = default_value::value<T>();
 
 				// CHECK FOR GOAL LOCATION!
-				goalDict.forEach([&nextNode, &nextCostDict](T location, bool value)
+				goalDict.forEach([&nextNode, &nextCostDict] (T location, bool value)
 				{
 					if (!value)
 					{
-						nextNode = nextCostDict->firstOrDefaultKey([&location](T ckey, T cvalue)
+						nextNode = nextCostDict->firstOrDefaultKey([&location] (T ckey, T cvalue)
 						{
 							return ckey.column == location.column &&
-									ckey.row == location.row;
+								ckey.row == location.row;
 						});
 
 						if (nextNode != default_value::value<T>())
@@ -391,15 +395,15 @@ namespace brogueHd::component
 		}
 
 		// No goals were found for the last locator; OR any failed paths were found (TODO: Take a look at fail conditions)
-		if (!goalDict.any([&lastLocator](T key, bool value)
-			{
-				return key.column == lastLocator.column && key.row == lastLocator.row;
+		if (!goalDict.any([&lastLocator] (T key, bool value)
+		{
+			return key.column == lastLocator.column && key.row == lastLocator.row;
 
-			}) ||
-			goalDict.any([](T key, bool value)
-			{
-				return !value;
-			}))
+		}) ||
+			goalDict.any([] (T key, bool value)
+		{
+			return !value;
+		}))
 		{
 			simpleException::showCstr("Dijkstra's Map was unable to find the current goal location");
 		}
@@ -514,10 +518,10 @@ namespace brogueHd::component
 			currentLocation = lowestWeightLocation;
 
 			// Add this to the path
-			if (!result.any([&lowestWeightLocation](T alocation)
-				{
-					return alocation == lowestWeightLocation;
-				}))
+			if (!result.any([&lowestWeightLocation] (T alocation)
+			{
+				return alocation == lowestWeightLocation;
+			}))
 			{
 				result.add(lowestWeightLocation);
 

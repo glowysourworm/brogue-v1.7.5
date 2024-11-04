@@ -1,11 +1,11 @@
 #pragma once
 
-#include "simple.h"
-#include "simpleGlObject.h"
-#include "simpleException.h"
-#include "simpleBuffer.h"
 #include "gl.h"
+#include "simple.h"
+#include "simpleException.h"
+#include "simpleGlObject.h"
 
+#include "openglHelper.h"
 #include <SDL_surface.h>
 
 
@@ -13,235 +13,235 @@ using namespace brogueHd::simple;
 
 namespace brogueHd::frontend::opengl
 {
-    struct simpleTexture : public simpleGlObject
-    {
-    public:
+	struct simpleTexture : public simpleGlObject
+	{
+	public:
 
-        // Corresponds to the level of the nth mipmap for the texture (see texture rendering to learn about minimaps)
-        //
-        const GLuint TEXTURE_MIPMAP_LEVEL = 0;
+		// Corresponds to the level of the nth mipmap for the texture (see texture rendering to learn about minimaps)
+		//
+		const GLuint TEXTURE_MIPMAP_LEVEL = 0;
 
-    public:
+	public:
 
-        simpleTexture();
-        simpleTexture(const simpleTexture& copy);
-        simpleTexture(SDL_Surface* pixelBuffer,
-                      GLsizei width, 
-                      GLsizei height, 
-                      GLuint textureIndex, 
-                      GLenum textureUnit, 
-                      GLenum pixelFormat, 
-                      GLenum pixelInternalFormat,
-                      GLuint pixelAlignment,
-                      GLenum pixelType);
-        ~simpleTexture(){};
+		simpleTexture();
+		simpleTexture(const simpleTexture& copy);
+		simpleTexture(SDL_Surface* pixelBuffer,
+					  GLsizei width,
+					  GLsizei height,
+					  GLuint textureIndex,
+					  GLenum textureUnit,
+					  GLenum pixelFormat,
+					  GLenum pixelInternalFormat,
+					  GLuint pixelAlignment,
+					  GLenum pixelType);
+		~simpleTexture() {};
 
-        void operator=(const simpleTexture& copy);
+		void operator=(const simpleTexture& copy);
 
-        void glCreate(GLuint programHandle) override;
-        void teardown() override;
-        void bind() override;
+		void glCreate(GLuint programHandle) override;
+		void teardown() override;
+		void bind() override;
 
-        bool isCreated() const override
-        {
-            return this->handle != simpleGlObject::HandleNull && openglHelper::getTextureCreated(this->handle);
-        }
-        bool isBound() const override
-        {
-            return openglHelper::getTextureBinding(this->handle);
-        }
+		bool isCreated() const override
+		{
+			return this->handle != simpleGlObject::HandleNull && openglHelper::getTextureCreated(this->handle);
+		}
+		bool isBound() const override
+		{
+			return openglHelper::getTextureBinding(this->handle);
+		}
 
-        GLenum getTextureUnit() const
-        {
-            return _textureUnit;
-        }
-        GLuint getTextureIndex() const
-        {
-            return _textureIndex;
-        }
+		GLenum getTextureUnit() const
+		{
+			return _textureUnit;
+		}
+		GLuint getTextureIndex() const
+		{
+			return _textureIndex;
+		}
 
-        SDL_Surface* getPixelBuffer() const
-        {
-            return _pixelBuffer;
-        }
-        GLsizei getWidth() const
-        {
-            return _width;
-        }
-        GLsizei getHeight() const
-        {
-            return _height;
-        }
-        GLenum getPixelFormat() const
-        {
-            return _pixelFormat;
-        }
-        GLenum getPixelInternalFormat() const
-        {
-            return _pixelInternalFormat;
-        }
-        GLuint getPixelAlignment() const
-        {
-            return _pixelAlignment;
-        }
-        GLenum getPixelType() const
-        {
-            return _pixelType;
-        }
+		SDL_Surface* getPixelBuffer() const
+		{
+			return _pixelBuffer;
+		}
+		GLsizei getWidth() const
+		{
+			return _width;
+		}
+		GLsizei getHeight() const
+		{
+			return _height;
+		}
+		GLenum getPixelFormat() const
+		{
+			return _pixelFormat;
+		}
+		GLenum getPixelInternalFormat() const
+		{
+			return _pixelInternalFormat;
+		}
+		GLuint getPixelAlignment() const
+		{
+			return _pixelAlignment;
+		}
+		GLenum getPixelType() const
+		{
+			return _pixelType;
+		}
 
-    public:
+	public:
 
-        size_t getHash() const override
-        {
-            return hashGenerator::generateHash(_textureUnit, _textureIndex, _pixelBuffer, _width, _height, _pixelFormat, _pixelInternalFormat, _pixelAlignment, _pixelType);
-        }
+		size_t getHash() const override
+		{
+			return hashGenerator::generateHash(_textureUnit, _textureIndex, _pixelBuffer, _width, _height, _pixelFormat, _pixelInternalFormat, _pixelAlignment, _pixelType);
+		}
 
-    private:
+	private:
 
-        void copyImpl(const simpleTexture& copy);
+		void copyImpl(const simpleTexture& copy);
 
-    private:
+	private:
 
-        GLenum _textureUnit;
-        GLuint _textureIndex;
+		GLenum _textureUnit;
+		GLuint _textureIndex;
 
-        SDL_Surface* _pixelBuffer;
-        GLsizei _width;
-        GLsizei _height;
-        GLenum _pixelFormat;
-        GLenum _pixelInternalFormat;
-        GLuint _pixelAlignment;
-        GLenum _pixelType;
-    };
-      
-    simpleTexture::simpleTexture()
-    {
-        _textureUnit = NULL;
-        _textureIndex = NULL;
+		SDL_Surface* _pixelBuffer;
+		GLsizei _width;
+		GLsizei _height;
+		GLenum _pixelFormat;
+		GLenum _pixelInternalFormat;
+		GLuint _pixelAlignment;
+		GLenum _pixelType;
+	};
 
-        _pixelBuffer = NULL;
-        _width = 0;
-        _height = 0;
-        _pixelFormat = NULL;
-        _pixelType = NULL;
-    }
-    simpleTexture::simpleTexture(const simpleTexture& copy)
-    {
-        copyImpl(copy);
-    }
-    simpleTexture::simpleTexture(SDL_Surface* pixelBuffer,
-                                    GLsizei width,
-                                    GLsizei height,
-                                    GLuint textureIndex,
-                                    GLenum textureUnit,
-                                    GLenum pixelFormat,
-                                    GLenum pixelInternalFormat,
-                                    GLuint pixelAlignment,
-                                    GLenum pixelType)
-    {
-        _textureUnit = textureUnit;
-        _textureIndex = textureIndex;
+	simpleTexture::simpleTexture()
+	{
+		_textureUnit = NULL;
+		_textureIndex = NULL;
 
-        _pixelBuffer = pixelBuffer;
-        _width = width;
-        _height = height;
-        _pixelFormat = pixelFormat;
-        _pixelInternalFormat = pixelInternalFormat;
-        _pixelAlignment = pixelAlignment;
-        _pixelType = pixelType;
-    }
+		_pixelBuffer = NULL;
+		_width = 0;
+		_height = 0;
+		_pixelFormat = NULL;
+		_pixelType = NULL;
+	}
+	simpleTexture::simpleTexture(const simpleTexture& copy)
+	{
+		copyImpl(copy);
+	}
+	simpleTexture::simpleTexture(SDL_Surface* pixelBuffer,
+								 GLsizei width,
+								 GLsizei height,
+								 GLuint textureIndex,
+								 GLenum textureUnit,
+								 GLenum pixelFormat,
+								 GLenum pixelInternalFormat,
+								 GLuint pixelAlignment,
+								 GLenum pixelType)
+	{
+		_textureUnit = textureUnit;
+		_textureIndex = textureIndex;
 
-    void simpleTexture::operator=(const simpleTexture& copy)
-    {
-        copyImpl(copy);
-    }
+		_pixelBuffer = pixelBuffer;
+		_width = width;
+		_height = height;
+		_pixelFormat = pixelFormat;
+		_pixelInternalFormat = pixelInternalFormat;
+		_pixelAlignment = pixelAlignment;
+		_pixelType = pixelType;
+	}
 
-    void simpleTexture::copyImpl(const simpleTexture& copy)
-    {
-        _textureUnit = copy.getTextureUnit();
-        _textureIndex = copy.getTextureIndex();
+	void simpleTexture::operator=(const simpleTexture& copy)
+	{
+		copyImpl(copy);
+	}
 
-        _pixelBuffer = copy.getPixelBuffer();
-        _width = copy.getWidth();
-        _height = copy.getHeight();
-        _pixelFormat = copy.getPixelFormat();
-        _pixelInternalFormat = copy.getPixelInternalFormat();
-        _pixelAlignment = copy.getPixelAlignment();
-        _pixelType = copy.getPixelType();
-    }
+	void simpleTexture::copyImpl(const simpleTexture& copy)
+	{
+		_textureUnit = copy.getTextureUnit();
+		_textureIndex = copy.getTextureIndex();
 
-    void simpleTexture::glCreate(GLuint programHandle)
-    {
-        if (this->isCreated())
-            simpleException::show("simpleTexture already created in the backend");
+		_pixelBuffer = copy.getPixelBuffer();
+		_width = copy.getWidth();
+		_height = copy.getHeight();
+		_pixelFormat = copy.getPixelFormat();
+		_pixelInternalFormat = copy.getPixelInternalFormat();
+		_pixelAlignment = copy.getPixelAlignment();
+		_pixelType = copy.getPixelType();
+	}
 
-        // Procedure
-        //
-        // 0) Generate texture to create the handle and set active texture
-        // 1) Bind GL to the current texture
-        // 2) Apply the pixel data to the texture
-        //
+	void simpleTexture::glCreate(GLuint programHandle)
+	{
+		if (this->isCreated())
+			simpleException::show("simpleTexture already created in the backend");
 
-        // Generate texture
-        GLuint textureHandle;
-        glGenTextures(1, &textureHandle);
-        
-        this->handle = textureHandle;
+		// Procedure
+		//
+		// 0) Generate texture to create the handle and set active texture
+		// 1) Bind GL to the current texture
+		// 2) Apply the pixel data to the texture
+		//
 
-        // Set active texture
-        glActiveTexture(_textureUnit);
+		// Generate texture
+		GLuint textureHandle;
+		glGenTextures(1, &textureHandle);
 
-        // Bind the texture to apply changes
-        glBindTexture(GL_TEXTURE_2D, this->handle);
+		this->handle = textureHandle;
 
-        // Sets the pixel alignment (related to stride) for the texture bitmap. This needs to be set according to the 
-        // bitmap format. (1 = byte, 2, 4, and 8) are accepted values. 4 would be the typical word alignment.
-        //glPixelStorei(GL_UNPACK_ALIGNMENT, _pixelAlignment);
+		// Set active texture
+		glActiveTexture(_textureUnit);
 
-        // Apply the pixel data to the backend
-        glTextureImage2DEXT(this->handle, 
-                            GL_TEXTURE_2D,
-                            TEXTURE_MIPMAP_LEVEL, 
-                            _pixelInternalFormat,          // specific pixel format
-                            _width, _height, 0,            // width, height, border (set = 0)
-                            _pixelFormat,                  // symbolic (base) pixel format
-                            _pixelType,
-                            _pixelBuffer != nullptr ? _pixelBuffer->pixels : NULL);                // Pixel data in byte array
+		// Bind the texture to apply changes
+		glBindTexture(GL_TEXTURE_2D, this->handle);
 
-        //if (_pixelBuffer != nullptr)
-        //    glTextureSubImage2DEXT(this->handle, GL_TEXTURE_2D, TEXTURE_MIPMAP_LEVEL, 0, 0, _width, _height, _pixelFormat, _pixelType, _pixelBuffer->getBuffer());
+		// Sets the pixel alignment (related to stride) for the texture bitmap. This needs to be set according to the 
+		// bitmap format. (1 = byte, 2, 4, and 8) are accepted values. 4 would be the typical word alignment.
+		//glPixelStorei(GL_UNPACK_ALIGNMENT, _pixelAlignment);
 
-        // SETTING THESE TO DEFAULTS (TODO)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		// Apply the pixel data to the backend
+		glTextureImage2DEXT(this->handle,
+							GL_TEXTURE_2D,
+							TEXTURE_MIPMAP_LEVEL,
+							_pixelInternalFormat,          // specific pixel format
+							_width, _height, 0,            // width, height, border (set = 0)
+							_pixelFormat,                  // symbolic (base) pixel format
+							_pixelType,
+							_pixelBuffer != nullptr ? _pixelBuffer->pixels : NULL);                // Pixel data in byte array
 
-        glGenerateTextureMipmap(this->handle);
+		//if (_pixelBuffer != nullptr)
+		//    glTextureSubImage2DEXT(this->handle, GL_TEXTURE_2D, TEXTURE_MIPMAP_LEVEL, 0, 0, _width, _height, _pixelFormat, _pixelType, _pixelBuffer->getBuffer());
 
-        if (!this->isCreated())
-            simpleException::show("simpleTexture problem creating on the backend");
-    }
+		// SETTING THESE TO DEFAULTS (TODO)
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    void simpleTexture::teardown()
-    {
-        if (!this->isCreated())
-            simpleException::show("GLTexture already deleted from the backend");
+		glGenerateTextureMipmap(this->handle);
 
-        glDeleteTextures(1, &_textureIndex);
+		if (!this->isCreated())
+			simpleException::show("simpleTexture problem creating on the backend");
+	}
 
-        if (this->isCreated())
-            simpleException::show("GLTexture problem deleting from the backend");
+	void simpleTexture::teardown()
+	{
+		if (!this->isCreated())
+			simpleException::show("GLTexture already deleted from the backend");
 
-        this->handle = simpleGlObject::HandleNull;
-    }
+		glDeleteTextures(1, &_textureIndex);
 
-    void simpleTexture::bind()
-    {
-        if (!this->isCreated())
-            simpleException::showCstr("GLTexture not yet created before calling bind()");
+		if (this->isCreated())
+			simpleException::show("GLTexture problem deleting from the backend");
 
-        glActiveTexture(_textureUnit);
-        glBindTexture(GL_TEXTURE_2D, this->handle);
-    }   
+		this->handle = simpleGlObject::HandleNull;
+	}
+
+	void simpleTexture::bind()
+	{
+		if (!this->isCreated())
+			simpleException::showCstr("GLTexture not yet created before calling bind()");
+
+		glActiveTexture(_textureUnit);
+		glBindTexture(GL_TEXTURE_2D, this->handle);
+	}
 }

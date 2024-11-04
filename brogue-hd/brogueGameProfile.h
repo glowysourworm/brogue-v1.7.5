@@ -1,6 +1,9 @@
 #pragma once
 
+#include "brogueGlobal.h"
 #include "brogueLevelProfile.h"
+#include "dungeonConstants.h"
+#include "randomGenerator.h"
 #include "simpleList.h"
 
 using namespace brogueHd::simple;

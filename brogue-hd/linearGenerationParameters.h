@@ -8,7 +8,7 @@ namespace brogueHd::backend::model::construction
 		short maxDepth;
 		short frequency;
 		short minNumberIntercept; // actually intercept * 100
-		short minNumberSlope; // actually slope * 100
+		short minNumberSlope;	  // actually slope * 100
 		short maxNumber;
 	};
 }

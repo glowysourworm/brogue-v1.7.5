@@ -1,11 +1,6 @@
 #pragma once
 
-#include "simple.h"
-#include "simpleEnumString.h"
 
-#include "colorConstants.h"
-#include "creatureBehaviorConstants.h"
-#include "feat.h"
 
 using namespace brogueHd::backend::model;
 using namespace brogueHd::backend::model::game;

@@ -1,13 +1,11 @@
 #pragma once
 
+#include "gl.h"
 #include "simpleLogger.h"
 #include "simpleString.h"
-#include "simpleList.h"
-#include "simpleGlObject.h"
-#include "gl.h"
 
-#include <SDL_image.h>
 #include <SDL_surface.h>
+#include <cstring>
 
 using namespace brogueHd::simple;
 

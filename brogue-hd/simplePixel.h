@@ -1,8 +1,9 @@
 #pragma once
 
-#include "bitmap.h"
 #include "simple.h"
+#include "simpleException.h"
 #include "simpleMaskedInt32.h"
+#include <cstdint>
 
 namespace brogueHd::simple
 {
@@ -75,16 +76,16 @@ namespace brogueHd::simple
 		{
 			switch (channel)
 			{
-			case simplePixel::colorChannel::R:
-				return red;
-			case simplePixel::colorChannel::G:
-				return green;
-			case simplePixel::colorChannel::B:
-				return blue;
-			case simplePixel::colorChannel::A:
-				return alpha;
-			default:
-				simpleException::show("Unhandled simplePixel color channel type:  simplePixel.h");
+				case simplePixel::colorChannel::R:
+					return red;
+				case simplePixel::colorChannel::G:
+					return green;
+				case simplePixel::colorChannel::B:
+					return blue;
+				case simplePixel::colorChannel::A:
+					return alpha;
+				default:
+					simpleException::show("Unhandled simplePixel color channel type:  simplePixel.h");
 			}
 
 			return default_value::value<simpleMaskedInt32>();

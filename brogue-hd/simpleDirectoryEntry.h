@@ -2,13 +2,15 @@
 
 #include "simple.h"
 #include "simpleFileEntry.h"
+#include "simpleList.h"
+#include <corecrt.h>
 
 namespace brogueHd::simple
 {
 	class simpleDirectoryEntry : hashableObject
 	{
 	public:
-		
+
 		simpleDirectoryEntry()
 		{
 			_files = new simpleList<simpleFileEntry*>();

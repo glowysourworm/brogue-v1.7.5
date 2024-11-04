@@ -1,22 +1,20 @@
 #pragma once
 
+#include "brogueUIConstants.h"
 #include "color.h"
 #include "colorGradient.h"
 #include "colorString.h"
 #include "gridLocator.h"
 #include "gridRect.h"
+#include "simple.h"
+#include "simpleException.h"
+#include "simpleMath.h"
 
+using namespace brogueHd::component;
 using namespace brogueHd::backend::model::game;
 
 namespace brogueHd::frontend::ui
 {
-	enum brogueTextAlignment
-	{
-		Left = 0,
-		Center = 1,
-		Right = 2
-	};
-
 	struct brogueUIData : hashable
 	{
 		brogueUIData()
@@ -68,14 +66,14 @@ namespace brogueHd::frontend::ui
 			: brogueUIData(boundary, zoomLevel, background1, background2, background1, background2, gradientType)
 		{}
 		brogueUIData(const gridRect& boundary, int zoomLevel, const color& background, const color& mouseHoverBackground)
-			: brogueUIData(boundary, zoomLevel, background, background,  mouseHoverBackground, mouseHoverBackground, brogueGradientType::Horizontal)
+			: brogueUIData(boundary, zoomLevel, background, background, mouseHoverBackground, mouseHoverBackground, brogueGradientType::Horizontal)
 		{}
-		brogueUIData(const gridRect& boundary, 
+		brogueUIData(const gridRect& boundary,
 					 int zoomLevel,
-					 const color& background1, 
-					 const color& background2, 
-					 const color& mouseBackground1, 
-					 const color& mouseBackground2, 
+					 const color& background1,
+					 const color& background2,
+					 const color& mouseBackground1,
+					 const color& mouseBackground2,
 					 brogueGradientType gradientType)
 			: brogueUIData(boundary, zoomLevel, "", background1, background2, mouseBackground1, mouseBackground2, gradientType, brogueTextAlignment::Left)
 		{}
@@ -86,19 +84,19 @@ namespace brogueHd::frontend::ui
 					 brogueTextAlignment alignment)
 			: brogueUIData(boundary, zoomLevel, text, background, background, background, background, brogueGradientType::Horizontal, alignment)
 		{}
-		brogueUIData(const gridRect& boundary, 
+		brogueUIData(const gridRect& boundary,
 					 int zoomLevel,
-					 const colorString& text, 
-					 const color& gradient1, 
-					 const color& gradient2, 
+					 const colorString& text,
+					 const color& gradient1,
+					 const color& gradient2,
 					 brogueTextAlignment alignment)
 			: brogueUIData(boundary, zoomLevel, text, gradient1, gradient2, gradient1, gradient2, brogueGradientType::Horizontal, alignment)
 		{}
-		brogueUIData(const gridRect& boundary, 
+		brogueUIData(const gridRect& boundary,
 					 int zoomLevel,
-					 const colorString& text, 
-					 const color& gradient1, 
-					 const color& gradient2, 
+					 const colorString& text,
+					 const color& gradient1,
+					 const color& gradient2,
 					 const color& mouseBackground1,
 					 const color& mouseBackground2,
 					 brogueGradientType gradientType,
@@ -108,7 +106,7 @@ namespace brogueHd::frontend::ui
 			_text = new colorString(text);
 			_background = new colorGradient(gradient1, gradient2, gradientType);
 			_hoverBackground = new colorGradient(mouseBackground1, mouseBackground2, gradientType);
-			_renderOffset = new gridLocator(0,0);
+			_renderOffset = new gridLocator(0, 0);
 			_alignment = alignment;
 			_hotkeyChar = '\0';
 			_hotkeyIndex = -1;
@@ -194,8 +192,8 @@ namespace brogueHd::frontend::ui
 
 		gridRect getPaddedBoundary() const
 		{
-			return gridRect(_boundary->column + _padding, 
-							_boundary->row + _padding, 
+			return gridRect(_boundary->column + _padding,
+							_boundary->row + _padding,
 							_boundary->width - (2 * _padding),
 							_boundary->height - (2 * _padding));
 		}
@@ -229,35 +227,35 @@ namespace brogueHd::frontend::ui
 
 			switch (gradient->gradientType)
 			{
-			case brogueGradientType::Horizontal:
-			{
-				if (menuColumn < (_boundary->width / 2.0f))
-					return gradient->getColor((_boundary->width - (2 * (menuColumn))) / (float)_boundary->width);
-				else
-					return gradient->getColor((2 * ((menuColumn)-(_boundary->width / 2.0f))) / (float)_boundary->width);
-			}
-			break;
-			case brogueGradientType::Vertical:
-			{
-				if (menuRow < (_boundary->height / 2.0f))
-					return gradient->getColor((_boundary->height - (2 * (menuRow))) / (float)_boundary->height);
-				else
-					return gradient->getColor((2 * ((menuRow)-(_boundary->height / 2.0f))) / (float)_boundary->height);
-			}
-			break;
-			case brogueGradientType::Circular:
-			{
-				// This was made slightly non-linear to match Brogue v1.7.5
-				//
-				float dx = simpleMath::abs(column - _boundary->centerX()) / ((float)_boundary->width / 2.0f);
-				float dy = simpleMath::abs(row - _boundary->centerY()) / ((float)_boundary->height / 2.0f);
-				float weight = simpleMath::sqrt((dx * dx) + (dy * dy));
+				case brogueGradientType::Horizontal:
+				{
+					if (menuColumn < (_boundary->width / 2.0f))
+						return gradient->getColor((_boundary->width - (2 * (menuColumn))) / (float)_boundary->width);
+					else
+						return gradient->getColor((2 * ((menuColumn)-(_boundary->width / 2.0f))) / (float)_boundary->width);
+				}
+				break;
+				case brogueGradientType::Vertical:
+				{
+					if (menuRow < (_boundary->height / 2.0f))
+						return gradient->getColor((_boundary->height - (2 * (menuRow))) / (float)_boundary->height);
+					else
+						return gradient->getColor((2 * ((menuRow)-(_boundary->height / 2.0f))) / (float)_boundary->height);
+				}
+				break;
+				case brogueGradientType::Circular:
+				{
+					// This was made slightly non-linear to match Brogue v1.7.5
+					//
+					float dx = simpleMath::abs(column - _boundary->centerX()) / ((float)_boundary->width / 2.0f);
+					float dy = simpleMath::abs(row - _boundary->centerY()) / ((float)_boundary->height / 2.0f);
+					float weight = simpleMath::sqrt((dx * dx) + (dy * dy));
 
-				return gradient->getColor(weight);
-			}
-			break;
-			default:
-				simpleException::show("Unhandled brogueGradientType:  brogueUIData.h");
+					return gradient->getColor(weight);
+				}
+				break;
+				default:
+					simpleException::show("Unhandled brogueGradientType:  brogueUIData.h");
 			}
 		}
 
@@ -267,16 +265,16 @@ namespace brogueHd::frontend::ui
 
 			switch (_alignment)
 			{
-			case brogueTextAlignment::Left:
-				break;
-			case brogueTextAlignment::Right:
-				textBeginIndex = _boundary->right() - _text->getCount() - _boundary->column;
-				break;
-			case brogueTextAlignment::Center:
-				textBeginIndex = ((_boundary->right() - _text->getCount() - _boundary->column) / 2) + 1;
-				break;
-			default:
-				simpleException::show("Unhandled brogueTextAlignment:  brogueUIData.h");
+				case brogueTextAlignment::Left:
+					break;
+				case brogueTextAlignment::Right:
+					textBeginIndex = _boundary->right() - _text->getCount() - _boundary->column;
+					break;
+				case brogueTextAlignment::Center:
+					textBeginIndex = ((_boundary->right() - _text->getCount() - _boundary->column) / 2) + 1;
+					break;
+				default:
+					simpleException::show("Unhandled brogueTextAlignment:  brogueUIData.h");
 			}
 
 			return textBeginIndex;

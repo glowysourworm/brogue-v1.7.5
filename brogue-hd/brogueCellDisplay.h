@@ -1,10 +1,10 @@
 #pragma once
 
-#include "light.h"
-#include "color.h"
-#include "simple.h"
-#include "gridLocator.h"
 #include "brogueGlyphMap.h"
+#include "color.h"
+#include "gridLocator.h"
+#include "simple.h"
+#include "simpleException.h"
 
 using namespace brogueHd::simple;
 using namespace brogueHd::component;
@@ -28,21 +28,21 @@ namespace brogueHd::backend::model::layout
 			// Must derive these from dividing the glyph sheet into a grid
 			switch (zoomLevel)
 			{
-				case 1:	return 0;
-				case 2: return 0;
-				case 3: return 0;
-				case 4: return 0;
-				case 5: return 0;
-				case 6: return 0;
-				case 7: return 0;
-				case 8: return 0;
-				case 9: return 15.0f;
-				case 10: return 16.0f;
-				case 11: return 17.0f;
-				case 12: return 18.0f;
-				case 13: return 19.0f;
-				default:
-					simpleException::show("Invalid zoom level:  brogueCellDisplay::CellWidth");
+			case 1:	return 0;
+			case 2: return 0;
+			case 3: return 0;
+			case 4: return 0;
+			case 5: return 0;
+			case 6: return 0;
+			case 7: return 0;
+			case 8: return 0;
+			case 9: return 15.0f;
+			case 10: return 16.0f;
+			case 11: return 17.0f;
+			case 12: return 18.0f;
+			case 13: return 19.0f;
+			default:
+			simpleException::show("Invalid zoom level:  brogueCellDisplay::CellWidth");
 			}
 		}
 
@@ -65,7 +65,7 @@ namespace brogueHd::backend::model::layout
 			case 12: return 31.06f;
 			case 13: return 31.06f;
 			default:
-				simpleException::show("Invalid zoom level:  brogueCellDisplay::CellHeight");
+			simpleException::show("Invalid zoom level:  brogueCellDisplay::CellHeight");
 			}
 		}
 
@@ -79,7 +79,7 @@ namespace brogueHd::backend::model::layout
 		bool needsUpdate;
 
 		//light lighting;
-		
+
 
 		//light oldLight;									// compare with subsequent lighting to determine whether to refresh cell
 
@@ -144,14 +144,14 @@ namespace brogueHd::backend::model::layout
 		bool compare(const brogueCellDisplay& display) const
 		{
 			return character == display.character &&
-				   foreColor.compare(display.foreColor) &&
-				   backColor.compare(display.backColor) &&
-				   opacity == display.opacity &&
-				   needsUpdate == display.needsUpdate &&
-				   noDisplay == display.noDisplay &&
-				   column == display.column &&
-				   row == display.row;
-					//lighting.compare(display.lighting);
+				foreColor.compare(display.foreColor) &&
+				backColor.compare(display.backColor) &&
+				opacity == display.opacity &&
+				needsUpdate == display.needsUpdate &&
+				noDisplay == display.noDisplay &&
+				column == display.column &&
+				row == display.row;
+			//lighting.compare(display.lighting);
 		}
 		size_t getHash() const override
 		{
@@ -168,7 +168,7 @@ namespace brogueHd::backend::model::layout
 			foreColor = copy.foreColor;									// Careful with instances. These are non-unique
 			backColor = copy.backColor;									// Careful with instances. These are non-unique
 			opacity = copy.opacity;
-			needsUpdate = copy.needsUpdate;			
+			needsUpdate = copy.needsUpdate;
 			noDisplay = copy.noDisplay;
 		}
 	};

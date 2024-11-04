@@ -1,12 +1,11 @@
 #pragma once
 
-#include "brogueGlobal.h"
+#include "brogueCell.h"
 #include "brogueLevel.h"
-#include "terrainDeclaration.h"
-#include "floorTileType.h"
 #include "dungeonConstants.h"
+#include "terrainDeclaration.h"
 
-using namespace brogueHd::backend::model::game;
+using namespace brogueHd::backend::model;
 using namespace brogueHd::backend::model::layout;
 
 namespace brogueHd::backend::methods
@@ -19,6 +18,7 @@ namespace brogueHd::backend::methods
 		//	levels[oldLevelNumber - 1].playerExitedVia[0] = player.xLoc;
 		//	levels[oldLevelNumber - 1].playerExitedVia[1] = player.yLoc;
 		//}
+		return false;
 	}
 
 	static bool stairsDownDiscovered(brogueLevel* level)
@@ -28,20 +28,21 @@ namespace brogueHd::backend::methods
 		//	levels[oldLevelNumber - 1].playerExitedVia[0] = player.xLoc;
 		//	levels[oldLevelNumber - 1].playerExitedVia[1] = player.yLoc;
 		//}
+		return false;
 	}
 
-//#define terrainFlags(x, y)					(tileCatalog[pmap[x][y].layers[DUNGEON]].flags \
-//											| tileCatalog[pmap[x][y].layers[LIQUID]].flags \
-//											| tileCatalog[pmap[x][y].layers[SURFACE]].flags \
-//											| tileCatalog[pmap[x][y].layers[GAS]].flags)
-//
-//#define terrainMechFlags(x, y)				(tileCatalog[pmap[x][y].layers[DUNGEON]].mechFlags \
-//											| tileCatalog[pmap[x][y].layers[LIQUID]].mechFlags \
-//											| tileCatalog[pmap[x][y].layers[SURFACE]].mechFlags \
-//											| tileCatalog[pmap[x][y].layers[GAS]].mechFlags)
-	
+	//#define terrainFlags(x, y)					(tileCatalog[pmap[x][y].layers[DUNGEON]].flags \
+	//											| tileCatalog[pmap[x][y].layers[LIQUID]].flags \
+	//											| tileCatalog[pmap[x][y].layers[SURFACE]].flags \
+	//											| tileCatalog[pmap[x][y].layers[GAS]].flags)
+	//
+	//#define terrainMechFlags(x, y)				(tileCatalog[pmap[x][y].layers[DUNGEON]].mechFlags \
+	//											| tileCatalog[pmap[x][y].layers[LIQUID]].mechFlags \
+	//											| tileCatalog[pmap[x][y].layers[SURFACE]].mechFlags \
+	//											| tileCatalog[pmap[x][y].layers[GAS]].mechFlags)
 
-	//#define cellHasTerrainFlag(x, y, flagMask)	((flagMask) & terrainFlags((x), (y)) ? true : false)
+
+		//#define cellHasTerrainFlag(x, y, flagMask)	((flagMask) & terrainFlags((x), (y)) ? true : false)
 	static bool isTerrain(brogueLevel* level, short column, short row, terrainFlagCatalog terrainFlag)
 	{
 		//brogueCell* cell = level->levelGrid->getCell(column, row);
@@ -84,7 +85,7 @@ namespace brogueHd::backend::methods
 
 		return false;
 	}
-	
+
 	static bool isAutoDescent(brogueLevel* level, short column, short row)
 	{
 		//brogueCell* cell = level->levelGrid->getCell(column, row);

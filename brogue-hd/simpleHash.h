@@ -1,9 +1,12 @@
 #pragma once
 
 #include "simple.h"
+#include "simpleArray.h"
 #include "simpleException.h"
-#include "simpleMath.h"
 #include "simpleList.h"
+#include "simpleMath.h"
+#include <chrono>
+#include <cmath>
 #include <functional>
 
 namespace brogueHd::simple

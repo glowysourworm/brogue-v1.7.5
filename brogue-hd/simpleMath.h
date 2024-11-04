@@ -1,10 +1,11 @@
 #pragma once
 
 #include "simple.h"
-#include "simpleVector.h"
-#include "simplePoint.h"
 #include "simpleException.h"
+#include "simplePoint.h"
+#include "simpleVector.h"
 
+#include <cmath>
 #include <numbers>
 
 namespace brogueHd::simple

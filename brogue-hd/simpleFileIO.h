@@ -1,24 +1,27 @@
 #pragma once
 
 #include "simpleBuffer.h"
-#include "simpleString.h"
-#include "simpleException.h"
-#include "simpleFileEntry.h"
 #include "simpleDirectoryEntry.h"
-#include "simpleList.h"
-#include <iostream>
+#include "simpleException.h"
+#include "simpleString.h"
+#include <chrono>
+#include <corecrt.h>
+#include <cstring>
+#include <exception>
+#include <filesystem>
 #include <fstream>
-#include <strstream>
-#include <filesystem>
-#include <filesystem>
+#include <iosfwd>
+#include <iostream>
 #include <regex>
+#include <string>
+#include <sys/stat.h>
 
 namespace brogueHd::simple
 {
 	class simpleFileIO
 	{
 	public:
-		
+
 		static simpleString filePathConcat(const simpleString& path1, const simpleString& path2)
 		{
 			simpleString result(path1);
@@ -146,11 +149,8 @@ namespace brogueHd::simple
 				// Using directory iterator
 				struct stat entry;
 
-				// Regex
-				const char* fileNameRegex = "/^[a-zA-Z0-9](?:[a-zA-Z0-9 ._-]*[a-zA-Z0-9])?\.[a-zA-Z0-9_-]+$/";
-
 				// Using "experimental" filesystem libraries (also "auto")
-				for (const auto& entry : std::filesystem::directory_iterator(path)) 
+				for (const auto& entry : std::filesystem::directory_iterator(path))
 				{
 					if (!entry.is_directory())
 					{
@@ -163,7 +163,7 @@ namespace brogueHd::simple
 						std::string fileName = entry.path().filename().string();
 						std::string fileNameWOExt = entry.path().filename().replace_extension().string();
 						std::regex searchRegex(search, strnlen_s(search, 100));
-						
+
 						if (filePath.size() <= 0 ||
 							fileName.size() <= 0 ||
 							fileNameWOExt.size() <= 0)

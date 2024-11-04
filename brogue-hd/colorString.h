@@ -1,7 +1,10 @@
 #pragma once
 
-#include "simpleArray.h"
+#include "brogueGlobal.h"
 #include "color.h"
+#include "simple.h"
+#include "simpleArray.h"
+#include <cstring>
 
 using namespace brogueHd::simple;
 using namespace brogueHd::backend::model::game;

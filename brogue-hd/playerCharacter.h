@@ -1,6 +1,7 @@
 #pragma once
 
 #include "brogueGlobal.h"
+#include <cstdint>
 
 namespace brogueHd::backend::model::game
 {

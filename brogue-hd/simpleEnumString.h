@@ -42,6 +42,7 @@
 
 #include <map>
 #include <string>
+#include <memory>
 // Helper macros
 
 #define Begin_Enum_String(EnumerationName)                                      \

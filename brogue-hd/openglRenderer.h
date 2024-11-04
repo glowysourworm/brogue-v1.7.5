@@ -2,25 +2,24 @@
 
 #ifndef MYGL
 #define MYGL
-#include <windows.h>
 #include "gl.h"
 #include <GLFW/glfw3.h>
 #endif
 
 #include <mutex>
 #include <thread>
-#include <functional>
+#include <chrono>
 
-#include "brogueProgram.h"
-#include "simpleQueue.h"
 #include "simpleKeyState.h"
 #include "simpleMouseState.h"
-#include "simpleShaderProgram.h"
 #include "simpleLogger.h"
 #include "simpleException.h"
-#include "simpleBoundingBox.h"
 #include "gridRect.h"
 #include "brogueProgramContainer.h"
+#include "brogueProgramController.h"
+#include "brogueUIResponseData.h"
+#include "brogueUIConstants.h"
+#include "simpleExt.h"
 
 using namespace brogueHd::simple;
 using namespace brogueHd::component;
@@ -40,7 +39,7 @@ namespace brogueHd::frontend::opengl
 	class openglRenderer
 	{
 	public:
-		openglRenderer();
+		openglRenderer(brogueProgramController* programController);
 		~openglRenderer();
 
 		// Making OpenGL / Window calls static to work with rendering controller.
@@ -71,7 +70,7 @@ namespace brogueHd::frontend::opengl
 			return _initializedGL;
 		}
 
-	private: 
+	private:
 
 		void destroyGL();
 
@@ -108,6 +107,7 @@ namespace brogueHd::frontend::opengl
 	private:
 
 		brogueProgramContainer* _program;
+		brogueProgramController* _programController;
 
 		bool _initializedGL;
 
@@ -116,10 +116,11 @@ namespace brogueHd::frontend::opengl
 		std::thread* _thread;
 	};
 
-	openglRenderer::openglRenderer()
+	openglRenderer::openglRenderer(brogueProgramController* programController)
 	{
 		_initializedGL = false;
 		_program = nullptr;
+		_programController = programController;
 		_thread = nullptr;
 		_threadLock = new std::mutex();
 	}
@@ -185,16 +186,16 @@ namespace brogueHd::frontend::opengl
 	}
 	void openglRenderer::mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 	{
-		opengl::MouseState->updateButtons(glfwGetMouseButton(window,GLFW_MOUSE_BUTTON_LEFT),
-											glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT),
-											glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE));
-	}		
+		opengl::MouseState->updateButtons(glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT),
+										  glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT),
+										  glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE));
+	}
 	void openglRenderer::mouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 	{
 		opengl::MouseState->updateScroll(xoffset, yoffset);
 	}
 	void openglRenderer::resizeCallback(GLFWwindow* window, int height, int width)
-	{	
+	{
 		// This will reset the coordinate system. Probably only needed once if the 
 		// size of the game display or aspect ratio is changed by the user. The window
 		// doesn't matter to the GL backend.
@@ -367,7 +368,7 @@ namespace brogueHd::frontend::opengl
 
 		// Mouse Handlers
 		glfwSetCursorPosCallback(window, mousePositionCallback);
-		glfwSetMouseButtonCallback(window, mouseButtonCallback);		
+		glfwSetMouseButtonCallback(window, mouseButtonCallback);
 		glfwSetScrollCallback(window, mouseScrollCallback);
 
 		// Window Resize Callback
@@ -438,17 +439,37 @@ namespace brogueHd::frontend::opengl
 
 			simpleMouseState mouseState(*opengl::MouseState);
 
-			_program->update(mouseState, intervalMilliseconds);							// Updates program buffers from the UI view
+			// Check the view tree for program control response
+			brogueUIResponseData response = _program->checkUpdate(mouseState, intervalMilliseconds);
+
+			// Response will still signal an update
+			if (response.shouldUpdate)
+			{
+				//brogueUIProgram nextProgram = _programController->getNextProgram(response);
+
+				//// Activate the next view
+				//if (nextProgram != response.program)
+				//{
+				//	_program->deactivateUIProgram(response.program);
+				//	_program->activateUIProgram(nextProgram);
+				//}
+			}
+
+			// Check normal program update
+			if (response.shouldUpdate)
+				_program->update(mouseState, intervalMilliseconds);							// Updates program buffers from the UI view
+
+			// Run drawing program
 			_program->run(intervalMilliseconds);										// Run() -> Draws the buffers
 			_program->showErrors();														// Log Errors to simpleLogger -> std::cout
-
-			// Scroll data has already been consumed by the view tree
-			opengl::MouseState->resetScroll();
 
 			GLenum error = glGetError();
 
 			if (error)
 				simpleLogger::log(getGLErrorString(error));
+
+			// Scroll data has already been consumed by the view tree
+			opengl::MouseState->resetScroll();
 
 			_threadLock->unlock();
 
@@ -469,47 +490,47 @@ namespace brogueHd::frontend::opengl
 	{
 		switch (error)
 		{
-		case GL_NO_ERROR:          return "No Error";
-		case GL_INVALID_ENUM:      return "Invalid Enum";
-		case GL_INVALID_VALUE:     return "Invalid Value";
-		case GL_INVALID_OPERATION: return "Invalid Operation";
-		case GL_INVALID_FRAMEBUFFER_OPERATION: return "Invalid Framebuffer Operation";
-		case GL_OUT_OF_MEMORY:     return "Out of Memory";
-		case GL_STACK_UNDERFLOW:   return "Stack Underflow";
-		case GL_STACK_OVERFLOW:    return "Stack Overflow";
-		case GL_CONTEXT_LOST:      return "Context Lost";
-		default:                   return "Unknown Error";
+			case GL_NO_ERROR:          return "No Error";
+			case GL_INVALID_ENUM:      return "Invalid Enum";
+			case GL_INVALID_VALUE:     return "Invalid Value";
+			case GL_INVALID_OPERATION: return "Invalid Operation";
+			case GL_INVALID_FRAMEBUFFER_OPERATION: return "Invalid Framebuffer Operation";
+			case GL_OUT_OF_MEMORY:     return "Out of Memory";
+			case GL_STACK_UNDERFLOW:   return "Stack Underflow";
+			case GL_STACK_OVERFLOW:    return "Stack Overflow";
+			case GL_CONTEXT_LOST:      return "Context Lost";
+			default:                   return "Unknown Error";
 		}
 	}
 	const char* openglRenderer::getGLTypeString(GLenum errorType)
 	{
 		switch (errorType)
 		{
-		case GL_DEBUG_TYPE_ERROR:				return "GL_DEBUG_TYPE_ERROR";
-		case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: return "GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR";
-		case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:	return "GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR";
-		case GL_DEBUG_TYPE_PORTABILITY:			return "GL_DEBUG_TYPE_PORTABILITY";
-		case GL_DEBUG_TYPE_PERFORMANCE:			return "GL_DEBUG_TYPE_PERFORMANCE";
-		case GL_DEBUG_TYPE_MARKER:				return "GL_DEBUG_TYPE_MARKER";
-		case GL_DEBUG_TYPE_PUSH_GROUP:			return "GL_DEBUG_TYPE_PUSH_GROUP";
-		case GL_DEBUG_TYPE_POP_GROUP:			return "GL_DEBUG_TYPE_POP_GROUP";
-		case GL_DEBUG_TYPE_OTHER:				return "GL_DEBUG_TYPE_OTHER";
-		default:
-			return "Unknown Error Type";
+			case GL_DEBUG_TYPE_ERROR:				return "GL_DEBUG_TYPE_ERROR";
+			case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: return "GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR";
+			case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:	return "GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR";
+			case GL_DEBUG_TYPE_PORTABILITY:			return "GL_DEBUG_TYPE_PORTABILITY";
+			case GL_DEBUG_TYPE_PERFORMANCE:			return "GL_DEBUG_TYPE_PERFORMANCE";
+			case GL_DEBUG_TYPE_MARKER:				return "GL_DEBUG_TYPE_MARKER";
+			case GL_DEBUG_TYPE_PUSH_GROUP:			return "GL_DEBUG_TYPE_PUSH_GROUP";
+			case GL_DEBUG_TYPE_POP_GROUP:			return "GL_DEBUG_TYPE_POP_GROUP";
+			case GL_DEBUG_TYPE_OTHER:				return "GL_DEBUG_TYPE_OTHER";
+			default:
+				return "Unknown Error Type";
 		}
 	}
 	const char* openglRenderer::getGLSourceString(GLenum errorSource)
 	{
 		switch (errorSource)
 		{
-		case GL_DEBUG_SOURCE_API:				return "GL_DEBUG_SOURCE_API";
-		case GL_DEBUG_SOURCE_WINDOW_SYSTEM:		return "GL_DEBUG_SOURCE_WINDOW_SYSTEM";
-		case GL_DEBUG_SOURCE_SHADER_COMPILER:	return "GL_DEBUG_SOURCE_SHADER_COMPILER";
-		case GL_DEBUG_SOURCE_THIRD_PARTY:		return "GL_DEBUG_SOURCE_THIRD_PARTY";
-		case GL_DEBUG_SOURCE_APPLICATION:		return "GL_DEBUG_SOURCE_APPLICATION";
-		case GL_DEBUG_SOURCE_OTHER:				return "GL_DEBUG_SOURCE_OTHER";
-		default:
-			return "Unknown Source Type";
+			case GL_DEBUG_SOURCE_API:				return "GL_DEBUG_SOURCE_API";
+			case GL_DEBUG_SOURCE_WINDOW_SYSTEM:		return "GL_DEBUG_SOURCE_WINDOW_SYSTEM";
+			case GL_DEBUG_SOURCE_SHADER_COMPILER:	return "GL_DEBUG_SOURCE_SHADER_COMPILER";
+			case GL_DEBUG_SOURCE_THIRD_PARTY:		return "GL_DEBUG_SOURCE_THIRD_PARTY";
+			case GL_DEBUG_SOURCE_APPLICATION:		return "GL_DEBUG_SOURCE_APPLICATION";
+			case GL_DEBUG_SOURCE_OTHER:				return "GL_DEBUG_SOURCE_OTHER";
+			default:
+				return "Unknown Source Type";
 		}
 	}
 }

@@ -2,7 +2,9 @@
 
 #include "brogueGlobal.h"
 #include "color.h"
+#include "dungeonConstants.h"
 
+using namespace brogueHd::backend::modelConstant;
 using namespace brogueHd::backend::model::game;
 
 namespace brogueHd::backend::model::layout

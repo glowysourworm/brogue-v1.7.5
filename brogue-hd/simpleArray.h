@@ -2,8 +2,8 @@
 
 #include "simple.h"
 #include "simpleException.h"
-#include <iostream>
 #include <functional>
+#include <iosfwd>
 
 namespace brogueHd::simple
 {

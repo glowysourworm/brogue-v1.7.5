@@ -1,13 +1,33 @@
 #pragma once
 
-#include "brogueProgram.h"
-#include "brogueView.h"
-#include "brogueProgramBuilder.h"
+#include "brogueCellDisplay.h"
+#include "brogueCoordinateConverter.h"
 #include "brogueDataStream.h"
+#include "brogueGlobal.h"
+#include "brogueGlyphMap.h"
+#include "brogueMouseState.h"
+#include "brogueProgram.h"
+#include "brogueProgramBuilder.h"
+#include "brogueUIConstants.h"
+#include "brogueUIResponseData.h"
+#include "brogueView.h"
+#include "gl.h"
+#include "gridRect.h"
+#include "openglHelper.h"
+#include "resourceController.h"
+#include "shaderData.h"
+#include "simpleDataStream.h"
+#include "simpleGlData.h"
+#include "simpleMouseState.h"
+#include "simpleShaderProgram.h"
+
+using namespace brogueHd::component;
+using namespace brogueHd::simple;
+using namespace brogueHd::frontend::ui;
+using namespace brogueHd::backend::model::layout;
 
 namespace brogueHd::frontend::opengl
 {
-	template<isBrogueView T>
 	class brogueViewProgram : public brogueProgram
 	{
 	public:
@@ -21,13 +41,15 @@ namespace brogueHd::frontend::opengl
 		/// <param name="glyphMap">Glyph map reference</param>
 		/// <param name="view">Reference to the view to be rendered</param>
 		/// <param name="dataStream">(MEMORY!) Data stream:  This produces a specific data structure to render to the VBO</param>
-		brogueViewProgram(T* view, 
-					      resourceController* resourceController, 
-						  brogueGlyphMap* glyphMap,
-						  shaderResource vertexShader,
-						  shaderResource fragmentShader,
-						  brogueDataStream<T>* dataStream,
-						  bool useAlphaBlending)
+		brogueViewProgram(brogueUIProgram programName,
+			brogueView* view,
+			resourceController* resourceController,
+			brogueGlyphMap* glyphMap,
+			shaderResource vertexShader,
+			shaderResource fragmentShader,
+			brogueDataStream* dataStream,
+			bool useAlphaBlending)
+			: brogueProgram(programName, false)
 		{
 			_view = view;
 			_vertexShader = resourceController->getShader(vertexShader);
@@ -45,7 +67,7 @@ namespace brogueHd::frontend::opengl
 		}
 
 		virtual void initialize() override;
-		virtual bool shouldUpdate(const simpleMouseState& mouseState, int millisecondsLapsed) override;
+		virtual brogueUIResponseData& checkUpdate(const simpleMouseState& mouseState, int millisecondsLapsed) override;
 		virtual void update(const simpleMouseState& mouseState, int millisecondsLapsed) override;
 		virtual void run(int millisecondsElapsed) override;
 		virtual void outputStatus() const override;
@@ -62,10 +84,10 @@ namespace brogueHd::frontend::opengl
 		{
 			gridRect sceneBoundaryUI = _view->calculateSceneBoundaryUI();
 
-			brogueCoordinateConverter converter =  _programBuilder->createCoordinateConverter(sceneBoundaryUI.width, sceneBoundaryUI.height, _view->getZoomLevel());
+			brogueCoordinateConverter converter = _programBuilder->createCoordinateConverter(sceneBoundaryUI.width, sceneBoundaryUI.height, _view->getZoomLevel());
 
 			return converter.getViewConverter()
-							.createQuadNormalizedUV(0, 0, brogueCellDisplay::CellWidth(_view->getZoomLevel()), brogueCellDisplay::CellHeight(_view->getZoomLevel()));
+				.createQuadNormalizedUV(0, 0, brogueCellDisplay::CellWidth(_view->getZoomLevel()), brogueCellDisplay::CellHeight(_view->getZoomLevel()));
 		}
 
 		simpleShaderProgram* getProgram() const
@@ -75,48 +97,51 @@ namespace brogueHd::frontend::opengl
 
 	private:
 
-		T* _view;
+		brogueView* _view;
 		brogueProgramBuilder* _programBuilder;
 		simpleShaderProgram* _program;
 		shaderData* _vertexShader;
 		shaderData* _fragmentShader;
-		brogueDataStream<T>* _dataStream;
+		brogueDataStream* _dataStream;
 		bool _useAlphaBlending;
 	};
 
-	template<isBrogueView T>
-	void brogueViewProgram<T>::initialize()
+	void brogueViewProgram::initialize()
 	{
 		simpleDataStream* stream = _dataStream->createStream(_view);
-		
+
 		_program = _programBuilder->createShaderProgram(stream, _vertexShader, _fragmentShader);
 
 		_program->compile();
 		_program->bind();
 	}
 
-	template<isBrogueView T>
-	bool brogueViewProgram<T>::shouldUpdate(const simpleMouseState& mouseState, int millisecondsLapsed)
+	brogueUIResponseData& brogueViewProgram::checkUpdate(const simpleMouseState& mouseState, int millisecondsLapsed)
 	{
 		gridRect sceneBoundary = this->getSceneBoundaryUI();
 
 		brogueMouseState mouseStateUI((mouseState.getX() / sceneBoundary.width) * _view->getSceneBoundary().width,
-									  (mouseState.getY() / sceneBoundary.height) * _view->getSceneBoundary().height,
-									  mouseState.getScrolldYPending() != 0 || mouseState.getScrolldXPending() != 0,
-									  mouseState.getScrolldYPending() > 0);
+			(mouseState.getY() / sceneBoundary.height) * _view->getSceneBoundary().height,
+			mouseState.getScrolldYPending() != 0 || mouseState.getScrolldXPending() != 0,
+			mouseState.getScrolldYPending() > 0, mouseState.getLeftButton() > 0);
 
-		return _view->shouldUpdate(mouseStateUI, millisecondsLapsed);
+		brogueUIResponseData response = _view->checkUpdate(mouseStateUI, millisecondsLapsed);
+
+		// CRITICAL!  Don't forget to mark the program name! Otherwise, the main controller won't know 
+		//			  how to process the message
+		response.program = this->getProgramName();
+
+		return response;
 	}
 
-	template<isBrogueView T>
-	void brogueViewProgram<T>::update(const simpleMouseState& mouseState, int millisecondsLapsed)
+	void brogueViewProgram::update(const simpleMouseState& mouseState, int millisecondsLapsed)
 	{
 		gridRect sceneBoundary = this->getSceneBoundaryUI();
 
 		brogueMouseState mouseStateUI((mouseState.getX() / sceneBoundary.width) * _view->getSceneBoundary().width,
-										(mouseState.getY() / sceneBoundary.height) * _view->getSceneBoundary().height,
-										mouseState.getScrolldYPending() != 0 || mouseState.getScrolldXPending() != 0,
-										mouseState.getScrolldYPending() > 0);
+			(mouseState.getY() / sceneBoundary.height) * _view->getSceneBoundary().height,
+			mouseState.getScrolldYPending() != 0 || mouseState.getScrolldXPending() != 0,
+			mouseState.getScrolldYPending() > 0, mouseState.getLeftButton() > 0);
 
 		// View will present new data
 		_view->update(mouseStateUI, millisecondsLapsed);
@@ -129,8 +154,7 @@ namespace brogueHd::frontend::opengl
 		_program->reBuffer(stream);
 	}
 
-	template<isBrogueView T>
-	void brogueViewProgram<T>::run(int millisecondsElapsed)
+	void brogueViewProgram::run(int millisecondsElapsed)
 	{
 		if (_useAlphaBlending)
 		{
@@ -145,20 +169,17 @@ namespace brogueHd::frontend::opengl
 			glDisable(GL_BLEND);
 	}
 
-	template<isBrogueView T>
-	void brogueViewProgram<T>::outputStatus() const
+	void brogueViewProgram::outputStatus() const
 	{
 		_program->showErrors();
 	}
 
-	template<isBrogueView T>
-	bool brogueViewProgram<T>::isCompiled() const
+	bool brogueViewProgram::isCompiled() const
 	{
 		return openglHelper::getProgramCreated(_program->getHandle());
 	}
 
-	template<isBrogueView T>
-	bool brogueViewProgram<T>::hasErrors() const
+	bool brogueViewProgram::hasErrors() const
 	{
 		return _program->hasErrors();
 	}

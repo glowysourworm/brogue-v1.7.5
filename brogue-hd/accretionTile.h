@@ -1,8 +1,9 @@
 #pragma once
 
-#include "gridRect.h"
 #include "gridLocator.h"
+#include "gridRect.h"
 #include "gridRegion.h"
+#include "simple.h"
 
 using namespace brogueHd::component;
 
@@ -32,14 +33,14 @@ namespace brogueHd::backend::model::layout
 
 		size_t getHash() const override
 		{
-			return hashGenerator::generateHash(hasNorthConnection, 
-											   hasSouthConnection, 
-											   hasEastConnection, 
-											   hasWestConnection, 
-											   connectionPointN,
-											   connectionPointS, 
-											   connectionPointE, 
-											   connectionPointW);
+			return hashGenerator::generateHash(hasNorthConnection,
+				hasSouthConnection,
+				hasEastConnection,
+				hasWestConnection,
+				connectionPointN,
+				connectionPointS,
+				connectionPointE,
+				connectionPointW);
 		}
 	};
 }

@@ -2,9 +2,10 @@
 
 #include "simple.h"
 
+#include <corecrt.h>
+#include <ctime>
 #include <stdexcept>
 #include <string>
-#include <ctime>
 
 namespace brogueHd::simple
 {

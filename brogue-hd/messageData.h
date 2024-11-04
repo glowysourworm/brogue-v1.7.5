@@ -1,8 +1,10 @@
 #pragma once
 
+#include "brogueGlobal.h"
+#include "color.h"
+#include "colorString.h"
 #include "simple.h"
 #include "simpleException.h"
-#include "colorString.h"
 
 using namespace brogueHd::simple;
 
@@ -17,7 +19,7 @@ namespace brogueHd::backend::model::game
 
 		messageData()
 		{
-			message = colorString("No Message", color(255,255,255,0, 0, 0, 0, false));
+			message = colorString("No Message", color(1, 1, 1, 1));
 			confirmed = false;
 		}
 		messageData(const char* amessage, color textColor, bool aconfirmed)
@@ -34,7 +36,7 @@ namespace brogueHd::backend::model::game
 
 		void update(const char* amessage, color atextColor, bool aconfirmed)
 		{
-			message.updateAll(amessage, atextColor);
+			message = colorString(amessage, atextColor);
 			confirmed = aconfirmed;
 		}
 		size_t getHash() const override

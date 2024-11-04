@@ -1,10 +1,15 @@
 #pragma once
 
-#include "grid.h"
-#include "gridRect.h"
-#include "brogueUIData.h"
-#include "brogueMouseState.h"
 #include "brogueCellDisplay.h"
+#include "brogueMouseState.h"
+#include "brogueUIConstants.h"
+#include "brogueUIData.h"
+#include "brogueUIResponseData.h"
+#include "grid.h"
+#include "gridDefinitions.h"
+#include "gridLocator.h"
+#include "gridRect.h"
+#include "simple.h"
 
 using namespace brogueHd::frontend::opengl;
 using namespace brogueHd::component;
@@ -16,8 +21,8 @@ namespace brogueHd::frontend::ui
 	class brogueView
 	{
 	public:
-		
-		brogueView(brogueUIData* data, const gridRect& sceneBoundary, const gridRect& viewBoundary);
+
+		brogueView(brogueUIView viewName, brogueUIData* data, const gridRect& sceneBoundary, const gridRect& viewBoundary);
 		~brogueView();
 
 		gridRect getSceneBoundary() const;
@@ -34,9 +39,9 @@ namespace brogueHd::frontend::ui
 		{
 			gridRect sceneBoundary = getSceneBoundary();
 			gridRect boundaryUI = gridRect(sceneBoundary.left() * brogueCellDisplay::CellWidth(_uiData->getZoomLevel()),
-											sceneBoundary.top() * brogueCellDisplay::CellHeight(_uiData->getZoomLevel()),
-											sceneBoundary.width * brogueCellDisplay::CellWidth(_uiData->getZoomLevel()),
-											sceneBoundary.height * brogueCellDisplay::CellHeight(_uiData->getZoomLevel()));
+										   sceneBoundary.top() * brogueCellDisplay::CellHeight(_uiData->getZoomLevel()),
+										   sceneBoundary.width * brogueCellDisplay::CellWidth(_uiData->getZoomLevel()),
+										   sceneBoundary.height * brogueCellDisplay::CellHeight(_uiData->getZoomLevel()));
 
 			return boundaryUI;
 		}
@@ -44,9 +49,9 @@ namespace brogueHd::frontend::ui
 		{
 			gridRect viewBoundary = getBoundary();
 			gridRect boundaryUI = gridRect(viewBoundary.left() * brogueCellDisplay::CellWidth(_uiData->getZoomLevel()),
-											viewBoundary.top() * brogueCellDisplay::CellHeight(_uiData->getZoomLevel()),
-											viewBoundary.width * brogueCellDisplay::CellWidth(_uiData->getZoomLevel()),
-											viewBoundary.height * brogueCellDisplay::CellHeight(_uiData->getZoomLevel()));
+										   viewBoundary.top() * brogueCellDisplay::CellHeight(_uiData->getZoomLevel()),
+										   viewBoundary.width * brogueCellDisplay::CellWidth(_uiData->getZoomLevel()),
+										   viewBoundary.height * brogueCellDisplay::CellHeight(_uiData->getZoomLevel()));
 
 			return boundaryUI;
 		}
@@ -61,11 +66,16 @@ namespace brogueHd::frontend::ui
 
 		}
 
-		virtual bool shouldUpdate(const brogueMouseState& mouseState, int millisecondsLapsed)
+		virtual brogueUIResponseData& checkUpdate(const brogueMouseState& mouseState, int millisecondsLapsed)
 		{
-			return false;
+			brogueUIResponseData defaultResponse;
+
+			defaultResponse.shouldUpdate = false;
+			defaultResponse.sender = _viewName;
+
+			return defaultResponse;
 		}
-		
+
 		virtual void incrementRenderOffset(short columnOffset, short rowOffset)
 		{
 			gridLocator offset = _uiData->getRenderOffset();
@@ -88,6 +98,11 @@ namespace brogueHd::frontend::ui
 			return _uiData->getZoomLevel();
 		}
 
+		brogueUIView getViewName() const
+		{
+			return _viewName;
+		}
+
 	protected:
 
 		brogueUIData* getUIData() const
@@ -100,11 +115,13 @@ namespace brogueHd::frontend::ui
 		grid<brogueCellDisplay*>* _view;
 
 		brogueUIData* _uiData;
+		brogueUIView _viewName;
 	};
 
-	brogueView::brogueView(brogueUIData* data, const gridRect& sceneBoundary, const gridRect& viewBoundary)
+	brogueView::brogueView(brogueUIView viewName, brogueUIData* data, const gridRect& sceneBoundary, const gridRect& viewBoundary)
 	{
 		_view = new grid<brogueCellDisplay*>(sceneBoundary, viewBoundary);
+		_viewName = viewName;
 		_uiData = data;
 
 		grid<brogueCellDisplay*>* grid = _view;

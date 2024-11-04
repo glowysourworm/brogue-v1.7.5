@@ -1,7 +1,8 @@
 #pragma once
 
-#include "simpleList.h"
+#include "simple.h"
 #include "simpleHash.h"
+#include "simpleList.h"
 
 namespace brogueHd::component
 {

@@ -1,11 +1,13 @@
 #pragma once
 
-#include "brogueGlobal.h"
 #include "brogueConsole.h"
-#include "simpleString.h"
+#include "brogueGlobal.h"
 #include "simpleArrayTests.h"
-#include "simpleHashTests.h"
 #include "simpleComponentTests.h"
+#include "simpleHashTests.h"
+#include "simpleString.h"
+#include <iosfwd>
+#include <ostream>
 
 using namespace brogueHd::test;
 
@@ -38,17 +40,17 @@ namespace brogueHd::console
 
 		switch (choice)
 		{
-		case 1:
-		{
-			if (this->runUnitTests())
-				return brogueConsoleReturn::Completed;
+			case 1:
+			{
+				if (this->runUnitTests())
+					return brogueConsoleReturn::Completed;
 
-			else
-				return brogueConsoleReturn::CompletedWithError;
-		}
-		break;
-		default:
-			return brogueConsoleReturn::Completed;
+				else
+					return brogueConsoleReturn::CompletedWithError;
+			}
+			break;
+			default:
+				return brogueConsoleReturn::Completed;
 		}
 	}
 

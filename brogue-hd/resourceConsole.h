@@ -4,6 +4,7 @@
 #include "brogueGlobal.h"
 #include "resourceController.h"
 #include "simpleString.h"
+#include <iosfwd>
 #include <iostream>
 
 using namespace brogueHd::simple;
@@ -42,14 +43,14 @@ namespace brogueHd::console
 
 		switch (choice)
 		{
-		case 1:
-		{
-			stream << "Running unit tests..." << std::endl;
-			return brogueConsoleReturn::Completed;
-		}
-		break;
-		default:
-			return brogueConsoleReturn::Exit;
+			case 1:
+			{
+				stream << "Running unit tests..." << std::endl;
+				return brogueConsoleReturn::Completed;
+			}
+			break;
+			default:
+				return brogueConsoleReturn::Exit;
 		}
 
 		return brogueConsoleReturn::Completed;

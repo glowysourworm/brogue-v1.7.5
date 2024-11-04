@@ -1,11 +1,9 @@
 #pragma once
 
-#include "brogueGlobal.h"
-#include "openglHelper.h"
-#include "simpleGlObject.h"
-#include "simpleVertexBuffer.h"
-#include "simpleList.h"
 #include "gl.h"
+#include "openglHelper.h"
+#include "simpleException.h"
+#include "simpleGlObject.h"
 
 namespace brogueHd::frontend::opengl
 {

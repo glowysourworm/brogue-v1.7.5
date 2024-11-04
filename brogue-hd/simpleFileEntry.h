@@ -1,7 +1,11 @@
 #pragma once
 
 #include "simple.h"
+#include "simpleException.h"
+#include "simpleExt.h"
 #include "simpleString.h"
+#include <corecrt.h>
+#include <cstdint>
 
 namespace brogueHd::simple
 {
@@ -71,11 +75,11 @@ namespace brogueHd::simple
 		bool compare(const simpleFileEntry& other) const
 		{
 			return _fileFullPath == other.getFileFullPath() &&
-				   _fileName == other.getFileName() &&
-				   _fileNameWithoutExtension == other.getFileNameWithoutExtension() &&
-				   _writeTimeLong == other.getWriteTimeLong() &&
-				   _writeTimeShort == other.getWriteTimeShort() &&
-				   _fileSize == other.getFileSize();
+				_fileName == other.getFileName() &&
+				_fileNameWithoutExtension == other.getFileNameWithoutExtension() &&
+				_writeTimeLong == other.getWriteTimeLong() &&
+				_writeTimeShort == other.getWriteTimeShort() &&
+				_fileSize == other.getFileSize();
 		}
 
 		static int comparePath(const simpleFileEntry& item1, const simpleFileEntry& item2)
@@ -84,8 +88,8 @@ namespace brogueHd::simple
 			int cursor = 0;
 
 			while (comparison == 0 &&
-				cursor < item1.getFileFullPath()->count() &&
-				cursor < item2.getFileFullPath()->count())
+				   cursor < item1.getFileFullPath()->count() &&
+				   cursor < item2.getFileFullPath()->count())
 			{
 				// Difference in integer value of the chars (positive => greater than)
 				comparison += item1.getFileFullPath()->get(cursor) - item2.getFileFullPath()->get(cursor);

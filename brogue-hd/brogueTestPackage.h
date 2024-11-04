@@ -1,10 +1,12 @@
 #pragma once
 
-#include <functional>
-#include "simpleLogger.h"
-#include "simpleHash.h"
-#include "simpleString.h"
 #include "brogueTestFunction.h"
+#include "simple.h"
+#include "simpleHash.h"
+#include "simpleLogger.h"
+#include "simpleString.h"
+#include <exception>
+#include <functional>
 
 using namespace brogueHd::simple;
 
@@ -34,8 +36,8 @@ namespace brogueHd::test
 		{
 			brogueTestPackage* that = this;
 			bool anyErrors = false;
-			
-			_tests->iterate([&that, &anyErrors](simpleString key, brogueTestFunction value)
+
+			_tests->iterate([&that, &anyErrors] (simpleString key, brogueTestFunction value)
 			{
 				that->setCurrentTest(key);
 
@@ -45,7 +47,7 @@ namespace brogueHd::test
 
 				try
 				{
-					 result = value.testRun();
+					result = value.testRun();
 				}
 				catch (const std::exception& ex)
 				{
@@ -80,7 +82,7 @@ namespace brogueHd::test
 				simpleLogger::logColor(brogueConsoleColor::Red, "Unit Test {} Assertion Exception {}:  {}", _currentTestName.c_str(), assertName.c_str(), ex.what());
 				result = false;
 			}
-				
+
 			if (!result)
 				simpleLogger::logColor(brogueConsoleColor::Red, "Unit Test {} Assertion {} Failed!", _currentTestName.c_str(), assertName.c_str());
 		}

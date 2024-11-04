@@ -1,9 +1,12 @@
 #pragma once
 
-#include "brogueTestPackage.h"
+#include "brogueGlobal.h"
 #include "brogueTestFunction.h"
+#include "brogueTestPackage.h"
+#include "simple.h"
 #include "simpleHash.h"
 #include "simpleString.h"
+#include <functional>
 
 using namespace brogueHd::simple;
 
@@ -59,7 +62,7 @@ namespace brogueHd::test
 
 			theHash.add(2, 3);
 
-			this->testAssert("intInt_OnStack_Set_Get", [&theHash]()
+			this->testAssert("intInt_OnStack_Set_Get", [&theHash] ()
 			{
 				return theHash.get(2) == 3;
 			});
@@ -73,7 +76,7 @@ namespace brogueHd::test
 
 			theHash->add(2, 3);
 
-			this->testAssert("intInt_OnHeap_Set_Get_Delete", [&theHash]()
+			this->testAssert("intInt_OnHeap_Set_Get_Delete", [&theHash] ()
 			{
 				return theHash->get(2) == 3;
 			});
@@ -88,7 +91,7 @@ namespace brogueHd::test
 			theHash.add(2, 1);
 			theHash.add(4, 4);
 
-			theHash.iterate([](int key, int value)
+			theHash.iterate([] (int key, int value)
 			{
 				return iterationCallback::iterate;
 			});
@@ -102,7 +105,7 @@ namespace brogueHd::test
 
 			theHash->add(2, 3);
 
-			theHash->iterate([](int key, int value)
+			theHash->iterate([] (int key, int value)
 			{
 				return iterationCallback::iterate;
 			});
@@ -129,54 +132,54 @@ namespace brogueHd::test
 			{
 				switch (key)
 				{
-				case shaderResource::backgroundColorFrag:
-					that->testAssert("Invalid Hash Key", [&value] ()
-					{
-						return value == "backgroundColorFrag";
-					});
-					break;
-				case shaderResource::backgroundColorVert:
-					that->testAssert("Invalid Hash Key", [&value] ()
-					{
-						return value == "backgroundColorVert";
-					});
-					break;
-				case shaderResource::colorMaskFrag:
-					that->testAssert("Invalid Hash Key", [&value] ()
-					{
-						return value == "colorMaskFrag";
-					});
-					break;
-				case shaderResource::colorMaskVert:
-					that->testAssert("Invalid Hash Key", [&value] ()
-					{
-						return value == "colorMaskVert";
-					});
-					break;
-				case shaderResource::diffuseColorUpwardFrag:
-					that->testAssert("Invalid Hash Key", [&value] ()
-					{
-						return value == "diffuseColorUpwardFrag";
-					});
-					break;
-				case shaderResource::diffuseColorUpwardVert:
-					that->testAssert("Invalid Hash Key", [&value] ()
-					{
-						return value == "diffuseColorUpwardVert";
-					});
-					break;
-				case shaderResource::mixFrameTexturesFrag:
-					that->testAssert("Invalid Hash Key", [&value] ()
-					{
-						return value == "mixFrameTexturesFrag";
-					});
-					break;
-				case shaderResource::mixFrameTexturesVert:
-					that->testAssert("Invalid Hash Key", [&value] ()
-					{
-						return value == "mixFrameTexturesVert";
-					});
-					break;
+					case shaderResource::backgroundColorFrag:
+						that->testAssert("Invalid Hash Key", [&value] ()
+						{
+							return value == "backgroundColorFrag";
+						});
+						break;
+					case shaderResource::backgroundColorVert:
+						that->testAssert("Invalid Hash Key", [&value] ()
+						{
+							return value == "backgroundColorVert";
+						});
+						break;
+					case shaderResource::colorMaskFrag:
+						that->testAssert("Invalid Hash Key", [&value] ()
+						{
+							return value == "colorMaskFrag";
+						});
+						break;
+					case shaderResource::colorMaskVert:
+						that->testAssert("Invalid Hash Key", [&value] ()
+						{
+							return value == "colorMaskVert";
+						});
+						break;
+					case shaderResource::diffuseColorUpwardFrag:
+						that->testAssert("Invalid Hash Key", [&value] ()
+						{
+							return value == "diffuseColorUpwardFrag";
+						});
+						break;
+					case shaderResource::diffuseColorUpwardVert:
+						that->testAssert("Invalid Hash Key", [&value] ()
+						{
+							return value == "diffuseColorUpwardVert";
+						});
+						break;
+					case shaderResource::mixFrameTexturesFrag:
+						that->testAssert("Invalid Hash Key", [&value] ()
+						{
+							return value == "mixFrameTexturesFrag";
+						});
+						break;
+					case shaderResource::mixFrameTexturesVert:
+						that->testAssert("Invalid Hash Key", [&value] ()
+						{
+							return value == "mixFrameTexturesVert";
+						});
+						break;
 				}
 				return iterationCallback::iterate;
 			});
@@ -206,7 +209,7 @@ namespace brogueHd::test
 
 			theHash.add("2", "some string");
 
-			this->testAssert("stringString_OnStack_Set_Get", [&theHash]()
+			this->testAssert("stringString_OnStack_Set_Get", [&theHash] ()
 			{
 				return theHash.get("2") == "some string";
 			});
@@ -220,7 +223,7 @@ namespace brogueHd::test
 
 			theHash->add("2", "some string");
 
-			this->testAssert("stringString_OnHeap_Set_Get_Delete", [&theHash]()
+			this->testAssert("stringString_OnHeap_Set_Get_Delete", [&theHash] ()
 			{
 				return theHash->get("2") == "some string";
 			});
@@ -236,7 +239,7 @@ namespace brogueHd::test
 
 			theHash.add("sdf", "wefefe");
 
-			theHash.iterate([](simpleString key, simpleString value)
+			theHash.iterate([] (simpleString key, simpleString value)
 			{
 				return iterationCallback::iterate;
 			});
@@ -250,7 +253,7 @@ namespace brogueHd::test
 
 			theHash->add("some string key", "value");
 
-			theHash->forEach([](simpleString key, simpleString value)
+			theHash->forEach([] (simpleString key, simpleString value)
 			{
 				return iterationCallback::iterate;
 			});

@@ -1,10 +1,17 @@
 #pragma once
 
-#include "simpleException.h"
+#include "simple.h"
 #include "simpleArray.h"
+#include "simpleException.h"
 #include "simpleList.h"
-#include <string>
+#include <cctype>
+#include <cmath>
+#include <cstdlib>
+#include <cstring>
+#include <exception>
+#include <iosfwd>
 #include <iostream>
+#include <string>
 
 namespace brogueHd::simple
 {
@@ -542,9 +549,9 @@ namespace brogueHd::simple
 	{
 		return _array->count() == 0 ||
 			_array->areAllWhere([] (char value)
-				{
-					return value == '\0' || std::isspace(value);
-				});
+		{
+			return value == '\0' || std::isspace(value);
+		});
 	}
 
 	void simpleString::set(int index, char value)

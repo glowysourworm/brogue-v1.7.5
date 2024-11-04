@@ -1,12 +1,15 @@
 #pragma once
 
-#include "gameData.h"
 #include "brogueGlobal.h"
+#include "gameData.h"
 #include "keyProcessor.h"
-#include "randomGenerator.h"
 #include "playbackProcessor.h"
+#include "randomGenerator.h"
 #include "renderingController.h"
+#include "resourceController.h"
+#include "simpleException.h"
 #include "simpleString.h"
+#include <exception>
 
 using namespace brogueHd::simple;
 using namespace brogueHd::backend::generator;
@@ -77,7 +80,7 @@ namespace brogueHd::backend::controller
 	private:
 
 		renderingController* _renderingController;
-		BrogueGameMode _gameMode;	
+		BrogueGameMode _gameMode;
 
 		randomGenerator* _randomMain;
 		randomGenerator* _randomCosmetic;
@@ -402,21 +405,11 @@ namespace brogueHd::backend::controller
 	{
 		switch (_gameMode)
 		{
-		case BrogueGameMode::Menu:
-			break;
-		case BrogueGameMode::MenuHighScores:
-			break;
-		case BrogueGameMode::MenuOpenGame:
-			break;
-		case BrogueGameMode::MenuSetSeed:
-			break;
 		case BrogueGameMode::Game:
 			break;
 		case BrogueGameMode::Playback:
 			break;
-		case BrogueGameMode::Scum:
-			break;
-		case BrogueGameMode::Quit:
+		case BrogueGameMode::Title:
 			break;
 		default:
 			break;

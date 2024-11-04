@@ -1,25 +1,31 @@
 #pragma once
 
-#include "resourceController.h"
-#include "playbackData.h"
-#include "gameData.h"
 #include "brogueColorMap.h"
 #include "brogueScoreEntry.h"
-#include "simpleFileIO.h"
+#include "gameData.h"
 #include "keyProcessor.h"
+#include "playbackData.h"
+#include "simpleFileIO.h"
 
-#include "simpleEnumString.h"
-#include "simpleString.h"
+#include "shaderData.h"
 #include "simpleBitmap.h"
 #include "simpleList.h"
-#include "shaderData.h"
-#include "colorConstants.h"
+#include "simpleString.h"
 
 #include "json.hpp"
 
-#include <string>
+#include "brogueGlobal.h"
+#include "gl.h"
+#include "simpleArray.h"
+#include "simpleException.h"
+#include "simpleExt.h"
+#include "simpleHash.h"
+#include <chrono>
+#include <cstdlib>
+#include <exception>
 #include <fstream>
-#include <format>
+#include <iosfwd>
+#include <string>
 
 using namespace brogueHd::simple;
 using namespace brogueHd::component;
@@ -102,7 +108,7 @@ namespace brogueHd::backend::controller
 	private:
 
 		void loadHighScores(const char* path);
-	
+
 	private:
 
 		simpleHash<shaderResource, shaderData*>* _shaderCache;

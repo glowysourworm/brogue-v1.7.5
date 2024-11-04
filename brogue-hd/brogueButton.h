@@ -1,10 +1,13 @@
 #pragma once
 
-#include "brogueView.h"
-#include "gridRect.h"
-#include "brogueUIData.h"
 #include "brogueMouseState.h"
-#include "simpleException.h"
+#include "brogueUIConstants.h"
+#include "brogueUIData.h"
+#include "brogueUIResponseData.h"
+#include "brogueView.h"
+#include "color.h"
+#include "gridRect.h"
+#include "simple.h"
 
 using namespace brogueHd::component;
 using namespace brogueHd::simple;
@@ -15,15 +18,15 @@ namespace brogueHd::frontend::ui
 	{
 	public:
 
-		brogueButton(brogueUIData* data, const gridRect& sceneBoundary, const gridRect& viewBoundary);
+		brogueButton(brogueUIView viewName, brogueUIData* data, const gridRect& sceneBoundary, const gridRect& viewBoundary);
 		~brogueButton();
 
 		virtual void update(const brogueMouseState& mouseState, int millisecondsLapsed) override;
-		virtual bool shouldUpdate(const brogueMouseState& mouseState, int millisecondsLapsed) override;
+		virtual brogueUIResponseData& checkUpdate(const brogueMouseState& mouseState, int millisecondsLapsed) override;
 	};
 
-	brogueButton::brogueButton(brogueUIData* data, const gridRect& sceneBoundary, const gridRect& viewBoundary)
-		: brogueView(data, sceneBoundary, viewBoundary)
+	brogueButton::brogueButton(brogueUIView viewName, brogueUIData* data, const gridRect& sceneBoundary, const gridRect& viewBoundary)
+		: brogueView(viewName, data, sceneBoundary, viewBoundary)
 	{
 		// Initialize the view
 		//
@@ -32,9 +35,17 @@ namespace brogueHd::frontend::ui
 	brogueButton::~brogueButton()
 	{
 	}
-	bool brogueButton::shouldUpdate(const brogueMouseState& mouseState, int millisecondsLapsed)
+	brogueUIResponseData& brogueButton::checkUpdate(const brogueMouseState& mouseState, int millisecondsLapsed)
 	{
-		return this->getUIData()->getHasMouseInteraction() && this->isMouseOver(mouseState);
+		brogueUIResponseData response;
+
+		response.sender = this->getViewName();
+		response.mouseHover = this->isMouseOver(mouseState);
+		response.mouseUsed = this->getUIData()->getHasMouseInteraction();
+		response.mouseLeft = mouseState.getMouseLeft();
+		response.shouldUpdate = (response.mouseHover || response.mouseLeft) && response.mouseUsed;
+
+		return response;
 	}
 	void brogueButton::update(const brogueMouseState& mouseState, int millisecondsLapsed)
 	{

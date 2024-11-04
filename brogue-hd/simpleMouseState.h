@@ -12,7 +12,7 @@ namespace brogueHd::frontend::opengl
 			_scrolldXPending = 0;
 			_scrolldYPending = 0;
 			_leftButton = 0;
-			_rightButton= 0;
+			_rightButton = 0;
 			_middleButton = 0;
 		}
 		simpleMouseState(const simpleMouseState& copy)
@@ -25,7 +25,7 @@ namespace brogueHd::frontend::opengl
 			_rightButton = copy.getRightButton();
 			_middleButton = copy.getMiddleButton();
 		}
-		~simpleMouseState(){}
+		~simpleMouseState() {}
 
 		double getX() const
 		{
@@ -86,7 +86,7 @@ namespace brogueHd::frontend::opengl
 		}
 
 	private:
-		
+
 		double _x;
 		double _y;
 		int _leftButton;

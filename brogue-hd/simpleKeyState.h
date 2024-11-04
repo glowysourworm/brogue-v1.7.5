@@ -59,7 +59,7 @@ namespace brogueHd::frontend::opengl
 	private:
 
 		simpleList<int>* _keys;
-		
+
 		int _modifiers;
 	};
 }

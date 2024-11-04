@@ -1,9 +1,12 @@
 #pragma once
 
 #include "brogueConsole.h"
+#include "brogueGlobal.h"
 #include "gameController.h"
 #include "resourceController.h"
 #include "simpleString.h"
+#include <exception>
+#include <iosfwd>
 #include <iostream>
 
 using namespace brogueHd::simple;
@@ -49,11 +52,8 @@ namespace brogueHd::console
 	void gameConsole::printHelp(std::ostream& stream)
 	{
 		stream << "Brogue Game Console:" << std::endl << std::endl;
-		stream << "\t1) New Game	   [options]" << std::endl;
-		stream << "\t2) Open Game	   [options]" << std::endl;
-		stream << "\t3) High Scores" << std::endl;
-		stream << "\t4) Run Playback   [options]" << std::endl;
-		stream << "\t5) Help (more options help)" << std::endl;
+		stream << "\t1) Start Game	   [options]" << std::endl;
+		stream << "\t2) Help (more options help)" << std::endl;
 		stream << "\tElse) Exit" << std::endl;
 
 		//stream << "--help         -h          print this help message" << std::endl;
@@ -227,7 +227,7 @@ namespace brogueHd::console
 
 		// Prepare Game Window
 		_gameController->initNewGame(1234);
-		_gameController->setMode(BrogueGameMode::Game);
+		_gameController->setMode(BrogueGameMode::Title);
 
 		// MAIN LOOP:  Leave 1ms thread sleep -> Grab key input -> send to game controller.
 		//
@@ -253,22 +253,15 @@ namespace brogueHd::console
 						//
 						switch (_gameController->getMode())
 						{
-						case BrogueGameMode::Menu:
-						case BrogueGameMode::MenuHighScores:
-						case BrogueGameMode::MenuOpenGame:
-						case BrogueGameMode::MenuSetSeed:
-						case BrogueGameMode::Game:
-						case BrogueGameMode::Playback:
-						case BrogueGameMode::Scum:
-						case BrogueGameMode::Quit:
-						default:
+							case BrogueGameMode::Game:
+							case BrogueGameMode::Playback:
+							case BrogueGameMode::Title:
+							default:
 
-							_gameController->setMode(BrogueGameMode::Quit);
+								// Currently nothing to do until there is more feedback from
+								// game components. This will be apparent when completed.
 
-							// Currently nothing to do until there is more feedback from
-							// game components. This will be apparent when completed.
-
-							break;
+								break;
 						}
 					}
 				}

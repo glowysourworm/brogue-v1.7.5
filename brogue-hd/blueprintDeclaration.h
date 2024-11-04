@@ -1,5 +1,6 @@
 #pragma once
 
+#include "brogueGlobal.h"
 #include "machineTemplate.h"
 
 using namespace brogueHd::backend::model::gameTemplate;

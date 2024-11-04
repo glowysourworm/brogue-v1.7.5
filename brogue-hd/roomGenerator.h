@@ -1,10 +1,19 @@
 #pragma once
 
+#include "brogueCell.h"
+#include "brogueGlobal.h"
+#include "cellularAutomataParameters.h"
 #include "grid.h"
-#include "gridDefinitions.h"
+#include "gridLocator.h"
+#include "gridRect.h"
+#include "gridRegion.h"
+#include "gridRegionConstructor.h"
 #include "gridRegionLocator.h"
 #include "noiseGenerator.h"
-#include "cellularAutomataParameters.h"
+#include "randomGenerator.h"
+#include "simple.h"
+#include "simpleList.h"
+#include "simpleMath.h"
 
 using namespace brogueHd::component;
 using namespace brogueHd::backend::model::layout;
@@ -18,11 +27,11 @@ namespace brogueHd::backend::generator
 		roomGenerator(noiseGenerator* noiseGenerator, randomGenerator* randomGenerator);
 		~roomGenerator();
 
-		void designCavern(gridRegionConstructor<gridLocator>& regionConstructor, 
-							const gridRect& parentBoundary, 
-							const gridRect& relativeBoundary, 
-							const gridRect& minSize, 
-							const gridRect& maxSize);
+		void designCavern(gridRegionConstructor<gridLocator>& regionConstructor,
+			const gridRect& parentBoundary,
+			const gridRect& relativeBoundary,
+			const gridRect& minSize,
+			const gridRect& maxSize);
 
 		void designEntranceRoom(gridRegionConstructor<gridLocator>& regionConstructor);
 
@@ -78,12 +87,12 @@ namespace brogueHd::backend::generator
 
 		// Create cellular automata using cavern parameters
 		_noiseGenerator->cellularAutomata(*_cavernParameters, [&designGrid] (short column, short row, bool result)
-			{
-				if (result)
-					designGrid.set(column, row, brogueCell(column, row));
+		{
+			if (result)
+				designGrid.set(column, row, brogueCell(column, row));
 
-				return iterationCallback::iterate;
-			});
+			return iterationCallback::iterate;
+		});
 
 		// Locate regions using flood fill method:  Find the max area region
 		gridRegion<gridLocator>* maxRegion;
@@ -95,18 +104,18 @@ namespace brogueHd::backend::generator
 
 		// Filter regions to comply to size constraints
 		validRegions = regions.where([&minSize, &maxSize] (gridRegion<gridLocator>* region)
-			{
-				return region->getBoundary().width >= minSize.width &&
-					region->getBoundary().width <= maxSize.width &&
-					region->getBoundary().height >= minSize.height &&
-					region->getBoundary().height <= maxSize.height;
-			});
+		{
+			return region->getBoundary().width >= minSize.width &&
+				region->getBoundary().width <= maxSize.width &&
+				region->getBoundary().height >= minSize.height &&
+				region->getBoundary().height <= maxSize.height;
+		});
 
 		// Select largest area region from valid regions
 		maxRegion = validRegions.withMax<short>([] (gridRegion<gridLocator>* region)
-			{
-				return region->getBoundary().area();
-			});
+		{
+			return region->getBoundary().area();
+		});
 
 		// Position the new cave in the middle of the grid...
 		gridRect blobBoundary = maxRegion->getBoundary();
@@ -122,19 +131,19 @@ namespace brogueHd::backend::generator
 
 		// ...and copy it to the master grid.
 		translatedRegion->iterateLocations([&regionConstructor] (short column, short row, gridLocator cell)
-			{
-				regionConstructor.add(column, row, cell);
+		{
+			regionConstructor.add(column, row, cell);
 
-				return iterationCallback::iterate;
-			});
+			return iterationCallback::iterate;
+		});
 
 		// (MEMORY) Don't need the region containers. Data for locators is alive in the regionConstructor.
 		regions.forEach([] (gridRegion<gridLocator>* region)
-			{
-				delete region;
+		{
+			delete region;
 
-				return iterationCallback::iterate;
-			});
+			return iterationCallback::iterate;
+		});
 
 		// (MEMORY) Don't forget the region created by the translation!
 		delete translatedRegion;
@@ -158,64 +167,64 @@ namespace brogueHd::backend::generator
 
 		// Add Room 1
 		room1.iterate([&regionConstructor] (short column, short row)
-			{
-				regionConstructor.add(column, row, gridLocator(column, row));
+		{
+			regionConstructor.add(column, row, gridLocator(column, row));
 
-				return iterationCallback::iterate;
-			});
+			return iterationCallback::iterate;
+		});
 
 		// Add Room 2
 		room2.iterate([&regionConstructor] (short column, short row)
-			{
-				regionConstructor.add(column, row, gridLocator(column, row));
+		{
+			regionConstructor.add(column, row, gridLocator(column, row));
 
-				return iterationCallback::iterate;
-			});
+			return iterationCallback::iterate;
+		});
 	}
 
 	void roomGenerator::designCrossRoom(gridRegionConstructor<gridLocator>& regionConstructor)
 	{
 		short roomWidth, roomHeight, roomWidth2, roomHeight2, roomX, roomY, roomX2, roomY2;
 
-		roomWidth = _randomGenerator->rand_range(3, 12);
-		roomX = _randomGenerator->rand_range(simpleMath::maxOf(0, DCOLS / 2 - (roomWidth - 1)), simpleMath::minOf(DCOLS, DCOLS / 2));
-		roomWidth2 = _randomGenerator->rand_range(4, 20);
-		roomX2 = (roomX + (roomWidth / 2) + _randomGenerator->rand_range(0, 2) + _randomGenerator->rand_range(0, 2) - 3) - (roomWidth2 / 2);
+		roomWidth = _randomGenerator->randomRange(3, 12);
+		roomX = _randomGenerator->randomRange(simpleMath::maxOf(0, DCOLS / 2 - (roomWidth - 1)), simpleMath::minOf(DCOLS, DCOLS / 2));
+		roomWidth2 = _randomGenerator->randomRange(4, 20);
+		roomX2 = (roomX + (roomWidth / 2) + _randomGenerator->randomRange(0, 2) + _randomGenerator->randomRange(0, 2) - 3) - (roomWidth2 / 2);
 
-		roomHeight = _randomGenerator->rand_range(3, 7);
+		roomHeight = _randomGenerator->randomRange(3, 7);
 		roomY = (DROWS / 2 - roomHeight);
 
-		roomHeight2 = _randomGenerator->rand_range(2, 5);
-		roomY2 = (DROWS / 2 - roomHeight2 - (_randomGenerator->rand_range(0, 2) + _randomGenerator->rand_range(0, 1)));
+		roomHeight2 = _randomGenerator->randomRange(2, 5);
+		roomY2 = (DROWS / 2 - roomHeight2 - (_randomGenerator->randomRange(0, 2) + _randomGenerator->randomRange(0, 1)));
 
 		gridRect room1(roomX - 5, roomY + 5, roomWidth, roomHeight);
 		gridRect room2(roomX2 - 5, roomY2 + 5, roomWidth2, roomHeight2);
 
 		// Add Room 1
 		room1.iterate([&regionConstructor] (short column, short row)
-			{
-				regionConstructor.add(column, row, gridLocator(column, row));
+		{
+			regionConstructor.add(column, row, gridLocator(column, row));
 
-				return iterationCallback::iterate;
-			});
+			return iterationCallback::iterate;
+		});
 
 		// Add Room 2
 		room2.iterate([&regionConstructor] (short column, short row)
-			{
-				regionConstructor.add(column, row, gridLocator(column, row));
+		{
+			regionConstructor.add(column, row, gridLocator(column, row));
 
-				return iterationCallback::iterate;
-			});
+			return iterationCallback::iterate;
+		});
 	}
 
 	void roomGenerator::designSymmetricalCrossRoom(gridRegionConstructor<gridLocator>& regionConstructor)
 	{
 		short majorWidth, majorHeight, minorWidth, minorHeight;
 
-		majorWidth = _randomGenerator->rand_range(4, 8);
-		majorHeight = _randomGenerator->rand_range(4, 5);
+		majorWidth = _randomGenerator->randomRange(4, 8);
+		majorHeight = _randomGenerator->randomRange(4, 5);
 
-		minorWidth = _randomGenerator->rand_range(3, 4);
+		minorWidth = _randomGenerator->randomRange(3, 4);
 		if (majorHeight % 2 == 0) {
 			minorWidth -= 1;
 		}
@@ -229,37 +238,37 @@ namespace brogueHd::backend::generator
 
 		// Add Room 1
 		room1.iterate([&regionConstructor] (short column, short row)
-			{
-				regionConstructor.add(column, row, gridLocator(column, row));
+		{
+			regionConstructor.add(column, row, gridLocator(column, row));
 
-				return iterationCallback::iterate;
-			});
+			return iterationCallback::iterate;
+		});
 
 		// Add Room 2
 		room2.iterate([&regionConstructor] (short column, short row)
-			{
-				regionConstructor.add(column, row, gridLocator(column, row));
+		{
+			regionConstructor.add(column, row, gridLocator(column, row));
 
-				return iterationCallback::iterate;
-			});
+			return iterationCallback::iterate;
+		});
 	}
 
 	void roomGenerator::designSmallRoom(gridRegionConstructor<gridLocator>& regionConstructor)
 	{
 		short width, height;
 
-		width = _randomGenerator->rand_range(3, 6);
-		height = _randomGenerator->rand_range(2, 4);
+		width = _randomGenerator->randomRange(3, 6);
+		height = _randomGenerator->randomRange(2, 4);
 
 		gridRect room((DCOLS - width) / 2, (DROWS - height) / 2, width, height);
 
 		// Add Room
 		room.iterate([&regionConstructor] (short column, short row)
-			{
-				regionConstructor.add(column, row, gridLocator(column, row));
+		{
+			regionConstructor.add(column, row, gridLocator(column, row));
 
-				return iterationCallback::iterate;
-			});
+			return iterationCallback::iterate;
+		});
 	}
 
 	void roomGenerator::designCircularRoom(gridRegionConstructor<gridLocator>& regionConstructor, const gridRect& parentBoundary, const gridRect& relativeBoundary)
@@ -270,11 +279,11 @@ namespace brogueHd::backend::generator
 		// 5% Chance
 		if (_randomGenerator->next() >= 0.05)
 		{
-			radius = _randomGenerator->rand_range(4, 10);
+			radius = _randomGenerator->randomRange(4, 10);
 		}
 		else
 		{
-			radius = _randomGenerator->rand_range(2, 4);
+			radius = _randomGenerator->randomRange(2, 4);
 		}
 
 		//drawCircleOnGrid(grid, DCOLS / 2, DROWS / 2, radius, 1);
@@ -282,11 +291,11 @@ namespace brogueHd::backend::generator
 		gridRect setRect = gridRect::fromCircle(DCOLS / 2, DROWS / 2, radius, radius);
 
 		setRect.iterateInCircle([&setGrid] (short column, short row)
-			{
-				setGrid.set(column, row, true);
+		{
+			setGrid.set(column, row, true);
 
-				return iterationCallback::iterate;
-			});
+			return iterationCallback::iterate;
+		});
 
 		//if (radius > 6
 		//    && rand_percent(50)) {
@@ -298,15 +307,15 @@ namespace brogueHd::backend::generator
 		{
 			// TODO:  FIGURE OUT ZERO VALUE! (last parameter from above. probably chasm)
 
-			short removeRadius = _randomGenerator->rand_range(3, radius - 3);
+			short removeRadius = _randomGenerator->randomRange(3, radius - 3);
 			gridRect removeRect = gridRect::fromCircle(DCOLS / 2 - removeRadius, DCOLS / 2 - removeRadius, removeRadius, removeRadius);
 
 			setRect.iterateInCircle([&setGrid] (short column, short row)
-				{
-					setGrid.set(column, row, false);
+			{
+				setGrid.set(column, row, false);
 
-					return iterationCallback::iterate;
-				});
+				return iterationCallback::iterate;
+			});
 		}
 	}
 
@@ -314,17 +323,17 @@ namespace brogueHd::backend::generator
 	{
 		short x, y;
 		short minX, maxX, minY, maxY;
-		short chunkCount = _randomGenerator->rand_range(2, 8);
+		short chunkCount = _randomGenerator->randomRange(2, 8);
 
 		grid<bool> setGrid(parentBoundary, parentBoundary);
 
 		// Set small room
 		gridRect(0, 0, 2, 2).iterateInCircle([&setGrid, &regionConstructor] (short column, short row)
-			{
-				setGrid.set(column, row, true);
-				regionConstructor.add(column, row, gridLocator(column, row));
-				return iterationCallback::iterate;
-			});
+		{
+			setGrid.set(column, row, true);
+			regionConstructor.add(column, row, gridLocator(column, row));
+			return iterationCallback::iterate;
+		});
 
 		minX = DCOLS / 2 - 3;
 		maxX = DCOLS / 2 + 3;
@@ -333,8 +342,8 @@ namespace brogueHd::backend::generator
 
 		for (short i = 0; i < chunkCount; i++)
 		{
-			x = _randomGenerator->rand_range(minX, maxX);
-			y = _randomGenerator->rand_range(minY, maxY);
+			x = _randomGenerator->randomRange(minX, maxX);
+			y = _randomGenerator->randomRange(minY, maxY);
 
 			if (setGrid.isDefined(x, y))
 			{
@@ -342,11 +351,11 @@ namespace brogueHd::backend::generator
 				//            hiliteGrid(grid, &white, 100);
 
 				gridRect(x, y, 2, 2).iterateInCircle([&setGrid, &regionConstructor] (short column, short row)
-					{
-						setGrid.set(column, row, true);
-						regionConstructor.add(column, row, gridLocator(column, row));
-						return iterationCallback::iterate;
-					});
+				{
+					setGrid.set(column, row, true);
+					regionConstructor.add(column, row, gridLocator(column, row));
+					return iterationCallback::iterate;
+				});
 
 				minX = simpleMath::maxOf(1, simpleMath::minOf(x - 3, minX));
 				maxX = simpleMath::minOf(DCOLS - 2, simpleMath::maxOf(x + 3, maxX));

@@ -1,7 +1,8 @@
 #pragma once
 
-#include "playerCharacter.h"
 #include "brogueLevel.h"
+#include "creature.h"
+#include "item.h"
 
 using namespace brogueHd::backend::model;
 
