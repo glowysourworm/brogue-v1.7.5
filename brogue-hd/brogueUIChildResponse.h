@@ -12,12 +12,14 @@ namespace brogueHd::frontend::opengl
 			tag = default_value::value<brogueUITagAction>();
 			actionMet = false;
 			needsUpdate = false;
+			deactivated = false;
 		}
-		brogueUIChildResponse(const brogueUITagAction& responseData, bool aactionMet, bool aneedsUpdate)
+		brogueUIChildResponse(const brogueUITagAction& responseData, bool aactionMet, bool adeactivated, bool aneedsUpdate)
 		{
 			tag = responseData;
 			actionMet = aactionMet;
 			needsUpdate = aneedsUpdate;
+			deactivated = adeactivated;
 		}
 		brogueUIChildResponse(const brogueUIChildResponse& copy)
 		{
@@ -31,6 +33,7 @@ namespace brogueHd::frontend::opengl
 		brogueUITagAction tag;
 
 		bool actionMet;
+		bool deactivated;
 		bool needsUpdate;
 
 	private:
@@ -40,6 +43,7 @@ namespace brogueHd::frontend::opengl
 			tag = copy.tag;
 			actionMet = copy.actionMet;
 			needsUpdate = copy.needsUpdate;
+			deactivated = copy.deactivated;
 		}
 	};
 }

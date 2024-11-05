@@ -440,19 +440,46 @@ namespace brogueHd::frontend::opengl
 			// Check the view tree for program control response (the tree handles marking the response)
 			brogueUIResponseData uiData;
 
+			bool programChange = false;
+
 			_program->checkUpdate(uiData, keyboardState, mouseState, intervalMilliseconds);
 
-			if (uiData.response.actionMet)
+			// Deactivated
+			if (uiData.response.deactivated)
+			{
+				switch (uiData.response.tag.deactivateAction)
+				{
+					case brogueUIAction::Close:
+						_program->deactivateCurrentUIProgram();
+						break;
+
+					case brogueUIAction::ViewMainMenu:
+						_program->deactivateCurrentUIProgram();
+						_program->activateUIProgram(brogueUIProgram::MainMenuProgram);
+						break;
+
+						// CRITICAL! Leave the 'None' action for views to report "Nothing to do"
+					case brogueUIAction::None:
+						break;
+
+					default:
+						throw simpleException("Unhandled brogueUIAction (deactivate):  openglRenderer.h");
+				}
+
+				programChange = true;
+			}
+
+			// Action Met -> Deactivate Current / Active Next
+			//
+			else if (uiData.response.actionMet)
 			{
 				switch (uiData.response.tag.action)
 				{
 					case brogueUIAction::Close:
+						_program->deactivateCurrentUIProgram();
 						break;
 
 					case brogueUIAction::NewGame:
-						break;
-
-					case brogueUIAction::None:
 						break;
 
 					case brogueUIAction::OpenGame:
@@ -464,37 +491,49 @@ namespace brogueHd::frontend::opengl
 					case brogueUIAction::ShowQuitGameModal:
 						break;
 
+					case brogueUIAction::ViewMainMenu:
+					{
+						_program->deactivateCurrentUIProgram();
+						_program->activateUIProgram(brogueUIProgram::MainMenuProgram);
+					}
+					break;
+
 					case brogueUIAction::ViewHighScores:
-						break;
+					{
+						_program->deactivateCurrentUIProgram();
+						_program->activateUIProgram(brogueUIProgram::HighScoresProgram);
+					}
+					break;
 
 					case brogueUIAction::ViewOpenGameMenu:
-						break;
+					{
+						_program->deactivateCurrentUIProgram();
+						_program->activateUIProgram(brogueUIProgram::OpenMenuProgram);
+					}
+					break;
 
 					case brogueUIAction::ViewPlaybackMenu:
-						break;
+					{
+						_program->deactivateCurrentUIProgram();
+						_program->activateUIProgram(brogueUIProgram::PlaybackMenuProgram);
+					}
+					break;
 
 					default:
 						throw simpleException("Unhandled brogueUIAction:  openglRenderer.h");
 				}
+				programChange = true;
 			}
 
-			//// Response will still signal an update
-			//if (_programController->wasExitConditionMet(response))
-			//{
-			//	brogueUIProgram nextProgram = _programController->getNextProgram(response);
-
-			//	// De-Activate UI Program
-			//	_program->deactivateUIProgram(response.signature.program);
-
-			//	if (nextProgram != brogueUIProgram::ContainerControlledProgram)
-			//		_program->activateUIProgram(nextProgram);
-
-			//	else
-			//		simpleException::show("Brogue Program Control Error:  Exit from current UI program not handled");
-			//}
+			// Force an update if there was a program change
+			if (programChange)
+			{
+				_program->checkUpdate(uiData, keyboardState, mouseState, intervalMilliseconds);
+				_program->update(keyboardState, mouseState, intervalMilliseconds);
+			}
 
 			// Check normal program update
-			if (uiData.response.needsUpdate)
+			else if (uiData.response.needsUpdate)
 				_program->update(keyboardState, mouseState, intervalMilliseconds);							// Updates program buffers from the UI view
 
 			// Run drawing program

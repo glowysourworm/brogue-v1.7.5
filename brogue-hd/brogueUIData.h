@@ -27,6 +27,7 @@ namespace brogueHd::frontend::ui
 			_background = nullptr;
 			_renderOffset = nullptr;
 			_hoverBackground = nullptr;
+			_pressedBackground = nullptr;
 			_alignment = brogueTextAlignment::Left;
 			_hotkeyIndex = -1;
 			_padding = 0;
@@ -83,14 +84,14 @@ namespace brogueHd::frontend::ui
 					 const color& mouseBackground1,
 					 const color& mouseBackground2,
 					 brogueGradientType gradientType)
-			: brogueUIData(boundary, zoomLevel, "", background1, background2, mouseBackground1, mouseBackground2, gradientType, brogueTextAlignment::Left)
+			: brogueUIData(boundary, zoomLevel, "", background1, background2, mouseBackground1, mouseBackground2, mouseBackground1, mouseBackground2, gradientType, brogueTextAlignment::Left)
 		{}
 		brogueUIData(const gridRect& boundary,
 					 int zoomLevel,
 					 const colorString& text,
 					 const color& background,
 					 brogueTextAlignment alignment)
-			: brogueUIData(boundary, zoomLevel, text, background, background, background, background, brogueGradientType::Horizontal, alignment)
+			: brogueUIData(boundary, zoomLevel, text, background, background, background, background, background, background, brogueGradientType::Horizontal, alignment)
 		{}
 		brogueUIData(const gridRect& boundary,
 					 int zoomLevel,
@@ -98,7 +99,7 @@ namespace brogueHd::frontend::ui
 					 const color& gradient1,
 					 const color& gradient2,
 					 brogueTextAlignment alignment)
-			: brogueUIData(boundary, zoomLevel, text, gradient1, gradient2, gradient1, gradient2, brogueGradientType::Horizontal, alignment)
+			: brogueUIData(boundary, zoomLevel, text, gradient1, gradient2, gradient1, gradient2, gradient1, gradient2, brogueGradientType::Horizontal, alignment)
 		{}
 		brogueUIData(const gridRect& boundary,
 					 int zoomLevel,
@@ -107,6 +108,8 @@ namespace brogueHd::frontend::ui
 					 const color& gradient2,
 					 const color& mouseBackground1,
 					 const color& mouseBackground2,
+					 const color& mousePressed1,
+					 const color& mousePressed2,
 					 brogueGradientType gradientType,
 					 brogueTextAlignment alignment)
 		{
@@ -114,6 +117,7 @@ namespace brogueHd::frontend::ui
 			_text = new colorString(text);
 			_background = new colorGradient(gradient1, gradient2, gradientType);
 			_hoverBackground = new colorGradient(mouseBackground1, mouseBackground2, gradientType);
+			_pressedBackground = new colorGradient(mousePressed1, mousePressed2, gradientType);
 			_renderOffset = new gridLocator(0, 0);
 			_alignment = alignment;
 			_hotkeyIndex = -1;
@@ -137,6 +141,7 @@ namespace brogueHd::frontend::ui
 							 int actionGLFWHotkey,
 							 const simpleString& actionFileName,
 							 brogueUIAction action,
+							 brogueUIAction deactivateAction,
 							 brogueUIView actionView,
 							 bool hasMouseInteraction,
 							 bool isVisible,
@@ -153,6 +158,7 @@ namespace brogueHd::frontend::ui
 			_tagAction->fileName = actionFileName;
 			_tagAction->actionView = actionView;
 			_tagAction->action = action;
+			_tagAction->deactivateAction = deactivateAction;
 		}
 
 		/// <summary>
@@ -186,15 +192,19 @@ namespace brogueHd::frontend::ui
 
 	public:
 
-		color calculateGradient(const gridLocator& location, bool isMouseOver)
+		color calculateGradient(const gridLocator& location)
 		{
-			return calculateGradient(location.column, location.row, isMouseOver);
+			return calculateGradient(location.column, location.row);
 		}
 
-		color calculateGradient(int column, int row, bool isMouseOver)
+		color calculateGradient(int column, int row)
 		{
-			if (isMouseOver && _hasMouseInteraction)
+			if (_mousePressed && _hasMouseInteraction)
+				return calculateGradientImpl(column, row, _pressedBackground);
+
+			else if (_mouseOver && _hasMouseInteraction)
 				return calculateGradientImpl(column, row, _hoverBackground);
+
 			else
 				return calculateGradientImpl(column, row, _background);
 		}
@@ -259,6 +269,14 @@ namespace brogueHd::frontend::ui
 		bool getHasMouseInteraction() const
 		{
 			return _hasMouseInteraction;
+		}
+		bool getMousePressed() const
+		{
+			return _mousePressed;
+		}
+		bool getMouseOver() const
+		{
+			return _mouseOver;
 		}
 
 	private:
@@ -361,14 +379,6 @@ namespace brogueHd::frontend::ui
 		{
 			return _isVisible;
 		}
-		bool getMousePressed() const
-		{
-			return _mousePressed;
-		}
-		bool getMouseOver() const
-		{
-			return _mouseOver;
-		}
 
 	private:
 
@@ -377,6 +387,7 @@ namespace brogueHd::frontend::ui
 		gridLocator* _renderOffset;
 		colorGradient* _background;
 		colorGradient* _hoverBackground;
+		colorGradient* _pressedBackground;
 		brogueTextAlignment _alignment;
 		int _hotkeyIndex;
 		int _padding;

@@ -109,13 +109,14 @@ namespace brogueHd::frontend
 	{
 		None = 0,
 		Close = 1,
-		ViewOpenGameMenu = 2,
-		ViewPlaybackMenu = 3,
-		ViewHighScores = 4,
-		NewGame = 5,
-		OpenGame = 6,
-		ShowQuitGameModal = 7,
-		QuitGame = 8
+		ViewMainMenu = 2,
+		ViewOpenGameMenu = 3,
+		ViewPlaybackMenu = 4,
+		ViewHighScores = 5,
+		NewGame = 6,
+		OpenGame = 7,
+		ShowQuitGameModal = 8,
+		QuitGame = 9
 	};
 
 	enum brogueTextAlignment

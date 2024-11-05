@@ -56,6 +56,7 @@ namespace brogueHd::frontend::ui
 
 			// Update the UI data
 			response.actionMet = this->getUIData()->setMouseUpdate(mouseState.getMouseLeft(), mouseOver);
+			response.deactivated = !mouseOver && mouseState.getMouseLeft();
 			response.needsUpdate = hasInteraction && (mouseOver || mouseState.getMouseLeft());
 			response.tag = *this->getUIData()->getAction();
 		}
@@ -68,15 +69,16 @@ namespace brogueHd::frontend::ui
 	{
 		// Check mouse hover
 		bool mouseHover = this->isMouseOver(mouseState);
+		bool mousePressed = mouseHover && mouseState.getMouseLeft();
 
 		gridRect bounds = this->getBoundary();
 		brogueUIData* data = this->getUIData();
 		brogueButton* that = this;
 
 		// Iterate THIS boundary:  Apply mouse data from the render boundary
-		this->getBoundary().iterate([&that, &data, &bounds, &mouseState, &mouseHover] (short column, short row)
+		this->getBoundary().iterate([&that, &data, &bounds] (short column, short row)
 		{
-			color nextColor = data->calculateGradient(column, row, mouseHover);
+			color nextColor = data->calculateGradient(column, row);
 
 			if (data->getIsHotkey(column, row))
 				that->get(column, row)->foreColor = colors::yellow();

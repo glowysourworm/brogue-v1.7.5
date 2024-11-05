@@ -4,6 +4,7 @@
 #include "brogueUIResponseData.h"
 #include "gridRect.h"
 #include "simple.h"
+#include "simpleException.h"
 #include "simpleHash.h"
 #include "simpleKeyboardState.h"
 #include "simpleMouseState.h"
@@ -27,6 +28,7 @@ namespace brogueHd::frontend::opengl
 
 		void activateUIProgram(brogueUIProgram programName);
 		void deactivateUIProgram(brogueUIProgram programName);
+		void deactivateCurrentUIProgram();
 
 		void initialize();
 		void run(int millisecondsLapsed);
@@ -111,7 +113,19 @@ namespace brogueHd::frontend::opengl
 	{
 		_uiPrograms->get(programName)->setIsActive(false);
 	}
+	void brogueProgramContainer::deactivateCurrentUIProgram()
+	{
+		brogueUIProgram activeProgram = _uiPrograms->firstOrDefaultKey([] (brogueUIProgram uiProgram, brogueProgram* program)
+		{
+			return program->getIsActive();
+		});
 
+		if (activeProgram != brogueUIProgram::ContainerControlledProgram)
+			deactivateUIProgram(activeProgram);
+
+		else
+			throw simpleException("Unhandled program type, or program not found:  brogueProgramContainer::deactivateCurrentUIProgram");
+	}
 	void brogueProgramContainer::initialize()
 	{
 		_backgroundProgram->initialize();

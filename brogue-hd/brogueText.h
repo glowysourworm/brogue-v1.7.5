@@ -52,6 +52,7 @@ namespace brogueHd::frontend::ui
 
 			// Update the UI data
 			response.actionMet = this->getUIData()->setMouseUpdate(mouseState.getMouseLeft(), mouseOver);
+			response.deactivated = !mouseOver && mouseState.getMouseLeft();
 			response.needsUpdate = hasInteraction && (mouseOver || mouseState.getMouseLeft());
 			response.tag = *this->getUIData()->getAction();
 		}
@@ -76,7 +77,7 @@ namespace brogueHd::frontend::ui
 			short menuRow = row - bounds.row;
 			int textOffset = column - bounds.column;
 
-			color nextColor = data->calculateGradient(column, row, mouseHover);
+			color nextColor = data->calculateGradient(column, row);
 
 			if (data->getIsHotkey(column, row))
 				that->get(column, row)->foreColor = colors::yellow();

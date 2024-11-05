@@ -118,14 +118,24 @@ namespace brogueHd::frontend::ui
 
 		response.response.needsUpdate |= headerResponse || footerResponse;
 
+		// Check to see if there are child responses
+		if (response.response.needsUpdate)
+			return;
+
+		// Otherwise, proceed to parent view
 		brogueView* parentView = this->getParentView();
 
-		// Scrolling
-		if (parentView->getUIData()->getHasMouseInteraction() && 
-			parentView->isMouseOver(mouseState) &&
-			mouseState.getScrollPending())
+		bool mouseOver = parentView->isMouseOver(mouseState);
+		bool mousePressed = mouseState.getMouseLeft();
+		bool hasInteraction = parentView->getUIData()->getHasMouseInteraction();
+
+		// Parent View -> Mouse
+		if (hasInteraction && mouseOver)
 		{
-			if (!mouseState.getIsScrollUp())
+			bool scrollEvent = mouseState.getScrollPending();
+
+			// Scrolling
+			if (scrollEvent && !mouseState.getIsScrollUp())
 			{
 				// Header Offset
 				int headerOffset = _header != nullptr ? 1 : 0;
@@ -139,15 +149,18 @@ namespace brogueHd::frontend::ui
 				if (nextOverflow > 0)
 					this->incrementRenderOffset(0, 1);
 			}
-			else
+			else if (scrollEvent)
 			{
 				// Make sure you're not at the top
 				if (parentView->getRenderOffset().row > 0)
 					this->incrementRenderOffset(0, -1);
 			}
 
-			// Mark the response to update the view
-			response.response.needsUpdate = true;
+			// Update the UI data
+			response.response.actionMet = this->getUIData()->setMouseUpdate(mousePressed, mouseOver);
+			response.response.deactivated = !mouseOver && mousePressed;
+			response.response.needsUpdate = scrollEvent;
+			response.response.tag = *this->getUIData()->getAction();
 		}
 	}
 	void brogueListView::update(const brogueKeyboardState& keyboardState,
@@ -163,7 +176,7 @@ namespace brogueHd::frontend::ui
 		// Background
 		parentView->getBoundary().iterate([&parentView, &menuData, &mouseHover] (short column, short row)
 		{
-			parentView->get(column, row)->backColor = menuData->calculateGradient(column, row, mouseHover);
+			parentView->get(column, row)->backColor = menuData->calculateGradient(column, row);
 
 			return iterationCallback::iterate;
 		});

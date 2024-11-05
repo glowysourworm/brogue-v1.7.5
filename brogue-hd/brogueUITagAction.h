@@ -15,10 +15,12 @@ namespace brogueHd::frontend::opengl
 			actionView = brogueUIView::Unnamed;
 			glfwHotkey = -1;
 			fileName = default_value::value<simpleString>();
+			deactivateAction = brogueUIAction::None;
 		}
-		brogueUITagAction(brogueUIAction aaction, brogueUIView aview, int hotkeyCodeGLFW, simpleString fileChosen)
+		brogueUITagAction(brogueUIAction aaction, brogueUIAction adeactivateAction, brogueUIView aview, int hotkeyCodeGLFW, simpleString fileChosen)
 		{
 			action = aaction;
+			deactivateAction = adeactivateAction;
 			actionView = aview;
 			glfwHotkey = hotkeyCodeGLFW;
 			fileName = fileChosen;
@@ -27,6 +29,7 @@ namespace brogueHd::frontend::opengl
 		{
 			action = copy.action;
 			actionView = copy.actionView;
+			deactivateAction = copy.deactivateAction;
 			glfwHotkey = copy.glfwHotkey;
 			fileName = copy.fileName;
 		}
@@ -34,6 +37,7 @@ namespace brogueHd::frontend::opengl
 		{
 			action = copy.action;
 			actionView = copy.actionView;
+			deactivateAction = copy.deactivateAction;
 			glfwHotkey = copy.glfwHotkey;
 			fileName = copy.fileName;
 		}
@@ -57,5 +61,10 @@ namespace brogueHd::frontend::opengl
 		/// Action to perform - which is the purpose of the UI control
 		/// </summary>
 		brogueUIAction action;
+
+		/// <summary>
+		/// Action to perform when the view is considered "deactivated":  Escape, or Click Off.
+		/// </summary>
+		brogueUIAction deactivateAction;
 	};
 }
