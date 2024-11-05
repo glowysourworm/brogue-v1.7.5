@@ -7,8 +7,6 @@
 #include "brogueGlyphMap.h"
 #include "brogueListView.h"
 #include "brogueProgramContainer.h"
-#include "brogueProgramControlData.h"
-#include "brogueProgramController.h"
 #include "brogueProgramSignature.h"
 #include "brogueUIBuilder.h"
 #include "brogueUIConstants.h"
@@ -45,7 +43,6 @@ namespace brogueHd::backend::controller
 
 		randomGenerator* _randomGenerator;
 		resourceController* _resourceController;
-		brogueProgramController* _programController;
 		openglRenderer* _openglRenderer;
 		brogueGlyphMap* _glyphMap;
 	};
@@ -53,31 +50,12 @@ namespace brogueHd::backend::controller
 	renderingController::renderingController(resourceController* resourceController, randomGenerator* randomGenerator)
 	{
 		_glyphMap = new brogueGlyphMap();
-		_programController = new brogueProgramController();
-		_openglRenderer = new openglRenderer(_programController);
+		_openglRenderer = new openglRenderer();
 		_resourceController = resourceController;
 		_randomGenerator = randomGenerator;
 		_mode = BrogueGameMode::Title;
 
 		_container = new brogueProgramContainer(brogueUIContainer::TitleContainer);
-
-		// Initialize State Change Conditions:  Program1 -> Program2 (given) Exit Conditions
-		//
-		brogueProgramSignature mainMenu(brogueUIView::MainMenuSelector, brogueUIProgram::MainMenuProgram, brogueUIContainer::TitleContainer, brogueProgramPurpose::None);
-		brogueProgramSignature openMenu(brogueUIView::OpenGameSelector, brogueUIProgram::OpenMenuProgram, brogueUIContainer::TitleContainer, brogueProgramPurpose::OpenFileItem);
-		brogueProgramSignature playbackMenu(brogueUIView::PlaybackSelector, brogueUIProgram::PlaybackMenuProgram, brogueUIContainer::TitleContainer, brogueProgramPurpose::OpenFileItem);
-		brogueProgramSignature highScores(brogueUIView::HighScoresView, brogueUIProgram::HighScoresProgram, brogueUIContainer::TitleContainer, brogueProgramPurpose::None);
-
-		brogueProgramExitCondition userButtonCondition = (brogueProgramExitCondition)(brogueProgramExitCondition::OnKeyboardHotkey | brogueProgramExitCondition::OnMouseButton);
-		brogueProgramExitCondition userMenuCondition = (brogueProgramExitCondition)(brogueProgramExitCondition::OnKeyboardEsc | brogueProgramExitCondition::OnKeyboardHotkey | brogueProgramExitCondition::OnMouseButton | brogueProgramExitCondition::OnMouseClickOff);
-		brogueProgramExitCondition userAnyCondition = brogueProgramExitCondition::Any;
-
-		_programController->addViewControl(brogueProgramControlData(mainMenu, openMenu, userButtonCondition));
-		_programController->addViewControl(brogueProgramControlData(mainMenu, playbackMenu, userButtonCondition));
-		_programController->addViewControl(brogueProgramControlData(mainMenu, highScores, userButtonCondition));
-		_programController->addViewControl(brogueProgramControlData(openMenu, mainMenu, userMenuCondition));
-		_programController->addViewControl(brogueProgramControlData(playbackMenu, mainMenu, userMenuCondition));
-		_programController->addViewControl(brogueProgramControlData(highScores, mainMenu, userAnyCondition));
 	}
 	renderingController::~renderingController()
 	{
@@ -91,7 +69,6 @@ namespace brogueHd::backend::controller
 
 		delete _container->getBackgroundProgram();
 		delete _container;
-		delete _programController;
 	}
 
 	void renderingController::setViewMode(BrogueGameMode mode)

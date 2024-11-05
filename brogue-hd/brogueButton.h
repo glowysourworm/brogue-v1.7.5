@@ -50,10 +50,15 @@ namespace brogueHd::frontend::ui
 
 		bool hasInteraction = this->getUIData()->getHasMouseInteraction();
 
-		response.mouseHoverRegistered = hasInteraction && this->isMouseOver(mouseState);
-		response.mouseLeftRegistered = hasInteraction && mouseState.getMouseLeft();
-		response.mouseScrollRegistered = false;
-		response.shouldUpdate = (response.mouseLeftRegistered || response.mouseHoverRegistered);
+		if (hasInteraction)
+		{
+			bool mouseOver = this->isMouseOver(mouseState);
+
+			// Update the UI data
+			response.actionMet = this->getUIData()->setMouseUpdate(mouseState.getMouseLeft(), mouseOver);
+			response.needsUpdate = hasInteraction && (mouseOver || mouseState.getMouseLeft());
+			response.tag = *this->getUIData()->getAction();
+		}
 
 		return response;
 	}

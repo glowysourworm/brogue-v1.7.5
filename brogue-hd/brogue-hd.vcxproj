@@ -186,9 +186,7 @@
     <ClInclude Include="brogueDataStream.h" />
     <ClInclude Include="brogueMouseState.h" />
     <ClInclude Include="brogueProgramContainer.h" />
-    <ClInclude Include="brogueProgramControlData.h" />
-    <ClInclude Include="brogueProgramController.h" />
-    <ClInclude Include="brogueProgramData.h" />
+    <ClInclude Include="brogueUITagAction.h" />
     <ClInclude Include="brogueProgramSignature.h" />
     <ClInclude Include="brogueProgramState.h" />
     <ClInclude Include="brogueScoreEntry.h" />

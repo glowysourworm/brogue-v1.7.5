@@ -111,12 +111,12 @@ namespace brogueHd::frontend::ui
 		brogueViewContainer::checkUpdate(response, keyboardState, mouseState, millisecondsLapsed);
 
 		// Check the header
-		bool headerResponse = _header == nullptr ? false : _header->checkUpdate(keyboardState, mouseState, millisecondsLapsed).shouldUpdate;
+		bool headerResponse = _header == nullptr ? false : _header->checkUpdate(keyboardState, mouseState, millisecondsLapsed).needsUpdate;
 
 		// Check the footer
-		bool footerResponse = _footer == nullptr ? false : _footer->checkUpdate(keyboardState, mouseState, millisecondsLapsed).shouldUpdate;
+		bool footerResponse = _footer == nullptr ? false : _footer->checkUpdate(keyboardState, mouseState, millisecondsLapsed).needsUpdate;
 
-		response.response.shouldUpdate |= headerResponse || footerResponse;
+		response.response.needsUpdate |= headerResponse || footerResponse;
 
 		brogueView* parentView = this->getParentView();
 
@@ -147,7 +147,7 @@ namespace brogueHd::frontend::ui
 			}
 
 			// Mark the response to update the view
-			response.response.shouldUpdate = true;
+			response.response.needsUpdate = true;
 		}
 	}
 	void brogueListView::update(const brogueKeyboardState& keyboardState,

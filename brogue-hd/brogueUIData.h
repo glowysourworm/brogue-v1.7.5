@@ -1,6 +1,7 @@
 #pragma once
 
 #include "brogueUIConstants.h"
+#include "brogueUITagAction.h"
 #include "color.h"
 #include "colorGradient.h"
 #include "colorString.h"
@@ -9,8 +10,10 @@
 #include "simple.h"
 #include "simpleException.h"
 #include "simpleMath.h"
+#include "simpleString.h"
 
 using namespace brogueHd::component;
+using namespace brogueHd::frontend::opengl;
 using namespace brogueHd::backend::model::game;
 
 namespace brogueHd::frontend::ui
@@ -25,13 +28,15 @@ namespace brogueHd::frontend::ui
 			_renderOffset = nullptr;
 			_hoverBackground = nullptr;
 			_alignment = brogueTextAlignment::Left;
-			_hotkeyChar = 'a';
 			_hotkeyIndex = -1;
 			_padding = 0;
 			_zoomLevel = 0;
 
 			_hasMouseInteraction = false;
 			_isVisible = false;
+			_tagAction = nullptr;
+			_mousePressed = false;
+			_mouseOver = false;
 		};
 		brogueUIData(const brogueUIData& copy)
 		{
@@ -41,12 +46,14 @@ namespace brogueHd::frontend::ui
 			_hoverBackground = copy.getHoverBackground();
 			_renderOffset = copy.getRenderOffsetPtr();
 			_alignment = copy.getAlignment();
-			_hotkeyChar = copy.getHotkeyChar();
 			_hotkeyIndex = copy.getHotkeyIndex();
 			_padding = copy.getPadding();
 			_zoomLevel = copy.getZoomLevel();
 			_hasMouseInteraction = copy.getHasMouseInteraction();
 			_isVisible = copy.getIsVisible();
+			_tagAction = copy.getAction();
+			_mousePressed = copy.getMousePressed();
+			_mouseOver = copy.getMouseOver();
 		}
 		~brogueUIData()
 		{
@@ -55,6 +62,7 @@ namespace brogueHd::frontend::ui
 			delete _background;
 			delete _hoverBackground;
 			delete _renderOffset;
+			delete _tagAction;
 		}
 		brogueUIData(const gridRect& boundary, int zoomLevel)
 			: brogueUIData(boundary, zoomLevel, colors::transparent(), colors::transparent())
@@ -108,12 +116,16 @@ namespace brogueHd::frontend::ui
 			_hoverBackground = new colorGradient(mouseBackground1, mouseBackground2, gradientType);
 			_renderOffset = new gridLocator(0, 0);
 			_alignment = alignment;
-			_hotkeyChar = '\0';
 			_hotkeyIndex = -1;
 			_padding = 0;
 			_zoomLevel = zoomLevel;
 			_hasMouseInteraction = false;
 			_isVisible = false;
+
+			// Set during setUIParameters()
+			_tagAction = new brogueUITagAction();
+			_mousePressed = false;
+			_mouseOver = false;
 		}
 
 	public:
@@ -121,14 +133,40 @@ namespace brogueHd::frontend::ui
 		/// <summary>
 		/// Sets ancillary parameters (that wouldn't fit nicely into the ctor's)
 		/// </summary>
-		void setUIParameters(char hotkey, int hotkeyIndex, bool hasMouseInteraction, bool isVisible, int padding, int zoomLevel)
+		void setUIParameters(int hotkeyIndex,
+							 int actionGLFWHotkey,
+							 const simpleString& actionFileName,
+							 brogueUIAction action,
+							 brogueUIView actionView,
+							 bool hasMouseInteraction,
+							 bool isVisible,
+							 int padding,
+							 int zoomLevel)
 		{
-			_hotkeyChar = hotkey;
 			_hotkeyIndex = hotkeyIndex;
 			_hasMouseInteraction = hasMouseInteraction;
 			_isVisible = isVisible;
 			_padding = padding;
 			_zoomLevel = zoomLevel;
+
+			_tagAction->glfwHotkey = actionGLFWHotkey;
+			_tagAction->fileName = actionFileName;
+			_tagAction->actionView = actionView;
+			_tagAction->action = action;
+		}
+
+		/// <summary>
+		/// Returns true if a mouse click has occurred
+		/// </summary>
+		bool setMouseUpdate(bool pressed, bool isMouseOver)
+		{
+			bool mouseClick = _mousePressed && !pressed && isMouseOver;
+
+			// Update
+			_mousePressed = pressed && isMouseOver;
+			_mouseOver = isMouseOver;
+
+			return mouseClick;
 		}
 
 		gridRect getBounds() const
@@ -139,6 +177,11 @@ namespace brogueHd::frontend::ui
 		colorString getColorString() const
 		{
 			return *_text;
+		}
+
+		brogueUITagAction* getAction() const
+		{
+			return _tagAction;
 		}
 
 	public:
@@ -216,10 +259,6 @@ namespace brogueHd::frontend::ui
 		bool getHasMouseInteraction() const
 		{
 			return _hasMouseInteraction;
-		}
-		char getHotkeyChar() const
-		{
-			return _hotkeyChar;
 		}
 
 	private:
@@ -322,6 +361,14 @@ namespace brogueHd::frontend::ui
 		{
 			return _isVisible;
 		}
+		bool getMousePressed() const
+		{
+			return _mousePressed;
+		}
+		bool getMouseOver() const
+		{
+			return _mouseOver;
+		}
 
 	private:
 
@@ -331,12 +378,16 @@ namespace brogueHd::frontend::ui
 		colorGradient* _background;
 		colorGradient* _hoverBackground;
 		brogueTextAlignment _alignment;
-		char _hotkeyChar;
 		int _hotkeyIndex;
 		int _padding;
 		int _zoomLevel;
 
 		bool _hasMouseInteraction;
 		bool _isVisible;
+
+		// Some real time data
+		brogueUITagAction* _tagAction;
+		bool _mousePressed;
+		bool _mouseOver;
 	};
 }

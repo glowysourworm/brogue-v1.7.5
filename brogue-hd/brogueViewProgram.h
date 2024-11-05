@@ -147,10 +147,8 @@ namespace brogueHd::frontend::opengl
 									  mouseState.getScrolldYPending() != 0 || mouseState.getScrolldXPending() != 0,
 									  mouseState.getScrolldYPending() > 0, mouseState.getLeftButton() > 0);
 
-		char hotkey = _view->getUIData()->getHotkeyChar();
-
 		// TODO: Get translator for the key system; and implement hotkeys
-		brogueKeyboardState keyboardStateUI(hotkey, hotkey);
+		brogueKeyboardState keyboardStateUI(-1, -1);
 
 		// Pass the parameters in to check the program's view (tree)
 		_view->checkUpdate(response, keyboardStateUI, mouseStateUI, millisecondsLapsed);
@@ -167,10 +165,8 @@ namespace brogueHd::frontend::opengl
 									  mouseState.getScrolldYPending() != 0 || mouseState.getScrolldXPending() != 0,
 									  mouseState.getScrolldYPending() > 0, mouseState.getLeftButton() > 0);
 
-		char hotkey = _view->getUIData()->getHotkeyChar();
-
 		// TODO: Get translator for the key system; and implement hotkeys
-		brogueKeyboardState keyboardStateUI(hotkey, hotkey);
+		brogueKeyboardState keyboardStateUI(-1, -1);
 
 		// View will present new data
 		_view->update(keyboardStateUI, mouseStateUI, millisecondsLapsed);

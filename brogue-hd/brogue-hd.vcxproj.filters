@@ -623,9 +623,6 @@
     <ClInclude Include="simpleDirectoryEntry.h">
       <Filter>Header Files\simple</Filter>
     </ClInclude>
-    <ClInclude Include="brogueProgramController.h">
-      <Filter>Header Files\frontend\opengl\program</Filter>
-    </ClInclude>
     <ClInclude Include="brogueListView.h">
       <Filter>Header Files\frontend\ui</Filter>
     </ClInclude>
@@ -635,7 +632,7 @@
     <ClInclude Include="brogueScoreEntry.h">
       <Filter>Header Files\backend\model\io</Filter>
     </ClInclude>
-    <ClInclude Include="brogueProgramData.h">
+    <ClInclude Include="brogueUITagAction.h">
       <Filter>Header Files\frontend\opengl\program\programData</Filter>
     </ClInclude>
     <ClInclude Include="brogueProgramSignature.h">
@@ -667,9 +664,6 @@
     </ClInclude>
     <ClInclude Include="brogueViewBase.h">
       <Filter>Header Files\frontend\ui</Filter>
-    </ClInclude>
-    <ClInclude Include="brogueProgramControlData.h">
-      <Filter>Header Files\frontend\opengl\program\programData</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -285,7 +285,7 @@ namespace brogueHd::frontend::opengl
 
 		// Mark that the view needs to be updated; but leave the counter until the update function - 
 		// which will double check for an update.
-		response.response.shouldUpdate = elapsed;
+		response.response.needsUpdate = elapsed;
 	}
 
 	void brogueFlameMenuProgram::update(const simpleKeyboardState& keyboardState,

@@ -74,7 +74,7 @@ namespace brogueHd::frontend::ui
 		{
 			brogueUIChildResponse defaultResponse;
 
-			defaultResponse.shouldUpdate = false;
+			defaultResponse.needsUpdate = false;
 
 			return defaultResponse;
 		}

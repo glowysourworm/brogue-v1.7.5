@@ -105,6 +105,19 @@ namespace brogueHd::frontend
 		GameView = 6,
 	};
 
+	enum class brogueUIAction
+	{
+		None = 0,
+		Close = 1,
+		ViewOpenGameMenu = 2,
+		ViewPlaybackMenu = 3,
+		ViewHighScores = 4,
+		NewGame = 5,
+		OpenGame = 6,
+		ShowQuitGameModal = 7,
+		QuitGame = 8
+	};
+
 	enum brogueTextAlignment
 	{
 		Left = 0,

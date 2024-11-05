@@ -219,14 +219,14 @@ namespace brogueHd::frontend::ui
 		{
 			brogueUIChildResponse childResponse = view->checkUpdate(keyboardState, mouseState, millisecondsLapsed);
 
-			if (childResponse.shouldUpdate)
+			if (childResponse.needsUpdate)
 				response.response = childResponse;
 
 			return iterationCallback::iterate;
 		});
 
 		// Nothing set in the child response -> Use this container response
-		if (!response.response.shouldUpdate)
+		if (!response.response.needsUpdate)
 		{
 			// Parent View
 			if (_parentView->isMouseOver(mouseState) && _parentView->getUIData()->getHasMouseInteraction())

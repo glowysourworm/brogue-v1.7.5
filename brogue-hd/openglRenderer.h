@@ -16,7 +16,6 @@
 #include "simpleException.h"
 #include "gridRect.h"
 #include "brogueProgramContainer.h"
-#include "brogueProgramController.h"
 #include "brogueUIResponseData.h"
 #include "brogueUIConstants.h"
 #include "simpleExt.h"
@@ -39,7 +38,7 @@ namespace brogueHd::frontend::opengl
 	class openglRenderer
 	{
 	public:
-		openglRenderer(brogueProgramController* programController);
+		openglRenderer();
 		~openglRenderer();
 
 		// Making OpenGL / Window calls static to work with rendering controller.
@@ -107,7 +106,6 @@ namespace brogueHd::frontend::opengl
 	private:
 
 		brogueProgramContainer* _program;
-		brogueProgramController* _programController;
 
 		bool _initializedGL;
 
@@ -116,11 +114,10 @@ namespace brogueHd::frontend::opengl
 		std::thread* _thread;
 	};
 
-	openglRenderer::openglRenderer(brogueProgramController* programController)
+	openglRenderer::openglRenderer()
 	{
 		_initializedGL = false;
 		_program = nullptr;
-		_programController = programController;
 		_thread = nullptr;
 		_threadLock = new std::mutex();
 	}
@@ -441,27 +438,63 @@ namespace brogueHd::frontend::opengl
 			simpleKeyboardState keyboardState(*opengl::KeyState);
 
 			// Check the view tree for program control response (the tree handles marking the response)
-			brogueUIResponseData response;
+			brogueUIResponseData uiData;
 
-			_program->checkUpdate(response, keyboardState, mouseState, intervalMilliseconds);
+			_program->checkUpdate(uiData, keyboardState, mouseState, intervalMilliseconds);
 
-			// Response will still signal an update
-			if (_programController->wasExitConditionMet(response))
+			if (uiData.response.actionMet)
 			{
-				brogueUIProgram nextProgram = _programController->getNextProgram(response);
+				switch (uiData.response.tag.action)
+				{
+					case brogueUIAction::Close:
+						break;
 
-				// De-Activate UI Program
-				_program->deactivateUIProgram(response.signature.program);
+					case brogueUIAction::NewGame:
+						break;
 
-				if (nextProgram != brogueUIProgram::ContainerControlledProgram)
-					_program->activateUIProgram(nextProgram);
+					case brogueUIAction::None:
+						break;
 
-				else
-					simpleException::show("Brogue Program Control Error:  Exit from current UI program not handled");
+					case brogueUIAction::OpenGame:
+						break;
+
+					case brogueUIAction::QuitGame:
+						break;
+
+					case brogueUIAction::ShowQuitGameModal:
+						break;
+
+					case brogueUIAction::ViewHighScores:
+						break;
+
+					case brogueUIAction::ViewOpenGameMenu:
+						break;
+
+					case brogueUIAction::ViewPlaybackMenu:
+						break;
+
+					default:
+						throw simpleException("Unhandled brogueUIAction:  openglRenderer.h");
+				}
 			}
 
+			//// Response will still signal an update
+			//if (_programController->wasExitConditionMet(response))
+			//{
+			//	brogueUIProgram nextProgram = _programController->getNextProgram(response);
+
+			//	// De-Activate UI Program
+			//	_program->deactivateUIProgram(response.signature.program);
+
+			//	if (nextProgram != brogueUIProgram::ContainerControlledProgram)
+			//		_program->activateUIProgram(nextProgram);
+
+			//	else
+			//		simpleException::show("Brogue Program Control Error:  Exit from current UI program not handled");
+			//}
+
 			// Check normal program update
-			if (response.response.shouldUpdate)
+			if (uiData.response.needsUpdate)
 				_program->update(keyboardState, mouseState, intervalMilliseconds);							// Updates program buffers from the UI view
 
 			// Run drawing program

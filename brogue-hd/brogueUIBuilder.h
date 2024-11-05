@@ -73,7 +73,7 @@ namespace brogueHd::frontend::ui
 			// Menu Background
 			brogueUIData* menuData = new brogueUIData(menuBounds, zoomLevel, menuColor1, menuColor2, brogueGradientType::Circular);
 
-			menuData->setUIParameters('\0', -1, false, true, 1, zoomLevel);
+			menuData->setUIParameters(-1, -1, "", brogueUIAction::None, brogueUIView::Unnamed, false, true, 1, zoomLevel);
 
 			simpleList<brogueUIData*> buttons;
 			int buttonPadding = 1;
@@ -86,17 +86,30 @@ namespace brogueHd::frontend::ui
 								  1);
 
 				if (index == 0)
+				{
 					buttons.add(new brogueUIData(boundary, zoomLevel, colorString("New Game"), gradient1, gradient2, active1, active2, brogueGradientType::Horizontal, brogueTextAlignment::Center));
+					buttons.get(index)->setUIParameters(0, -1, "", brogueUIAction::NewGame, brogueUIView::GameView, true, true, 0, zoomLevel);
+				}
 				else if (index == 1)
+				{
 					buttons.add(new brogueUIData(boundary, zoomLevel, colorString("Open Game"), gradient1, gradient2, active1, active2, brogueGradientType::Horizontal, brogueTextAlignment::Center));
+					buttons.get(index)->setUIParameters(0, -1, "", brogueUIAction::ViewOpenGameMenu, brogueUIView::OpenGameSelector, true, true, 0, zoomLevel);
+				}
 				else if (index == 2)
+				{
 					buttons.add(new brogueUIData(boundary, zoomLevel, colorString("View Recording"), gradient1, gradient2, active1, active2, brogueGradientType::Horizontal, brogueTextAlignment::Center));
+					buttons.get(index)->setUIParameters(0, -1, "", brogueUIAction::ViewPlaybackMenu, brogueUIView::PlaybackSelector, true, true, 0, zoomLevel);
+				}
 				else if (index == 3)
+				{
 					buttons.add(new brogueUIData(boundary, zoomLevel, colorString("High Scores"), gradient1, gradient2, active1, active2, brogueGradientType::Horizontal, brogueTextAlignment::Center));
+					buttons.get(index)->setUIParameters(0, -1, "", brogueUIAction::ViewHighScores, brogueUIView::HighScoresView, true, true, 0, zoomLevel);
+				}
 				else if (index == 4)
+				{
 					buttons.add(new brogueUIData(boundary, zoomLevel, colorString("Quit"), gradient1, gradient2, active1, active2, brogueGradientType::Horizontal, brogueTextAlignment::Center));
-
-				buttons.get(index)->setUIParameters('\0', 0, true, true, 0, zoomLevel);
+					buttons.get(index)->setUIParameters(0, -1, "", brogueUIAction::ShowQuitGameModal, brogueUIView::QuitModal, true, true, 0, zoomLevel);
+				}
 			}
 
 			brogueView* listBackground = new brogueView(menuData, sceneBounds, menuBounds);
@@ -118,13 +131,13 @@ namespace brogueHd::frontend::ui
 
 			// Menu Background
 			brogueUIData* menuData = new brogueUIData(menuBounds, zoomLevel, menuColor1, menuColor2, brogueGradientType::Circular);
-			menuData->setUIParameters('\0', -1, true, true, 1, zoomLevel);
+			menuData->setUIParameters(-1, -1, "", brogueUIAction::None, brogueUIView::Unnamed, false, true, 1, zoomLevel);
 
 			// Header (None)
 			gridRect headerBounds(paddedBounds.column, paddedBounds.row, paddedBounds.width, 1);
 			brogueUIData* headerData = new brogueUIData(headerBounds, zoomLevel, colorString("Open Saved Game", colors::yellow()), menuColor1, menuColor2, brogueTextAlignment::Center);
 
-			headerData->setUIParameters('\0', -1, false, true, 0, zoomLevel);
+			headerData->setUIParameters(-1, -1, "", brogueUIAction::None, brogueUIView::Unnamed, false, true, 0, zoomLevel);
 
 			simpleList<brogueUIData*> buttons;
 
@@ -192,7 +205,7 @@ namespace brogueHd::frontend::ui
 				brogueUIData* data = new brogueUIData(boundary, zoomLevel, colorString(result.c_str(), colors::white()), menuColor1, menuColor2, active1, active2, brogueGradientType::Horizontal, brogueTextAlignment::Left);
 
 				// Hotkey is the first letter a), b), etc..
-				data->setUIParameters('\0', 0, true, true, 0, zoomLevel);
+				data->setUIParameters(0, -1, *(filesSorted.get(index)->getFileFullPath()), brogueUIAction::OpenGame, brogueUIView::GameView, true, true, 0, zoomLevel);
 
 				buttons.add(data);
 			}
@@ -215,13 +228,13 @@ namespace brogueHd::frontend::ui
 			int menuPadding = 2;
 
 			// Padding
-			menuData->setUIParameters('\0', -1, false, true, menuPadding, zoomLevel);
+			menuData->setUIParameters(-1, -1, "", brogueUIAction::None, brogueUIView::Unnamed, false, true, menuPadding, zoomLevel);
 
 			// Header
 			gridRect headerBounds(sceneBounds.column, sceneBounds.row, sceneBounds.width, 1);
 			brogueUIData* headerData = new brogueUIData(headerBounds, zoomLevel, colorString("-- High Scores --", colors::yellow()), menuColor, brogueTextAlignment::Center);
 
-			headerData->setUIParameters('\0', -1, false, true, 0, zoomLevel);
+			headerData->setUIParameters(-1, -1, "", brogueUIAction::None, brogueUIView::Unnamed, false, true, 0, zoomLevel);
 
 			simpleList<brogueUIData*> items;
 
@@ -253,8 +266,6 @@ namespace brogueHd::frontend::ui
 			// Footer
 			gridRect footerBounds(sceneBounds.column, sceneBounds.height - 1, sceneBounds.width, 1);
 			brogueUIData* footerData = new brogueUIData(footerBounds, zoomLevel, colorString("Press space to continue.", footerColor), menuColor, brogueTextAlignment::Center);
-
-			footerData->setUIParameters('\0', -1, false, true, 0, zoomLevel);
 
 			brogueView* listBackground = new brogueView(menuData, sceneBounds, sceneBounds);
 

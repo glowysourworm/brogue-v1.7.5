@@ -1,6 +1,6 @@
 #pragma once
 
-#include "brogueProgramData.h"
+#include "brogueUITagAction.h"
 #include "simple.h"
 
 namespace brogueHd::frontend::opengl
@@ -9,19 +9,15 @@ namespace brogueHd::frontend::opengl
 	{
 		brogueUIChildResponse()
 		{
-			data = default_value::value<brogueProgramData>();
-			mouseLeftRegistered = false;
-			mouseHoverRegistered = false;
-			mouseScrollRegistered = false;
-			shouldUpdate = false;
+			tag = default_value::value<brogueUITagAction>();
+			actionMet = false;
+			needsUpdate = false;
 		}
-		brogueUIChildResponse(const brogueProgramData& responseData, bool mouseLeft, bool mouseHover, bool mouseScroll, bool update)
+		brogueUIChildResponse(const brogueUITagAction& responseData, bool aactionMet, bool aneedsUpdate)
 		{
-			data = responseData;
-			mouseLeftRegistered = mouseLeft;
-			mouseHoverRegistered = mouseHover;
-			mouseScrollRegistered = mouseScroll;
-			shouldUpdate = update;
+			tag = responseData;
+			actionMet = aactionMet;
+			needsUpdate = aneedsUpdate;
 		}
 		brogueUIChildResponse(const brogueUIChildResponse& copy)
 		{
@@ -32,23 +28,18 @@ namespace brogueHd::frontend::opengl
 			copyImpl(copy);
 		}
 
-		brogueProgramData data;
+		brogueUITagAction tag;
 
-		bool mouseLeftRegistered;
-		bool mouseHoverRegistered;
-		bool mouseScrollRegistered;
-
-		bool shouldUpdate;
+		bool actionMet;
+		bool needsUpdate;
 
 	private:
 
 		void copyImpl(const brogueUIChildResponse& copy)
 		{
-			data = copy.data;
-			mouseLeftRegistered = copy.mouseLeftRegistered;
-			mouseHoverRegistered = copy.mouseHoverRegistered;
-			mouseScrollRegistered = copy.mouseScrollRegistered;
-			shouldUpdate = copy.shouldUpdate;
+			tag = copy.tag;
+			actionMet = copy.actionMet;
+			needsUpdate = copy.needsUpdate;
 		}
 	};
 }
