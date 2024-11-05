@@ -6,6 +6,7 @@
 #include "brogueProgramBuilder.h"
 #include "brogueUIConstants.h"
 #include "brogueView.h"
+#include "brogueViewBase.h"
 #include "gridDefinitions.h"
 #include "resourceController.h"
 #include "simpleDataStream.h"
@@ -22,11 +23,11 @@ namespace brogueHd::frontend::opengl
 	public:
 		brogueDataStream() {}
 		brogueDataStream(resourceController* resourceController,
-			brogueGlyphMap* glyphMap,
-			brogueOpenglDataStream adataStreamName,
-			openglDataStreamType dataStreamType,
-			openglBrogueCellOutputSelector noDisplaySelector,
-			bool aisFrameType)
+						brogueGlyphMap* glyphMap,
+						brogueOpenglDataStream adataStreamName,
+						openglDataStreamType dataStreamType,
+						openglBrogueCellOutputSelector noDisplaySelector,
+						bool aisFrameType)
 		{
 			programBuilder = new brogueProgramBuilder(resourceController, glyphMap);
 			type = dataStreamType;
@@ -64,7 +65,7 @@ namespace brogueHd::frontend::opengl
 			}
 		}
 
-		simpleDataStream* createStream(brogueView* view)
+		simpleDataStream* createStream(brogueViewBase* view)
 		{
 			switch (dataStreamName)
 			{

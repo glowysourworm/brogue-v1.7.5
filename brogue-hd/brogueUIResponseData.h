@@ -1,28 +1,32 @@
 #pragma once
 
-#include "brogueUIConstants.h"
+#include "brogueKeyboardState.h"
+#include "brogueMouseState.h"
+#include "brogueProgramSignature.h"
+#include "brogueUIChildResponse.h"
+#include "simple.h"
 
-namespace brogueHd::frontend::ui
+using namespace brogueHd::simple;
+
+namespace brogueHd::frontend::opengl
 {
 	struct brogueUIResponseData
 	{
+
+	public:
+
 		brogueUIResponseData()
 		{
-			program = brogueUIProgram::ContainerControlledProgram;
-			sender = brogueUIView::Unnamed;
-			hotkey = '\0';
-			hotkeyUsed = false;
-			mouseLeft = false;
-			mouseHover = false;
-			mouseScroll = false;
-			mouseUsed = false;
-			shouldUpdate = false;
+			signature = default_value::value<brogueProgramSignature>();
+			mouse = default_value::value<brogueMouseState>();
+			keyboard = default_value::value<brogueKeyboardState>();
+			response = default_value::value<brogueUIChildResponse>();
 		}
-		brogueUIResponseData(brogueUIProgram aprogram, brogueUIView asender, bool ashouldUpdate)
+		brogueUIResponseData(const brogueProgramSignature& programSignature, const brogueMouseState& mouseState, const brogueKeyboardState& keyboardState)
 		{
-			program = aprogram;
-			sender = asender;
-			shouldUpdate = ashouldUpdate;
+			signature = programSignature;
+			mouse = mouseState;
+			keyboard = keyboardState;
 		}
 		brogueUIResponseData(const brogueUIResponseData& copy)
 		{
@@ -33,30 +37,23 @@ namespace brogueHd::frontend::ui
 			copyImpl(copy);
 		}
 
-		brogueUIProgram program;
-		brogueUIView sender;
-		char hotkey;
-		bool hotkeyUsed;		// Hotkey consumed and used by the focused view
-		bool mouseLeft;
-		bool mouseHover;
-		bool mouseScroll;
-		bool mouseUsed;			// Mouse data consumed and used by the focused view
+		brogueProgramSignature signature;
+		brogueMouseState mouse;
+		brogueKeyboardState keyboard;
 
-		bool shouldUpdate;
+		/// <summary>
+		/// Data sent from the leaf child ui element back to the parent (this will be from a child program / view)
+		/// </summary>
+		brogueUIChildResponse response;
 
 	private:
 
 		void copyImpl(const brogueUIResponseData& copy)
 		{
-			program = copy.program;
-			sender = copy.sender;
-			hotkey = copy.hotkey;
-			hotkeyUsed = copy.hotkeyUsed;
-			mouseLeft = copy.mouseLeft;
-			mouseHover = copy.mouseHover;
-			mouseScroll = copy.mouseScroll;
-			mouseUsed = copy.mouseUsed;
-			shouldUpdate = copy.shouldUpdate;
+			signature = copy.signature;
+			mouse = copy.mouse;
+			keyboard = copy.keyboard;
+			response = copy.response;
 		}
 	};
 }

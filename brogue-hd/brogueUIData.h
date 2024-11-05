@@ -217,6 +217,10 @@ namespace brogueHd::frontend::ui
 		{
 			return _hasMouseInteraction;
 		}
+		char getHotkeyChar() const
+		{
+			return _hotkeyChar;
+		}
 
 	private:
 
@@ -305,10 +309,6 @@ namespace brogueHd::frontend::ui
 		brogueTextAlignment getAlignment() const
 		{
 			return _alignment;
-		}
-		char getHotkeyChar() const
-		{
-			return _hotkeyChar;
 		}
 		int getHotkeyIndex() const
 		{

@@ -127,9 +127,9 @@ namespace brogueHd::simple
 
 	template<typename T>
 	concept isHashable = std::convertible_to<T, hashable> ||
-		std::convertible_to<T, hashableObject> ||
-		std::same_as<T, simpleString> ||
-		isStdHashable<T>;
+							std::convertible_to<T, hashableObject> ||
+							std::same_as<T, simpleString> ||
+							isStdHashable<T>;
 
 	class hashGenerator
 	{

@@ -2,10 +2,11 @@
 
 #include "brogueCellDisplay.h"
 #include "brogueGlobal.h"
+#include "brogueKeyboardState.h"
 #include "brogueMouseState.h"
+#include "brogueUIChildResponse.h"
 #include "brogueUIConstants.h"
 #include "brogueUIData.h"
-#include "brogueUIResponseData.h"
 #include "brogueView.h"
 #include "color.h"
 #include "grid.h"
@@ -33,8 +34,13 @@ namespace brogueHd::frontend::ui
 						int zoomLevel);
 		~brogueFlameMenu();
 
-		void update(const brogueMouseState& mouseState, int millisecondsLapsed) override;
-		brogueUIResponseData& checkUpdate(const brogueMouseState& mouseState, int millisecondsLapsed) override;
+		void update(const brogueKeyboardState& keyboardState,
+					const brogueMouseState& mouseState,
+					int millisecondsLapsed) override;
+
+		virtual brogueUIChildResponse checkUpdate(const brogueKeyboardState& keyboardState,
+												  const brogueMouseState& mouseState,
+												  int millisecondsLapsed);
 
 		float calculateHeatEnvelope(short column, short row);
 
@@ -128,7 +134,7 @@ namespace brogueHd::frontend::ui
 									 int fadePeriodMilliseconds,
 									 int zoomLevel)
 
-		: brogueView(viewName, new brogueUIData(gridRect(0, 0, COLS, ROWS), zoomLevel), gridRect(0, 0, COLS, ROWS), gridRect(0, 0, COLS, ROWS))
+		: brogueView(new brogueUIData(gridRect(0, 0, COLS, ROWS), zoomLevel), gridRect(0, 0, COLS, ROWS), gridRect(0, 0, COLS, ROWS))
 	{
 		_randomGenerator = randomGenerator;
 		_fadePeriodMilliconds = fadePeriodMilliseconds;
@@ -142,19 +148,23 @@ namespace brogueHd::frontend::ui
 	{
 		delete _heatSourceGrid;
 	}
-	brogueUIResponseData& brogueFlameMenu::checkUpdate(const brogueMouseState& mouseState, int millisecondsLapsed)
+	brogueUIChildResponse brogueFlameMenu::checkUpdate(const brogueKeyboardState& keyboardState,
+													   const brogueMouseState& mouseState,
+													   int millisecondsLapsed)
 	{
-		brogueUIResponseData response;
+		brogueUIChildResponse response;
 
-		response.sender = this->getViewName();
-		response.mouseHover = this->isMouseOver(mouseState);
-		response.mouseUsed = this->getUIData()->getHasMouseInteraction();
-		response.mouseLeft = mouseState.getMouseLeft();
-		response.shouldUpdate = (response.mouseHover || response.mouseLeft) && response.mouseUsed;
+		bool hasInteraction = this->getUIData()->getHasMouseInteraction();
+
+		response.mouseHoverRegistered = hasInteraction && this->isMouseOver(mouseState);
+		response.mouseLeftRegistered = hasInteraction && this->getUIData()->getHasMouseInteraction();
+		response.shouldUpdate = true;
 
 		return response;
 	}
-	void brogueFlameMenu::update(const brogueMouseState& mouseState, int millisecondsLapsed)
+	void brogueFlameMenu::update(const brogueKeyboardState& keyboardState,
+								 const brogueMouseState& mouseState,
+								 int millisecondsLapsed)
 	{
 		// Heat source fade over the fade period; and then they're cycled to the next
 		// color.

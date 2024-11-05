@@ -10,7 +10,7 @@
 #include <thread>
 #include <chrono>
 
-#include "simpleKeyState.h"
+#include "simpleKeyboardState.h"
 #include "simpleMouseState.h"
 #include "simpleLogger.h"
 #include "simpleException.h"
@@ -33,7 +33,7 @@ namespace brogueHd::frontend::opengl
 	//using openglRebufferHandler = std::function<simpleDataStream<T>*(int millisecondsLapsed);
 
 	// Initialized on thread_start, and deleted after the main loop
-	static simpleKeyState* KeyState;
+	static simpleKeyboardState* KeyState;
 	static simpleMouseState* MouseState;
 
 	class openglRenderer
@@ -169,16 +169,16 @@ namespace brogueHd::frontend::opengl
 		if (action == GLFW_PRESS || action == GLFW_REPEAT)
 		{
 			if (!opengl::KeyState->hasKey(key))
-				opengl::KeyState->addKey(key);
+				opengl::KeyState->setKey(key);
 		}
 		else if (action == GLFW_RELEASE)
 		{
-			opengl::KeyState->removeKey(key);
+			opengl::KeyState->clearKey(key);
 		}
 		else
 			simpleException::show("Unknown GLFW key callback action {}:  openglRenderer::keyCallback", action);
 
-		opengl::KeyState->setModifiers(mods);
+		opengl::KeyState->setModifier(mods);
 	}
 	void openglRenderer::mousePositionCallback(GLFWwindow* window, double xpos, double ypos)
 	{
@@ -423,7 +423,7 @@ namespace brogueHd::frontend::opengl
 		glViewport(0, 0, sceneBoundaryUI.width, sceneBoundaryUI.height);
 
 		// Keyboard / Mouse State
-		opengl::KeyState = new simpleKeyState();
+		opengl::KeyState = new simpleKeyboardState();
 		opengl::MouseState = new simpleMouseState();
 
 		// THREAD:  UNLOCK TO ENTER PRIMARY LOOP
@@ -438,26 +438,31 @@ namespace brogueHd::frontend::opengl
 			_threadLock->lock();
 
 			simpleMouseState mouseState(*opengl::MouseState);
+			simpleKeyboardState keyboardState(*opengl::KeyState);
 
-			// Check the view tree for program control response
-			brogueUIResponseData response = _program->checkUpdate(mouseState, intervalMilliseconds);
+			// Check the view tree for program control response (the tree handles marking the response)
+			brogueUIResponseData response;
+
+			_program->checkUpdate(response, keyboardState, mouseState, intervalMilliseconds);
 
 			// Response will still signal an update
-			if (response.shouldUpdate)
+			if (_programController->wasExitConditionMet(response))
 			{
-				//brogueUIProgram nextProgram = _programController->getNextProgram(response);
+				brogueUIProgram nextProgram = _programController->getNextProgram(response);
 
-				//// Activate the next view
-				//if (nextProgram != response.program)
-				//{
-				//	_program->deactivateUIProgram(response.program);
-				//	_program->activateUIProgram(nextProgram);
-				//}
+				// De-Activate UI Program
+				_program->deactivateUIProgram(response.signature.program);
+
+				if (nextProgram != brogueUIProgram::ContainerControlledProgram)
+					_program->activateUIProgram(nextProgram);
+
+				else
+					simpleException::show("Brogue Program Control Error:  Exit from current UI program not handled");
 			}
 
 			// Check normal program update
-			if (response.shouldUpdate)
-				_program->update(mouseState, intervalMilliseconds);							// Updates program buffers from the UI view
+			if (response.response.shouldUpdate)
+				_program->update(keyboardState, mouseState, intervalMilliseconds);							// Updates program buffers from the UI view
 
 			// Run drawing program
 			_program->run(intervalMilliseconds);										// Run() -> Draws the buffers

@@ -4,7 +4,6 @@
 #include "brogueCellQuad.h"
 #include "brogueGlyphMap.h"
 #include "brogueImageQuad.h"
-#include "brogueView.h"
 #include "gridDefinitions.h"
 #include "openglQuadConverter.h"
 #include "resourceController.h"
@@ -12,6 +11,7 @@
 #include "brogueColorQuad.h"
 #include "brogueCoordinateConverter.h"
 #include "brogueUIConstants.h"
+#include "brogueViewBase.h"
 #include "color.h"
 #include "gl.h"
 #include "gridRect.h"
@@ -46,30 +46,30 @@ namespace brogueHd::frontend::opengl
 		/// (MEMORY!) The scene data is the data from a brogueView. Using quads, this data is streamed out to our simpleDataStream
 		/// object to hold for the GL backend calls.
 		/// </summary>
-		simpleDataStream* createSceneDataStream(const brogueView* view, openglDataStreamType dataType, openglBrogueCellOutputSelector noDisplayOutputSelector);
+		simpleDataStream* createSceneDataStream(const brogueViewBase* view, openglDataStreamType dataType, openglBrogueCellOutputSelector noDisplayOutputSelector);
 
 		/// <summary>
 		/// (MEMORY!) The scene data is the data from a brogueView. Using quads, this data is streamed out to our simpleDataStream
 		/// object to hold for the GL backend calls.
 		/// </summary>
-		simpleDataStream* createSceneDataStream(const brogueView* view,
-			openglDataStreamType dataType,
-			openglBrogueCellOutputSelector noDisplayOutputSelector,
-			gridPredicate<brogueCellDisplay*> inclusionPredicate);
+		simpleDataStream* createSceneDataStream(const brogueViewBase* view,
+												openglDataStreamType dataType,
+												openglBrogueCellOutputSelector noDisplayOutputSelector,
+												gridPredicate<brogueCellDisplay*> inclusionPredicate);
 
 		/// <summary>
 		/// (MEMORY!) The Frame of the scene is essentially the buffer that owns the scene's rendering output. It must be declared before 
 		/// it is used during rendering.
 		/// </summary>
-		simpleDataStream* createFrameDataStream(const brogueView* view, openglDataStreamType dataType);
+		simpleDataStream* createFrameDataStream(const brogueViewBase* view, openglDataStreamType dataType);
 
 
 		/// <summary>
 		/// (MEMORY!) Creates program for rendering the scene's data to a buffer on the GL backend
 		/// </summary>
 		simpleShaderProgram* createShaderProgram(simpleDataStream* sceneDataStream,
-			shaderData* vertexData,
-			shaderData* fragmentData);
+												 shaderData* vertexData,
+												 shaderData* fragmentData);
 
 		/// <summary>
 		/// Creates a coordinate converter for openGL backend coordinate transformations
@@ -106,7 +106,7 @@ namespace brogueHd::frontend::opengl
 		return brogueCoordinateConverter(glyphMap, viewMap);
 	}
 
-	simpleDataStream* brogueProgramBuilder::createSceneDataStream(const brogueView* view, openglDataStreamType dataType, openglBrogueCellOutputSelector noDisplayOutputSelector)
+	simpleDataStream* brogueProgramBuilder::createSceneDataStream(const brogueViewBase* view, openglDataStreamType dataType, openglBrogueCellOutputSelector noDisplayOutputSelector)
 	{
 		return createSceneDataStream(view, dataType, noDisplayOutputSelector, [] (short column, short row, brogueCellDisplay* cell)
 		{
@@ -114,10 +114,10 @@ namespace brogueHd::frontend::opengl
 		});
 	}
 
-	simpleDataStream* brogueProgramBuilder::createSceneDataStream(const brogueView* view,
-		openglDataStreamType dataType,
-		openglBrogueCellOutputSelector noDisplayOutputSelector,
-		gridPredicate<brogueCellDisplay*> inclusionPredicate)
+	simpleDataStream* brogueProgramBuilder::createSceneDataStream(const brogueViewBase* view,
+																  openglDataStreamType dataType,
+																  openglBrogueCellOutputSelector noDisplayOutputSelector,
+																  gridPredicate<brogueCellDisplay*> inclusionPredicate)
 	{
 		// Starting with the raw data, build a simpleQuad data vector to pass to the simpleDataStream<float>
 		//
@@ -176,8 +176,8 @@ namespace brogueHd::frontend::opengl
 			{
 				// (MEMORY!) Scene Base: Must declare before streaming the data onto it
 				dataStream = new simpleDataStream(imageQuads.count(),
-					imageQuads.first().getElementVertexSize(GL_TRIANGLES),
-					imageQuads.first().getStreamSize(GL_TRIANGLES));
+												  imageQuads.first().getElementVertexSize(GL_TRIANGLES),
+												  imageQuads.first().getStreamSize(GL_TRIANGLES));
 
 				imageQuads.forEach([&dataStream] (brogueImageQuad quad)
 				{
@@ -190,8 +190,8 @@ namespace brogueHd::frontend::opengl
 			{
 				// (MEMORY!) Scene Base: Must declare before streaming the data onto it
 				dataStream = new simpleDataStream(cellQuads.count(),
-					cellQuads.first().getElementVertexSize(GL_TRIANGLES),
-					cellQuads.first().getStreamSize(GL_TRIANGLES));
+												  cellQuads.first().getElementVertexSize(GL_TRIANGLES),
+												  cellQuads.first().getStreamSize(GL_TRIANGLES));
 
 				cellQuads.forEach([&dataStream] (brogueCellQuad quad)
 				{
@@ -204,8 +204,8 @@ namespace brogueHd::frontend::opengl
 			{
 				// (MEMORY!) Scene Base: Must declare before streaming the data onto it
 				dataStream = new simpleDataStream(colorQuads.count(),
-					colorQuads.first().getElementVertexSize(GL_TRIANGLES),
-					colorQuads.first().getStreamSize(GL_TRIANGLES));
+												  colorQuads.first().getElementVertexSize(GL_TRIANGLES),
+												  colorQuads.first().getStreamSize(GL_TRIANGLES));
 
 				colorQuads.forEach([&dataStream] (brogueColorQuad quad)
 				{
@@ -222,7 +222,7 @@ namespace brogueHd::frontend::opengl
 		return dataStream;
 	}
 
-	simpleDataStream* brogueProgramBuilder::createFrameDataStream(const brogueView* view, openglDataStreamType dataType)
+	simpleDataStream* brogueProgramBuilder::createFrameDataStream(const brogueViewBase* view, openglDataStreamType dataType)
 	{
 		gridRect sceneBoundaryUI = view->calculateSceneBoundaryUI();
 
@@ -268,8 +268,8 @@ namespace brogueHd::frontend::opengl
 	}
 
 	simpleShaderProgram* brogueProgramBuilder::createShaderProgram(simpleDataStream* sceneDataStream,
-		shaderData* vertexData,
-		shaderData* fragmentData)
+																   shaderData* vertexData,
+																   shaderData* fragmentData)
 	{
 		// Create Shaders
 		simpleShader vertexShader(vertexData);

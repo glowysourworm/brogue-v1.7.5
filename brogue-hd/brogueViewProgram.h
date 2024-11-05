@@ -5,12 +5,14 @@
 #include "brogueDataStream.h"
 #include "brogueGlobal.h"
 #include "brogueGlyphMap.h"
+#include "brogueKeyboardState.h"
 #include "brogueMouseState.h"
 #include "brogueProgram.h"
 #include "brogueProgramBuilder.h"
 #include "brogueUIConstants.h"
 #include "brogueUIResponseData.h"
 #include "brogueView.h"
+#include "brogueViewBase.h"
 #include "gl.h"
 #include "gridRect.h"
 #include "openglHelper.h"
@@ -18,6 +20,7 @@
 #include "shaderData.h"
 #include "simpleDataStream.h"
 #include "simpleGlData.h"
+#include "simpleKeyboardState.h"
 #include "simpleMouseState.h"
 #include "simpleShaderProgram.h"
 
@@ -42,13 +45,13 @@ namespace brogueHd::frontend::opengl
 		/// <param name="view">Reference to the view to be rendered</param>
 		/// <param name="dataStream">(MEMORY!) Data stream:  This produces a specific data structure to render to the VBO</param>
 		brogueViewProgram(brogueUIProgram programName,
-			brogueView* view,
-			resourceController* resourceController,
-			brogueGlyphMap* glyphMap,
-			shaderResource vertexShader,
-			shaderResource fragmentShader,
-			brogueDataStream* dataStream,
-			bool useAlphaBlending)
+						  brogueViewBase* view,
+						  resourceController* resourceController,
+						  brogueGlyphMap* glyphMap,
+						  shaderResource vertexShader,
+						  shaderResource fragmentShader,
+						  brogueDataStream* dataStream,
+						  bool useAlphaBlending)
 			: brogueProgram(programName, false)
 		{
 			_view = view;
@@ -67,8 +70,15 @@ namespace brogueHd::frontend::opengl
 		}
 
 		virtual void initialize() override;
-		virtual brogueUIResponseData& checkUpdate(const simpleMouseState& mouseState, int millisecondsLapsed) override;
-		virtual void update(const simpleMouseState& mouseState, int millisecondsLapsed) override;
+		virtual void checkUpdate(brogueUIResponseData& response,
+								 const simpleKeyboardState& keyboardState,
+								 const simpleMouseState& mouseState,
+								 int millisecondsLapsed) override;
+
+		virtual void update(const simpleKeyboardState& keyboardState,
+							const simpleMouseState& mouseState,
+							int millisecondsLapsed) override;
+
 		virtual void run(int millisecondsElapsed) override;
 		virtual void outputStatus() const override;
 		virtual bool isCompiled() const override;
@@ -97,7 +107,7 @@ namespace brogueHd::frontend::opengl
 
 	private:
 
-		brogueView* _view;
+		brogueViewBase* _view;
 		brogueProgramBuilder* _programBuilder;
 		simpleShaderProgram* _program;
 		shaderData* _vertexShader;
@@ -116,35 +126,54 @@ namespace brogueHd::frontend::opengl
 		_program->bind();
 	}
 
-	brogueUIResponseData& brogueViewProgram::checkUpdate(const simpleMouseState& mouseState, int millisecondsLapsed)
+	void brogueViewProgram::checkUpdate(brogueUIResponseData& response,
+										const simpleKeyboardState& keyboardState,
+										const simpleMouseState& mouseState,
+										int millisecondsLapsed)
 	{
-		gridRect sceneBoundary = this->getSceneBoundaryUI();
-
-		brogueMouseState mouseStateUI((mouseState.getX() / sceneBoundary.width) * _view->getSceneBoundary().width,
-			(mouseState.getY() / sceneBoundary.height) * _view->getSceneBoundary().height,
-			mouseState.getScrolldYPending() != 0 || mouseState.getScrolldXPending() != 0,
-			mouseState.getScrolldYPending() > 0, mouseState.getLeftButton() > 0);
-
-		brogueUIResponseData response = _view->checkUpdate(mouseStateUI, millisecondsLapsed);
-
 		// CRITICAL!  Don't forget to mark the program name! Otherwise, the main controller won't know 
 		//			  how to process the message
-		response.program = this->getProgramName();
+		//
+		//			  Mark the reponse. (see views to make sure the response is being marked properly)
+		//
+		response.signature.program = this->getProgramName();
 
-		return response;
+		// Translate the UI space -> the brogue / program space and pass down the pipeline
+		//
+		gridRect sceneBoundary = this->getSceneBoundaryUI();
+
+		brogueMouseState mouseStateUI((mouseState.getX() / sceneBoundary.width) * _view->getSceneBoundary().width,
+									  (mouseState.getY() / sceneBoundary.height) * _view->getSceneBoundary().height,
+									  mouseState.getScrolldYPending() != 0 || mouseState.getScrolldXPending() != 0,
+									  mouseState.getScrolldYPending() > 0, mouseState.getLeftButton() > 0);
+
+		char hotkey = _view->getUIData()->getHotkeyChar();
+
+		// TODO: Get translator for the key system; and implement hotkeys
+		brogueKeyboardState keyboardStateUI(hotkey, hotkey);
+
+		// Pass the parameters in to check the program's view (tree)
+		_view->checkUpdate(response, keyboardStateUI, mouseStateUI, millisecondsLapsed);
 	}
 
-	void brogueViewProgram::update(const simpleMouseState& mouseState, int millisecondsLapsed)
+	void brogueViewProgram::update(const simpleKeyboardState& keyboardState,
+								   const simpleMouseState& mouseState,
+								   int millisecondsLapsed)
 	{
 		gridRect sceneBoundary = this->getSceneBoundaryUI();
 
 		brogueMouseState mouseStateUI((mouseState.getX() / sceneBoundary.width) * _view->getSceneBoundary().width,
-			(mouseState.getY() / sceneBoundary.height) * _view->getSceneBoundary().height,
-			mouseState.getScrolldYPending() != 0 || mouseState.getScrolldXPending() != 0,
-			mouseState.getScrolldYPending() > 0, mouseState.getLeftButton() > 0);
+									  (mouseState.getY() / sceneBoundary.height) * _view->getSceneBoundary().height,
+									  mouseState.getScrolldYPending() != 0 || mouseState.getScrolldXPending() != 0,
+									  mouseState.getScrolldYPending() > 0, mouseState.getLeftButton() > 0);
+
+		char hotkey = _view->getUIData()->getHotkeyChar();
+
+		// TODO: Get translator for the key system; and implement hotkeys
+		brogueKeyboardState keyboardStateUI(hotkey, hotkey);
 
 		// View will present new data
-		_view->update(mouseStateUI, millisecondsLapsed);
+		_view->update(keyboardStateUI, mouseStateUI, millisecondsLapsed);
 
 		// Must update the data stream
 		simpleDataStream* stream = _dataStream->createStream(_view);

@@ -7,12 +7,13 @@
 #include "brogueGlyphMap.h"
 #include "brogueListView.h"
 #include "brogueProgramContainer.h"
+#include "brogueProgramControlData.h"
 #include "brogueProgramController.h"
+#include "brogueProgramSignature.h"
 #include "brogueUIBuilder.h"
 #include "brogueUIConstants.h"
 #include "brogueViewProgram.h"
 #include "openglRenderer.h"
-#include "programControlData.h"
 #include "randomGenerator.h"
 #include "resourceController.h"
 #include "simpleDirectoryEntry.h"
@@ -58,18 +59,25 @@ namespace brogueHd::backend::controller
 		_randomGenerator = randomGenerator;
 		_mode = BrogueGameMode::Title;
 
-		_container = new brogueProgramContainer();
+		_container = new brogueProgramContainer(brogueUIContainer::TitleContainer);
 
-		// Initialize:  NOTE:  Still need key codes. So, 'E' => "Escape Key". Also, need "select item behavior" for the program control framework (so, more to do)
-		_programController->addViewControl(programControlData(brogueUIContainer::TitleContainer, brogueUIProgram::MainMenuProgram, brogueUIProgram::OpenMenuProgram, brogueUIView::MainMenuSelector, brogueUIView::OpenGameSelector, false, true, false, false, false, true, 'o'));
-		_programController->addViewControl(programControlData(brogueUIContainer::TitleContainer, brogueUIProgram::MainMenuProgram, brogueUIProgram::PlaybackMenuProgram, brogueUIView::MainMenuSelector, brogueUIView::PlaybackSelector, false, true, false, false, false, true, 'v'));
-		_programController->addViewControl(programControlData(brogueUIContainer::TitleContainer, brogueUIProgram::MainMenuProgram, brogueUIProgram::HighScoresProgram, brogueUIView::MainMenuSelector, brogueUIView::HighScoresView, false, true, false, false, false, true, 'h'));
-		_programController->addViewControl(programControlData(brogueUIContainer::TitleContainer, brogueUIProgram::MainMenuProgram, brogueUIProgram::ModalProgram, brogueUIView::MainMenuSelector, brogueUIView::QuitModal, false, true, false, false, false, true, 'q'));
-		_programController->addViewControl(programControlData(brogueUIContainer::TitleContainer, brogueUIProgram::OpenMenuProgram, brogueUIProgram::MainMenuProgram, brogueUIView::OpenGameSelector, brogueUIView::MainMenuSelector, false, true, true, false, true, true, 'E'));
-		_programController->addViewControl(programControlData(brogueUIContainer::TitleContainer, brogueUIProgram::PlaybackMenuProgram, brogueUIProgram::MainMenuProgram, brogueUIView::PlaybackSelector, brogueUIView::MainMenuSelector, false, true, true, false, true, true, 'E'));
-		_programController->addViewControl(programControlData(brogueUIContainer::TitleContainer, brogueUIProgram::HighScoresProgram, brogueUIProgram::MainMenuProgram, brogueUIView::HighScoresView, brogueUIView::MainMenuSelector, false, true, true, false, true, true, 'E'));
-		_programController->addViewControl(programControlData(brogueUIContainer::TitleContainer, brogueUIProgram::ModalProgram, brogueUIProgram::MainMenuProgram, brogueUIView::QuitModal, brogueUIView::MainMenuSelector, false, true, true, false, true, true, 'E'));
-		_programController->addViewControl(programControlData(brogueUIContainer::TitleContainer, brogueUIProgram::ModalProgram, brogueUIProgram::MainMenuProgram, brogueUIView::QuitModal, brogueUIView::Unnamed, true, true, false, false, false, true, 'y'));
+		// Initialize State Change Conditions:  Program1 -> Program2 (given) Exit Conditions
+		//
+		brogueProgramSignature mainMenu(brogueUIView::MainMenuSelector, brogueUIProgram::MainMenuProgram, brogueUIContainer::TitleContainer, brogueProgramPurpose::None);
+		brogueProgramSignature openMenu(brogueUIView::OpenGameSelector, brogueUIProgram::OpenMenuProgram, brogueUIContainer::TitleContainer, brogueProgramPurpose::OpenFileItem);
+		brogueProgramSignature playbackMenu(brogueUIView::PlaybackSelector, brogueUIProgram::PlaybackMenuProgram, brogueUIContainer::TitleContainer, brogueProgramPurpose::OpenFileItem);
+		brogueProgramSignature highScores(brogueUIView::HighScoresView, brogueUIProgram::HighScoresProgram, brogueUIContainer::TitleContainer, brogueProgramPurpose::None);
+
+		brogueProgramExitCondition userButtonCondition = (brogueProgramExitCondition)(brogueProgramExitCondition::OnKeyboardHotkey | brogueProgramExitCondition::OnMouseButton);
+		brogueProgramExitCondition userMenuCondition = (brogueProgramExitCondition)(brogueProgramExitCondition::OnKeyboardEsc | brogueProgramExitCondition::OnKeyboardHotkey | brogueProgramExitCondition::OnMouseButton | brogueProgramExitCondition::OnMouseClickOff);
+		brogueProgramExitCondition userAnyCondition = brogueProgramExitCondition::Any;
+
+		_programController->addViewControl(brogueProgramControlData(mainMenu, openMenu, userButtonCondition));
+		_programController->addViewControl(brogueProgramControlData(mainMenu, playbackMenu, userButtonCondition));
+		_programController->addViewControl(brogueProgramControlData(mainMenu, highScores, userButtonCondition));
+		_programController->addViewControl(brogueProgramControlData(openMenu, mainMenu, userMenuCondition));
+		_programController->addViewControl(brogueProgramControlData(playbackMenu, mainMenu, userMenuCondition));
+		_programController->addViewControl(brogueProgramControlData(highScores, mainMenu, userAnyCondition));
 	}
 	renderingController::~renderingController()
 	{
@@ -187,7 +195,7 @@ namespace brogueHd::backend::controller
 										  highScoresStream,
 										  true);
 
-				_container->setBackground(new brogueFlameMenuProgram(titleView, mainMenu, _resourceController, _glyphMap));
+				_container->setBackground(new brogueFlameMenuProgram(titleView, _resourceController, _glyphMap));
 				_container->addUIProgram(mainMenuProgram);
 				_container->addUIProgram(openMenuProgram);
 				_container->addUIProgram(playbackMenuProgram);

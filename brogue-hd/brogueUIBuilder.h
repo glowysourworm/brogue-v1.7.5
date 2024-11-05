@@ -4,6 +4,7 @@
 #include "brogueScoreEntry.h"
 #include "brogueUIConstants.h"
 #include "brogueUIData.h"
+#include "brogueView.h"
 #include "color.h"
 #include "colorGradient.h"
 #include "colorString.h"
@@ -72,8 +73,7 @@ namespace brogueHd::frontend::ui
 			// Menu Background
 			brogueUIData* menuData = new brogueUIData(menuBounds, zoomLevel, menuColor1, menuColor2, brogueGradientType::Circular);
 
-			// Header (None)
-			brogueUIData* headerData = new brogueUIData(*menuData); // This should probably have an "EMPTY" default somewhere
+			menuData->setUIParameters('\0', -1, false, true, 1, zoomLevel);
 
 			simpleList<brogueUIData*> buttons;
 			int buttonPadding = 1;
@@ -99,7 +99,9 @@ namespace brogueHd::frontend::ui
 				buttons.get(index)->setUIParameters('\0', 0, true, true, 0, zoomLevel);
 			}
 
-			return new brogueListView(brogueUIView::MainMenuSelector, menuData, buttons, headerData, nullptr, sceneBounds, menuBounds);
+			brogueView* listBackground = new brogueView(menuData, sceneBounds, menuBounds);
+
+			return new brogueListView(listBackground, brogueUIView::MainMenuSelector, menuData, buttons, nullptr, nullptr);
 		}
 
 		static brogueListView* createMainMenuSelector(brogueUIView viewName, const simpleDirectoryEntry& files, int zoomLevel)
@@ -195,7 +197,9 @@ namespace brogueHd::frontend::ui
 				buttons.add(data);
 			}
 
-			return new brogueListView(viewName, menuData, buttons, headerData, nullptr, sceneBounds, menuBounds);
+			brogueView* listBackground = new brogueView(menuData, sceneBounds, menuBounds);
+
+			return new brogueListView(listBackground, viewName, menuData, buttons, headerData, nullptr);
 		}
 
 		static brogueListView* createHighScoresView(resourceController* resourceController, int zoomLevel)
@@ -252,7 +256,9 @@ namespace brogueHd::frontend::ui
 
 			footerData->setUIParameters('\0', -1, false, true, 0, zoomLevel);
 
-			return new brogueListView(brogueUIView::HighScoresView, menuData, items, headerData, footerData, sceneBounds, sceneBounds);
+			brogueView* listBackground = new brogueView(menuData, sceneBounds, sceneBounds);
+
+			return new brogueListView(listBackground, brogueUIView::HighScoresView, menuData, items, headerData, footerData);
 		}
 	};
 }

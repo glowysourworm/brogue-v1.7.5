@@ -1,9 +1,10 @@
 #pragma once
 
+#include "brogueKeyboardState.h"
 #include "brogueMouseState.h"
+#include "brogueUIChildResponse.h"
 #include "brogueUIConstants.h"
 #include "brogueUIData.h"
-#include "brogueUIResponseData.h"
 #include "brogueView.h"
 #include "color.h"
 #include "gridRect.h"
@@ -20,31 +21,41 @@ namespace brogueHd::frontend::ui
 		brogueText(brogueUIView viewName, brogueUIData* data, const gridRect& sceneBoundary, const gridRect& viewBoundary);
 		~brogueText();
 
-		virtual void update(const brogueMouseState& mouseState, int millisecondsLapsed) override;
-		virtual brogueUIResponseData& checkUpdate(const brogueMouseState& mouseState, int millisecondsLapsed) override;
+		virtual void update(const brogueKeyboardState& keyboardState,
+							const brogueMouseState& mouseState,
+							int millisecondsLapsed) override;
+
+		virtual brogueUIChildResponse checkUpdate(const brogueKeyboardState& keyboardState,
+												  const brogueMouseState& mouseState,
+												  int millisecondsLapsed) override;
 	};
 
 	brogueText::brogueText(brogueUIView viewName, brogueUIData* data, const gridRect& sceneBoundary, const gridRect& viewBoundary)
-		: brogueView(viewName, data, sceneBoundary, viewBoundary)
+		: brogueView(data, sceneBoundary, viewBoundary)
 	{
-		update(default_value::value<brogueMouseState>(), 0);
+		update(default_value::value<brogueKeyboardState>(), default_value::value<brogueMouseState>(), 0);
 	}
 	brogueText::~brogueText()
 	{
 	}
-	brogueUIResponseData& brogueText::checkUpdate(const brogueMouseState& mouseState, int millisecondsLapsed)
+	brogueUIChildResponse brogueText::checkUpdate(const brogueKeyboardState& keyboardState,
+												  const brogueMouseState& mouseState,
+												  int millisecondsLapsed)
 	{
-		brogueUIResponseData response;
+		brogueUIChildResponse response;
 
-		response.sender = this->getViewName();
-		response.mouseHover = this->isMouseOver(mouseState);
-		response.mouseUsed = this->getUIData()->getHasMouseInteraction();
-		response.mouseLeft = mouseState.getMouseLeft();
-		response.shouldUpdate = (response.mouseHover || response.mouseLeft) && response.mouseUsed;
+		bool hasInteraction = this->getUIData()->getHasMouseInteraction();
+
+		response.mouseHoverRegistered = hasInteraction && this->isMouseOver(mouseState);
+		response.mouseLeftRegistered = hasInteraction && this->isMouseOver(mouseState) && mouseState.getMouseLeft();
+		response.mouseScrollRegistered = hasInteraction && this->isMouseOver(mouseState) && mouseState.getScrollPending();
+		response.shouldUpdate = hasInteraction && (response.mouseHoverRegistered || response.mouseLeftRegistered);
 
 		return response;
 	}
-	void brogueText::update(const brogueMouseState& mouseState, int millisecondsLapsed)
+	void brogueText::update(const brogueKeyboardState& keyboardState,
+							const brogueMouseState& mouseState,
+							int millisecondsLapsed)
 	{
 		gridRect bounds = this->getBoundary();
 		brogueUIData* data = this->getUIData();

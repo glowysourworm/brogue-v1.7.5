@@ -2,15 +2,50 @@
 
 #include "simple.h"
 #include "simpleExt.h"
-//#include "simpleString.h"
+#include <exception>
 #include <iostream>
 #include <stacktrace>
 #include <string>
 
 namespace brogueHd::simple
 {
-	class simpleException
+	class simpleException : std::exception
 	{
+
+	public:
+
+		simpleException() : simpleException("BrogueHd Error (No Message Specified)")
+		{
+		}
+
+		simpleException(const char* message) : std::exception(message)
+		{
+			std::string result = message;
+
+			for (int index = 0; index < std::stacktrace::current().size(); index++)
+			{
+				const std::stacktrace_entry stack = std::stacktrace::current().at(index);
+
+				const char* format1 = "Source File:  {}  Line:  {}  \r\n";
+				const char* format2 = "Description:  {} \r\n";
+
+				result += simpleExt::format(format1, stack.source_file().c_str(), stack.source_line());
+				result += simpleExt::format(format2, stack.description().c_str());
+			}
+
+#ifdef _DEBUG
+			std::cout << result << std::endl;
+#endif
+			_message = result;
+		}
+
+		virtual const char* what() const noexcept
+		{
+			return _message.c_str();
+		}
+
+
+
 	public:
 
 		//static void show(const simpleString& message)
@@ -18,14 +53,14 @@ namespace brogueHd::simple
 		//	throw std::exception(message.c_str());
 		//}
 
-		static void showCstr(const char* message)
+		static void showCstr(const char* message) throw()
 		{
 			std::cout << message << std::endl;
 			std::cout << std::stacktrace::current() << std::endl;
 
 			throw message;
 		}
-		static void show(const char* message)
+		static void show(const char* message) throw()
 		{
 			std::cout << message << std::endl;
 			std::cout << std::stacktrace::current() << std::endl;
@@ -36,7 +71,7 @@ namespace brogueHd::simple
 	public:
 
 		template<isStringConvertible T>
-		static void show(const char* formatStr, const T& param)
+		static void show(const char* formatStr, const T& param) throw()
 		{
 			std::string message = simpleExt::format(formatStr, param);
 
@@ -44,7 +79,7 @@ namespace brogueHd::simple
 		}
 
 		template<isStringConvertible T, isStringConvertible...Args>
-		static void show(const char* formatStr, const T& param, const Args&...rest)
+		static void show(const char* formatStr, const T& param, const Args&...rest) throw()
 		{
 			std::string message = simpleExt::format(formatStr, param, rest...);
 
@@ -70,5 +105,9 @@ namespace brogueHd::simple
 		//			throw std::runtime_error(message);
 		//#endif
 		//		}
+
+	private:
+
+		std::string _message;
 	};
 }

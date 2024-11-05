@@ -1,11 +1,14 @@
 #pragma once
 
 #include "brogueCellDisplay.h"
+#include "brogueKeyboardState.h"
 #include "brogueMouseState.h"
+#include "brogueUIChildResponse.h"
 #include "brogueUIConstants.h"
 #include "brogueUIData.h"
 #include "brogueUIResponseData.h"
 #include "brogueView.h"
+#include "brogueViewBase.h"
 #include "gridDefinitions.h"
 #include "gridLocator.h"
 #include "gridRect.h"
@@ -24,27 +27,67 @@ namespace brogueHd::frontend::ui
 	/// child views where there are child views defined. Otherwise, it will utilize its own
 	/// grid of cells.
 	/// </summary>
-	class brogueViewContainer : public brogueView
+	class brogueViewContainer : public brogueViewBase
 	{
 	public:
 
-		brogueViewContainer(brogueUIView viewName, brogueUIData* uiData, const gridRect& sceneBoundary, const gridRect& viewBoundary);
+		/// <summary>
+		/// BrogueViewContainer is the primary brogueUIView for the render path.
+		/// </summary>
+		brogueViewContainer(brogueView* parentView, brogueUIView parentViewName, const gridRect& sceneBoundary, const gridRect& viewBoundary);
 		~brogueViewContainer();
 
 		void addView(brogueView* view);
 
-		virtual void update(const brogueMouseState& mouseState, int millisecondsLapsed) override;
-		virtual brogueUIResponseData& checkUpdate(const brogueMouseState& mouseState, int millisecondsLapsed) override;
+		virtual void update(const brogueKeyboardState& keyboardState,
+							const brogueMouseState& mouseState,
+							int millisecondsLapsed);
+
+		virtual void checkUpdate(brogueUIResponseData& response,
+								 const brogueKeyboardState& keyboardState,
+								 const brogueMouseState& mouseState,
+								 int millisecondsLapsed) override;
+
+		virtual brogueUIChildResponse checkUpdate(const brogueKeyboardState& keyboardState,
+												  const brogueMouseState& mouseState,
+												  int millisecondsLapsed) override;
 
 		virtual brogueCellDisplay* get(short column, short row) const override;
 
-		virtual void iterate(gridCallback<brogueCellDisplay*> callback) const override;
-		void iterateAdjacent(short column, short row, gridCallbackAdjacent<brogueCellDisplay*> callback) const override;
-		void iterateViews(simpleListCallback<brogueView*> callback) const;
+		/// <summary>
+		/// Iterates child views of the container
+		/// </summary>
+		void iterateChildViews(simpleListCallback<brogueView*> callback) const;
 
-	protected:
+	public:		// UI Overrides
 
-		virtual void incrementRenderOffset(short columnOffset, short rowOffset) override
+		virtual gridRect getSceneBoundary() const override
+		{
+			return _parentView->getSceneBoundary();
+		}
+		virtual gridRect getBoundary() const override
+		{
+			return _parentView->getBoundary();
+		}
+		virtual gridRect getPaddedBoundary() const override
+		{
+			return _parentView->getPaddedBoundary();
+		}
+		virtual gridRect getRenderBoundary() const override
+		{
+			return _parentView->getRenderBoundary();
+		}
+
+		virtual gridRect calculateSceneBoundaryUI() const override
+		{
+			return _parentView->calculateSceneBoundaryUI();
+		}
+		virtual gridRect calculateViewBoundaryUI() const override
+		{
+			return _parentView->calculateViewBoundaryUI();
+		}
+
+		virtual void incrementRenderOffset(short columnOffset, short rowOffset)
 		{
 			// Increment Child Views
 			for (int index = 0; index < _childViews->count(); index++)
@@ -53,33 +96,89 @@ namespace brogueHd::frontend::ui
 			}
 
 			// Increment This View
-			brogueView::incrementRenderOffset(columnOffset, rowOffset);
+			_parentView->incrementRenderOffset(columnOffset, rowOffset);
 		}
+
+		virtual gridLocator getRenderOffset() const
+		{
+			return _parentView->getRenderOffset();
+		}
+
+		virtual bool isMouseOver(const brogueMouseState& mouseState)
+		{
+			return _parentView->isMouseOver(mouseState);
+		}
+
+		virtual int getZoomLevel() const
+		{
+			return _parentView->getZoomLevel();
+		}
+
+		virtual brogueUIData* getUIData() const
+		{
+			return _parentView->getUIData();
+		}
+
+		virtual void iterate(gridCallback<brogueCellDisplay*> callback) const
+		{
+			const brogueViewContainer* that = this;
+
+			_parentView->getBoundary().iterate([&that, &callback] (short column, short row)
+			{
+				return callback(column, row, that->get(column, row));
+			});
+		}
+
+	protected:
 
 		int getViewCount() const
 		{
 			return _childViews->count();
 		}
 
+		brogueUIView getViewName() const
+		{
+			return _parentViewName;
+		}
+
+		brogueView* getParentView() const
+		{
+			return _parentView;
+		}
+
 	private:
 
+		brogueView* _parentView;
+		brogueUIView _parentViewName;
 		simpleList<brogueView*>* _childViews;
 	};
 
-	brogueViewContainer::brogueViewContainer(brogueUIView viewName, brogueUIData* uiData, const gridRect& sceneBoundary, const gridRect& viewBoundary)
-		: brogueView(viewName, uiData, sceneBoundary, viewBoundary)
+	brogueViewContainer::brogueViewContainer(brogueView* parentView,
+											 brogueUIView parentViewName,
+											 const gridRect& sceneBoundary,
+											 const gridRect& viewBoundary)
 	{
 		_childViews = new simpleList<brogueView*>();
+		_parentViewName = parentViewName;
+		_parentView = parentView;
 	}
 	brogueViewContainer::~brogueViewContainer()
 	{
 		delete _childViews;
 	}
+	void brogueViewContainer::addView(brogueView* view)
+	{
+		_childViews->add(view);
+	}
+	void brogueViewContainer::iterateChildViews(simpleListCallback<brogueView*> callback) const
+	{
+		_childViews->forEach(callback);
+	}
 	brogueCellDisplay* brogueViewContainer::get(short column, short row) const
 	{
 		// Check padding first
-		if (!this->getPaddedBoundary().contains(column, row))
-			return brogueView::get(column, row);
+		if (!_parentView->getPaddedBoundary().contains(column, row))
+			return _parentView->get(column, row);
 
 		for (int index = 0; index < _childViews->count(); index++)
 		{
@@ -94,84 +193,63 @@ namespace brogueHd::frontend::ui
 			}
 		}
 
-		return brogueView::get(column, row);
+		return _parentView->get(column, row);
 	}
-	void brogueViewContainer::iterate(gridCallback<brogueCellDisplay*> callback) const
+	brogueUIChildResponse brogueViewContainer::checkUpdate(const brogueKeyboardState& keyboardState,
+														   const brogueMouseState& mouseState,
+														   int millisecondsLapsed)
 	{
-		const brogueViewContainer* that = this;
+		// Treats this view as the child (parent caller)
+		brogueUIResponseData thisResponse;
 
-		brogueView::iterate([&that, &callback] (short acolumn, short arow, brogueCellDisplay* cell)
-		{
-			brogueCellDisplay* childOrContainerCell = that->get(acolumn, arow);
+		checkUpdate(thisResponse, keyboardState, mouseState, millisecondsLapsed);
 
-			return callback(acolumn, arow, childOrContainerCell);
-		});
+		return thisResponse.response;
 	}
-	void brogueViewContainer::iterateAdjacent(short column, short row, gridCallbackAdjacent<brogueCellDisplay*> callback) const
+	void brogueViewContainer::checkUpdate(brogueUIResponseData& response,
+										  const brogueKeyboardState& keyboardState,
+										  const brogueMouseState& mouseState,
+										  int millisecondsLapsed)
 	{
-		const brogueViewContainer* that = this;
-
-		brogueView::iterateAdjacent(column, row, [&that, &callback] (short acolumn, short arow, brogueCompass direction, brogueCellDisplay* cell)
-		{
-			brogueCellDisplay* childOrContainerCell = that->get(acolumn, arow);
-
-			return callback(acolumn, arow, direction, childOrContainerCell);
-		});
-	}
-	void brogueViewContainer::addView(brogueView* view)
-	{
-		_childViews->add(view);
-	}
-	brogueUIResponseData& brogueViewContainer::checkUpdate(const brogueMouseState& mouseState, int millisecondsLapsed)
-	{
-		// Use container's response data to aggregate the child views
-		brogueUIResponseData response;
+		// Mark the response
+		response.signature.view = _parentViewName;
 
 		// Check child views first (for performance) (NOTE:  This function updates mouse related data; and must be run on child views)
-		_childViews->forEach([&mouseState, &millisecondsLapsed, &response] (brogueView* view)
+		_childViews->forEach([&mouseState, &keyboardState, &millisecondsLapsed, &response] (brogueView* view)
 		{
-			brogueUIResponseData childResponse = view->checkUpdate(mouseState, millisecondsLapsed);
+			brogueUIChildResponse childResponse = view->checkUpdate(keyboardState, mouseState, millisecondsLapsed);
 
 			if (childResponse.shouldUpdate)
-				response = childResponse;
+				response.response = childResponse;
 
 			return iterationCallback::iterate;
 		});
 
-		// Set the repsonse view name to the container
-		response.sender = this->getViewName();
-
-		// Override with this container (wait for the caller to get child data)
-		if (this->isMouseOver(mouseState) && this->getUIData()->getHasMouseInteraction())
+		// Nothing set in the child response -> Use this container response
+		if (!response.response.shouldUpdate)
 		{
-			response.mouseHover = true;
-			response.mouseLeft = mouseState.getMouseLeft();
-			response.mouseUsed = mouseState.getMouseLeft();
-			response.shouldUpdate = true;
+			// Parent View
+			if (_parentView->isMouseOver(mouseState) && _parentView->getUIData()->getHasMouseInteraction())
+			{
+				response.response = _parentView->checkUpdate(keyboardState, mouseState, millisecondsLapsed);
+			}
 		}
-
-		return response;
 	}
-	void brogueViewContainer::update(const brogueMouseState& mouseState, int millisecondsLapsed)
+	void brogueViewContainer::update(const brogueKeyboardState& keyboardState,
+									 const brogueMouseState& mouseState,
+									 int millisecondsLapsed)
 	{
 		// May be overridden.
 		//
-		brogueView::update(mouseState, millisecondsLapsed);
+		_parentView->update(keyboardState, mouseState, millisecondsLapsed);
 
 		// Call update afterwards (logically, we want to overlay the child views; but it may not matter here)
 		//
-		_childViews->forEach([&mouseState, &millisecondsLapsed] (brogueView* view)
+		_childViews->forEach([&keyboardState, &mouseState, &millisecondsLapsed] (brogueView* view)
 		{
-			view->update(mouseState, millisecondsLapsed);
+			view->update(keyboardState, mouseState, millisecondsLapsed);
 
 			return iterationCallback::iterate;
-		});
-	}
-	void brogueViewContainer::iterateViews(simpleListCallback<brogueView*> callback) const
-	{
-		_childViews->forEach([&callback] (brogueView* view)
-		{
-			return callback(view);
 		});
 	}
 }

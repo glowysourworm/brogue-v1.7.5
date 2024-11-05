@@ -2,6 +2,7 @@
 
 #include "brogueButton.h"
 #include "brogueCellDisplay.h"
+#include "brogueKeyboardState.h"
 #include "brogueMouseState.h"
 #include "brogueText.h"
 #include "brogueUIConstants.h"
@@ -22,17 +23,22 @@ namespace brogueHd::frontend::ui
 	{
 	public:
 
-		brogueListView(brogueUIView viewName,
+		brogueListView(brogueView* parentView,
+					   brogueUIView viewName,
 					   brogueUIData* menuData,
 					   const simpleList<brogueUIData*>& items,
 					   brogueUIData* header,
-					   brogueUIData* footer,
-					   const gridRect& sceneBoundary,
-					   const gridRect& viewBoundary);
+					   brogueUIData* footer);
 		~brogueListView();
 
-		virtual void update(const brogueMouseState& mouseState, int millisecondsLapsed) override;
-		virtual brogueUIResponseData& checkUpdate(const brogueMouseState& mouseState, int millisecondsLapsed) override;
+		virtual void update(const brogueKeyboardState& keyboardState,
+							const brogueMouseState& mouseState,
+							int millisecondsLapsed) override;
+
+		virtual void checkUpdate(brogueUIResponseData& response, 
+								 const brogueKeyboardState& keyboardState, 
+								 const brogueMouseState& mouseState, 
+								 int millisecondsLapsed) override;
 
 		// Override needed to check for the header
 		virtual brogueCellDisplay* get(short column, short row) const override;
@@ -43,30 +49,29 @@ namespace brogueHd::frontend::ui
 		brogueText* _footer;
 	};
 
-	brogueListView::brogueListView(brogueUIView viewName,
+	brogueListView::brogueListView(brogueView* parentView,
+								   brogueUIView viewName,
 								   brogueUIData* menuData,
 								   const simpleList<brogueUIData*>& items,
 								   brogueUIData* header,
-								   brogueUIData* footer,
-								   const gridRect& sceneBoundary,
-								   const gridRect& viewBoundary)
-		: brogueViewContainer(viewName, menuData, sceneBoundary, viewBoundary)
+								   brogueUIData* footer)
+		: brogueViewContainer(parentView, viewName, parentView->getSceneBoundary(), parentView->getBoundary())
 	{
 		// Header View
 		if (header != nullptr)
-			_header = new brogueText(brogueUIView::Unnamed, header, sceneBoundary, header->getBounds());
+			_header = new brogueText(brogueUIView::Unnamed, header, parentView->getSceneBoundary(), header->getBounds());
 
 		// Vertical Buttons
 		for (int index = 0; index < items.count(); index++)
 		{
 			// Button View
-			this->addView((brogueView*)new brogueButton(brogueUIView::Unnamed, items.get(index), sceneBoundary, items.get(index)->getBounds()));
+			this->addView((brogueView*)new brogueButton(brogueUIView::Unnamed, items.get(index), parentView->getSceneBoundary(), items.get(index)->getBounds()));
 		}
 
 		if (footer != nullptr)
-			_footer = new brogueText(brogueUIView::Unnamed, footer, sceneBoundary, footer->getBounds());
+			_footer = new brogueText(brogueUIView::Unnamed, footer, parentView->getSceneBoundary(), footer->getBounds());
 
-		update(default_value::value<brogueMouseState>(), 0);
+		update(default_value::value<brogueKeyboardState>(), default_value::value<brogueMouseState>(), 0);
 	}
 	brogueListView::~brogueListView()
 	{
@@ -88,22 +93,37 @@ namespace brogueHd::frontend::ui
 
 		return brogueViewContainer::get(column, row);
 	}
-	brogueUIResponseData& brogueListView::checkUpdate(const brogueMouseState& mouseState, int millisecondsLapsed)
+	void brogueListView::checkUpdate(brogueUIResponseData& response,
+									 const brogueKeyboardState& keyboardState,
+									 const brogueMouseState& mouseState,
+									 int millisecondsLapsed)
 	{
-		brogueUIResponseData response;
+		/*
+			UI Behavior:  This will be an override that takes the base behavior - favoring
+						  the child views - but adding the scroll problem.
 
-		response.sender = this->getViewName();
+						  Header / Footer:  There could be a reason to update these, eventually. The
+						  behavior would be the same. They must be rendered here becuase of the scroll
+						  calculation.
+		*/
 
-		// Mouse Interaction
-		response.mouseUsed = this->getUIData()->getHasMouseInteraction();
+		// Start with the base (marks the response) (favors the child views; but also gets a response from the parent view)
+		brogueViewContainer::checkUpdate(response, keyboardState, mouseState, millisecondsLapsed);
 
-		// Check mouse hover
-		response.mouseHover = this->isMouseOver(mouseState);
+		// Check the header
+		bool headerResponse = _header == nullptr ? false : _header->checkUpdate(keyboardState, mouseState, millisecondsLapsed).shouldUpdate;
 
-		// Check mouse scroll
-		response.mouseScroll = mouseState.getScrollPending() && response.mouseHover;
+		// Check the footer
+		bool footerResponse = _footer == nullptr ? false : _footer->checkUpdate(keyboardState, mouseState, millisecondsLapsed).shouldUpdate;
 
-		if (response.mouseScroll && response.mouseUsed)
+		response.response.shouldUpdate |= headerResponse || footerResponse;
+
+		brogueView* parentView = this->getParentView();
+
+		// Scrolling
+		if (parentView->getUIData()->getHasMouseInteraction() && 
+			parentView->isMouseOver(mouseState) &&
+			mouseState.getScrollPending())
 		{
 			if (!mouseState.getIsScrollUp())
 			{
@@ -111,10 +131,10 @@ namespace brogueHd::frontend::ui
 				int headerOffset = _header != nullptr ? 1 : 0;
 
 				// Check scroll bounds
-				int overflow = this->getViewCount() - (this->getPaddedBoundary().height - headerOffset);
+				int overflow = this->getViewCount() - (parentView->getPaddedBoundary().height - headerOffset);
 
 				// Calculate the number of slots (TODO: USE BOUNDS)
-				int nextOverflow = overflow - this->getRenderOffset().row;
+				int nextOverflow = overflow - parentView->getRenderOffset().row;
 
 				if (nextOverflow > 0)
 					this->incrementRenderOffset(0, 1);
@@ -122,53 +142,46 @@ namespace brogueHd::frontend::ui
 			else
 			{
 				// Make sure you're not at the top
-				if (this->getRenderOffset().row > 0)
+				if (parentView->getRenderOffset().row > 0)
 					this->incrementRenderOffset(0, -1);
 			}
+
+			// Mark the response to update the view
+			response.response.shouldUpdate = true;
 		}
-
-
-		// Check the header, the footer, then pass through to the base class
-		response.shouldUpdate |= _header == nullptr ? false : _header->checkUpdate(mouseState, millisecondsLapsed).shouldUpdate;
-
-		// Check the footer
-		response.shouldUpdate |= _footer == nullptr ? false : _footer->checkUpdate(mouseState, millisecondsLapsed).shouldUpdate;
-
-		// Base class (child views)
-		response.shouldUpdate = brogueViewContainer::checkUpdate(mouseState, millisecondsLapsed).shouldUpdate;
-
-		return response;
 	}
-	void brogueListView::update(const brogueMouseState& mouseState, int millisecondsLapsed)
+	void brogueListView::update(const brogueKeyboardState& keyboardState,
+								const brogueMouseState& mouseState,
+								int millisecondsLapsed)
 	{
-		brogueListView* that = this;
-		brogueUIData* menuData = this->getUIData();
+		brogueView* parentView = this->getParentView();
+		brogueUIData* menuData = parentView->getUIData();
 
 		// Check mouse hover
-		bool mouseHover = this->isMouseOver(mouseState);
+		bool mouseHover = parentView->isMouseOver(mouseState);
 
 		// Background
-		this->getBoundary().iterate([&that, &menuData, &mouseHover] (short column, short row)
+		parentView->getBoundary().iterate([&parentView, &menuData, &mouseHover] (short column, short row)
 		{
-			that->get(column, row)->backColor = menuData->calculateGradient(column, row, mouseHover);
+			parentView->get(column, row)->backColor = menuData->calculateGradient(column, row, mouseHover);
 
 			return iterationCallback::iterate;
 		});
 
 		// Header
 		if (_header != nullptr)
-			_header->update(mouseState, millisecondsLapsed);
+			_header->update(keyboardState, mouseState, millisecondsLapsed);
 
 		// Items
-		this->iterateViews([&that, &mouseState, &millisecondsLapsed] (brogueView* item)
+		this->iterateChildViews([&keyboardState, &mouseState, &millisecondsLapsed] (brogueView* item)
 		{
-			item->update(mouseState, millisecondsLapsed);
+			item->update(keyboardState, mouseState, millisecondsLapsed);
 
 			return iterationCallback::iterate;
 		});
 
 		// Footer
 		if (_footer != nullptr)
-			_footer->update(mouseState, millisecondsLapsed);
+			_footer->update(keyboardState, mouseState, millisecondsLapsed);
 	}
 }

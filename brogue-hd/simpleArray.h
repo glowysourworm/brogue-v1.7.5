@@ -53,7 +53,7 @@ namespace brogueHd::simple
 
 		int count() const;
 
-		T& get(int index) const;
+		T get(int index) const;
 		void set(int index, const T& value);
 
 		void operator=(const simpleArray<T>& other);
@@ -237,7 +237,7 @@ namespace brogueHd::simple
 	}
 
 	template<isHashable T>
-	T& simpleArray<T>::get(int index) const
+	T simpleArray<T>::get(int index) const
 	{
 		if (index >= _count)
 			simpleException::show("Index is outside the bounds of the array: simpleArray.h");

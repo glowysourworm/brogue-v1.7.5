@@ -4,6 +4,7 @@
 #include "brogueUIResponseData.h"
 #include "gridRect.h"
 #include "simple.h"
+#include "simpleKeyboardState.h"
 #include "simpleMouseState.h"
 
 using namespace brogueHd::component;
@@ -31,25 +32,24 @@ namespace brogueHd::frontend::opengl
 		}
 
 		/// <summary>
-		/// Returns true if the program requires update.
+		/// Following a similar pipeline to the brogueView, checkUpdate checks program parameters needed
+		/// to update the view - also calling the view's checkUpdate method. (creating the pipeline)
 		/// </summary>
-		/// <param name="millisecondsLapsed">Number of milliseconds lapsed since the last update</param>
-		virtual brogueUIResponseData& checkUpdate(const simpleMouseState& mouseState, int millisecondsLapsed)
+		virtual void checkUpdate(brogueUIResponseData& response,
+								 const simpleKeyboardState& keyboardState,
+								 const simpleMouseState& mouseState,
+								 int millisecondsLapsed)
 		{
-			brogueUIResponseData defaultResponse;
 
-			defaultResponse.program = _programName;
-			defaultResponse.sender = brogueUIView::Unnamed;
-			defaultResponse.shouldUpdate = false;
-
-			return defaultResponse;
 		}
 
 		/// <summary>
-		/// Updates the opengl program by calling the necessary routines to stream / buffer data
+		/// Following a similar pipeline to the brogueView, update checks program parameters needed
+		/// to update the view - also calling the view's update method. (creating the pipeline)
 		/// </summary>
-		/// <param name="millisecondsLapsed">Number of milliseconds lapsed since the last update</param>
-		virtual void update(const simpleMouseState& mouseState, int millisecondsLapsed)
+		virtual void update(const simpleKeyboardState& keyboardState,
+							const simpleMouseState& mouseState,
+							int millisecondsLapsed)
 		{
 
 		}

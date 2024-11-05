@@ -2,44 +2,67 @@
 
 namespace brogueHd::frontend
 {
-	enum brogueUIProgram
+	enum brogueUIProgram : int
 	{
 		/// <summary>
 		/// This type of program is managed by a parent. So, the response should never
 		/// indicate that it needs to be managed. An exception is thrown if this name is
 		/// allowed to bubble up to the opengl controller.
 		/// </summary>
-		ContainerControlledProgram,
+		ContainerControlledProgram = 0,
 
 		/// <summary>
 		/// The primary brogue flame menu title program
 		/// </summary>
-		FlameMenuProgram,
+		FlameMenuProgram = 1,
 
 		/// <summary>
 		/// The main menu button menu program
 		/// </summary>
-		MainMenuProgram,
+		MainMenuProgram = 2,
 
 		/// <summary>
 		/// The title screen's open menu program
 		/// </summary>
-		OpenMenuProgram,
+		OpenMenuProgram = 3,
 
 		/// <summary>
 		/// The title screen's view recording program
 		/// </summary>
-		PlaybackMenuProgram,
+		PlaybackMenuProgram = 4,
 
 		/// <summary>
 		/// The title screen's high scores program
 		/// </summary>
-		HighScoresProgram,
+		HighScoresProgram = 5,
 
 		/// <summary>
 		/// The quit modal program
 		/// </summary>
-		ModalProgram
+		ModalProgram = 6
+	};
+
+	enum brogueProgramPurpose : int
+	{
+		/// <summary>
+		/// No action required by the program. This implies that no data is gathered when the user
+		/// interacts with the program which will be needed for further processing.
+		/// </summary>
+		None = 0,
+		Game_XYZ = 2, 
+		MenuItem = 3,
+		OpenFileItem = 4,
+		ModalSelector = 5,
+	};
+
+	enum brogueProgramExitCondition : int
+	{
+		OnMouseButton = 1,
+		OnMouseClickOff = 2,
+		OnKeyboardAny = 4,
+		OnKeyboardEsc = 8,
+		OnKeyboardHotkey = 16,
+		Any = 32
 	};
 
 	enum brogueOpenglDataStream

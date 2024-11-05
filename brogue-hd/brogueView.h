@@ -1,10 +1,11 @@
 #pragma once
 
 #include "brogueCellDisplay.h"
+#include "brogueKeyboardState.h"
 #include "brogueMouseState.h"
-#include "brogueUIConstants.h"
+#include "brogueUIChildResponse.h"
 #include "brogueUIData.h"
-#include "brogueUIResponseData.h"
+#include "brogueViewBase.h"
 #include "grid.h"
 #include "gridDefinitions.h"
 #include "gridLocator.h"
@@ -18,24 +19,24 @@ using namespace brogueHd::backend::model::layout;
 
 namespace brogueHd::frontend::ui
 {
-	class brogueView
+	class brogueView : public brogueViewBase
 	{
 	public:
 
-		brogueView(brogueUIView viewName, brogueUIData* data, const gridRect& sceneBoundary, const gridRect& viewBoundary);
+		brogueView(brogueUIData* data, const gridRect& sceneBoundary, const gridRect& viewBoundary);
 		~brogueView();
 
-		gridRect getSceneBoundary() const;
-		gridRect getBoundary() const;
-		gridRect getPaddedBoundary() const;
-		gridRect getRenderBoundary() const;
+		gridRect getSceneBoundary() const override;
+		gridRect getBoundary() const override;
+		gridRect getPaddedBoundary() const override;
+		gridRect getRenderBoundary() const override;
 
 		/// <summary>
 		/// (TODO: MOVE THIS) Calculates the view's boundary is UI coordinates. This is not the same as the
 		/// GL viewport; but the coordinate space relates to it. Zoom, and offset must be
 		/// first added to the calculation.
 		/// </summary>
-		gridRect calculateSceneBoundaryUI() const
+		gridRect calculateSceneBoundaryUI() const override
 		{
 			gridRect sceneBoundary = getSceneBoundary();
 			gridRect boundaryUI = gridRect(sceneBoundary.left() * brogueCellDisplay::CellWidth(_uiData->getZoomLevel()),
@@ -45,7 +46,7 @@ namespace brogueHd::frontend::ui
 
 			return boundaryUI;
 		}
-		gridRect calculateViewBoundaryUI() const
+		gridRect calculateViewBoundaryUI() const override
 		{
 			gridRect viewBoundary = getBoundary();
 			gridRect boundaryUI = gridRect(viewBoundary.left() * brogueCellDisplay::CellWidth(_uiData->getZoomLevel()),
@@ -56,56 +57,51 @@ namespace brogueHd::frontend::ui
 			return boundaryUI;
 		}
 
-		virtual brogueCellDisplay* get(short column, short row) const;
+		virtual brogueCellDisplay* get(short column, short row) const override;
 
-		virtual void iterate(gridCallback<brogueCellDisplay*> callback) const;
-		virtual void iterateAdjacent(short column, short row, gridCallbackAdjacent<brogueCellDisplay*> callback) const;
+		virtual void iterate(gridCallback<brogueCellDisplay*> callback) const override;
 
-		virtual void update(const brogueMouseState& mouseState, int millisecondsLapsed)
+		virtual void update(const brogueKeyboardState& keyboardState,
+							const brogueMouseState& mouseState,
+							int millisecondsLapsed) override
 		{
 
 		}
 
-		virtual brogueUIResponseData& checkUpdate(const brogueMouseState& mouseState, int millisecondsLapsed)
+		virtual brogueUIChildResponse checkUpdate(const brogueKeyboardState& keyboardState,
+												  const brogueMouseState& mouseState,
+												  int millisecondsLapsed) override
 		{
-			brogueUIResponseData defaultResponse;
+			brogueUIChildResponse defaultResponse;
 
 			defaultResponse.shouldUpdate = false;
-			defaultResponse.sender = _viewName;
 
 			return defaultResponse;
 		}
 
-		virtual void incrementRenderOffset(short columnOffset, short rowOffset)
+		virtual void incrementRenderOffset(short columnOffset, short rowOffset) override
 		{
 			gridLocator offset = _uiData->getRenderOffset();
 
 			_uiData->setRenderOffset(offset.column + columnOffset, offset.row + rowOffset);
 		}
 
-		gridLocator getRenderOffset() const
+		gridLocator getRenderOffset() const override
 		{
 			return _uiData->getRenderOffset();
 		}
 
-		bool isMouseOver(const brogueMouseState& mouseState)
+		bool isMouseOver(const brogueMouseState& mouseState) override
 		{
 			return this->getRenderBoundary().contains(mouseState.getLocation());
 		}
 
-		int getZoomLevel() const
+		int getZoomLevel() const override
 		{
 			return _uiData->getZoomLevel();
 		}
 
-		brogueUIView getViewName() const
-		{
-			return _viewName;
-		}
-
-	protected:
-
-		brogueUIData* getUIData() const
+		brogueUIData* getUIData() const override
 		{
 			return _uiData;
 		}
@@ -115,13 +111,11 @@ namespace brogueHd::frontend::ui
 		grid<brogueCellDisplay*>* _view;
 
 		brogueUIData* _uiData;
-		brogueUIView _viewName;
 	};
 
-	brogueView::brogueView(brogueUIView viewName, brogueUIData* data, const gridRect& sceneBoundary, const gridRect& viewBoundary)
+	brogueView::brogueView(brogueUIData* data, const gridRect& sceneBoundary, const gridRect& viewBoundary)
 	{
 		_view = new grid<brogueCellDisplay*>(sceneBoundary, viewBoundary);
-		_viewName = viewName;
 		_uiData = data;
 
 		grid<brogueCellDisplay*>* grid = _view;
@@ -169,11 +163,6 @@ namespace brogueHd::frontend::ui
 	void brogueView::iterate(gridCallback<brogueCellDisplay*> callback) const
 	{
 		_view->iterate(callback);
-	}
-
-	void brogueView::iterateAdjacent(short column, short row, gridCallbackAdjacent<brogueCellDisplay*> callback) const
-	{
-		_view->iterateAdjacent(column, row, false, callback);
 	}
 }
 

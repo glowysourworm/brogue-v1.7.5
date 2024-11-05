@@ -7,10 +7,8 @@ using namespace brogueHd::component;
 
 namespace brogueHd::frontend::opengl
 {
-	class brogueMouseState
+	struct brogueMouseState
 	{
-	public:
-
 		brogueMouseState()
 		{
 			_location = default_value::value<gridLocator>();
@@ -33,6 +31,13 @@ namespace brogueHd::frontend::opengl
 			_mouseLeft = mouseLeft;
 		}
 		brogueMouseState(const brogueMouseState& copy)
+		{
+			_location = copy.getLocation();
+			_scrollPending = copy.getScrollPending();
+			_scrollUp = copy.getIsScrollUp();
+			_mouseLeft = copy.getMouseLeft();
+		}
+		void operator=(const brogueMouseState& copy)
 		{
 			_location = copy.getLocation();
 			_scrollPending = copy.getScrollPending();

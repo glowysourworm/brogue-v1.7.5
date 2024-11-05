@@ -2,7 +2,6 @@
 
 #include "brogueDataStream.h"
 #include "brogueFlameMenu.h"
-#include "brogueListView.h"
 #include "brogueProgram.h"
 #include "brogueUIConstants.h"
 #include "brogueUIResponseData.h"
@@ -23,6 +22,7 @@
 #include "openglHelper.h"
 #include "simpleException.h"
 #include "simpleGlData.h"
+#include "simpleKeyboardState.h"
 #include <SDL_image.h>
 #include <SDL_surface.h>
 
@@ -38,14 +38,21 @@ namespace brogueHd::frontend::opengl
 	public:
 
 		brogueFlameMenuProgram(brogueFlameMenu* titleView,
-			brogueListView* mainMenu,
-			resourceController* resourceController,
-			brogueGlyphMap* glyphMap);
+							   resourceController* resourceController,
+							   brogueGlyphMap* glyphMap);
 		~brogueFlameMenuProgram();
 
 		void initialize() override;
-		void update(const simpleMouseState& mouseState, int millisecondsLapsed) override;
-		brogueUIResponseData& checkUpdate(const simpleMouseState& mouseState, int millisecondsLapsed) override;
+
+		virtual void checkUpdate(brogueUIResponseData& response,
+								 const simpleKeyboardState& keyboardState,
+								 const simpleMouseState& mouseState,
+								 int millisecondsLapsed) override;
+
+		virtual void update(const simpleKeyboardState& keyboardState,
+							const simpleMouseState& mouseState,
+							int millisecondsLapsed) override;
+
 		void run(int millisecondsElapsed) override;
 		bool hasErrors() const override;
 		void outputStatus() const override;
@@ -73,9 +80,8 @@ namespace brogueHd::frontend::opengl
 	};
 
 	brogueFlameMenuProgram::brogueFlameMenuProgram(brogueFlameMenu* titleView,
-		brogueListView* mainMenu,
-		resourceController* resourceController,
-		brogueGlyphMap* glyphMap)
+												   resourceController* resourceController,
+												   brogueGlyphMap* glyphMap)
 		: brogueProgram(brogueUIProgram::FlameMenuProgram, false)
 	{
 		_diffuseCounter = new simplePeriodCounter(10);
@@ -83,67 +89,67 @@ namespace brogueHd::frontend::opengl
 
 		brogueDataStream* heatSourceStream =
 			new brogueDataStream(resourceController,
-				glyphMap,
-				brogueOpenglDataStream::HeatSourceStream,
-				openglDataStreamType::brogueCellQuad,
-				openglBrogueCellOutputSelector::DisplayCurrentFrame,
-				false);
+								 glyphMap,
+								 brogueOpenglDataStream::HeatSourceStream,
+								 openglDataStreamType::brogueCellQuad,
+								 openglBrogueCellOutputSelector::DisplayCurrentFrame,
+								 false);
 
 		brogueDataStream* heatDiffuseStream =
 			new brogueDataStream(resourceController,
-				glyphMap,
-				brogueOpenglDataStream::BrogueView,
-				openglDataStreamType::brogueCellQuad,
-				openglBrogueCellOutputSelector::Display,
-				false);
+								 glyphMap,
+								 brogueOpenglDataStream::BrogueView,
+								 openglDataStreamType::brogueCellQuad,
+								 openglBrogueCellOutputSelector::Display,
+								 false);
 
 		brogueDataStream* titleMaskStream =
 			new brogueDataStream(resourceController,
-				glyphMap,
-				brogueOpenglDataStream::TitleMaskStream,
-				openglDataStreamType::brogueColorQuad,
-				openglBrogueCellOutputSelector::NoDisplay,
-				false);
+								 glyphMap,
+								 brogueOpenglDataStream::TitleMaskStream,
+								 openglDataStreamType::brogueColorQuad,
+								 openglBrogueCellOutputSelector::NoDisplay,
+								 false);
 
 		brogueDataStream* frameStream =
 			new brogueDataStream(resourceController, glyphMap,
-				brogueOpenglDataStream::BrogueView,
-				openglDataStreamType::brogueImageQuad,
-				openglBrogueCellOutputSelector::NoDisplay,
-				true);
+								 brogueOpenglDataStream::BrogueView,
+								 openglDataStreamType::brogueImageQuad,
+								 openglBrogueCellOutputSelector::NoDisplay,
+								 true);
 
 
 		// Heat Sources:  brogueCellQuad, full scene (its view coordinates), using inclusion predicate mask
 		_heatSourceProgram = new brogueViewProgram(brogueUIProgram::ContainerControlledProgram,
-			titleView, resourceController, glyphMap,
-			shaderResource::brogueCellDisplayVert,
-			shaderResource::brogueCellDisplayFrag,
-			heatSourceStream,
-			false);
+												   titleView, resourceController, glyphMap,
+												   shaderResource::brogueCellDisplayVert,
+												   shaderResource::brogueCellDisplayFrag,
+												   heatSourceStream,
+												   false);
 
 		// Heat Diffusion:  brogueCellDisplay, full scene (...), Heat Diffusion Shaders
 		_heatDiffuseProgram = new brogueViewProgram(brogueUIProgram::ContainerControlledProgram,
-			titleView, resourceController, glyphMap,
-			shaderResource::diffuseColorUpwardVert,
-			shaderResource::diffuseColorUpwardFrag,
-			heatDiffuseStream,
-			false);
+													titleView, resourceController, glyphMap,
+													shaderResource::diffuseColorUpwardVert,
+													shaderResource::diffuseColorUpwardFrag,
+													heatDiffuseStream,
+													false);
 
 		// Title Mask:  brogueColorQuad, full scene, using title mask inclusion predicate
 		_titleMaskProgram = new brogueViewProgram(brogueUIProgram::ContainerControlledProgram,
-			titleView, resourceController, glyphMap,
-			shaderResource::colorMaskVert,
-			shaderResource::colorMaskFrag,
-			titleMaskStream,
-			false);
+												  titleView, resourceController, glyphMap,
+												  shaderResource::colorMaskVert,
+												  shaderResource::colorMaskFrag,
+												  titleMaskStream,
+												  false);
 
 		// Frame Program:  brogueImageQuad, full scene, frame-type data stream
 		_frameProgram = new brogueViewProgram(brogueUIProgram::ContainerControlledProgram,
-			titleView, resourceController, glyphMap,
-			shaderResource::mixFrameTexturesVert,
-			shaderResource::mixFrameTexturesFrag,
-			frameStream,
-			false);
+											  titleView, resourceController, glyphMap,
+											  shaderResource::mixFrameTexturesVert,
+											  shaderResource::mixFrameTexturesFrag,
+											  frameStream,
+											  false);
 
 		// Some final initialization of the other opengl objects
 		gridRect sceneBoundaryUI = titleView->calculateSceneBoundaryUI();
@@ -265,16 +271,37 @@ namespace brogueHd::frontend::opengl
 		_frameBuffer->unBind();
 	}
 
-	brogueUIResponseData& brogueFlameMenuProgram::checkUpdate(const simpleMouseState& mouseState, int millisecondsLapsed)
+	void brogueFlameMenuProgram::checkUpdate(brogueUIResponseData& response,
+											 const simpleKeyboardState& keyboardState,
+											 const simpleMouseState& mouseState,
+											 int millisecondsLapsed)
 	{
+		// Mark the reponse
+		response.signature.program = this->getProgramName();
+
 		// Wait until the period has elapsed
 		//
 		bool elapsed = _updateCounter->update(millisecondsLapsed, false);
 
-		brogueUIResponseData response(brogueUIProgram::FlameMenuProgram, brogueUIView::Unnamed, elapsed);
-
-		return response;
+		// Mark that the view needs to be updated; but leave the counter until the update function - 
+		// which will double check for an update.
+		response.response.shouldUpdate = elapsed;
 	}
+
+	void brogueFlameMenuProgram::update(const simpleKeyboardState& keyboardState,
+										const simpleMouseState& mouseState,
+										int millisecondsLapsed)
+	{
+		// Take frame buffer offline
+		_frameBuffer->unBind();
+
+		// Check programs
+		_heatSourceProgram->update(keyboardState, mouseState, millisecondsLapsed);
+
+		// Reset the counter
+		_updateCounter->reset();
+	}
+
 	bool brogueFlameMenuProgram::hasErrors() const
 	{
 		return _heatSourceProgram->hasErrors() ||
@@ -295,15 +322,5 @@ namespace brogueHd::frontend::opengl
 			_heatDiffuseProgram->isCompiled() &&
 			_titleMaskProgram->isCompiled() &&
 			_frameProgram->isCompiled();
-	}
-
-	void brogueFlameMenuProgram::update(const simpleMouseState& mouseState, int millisecondsLapsed)
-	{
-		// Take frame buffer offline
-		_frameBuffer->unBind();
-
-		// Check programs
-		if (_heatSourceProgram->checkUpdate(mouseState, millisecondsLapsed).shouldUpdate)
-			_heatSourceProgram->update(mouseState, millisecondsLapsed);
 	}
 }

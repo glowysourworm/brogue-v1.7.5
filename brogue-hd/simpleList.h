@@ -56,7 +56,7 @@ namespace brogueHd::simple
 		simpleList(const simpleList<T>& copy);
 		~simpleList();
 
-		T& get(int index) const;
+		T get(int index) const;
 		int count() const;
 
 		void add(const T& item);
@@ -64,7 +64,7 @@ namespace brogueHd::simple
 		void addRange(const simpleList<T>& list);
 		void insert(int index, const T& item);
 		void remove(const T& item);
-		T& removeAt(int index);
+		T removeAt(int index);
 		void clear();
 
 	protected:
@@ -83,8 +83,8 @@ namespace brogueHd::simple
 		simpleList<T> remove(simpleListPredicate<T> predicate);
 		simpleList<T> except(simpleListPredicate<T> predicate) const;
 
-		T& first(simpleListPredicate<T> predicate) const;
-		T& first() const;
+		T first(simpleListPredicate<T> predicate) const;
+		T first() const;
 		bool any(simpleListPredicate<T> predicate) const;
 		void forEach(simpleListCallback<T> callback) const;
 		simpleList<T> where(simpleListPredicate<T> predicate) const;
@@ -104,10 +104,10 @@ namespace brogueHd::simple
 		TResult& aggregate(TResult& seed, simpleListAggregator<T, TResult> aggregator);
 
 		template<typename TResult>
-		T& withMin(simpleListSelector<T, TResult> selector) const;
+		T withMin(simpleListSelector<T, TResult> selector) const;
 
 		template<typename TResult>
-		T& withMax(simpleListSelector<T, TResult> selector) const;
+		T withMax(simpleListSelector<T, TResult> selector) const;
 
 		simpleList<T> sort(simpleListComparer<T> comparer) const;
 
@@ -164,7 +164,7 @@ namespace brogueHd::simple
 	}
 
 	template<isHashable T>
-	T& simpleList<T>::get(int index) const
+	T simpleList<T>::get(int index) const
 	{
 		if (index >= _count)
 			simpleException::showCstr("Index is outside the bounds of the list:  simpleList.h");
@@ -286,7 +286,7 @@ namespace brogueHd::simple
 	}
 
 	template<isHashable T>
-	T& simpleList<T>::removeAt(int index)
+	T simpleList<T>::removeAt(int index)
 	{
 		if (index >= _count)
 			simpleException::showCstr("Index is outside the bounds of the array");
@@ -412,7 +412,7 @@ namespace brogueHd::simple
 	}
 
 	template<isHashable T>
-	T& simpleList<T>::first(simpleListPredicate<T> predicate) const
+	T simpleList<T>::first(simpleListPredicate<T> predicate) const
 	{
 		for (int index = 0; index < _count; index++)
 		{
@@ -424,7 +424,7 @@ namespace brogueHd::simple
 	}
 
 	template<isHashable T>
-	T& simpleList<T>::first() const
+	T simpleList<T>::first() const
 	{
 		if (this->count() == 0)
 			simpleException::showCstr("Trying to get element from an empty list:  simpleList::first()");
@@ -596,7 +596,7 @@ namespace brogueHd::simple
 
 	template<isHashable T>
 	template<typename TResult>
-	T& simpleList<T>::withMin(simpleListSelector<T, TResult> selector) const
+	T simpleList<T>::withMin(simpleListSelector<T, TResult> selector) const
 	{
 		TResult min = default_value::value<T>();
 		int minIndex = -1;
@@ -623,7 +623,7 @@ namespace brogueHd::simple
 
 	template<isHashable T>
 	template<typename TResult>
-	T& simpleList<T>::withMax(simpleListSelector<T, TResult> selector) const
+	T simpleList<T>::withMax(simpleListSelector<T, TResult> selector) const
 	{
 		TResult max = default_value::value<TResult>();
 		int maxIndex = -1;
