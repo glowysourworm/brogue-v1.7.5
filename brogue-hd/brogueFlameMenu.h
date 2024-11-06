@@ -4,11 +4,11 @@
 #include "brogueGlobal.h"
 #include "brogueKeyboardState.h"
 #include "brogueMouseState.h"
-#include "brogueUIChildResponse.h"
 #include "brogueUIConstants.h"
 #include "brogueUIData.h"
 #include "brogueView.h"
 #include "color.h"
+#include "eventController.h"
 #include "grid.h"
 #include "gridRect.h"
 #include "randomGenerator.h"
@@ -28,7 +28,8 @@ namespace brogueHd::frontend::ui
 	class brogueFlameMenu : public brogueView
 	{
 	public:
-		brogueFlameMenu(brogueUIView viewName,
+		brogueFlameMenu(eventController* eventController,
+						brogueUIView viewName,
 						randomGenerator* randomGenerator,
 						int fadePeriodMilliseconds,
 						int zoomLevel);
@@ -37,10 +38,6 @@ namespace brogueHd::frontend::ui
 		void update(const brogueKeyboardState& keyboardState,
 					const brogueMouseState& mouseState,
 					int millisecondsLapsed) override;
-
-		virtual brogueUIChildResponse checkUpdate(const brogueKeyboardState& keyboardState,
-												  const brogueMouseState& mouseState,
-												  int millisecondsLapsed);
 
 		float calculateHeatEnvelope(short column, short row);
 
@@ -129,12 +126,13 @@ namespace brogueHd::frontend::ui
 		};
 	};
 
-	brogueFlameMenu::brogueFlameMenu(brogueUIView viewName,
+	brogueFlameMenu::brogueFlameMenu(eventController* eventController,
+									 brogueUIView viewName,
 									 randomGenerator* randomGenerator,
 									 int fadePeriodMilliseconds,
 									 int zoomLevel)
 
-		: brogueView(new brogueUIData(gridRect(0, 0, COLS, ROWS), zoomLevel), gridRect(0, 0, COLS, ROWS), gridRect(0, 0, COLS, ROWS))
+		: brogueView(eventController, new brogueUIData(gridRect(0, 0, COLS, ROWS), zoomLevel), gridRect(0, 0, COLS, ROWS), gridRect(0, 0, COLS, ROWS))
 	{
 		_randomGenerator = randomGenerator;
 		_fadePeriodMilliconds = fadePeriodMilliseconds;
@@ -147,26 +145,6 @@ namespace brogueHd::frontend::ui
 	brogueFlameMenu::~brogueFlameMenu()
 	{
 		delete _heatSourceGrid;
-	}
-	brogueUIChildResponse brogueFlameMenu::checkUpdate(const brogueKeyboardState& keyboardState,
-													   const brogueMouseState& mouseState,
-													   int millisecondsLapsed)
-	{
-		brogueUIChildResponse response;
-
-		bool hasInteraction = this->getUIData()->getHasMouseInteraction();
-
-		if (hasInteraction)
-		{
-			bool mouseOver = this->isMouseOver(mouseState);
-
-			// Update the UI data
-			response.actionMet = this->getUIData()->setMouseUpdate(mouseState.getMouseLeft(), mouseOver);
-			response.needsUpdate = hasInteraction && (mouseOver || mouseState.getMouseLeft());
-			response.tag = *this->getUIData()->getAction();
-		}
-
-		return response;
 	}
 	void brogueFlameMenu::update(const brogueKeyboardState& keyboardState,
 								 const brogueMouseState& mouseState,

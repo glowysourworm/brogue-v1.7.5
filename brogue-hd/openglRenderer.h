@@ -9,6 +9,7 @@
 #include <mutex>
 #include <thread>
 #include <chrono>
+#include <functional>
 
 #include "simpleKeyboardState.h"
 #include "simpleMouseState.h"
@@ -16,9 +17,10 @@
 #include "simpleException.h"
 #include "gridRect.h"
 #include "brogueProgramContainer.h"
-#include "brogueUIResponseData.h"
 #include "brogueUIConstants.h"
 #include "simpleExt.h"
+#include "eventController.h"
+#include "brogueUITagAction.h"
 
 using namespace brogueHd::simple;
 using namespace brogueHd::component;
@@ -38,7 +40,7 @@ namespace brogueHd::frontend::opengl
 	class openglRenderer
 	{
 	public:
-		openglRenderer();
+		openglRenderer(eventController* eventController);
 		~openglRenderer();
 
 		// Making OpenGL / Window calls static to work with rendering controller.
@@ -97,13 +99,19 @@ namespace brogueHd::frontend::opengl
 
 	public:
 
-
+		void thread_brogueUIClickEvent(const brogueUITagAction& response);
+		void thread_brogueUIDeactivateEvent(const brogueUITagAction& response);
 
 	private:
 
 		void thread_start();
+		bool thread_initializeGLFW(GLFWwindow*& resultWindow, const gridRect& sceneBoundaryUI);
 
 	private:
+
+		eventController* _eventController;
+		int _clickToken;
+		int _deactivateToken;
 
 		brogueProgramContainer* _program;
 
@@ -114,12 +122,15 @@ namespace brogueHd::frontend::opengl
 		std::thread* _thread;
 	};
 
-	openglRenderer::openglRenderer()
+	openglRenderer::openglRenderer(eventController* eventController)
 	{
 		_initializedGL = false;
 		_program = nullptr;
 		_thread = nullptr;
 		_threadLock = new std::mutex();
+		_eventController = eventController;
+
+		_clickToken = eventController->getUIClickEvent()->subscribe(std::bind(&openglRenderer::thread_brogueUIClickEvent, this, std::placeholders::_1));
 	}
 	openglRenderer::~openglRenderer()
 	{
@@ -139,6 +150,13 @@ namespace brogueHd::frontend::opengl
 		destroyGL();
 
 		_initializedGL = false;
+
+		// Unhook Events
+		if (_clickToken > 0)
+			_eventController->getUIClickEvent()->unSubscribe(_clickToken);
+
+		if (_deactivateToken > 0)
+			_eventController->getUIDeactivatedEvent()->unSubscribe(_deactivateToken);
 	}
 
 #pragma region GLFW Callbacks
@@ -304,27 +322,110 @@ namespace brogueHd::frontend::opengl
 		_initializedGL = false;
 	}
 
-	void openglRenderer::thread_start()
+	void openglRenderer::thread_brogueUIDeactivateEvent(const brogueUITagAction& tagAction)
 	{
-		// Full Screen Mode, Primary Monitor
-		//window = glfwCreateWindow(mode->width, mode->height, "Brogue v1.7.5", monitor, NULL);
+		// Thread Mutex Lock (Still Active)
 
-		// THREAD:  LOCK TO INITIALIZE
-		_threadLock->lock();
+		switch (tagAction.action)
+		{
+			case brogueUIAction::Close:
+				_program->deactivateCurrentUIProgram();
+				break;
 
-		gridRect sceneBoundaryUI = _program->getSceneBoundaryUI();
+			case brogueUIAction::ViewMainMenu:
+				_program->deactivateCurrentUIProgram();
+				_program->activateUIProgram(brogueUIProgram::MainMenuProgram);
+				break;
 
-		// CAREFULLY SET THESE TO WAIT ON GL CALLS (see main loop below)
-		// 
-		// assert(threadSleepTime <= intervalMilliseconds)
-		//
-		int intervalMilliseconds = 10;
+				// CRITICAL! Leave the 'None' action for views to report "Nothing to do"
+			case brogueUIAction::None:
+				break;
+
+			default:
+				throw simpleException("Unhandled brogueUIAction (deactivate):  openglRenderer.h");
+		}
+
+		//if (response.tag.deactivateAction != brogueUIAction::None)
+		//{
+		//	//programChange = true;
+		//	//programChangeCounter = 0;
+		//	//programChangeThisIteration = true;
+		//}
+	}
+
+	void openglRenderer::thread_brogueUIClickEvent(const brogueUITagAction& tagAction)
+	{
+		// Thread Mutex Lock (Still Active)
+
+		switch (tagAction.action)
+		{
+			case brogueUIAction::Close:
+				_program->deactivateCurrentUIProgram();
+				break;
+
+			case brogueUIAction::NewGame:
+				break;
+
+			case brogueUIAction::OpenGame:
+				break;
+
+			case brogueUIAction::QuitGame:
+				break;
+
+			case brogueUIAction::ShowQuitGameModal:
+				break;
+
+			case brogueUIAction::ViewMainMenu:
+			{
+				_program->deactivateCurrentUIProgram();
+				_program->activateUIProgram(brogueUIProgram::MainMenuProgram);
+			}
+			break;
+
+			case brogueUIAction::ViewHighScores:
+			{
+				_program->deactivateCurrentUIProgram();
+				_program->activateUIProgram(brogueUIProgram::HighScoresProgram);
+			}
+			break;
+
+			case brogueUIAction::ViewOpenGameMenu:
+			{
+				_program->deactivateCurrentUIProgram();
+				_program->activateUIProgram(brogueUIProgram::OpenMenuProgram);
+			}
+			break;
+
+			case brogueUIAction::ViewPlaybackMenu:
+			{
+				_program->deactivateCurrentUIProgram();
+				_program->activateUIProgram(brogueUIProgram::PlaybackMenuProgram);
+			}
+			break;
+			default:
+				break;
+
+				//default:
+				//	throw simpleException("Unhandled brogueUIAction:  openglRenderer.h");
+		}
+
+		//if (response.tag.deactivateAction != brogueUIAction::None)
+		//{
+		//	//programChange = true;
+		//	//programChangeCounter = 0;
+		//	//programChangeThisIteration = true;
+		//}
+	}
+
+	bool openglRenderer::thread_initializeGLFW(GLFWwindow*& resultWindow, const gridRect& sceneBoundaryUI)
+	{
+		// Thread Mutex Lock (Still Active)
 
 		// Windowed Mode
-		GLFWwindow* window = glfwCreateWindow(sceneBoundaryUI.width, sceneBoundaryUI.height, "Brogue v1.7.5", NULL, NULL);
+		resultWindow = glfwCreateWindow(sceneBoundaryUI.width, sceneBoundaryUI.height, "Brogue v1.7.5", NULL, NULL);
 
 		// Open GL Context
-		glfwMakeContextCurrent(window);
+		glfwMakeContextCurrent(resultWindow);
 
 		int version = gladLoadGL(glfwGetProcAddress);
 
@@ -332,12 +433,10 @@ namespace brogueHd::frontend::opengl
 		{
 			simpleLogger::logColor(brogueConsoleColor::Red, "Error calling gladLoadGL");
 
-			glfwDestroyWindow(window);
+			glfwDestroyWindow(resultWindow);
 			//glfwTerminate();
 
-			// THREAD:  UNLOCK TO RETURN
-			_threadLock->unlock();
-			return;
+			return false;
 		}
 		else
 		{
@@ -361,21 +460,21 @@ namespace brogueHd::frontend::opengl
 		glfwSwapInterval(1);
 
 		// Keyboard Handler
-		glfwSetKeyCallback(window, &openglRenderer::keyCallback);
+		glfwSetKeyCallback(resultWindow, &openglRenderer::keyCallback);
 
 		// Mouse Handlers
-		glfwSetCursorPosCallback(window, mousePositionCallback);
-		glfwSetMouseButtonCallback(window, mouseButtonCallback);
-		glfwSetScrollCallback(window, mouseScrollCallback);
+		glfwSetCursorPosCallback(resultWindow, mousePositionCallback);
+		glfwSetMouseButtonCallback(resultWindow, mouseButtonCallback);
+		glfwSetScrollCallback(resultWindow, mouseScrollCallback);
 
 		// Window Resize Callback
-		glfwSetFramebufferSizeCallback(window, &openglRenderer::resizeCallback);
+		glfwSetFramebufferSizeCallback(resultWindow, &openglRenderer::resizeCallback);
 
 		//// Window Refresh Callback
-		//glfwSetWindowRefreshCallback(window, &openglRenderer::refreshCallback);
+		//glfwSetWindowRefreshCallback(resultWindow, &openglRenderer::refreshCallback);
 
 		// Window Close Callback (NOT NEEDED! This is a callback to perform before window closes)
-		glfwSetWindowCloseCallback(window, &openglRenderer::windowCloseCallback);
+		glfwSetWindowCloseCallback(resultWindow, &openglRenderer::windowCloseCallback);
 
 		// GL Enable Debug Output:
 		glEnable(GL_DEBUG_OUTPUT);
@@ -385,11 +484,40 @@ namespace brogueHd::frontend::opengl
 		// (Not sure)
 		glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
 
-		// *** Compile our program for the main loop: HOPING THIS IS OK WHEN DONE FROM THE RENDERING THREAD
+		// Khronos Group:       glViewport(x, y, width, height)
+		// Window Coordinates:  (x_w, y_w), (x, y) - position offsets, (width, height) - window size
+		// GL Coordinates:		(x_nd, y_nd)
+
+		// x_w = (x_nd + 1)(width / 2) + x
+		// y_w = (y_nd + 1)(height / 2) + y
+
+		// Initialize the viewport
+		glViewport(0, 0, sceneBoundaryUI.width, sceneBoundaryUI.height);
+	}
+
+	void openglRenderer::thread_start()
+	{
+		int intervalMilliseconds = 10;
+		int programChangeDebounce = 150;
+		int programChangeCounter = 0;
+		bool programChange = false;
+
+		// THREAD:  LOCK TO INITIALIZE
+		_threadLock->lock();
+
+		// Get the calculated scene boundary from the UI view components
+		gridRect sceneBoundaryUI = _program->getSceneBoundaryUI();
+		GLFWwindow* window = nullptr;
+
+		if (!thread_initializeGLFW(window, sceneBoundaryUI))
+		{
+			_threadLock->unlock();
+			return;
+		}
+
+		// *** Compile our program for the main loop:  GL Functions must be called after calling glfwMakeContextCurrent.
 		//
-		// GL Functions must be called after calling glfwMakeContextCurrent.
-		//
-		_program->initialize();		// Declares program and program pieces on GL backend
+		_program->initialize();
 
 		if (_program->hasErrors())
 		{
@@ -399,25 +527,6 @@ namespace brogueHd::frontend::opengl
 			_threadLock->unlock();
 			return;
 		}
-
-		// Initialize the viewport
-		//int surfaceWidth, surfaceHeight;
-		//glfwGetFramebufferSize(window, &surfaceWidth, &surfaceHeight);
-
-		// Khronos Group:       glViewport(x, y, width, height)
-		// Window Coordinates:  (x_w, y_w), (x, y) - position offsets, (width, height) - window size
-		// GL Coordinates:		(x_nd, y_nd)
-
-		// x_w = (x_nd + 1)(width / 2) + x
-		// y_w = (y_nd + 1)(height / 2) + y
-
-		//float viewportX = (_sceneBoundaryGL.x + 1) * (windowWidth / 2.0f);
-		//float viewportY = (_sceneBoundaryGL.y + 1) * (windowHeight / 2.0f);
-		//float viewportWidth = (_sceneBoundaryGL.width + 1) * (windowWidth / 2.0f);
-		//float viewportHeight = (_sceneBoundaryGL.height + 1) * (windowHeight / 2.0f);
-
-		//glViewport(_sceneBoundaryUI.left(), _sceneBoundaryUI.top(), _sceneBoundaryUI.width, _sceneBoundaryUI.height);
-		glViewport(0, 0, sceneBoundaryUI.width, sceneBoundaryUI.height);
 
 		// Keyboard / Mouse State
 		opengl::KeyState = new simpleKeyboardState();
@@ -434,111 +543,44 @@ namespace brogueHd::frontend::opengl
 			// Update from main thread's brogueView*
 			_threadLock->lock();
 
+			// Procedure: (CRITICAL SECTION)
+			//
+			// 0) Copy mouse and keyboard state onto the stack
+			// 1) Run checkUpdate (sets UI data on the tree)
+			// 2) Run queries: Was Deactivated? Was Action Met? NeedsUpdate?
+			// 3) Action Met -> Change View Programs
+			// 4) Deactivated -> (May) Change View Programs
+			// 5) Needs Update -> View needs re-buffered
+			// 6) Run the drawing program(s)
+			// 7) Log Errors, Reset Mouse State, finish draw pass.
+			//
+
 			simpleMouseState mouseState(*opengl::MouseState);
 			simpleKeyboardState keyboardState(*opengl::KeyState);
+			bool programChangeThisIteration = false;
 
-			// Check the view tree for program control response (the tree handles marking the response)
-			brogueUIResponseData uiData;
+			// Increment program change counter (Debounce)
+			programChangeCounter += intervalMilliseconds;
 
-			bool programChange = false;
-
-			_program->checkUpdate(uiData, keyboardState, mouseState, intervalMilliseconds);
-
-			// Deactivated
-			if (uiData.response.deactivated)
-			{
-				switch (uiData.response.tag.deactivateAction)
-				{
-					case brogueUIAction::Close:
-						_program->deactivateCurrentUIProgram();
-						break;
-
-					case brogueUIAction::ViewMainMenu:
-						_program->deactivateCurrentUIProgram();
-						_program->activateUIProgram(brogueUIProgram::MainMenuProgram);
-						break;
-
-						// CRITICAL! Leave the 'None' action for views to report "Nothing to do"
-					case brogueUIAction::None:
-						break;
-
-					default:
-						throw simpleException("Unhandled brogueUIAction (deactivate):  openglRenderer.h");
-				}
-
-				programChange = true;
-			}
-
-			// Action Met -> Deactivate Current / Active Next
-			//
-			else if (uiData.response.actionMet)
-			{
-				switch (uiData.response.tag.action)
-				{
-					case brogueUIAction::Close:
-						_program->deactivateCurrentUIProgram();
-						break;
-
-					case brogueUIAction::NewGame:
-						break;
-
-					case brogueUIAction::OpenGame:
-						break;
-
-					case brogueUIAction::QuitGame:
-						break;
-
-					case brogueUIAction::ShowQuitGameModal:
-						break;
-
-					case brogueUIAction::ViewMainMenu:
-					{
-						_program->deactivateCurrentUIProgram();
-						_program->activateUIProgram(brogueUIProgram::MainMenuProgram);
-					}
-					break;
-
-					case brogueUIAction::ViewHighScores:
-					{
-						_program->deactivateCurrentUIProgram();
-						_program->activateUIProgram(brogueUIProgram::HighScoresProgram);
-					}
-					break;
-
-					case brogueUIAction::ViewOpenGameMenu:
-					{
-						_program->deactivateCurrentUIProgram();
-						_program->activateUIProgram(brogueUIProgram::OpenMenuProgram);
-					}
-					break;
-
-					case brogueUIAction::ViewPlaybackMenu:
-					{
-						_program->deactivateCurrentUIProgram();
-						_program->activateUIProgram(brogueUIProgram::PlaybackMenuProgram);
-					}
-					break;
-
-					default:
-						throw simpleException("Unhandled brogueUIAction:  openglRenderer.h");
-				}
-				programChange = true;
-			}
+			// Check Update(s)
+			_program->checkUpdate(keyboardState, mouseState, intervalMilliseconds);
 
 			// Force an update if there was a program change
-			if (programChange)
-			{
-				_program->checkUpdate(uiData, keyboardState, mouseState, intervalMilliseconds);
-				_program->update(keyboardState, mouseState, intervalMilliseconds);
-			}
+			//if (programChangeThisIteration)
+			//{
+			//	_program->checkUpdate(keyboardState, mouseState, intervalMilliseconds);
+			//	_program->update(keyboardState, mouseState, intervalMilliseconds);
+			//}
 
-			// Check normal program update
-			else if (uiData.response.needsUpdate)
-				_program->update(keyboardState, mouseState, intervalMilliseconds);							// Updates program buffers from the UI view
+
+			// Check normal program update (view state change)
+			if (_program->needsUpdate())
+				_program->update(keyboardState, mouseState, intervalMilliseconds);		// Updates program buffers from the UI view
 
 			// Run drawing program
 			_program->run(intervalMilliseconds);										// Run() -> Draws the buffers
 			_program->showErrors();														// Log Errors to simpleLogger -> std::cout
+			_program->clearUpdate();													// Clear Update Flags
 
 			GLenum error = glGetError();
 
@@ -547,6 +589,13 @@ namespace brogueHd::frontend::opengl
 
 			// Scroll data has already been consumed by the view tree
 			opengl::MouseState->resetScroll();
+
+			// (Debounce) Reset period for changing programs
+			if (programChangeCounter >= programChangeDebounce)
+			{
+				programChangeCounter = 0;
+				programChange = false;
+			}
 
 			_threadLock->unlock();
 

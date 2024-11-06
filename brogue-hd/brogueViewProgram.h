@@ -10,8 +10,6 @@
 #include "brogueProgram.h"
 #include "brogueProgramBuilder.h"
 #include "brogueUIConstants.h"
-#include "brogueUIResponseData.h"
-#include "brogueView.h"
 #include "brogueViewBase.h"
 #include "gl.h"
 #include "gridRect.h"
@@ -70,10 +68,12 @@ namespace brogueHd::frontend::opengl
 		}
 
 		virtual void initialize() override;
-		virtual void checkUpdate(brogueUIResponseData& response,
-								 const simpleKeyboardState& keyboardState,
+		virtual void checkUpdate(const simpleKeyboardState& keyboardState,
 								 const simpleMouseState& mouseState,
 								 int millisecondsLapsed) override;
+
+		virtual bool needsUpdate() override;
+		virtual void clearUpdate() override;
 
 		virtual void update(const simpleKeyboardState& keyboardState,
 							const simpleMouseState& mouseState,
@@ -126,18 +126,10 @@ namespace brogueHd::frontend::opengl
 		_program->bind();
 	}
 
-	void brogueViewProgram::checkUpdate(brogueUIResponseData& response,
-										const simpleKeyboardState& keyboardState,
+	void brogueViewProgram::checkUpdate(const simpleKeyboardState& keyboardState,
 										const simpleMouseState& mouseState,
 										int millisecondsLapsed)
 	{
-		// CRITICAL!  Don't forget to mark the program name! Otherwise, the main controller won't know 
-		//			  how to process the message
-		//
-		//			  Mark the reponse. (see views to make sure the response is being marked properly)
-		//
-		response.signature.program = this->getProgramName();
-
 		// Translate the UI space -> the brogue / program space and pass down the pipeline
 		//
 		gridRect sceneBoundary = this->getSceneBoundaryUI();
@@ -151,13 +143,23 @@ namespace brogueHd::frontend::opengl
 		brogueKeyboardState keyboardStateUI(-1, -1);
 
 		// Pass the parameters in to check the program's view (tree)
-		_view->checkUpdate(response, keyboardStateUI, mouseStateUI, millisecondsLapsed);
+		_view->checkUpdate(keyboardStateUI, mouseStateUI, millisecondsLapsed);
 	}
 
+	bool brogueViewProgram::needsUpdate()
+	{
+		return _view->needsUpdate();
+	}
+	void brogueViewProgram::clearUpdate()
+	{
+		_view->clearUpdate();
+	}
 	void brogueViewProgram::update(const simpleKeyboardState& keyboardState,
 								   const simpleMouseState& mouseState,
 								   int millisecondsLapsed)
 	{
+		//if (_view->needsUpdate())
+		//{
 		gridRect sceneBoundary = this->getSceneBoundaryUI();
 
 		brogueMouseState mouseStateUI((mouseState.getX() / sceneBoundary.width) * _view->getSceneBoundary().width,
@@ -177,6 +179,7 @@ namespace brogueHd::frontend::opengl
 		// Put the new stream online (deletes the old stream)
 		_program->bind();
 		_program->reBuffer(stream);
+		//}
 	}
 
 	void brogueViewProgram::run(int millisecondsElapsed)

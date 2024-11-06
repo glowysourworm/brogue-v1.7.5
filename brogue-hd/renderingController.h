@@ -7,10 +7,10 @@
 #include "brogueGlyphMap.h"
 #include "brogueListView.h"
 #include "brogueProgramContainer.h"
-#include "brogueProgramSignature.h"
 #include "brogueUIBuilder.h"
 #include "brogueUIConstants.h"
 #include "brogueViewProgram.h"
+#include "eventController.h"
 #include "openglRenderer.h"
 #include "randomGenerator.h"
 #include "resourceController.h"
@@ -18,6 +18,7 @@
 #include "simpleFileIO.h"
 
 using namespace brogueHd::frontend;
+using namespace brogueHd::frontend::ui;
 using namespace brogueHd::backend::controller;
 using namespace brogueHd::frontend::opengl;
 
@@ -27,7 +28,7 @@ namespace brogueHd::backend::controller
 	{
 	public:
 
-		renderingController(resourceController* resourceController, randomGenerator* randomGenerator);
+		renderingController(eventController* eventController, resourceController* resourceController, randomGenerator* randomGenerator);
 		~renderingController();
 
 		/// <summary>
@@ -42,16 +43,18 @@ namespace brogueHd::backend::controller
 		brogueProgramContainer* _container;
 
 		randomGenerator* _randomGenerator;
+		eventController* _eventController;
 		resourceController* _resourceController;
 		openglRenderer* _openglRenderer;
 		brogueGlyphMap* _glyphMap;
 	};
 
-	renderingController::renderingController(resourceController* resourceController, randomGenerator* randomGenerator)
+	renderingController::renderingController(eventController* eventController, resourceController* resourceController, randomGenerator* randomGenerator)
 	{
 		_glyphMap = new brogueGlyphMap();
-		_openglRenderer = new openglRenderer();
+		_openglRenderer = new openglRenderer(eventController);
 		_resourceController = resourceController;
+		_eventController = eventController;
 		_randomGenerator = randomGenerator;
 		_mode = BrogueGameMode::Title;
 
@@ -98,11 +101,11 @@ namespace brogueHd::backend::controller
 				simpleDirectoryEntry gameFiles = simpleFileIO::readDirectory(_resourceController->getGamesDirectory()->c_str(), ".broguesave");
 				simpleDirectoryEntry recordingFiles = simpleFileIO::readDirectory(_resourceController->getPlaybackDirectory()->c_str(), ".broguerec");
 
-				brogueFlameMenu* titleView = new brogueFlameMenu(brogueUIView::Unnamed, _randomGenerator, 100, zoomLevel);
-				brogueListView* mainMenu = brogueUIBuilder::createMainMenuButtons(zoomLevel);
-				brogueListView* openMenu = brogueUIBuilder::createMainMenuSelector(brogueUIView::OpenGameSelector, gameFiles, zoomLevel);
-				brogueListView* playbackMenu = brogueUIBuilder::createMainMenuSelector(brogueUIView::PlaybackSelector, recordingFiles, zoomLevel);
-				brogueListView* highScoresMenu = brogueUIBuilder::createHighScoresView(_resourceController, zoomLevel);
+				brogueFlameMenu* titleView = new brogueFlameMenu(_eventController, brogueUIView::Unnamed, _randomGenerator, 100, zoomLevel);
+				brogueListView* mainMenu = brogueUIBuilder::createMainMenuButtons(_eventController, zoomLevel);
+				brogueListView* openMenu = brogueUIBuilder::createMainMenuSelector(_eventController, brogueUIView::OpenGameSelector, gameFiles, zoomLevel);
+				brogueListView* playbackMenu = brogueUIBuilder::createMainMenuSelector(_eventController, brogueUIView::PlaybackSelector, recordingFiles, zoomLevel);
+				brogueListView* highScoresMenu = brogueUIBuilder::createHighScoresView(_eventController, _resourceController, zoomLevel);
 
 				// Main Menu:  brogueCellQuad, full scene (its view coordinates)
 				brogueDataStream* mainMenuStream =
@@ -171,6 +174,8 @@ namespace brogueHd::backend::controller
 										  shaderResource::brogueCellDisplayFrag,
 										  highScoresStream,
 										  true);
+
+				//brogueUIEvent anEvent = _eventController->getEvent<brogueUIEvent>();
 
 				_container->setBackground(new brogueFlameMenuProgram(titleView, _resourceController, _glyphMap));
 				_container->addUIProgram(mainMenuProgram);

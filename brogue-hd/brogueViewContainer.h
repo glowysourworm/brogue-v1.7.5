@@ -3,10 +3,8 @@
 #include "brogueCellDisplay.h"
 #include "brogueKeyboardState.h"
 #include "brogueMouseState.h"
-#include "brogueUIChildResponse.h"
 #include "brogueUIConstants.h"
 #include "brogueUIData.h"
-#include "brogueUIResponseData.h"
 #include "brogueView.h"
 #include "brogueViewBase.h"
 #include "gridDefinitions.h"
@@ -39,18 +37,12 @@ namespace brogueHd::frontend::ui
 
 		void addView(brogueView* view);
 
-		virtual void update(const brogueKeyboardState& keyboardState,
-							const brogueMouseState& mouseState,
-							int millisecondsLapsed);
-
-		virtual void checkUpdate(brogueUIResponseData& response,
-								 const brogueKeyboardState& keyboardState,
+		virtual void checkUpdate(const brogueKeyboardState& keyboardState,
 								 const brogueMouseState& mouseState,
 								 int millisecondsLapsed) override;
 
-		virtual brogueUIChildResponse checkUpdate(const brogueKeyboardState& keyboardState,
-												  const brogueMouseState& mouseState,
-												  int millisecondsLapsed) override;
+		virtual bool needsUpdate() const override;
+		virtual void clearUpdate() override;
 
 		virtual brogueCellDisplay* get(short column, short row) const override;
 
@@ -195,61 +187,47 @@ namespace brogueHd::frontend::ui
 
 		return _parentView->get(column, row);
 	}
-	brogueUIChildResponse brogueViewContainer::checkUpdate(const brogueKeyboardState& keyboardState,
-														   const brogueMouseState& mouseState,
-														   int millisecondsLapsed)
-	{
-		// Treats this view as the child (parent caller)
-		brogueUIResponseData thisResponse;
-
-		checkUpdate(thisResponse, keyboardState, mouseState, millisecondsLapsed);
-
-		return thisResponse.response;
-	}
-	void brogueViewContainer::checkUpdate(brogueUIResponseData& response,
-										  const brogueKeyboardState& keyboardState,
+	void brogueViewContainer::checkUpdate(const brogueKeyboardState& keyboardState,
 										  const brogueMouseState& mouseState,
 										  int millisecondsLapsed)
 	{
-		// Mark the response
-		response.signature.view = _parentViewName;
-
 		// Check child views first (for performance) (NOTE:  This function updates mouse related data; and must be run on child views)
-		_childViews->forEach([&mouseState, &keyboardState, &millisecondsLapsed, &response] (brogueView* view)
+		_childViews->forEach([&mouseState, &keyboardState, &millisecondsLapsed] (brogueView* view)
 		{
-			brogueUIChildResponse childResponse = view->checkUpdate(keyboardState, mouseState, millisecondsLapsed);
-
-			if (childResponse.needsUpdate)
-				response.response = childResponse;
+			view->checkUpdate(keyboardState, mouseState, millisecondsLapsed);
 
 			return iterationCallback::iterate;
 		});
 
-		// Nothing set in the child response -> Use this container response
-		if (!response.response.needsUpdate)
-		{
-			// Parent View
-			if (_parentView->isMouseOver(mouseState) && _parentView->getUIData()->getHasMouseInteraction())
-			{
-				response.response = _parentView->checkUpdate(keyboardState, mouseState, millisecondsLapsed);
-			}
-		}
+		// Parent View
+		_parentView->checkUpdate(keyboardState, mouseState, millisecondsLapsed);
 	}
-	void brogueViewContainer::update(const brogueKeyboardState& keyboardState,
-									 const brogueMouseState& mouseState,
-									 int millisecondsLapsed)
+	bool brogueViewContainer::needsUpdate() const
 	{
-		// May be overridden.
-		//
-		_parentView->update(keyboardState, mouseState, millisecondsLapsed);
+		bool result = false;
 
-		// Call update afterwards (logically, we want to overlay the child views; but it may not matter here)
-		//
-		_childViews->forEach([&keyboardState, &mouseState, &millisecondsLapsed] (brogueView* view)
+		_childViews->forEach([&result] (brogueView* view)
 		{
-			view->update(keyboardState, mouseState, millisecondsLapsed);
+			result |= view->needsUpdate();
+
+			if (result)
+				return iterationCallback::breakAndReturn;
+			else
+				return iterationCallback::iterate;
+		});
+
+		// Parent View
+		return result || _parentView->needsUpdate();
+	}
+	void brogueViewContainer::clearUpdate()
+	{
+		_childViews->forEach([] (brogueView* view)
+		{
+			view->clearUpdate();
 
 			return iterationCallback::iterate;
 		});
+
+		_parentView->clearUpdate();
 	}
 }

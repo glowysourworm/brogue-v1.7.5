@@ -1,7 +1,6 @@
 #pragma once
 #include "brogueProgram.h"
 #include "brogueUIConstants.h"
-#include "brogueUIResponseData.h"
 #include "gridRect.h"
 #include "simple.h"
 #include "simpleException.h"
@@ -39,10 +38,11 @@ namespace brogueHd::frontend::opengl
 		/// Following a similar pipeline to the brogueView, checkUpdate checks program parameters needed
 		/// to update the view - also calling the view's checkUpdate method. (creating the pipeline)
 		/// </summary>
-		virtual void checkUpdate(brogueUIResponseData& response,
-								 const simpleKeyboardState& keyboardState,
+		virtual void checkUpdate(const simpleKeyboardState& keyboardState,
 								 const simpleMouseState& mouseState,
 								 int millisecondsLapsed);
+		virtual void clearUpdate();
+		virtual bool needsUpdate();
 
 		/// <summary>
 		/// Following a similar pipeline to the brogueView, update checks program parameters needed
@@ -177,42 +177,69 @@ namespace brogueHd::frontend::opengl
 		return hasErrors;
 	}
 
-	void brogueProgramContainer::checkUpdate(brogueUIResponseData& response,
-											 const simpleKeyboardState& keyboardState,
+	void brogueProgramContainer::checkUpdate(const simpleKeyboardState& keyboardState,
 											 const simpleMouseState& mouseState,
 											 int millisecondsLapsed)
 	{
-		// CRITICAL!  Don't forget to mark the program name! Otherwise, the main controller won't know 
-		//			  how to process the message
-		//
-		//			  Mark the reponse. (see views to make sure the response is being marked properly)
-		//
-		response.signature.container = _containerName;
-
 		// Pass the response down the pipeline -> background program
-		_backgroundProgram->checkUpdate(response, keyboardState, mouseState, millisecondsLapsed);
+		_backgroundProgram->checkUpdate(keyboardState, mouseState, millisecondsLapsed);
 
 		// Iterate UI Programs
-		_uiPrograms->iterate([&keyboardState, &mouseState, &millisecondsLapsed, &response] (brogueUIProgram programName, brogueProgram* program)
+		_uiPrograms->iterate([&keyboardState, &mouseState, &millisecondsLapsed] (brogueUIProgram programName, brogueProgram* program)
 		{
 			if (program->getIsActive())
 			{
-				program->checkUpdate(response, keyboardState, mouseState, millisecondsLapsed);
+				program->checkUpdate(keyboardState, mouseState, millisecondsLapsed);
 			}
 
 			return iterationCallback::iterate;
 		});
 	}
+	void brogueProgramContainer::clearUpdate()
+	{
+		// Pass the response down the pipeline -> background program
+		_backgroundProgram->clearUpdate();
 
+		// Iterate UI Programs
+		_uiPrograms->iterate([] (brogueUIProgram programName, brogueProgram* program)
+		{
+			// Go ahead and clear non-active view's events
+			program->clearUpdate();
+
+			return iterationCallback::iterate;
+		});
+	}
+	bool brogueProgramContainer::needsUpdate()
+	{
+		bool result = false;
+
+		// UI Programs
+		_uiPrograms->iterate([&result] (brogueUIProgram programName, brogueProgram* program)
+		{
+			if (program->getIsActive())
+			{
+				result |= program->needsUpdate();
+			}
+
+			if (result)
+				return iterationCallback::breakAndReturn;
+			else
+				return iterationCallback::iterate;
+		});
+
+		// Pass the response down the pipeline -> background program
+		return result || _backgroundProgram->needsUpdate();
+	}
 	void brogueProgramContainer::update(const simpleKeyboardState& keyboardState,
 										const simpleMouseState& mouseState,
 										int millisecondsLapsed)
 	{
-		_backgroundProgram->update(keyboardState, mouseState, millisecondsLapsed);
+		//if (_backgroundProgram->needsUpdate())
+			_backgroundProgram->update(keyboardState, mouseState, millisecondsLapsed);
 
 		_uiPrograms->iterate([&keyboardState, &mouseState, &millisecondsLapsed] (brogueUIProgram programName, brogueProgram* program)
 		{
-			if (program->getIsActive())
+			if (program->getIsActive() /* && program->needsUpdate() */)
 			{
 				program->update(keyboardState, mouseState, millisecondsLapsed);
 			}

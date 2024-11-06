@@ -1,9 +1,10 @@
 #pragma once
 
 #include "brogueUIConstants.h"
-#include "brogueUIResponseData.h"
 #include "gridRect.h"
 #include "simple.h"
+#include "simpleException.h"
+#include "simpleException.h"
 #include "simpleKeyboardState.h"
 #include "simpleMouseState.h"
 
@@ -35,10 +36,25 @@ namespace brogueHd::frontend::opengl
 		/// Following a similar pipeline to the brogueView, checkUpdate checks program parameters needed
 		/// to update the view - also calling the view's checkUpdate method. (creating the pipeline)
 		/// </summary>
-		virtual void checkUpdate(brogueUIResponseData& response,
-								 const simpleKeyboardState& keyboardState,
+		virtual void checkUpdate(const simpleKeyboardState& keyboardState,
 								 const simpleMouseState& mouseState,
 								 int millisecondsLapsed)
+		{
+
+		}
+
+		/// <summary>
+		/// Returns true if the program tree needs to be updated
+		/// </summary>
+		virtual bool needsUpdate()
+		{
+			return false;
+		}
+
+		/// <summary>
+		/// Clears mouse event data from the UI tree
+		/// </summary>
+		virtual void clearUpdate()
 		{
 
 		}

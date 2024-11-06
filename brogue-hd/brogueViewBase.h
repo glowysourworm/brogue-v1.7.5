@@ -2,9 +2,9 @@
 #include "brogueCellDisplay.h"
 #include "brogueKeyboardState.h"
 #include "brogueMouseState.h"
-#include "brogueUIChildResponse.h"
+#include "brogueUIConstants.h"
 #include "brogueUIData.h"
-#include "brogueUIResponseData.h"
+#include "brogueUITagAction.h"
 #include "gridDefinitions.h"
 #include "gridLocator.h"
 #include "gridRect.h"
@@ -36,6 +36,11 @@ namespace brogueHd::frontend::ui
 		~brogueViewBase()
 		{
 
+		}
+
+		virtual void raiseClickEvent(const brogueUITagAction& response)
+		{
+			throw simpleException("brogueViewBase function not overriden:  brogueViewBase::raiseClickEvent");
 		}
 
 		virtual brogueCellDisplay* get(short column, short row) const
@@ -84,24 +89,28 @@ namespace brogueHd::frontend::ui
 		/// <summary>
 		/// Overload of the checkUpdate function behaves as though the view is a child of a parent view
 		/// </summary>
-		virtual brogueUIChildResponse checkUpdate(const brogueKeyboardState& keyboardState,
-												  const brogueMouseState& mouseState,
-												  int millisecondsLapsed)
-		{
-			throw simpleException("brogueViewBase function not overriden:  brogueViewBase::checkUpdate");
-		}
-
-		/// <summary>
-		/// Overload of the checkUpdate function behaves as though the view is the parent view
-		/// </summary>
-		virtual void checkUpdate(brogueUIResponseData& response,
-								 const brogueKeyboardState& keyboardState,
+		virtual void checkUpdate(const brogueKeyboardState& keyboardState,
 								 const brogueMouseState& mouseState,
 								 int millisecondsLapsed)
 		{
 			throw simpleException("brogueViewBase function not overriden:  brogueViewBase::checkUpdate");
 		}
 
+		/// <summary>
+		/// Clears mouse interaction events from the UI tree
+		/// </summary>
+		virtual void clearUpdate()
+		{
+			throw simpleException("brogueViewBase function not overriden:  brogueViewBase::clearUpdate");
+		}
+
+		/// <summary>
+		/// Checks the tree to see if there are views that need updating.
+		/// </summary>
+		virtual bool needsUpdate() const
+		{
+			throw simpleException("brogueViewBase function not overriden:  brogueViewBase::needsUpdate");
+		}
 		virtual void incrementRenderOffset(short columnOffset, short rowOffset)
 		{
 			throw simpleException("brogueViewBase function not overriden:  brogueViewBase::incrementRenderOffset");

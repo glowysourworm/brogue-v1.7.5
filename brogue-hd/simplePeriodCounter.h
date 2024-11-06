@@ -46,6 +46,11 @@ namespace brogueHd::frontend::opengl
 			return false;
 		}
 
+		bool pending() const
+		{
+			return _counter >= _period;
+		}
+
 		void reset()
 		{
 			_counter = 0;

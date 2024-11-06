@@ -2,11 +2,11 @@
 
 #include "brogueKeyboardState.h"
 #include "brogueMouseState.h"
-#include "brogueUIChildResponse.h"
 #include "brogueUIConstants.h"
 #include "brogueUIData.h"
 #include "brogueView.h"
 #include "color.h"
+#include "eventController.h"
 #include "gridRect.h"
 #include "simple.h"
 
@@ -18,46 +18,29 @@ namespace brogueHd::frontend::ui
 	{
 	public:
 
-		brogueText(brogueUIView viewName, brogueUIData* data, const gridRect& sceneBoundary, const gridRect& viewBoundary);
+		brogueText(eventController* eventController, brogueUIView viewName, brogueUIData* data, const gridRect& sceneBoundary, const gridRect& viewBoundary);
 		~brogueText();
 
 		virtual void update(const brogueKeyboardState& keyboardState,
 							const brogueMouseState& mouseState,
 							int millisecondsLapsed) override;
 
-		virtual brogueUIChildResponse checkUpdate(const brogueKeyboardState& keyboardState,
-												  const brogueMouseState& mouseState,
-												  int millisecondsLapsed) override;
+		virtual bool needsUpdate() const override;
 	};
 
-	brogueText::brogueText(brogueUIView viewName, brogueUIData* data, const gridRect& sceneBoundary, const gridRect& viewBoundary)
-		: brogueView(data, sceneBoundary, viewBoundary)
+	brogueText::brogueText(eventController* eventController, brogueUIView viewName, brogueUIData* data, const gridRect& sceneBoundary, const gridRect& viewBoundary)
+		: brogueView(eventController, data, sceneBoundary, viewBoundary)
 	{
 		update(default_value::value<brogueKeyboardState>(), default_value::value<brogueMouseState>(), 0);
 	}
 	brogueText::~brogueText()
 	{
 	}
-	brogueUIChildResponse brogueText::checkUpdate(const brogueKeyboardState& keyboardState,
-												  const brogueMouseState& mouseState,
-												  int millisecondsLapsed)
+	bool brogueText::needsUpdate() const
 	{
-		brogueUIChildResponse response;
-
-		bool hasInteraction = this->getUIData()->getHasMouseInteraction();
-
-		if (hasInteraction)
-		{
-			bool mouseOver = this->isMouseOver(mouseState);
-
-			// Update the UI data
-			response.actionMet = this->getUIData()->setMouseUpdate(mouseState.getMouseLeft(), mouseOver);
-			response.deactivated = !mouseOver && mouseState.getMouseLeft();
-			response.needsUpdate = hasInteraction && (mouseOver || mouseState.getMouseLeft());
-			response.tag = *this->getUIData()->getAction();
-		}
-
-		return response;
+		// Adding the mouse enter / leave events
+		//
+		return this->getUIData()->needsUpdate() || this->getUIData()->getMouseLeave() || this->getUIData()->getMouseEnter();
 	}
 	void brogueText::update(const brogueKeyboardState& keyboardState,
 							const brogueMouseState& mouseState,
@@ -67,11 +50,8 @@ namespace brogueHd::frontend::ui
 		brogueUIData* data = this->getUIData();
 		brogueText* that = this;
 
-		// Check mouse hover (Render Boundary)
-		bool mouseHover = this->isMouseOver(mouseState);
-
 		// Iterate THIS Boundary:  apply mouse data
-		this->getBoundary().iterate([&that, &data, &bounds, &mouseState, &mouseHover] (short column, short row)
+		this->getBoundary().iterate([&that, &data, &bounds] (short column, short row)
 		{
 			short menuColumn = column - bounds.column;
 			short menuRow = row - bounds.row;

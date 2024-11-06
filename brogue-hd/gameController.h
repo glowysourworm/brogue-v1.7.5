@@ -1,6 +1,7 @@
 #pragma once
 
 #include "brogueGlobal.h"
+#include "eventController.h"
 #include "gameData.h"
 #include "keyProcessor.h"
 #include "playbackProcessor.h"
@@ -80,6 +81,7 @@ namespace brogueHd::backend::controller
 	private:
 
 		renderingController* _renderingController;
+		eventController* _eventController;
 		BrogueGameMode _gameMode;
 
 		randomGenerator* _randomMain;
@@ -101,7 +103,8 @@ namespace brogueHd::backend::controller
 		_playbackProcessor = new playbackProcessor();
 		_randomMain = new randomGenerator(RANDOM_GENERATOR_MAIN);
 		_randomCosmetic = new randomGenerator(RANDOM_GENERATOR_COSMETIC);
-		_renderingController = new renderingController(resourceController, _randomCosmetic);
+		_eventController = new eventController();
+		_renderingController = new renderingController(_eventController, resourceController, _randomCosmetic);
 	}
 
 	gameController::~gameController()
@@ -118,6 +121,7 @@ namespace brogueHd::backend::controller
 		delete _randomCosmetic;
 		delete _playbackProcessor;
 		delete _renderingController;
+		delete _eventController;
 	}
 
 	void gameController::loadKeymap()

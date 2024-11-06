@@ -36,8 +36,14 @@ namespace brogueHd::frontend::ui
 			_hasMouseInteraction = false;
 			_isVisible = false;
 			_tagAction = nullptr;
+			_mouseClickCapture = false;
+			_mouseDownCapture = false;
+			_mouseUpCapture = false;
+			_mouseLastPressed = false;
+			_mouseLastOver = false;
 			_mousePressed = false;
 			_mouseOver = false;
+			_needsUpdate = false;
 		};
 		brogueUIData(const brogueUIData& copy)
 		{
@@ -53,8 +59,14 @@ namespace brogueHd::frontend::ui
 			_hasMouseInteraction = copy.getHasMouseInteraction();
 			_isVisible = copy.getIsVisible();
 			_tagAction = copy.getAction();
+			_mouseClickCapture = copy.getMouseClick();
+			_mouseUpCapture = copy.getMouseUp();
+			_mouseDownCapture = copy.getMouseDown();
+			_mouseLastPressed = copy.getMousePressedLast();
+			_mouseLastOver = copy.getMouseOverLast();
 			_mousePressed = copy.getMousePressed();
 			_mouseOver = copy.getMouseOver();
+			_needsUpdate = copy.needsUpdate();
 		}
 		~brogueUIData()
 		{
@@ -128,8 +140,14 @@ namespace brogueHd::frontend::ui
 
 			// Set during setUIParameters()
 			_tagAction = new brogueUITagAction();
+			_mouseClickCapture = false;
+			_mouseDownCapture = false;
+			_mouseUpCapture = false;
+			_mouseLastPressed = false;
+			_mouseLastOver = false;
 			_mousePressed = false;
 			_mouseOver = false;
+			_needsUpdate = false;
 		}
 
 	public:
@@ -141,8 +159,6 @@ namespace brogueHd::frontend::ui
 							 int actionGLFWHotkey,
 							 const simpleString& actionFileName,
 							 brogueUIAction action,
-							 brogueUIAction deactivateAction,
-							 brogueUIView actionView,
 							 bool hasMouseInteraction,
 							 bool isVisible,
 							 int padding,
@@ -156,23 +172,79 @@ namespace brogueHd::frontend::ui
 
 			_tagAction->glfwHotkey = actionGLFWHotkey;
 			_tagAction->fileName = actionFileName;
-			_tagAction->actionView = actionView;
 			_tagAction->action = action;
-			_tagAction->deactivateAction = deactivateAction;
 		}
 
 		/// <summary>
 		/// Returns true if a mouse click has occurred
 		/// </summary>
-		bool setMouseUpdate(bool pressed, bool isMouseOver)
+		void setUpdate(bool mousePressed, bool mouseOver, bool forceUpdate = false)
 		{
-			bool mouseClick = _mousePressed && !pressed && isMouseOver;
+			// Reset Mouse Capture if mouse-up occurs out-of-bounds
+			if (!mousePressed && !mouseOver)
+			{
+				_mouseDownCapture = false;
+				_mouseUpCapture = false;
+				_mouseClickCapture = false;
+			}
 
-			// Update
-			_mousePressed = pressed && isMouseOver;
-			_mouseOver = isMouseOver;
+			_mouseDownCapture = _mouseDownCapture || (!_mouseLastPressed && mousePressed && mouseOver);
+			_mouseUpCapture = _mouseUpCapture || (_mouseLastPressed && !mousePressed && mouseOver);
+			_mouseClickCapture = _mouseClickCapture || (_mouseDownCapture && _mouseUpCapture);
 
-			return mouseClick;
+			// Last Cycle
+			_mouseLastPressed = _mousePressed;
+			_mouseLastOver = _mouseOver;
+
+			// Current Cycle
+			_mousePressed = mousePressed;
+			_mouseOver = mouseOver;
+
+			// Set Update Flags
+			_needsUpdate = _hasMouseInteraction && ((mouseOver && !_mouseOver) || (mousePressed && !_mousePressed)) || forceUpdate;
+		}
+
+		bool needsUpdate() const
+		{
+			return _needsUpdate;
+		}
+		bool getMouseLeave() const
+		{
+			return _mouseLastOver && !_mouseOver;
+		}
+		bool getMouseEnter() const
+		{
+			return !_mouseLastOver && _mouseOver;
+		}
+		bool getMouseClick() const
+		{
+			return _mouseClickCapture;
+		}
+		bool getMouseUp() const
+		{
+			return _mouseUpCapture;
+		}
+		bool getMouseDown() const
+		{
+			return _mouseDownCapture;
+		}
+		bool getMousePressedLast() const
+		{
+			return _mouseLastPressed;
+		}
+		bool getMouseOverLast() const
+		{
+			return _mouseLastOver;
+		}
+		void clearUpdate()
+		{
+			_needsUpdate = false;
+		}
+		void clearCapture()
+		{
+			_mouseDownCapture = false;
+			_mouseUpCapture = false;
+			_mouseClickCapture = false;
 		}
 
 		gridRect getBounds() const
@@ -199,7 +271,7 @@ namespace brogueHd::frontend::ui
 
 		color calculateGradient(int column, int row)
 		{
-			if (_mousePressed && _hasMouseInteraction)
+			if (_mouseOver && this->getMouseDown() && _hasMouseInteraction)
 				return calculateGradientImpl(column, row, _pressedBackground);
 
 			else if (_mouseOver && _hasMouseInteraction)
@@ -398,7 +470,13 @@ namespace brogueHd::frontend::ui
 
 		// Some real time data
 		brogueUITagAction* _tagAction;
+		bool _mouseClickCapture;
+		bool _mouseDownCapture;
+		bool _mouseUpCapture;
+		bool _mouseLastPressed;
+		bool _mouseLastOver;
 		bool _mousePressed;
 		bool _mouseOver;
+		bool _needsUpdate;
 	};
 }

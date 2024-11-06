@@ -112,6 +112,9 @@
     <Filter Include="Header Files\frontend\opengl\program\openglData">
       <UniqueIdentifier>{109b73d2-3b5c-45cb-a64f-0500f254e6a9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\backend\controller\eventData">
+      <UniqueIdentifier>{1edd2cb2-45a7-49eb-ba2a-0b273cf92c2d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="brogue-hd.cpp">
@@ -641,9 +644,6 @@
     <ClInclude Include="brogueProgramState.h">
       <Filter>Header Files\frontend\opengl\program\programData</Filter>
     </ClInclude>
-    <ClInclude Include="brogueUIChildResponse.h">
-      <Filter>Header Files\frontend\opengl\program\programData</Filter>
-    </ClInclude>
     <ClInclude Include="brogueUIResponseData.h">
       <Filter>Header Files\frontend\opengl\program\programData</Filter>
     </ClInclude>
@@ -664,6 +664,15 @@
     </ClInclude>
     <ClInclude Include="brogueViewBase.h">
       <Filter>Header Files\frontend\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="eventController.h">
+      <Filter>Header Files\backend\controller</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueEvent.h">
+      <Filter>Header Files\backend\controller\eventData</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueUIEvent.h">
+      <Filter>Header Files\backend\controller\eventData</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

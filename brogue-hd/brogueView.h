@@ -3,8 +3,8 @@
 #include "brogueCellDisplay.h"
 #include "brogueKeyboardState.h"
 #include "brogueMouseState.h"
-#include "brogueUIChildResponse.h"
 #include "brogueUIData.h"
+#include "brogueUIEvent.h"
 #include "brogueViewBase.h"
 #include "grid.h"
 #include "gridDefinitions.h"
@@ -12,6 +12,10 @@
 #include "gridRect.h"
 #include "simple.h"
 
+#include "brogueUITagAction.h"
+#include "eventController.h"
+
+using namespace brogueHd::backend::controller;
 using namespace brogueHd::frontend::opengl;
 using namespace brogueHd::component;
 using namespace brogueHd::backend::model;
@@ -23,7 +27,7 @@ namespace brogueHd::frontend::ui
 	{
 	public:
 
-		brogueView(brogueUIData* data, const gridRect& sceneBoundary, const gridRect& viewBoundary);
+		brogueView(eventController* eventController, brogueUIData* data, const gridRect& sceneBoundary, const gridRect& viewBoundary);
 		~brogueView();
 
 		gridRect getSceneBoundary() const override;
@@ -57,26 +61,38 @@ namespace brogueHd::frontend::ui
 			return boundaryUI;
 		}
 
+		virtual void raiseClickEvent(const brogueUITagAction& response) override
+		{
+			_eventController->getUIClickEvent()->publish(response);
+		}
+
 		virtual brogueCellDisplay* get(short column, short row) const override;
 
 		virtual void iterate(gridCallback<brogueCellDisplay*> callback) const override;
 
-		virtual void update(const brogueKeyboardState& keyboardState,
-							const brogueMouseState& mouseState,
-							int millisecondsLapsed) override
+		virtual void checkUpdate(const brogueKeyboardState& keyboardState,
+								 const brogueMouseState& mouseState,
+								 int millisecondsLapsed) override
 		{
+			_uiData->setUpdate(mouseState.getMouseLeft(), this->isMouseOver(mouseState));
 
+			if (_uiData->getMouseClick())
+			{
+				if (_uiData->getHasMouseInteraction())
+				{
+					this->raiseClickEvent(*_uiData->getAction());
+				}
+				_uiData->clearCapture();
+			}
+		}
+		virtual void clearUpdate() override
+		{
+			_uiData->clearUpdate();
 		}
 
-		virtual brogueUIChildResponse checkUpdate(const brogueKeyboardState& keyboardState,
-												  const brogueMouseState& mouseState,
-												  int millisecondsLapsed) override
+		virtual bool needsUpdate() const override
 		{
-			brogueUIChildResponse defaultResponse;
-
-			defaultResponse.needsUpdate = false;
-
-			return defaultResponse;
+			return _uiData->needsUpdate();
 		}
 
 		virtual void incrementRenderOffset(short columnOffset, short rowOffset) override
@@ -111,10 +127,15 @@ namespace brogueHd::frontend::ui
 		grid<brogueCellDisplay*>* _view;
 
 		brogueUIData* _uiData;
+
+	private:
+
+		eventController* _eventController;
 	};
 
-	brogueView::brogueView(brogueUIData* data, const gridRect& sceneBoundary, const gridRect& viewBoundary)
+	brogueView::brogueView(eventController* eventController, brogueUIData* data, const gridRect& sceneBoundary, const gridRect& viewBoundary)
 	{
+		_eventController = eventController;
 		_view = new grid<brogueCellDisplay*>(sceneBoundary, viewBoundary);
 		_uiData = data;
 

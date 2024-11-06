@@ -4,7 +4,6 @@
 #include "brogueFlameMenu.h"
 #include "brogueProgram.h"
 #include "brogueUIConstants.h"
-#include "brogueUIResponseData.h"
 #include "brogueView.h"
 #include "brogueViewProgram.h"
 #include "resourceController.h"
@@ -20,6 +19,7 @@
 #include "gl.h"
 #include "gridRect.h"
 #include "openglHelper.h"
+#include "simple.h"
 #include "simpleException.h"
 #include "simpleGlData.h"
 #include "simpleKeyboardState.h"
@@ -44,10 +44,11 @@ namespace brogueHd::frontend::opengl
 
 		void initialize() override;
 
-		virtual void checkUpdate(brogueUIResponseData& response,
-								 const simpleKeyboardState& keyboardState,
+		virtual void checkUpdate(const simpleKeyboardState& keyboardState,
 								 const simpleMouseState& mouseState,
 								 int millisecondsLapsed) override;
+
+		virtual bool needsUpdate() override;
 
 		virtual void update(const simpleKeyboardState& keyboardState,
 							const simpleMouseState& mouseState,
@@ -271,23 +272,19 @@ namespace brogueHd::frontend::opengl
 		_frameBuffer->unBind();
 	}
 
-	void brogueFlameMenuProgram::checkUpdate(brogueUIResponseData& response,
-											 const simpleKeyboardState& keyboardState,
+	void brogueFlameMenuProgram::checkUpdate(const simpleKeyboardState& keyboardState,
 											 const simpleMouseState& mouseState,
 											 int millisecondsLapsed)
 	{
-		// Mark the reponse
-		response.signature.program = this->getProgramName();
-
 		// Wait until the period has elapsed
 		//
-		bool elapsed = _updateCounter->update(millisecondsLapsed, false);
-
-		// Mark that the view needs to be updated; but leave the counter until the update function - 
-		// which will double check for an update.
-		response.response.needsUpdate = elapsed;
+		_updateCounter->update(millisecondsLapsed, false);
 	}
 
+	bool brogueFlameMenuProgram::needsUpdate()
+	{
+		return _updateCounter->pending();
+	}
 	void brogueFlameMenuProgram::update(const simpleKeyboardState& keyboardState,
 										const simpleMouseState& mouseState,
 										int millisecondsLapsed)
@@ -295,11 +292,12 @@ namespace brogueHd::frontend::opengl
 		// Take frame buffer offline
 		_frameBuffer->unBind();
 
-		// Check programs
-		_heatSourceProgram->update(keyboardState, mouseState, millisecondsLapsed);
-
-		// Reset the counter
-		_updateCounter->reset();
+		// Check -> Reset
+		if (_updateCounter->pending())
+		{
+			_heatSourceProgram->update(keyboardState, mouseState, millisecondsLapsed);
+			_updateCounter->reset();
+		}
 	}
 
 	bool brogueFlameMenuProgram::hasErrors() const

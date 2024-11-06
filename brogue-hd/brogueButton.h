@@ -2,12 +2,11 @@
 
 #include "brogueKeyboardState.h"
 #include "brogueMouseState.h"
-#include "brogueUIChildResponse.h"
 #include "brogueUIConstants.h"
 #include "brogueUIData.h"
-#include "brogueUIResponseData.h"
 #include "brogueView.h"
 #include "color.h"
+#include "eventController.h"
 #include "gridRect.h"
 #include "simple.h"
 
@@ -20,20 +19,18 @@ namespace brogueHd::frontend::ui
 	{
 	public:
 
-		brogueButton(brogueUIView viewName, brogueUIData* data, const gridRect& sceneBoundary, const gridRect& viewBoundary);
+		brogueButton(eventController* eventController, brogueUIView viewName, brogueUIData* data, const gridRect& sceneBoundary, const gridRect& viewBoundary);
 		~brogueButton();
 
 		virtual void update(const brogueKeyboardState& keyboardState,
 							const brogueMouseState& mouseState,
 							int millisecondsLapsed) override;
 
-		virtual brogueUIChildResponse checkUpdate(const brogueKeyboardState& keyboardState,
-												  const brogueMouseState& mouseState,
-												  int millisecondsLapsed) override;
+		virtual bool needsUpdate() const override;
 	};
 
-	brogueButton::brogueButton(brogueUIView viewName, brogueUIData* data, const gridRect& sceneBoundary, const gridRect& viewBoundary)
-		: brogueView(data, sceneBoundary, viewBoundary)
+	brogueButton::brogueButton(eventController* eventController, brogueUIView viewName, brogueUIData* data, const gridRect& sceneBoundary, const gridRect& viewBoundary)
+		: brogueView(eventController, data, sceneBoundary, viewBoundary)
 	{
 		// Initialize the view
 		//
@@ -42,35 +39,16 @@ namespace brogueHd::frontend::ui
 	brogueButton::~brogueButton()
 	{
 	}
-	brogueUIChildResponse brogueButton::checkUpdate(const brogueKeyboardState& keyboardState,
-												   const brogueMouseState& mouseState,
-												   int millisecondsLapsed)
+	bool brogueButton::needsUpdate() const
 	{
-		brogueUIChildResponse response;
-
-		bool hasInteraction = this->getUIData()->getHasMouseInteraction();
-
-		if (hasInteraction)
-		{
-			bool mouseOver = this->isMouseOver(mouseState);
-
-			// Update the UI data
-			response.actionMet = this->getUIData()->setMouseUpdate(mouseState.getMouseLeft(), mouseOver);
-			response.deactivated = !mouseOver && mouseState.getMouseLeft();
-			response.needsUpdate = hasInteraction && (mouseOver || mouseState.getMouseLeft());
-			response.tag = *this->getUIData()->getAction();
-		}
-
-		return response;
+		// Adding the mouse enter / leave events
+		//
+		return this->getUIData()->needsUpdate() || this->getUIData()->getMouseLeave() || this->getUIData()->getMouseEnter();
 	}
 	void brogueButton::update(const brogueKeyboardState& keyboardState,
 							  const brogueMouseState& mouseState,
 							  int millisecondsLapsed)
 	{
-		// Check mouse hover
-		bool mouseHover = this->isMouseOver(mouseState);
-		bool mousePressed = mouseHover && mouseState.getMouseLeft();
-
 		gridRect bounds = this->getBoundary();
 		brogueUIData* data = this->getUIData();
 		brogueButton* that = this;
