@@ -60,6 +60,14 @@ namespace brogueHd::frontend::opengl
 		}
 
 		/// <summary>
+		/// Clears mouse event data from the UI tree
+		/// </summary>
+		virtual void clearEvents()
+		{
+
+		}
+
+		/// <summary>
 		/// Following a similar pipeline to the brogueView, update checks program parameters needed
 		/// to update the view - also calling the view's update method. (creating the pipeline)
 		/// </summary>

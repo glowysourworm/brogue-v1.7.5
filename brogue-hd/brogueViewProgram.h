@@ -74,6 +74,7 @@ namespace brogueHd::frontend::opengl
 
 		virtual bool needsUpdate() override;
 		virtual void clearUpdate() override;
+		virtual void clearEvents() override;
 
 		virtual void update(const simpleKeyboardState& keyboardState,
 							const simpleMouseState& mouseState,
@@ -153,6 +154,10 @@ namespace brogueHd::frontend::opengl
 	void brogueViewProgram::clearUpdate()
 	{
 		_view->clearUpdate();
+	}
+	void brogueViewProgram::clearEvents()
+	{
+		_view->clearEvents();
 	}
 	void brogueViewProgram::update(const simpleKeyboardState& keyboardState,
 								   const simpleMouseState& mouseState,

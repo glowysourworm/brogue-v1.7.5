@@ -21,6 +21,7 @@
 #include "simpleExt.h"
 #include "eventController.h"
 #include "brogueUITagAction.h"
+#include "simplePeriodCounter.h"
 
 using namespace brogueHd::simple;
 using namespace brogueHd::component;
@@ -100,7 +101,6 @@ namespace brogueHd::frontend::opengl
 	public:
 
 		void thread_brogueUIClickEvent(const brogueUITagAction& response);
-		void thread_brogueUIDeactivateEvent(const brogueUITagAction& response);
 
 	private:
 
@@ -114,6 +114,7 @@ namespace brogueHd::frontend::opengl
 		int _deactivateToken;
 
 		brogueProgramContainer* _program;
+		simplePeriodCounter* _uiEventDebouncer;
 
 		bool _initializedGL;
 
@@ -129,6 +130,7 @@ namespace brogueHd::frontend::opengl
 		_thread = nullptr;
 		_threadLock = new std::mutex();
 		_eventController = eventController;
+		_uiEventDebouncer = new simplePeriodCounter(2);
 
 		_clickToken = eventController->getUIClickEvent()->subscribe(std::bind(&openglRenderer::thread_brogueUIClickEvent, this, std::placeholders::_1));
 	}
@@ -157,6 +159,8 @@ namespace brogueHd::frontend::opengl
 
 		if (_deactivateToken > 0)
 			_eventController->getUIDeactivatedEvent()->unSubscribe(_deactivateToken);
+
+		delete _uiEventDebouncer;
 	}
 
 #pragma region GLFW Callbacks
@@ -322,45 +326,28 @@ namespace brogueHd::frontend::opengl
 		_initializedGL = false;
 	}
 
-	void openglRenderer::thread_brogueUIDeactivateEvent(const brogueUITagAction& tagAction)
-	{
-		// Thread Mutex Lock (Still Active)
-
-		switch (tagAction.action)
-		{
-			case brogueUIAction::Close:
-				_program->deactivateCurrentUIProgram();
-				break;
-
-			case brogueUIAction::ViewMainMenu:
-				_program->deactivateCurrentUIProgram();
-				_program->activateUIProgram(brogueUIProgram::MainMenuProgram);
-				break;
-
-				// CRITICAL! Leave the 'None' action for views to report "Nothing to do"
-			case brogueUIAction::None:
-				break;
-
-			default:
-				throw simpleException("Unhandled brogueUIAction (deactivate):  openglRenderer.h");
-		}
-
-		//if (response.tag.deactivateAction != brogueUIAction::None)
-		//{
-		//	//programChange = true;
-		//	//programChangeCounter = 0;
-		//	//programChangeThisIteration = true;
-		//}
-	}
-
 	void openglRenderer::thread_brogueUIClickEvent(const brogueUITagAction& tagAction)
 	{
 		// Thread Mutex Lock (Still Active)
 
+		if (!_uiEventDebouncer->update(1, false))
+			return;
+
+		brogueUIProgram activeProgram = _program->getActiveUIProgramName();
+
 		switch (tagAction.action)
 		{
-			case brogueUIAction::Close:
-				_program->deactivateCurrentUIProgram();
+			// Click registered by a background program (typically)
+			case brogueUIAction::None:
+			{
+				if (activeProgram != brogueUIProgram::MainMenuProgram)
+				{
+					_program->deactivateUIProgram(activeProgram);
+					_program->activateUIProgram(brogueUIProgram::MainMenuProgram);
+					_program->clearEvents();
+					//_uiEventDebouncer->reset();
+				}
+			}
 				break;
 
 			case brogueUIAction::NewGame:
@@ -377,36 +364,53 @@ namespace brogueHd::frontend::opengl
 
 			case brogueUIAction::ViewMainMenu:
 			{
-				_program->deactivateCurrentUIProgram();
-				_program->activateUIProgram(brogueUIProgram::MainMenuProgram);
+				if (activeProgram != brogueUIProgram::MainMenuProgram)
+				{
+					_program->deactivateUIProgram(activeProgram);
+					_program->activateUIProgram(brogueUIProgram::MainMenuProgram);
+					_program->clearEvents();
+					_uiEventDebouncer->reset();
+				}
 			}
 			break;
 
 			case brogueUIAction::ViewHighScores:
 			{
-				_program->deactivateCurrentUIProgram();
-				_program->activateUIProgram(brogueUIProgram::HighScoresProgram);
+				if (activeProgram != brogueUIProgram::HighScoresProgram)
+				{
+					_program->deactivateUIProgram(activeProgram);
+					_program->activateUIProgram(brogueUIProgram::HighScoresProgram);
+					_program->clearEvents();
+					_uiEventDebouncer->reset();
+				}
 			}
 			break;
 
 			case brogueUIAction::ViewOpenGameMenu:
 			{
-				_program->deactivateCurrentUIProgram();
-				_program->activateUIProgram(brogueUIProgram::OpenMenuProgram);
+				if (activeProgram != brogueUIProgram::OpenMenuProgram)
+				{
+					_program->deactivateUIProgram(activeProgram);
+					_program->activateUIProgram(brogueUIProgram::OpenMenuProgram);
+					_program->clearEvents();
+					_uiEventDebouncer->reset();
+				}
 			}
 			break;
 
 			case brogueUIAction::ViewPlaybackMenu:
 			{
-				_program->deactivateCurrentUIProgram();
-				_program->activateUIProgram(brogueUIProgram::PlaybackMenuProgram);
+				if (activeProgram != brogueUIProgram::PlaybackMenuProgram)
+				{
+					_program->deactivateUIProgram(activeProgram);
+					_program->activateUIProgram(brogueUIProgram::PlaybackMenuProgram);
+					_program->clearEvents();
+					_uiEventDebouncer->reset();
+				}
 			}
 			break;
 			default:
 				break;
-
-				//default:
-				//	throw simpleException("Unhandled brogueUIAction:  openglRenderer.h");
 		}
 
 		//if (response.tag.deactivateAction != brogueUIAction::None)

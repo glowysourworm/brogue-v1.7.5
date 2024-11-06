@@ -245,6 +245,11 @@ namespace brogueHd::frontend::ui
 			_mouseDownCapture = false;
 			_mouseUpCapture = false;
 			_mouseClickCapture = false;
+
+			_mouseOver = false;
+			_mousePressed = false;
+			_mouseLastPressed = false;
+			_mouseLastOver = false;
 		}
 
 		gridRect getBounds() const

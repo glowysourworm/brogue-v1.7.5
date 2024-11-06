@@ -76,18 +76,19 @@ namespace brogueHd::frontend::ui
 		{
 			_uiData->setUpdate(mouseState.getMouseLeft(), this->isMouseOver(mouseState));
 
-			if (_uiData->getMouseClick())
+			if (_uiData->getMouseClick() && _uiData->getHasMouseInteraction())
 			{
-				if (_uiData->getHasMouseInteraction())
-				{
-					this->raiseClickEvent(*_uiData->getAction());
-				}
+				this->raiseClickEvent(*_uiData->getAction());
 				_uiData->clearCapture();
 			}
 		}
 		virtual void clearUpdate() override
 		{
 			_uiData->clearUpdate();
+		}
+		virtual void clearEvents() override
+		{
+			_uiData->clearCapture();
 		}
 
 		virtual bool needsUpdate() const override

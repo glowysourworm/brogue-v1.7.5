@@ -27,7 +27,7 @@ namespace brogueHd::frontend::opengl
 
 		void activateUIProgram(brogueUIProgram programName);
 		void deactivateUIProgram(brogueUIProgram programName);
-		void deactivateCurrentUIProgram();
+		brogueUIProgram getActiveUIProgramName();
 
 		void initialize();
 		void run(int millisecondsLapsed);
@@ -42,6 +42,7 @@ namespace brogueHd::frontend::opengl
 								 const simpleMouseState& mouseState,
 								 int millisecondsLapsed);
 		virtual void clearUpdate();
+		virtual void clearEvents();
 		virtual bool needsUpdate();
 
 		/// <summary>
@@ -113,18 +114,12 @@ namespace brogueHd::frontend::opengl
 	{
 		_uiPrograms->get(programName)->setIsActive(false);
 	}
-	void brogueProgramContainer::deactivateCurrentUIProgram()
+	brogueUIProgram brogueProgramContainer::getActiveUIProgramName()
 	{
-		brogueUIProgram activeProgram = _uiPrograms->firstOrDefaultKey([] (brogueUIProgram uiProgram, brogueProgram* program)
+		return _uiPrograms->firstOrDefaultKey([] (brogueUIProgram uiProgram, brogueProgram* program)
 		{
 			return program->getIsActive();
 		});
-
-		if (activeProgram != brogueUIProgram::ContainerControlledProgram)
-			deactivateUIProgram(activeProgram);
-
-		else
-			throw simpleException("Unhandled program type, or program not found:  brogueProgramContainer::deactivateCurrentUIProgram");
 	}
 	void brogueProgramContainer::initialize()
 	{
@@ -181,9 +176,6 @@ namespace brogueHd::frontend::opengl
 											 const simpleMouseState& mouseState,
 											 int millisecondsLapsed)
 	{
-		// Pass the response down the pipeline -> background program
-		_backgroundProgram->checkUpdate(keyboardState, mouseState, millisecondsLapsed);
-
 		// Iterate UI Programs
 		_uiPrograms->iterate([&keyboardState, &mouseState, &millisecondsLapsed] (brogueUIProgram programName, brogueProgram* program)
 		{
@@ -194,20 +186,35 @@ namespace brogueHd::frontend::opengl
 
 			return iterationCallback::iterate;
 		});
+
+		// Pass the response down the pipeline -> background program
+		_backgroundProgram->checkUpdate(keyboardState, mouseState, millisecondsLapsed);
 	}
 	void brogueProgramContainer::clearUpdate()
 	{
-		// Pass the response down the pipeline -> background program
-		_backgroundProgram->clearUpdate();
-
 		// Iterate UI Programs
 		_uiPrograms->iterate([] (brogueUIProgram programName, brogueProgram* program)
 		{
-			// Go ahead and clear non-active view's events
+			// Go ahead and clear non-active view's data
 			program->clearUpdate();
 
 			return iterationCallback::iterate;
 		});
+
+		_backgroundProgram->clearUpdate();
+	}
+	void brogueProgramContainer::clearEvents()
+	{
+		// Iterate UI Programs
+		_uiPrograms->iterate([] (brogueUIProgram programName, brogueProgram* program)
+		{
+			// Go ahead and clear non-active view's data
+			program->clearEvents();
+
+			return iterationCallback::iterate;
+		});
+
+		_backgroundProgram->clearEvents();
 	}
 	bool brogueProgramContainer::needsUpdate()
 	{
@@ -235,7 +242,7 @@ namespace brogueHd::frontend::opengl
 										int millisecondsLapsed)
 	{
 		//if (_backgroundProgram->needsUpdate())
-			_backgroundProgram->update(keyboardState, mouseState, millisecondsLapsed);
+		_backgroundProgram->update(keyboardState, mouseState, millisecondsLapsed);
 
 		_uiPrograms->iterate([&keyboardState, &mouseState, &millisecondsLapsed] (brogueUIProgram programName, brogueProgram* program)
 		{

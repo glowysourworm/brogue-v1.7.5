@@ -132,12 +132,17 @@ namespace brogueHd::frontend::ui
 									 int fadePeriodMilliseconds,
 									 int zoomLevel)
 
-		: brogueView(eventController, new brogueUIData(gridRect(0, 0, COLS, ROWS), zoomLevel), gridRect(0, 0, COLS, ROWS), gridRect(0, 0, COLS, ROWS))
+		: brogueView(eventController, 
+					 new brogueUIData(gridRect(0, 0, COLS, ROWS), zoomLevel), 
+					 gridRect(0, 0, COLS, ROWS), 
+					 gridRect(0, 0, COLS, ROWS))
 	{
 		_randomGenerator = randomGenerator;
 		_fadePeriodMilliconds = fadePeriodMilliseconds;
 		_periodCounter = 0;
 		_heatSourceGrid = new grid<color>(this->getSceneBoundary(), this->getSceneBoundary());
+
+		this->getUIData()->setUIParameters(-1, -1, "", brogueUIAction::None, true, true, 0, zoomLevel);
 
 		cycleHeatSources();
 		nextHeatValues();

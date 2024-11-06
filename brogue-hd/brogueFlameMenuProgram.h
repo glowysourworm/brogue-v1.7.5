@@ -19,7 +19,6 @@
 #include "gl.h"
 #include "gridRect.h"
 #include "openglHelper.h"
-#include "simple.h"
 #include "simpleException.h"
 #include "simpleGlData.h"
 #include "simpleKeyboardState.h"
@@ -276,6 +275,10 @@ namespace brogueHd::frontend::opengl
 											 const simpleMouseState& mouseState,
 											 int millisecondsLapsed)
 	{
+		// Setup UI state -> handle mouse interaction
+		//
+		_frameProgram->checkUpdate(keyboardState, mouseState, millisecondsLapsed);
+
 		// Wait until the period has elapsed
 		//
 		_updateCounter->update(millisecondsLapsed, false);

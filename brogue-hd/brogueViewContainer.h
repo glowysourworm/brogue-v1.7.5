@@ -43,6 +43,7 @@ namespace brogueHd::frontend::ui
 
 		virtual bool needsUpdate() const override;
 		virtual void clearUpdate() override;
+		virtual void clearEvents() override;
 
 		virtual brogueCellDisplay* get(short column, short row) const override;
 
@@ -229,5 +230,16 @@ namespace brogueHd::frontend::ui
 		});
 
 		_parentView->clearUpdate();
+	}
+	void brogueViewContainer::clearEvents()
+	{
+		_childViews->forEach([] (brogueView* view)
+		{
+			view->clearEvents();
+
+			return iterationCallback::iterate;
+		});
+
+		_parentView->clearEvents();
 	}
 }

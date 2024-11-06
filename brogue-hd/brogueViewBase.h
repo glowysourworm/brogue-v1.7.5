@@ -97,9 +97,17 @@ namespace brogueHd::frontend::ui
 		}
 
 		/// <summary>
-		/// Clears mouse interaction events from the UI tree
+		/// Clears update flags from the UI tree
 		/// </summary>
 		virtual void clearUpdate()
+		{
+			throw simpleException("brogueViewBase function not overriden:  brogueViewBase::clearUpdate");
+		}
+
+		/// <summary>
+		/// Clears mouse interaction events from the UI tree
+		/// </summary>
+		virtual void clearEvents()
 		{
 			throw simpleException("brogueViewBase function not overriden:  brogueViewBase::clearUpdate");
 		}
