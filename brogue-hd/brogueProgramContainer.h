@@ -1,4 +1,6 @@
 #pragma once
+#include "brogueKeyboardState.h"
+#include "brogueMouseState.h"
 #include "brogueProgram.h"
 #include "brogueUIConstants.h"
 #include "gridRect.h"
@@ -24,15 +26,21 @@ namespace brogueHd::frontend::opengl
 		brogueProgram* getUIProgram(brogueUIProgram programName);
 		brogueProgram* getUIProgramAt(int index);
 		int getUIProgramCount();
+		void clearUIPrograms();
+
+		brogueKeyboardState getKeyboardState(const simpleKeyboardState& mouse) const;
+		brogueMouseState getMouseState(const simpleMouseState& mouse) const;
 
 		void activateUIProgram(brogueUIProgram programName);
 		void deactivateUIProgram(brogueUIProgram programName);
 		brogueUIProgram getActiveUIProgramName();
 
 		void initialize();
+		void teardown();
 		void run(int millisecondsLapsed);
 		void showErrors();
 		bool hasErrors();
+		bool isInitialized();
 
 		/// <summary>
 		/// Following a similar pipeline to the brogueView, checkUpdate checks program parameters needed
@@ -63,6 +71,7 @@ namespace brogueHd::frontend::opengl
 		brogueUIContainer _containerName;
 		brogueProgram* _backgroundProgram;
 		simpleHash<brogueUIProgram, brogueProgram*>* _uiPrograms;
+		bool _initialized;
 	};
 
 	brogueProgramContainer::brogueProgramContainer(brogueUIContainer containerName)
@@ -70,11 +79,19 @@ namespace brogueHd::frontend::opengl
 		_backgroundProgram = nullptr;
 		_uiPrograms = new simpleHash<brogueUIProgram, brogueProgram*>();
 		_containerName = containerName;
+		_initialized = false;
 	}
 
 	brogueProgramContainer::~brogueProgramContainer()
 	{
 		delete _uiPrograms;
+
+		_initialized = false;
+	}
+
+	bool brogueProgramContainer::isInitialized()
+	{
+		return _initialized;
 	}
 
 	void brogueProgramContainer::setBackground(brogueProgram* backgroundProgram)
@@ -91,7 +108,14 @@ namespace brogueHd::frontend::opengl
 	{
 		return _backgroundProgram;
 	}
-
+	brogueKeyboardState brogueProgramContainer::getKeyboardState(const simpleKeyboardState& keyboard) const
+	{
+		return _backgroundProgram->calculateKeyboardState(keyboard);
+	}
+	brogueMouseState brogueProgramContainer::getMouseState(const simpleMouseState& mouse) const
+	{
+		return _backgroundProgram->calculateMouseState(mouse);
+	}
 	brogueProgram* brogueProgramContainer::getUIProgram(brogueUIProgram programName)
 	{
 		return _uiPrograms->get(programName);
@@ -105,6 +129,10 @@ namespace brogueHd::frontend::opengl
 	int brogueProgramContainer::getUIProgramCount()
 	{
 		return _uiPrograms->count();
+	}
+	void brogueProgramContainer::clearUIPrograms()
+	{
+		_uiPrograms->clear();
 	}
 	void brogueProgramContainer::activateUIProgram(brogueUIProgram programName)
 	{
@@ -131,10 +159,27 @@ namespace brogueHd::frontend::opengl
 
 			return iterationCallback::iterate;
 		});
-	}
 
+		_initialized = true;
+	}
+	void brogueProgramContainer::teardown()
+	{
+		_backgroundProgram->teardown();
+
+		_uiPrograms->iterate([] (brogueUIProgram programName, brogueProgram* program)
+		{
+			program->teardown();
+
+			return iterationCallback::iterate;
+		});
+
+		_initialized = false;
+	}
 	void brogueProgramContainer::run(int millisecondsLapsed)
 	{
+		if (!_initialized)
+			throw simpleException("Trying to run brogue program container without initializing the programs:  brogueProgramContainer::run");
+
 		_backgroundProgram->run(millisecondsLapsed);
 
 		_uiPrograms->iterate([&millisecondsLapsed] (brogueUIProgram programName, brogueProgram* program)

@@ -8,6 +8,7 @@
 #include "simpleException.h"
 #include "simpleGlData.h"
 #include "simpleGlObject.h"
+#include "simpleLogger.h"
 #include "simpleString.h"
 #include "simpleUniform.h"
 #include <concepts>
@@ -262,7 +263,10 @@ namespace brogueHd::frontend::opengl
 	void simpleShader::teardown()
 	{
 		if (!this->isCreated())
-			simpleException::show("simpleShader already deleted from the backend");
+		{
+			simpleLogger::logColor(brogueConsoleColor::Yellow, "simpleShader already deleted from the backend");
+			return;
+		}
 
 		// Deletes the shader object from the GL backend
 		glDeleteShader(this->handle);

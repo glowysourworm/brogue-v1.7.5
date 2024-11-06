@@ -2,12 +2,17 @@
 
 #include "brogueConsole.h"
 #include "brogueGlobal.h"
+#include "brogueKeyboardState.h"
+#include "brogueMouseState.h"
 #include "gameController.h"
 #include "resourceController.h"
+#include "simpleException.h"
 #include "simpleString.h"
+#include <chrono>
 #include <exception>
 #include <iosfwd>
 #include <iostream>
+#include <thread>
 
 using namespace brogueHd::simple;
 using namespace brogueHd::backend::controller;
@@ -89,195 +94,37 @@ namespace brogueHd::console
 		if (!input.tryToInt(choice))
 			return brogueConsoleReturn::CompletedWithError;
 
-		//switch (choice)
-		//{
-		//case 1:
-		//{
-		//	stream << "New Game..." << std::endl;
-		//	return brogueConsoleReturn::Completed;
-		//}
-		//break;
-		//case 2:
-		//{
-		//	stream << "Open Game..." << std::endl;
-		//	return brogueConsoleReturn::Completed;
-		//}
-		//break;
-		//case 3:
-		//{
-		//	stream << "High Scores..." << std::endl;
-		//	return brogueConsoleReturn::Completed;
-		//}
-		//break;
-		//case 4:
-		//{
-		//	stream << "Run Playback..." << std::endl;
-		//	return brogueConsoleReturn::Completed;
-		//}
-		//break;
-		//case 5:
-		//{
-		//	stream << "Help (about options)..." << std::endl;
-		//	return brogueConsoleReturn::Completed;
-		//}
-		//break;
-		//default:
-		//	return brogueConsoleReturn::Completed;
-		//}
+		int intervalMilliseconds = 30;
+		bool run = true;
 
-		//std::string* cmd = NULL;
-
-		//std::string gamePath = "";
-		//std::string viewPath = "";
-		//unsigned long gameSeed = 0;
-
-		//bool noMenu = false;
-		//bool serverMode = false;
-
-		//brogueEvent theEvent;
-		//char path[4096], buf[100], seedDefault[100];
-		//char maxSeed[40];
-
-		//// Initialize Game Controller (some arguments are sent to controller)
-		////
-		//_gameController->loadKeymap();
-
-		//// Dump Scores
-		//if (hasArgument(cmd, "--scores"))
-		//{
-		//	printScores(stream);
-		//	return brogueConsoleReturn::Completed;
-		//}
-
-		//// Version
-		//if (hasArgument(cmd, "--version") || hasArgument(cmd, "-V"))
-		//{
-		//	stream << this->BrogueVersion << std::endl;
-		//	return brogueConsoleReturn::Completed;
-		//}
-
-		//// Help
-		//if (hasArgument(cmd, "--help") || hasArgument(cmd, "-h") || hasArgument(cmd, "-?"))
-		//{
-		//	printHelp(stream);
-		//	return brogueConsoleReturn::Completed;
-		//}
-
-		//// New Game
-		//if (hasArgument(cmd, "-n"))
-		//{
-		//	_gameController->initNewGame(0);
-		//	_gameController->setMode(BrogueGameMode::Game);
-		//}
-
-		//// New Game w/ Seed
-		//if (hasArgument(cmd, "--seed") || hasArgument(cmd, "-s"))
-		//{
-		//	unsigned long seed = getArgumentInt(cmd, "--seed");
-
-		//	_gameController->initNewGame(seed);
-		//	_gameController->setMode(BrogueGameMode::Game);
-		//}
-
-		//// No Menu
-		//if (hasArgument(cmd, "--no-menu") || hasArgument(cmd, "-M"))
-		//{
-		//	noMenu = true;
-
-		//	// TODO:
-		//	return brogueConsoleReturn::CompletedWithError;
-		//}
-
-		//// Not Eye Hack
-		//if (hasArgument(cmd, "--noteye-hack"))
-		//{
-		//	serverMode = true;
-
-		//	// TODO:
-		//	return brogueConsoleReturn::CompletedWithError;
-		//}
-
-		//// Open
-		//if (hasArgument(cmd, "--open") || hasArgument(cmd, "-o"))
-		//{
-		//	gamePath = getArgument(cmd, "--open");
-
-		//	if (gamePath == "")
-		//		gamePath = getArgument(cmd, "-o");
-		//	
-		//	gameData* data = _resourceController->loadGame(gamePath.c_str());
-
-		//	_gameController->initGame(data);
-		//	_gameController->setMode(BrogueGameMode::Game);
-		//}
-
-		//// View
-		//if (hasArgument(cmd, "--view") || hasArgument(cmd, "-v"))
-		//{
-		//	viewPath = getArgument(cmd, "--view");
-
-		//	if (viewPath == "")
-		//		viewPath = getArgument(cmd, "-v");
-
-		//	_gameController->initPlayback(viewPath.c_str());
-		//	_gameController->setMode(BrogueGameMode::Playback);
-		//}
-
-		bool result = true;
-
-		// Prepare Game Window
-		_gameController->initNewGame(1234);
+		// Initialize:  Primary call to init OpenGL Rendering
+		//
 		_gameController->setMode(BrogueGameMode::Title);
 
-		// MAIN LOOP:  Leave 1ms thread sleep -> Grab key input -> send to game controller.
+		// Operates the current game mode loop to completion
 		//
-		do
+		while (run)
 		{
 			try
 			{
-				unsigned char key;
+				// Run the game, in its current mode, for one cycle (rendering thread separate)
+				//
+				run = _gameController->run();
 
-				if (std::cin >> key)
-				{
-					// Exit Game Loop
-					if (key == 27)
-						result = false;
-
-					else
-					{
-						// Operates the current game mode loop to completion
-						//
-						result = _gameController->run();
-
-						// Switch to next game mode
-						//
-						switch (_gameController->getMode())
-						{
-							case BrogueGameMode::Game:
-							case BrogueGameMode::Playback:
-							case BrogueGameMode::Title:
-							default:
-
-								// Currently nothing to do until there is more feedback from
-								// game components. This will be apparent when completed.
-
-								break;
-						}
-					}
-				}
+				// Allow a short thread sleep for the rendering thread
+				//
+				std::this_thread::sleep_for(std::chrono::milliseconds(intervalMilliseconds));
 			}
 			catch (std::exception& ex)
 			{
 				// Primary Exception Handler. Should show a popup if there is an error.
 				//
-				//simpleException::show(std::string(std::string("Brogue Error:  ") + ex.what()).c_str());
+				throw simpleException("Brogue Program Error ~ Please see error log for details");
 			}
-		} while (result == true);
+
+		}
 
 		_gameController->closeGame();
-
-		// MEMORY! 
-		delete _gameController;
 
 		return brogueConsoleReturn::Completed;
 	}

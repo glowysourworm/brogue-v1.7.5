@@ -10,6 +10,7 @@
 #include "gl.h"
 #include "openglHelper.h"
 #include "simpleDataStream.h"
+#include "simpleLogger.h"
 #include "simpleUniform.h"
 
 using namespace brogueHd::simple;
@@ -26,7 +27,7 @@ namespace brogueHd::frontend::opengl
 		void compile();
 		void draw();
 		void bind() override;
-		void deleteProgram();
+		void teardown() override;
 
 		bool isCreated() const override
 		{
@@ -63,8 +64,6 @@ namespace brogueHd::frontend::opengl
 
 	private:
 
-		bool _isCompiled;
-
 		simpleVertexArray<float>* _programVAO;
 
 		simpleShader _vertexShader;
@@ -76,7 +75,6 @@ namespace brogueHd::frontend::opengl
 		_programVAO = programVAO;
 		_vertexShader = vertexShader;
 		_fragmentShader = fragmentShader;
-		_isCompiled = false;
 	}
 	simpleShaderProgram::~simpleShaderProgram()
 	{
@@ -85,8 +83,8 @@ namespace brogueHd::frontend::opengl
 
 	void simpleShaderProgram::compile()
 	{
-		if (_isCompiled)
-			simpleException::showCstr("Already called simpleShaderProgram::compile");
+		if (this->isCreated())
+			throw simpleException("Already called simpleShaderProgram::compile");
 
 		// Procedure
 		//
@@ -124,17 +122,15 @@ namespace brogueHd::frontend::opengl
 		openglHelper::outputShaderInfoLog(_fragmentShader.getHandle());
 		openglHelper::outputProgramInfoLog(this->handle);
 		openglHelper::outputProgramParameters(this->handle);
-
-		_isCompiled = true;
 	}
 
 	void simpleShaderProgram::draw()
 	{
-		if (!_isCompiled)
-			simpleException::showCstr("Must first call IGLProgram.Compile() before using the GL program");
+		if (!this->isCreated())
+			throw simpleException("Must first call compile() to run shader program:  simpleShaderProgram.h");
 
 		if (!this->isBound())
-			simpleException::showCstr("Must first call bind to set the program active");
+			throw simpleException("Must first call bind to set the program active");
 
 		_programVAO->bind();
 		_programVAO->draw();
@@ -142,11 +138,11 @@ namespace brogueHd::frontend::opengl
 
 	void simpleShaderProgram::reBuffer(simpleDataStream* newBuffer)
 	{
-		if (!_isCompiled)
-			simpleException::show("Must first call compile before using the GL program");
+		if (!this->isCreated())
+			throw simpleException("Must first call compile() to run shader program:  simpleShaderProgram.h");
 
 		if (!this->isBound())
-			simpleException::show("Must first call Bind(true) to rebuffer data!");
+			throw simpleException("Must first call bind to set the program active");
 
 		_programVAO->bind();
 		_programVAO->reBuffer(this->handle, newBuffer);
@@ -154,14 +150,20 @@ namespace brogueHd::frontend::opengl
 
 	void simpleShaderProgram::bind()
 	{
-		if (!_isCompiled)
-			simpleException::show("Must first call compile before using the GL program");
+		if (!this->isCreated())
+			throw simpleException("Must first call compile() to run shader program:  simpleShaderProgram.h");
 
 		glUseProgram(this->handle);
 	}
 
 	void simpleShaderProgram::bindUniforms()
 	{
+		if (!this->isCreated())
+			throw simpleException("Must first call compile() to run shader program:  simpleShaderProgram.h");
+
+		if (!this->isBound())
+			throw simpleException("Must first call bind to set the program active");
+
 		// Uniform data is stored in each shader
 		//
 
@@ -283,10 +285,14 @@ namespace brogueHd::frontend::opengl
 		glUniform4f(location, uniformValue.x, uniformValue.y, uniformValue.z, uniformValue.w);
 	}
 
-	void simpleShaderProgram::deleteProgram()
+	void simpleShaderProgram::teardown()
 	{
-		if (!_isCompiled)
-			simpleException::show("Must first call compile before using the GL program");
+		if (!this->isCreated())
+		{
+			simpleLogger::logColor(brogueConsoleColor::Yellow, "simpleShaderProgram showing deleted by the backend - not the user code");
+			simpleLogger::logColor(brogueConsoleColor::Yellow, "simpleShaderProgram-> continuing on to try and delete its resources");
+		}
+			
 
 		// Procedure
 		//
@@ -312,7 +318,5 @@ namespace brogueHd::frontend::opengl
 
 		// Delete this prgram from the backend
 		glDeleteProgram(this->handle);
-
-		_isCompiled = false;
 	}
 }

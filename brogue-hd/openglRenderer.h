@@ -22,6 +22,10 @@
 #include "eventController.h"
 #include "brogueUITagAction.h"
 #include "simplePeriodCounter.h"
+#include "brogueGlobal.h"
+#include "brogueMouseState.h"
+#include "brogueKeyboardState.h"
+#include "simple.h"
 
 using namespace brogueHd::simple;
 using namespace brogueHd::component;
@@ -41,6 +45,7 @@ namespace brogueHd::frontend::opengl
 	class openglRenderer
 	{
 	public:
+		
 		openglRenderer(eventController* eventController);
 		~openglRenderer();
 
@@ -54,7 +59,7 @@ namespace brogueHd::frontend::opengl
 		/// <summary>
 		/// Sets the program pointer for use
 		/// </summary>
-		void setProgram(brogueProgramContainer* program);
+		void setProgram(brogueProgramContainer* program, BrogueGameMode gameMode);
 
 		/// <summary>
 		/// Starts program rendering thread, and opens window using GLFW
@@ -67,10 +72,16 @@ namespace brogueHd::frontend::opengl
 		/// </summary>
 		void terminateProgram();
 
-		bool isInitializedGL() const
-		{
-			return _initializedGL;
-		}
+		/// <summary>
+		/// Returns true if the GL backend has been initialized
+		/// </summary>
+		/// <returns></returns>
+		bool isInitializedGL() const;
+
+		// Shared resources
+		BrogueGameMode getRequestedMode() const;
+		brogueKeyboardState getKeyboardState() const;
+		brogueMouseState getMouseState() const;
 
 	private:
 
@@ -111,10 +122,12 @@ namespace brogueHd::frontend::opengl
 
 		eventController* _eventController;
 		int _clickToken;
-		int _deactivateToken;
 
 		brogueProgramContainer* _program;
 		simplePeriodCounter* _uiEventDebouncer;
+
+		BrogueGameMode _gameMode;
+		BrogueGameMode _gameModeRequest;
 
 		bool _initializedGL;
 
@@ -133,6 +146,7 @@ namespace brogueHd::frontend::opengl
 		_uiEventDebouncer = new simplePeriodCounter(2);
 
 		_clickToken = eventController->getUIClickEvent()->subscribe(std::bind(&openglRenderer::thread_brogueUIClickEvent, this, std::placeholders::_1));
+		_gameModeRequest = BrogueGameMode::Title;
 	}
 	openglRenderer::~openglRenderer()
 	{
@@ -156,9 +170,6 @@ namespace brogueHd::frontend::opengl
 		// Unhook Events
 		if (_clickToken > 0)
 			_eventController->getUIClickEvent()->unSubscribe(_clickToken);
-
-		if (_deactivateToken > 0)
-			_eventController->getUIDeactivatedEvent()->unSubscribe(_deactivateToken);
 
 		delete _uiEventDebouncer;
 	}
@@ -288,13 +299,15 @@ namespace brogueHd::frontend::opengl
 			simpleException::show("Initialization of GLFW failed! Cannot render graphics!");
 		}
 	}
-	void openglRenderer::setProgram(brogueProgramContainer* program)
+	void openglRenderer::setProgram(brogueProgramContainer* program, BrogueGameMode gameMode)
 	{
 		if (_program != nullptr)
 			simpleException::show("Trying to set a new program to the opengl renderer before terminating the old program.");
 
 		// Shared Program Pointer (the program is acutally built, separating it from the brogueView)
 		_program = program;
+		_gameMode = gameMode;
+		_gameModeRequest = gameMode;
 	}
 	void openglRenderer::startProgram()
 	{
@@ -314,7 +327,16 @@ namespace brogueHd::frontend::opengl
 			return;
 
 		_thread->join();
+		delete _thread;
 		_thread = nullptr;
+
+		// (MEMORY!) All other pieces of memory have been deleted. The program container is managed
+		//			 by the rendering controller. These are nulled here for reference; and to guard
+		//			 other methods during a program change.
+		//
+		opengl::KeyState = nullptr;
+		opengl::MouseState = nullptr;
+		_program = nullptr;
 	}
 	void openglRenderer::destroyGL()
 	{
@@ -326,9 +348,59 @@ namespace brogueHd::frontend::opengl
 		_initializedGL = false;
 	}
 
+	BrogueGameMode openglRenderer::getRequestedMode() const
+	{
+		BrogueGameMode mode;
+
+		_threadLock->lock();
+		mode = _gameModeRequest;
+		_threadLock->unlock();
+
+		return mode;
+	}
+	brogueKeyboardState openglRenderer::getKeyboardState() const
+	{
+		brogueKeyboardState keyboard;
+
+		_threadLock->lock();
+
+		if (opengl::KeyState == nullptr)
+			keyboard = default_value::value<brogueKeyboardState>();
+
+		else
+			keyboard = _program->getKeyboardState(*opengl::KeyState);
+
+		_threadLock->unlock();
+
+		return keyboard;
+	}
+	brogueMouseState openglRenderer::getMouseState() const
+	{
+		brogueMouseState mouse;
+
+		_threadLock->lock();
+
+		if (opengl::MouseState == nullptr)
+			mouse = default_value::value<brogueMouseState>();
+
+		else
+			mouse = _program->getMouseState(*opengl::MouseState);
+
+		_threadLock->unlock();
+
+		return mouse;
+	}
+	bool openglRenderer::isInitializedGL() const
+	{
+		return _initializedGL;
+	}
+
 	void openglRenderer::thread_brogueUIClickEvent(const brogueUITagAction& tagAction)
 	{
 		// Thread Mutex Lock (Still Active)
+
+		if (_gameModeRequest != _gameMode)
+			return;
 
 		if (!_uiEventDebouncer->update(1, false))
 			return;
@@ -351,9 +423,11 @@ namespace brogueHd::frontend::opengl
 				break;
 
 			case brogueUIAction::NewGame:
+				_gameModeRequest = BrogueGameMode::Game;
 				break;
 
 			case brogueUIAction::OpenGame:
+				_gameModeRequest = BrogueGameMode::Game;
 				break;
 
 			case brogueUIAction::QuitGame:
@@ -412,13 +486,6 @@ namespace brogueHd::frontend::opengl
 			default:
 				break;
 		}
-
-		//if (response.tag.deactivateAction != brogueUIAction::None)
-		//{
-		//	//programChange = true;
-		//	//programChangeCounter = 0;
-		//	//programChangeThisIteration = true;
-		//}
 	}
 
 	bool openglRenderer::thread_initializeGLFW(GLFWwindow*& resultWindow, const gridRect& sceneBoundaryUI)
@@ -502,9 +569,6 @@ namespace brogueHd::frontend::opengl
 	void openglRenderer::thread_start()
 	{
 		int intervalMilliseconds = 10;
-		int programChangeDebounce = 150;
-		int programChangeCounter = 0;
-		bool programChange = false;
 
 		// THREAD:  LOCK TO INITIALIZE
 		_threadLock->lock();
@@ -540,7 +604,7 @@ namespace brogueHd::frontend::opengl
 		_threadLock->unlock();
 
 		// Main Rendering Loop (haven't seen any issues with this on the other thread.)
-		while (!glfwWindowShouldClose(window))
+		while (!glfwWindowShouldClose(window) && (_gameModeRequest == _gameMode))
 		{
 			std::this_thread::sleep_for(std::chrono::milliseconds(intervalMilliseconds));
 
@@ -563,19 +627,8 @@ namespace brogueHd::frontend::opengl
 			simpleKeyboardState keyboardState(*opengl::KeyState);
 			bool programChangeThisIteration = false;
 
-			// Increment program change counter (Debounce)
-			programChangeCounter += intervalMilliseconds;
-
 			// Check Update(s)
 			_program->checkUpdate(keyboardState, mouseState, intervalMilliseconds);
-
-			// Force an update if there was a program change
-			//if (programChangeThisIteration)
-			//{
-			//	_program->checkUpdate(keyboardState, mouseState, intervalMilliseconds);
-			//	_program->update(keyboardState, mouseState, intervalMilliseconds);
-			//}
-
 
 			// Check normal program update (view state change)
 			if (_program->needsUpdate())
@@ -593,13 +646,6 @@ namespace brogueHd::frontend::opengl
 
 			// Scroll data has already been consumed by the view tree
 			opengl::MouseState->resetScroll();
-
-			// (Debounce) Reset period for changing programs
-			if (programChangeCounter >= programChangeDebounce)
-			{
-				programChangeCounter = 0;
-				programChange = false;
-			}
 
 			_threadLock->unlock();
 

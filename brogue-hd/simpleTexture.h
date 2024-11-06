@@ -6,6 +6,7 @@
 #include "simpleGlObject.h"
 
 #include "openglHelper.h"
+#include "simpleLogger.h"
 #include <SDL_surface.h>
 
 
@@ -226,12 +227,12 @@ namespace brogueHd::frontend::opengl
 	void simpleTexture::teardown()
 	{
 		if (!this->isCreated())
-			simpleException::show("GLTexture already deleted from the backend");
+			simpleLogger::logColor(brogueConsoleColor::Yellow, "simpleTexture already deleted from the backend");
 
 		glDeleteTextures(1, &_textureIndex);
 
 		if (this->isCreated())
-			simpleException::show("GLTexture problem deleting from the backend");
+			throw simpleException("simpleTexture problem deleting from the backend");
 
 		this->handle = simpleGlObject::HandleNull;
 	}

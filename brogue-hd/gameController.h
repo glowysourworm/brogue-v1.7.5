@@ -1,6 +1,8 @@
 #pragma once
 
 #include "brogueGlobal.h"
+#include "brogueKeyboardState.h"
+#include "brogueMouseState.h"
 #include "eventController.h"
 #include "gameData.h"
 #include "keyProcessor.h"
@@ -48,6 +50,16 @@ namespace brogueHd::backend::controller
 		/// the run() method. 
 		/// </summary>
 		BrogueGameMode getMode();
+
+		/// <summary>
+		/// Returns current mouse state maintained by rendering thread (GLFW / OpenGL)
+		/// </summary>
+		brogueMouseState getMouse();
+
+		/// <summary>
+		/// Returns current keyboard state maintained by rendering thread (GLFW / OpenGL)
+		/// </summary>
+		brogueKeyboardState getKeyboard();
 
 		/// <summary>
 		/// Sets the mode of the controller - prepping the game variables. This should be done
@@ -105,6 +117,7 @@ namespace brogueHd::backend::controller
 		_randomCosmetic = new randomGenerator(RANDOM_GENERATOR_COSMETIC);
 		_eventController = new eventController();
 		_renderingController = new renderingController(_eventController, resourceController, _randomCosmetic);
+		_gameMode = BrogueGameMode::Title;
 	}
 
 	gameController::~gameController()
@@ -133,48 +146,7 @@ namespace brogueHd::backend::controller
 	{
 		_gameMode = gameMode;
 
-		_renderingController->setViewMode(gameMode);
-
-		//if (SDL_Init(SDL_INIT_VIDEO)) 
-		//{
-		//	printf("Could not start SDL.\n");
-		//	return;
-		//}
-
-		//loadFont(true);
-		//rogueMain();
-
-		//TCOD_console_delete(NULL);
-
-		//rogueEvent theEvent;
-		//char path[BROGUE_FILENAME_MAX], buf[100], seedDefault[100];
-		//char maxSeed[40];
-		//short i, j, k;
-		//boolean seedTooBig;
-
-		// (RENDERING CODE)
-		// 
-		/*
-		// clear screen and display buffer
-		for (i = 0; i < COLS; i++)
-		{
-			for (j = 0; j < ROWS; j++)
-			{
-				displayBuffer[i][j].character = 0;
-				displayBuffer[i][j].needsUpdate = false;
-				displayBuffer[i][j].opacity = 100;
-
-				for (k = 0; k < 3; k++)
-				{
-					displayBuffer[i][j].foreColorComponents[k] = 0;
-					displayBuffer[i][j].backColorComponents[k] = 0;
-				}
-				plotCharWithColor(' ', i, j, &black, &black);
-			}
-		}*/
-
-
-
+		_renderingController->setGameMode(gameMode);
 	}
 
 	void gameController::closeGame()
@@ -222,27 +194,6 @@ namespace brogueHd::backend::controller
 		}
 
 		_gameData = data;
-
-		//if (rogue.nextGamePath[0])
-		//{
-		//	strcpy(path, rogue.nextGamePath);
-		//	rogue.nextGamePath[0] = '\0';
-		//}
-		//else {
-		//	dialogChooseFile(path, GAME_SUFFIX, "Open saved game:");
-		//	//chooseFile(path, "Open saved game: ", "Saved game", GAME_SUFFIX);
-		//}
-
-		//if (openFile(path)) {
-		//	loadSavedGame();
-		//	mainInputLoop();
-		//	freeEverything();
-		//}
-		//else {
-		//	//dialogAlert("File not found.");
-		//}
-		//rogue.playbackMode = false;
-		//rogue.playbackOOS = false;
 	}
 
 	void gameController::initPlayback(const char* recordingPath)
@@ -261,53 +212,6 @@ namespace brogueHd::backend::controller
 		{
 			throw ex;
 		}
-
-		//	// Procedure
-		//	//
-		//	// 1) Load BrogueEvent list (keystrokes)
-		//	// 2) Prepare display data in advance for processing
-		//	//
-		//	
-
-		//	randomNumbersGenerated = 0;
-		//	rogue.playbackMode = true;
-		//	initializeRogue(0); // Seed argument is ignored because we're in playback.
-		//	if (!rogue.gameHasEnded) {
-		//		startLevel(rogue.depthLevel, 1);
-		//		rogue.playbackPaused = true;
-		//		displayAnnotation(); // in case there's an annotation for turn 0
-		//	}
-
-		//	while (!rogue.gameHasEnded && rogue.playbackMode) {
-		//		if (rogue.playbackPaused) {
-		//			rogue.playbackPaused = false;
-		//			pausePlayback();
-		//		}
-
-		//		rogue.RNG = RNG_COSMETIC; // dancing terrain colors can't influence recordings
-		//		rogue.playbackBetweenTurns = true;
-		//		nextBrogueEvent(&theEvent, false, true, false);
-		//		rogue.RNG = RNG_SUBSTANTIVE;
-
-		//		executeEvent(&theEvent);
-		//	}
-
-		//	freeEverything();
-		//}
-
-		////dialogChooseFile(path, RECORDING_SUFFIX, "View recording:");
-		////chooseFile(path, "View recording: ", "Recording", RECORDING_SUFFIX);
-
-		//if (openFile(path)) 
-		//{
-
-		//}
-		//else 
-		//{
-		//	// announce file not found
-		//}
-		////rogue.playbackMode = false;
-		////rogue.playbackOOS = false;
 	}
 
 	bool gameController::runMenu()
@@ -327,99 +231,64 @@ namespace brogueHd::backend::controller
 
 	bool gameController::runOpenGame()
 	{
-		//if (rogue.nextGamePath[0]) 
-		//{
-		//	strcpy(path, rogue.nextGamePath);
-		//	rogue.nextGamePath[0] = '\0';
-		//}
-		//else {
-		//	dialogChooseFile(path, GAME_SUFFIX, "Open saved game:");
-		//	//chooseFile(path, "Open saved game: ", "Saved game", GAME_SUFFIX);
-		//}
-
-		//if (openFile(path)) {
-		//	loadSavedGame();
-		//	mainInputLoop();
-		//	freeEverything();
-		//}
-		//else {
-		//	//dialogAlert("File not found.");
-		//}
-		//rogue.playbackMode = false;
-		//rogue.playbackOOS = false;
 
 		return false;
 	}
 
 	bool gameController::runPlayback()
 	{
-		//rogue.nextGame = NG_NOTHING;
-
-		//path[0] = '\0';
-		//if (rogue.nextGamePath[0]) {
-		//	strcpy(path, rogue.nextGamePath);
-		//	rogue.nextGamePath[0] = '\0';
-		//}
-		//else {
-		//	dialogChooseFile(path, RECORDING_SUFFIX, "View recording:");
-		//	//chooseFile(path, "View recording: ", "Recording", RECORDING_SUFFIX);
-		//}
-
-		//if (openFile(path)) {
-		//	randomNumbersGenerated = 0;
-		//	rogue.playbackMode = true;
-		//	initializeRogue(0); // Seed argument is ignored because we're in playback.
-		//	if (!rogue.gameHasEnded) {
-		//		startLevel(rogue.depthLevel, 1);
-		//		rogue.playbackPaused = true;
-		//		displayAnnotation(); // in case there's an annotation for turn 0
-		//	}
-
-		//	while (!rogue.gameHasEnded && rogue.playbackMode) {
-		//		if (rogue.playbackPaused) {
-		//			rogue.playbackPaused = false;
-		//			pausePlayback();
-		//		}
-
-		//		rogue.RNG = RNG_COSMETIC; // dancing terrain colors can't influence recordings
-		//		rogue.playbackBetweenTurns = true;
-		//		nextBrogueEvent(&theEvent, false, true, false);
-		//		rogue.RNG = RNG_SUBSTANTIVE;
-
-		//		executeEvent(&theEvent);
-		//	}
-
-		//	freeEverything();
-		//}
-		//else {
-		//	// announce file not found
-		//}
-		//rogue.playbackMode = false;
-		//rogue.playbackOOS = false;
 
 		return false;
 	}
 
 	BrogueGameMode gameController::getMode()
 	{
-		return BrogueGameMode::Game;
+		// Forwards game mode request input from the rendering game thread
+		return _renderingController->getGameModeRequest();
+	}
+
+	brogueKeyboardState gameController::getKeyboard()
+	{
+		return _renderingController->getKeyboardState();
+	}
+
+	brogueMouseState gameController::getMouse()
+	{
+		return _renderingController->getMouseState();
 	}
 
 	bool gameController::run()
 	{
-		switch (_gameMode)
+		// Get the current keyboard / mouse state from OpenGL
+		//
+		brogueKeyboardState keyboard = getKeyboard();
+		brogueMouseState mouse = getMouse();
+
+		// Check the game mode from the rendering thread
+		//
+		BrogueGameMode requestedMode = _renderingController->getGameModeRequest();
+
+		// Game Mode Change
+		if (requestedMode != _gameMode)
 		{
-		case BrogueGameMode::Game:
-			break;
-		case BrogueGameMode::Playback:
-			break;
-		case BrogueGameMode::Title:
-			break;
-		default:
-			break;
+			// Might need to check on environment first (for now, just keep this here to manage the rendering thread)
+			setMode(requestedMode);
 		}
 
-		return true;
+		// RUN THE GAME:	Apply keyboard / mouse to the game backend processors
+
+		// Return Control
+		switch (_gameMode)
+		{
+			case BrogueGameMode::Game:
+			case BrogueGameMode::Playback:
+			case BrogueGameMode::Title:
+				return true;
+
+			case BrogueGameMode::Exit:
+			default:
+				return false;
+		}
 	}
 
 	bool gameController::runHighScores()

@@ -16,6 +16,8 @@
 
 #include "brogueGlobal.h"
 #include "brogueGlyphMap.h"
+#include "brogueKeyboardState.h"
+#include "brogueMouseState.h"
 #include "gl.h"
 #include "gridRect.h"
 #include "openglHelper.h"
@@ -42,16 +44,21 @@ namespace brogueHd::frontend::opengl
 		~brogueFlameMenuProgram();
 
 		void initialize() override;
+		void teardown() override;
 
 		virtual void checkUpdate(const simpleKeyboardState& keyboardState,
 								 const simpleMouseState& mouseState,
 								 int millisecondsLapsed) override;
-
+		virtual void clearUpdate() override;
+		virtual void clearEvents() override;
 		virtual bool needsUpdate() override;
 
 		virtual void update(const simpleKeyboardState& keyboardState,
 							const simpleMouseState& mouseState,
 							int millisecondsLapsed) override;
+
+		virtual brogueKeyboardState calculateKeyboardState(const simpleKeyboardState& keyboard) override;
+		virtual brogueMouseState calculateMouseState(const simpleMouseState& mouse) override;
 
 		void run(int millisecondsElapsed) override;
 		bool hasErrors() const override;
@@ -185,6 +192,26 @@ namespace brogueHd::frontend::opengl
 		delete _diffuseCounter;
 	}
 
+	void brogueFlameMenuProgram::teardown()
+	{
+		_heatSourceProgram->teardown();
+		_heatDiffuseProgram->teardown();
+		_titleMaskProgram->teardown();
+		_frameProgram->teardown();
+		_frameTexture0->teardown();
+		_fontTexture->teardown();
+		_frameBuffer->teardown();
+	}
+
+	brogueKeyboardState brogueFlameMenuProgram::calculateKeyboardState(const simpleKeyboardState& keyboard)
+	{
+		return _frameProgram->calculateKeyboardState(keyboard);
+	}
+	brogueMouseState brogueFlameMenuProgram::calculateMouseState(const simpleMouseState& mouse)
+	{
+		return _frameProgram->calculateMouseState(mouse);
+	}
+
 	void brogueFlameMenuProgram::run(int millisecondsElapsed)
 	{
 		if (!this->isCompiled())
@@ -283,7 +310,16 @@ namespace brogueHd::frontend::opengl
 		//
 		_updateCounter->update(millisecondsLapsed, false);
 	}
-
+	void brogueFlameMenuProgram::clearUpdate()
+	{
+		// Using frame program for "mouse events"
+		_frameProgram->clearUpdate();
+	}
+	void brogueFlameMenuProgram::clearEvents()
+	{
+		// Using frame program for "mouse events"
+		_frameProgram->clearEvents();
+	}
 	bool brogueFlameMenuProgram::needsUpdate()
 	{
 		return _updateCounter->pending();

@@ -79,7 +79,7 @@ namespace brogueHd
 	/// Specific modes that relate to game controller settings. Changing modes means that the controller
 	/// will reset for the next mode. This has an impact on loaded variables.
 	/// </summary>
-	enum BrogueGameMode
+	enum class BrogueGameMode
 	{
 		/// <summary>
 		/// Currently loaded UI programs relate to title screen
@@ -94,7 +94,12 @@ namespace brogueHd
 		/// <summary>
 		/// Currently loaded UI programs relate to the playback screen
 		/// </summary>
-		Playback = 2
+		Playback = 2,
+
+		/// <summary>
+		/// Requests that game be shut down / primary loop exit
+		/// </summary>
+		Exit = 3
 	};
 
 	/*

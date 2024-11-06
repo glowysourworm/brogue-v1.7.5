@@ -5,6 +5,7 @@
 #include "brogueUIConstants.h"
 #include "brogueUIData.h"
 #include "brogueView.h"
+#include "brogueViewContainer.h"
 #include "color.h"
 #include "colorGradient.h"
 #include "colorString.h"
@@ -34,6 +35,40 @@ namespace brogueHd::frontend::ui
 		static gridRect getBrogueSceneBoundary()
 		{
 			return gridRect(0, 0, COLS, ROWS);
+		}
+
+		static gridRect getGameBoundary()
+		{
+			return gridRect(COLS - DCOLS, ROWS - DROWS, DCOLS, DROWS);
+		}
+
+		static gridRect getLeftSidebarBoundary()
+		{
+			return gridRect(0, 0, COLS - DCOLS, ROWS - DROWS);
+		}
+
+		static gridRect getInventoryBoundary()
+		{
+			// Double check this (The height is meant to be dynamic - leaving space at the bottom and top for the
+			// other menus)
+			return gridRect(COLS - 34, 3, 34, ROWS - 5);
+		}
+
+		static gridRect getMenuBoundary()
+		{
+			// Double check this (The height and width are static - these are just measured from the bottom right
+			// to make it easier)
+			return gridRect(COLS - 30 - 3, ROWS - 16, 30, 16);
+		}
+
+		static gridRect getBottomBarBoundary()
+		{
+			return gridRect(COLS - DCOLS, ROWS - 1, DCOLS, 1);
+		}
+
+		static gridRect getFlavorTextBoundary()
+		{
+			return gridRect(COLS - DCOLS, ROWS - 2, DCOLS, 1);
 		}
 
 		static gridRect getMainMenuSelectorBoundary()
@@ -266,6 +301,8 @@ namespace brogueHd::frontend::ui
 
 				brogueUIData* data = new brogueUIData(boundary, zoomLevel, colorString(formattedEntry.c_str(), foreGround), menuColor, brogueTextAlignment::Center);
 
+				data->setUIParameters(-1, -1, "", brogueUIAction::None, true, true, 0, zoomLevel);
+
 				items.add(data);
 			}
 
@@ -276,6 +313,50 @@ namespace brogueHd::frontend::ui
 			brogueView* listBackground = new brogueView(eventController, menuData, sceneBounds, sceneBounds);
 
 			return new brogueListView(eventController, listBackground, brogueUIView::HighScoresView, menuData, items, headerData, footerData);
+		}
+
+		static brogueView* createRectangle(eventController* eventController, 
+										   resourceController* resourceController, 
+										   int zoomLevel, 
+										   const color& color, 
+										   const gridRect& bounds)
+		{
+			gridRect sceneBounds = getBrogueSceneBoundary();
+
+			brogueUIData* data = new brogueUIData(sceneBounds, zoomLevel, color);
+
+			return new brogueView(eventController, data, sceneBounds, bounds);
+		}
+
+		static brogueViewContainer* createGameView(eventController* eventController, resourceController* resourceController, int zoomLevel)
+		{
+			gridRect sceneBounds = getBrogueSceneBoundary();
+			gridRect sidebarBounds = getLeftSidebarBoundary();
+			gridRect bottomBarBounds = getBottomBarBoundary();
+			gridRect flavorTextBounds = getFlavorTextBoundary();
+			gridRect gameBounds = getGameBoundary();
+
+			brogueUIData* backgroundData = new brogueUIData(sceneBounds, zoomLevel, colors::black());
+			brogueUIData* sidebarData = new brogueUIData(sceneBounds, zoomLevel, colors::blue());
+			brogueUIData* bottomBarData = new brogueUIData(sceneBounds, zoomLevel, colors::green());
+			brogueUIData* flavorTextData = new brogueUIData(sceneBounds, zoomLevel, colors::white());
+			brogueUIData* gameData = new brogueUIData(sceneBounds, zoomLevel, colors::getGray(0.5));
+
+			brogueView* background = new brogueView(eventController, backgroundData, sceneBounds, sceneBounds);
+
+			brogueView* sidebar = new brogueView(eventController, sidebarData, sceneBounds, sidebarBounds);
+			brogueView* bottomBar = new brogueView(eventController, bottomBarData, sceneBounds, bottomBarBounds);
+			brogueView* flavorText = new brogueView(eventController, flavorTextData, sceneBounds, flavorTextBounds);
+			brogueView* gameView = new brogueView(eventController, gameData, sceneBounds, gameBounds);
+
+			brogueViewContainer* container = new brogueViewContainer(background, brogueUIView::GameView, sceneBounds, sceneBounds);
+
+			container->addView(sidebar);
+			container->addView(bottomBar);
+			container->addView(flavorText);
+			container->addView(gameView);
+
+			return container;
 		}
 	};
 }

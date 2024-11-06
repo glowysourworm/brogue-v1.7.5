@@ -5,6 +5,7 @@
 #include "simpleDataStream.h"
 #include "simpleException.h"
 #include "simpleGlObject.h"
+#include "simpleLogger.h"
 #include "simpleVertexBuffer.h"
 
 using namespace brogueHd::simple;
@@ -123,7 +124,11 @@ namespace brogueHd::frontend::opengl
 	void simpleVertexArray<T>::teardown()
 	{
 		if (!this->isCreated())
-			simpleException::show("simpleVertexArray already deleted from the backend");
+		{
+			simpleLogger::logColor(brogueConsoleColor::Yellow, "simpleVertexArray already deleted from the backend");
+			simpleLogger::logColor(brogueConsoleColor::Yellow, "simpleVertexArray-> Continuing on to try and delete other GPU resources");
+		}
+			
 
 		// Teardown vertex buffers
 		_vertexBuffer->teardown();

@@ -7,6 +7,7 @@
 #include "simpleException.h"
 #include "simpleGlObject.h"
 #include "simpleList.h"
+#include "simpleLogger.h"
 #include "simpleVertexAttribute.h"
 
 using namespace brogueHd::simple;
@@ -245,13 +246,13 @@ namespace brogueHd::frontend::opengl
 	void simpleVertexBuffer<T>::teardown()
 	{
 		if (!this->isCreated())
-			simpleException::show("simpleVertexBuffer already deleted from the backend");
+			simpleLogger::logColor(brogueConsoleColor::Yellow, "simpleVertexBuffer already deleted from the backend -> continuing to delete other GPU resources");
 
 		// Deleting (likely) takes care of other resources
 		glDeleteBuffers(1, &this->handle);
 
 		if (this->isCreated())
-			simpleException::show("Error deleting simpleVertexBuffer");
+			throw simpleException("Error deleting simpleVertexBuffer");
 	}
 
 	template<typename T>
@@ -321,7 +322,7 @@ namespace brogueHd::frontend::opengl
 	void simpleVertexBuffer<T>::bind()
 	{
 		if (!this->isCreated())
-			simpleException::show("GLVertexBuffer already deleted from the backend");
+			simpleException::show("simpleVertexBuffer already deleted from the backend");
 
 		// Bind VBO before using
 		glBindBuffer(GL_ARRAY_BUFFER, this->handle);

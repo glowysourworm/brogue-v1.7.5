@@ -68,9 +68,10 @@ namespace brogueHd::frontend::opengl
 		}
 
 		virtual void initialize() override;
+		virtual void teardown() override;
 		virtual void checkUpdate(const simpleKeyboardState& keyboardState,
 								 const simpleMouseState& mouseState,
-								 int millisecondsLapsed) override;
+								 int millisecondsLapsed) override;		
 
 		virtual bool needsUpdate() override;
 		virtual void clearUpdate() override;
@@ -86,20 +87,11 @@ namespace brogueHd::frontend::opengl
 		virtual bool hasErrors() const override;
 
 
-		virtual gridRect getSceneBoundaryUI() const override
-		{
-			return _view->calculateSceneBoundaryUI();
-		}
+		virtual gridRect getSceneBoundaryUI() const override;
+		simpleQuad getCellSizeUV() const;
 
-		simpleQuad getCellSizeUV() const
-		{
-			gridRect sceneBoundaryUI = _view->calculateSceneBoundaryUI();
-
-			brogueCoordinateConverter converter = _programBuilder->createCoordinateConverter(sceneBoundaryUI.width, sceneBoundaryUI.height, _view->getZoomLevel());
-
-			return converter.getViewConverter()
-				.createQuadNormalizedUV(0, 0, brogueCellDisplay::CellWidth(_view->getZoomLevel()), brogueCellDisplay::CellHeight(_view->getZoomLevel()));
-		}
+		virtual brogueKeyboardState calculateKeyboardState(const simpleKeyboardState& keyboard) override;
+		virtual brogueMouseState calculateMouseState(const simpleMouseState& mouse) override;
 
 		simpleShaderProgram* getProgram() const
 		{
@@ -126,25 +118,51 @@ namespace brogueHd::frontend::opengl
 		_program->compile();
 		_program->bind();
 	}
+	void brogueViewProgram::teardown()
+	{
+		_program->teardown();
+	}
+	gridRect brogueViewProgram::getSceneBoundaryUI() const
+	{
+		return _view->calculateSceneBoundaryUI();
+	}
 
-	void brogueViewProgram::checkUpdate(const simpleKeyboardState& keyboardState,
-										const simpleMouseState& mouseState,
-										int millisecondsLapsed)
+	simpleQuad brogueViewProgram::getCellSizeUV() const
+	{
+		gridRect sceneBoundaryUI = _view->calculateSceneBoundaryUI();
+
+		brogueCoordinateConverter converter = _programBuilder->createCoordinateConverter(sceneBoundaryUI.width, sceneBoundaryUI.height, _view->getZoomLevel());
+
+		return converter.getViewConverter()
+						.createQuadNormalizedUV(0, 0, brogueCellDisplay::CellWidth(_view->getZoomLevel()), brogueCellDisplay::CellHeight(_view->getZoomLevel()));
+	}
+
+	brogueKeyboardState brogueViewProgram::calculateKeyboardState(const simpleKeyboardState& keyboard)
+	{
+		// TODO: Get translator for the key system; and implement hotkeys
+		return brogueKeyboardState(-1, -1);
+	}
+	brogueMouseState brogueViewProgram::calculateMouseState(const simpleMouseState& mouse)
 	{
 		// Translate the UI space -> the brogue / program space and pass down the pipeline
 		//
 		gridRect sceneBoundary = this->getSceneBoundaryUI();
 
-		brogueMouseState mouseStateUI((mouseState.getX() / sceneBoundary.width) * _view->getSceneBoundary().width,
-									  (mouseState.getY() / sceneBoundary.height) * _view->getSceneBoundary().height,
-									  mouseState.getScrolldYPending() != 0 || mouseState.getScrolldXPending() != 0,
-									  mouseState.getScrolldYPending() > 0, mouseState.getLeftButton() > 0);
+		return brogueMouseState((mouse.getX() / sceneBoundary.width) * _view->getSceneBoundary().width,
+								(mouse.getY() / sceneBoundary.height) * _view->getSceneBoundary().height,
+								mouse.getScrolldYPending() != 0 || mouse.getScrolldXPending() != 0,
+								mouse.getScrolldYPending() > 0, mouse.getLeftButton() > 0);
+	}
 
-		// TODO: Get translator for the key system; and implement hotkeys
-		brogueKeyboardState keyboardStateUI(-1, -1);
+	void brogueViewProgram::checkUpdate(const simpleKeyboardState& keyboardState,
+										const simpleMouseState& mouseState,
+										int millisecondsLapsed)
+	{
+		brogueKeyboardState keyboardUI = calculateKeyboardState(keyboardState);
+		brogueMouseState mouseUI = calculateMouseState(mouseState);
 
 		// Pass the parameters in to check the program's view (tree)
-		_view->checkUpdate(keyboardStateUI, mouseStateUI, millisecondsLapsed);
+		_view->checkUpdate(keyboardUI, mouseUI, millisecondsLapsed);
 	}
 
 	bool brogueViewProgram::needsUpdate()

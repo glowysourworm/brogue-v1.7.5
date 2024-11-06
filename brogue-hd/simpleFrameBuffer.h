@@ -4,6 +4,7 @@
 #include "openglHelper.h"
 #include "simpleException.h"
 #include "simpleGlObject.h"
+#include "simpleLogger.h"
 
 namespace brogueHd::frontend::opengl
 {
@@ -133,7 +134,7 @@ namespace brogueHd::frontend::opengl
     void simpleFrameBuffer::teardown()
     {
         if (!this->isCreated())
-            simpleException::show("simpleFrameBuffer has not yet been created on the backend");
+            simpleLogger::logColor(brogueConsoleColor::Yellow, "simpleFrameBuffer already removed by backend -> continuing to try and delete rest of GPU resources");
 
         if (_renderBufferHandle != simpleGlObject::HandleNull)
         {

@@ -1,9 +1,10 @@
 #pragma once
 
+#include "brogueKeyboardState.h"
+#include "brogueMouseState.h"
 #include "brogueUIConstants.h"
 #include "gridRect.h"
 #include "simple.h"
-#include "simpleException.h"
 #include "simpleException.h"
 #include "simpleKeyboardState.h"
 #include "simpleMouseState.h"
@@ -29,7 +30,25 @@ namespace brogueHd::frontend::opengl
 		/// </summary>
 		virtual void initialize()
 		{
+			throw simpleException("Function must be overridden in the child class:  brogueProgram::initialize");
+		}
 
+		/// <summary>
+		/// Function that deletes GL program from the backend
+		/// </summary>
+		virtual void teardown()
+		{
+			throw simpleException("Function must be overridden in the child class:  brogueProgram::teardown");
+		}
+
+		virtual brogueKeyboardState calculateKeyboardState(const simpleKeyboardState& keyboard)
+		{
+			throw simpleException("Function must be overridden in the child class:  brogueProgram::calculateKeyboardState");
+		}
+
+		virtual brogueMouseState calculateMouseState(const simpleMouseState& mouse)
+		{
+			throw simpleException("Function must be overridden in the child class:  brogueProgram::calculateMouseState");
 		}
 
 		/// <summary>
@@ -40,7 +59,7 @@ namespace brogueHd::frontend::opengl
 								 const simpleMouseState& mouseState,
 								 int millisecondsLapsed)
 		{
-
+			throw simpleException("Function must be overridden in the child class:  brogueProgram::checkUpdate");
 		}
 
 		/// <summary>
@@ -48,7 +67,7 @@ namespace brogueHd::frontend::opengl
 		/// </summary>
 		virtual bool needsUpdate()
 		{
-			return false;
+			throw simpleException("Function must be overridden in the child class:  brogueProgram::needsUpdate");
 		}
 
 		/// <summary>
@@ -56,7 +75,7 @@ namespace brogueHd::frontend::opengl
 		/// </summary>
 		virtual void clearUpdate()
 		{
-
+			throw simpleException("Function must be overridden in the child class:  brogueProgram::clearUpdate");
 		}
 
 		/// <summary>
@@ -64,7 +83,7 @@ namespace brogueHd::frontend::opengl
 		/// </summary>
 		virtual void clearEvents()
 		{
-
+			throw simpleException("Function must be overridden in the child class:  brogueProgram::clearEvents");
 		}
 
 		/// <summary>
@@ -75,7 +94,7 @@ namespace brogueHd::frontend::opengl
 							const simpleMouseState& mouseState,
 							int millisecondsLapsed)
 		{
-
+			throw simpleException("Function must be overridden in the child class:  brogueProgram::update");
 		}
 
 		/// <summary>
@@ -83,7 +102,7 @@ namespace brogueHd::frontend::opengl
 		/// </summary>
 		virtual void run(int millisecondsElapsed)
 		{
-
+			throw simpleException("Function must be overridden in the child class:  brogueProgram::run");
 		}
 
 		/// <summary>
@@ -91,12 +110,12 @@ namespace brogueHd::frontend::opengl
 		/// </summary>
 		virtual void outputStatus() const
 		{
-
+			throw simpleException("Function must be overridden in the child class:  brogueProgram::outputStatus");
 		}
 
 		virtual bool isCompiled() const
 		{
-			return false;
+			throw simpleException("Function must be overridden in the child class:  brogueProgram::isCompiled");
 		}
 
 		/// <summary>
@@ -104,7 +123,7 @@ namespace brogueHd::frontend::opengl
 		/// </summary>
 		virtual bool hasErrors() const
 		{
-			return false;
+			throw simpleException("Function must be overridden in the child class:  brogueProgram::hasErrors");
 		}
 
 		/// <summary>
@@ -113,7 +132,7 @@ namespace brogueHd::frontend::opengl
 		/// <returns></returns>
 		virtual gridRect getSceneBoundaryUI() const
 		{
-			return default_value::value<gridRect>();
+			throw simpleException("Function must be overridden in the child class:  brogueProgram::getSceneBoundaryUI");
 		}
 
 		brogueUIProgram getProgramName() const
