@@ -26,6 +26,11 @@ namespace brogueHd::backend::model::game
 			_characters = new simpleArray<int>();
 			_colors = new simpleArray<color>();
 		}
+		colorString(int capacity)
+		{
+			_characters = new simpleArray<int>(capacity);
+			_colors = new simpleArray<color>(capacity);
+		}
 		colorString(const char* message)
 		{
 			_characters = new simpleArray<int>(strnlen_s(message, COLS * 2));

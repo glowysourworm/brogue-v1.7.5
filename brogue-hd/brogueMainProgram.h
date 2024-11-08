@@ -102,9 +102,10 @@ namespace brogueHd::frontend::opengl
 		_gameMode = BrogueGameMode::Title;
 		_sceneBoundaryUI = new gridRect(sceneBoundaryUI);
 
+		brogueUIData backgroundData(brogueUIProgram::ContainerControlledProgram, brogueUIProgramPart::None, sceneBoundaryUI, zoomLevel);
 		brogueProgramBuilder builder(resourceController, glyphMap);
 		brogueView background(eventController,
-							  brogueUIData(brogueUIProgram::ContainerControlledProgram, brogueUIProgramPart::None, sceneBoundaryUI, zoomLevel),
+							  backgroundData,
 							  sceneBoundaryUI,
 							  sceneBoundaryUI);
 

@@ -136,9 +136,6 @@ namespace brogueHd::frontend::opengl
 	}
 	gridRect brogueProgramContainer::getSceneBoundaryUI() const
 	{
-		if (!_initialized)
-			throw simpleException("Brogue Program Container must first be initialized:  brogueProgramContainer::getSceneBoundaryUI");
-
 		return _mainProgram->getSceneBoundaryUI();
 	}
 

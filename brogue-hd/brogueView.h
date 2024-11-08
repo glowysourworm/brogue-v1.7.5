@@ -79,7 +79,7 @@ namespace brogueHd::frontend::ui
 			if (_uiData->getMouseClick() && _uiData->getHasMouseInteraction())
 			{
 				// UI EVENT:  Mouse Click
-				this->raiseClickEvent(*_uiData->getAction());
+				this->raiseClickEvent(_uiData->getAction());
 
 				// Clears UI event data for the mouse
 				_uiData->clearCapture();

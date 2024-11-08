@@ -60,6 +60,8 @@ namespace brogueHd::frontend::opengl
 
 	brogueProgramBuilder::brogueProgramBuilder(resourceController* resourceController, brogueGlyphMap* glyphMap)
 	{
+		_resourceController = resourceController;
+		_glyphMap = glyphMap;
 		_dataStreamBuilder = new brogueDataStreamBuilder(resourceController, glyphMap);
 	}
 	brogueProgramBuilder::~brogueProgramBuilder()

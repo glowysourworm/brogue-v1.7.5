@@ -140,7 +140,7 @@ namespace brogueHd::frontend::ui
 		_periodCounter = 0;
 		_heatSourceGrid = new grid<color>(this->getSceneBoundary(), this->getSceneBoundary());
 
-		this->getUIData()->setUIParameters(-1, -1, "", brogueUIAction::None, true, true, 0, zoomLevel);
+		this->getUIData()->setUIParameters(-1, -1, "", brogueUIAction::None, true, 0, zoomLevel);
 
 		cycleHeatSources();
 		nextHeatValues();
