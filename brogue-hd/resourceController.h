@@ -15,6 +15,8 @@
 #include "json.hpp"
 
 #include "brogueGlobal.h"
+#include "brogueUIConstants.h"
+#include "brogueUIProgramPartConfiguration.h"
 #include "gl.h"
 #include "simpleArray.h"
 #include "simpleException.h"
@@ -29,6 +31,7 @@
 
 using namespace brogueHd::simple;
 using namespace brogueHd::component;
+using namespace brogueHd::frontend;
 using namespace brogueHd::frontend::opengl;
 using namespace brogueHd::backend::processor;
 using namespace brogueHd::backend::model;
@@ -105,14 +108,21 @@ namespace brogueHd::backend::controller
 			return _playbackDirectory;
 		}
 
+		brogueUIProgramPartConfiguration* getUIPartConfig(brogueUIProgramPart partName)
+		{
+			return _programPartConfigs->get(partName);
+		}
+
 	private:
 
 		void loadHighScores(const char* path);
+		void loadPartConfigs();
 
 	private:
 
 		simpleHash<shaderResource, shaderData*>* _shaderCache;
 		simpleHash<int, simpleBitmap*>* _fontGlyphs;
+		simpleHash<brogueUIProgramPart, brogueUIProgramPartConfiguration*>* _programPartConfigs;
 		simpleList<brogueScoreEntry*>* _highScores;
 		simpleString* _gameDirectory;
 		simpleString* _playbackDirectory;
@@ -123,6 +133,7 @@ namespace brogueHd::backend::controller
 	{
 		_shaderCache = new simpleHash<shaderResource, shaderData*>();
 		_fontGlyphs = new simpleHash<int, simpleBitmap*>();
+		_programPartConfigs = new simpleHash<brogueUIProgramPart, brogueUIProgramPartConfiguration*>();
 		_highScores = new simpleList<brogueScoreEntry*>();
 		_gameDirectory = nullptr;
 		_playbackDirectory = nullptr;
@@ -134,6 +145,7 @@ namespace brogueHd::backend::controller
 		delete _gameDirectory;
 		delete _playbackDirectory;
 		delete _highScores;
+		delete _programPartConfigs;
 	}
 
 	bool resourceController::initialize(const char* resourceConfigFile)
@@ -197,6 +209,7 @@ namespace brogueHd::backend::controller
 			_playbackDirectory = new simpleString(std::string(jsonConfig[brogueHd::ConfigPlaybackDirectory]).c_str());
 
 			loadHighScores(std::string(jsonConfig[brogueHd::ConfigHighScoresFile]).c_str());
+			loadPartConfigs();
 
 			return true;
 		}
@@ -250,6 +263,82 @@ namespace brogueHd::backend::controller
 		{
 			simpleException::show("Error reading high scores file:  {}", ex.what());
 		}
+	}
+
+	void resourceController::loadPartConfigs()
+	{
+		// Title View
+		brogueUIProgramPartConfiguration* flameMenu_heatDiffuse = 
+			new brogueUIProgramPartConfiguration(brogueUIProgramPart::FlameMenuProgram_HeatDiffuseProgram, 
+												 shaderResource::diffuseColorUpwardVert, 
+												 shaderResource::diffuseColorUpwardFrag, 
+												 openglDataStreamType::brogueCellQuad, 
+												 openglBrogueCellOutputSelector::DisplayCurrentFrame, 
+												 30,
+												 false);
+
+		brogueUIProgramPartConfiguration* flameMenu_heatSource =
+			new brogueUIProgramPartConfiguration(brogueUIProgramPart::FlameMenuProgram_HeatSourceProgram,
+												 shaderResource::backgroundColorVert,
+												 shaderResource::backgroundColorFrag,
+												 openglDataStreamType::brogueColorQuad,
+												 openglBrogueCellOutputSelector::DisplayCurrentFrame,
+												 10,
+												 false);
+
+		brogueUIProgramPartConfiguration* flameMenu_titleMask =
+			new brogueUIProgramPartConfiguration(brogueUIProgramPart::FlameMenuProgram_TitleMaskProgram,
+												 shaderResource::backgroundColorVert,
+												 shaderResource::backgroundColorFrag,
+												 openglDataStreamType::brogueColorQuad,
+												 openglBrogueCellOutputSelector::DisplayCurrentFrame,
+												 0,
+												 false);
+
+		// Generic Parts
+		brogueUIProgramPartConfiguration* menuButton =
+			new brogueUIProgramPartConfiguration(brogueUIProgramPart::MenuButton,
+												 shaderResource::brogueCellDisplayVert,
+												 shaderResource::brogueCellDisplayFrag,
+												 openglDataStreamType::brogueCellQuad,
+												 openglBrogueCellOutputSelector::DisplayCurrentFrame,
+												 0,
+												 false);
+
+		brogueUIProgramPartConfiguration* text =
+			new brogueUIProgramPartConfiguration(brogueUIProgramPart::Text,
+												 shaderResource::brogueCellDisplayVert,
+												 shaderResource::brogueCellDisplayFrag,
+												 openglDataStreamType::brogueCellQuad,
+												 openglBrogueCellOutputSelector::DisplayCurrentFrame,
+												 0,
+												 true);
+
+		brogueUIProgramPartConfiguration* background =
+			new brogueUIProgramPartConfiguration(brogueUIProgramPart::Background,
+												 shaderResource::backgroundColorVert,
+												 shaderResource::backgroundColorFrag,
+												 openglDataStreamType::brogueColorQuad,
+												 openglBrogueCellOutputSelector::DisplayCurrentFrame,
+												 0,
+												 false);
+
+		brogueUIProgramPartConfiguration* menuBackground =
+			new brogueUIProgramPartConfiguration(brogueUIProgramPart::MenuBackground,
+												 shaderResource::brogueCellDisplayVert,
+												 shaderResource::brogueCellDisplayFrag,
+												 openglDataStreamType::brogueCellQuad,
+												 openglBrogueCellOutputSelector::DisplayCurrentFrame,
+												 0,
+												 true);
+
+		_programPartConfigs->add(brogueUIProgramPart::FlameMenuProgram_HeatDiffuseProgram, flameMenu_heatDiffuse);
+		_programPartConfigs->add(brogueUIProgramPart::FlameMenuProgram_HeatSourceProgram, flameMenu_heatSource);
+		_programPartConfigs->add(brogueUIProgramPart::FlameMenuProgram_TitleMaskProgram, flameMenu_titleMask);
+		_programPartConfigs->add(brogueUIProgramPart::MenuButton, menuButton);
+		_programPartConfigs->add(brogueUIProgramPart::Text, text);
+		_programPartConfigs->add(brogueUIProgramPart::Background, background);
+		_programPartConfigs->add(brogueUIProgramPart::MenuBackground, menuBackground);
 	}
 
 	void resourceController::loadKeymap(keyProcessor& processor)

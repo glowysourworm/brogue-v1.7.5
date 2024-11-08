@@ -32,13 +32,7 @@ using namespace brogueHd::component;
 
 namespace brogueHd::frontend::opengl
 {
-	/// <summary>
-	/// Function that must return a pointer to a new data stream for re-buffering
-	/// </summary>
-	//template<typename T>
-	//using openglRebufferHandler = std::function<simpleDataStream<T>*(int millisecondsLapsed);
-
-	// Initialized on thread_start, and deleted after the main loop
+	// Contended Resources
 	static simpleKeyboardState* KeyState;
 	static simpleMouseState* MouseState;
 
@@ -49,17 +43,17 @@ namespace brogueHd::frontend::opengl
 		openglRenderer(eventController* eventController);
 		~openglRenderer();
 
-		// Making OpenGL / Window calls static to work with rendering controller.
-
-		/// <summary>
-		/// Initializes OpenGL using static calls to backend
-		/// </summary>
-		void initializeOpenGL();
-
 		/// <summary>
 		/// Sets the program pointer for use
 		/// </summary>
 		void setProgram(brogueProgramContainer* program, BrogueGameMode gameMode);
+
+		/// <summary>
+		/// Game mode will handle the context switching for the program. So, there is two-way
+		/// communication using the game mode. The render thread will check for a new one inside
+		/// the thread lock. So, this will be set when the render routine is done for one cycle.
+		/// </summary>
+		void setGameMode(BrogueGameMode gameMode);
 
 		/// <summary>
 		/// Starts program rendering thread, and opens window using GLFW
@@ -72,16 +66,15 @@ namespace brogueHd::frontend::opengl
 		/// </summary>
 		void terminateProgram();
 
-		/// <summary>
-		/// Returns true if the GL backend has been initialized
-		/// </summary>
-		/// <returns></returns>
-		bool isInitializedGL() const;
-
 		// Shared resources
 		BrogueGameMode getRequestedMode() const;
 		brogueKeyboardState getKeyboardState() const;
 		brogueMouseState getMouseState() const;
+
+	private:
+
+		bool isInitializedGL() const;
+		void initializeOpenGL(const gridRect& sceneBoundaryUI);
 
 	private:
 
@@ -111,12 +104,11 @@ namespace brogueHd::frontend::opengl
 
 	public:
 
-		void thread_brogueUIClickEvent(const brogueUITagAction& response);
+		void thread_brogueUIClickEvent(brogueUIProgram sender, const brogueUITagAction& response);
 
 	private:
 
 		void thread_start();
-		bool thread_initializeGLFW(GLFWwindow*& resultWindow, const gridRect& sceneBoundaryUI);
 
 	private:
 
@@ -126,9 +118,12 @@ namespace brogueHd::frontend::opengl
 		brogueProgramContainer* _program;
 		simplePeriodCounter* _uiEventDebouncer;
 
+		// Two way communication for the rendering context
 		BrogueGameMode _gameMode;
-		BrogueGameMode _gameModeRequest;
-
+		BrogueGameMode _gameModeIn;
+		BrogueGameMode _gameModeOut;
+		
+		GLFWwindow* _window;
 		bool _initializedGL;
 
 		// Create Lock Mechanism
@@ -145,8 +140,10 @@ namespace brogueHd::frontend::opengl
 		_eventController = eventController;
 		_uiEventDebouncer = new simplePeriodCounter(2);
 
-		_clickToken = eventController->getUIClickEvent()->subscribe(std::bind(&openglRenderer::thread_brogueUIClickEvent, this, std::placeholders::_1));
-		_gameModeRequest = BrogueGameMode::Title;
+		_clickToken = eventController->getUIClickEvent()->subscribe(std::bind(&openglRenderer::thread_brogueUIClickEvent, this, std::placeholders::_1, std::placeholders::_2));
+		_gameModeOut = BrogueGameMode::Title;
+		_gameModeIn = BrogueGameMode::Title;
+		_gameMode = BrogueGameMode::Title;
 	}
 	openglRenderer::~openglRenderer()
 	{
@@ -243,7 +240,7 @@ namespace brogueHd::frontend::opengl
 	}
 #pragma endregion
 
-	void openglRenderer::initializeOpenGL()
+	void openglRenderer::initializeOpenGL(const gridRect& sceneBoundaryUI)
 	{
 		if (_initializedGL)
 			return;
@@ -298,16 +295,97 @@ namespace brogueHd::frontend::opengl
 			// error
 			simpleException::show("Initialization of GLFW failed! Cannot render graphics!");
 		}
+
+		// Windowed Mode
+		_window = glfwCreateWindow(sceneBoundaryUI.width, sceneBoundaryUI.height, "Brogue v1.7.5", NULL, NULL);
+
+		// Open GL Context
+		glfwMakeContextCurrent(_window);
+
+		int version = gladLoadGL(glfwGetProcAddress);
+
+		if (!version)
+		{
+			simpleLogger::logColor(brogueConsoleColor::Red, "Error calling gladLoadGL");
+
+			glfwDestroyWindow(_window);
+			//glfwTerminate();
+
+			return;
+		}
+		else
+		{
+			// Version
+			simpleLogger::logColor(brogueConsoleColor::Yellow, "Glad Version:  {}.{}", GLAD_VERSION_MAJOR(version), GLAD_VERSION_MINOR(version));
+			simpleLogger::logColor(brogueConsoleColor::Yellow, "GL Shading Language:  {}", (char*)glGetString(GL_SHADING_LANGUAGE_VERSION));
+			simpleLogger::logColor(brogueConsoleColor::Yellow, "GL Version:  {}", (char*)glGetString(GL_VERSION));
+			simpleLogger::logColor(brogueConsoleColor::Yellow, "GL Vendor:  {}", (char*)glGetString(GL_VENDOR));
+			simpleLogger::logColor(brogueConsoleColor::Yellow, "GL Renderer:  {}", (char*)glGetString(GL_RENDERER));
+
+			// Print out extension(s)
+			GLint numExtensions;
+			glGetIntegerv(GL_NUM_EXTENSIONS, &numExtensions);
+
+			for (GLint index = 0; index < numExtensions; index++)
+			{
+				simpleLogger::logColor(brogueConsoleColor::Yellow, "GL Extension (loaded):  {}", (char*)glGetStringi(GL_EXTENSIONS, index));
+			}
+		}
+
+		glfwSwapInterval(1);
+
+		// Keyboard Handler
+		glfwSetKeyCallback(_window, &openglRenderer::keyCallback);
+
+		// Mouse Handlers
+		glfwSetCursorPosCallback(_window, mousePositionCallback);
+		glfwSetMouseButtonCallback(_window, mouseButtonCallback);
+		glfwSetScrollCallback(_window, mouseScrollCallback);
+
+		// Window Resize Callback
+		glfwSetFramebufferSizeCallback(_window, &openglRenderer::resizeCallback);
+
+		//// Window Refresh Callback
+		//glfwSetWindowRefreshCallback(window, &openglRenderer::refreshCallback);
+
+		// Window Close Callback (NOT NEEDED! This is a callback to perform before window closes)
+		glfwSetWindowCloseCallback(_window, &openglRenderer::windowCloseCallback);
+
+		// GL Enable Debug Output:
+		glEnable(GL_DEBUG_OUTPUT);
+		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+		glDebugMessageCallback(&openglRenderer::debugMessage, NULL);
+
+		// (Not sure)
+		glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
+
+		// Khronos Group:       glViewport(x, y, width, height)
+		// Window Coordinates:  (x_w, y_w), (x, y) - position offsets, (width, height) - window size
+		// GL Coordinates:		(x_nd, y_nd)
+
+		// x_w = (x_nd + 1)(width / 2) + x
+		// y_w = (y_nd + 1)(height / 2) + y
+
+		// Initialize the viewport
+		glViewport(0, 0, sceneBoundaryUI.width, sceneBoundaryUI.height);
 	}
 	void openglRenderer::setProgram(brogueProgramContainer* program, BrogueGameMode gameMode)
 	{
-		if (_program != nullptr)
-			simpleException::show("Trying to set a new program to the opengl renderer before terminating the old program.");
+		// (CRITICAL!)  The program pointer is shared. So, this set function is called during 
+		//				initialization, but still before GL is initialized. The thread_start
+		//				method will take care of everything else for the backend. So, the program
+		//			    container is not yet compiled. (for all of its parts)
 
-		// Shared Program Pointer (the program is acutally built, separating it from the brogueView)
 		_program = program;
 		_gameMode = gameMode;
-		_gameModeRequest = gameMode;
+		_gameModeIn = gameMode;
+		_gameModeOut = gameMode;
+	}
+	void openglRenderer::setGameMode(BrogueGameMode gameMode)
+	{
+		_threadLock->lock();
+		_gameModeIn = gameMode;
+		_threadLock->unlock();
 	}
 	void openglRenderer::startProgram()
 	{
@@ -353,7 +431,7 @@ namespace brogueHd::frontend::opengl
 		BrogueGameMode mode;
 
 		_threadLock->lock();
-		mode = _gameModeRequest;
+		mode = _gameModeOut;
 		_threadLock->unlock();
 
 		return mode;
@@ -395,26 +473,24 @@ namespace brogueHd::frontend::opengl
 		return _initializedGL;
 	}
 
-	void openglRenderer::thread_brogueUIClickEvent(const brogueUITagAction& tagAction)
+	void openglRenderer::thread_brogueUIClickEvent(brogueUIProgram sender, const brogueUITagAction& tagAction)
 	{
 		// Thread Mutex Lock (Still Active)
 
-		if (_gameModeRequest != _gameMode)
+		if (_gameModeOut != _gameMode)
 			return;
 
-		if (!_uiEventDebouncer->update(1, false))
-			return;
-
-		brogueUIProgram activeProgram = _program->getActiveUIProgramName();
+		//if (!_uiEventDebouncer->update(1, false))
+		//	return;
 
 		switch (tagAction.action)
 		{
 			// Click registered by a background program (typically)
 			case brogueUIAction::None:
 			{
-				if (activeProgram != brogueUIProgram::MainMenuProgram)
+				if (sender != brogueUIProgram::MainMenuProgram)
 				{
-					_program->deactivateUIProgram(activeProgram);
+					_program->deactivateUIProgram(sender);
 					_program->activateUIProgram(brogueUIProgram::MainMenuProgram);
 					_program->clearEvents();
 					//_uiEventDebouncer->reset();
@@ -423,11 +499,11 @@ namespace brogueHd::frontend::opengl
 				break;
 
 			case brogueUIAction::NewGame:
-				_gameModeRequest = BrogueGameMode::Game;
+				_gameModeOut = BrogueGameMode::Game;
 				break;
 
 			case brogueUIAction::OpenGame:
-				_gameModeRequest = BrogueGameMode::Game;
+				_gameModeOut = BrogueGameMode::Game;
 				break;
 
 			case brogueUIAction::QuitGame:
@@ -438,9 +514,9 @@ namespace brogueHd::frontend::opengl
 
 			case brogueUIAction::ViewMainMenu:
 			{
-				if (activeProgram != brogueUIProgram::MainMenuProgram)
+				if (sender != brogueUIProgram::MainMenuProgram)
 				{
-					_program->deactivateUIProgram(activeProgram);
+					_program->deactivateUIProgram(sender);
 					_program->activateUIProgram(brogueUIProgram::MainMenuProgram);
 					_program->clearEvents();
 					_uiEventDebouncer->reset();
@@ -450,9 +526,9 @@ namespace brogueHd::frontend::opengl
 
 			case brogueUIAction::ViewHighScores:
 			{
-				if (activeProgram != brogueUIProgram::HighScoresProgram)
+				if (sender != brogueUIProgram::HighScoresProgram)
 				{
-					_program->deactivateUIProgram(activeProgram);
+					_program->deactivateUIProgram(sender);
 					_program->activateUIProgram(brogueUIProgram::HighScoresProgram);
 					_program->clearEvents();
 					_uiEventDebouncer->reset();
@@ -462,9 +538,9 @@ namespace brogueHd::frontend::opengl
 
 			case brogueUIAction::ViewOpenGameMenu:
 			{
-				if (activeProgram != brogueUIProgram::OpenMenuProgram)
+				if (sender != brogueUIProgram::OpenMenuProgram)
 				{
-					_program->deactivateUIProgram(activeProgram);
+					_program->deactivateUIProgram(sender);
 					_program->activateUIProgram(brogueUIProgram::OpenMenuProgram);
 					_program->clearEvents();
 					_uiEventDebouncer->reset();
@@ -474,9 +550,9 @@ namespace brogueHd::frontend::opengl
 
 			case brogueUIAction::ViewPlaybackMenu:
 			{
-				if (activeProgram != brogueUIProgram::PlaybackMenuProgram)
+				if (sender != brogueUIProgram::PlaybackMenuProgram)
 				{
-					_program->deactivateUIProgram(activeProgram);
+					_program->deactivateUIProgram(sender);
 					_program->activateUIProgram(brogueUIProgram::PlaybackMenuProgram);
 					_program->clearEvents();
 					_uiEventDebouncer->reset();
@@ -487,85 +563,6 @@ namespace brogueHd::frontend::opengl
 				break;
 		}
 	}
-
-	bool openglRenderer::thread_initializeGLFW(GLFWwindow*& resultWindow, const gridRect& sceneBoundaryUI)
-	{
-		// Thread Mutex Lock (Still Active)
-
-		// Windowed Mode
-		resultWindow = glfwCreateWindow(sceneBoundaryUI.width, sceneBoundaryUI.height, "Brogue v1.7.5", NULL, NULL);
-
-		// Open GL Context
-		glfwMakeContextCurrent(resultWindow);
-
-		int version = gladLoadGL(glfwGetProcAddress);
-
-		if (!version)
-		{
-			simpleLogger::logColor(brogueConsoleColor::Red, "Error calling gladLoadGL");
-
-			glfwDestroyWindow(resultWindow);
-			//glfwTerminate();
-
-			return false;
-		}
-		else
-		{
-			// Version
-			simpleLogger::logColor(brogueConsoleColor::Yellow, "Glad Version:  {}.{}", GLAD_VERSION_MAJOR(version), GLAD_VERSION_MINOR(version));
-			simpleLogger::logColor(brogueConsoleColor::Yellow, "GL Shading Language:  {}", (char*)glGetString(GL_SHADING_LANGUAGE_VERSION));
-			simpleLogger::logColor(brogueConsoleColor::Yellow, "GL Version:  {}", (char*)glGetString(GL_VERSION));
-			simpleLogger::logColor(brogueConsoleColor::Yellow, "GL Vendor:  {}", (char*)glGetString(GL_VENDOR));
-			simpleLogger::logColor(brogueConsoleColor::Yellow, "GL Renderer:  {}", (char*)glGetString(GL_RENDERER));
-
-			// Print out extension(s)
-			GLint numExtensions;
-			glGetIntegerv(GL_NUM_EXTENSIONS, &numExtensions);
-
-			for (GLint index = 0; index < numExtensions; index++)
-			{
-				simpleLogger::logColor(brogueConsoleColor::Yellow, "GL Extension (loaded):  {}", (char*)glGetStringi(GL_EXTENSIONS, index));
-			}
-		}
-
-		glfwSwapInterval(1);
-
-		// Keyboard Handler
-		glfwSetKeyCallback(resultWindow, &openglRenderer::keyCallback);
-
-		// Mouse Handlers
-		glfwSetCursorPosCallback(resultWindow, mousePositionCallback);
-		glfwSetMouseButtonCallback(resultWindow, mouseButtonCallback);
-		glfwSetScrollCallback(resultWindow, mouseScrollCallback);
-
-		// Window Resize Callback
-		glfwSetFramebufferSizeCallback(resultWindow, &openglRenderer::resizeCallback);
-
-		//// Window Refresh Callback
-		//glfwSetWindowRefreshCallback(resultWindow, &openglRenderer::refreshCallback);
-
-		// Window Close Callback (NOT NEEDED! This is a callback to perform before window closes)
-		glfwSetWindowCloseCallback(resultWindow, &openglRenderer::windowCloseCallback);
-
-		// GL Enable Debug Output:
-		glEnable(GL_DEBUG_OUTPUT);
-		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-		glDebugMessageCallback(&openglRenderer::debugMessage, NULL);
-
-		// (Not sure)
-		glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
-
-		// Khronos Group:       glViewport(x, y, width, height)
-		// Window Coordinates:  (x_w, y_w), (x, y) - position offsets, (width, height) - window size
-		// GL Coordinates:		(x_nd, y_nd)
-
-		// x_w = (x_nd + 1)(width / 2) + x
-		// y_w = (y_nd + 1)(height / 2) + y
-
-		// Initialize the viewport
-		glViewport(0, 0, sceneBoundaryUI.width, sceneBoundaryUI.height);
-	}
-
 	void openglRenderer::thread_start()
 	{
 		int intervalMilliseconds = 10;
@@ -575,13 +572,10 @@ namespace brogueHd::frontend::opengl
 
 		// Get the calculated scene boundary from the UI view components
 		gridRect sceneBoundaryUI = _program->getSceneBoundaryUI();
-		GLFWwindow* window = nullptr;
 
-		if (!thread_initializeGLFW(window, sceneBoundaryUI))
-		{
-			_threadLock->unlock();
-			return;
-		}
+		// Initialize GL
+		if (!_initializedGL)
+			initializeOpenGL(sceneBoundaryUI);
 
 		// *** Compile our program for the main loop:  GL Functions must be called after calling glfwMakeContextCurrent.
 		//
@@ -600,11 +594,14 @@ namespace brogueHd::frontend::opengl
 		opengl::KeyState = new simpleKeyboardState();
 		opengl::MouseState = new simpleMouseState();
 
+		// Update the viewport for the current program
+		glViewport(0, 0, sceneBoundaryUI.width, sceneBoundaryUI.height);
+
 		// THREAD:  UNLOCK TO ENTER PRIMARY LOOP
 		_threadLock->unlock();
 
 		// Main Rendering Loop (haven't seen any issues with this on the other thread.)
-		while (!glfwWindowShouldClose(window) && (_gameModeRequest == _gameMode))
+		while (!glfwWindowShouldClose(_window) /* && (_gameModeRequest == _gameMode) */)
 		{
 			std::this_thread::sleep_for(std::chrono::milliseconds(intervalMilliseconds));
 
@@ -625,13 +622,20 @@ namespace brogueHd::frontend::opengl
 
 			simpleMouseState mouseState(*opengl::MouseState);
 			simpleKeyboardState keyboardState(*opengl::KeyState);
-			bool programChangeThisIteration = false;
+			bool programChangeThisIteration = _gameModeIn != _gameMode;
+
+			// Program Context Change
+			if (programChangeThisIteration)
+			{
+				_program->setMode(_gameModeIn);
+				_gameMode = _gameModeIn;
+			}
 
 			// Check Update(s)
 			_program->checkUpdate(keyboardState, mouseState, intervalMilliseconds);
 
 			// Check normal program update (view state change)
-			if (_program->needsUpdate())
+			if (_program->needsUpdate() || programChangeThisIteration)
 				_program->update(keyboardState, mouseState, intervalMilliseconds);		// Updates program buffers from the UI view
 
 			// Run drawing program
@@ -649,13 +653,15 @@ namespace brogueHd::frontend::opengl
 
 			_threadLock->unlock();
 
-			glfwSwapBuffers(window);
+			glfwSwapBuffers(_window);
 			glfwPollEvents();
 		}
 
 		// Keyboard / Mouse State (cleanup)
 		delete opengl::KeyState;
 		delete opengl::MouseState;
+
+		//_program->teardown();
 
 		// Window could've been destroyed already
 		//

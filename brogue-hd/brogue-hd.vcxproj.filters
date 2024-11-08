@@ -536,13 +536,7 @@
     <ClInclude Include="simpleMouseState.h">
       <Filter>Header Files\frontend\opengl</Filter>
     </ClInclude>
-    <ClInclude Include="brogueFlameMenuProgram.h">
-      <Filter>Header Files\frontend\opengl\program</Filter>
-    </ClInclude>
-    <ClInclude Include="brogueProgramBuilder.h">
-      <Filter>Header Files\frontend\opengl\program</Filter>
-    </ClInclude>
-    <ClInclude Include="brogueProgram.h">
+    <ClInclude Include="brogueDataStreamBuilder.h">
       <Filter>Header Files\frontend\opengl\program</Filter>
     </ClInclude>
     <ClInclude Include="simpleShaderProgram.h">
@@ -626,7 +620,7 @@
     <ClInclude Include="simpleDirectoryEntry.h">
       <Filter>Header Files\simple</Filter>
     </ClInclude>
-    <ClInclude Include="brogueListView.h">
+    <ClInclude Include="brogueComposedView.h">
       <Filter>Header Files\frontend\ui</Filter>
     </ClInclude>
     <ClInclude Include="brogueUIConstants.h">
@@ -638,15 +632,6 @@
     <ClInclude Include="brogueUITagAction.h">
       <Filter>Header Files\frontend\opengl\program\programData</Filter>
     </ClInclude>
-    <ClInclude Include="brogueProgramSignature.h">
-      <Filter>Header Files\frontend\opengl\program\programData</Filter>
-    </ClInclude>
-    <ClInclude Include="brogueProgramState.h">
-      <Filter>Header Files\frontend\opengl\program\programData</Filter>
-    </ClInclude>
-    <ClInclude Include="brogueUIResponseData.h">
-      <Filter>Header Files\frontend\opengl\program\programData</Filter>
-    </ClInclude>
     <ClInclude Include="brogueMouseState.h">
       <Filter>Header Files\frontend\opengl\program\programData</Filter>
     </ClInclude>
@@ -654,9 +639,6 @@
       <Filter>Header Files\frontend\opengl\program\programData</Filter>
     </ClInclude>
     <ClInclude Include="brogueCoordinateConverter.h">
-      <Filter>Header Files\frontend\opengl\program\openglData</Filter>
-    </ClInclude>
-    <ClInclude Include="brogueDataStream.h">
       <Filter>Header Files\frontend\opengl\program\openglData</Filter>
     </ClInclude>
     <ClInclude Include="openglQuadConverter.h">
@@ -673,6 +655,15 @@
     </ClInclude>
     <ClInclude Include="brogueUIEvent.h">
       <Filter>Header Files\backend\controller\eventData</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueProgramBuilder.h">
+      <Filter>Header Files\frontend\opengl\program</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueUIProgramPartConfiguration.h">
+      <Filter>Header Files\frontend\opengl\program\openglData</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueMainProgram.h">
+      <Filter>Header Files\frontend\opengl\program</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

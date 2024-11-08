@@ -1,21 +1,13 @@
 #pragma once
 
-#include "brogueDataStream.h"
-#include "brogueFlameMenu.h"
-#include "brogueFlameMenuProgram.h"
 #include "brogueGlobal.h"
 #include "brogueGlyphMap.h"
 #include "brogueKeyboardState.h"
-#include "brogueListView.h"
 #include "brogueMouseState.h"
 #include "brogueProgramContainer.h"
 #include "brogueUIBuilder.h"
 #include "brogueUIConstants.h"
-#include "brogueView.h"
-#include "brogueViewBase.h"
 #include "brogueViewContainer.h"
-#include "brogueViewProgram.h"
-#include "color.h"
 #include "eventController.h"
 #include "gridRect.h"
 #include "openglRenderer.h"
@@ -23,6 +15,7 @@
 #include "resourceController.h"
 #include "simpleDirectoryEntry.h"
 #include "simpleFileIO.h"
+#include "simpleList.h"
 
 using namespace brogueHd::frontend;
 using namespace brogueHd::frontend::ui;
@@ -43,13 +36,18 @@ namespace brogueHd::backend::controller
 		/// </summary>
 		void setGameMode(BrogueGameMode mode);
 
+		/// <summary>
+		/// Creates program containers with active UI components
+		/// </summary>
+		void initialize();
+
 		brogueKeyboardState getKeyboardState() const;
 		brogueMouseState getMouseState() const;
 		BrogueGameMode getGameModeRequest() const;
 
 	private:
 
-		brogueProgramContainer* _container;
+		brogueProgramContainer* _programContainer;
 
 		randomGenerator* _randomGenerator;
 		eventController* _eventController;
@@ -66,22 +64,43 @@ namespace brogueHd::backend::controller
 		_eventController = eventController;
 		_randomGenerator = randomGenerator;
 
-		_container = new brogueProgramContainer(brogueUIContainer::TitleContainer);
+		int zoomLevel = 9;
+
+		// Title Screen:  Build program parts, load the container
+
+		simpleDirectoryEntry gameFiles = simpleFileIO::readDirectory(_resourceController->getGamesDirectory()->c_str(), ".broguesave");
+		simpleDirectoryEntry recordingFiles = simpleFileIO::readDirectory(_resourceController->getPlaybackDirectory()->c_str(), ".broguerec");
+
+		brogueViewContainer* titleView = brogueUIBuilder::createFlameMenu(_eventController, _randomGenerator, zoomLevel);
+		brogueViewContainer* mainMenu = brogueUIBuilder::createMainMenuButtons(_eventController, zoomLevel);
+		brogueViewContainer* openMenu = brogueUIBuilder::createMainMenuSelector(brogueUIProgram::OpenMenuProgram, _eventController, gameFiles, zoomLevel);
+		brogueViewContainer* playbackMenu = brogueUIBuilder::createMainMenuSelector(brogueUIProgram::PlaybackMenuProgram, _eventController, recordingFiles, zoomLevel);
+		brogueViewContainer* highScoresMenu = brogueUIBuilder::createHighScoresView(_eventController, _resourceController, zoomLevel);
+
+		simpleList<brogueViewContainer*> viewList;
+
+		viewList.add(titleView);
+		viewList.add(mainMenu);
+		viewList.add(openMenu);
+		viewList.add(playbackMenu);
+		viewList.add(highScoresMenu);
+
+		gridRect sceneBoundaryUI = titleView->getSceneBoundary();
+
+		_programContainer = new brogueProgramContainer(resourceController, eventController, _glyphMap, sceneBoundaryUI, zoomLevel, viewList);
 	}
 	renderingController::~renderingController()
 	{
 		delete _openglRenderer;
 		delete _glyphMap;
-
-		for (int index = 0; index < _container->getUIProgramCount(); index++)
-		{
-			delete _container->getUIProgramAt(index);
-		}
-
-		delete _container->getBackgroundProgram();
-		delete _container;
+		delete _programContainer;
 	}
-	
+
+	void renderingController::initialize()
+	{
+		_openglRenderer->setProgram(_programContainer, BrogueGameMode::Title);
+		_openglRenderer->startProgram();
+	}
 	brogueKeyboardState renderingController::getKeyboardState() const
 	{
 		return _openglRenderer->getKeyboardState();
@@ -95,169 +114,15 @@ namespace brogueHd::backend::controller
 		return _openglRenderer->getRequestedMode();
 	}
 
-
 	void renderingController::setGameMode(BrogueGameMode mode)
 	{
-		// Shuts down thread, deletes our program memory
-		_openglRenderer->terminateProgram();
-
-		// Tears down openGL GPU memory used for our program(s)
-		if (_container->isInitialized())
-			_container->teardown();
-
-		// Delete program memory
-		for (int index = 0; index < _container->getUIProgramCount(); index++)
-		{
-			delete _container->getUIProgramAt(index);
-		}
-
-		if (_container->getBackgroundProgram() != nullptr)
-			delete _container->getBackgroundProgram();
-
-		_container->clearUIPrograms();
-
-		if (!_openglRenderer->isInitializedGL())
-			_openglRenderer->initializeOpenGL();
-
-		int zoomLevel = 9;
-
 		switch (mode)
 		{
 			case BrogueGameMode::Title:
-			{
-				simpleDirectoryEntry gameFiles = simpleFileIO::readDirectory(_resourceController->getGamesDirectory()->c_str(), ".broguesave");
-				simpleDirectoryEntry recordingFiles = simpleFileIO::readDirectory(_resourceController->getPlaybackDirectory()->c_str(), ".broguerec");
-
-				brogueFlameMenu* titleView = new brogueFlameMenu(_eventController, brogueUIView::Unnamed, _randomGenerator, 100, zoomLevel);
-				brogueListView* mainMenu = brogueUIBuilder::createMainMenuButtons(_eventController, zoomLevel);
-				brogueListView* openMenu = brogueUIBuilder::createMainMenuSelector(_eventController, brogueUIView::OpenGameSelector, gameFiles, zoomLevel);
-				brogueListView* playbackMenu = brogueUIBuilder::createMainMenuSelector(_eventController, brogueUIView::PlaybackSelector, recordingFiles, zoomLevel);
-				brogueListView* highScoresMenu = brogueUIBuilder::createHighScoresView(_eventController, _resourceController, zoomLevel);
-
-				// Main Menu:  brogueCellQuad, full scene (its view coordinates)
-				brogueDataStream* mainMenuStream =
-					new brogueDataStream(_resourceController,
-										 _glyphMap,
-										 brogueOpenglDataStream::BrogueView,
-										 openglDataStreamType::brogueCellQuad,
-										 openglBrogueCellOutputSelector::Display,
-										 false);
-
-				// Open Menu:  brogueCellQuad, full scene (its view coordinates)
-				brogueDataStream* openMenuStream =
-					new brogueDataStream(_resourceController,
-										 _glyphMap,
-										 brogueOpenglDataStream::BrogueView,
-										 openglDataStreamType::brogueCellQuad,
-										 openglBrogueCellOutputSelector::Display,
-										 false);
-
-				// Playback Menu:  brogueCellQuad, full scene (its view coordinates)
-				brogueDataStream* playbackMenuStream =
-					new brogueDataStream(_resourceController,
-										 _glyphMap,
-										 brogueOpenglDataStream::BrogueView,
-										 openglDataStreamType::brogueCellQuad,
-										 openglBrogueCellOutputSelector::Display,
-										 false);
-
-				// High Scores Menu:  brogueCellQuad, full scene (its view coordinates)
-				brogueDataStream* highScoresStream =
-					new brogueDataStream(_resourceController,
-										 _glyphMap,
-										 brogueOpenglDataStream::BrogueView,
-										 openglDataStreamType::brogueCellQuad,
-										 openglBrogueCellOutputSelector::Display,
-										 false);
-
-				brogueViewProgram* mainMenuProgram =
-					new brogueViewProgram(brogueUIProgram::MainMenuProgram,
-										  mainMenu, _resourceController, _glyphMap,
-										  shaderResource::brogueCellDisplayVert,
-										  shaderResource::brogueCellDisplayFrag,
-										  mainMenuStream,
-										  true);
-
-				brogueViewProgram* openMenuProgram =
-					new brogueViewProgram(brogueUIProgram::OpenMenuProgram,
-										  openMenu, _resourceController, _glyphMap,
-										  shaderResource::brogueCellDisplayVert,
-										  shaderResource::brogueCellDisplayFrag,
-										  openMenuStream,
-										  true);
-
-				brogueViewProgram* playbackMenuProgram =
-					new brogueViewProgram(brogueUIProgram::PlaybackMenuProgram,
-										  playbackMenu, _resourceController, _glyphMap,
-										  shaderResource::brogueCellDisplayVert,
-										  shaderResource::brogueCellDisplayFrag,
-										  playbackMenuStream,
-										  true);
-
-				brogueViewProgram* highScoresProgram =
-					new brogueViewProgram(brogueUIProgram::HighScoresProgram,
-										  highScoresMenu, _resourceController, _glyphMap,
-										  shaderResource::brogueCellDisplayVert,
-										  shaderResource::brogueCellDisplayFrag,
-										  highScoresStream,
-										  true);
-
-				_container->setBackground(new brogueFlameMenuProgram(titleView, _resourceController, _glyphMap));
-				_container->addUIProgram(mainMenuProgram);
-				_container->addUIProgram(openMenuProgram);
-				_container->addUIProgram(playbackMenuProgram);
-				_container->addUIProgram(highScoresProgram);
-
-				_container->activateUIProgram(mainMenuProgram->getProgramName());
-
-				_openglRenderer->setProgram(_container, mode);
-				_openglRenderer->startProgram();
-			}
-			break;
 			case BrogueGameMode::Game:
-			{
-				gridRect sceneBounds = brogueUIBuilder::getBrogueSceneBoundary();
-				gridRect sidebarBounds = brogueUIBuilder::getLeftSidebarBoundary();
-				gridRect bottomBarBounds = brogueUIBuilder::getBottomBarBoundary();
-				gridRect flavorTextBounds = brogueUIBuilder::getFlavorTextBoundary();
-				gridRect gameBounds = brogueUIBuilder::getGameBoundary();
-
-				brogueViewBase* background = brogueUIBuilder::createRectangle(_eventController, _resourceController, zoomLevel, colors::red(), sceneBounds);
-				brogueViewBase* sidebar = brogueUIBuilder::createRectangle(_eventController, _resourceController, zoomLevel, colors::blue(), sceneBounds);
-				brogueViewBase* bottomBar = brogueUIBuilder::createRectangle(_eventController, _resourceController, zoomLevel, colors::green(), sceneBounds);
-				brogueViewBase* flavorText = brogueUIBuilder::createRectangle(_eventController, _resourceController, zoomLevel, colors::yellow(), sceneBounds);
-				brogueViewBase* gameView = brogueUIBuilder::createRectangle(_eventController, _resourceController, zoomLevel, colors::getGray(0.3), sceneBounds);
-
-				brogueDataStream* backgroundStream = new brogueDataStream(_resourceController, _glyphMap, brogueOpenglDataStream::BrogueView, openglDataStreamType::brogueColorQuad, openglBrogueCellOutputSelector::Display, true);
-				brogueDataStream* sidebarStream = new brogueDataStream(_resourceController, _glyphMap, brogueOpenglDataStream::BrogueView, openglDataStreamType::brogueColorQuad, openglBrogueCellOutputSelector::Display, true);
-				brogueDataStream* bottomBarStream = new brogueDataStream(_resourceController, _glyphMap, brogueOpenglDataStream::BrogueView, openglDataStreamType::brogueColorQuad, openglBrogueCellOutputSelector::Display, true);
-				brogueDataStream* flavorTextStream = new brogueDataStream(_resourceController, _glyphMap, brogueOpenglDataStream::BrogueView, openglDataStreamType::brogueColorQuad, openglBrogueCellOutputSelector::Display, true);
-				brogueDataStream* gameViewStream = new brogueDataStream(_resourceController, _glyphMap, brogueOpenglDataStream::BrogueView, openglDataStreamType::brogueColorQuad, openglBrogueCellOutputSelector::Display, true);
-
-				brogueViewProgram* backgroundProgram = new brogueViewProgram(brogueUIProgram::ContainerControlledProgram, background, _resourceController, _glyphMap, shaderResource::backgroundColorVert, shaderResource::backgroundColorFrag, backgroundStream, true);
-				brogueViewProgram* sidebarProgram = new brogueViewProgram(brogueUIProgram::ContainerControlledProgram, background, _resourceController, _glyphMap, shaderResource::backgroundColorVert, shaderResource::backgroundColorFrag, sidebarStream, true);
-				brogueViewProgram* bottomBarProgram = new brogueViewProgram(brogueUIProgram::ContainerControlledProgram, background, _resourceController, _glyphMap, shaderResource::backgroundColorVert, shaderResource::backgroundColorFrag, bottomBarStream, true);
-				brogueViewProgram* flavorTextProgram = new brogueViewProgram(brogueUIProgram::ContainerControlledProgram, background, _resourceController, _glyphMap, shaderResource::backgroundColorVert, shaderResource::backgroundColorFrag, flavorTextStream, true);
-				brogueViewProgram* gameViewProgram = new brogueViewProgram(brogueUIProgram::ContainerControlledProgram, background, _resourceController, _glyphMap, shaderResource::backgroundColorVert, shaderResource::backgroundColorFrag, gameViewStream, true);
-
-
-				_container->setBackground(backgroundProgram);
-				//_container->addUIProgram(sidebarProgram);
-				//_container->addUIProgram(bottomBarProgram);
-				//_container->addUIProgram(flavorTextProgram);
-				//_container->addUIProgram(gameViewProgram);
-
-				//_container->activateUIProgram(mainMenuProgram->getProgramName());
-
-				_openglRenderer->setProgram(_container, mode);
-				_openglRenderer->startProgram();
-			}
-			break;
 			case BrogueGameMode::Playback:
-			{
-
-			}
-			break;
+				_openglRenderer->setGameMode(mode);
+				break;
 			default:
 				break;
 		}

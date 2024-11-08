@@ -2,34 +2,36 @@
 
 #include "brogueCellDisplay.h"
 #include "brogueCoordinateConverter.h"
-#include "brogueDataStream.h"
-#include "brogueGlobal.h"
 #include "brogueGlyphMap.h"
 #include "brogueKeyboardState.h"
 #include "brogueMouseState.h"
-#include "brogueProgram.h"
 #include "brogueProgramBuilder.h"
 #include "brogueUIConstants.h"
+#include "brogueUIProgramPartConfiguration.h"
 #include "brogueViewBase.h"
+#include "brogueViewContainer.h"
 #include "gl.h"
 #include "gridRect.h"
-#include "openglHelper.h"
 #include "resourceController.h"
-#include "shaderData.h"
+#include "simple.h"
 #include "simpleDataStream.h"
+#include "simpleException.h"
 #include "simpleGlData.h"
+#include "simpleHash.h"
 #include "simpleKeyboardState.h"
 #include "simpleMouseState.h"
+#include "simplePeriodCounter.h"
 #include "simpleShaderProgram.h"
 
 using namespace brogueHd::component;
 using namespace brogueHd::simple;
+using namespace brogueHd::frontend;
 using namespace brogueHd::frontend::ui;
 using namespace brogueHd::backend::model::layout;
 
 namespace brogueHd::frontend::opengl
 {
-	class brogueViewProgram : public brogueProgram
+	class brogueViewProgram
 	{
 	public:
 
@@ -43,98 +45,126 @@ namespace brogueHd::frontend::opengl
 		/// <param name="view">Reference to the view to be rendered</param>
 		/// <param name="dataStream">(MEMORY!) Data stream:  This produces a specific data structure to render to the VBO</param>
 		brogueViewProgram(brogueUIProgram programName,
-						  brogueViewBase* view,
+						  brogueViewContainer* viewContainer,
 						  resourceController* resourceController,
-						  brogueGlyphMap* glyphMap,
-						  shaderResource vertexShader,
-						  shaderResource fragmentShader,
-						  brogueDataStream* dataStream,
-						  bool useAlphaBlending)
-			: brogueProgram(programName, false)
+						  brogueGlyphMap* glyphMap)
 		{
-			_view = view;
-			_vertexShader = resourceController->getShader(vertexShader);
-			_fragmentShader = resourceController->getShader(fragmentShader);
+			_resourceController = resourceController;
+			_programName = programName;
+			_viewContainer = viewContainer;
 			_programBuilder = new brogueProgramBuilder(resourceController, glyphMap);
-			_program = nullptr;
-			_dataStream = dataStream;
-			_useAlphaBlending = useAlphaBlending;
+			_programs = new simpleHash<brogueUIProgramPart, simpleShaderProgram*>();
+			_active = false;
 		}
 		~brogueViewProgram()
 		{
+			for (int index = 0; index < _programs->count(); index++)
+			{
+				// OpenGL -> Delete GPU Resources
+				_programs->getAt(index)->value->teardown();
+
+				delete _programs->getAt(index)->value;
+			}
+
 			delete _programBuilder;
-			delete _program;
-			delete _dataStream;
+			delete _programs;
 		}
 
-		virtual void initialize() override;
-		virtual void teardown() override;
-		virtual void checkUpdate(const simpleKeyboardState& keyboardState,
-								 const simpleMouseState& mouseState,
-								 int millisecondsLapsed) override;		
+		bool isActive();
+		void initialize();
+		void activate();
+		void deactivate();
+		void checkUpdate(const simpleKeyboardState& keyboardState,
+						 const simpleMouseState& mouseState,
+						 int millisecondsLapsed);
 
-		virtual bool needsUpdate() override;
-		virtual void clearUpdate() override;
-		virtual void clearEvents() override;
+		bool needsUpdate();
+		void clearUpdate();
+		void clearEvents();
 
-		virtual void update(const simpleKeyboardState& keyboardState,
-							const simpleMouseState& mouseState,
-							int millisecondsLapsed) override;
+		void update(const simpleKeyboardState& keyboardState,
+					const simpleMouseState& mouseState,
+					int millisecondsLapsed);
 
-		virtual void run(int millisecondsElapsed) override;
-		virtual void outputStatus() const override;
-		virtual bool isCompiled() const override;
-		virtual bool hasErrors() const override;
+		void run(int millisecondsElapsed);
+		void outputStatus() const;
+		bool hasErrors() const;
 
-
-		virtual gridRect getSceneBoundaryUI() const override;
+		gridRect getSceneBoundaryUI() const;
 		simpleQuad getCellSizeUV() const;
 
-		virtual brogueKeyboardState calculateKeyboardState(const simpleKeyboardState& keyboard) override;
-		virtual brogueMouseState calculateMouseState(const simpleMouseState& mouse) override;
-
-		simpleShaderProgram* getProgram() const
-		{
-			return _program;
-		}
+		brogueKeyboardState calculateKeyboardState(const simpleKeyboardState& keyboard);
+		brogueMouseState calculateMouseState(const simpleMouseState& mouse);
 
 	private:
 
-		brogueViewBase* _view;
+		resourceController* _resourceController;
+
+		brogueUIProgram _programName;
+		bool _active;
+		brogueViewContainer* _viewContainer;
 		brogueProgramBuilder* _programBuilder;
-		simpleShaderProgram* _program;
-		shaderData* _vertexShader;
-		shaderData* _fragmentShader;
-		brogueDataStream* _dataStream;
-		bool _useAlphaBlending;
+
+		simpleHash<brogueUIProgramPart, simpleShaderProgram*>* _programs;
+		simpleHash<brogueUIProgramPart, simplePeriodCounter*>* _programCounters;
 	};
 
 	void brogueViewProgram::initialize()
 	{
-		simpleDataStream* stream = _dataStream->createStream(_view);
+		// Create shader programs for each program part
+		for (int index = 0; index < _viewContainer->getViewCount(); index++)
+		{
+			brogueViewBase* view = _viewContainer->getViewAt(index);
+			brogueUIProgramPartConfiguration* configuration = _resourceController->getUIPartConfig(view->getUIData()->getProgramPartName());
+			simpleShaderProgram* program = _programBuilder->buildProgram(view, *configuration);
 
-		_program = _programBuilder->createShaderProgram(stream, _vertexShader, _fragmentShader);
+			// Initialize program part to "active"
+			_programs->add(configuration->programPartName, program);
+			_programCounters->add(configuration->programPartName, new simplePeriodCounter(configuration->minimumUpdatePeriodMilliseconds));
 
-		_program->compile();
-		_program->bind();
+			// *** Load OpenGL Backend
+			program->compile();
+			program->bind();
+		}
+
+		_active = true;
 	}
-	void brogueViewProgram::teardown()
+	void brogueViewProgram::activate()
 	{
-		_program->teardown();
+		_programs->iterate([] (brogueUIProgramPart part, simpleShaderProgram* program)
+		{
+			program->bind();
+
+			return iterationCallback::iterate;
+		});
+
+		_active = true;
+	}
+	void brogueViewProgram::deactivate()
+	{
+		_programs->iterate([] (brogueUIProgramPart part, simpleShaderProgram* program)
+		{
+			program->unBind();
+
+			return iterationCallback::iterate;
+		});
+
+		_active = false;
 	}
 	gridRect brogueViewProgram::getSceneBoundaryUI() const
 	{
-		return _view->calculateSceneBoundaryUI();
+		return _viewContainer->calculateSceneBoundaryUI();
 	}
 
 	simpleQuad brogueViewProgram::getCellSizeUV() const
 	{
-		gridRect sceneBoundaryUI = _view->calculateSceneBoundaryUI();
+		gridRect sceneBoundaryUI = _viewContainer->calculateSceneBoundaryUI();
 
-		brogueCoordinateConverter converter = _programBuilder->createCoordinateConverter(sceneBoundaryUI.width, sceneBoundaryUI.height, _view->getZoomLevel());
+		brogueCoordinateConverter converter = _programBuilder->buildCoordinateConverter(sceneBoundaryUI.width, sceneBoundaryUI.height, _viewContainer->getZoomLevel());
 
 		return converter.getViewConverter()
-						.createQuadNormalizedUV(0, 0, brogueCellDisplay::CellWidth(_view->getZoomLevel()), brogueCellDisplay::CellHeight(_view->getZoomLevel()));
+			.createQuadNormalizedUV(0, 0, brogueCellDisplay::CellWidth(_viewContainer->getZoomLevel()),
+									brogueCellDisplay::CellHeight(_viewContainer->getZoomLevel()));
 	}
 
 	brogueKeyboardState brogueViewProgram::calculateKeyboardState(const simpleKeyboardState& keyboard)
@@ -148,90 +178,176 @@ namespace brogueHd::frontend::opengl
 		//
 		gridRect sceneBoundary = this->getSceneBoundaryUI();
 
-		return brogueMouseState((mouse.getX() / sceneBoundary.width) * _view->getSceneBoundary().width,
-								(mouse.getY() / sceneBoundary.height) * _view->getSceneBoundary().height,
-								mouse.getScrolldYPending() != 0 || mouse.getScrolldXPending() != 0,
-								mouse.getScrolldYPending() > 0, mouse.getLeftButton() > 0);
+		brogueMouseState mouseStateUI((mouse.getX() / sceneBoundary.width) * _viewContainer->getSceneBoundary().width,
+									  (mouse.getY() / sceneBoundary.height) * _viewContainer->getSceneBoundary().height,
+									  mouse.getScrolldXPending() != 0, mouse.getScrolldYPending() != 0,
+									  mouse.getScrolldXPending() < 0, mouse.getScrolldYPending() < 0,
+									  mouse.getLeftButton() > 0);
+
+		return mouseStateUI;
 	}
 
 	void brogueViewProgram::checkUpdate(const simpleKeyboardState& keyboardState,
 										const simpleMouseState& mouseState,
 										int millisecondsLapsed)
 	{
+		if (!_active)
+			throw simpleException("Brogue View Program not active:  brogueViewProgram::checkUpdate");
+
 		brogueKeyboardState keyboardUI = calculateKeyboardState(keyboardState);
 		brogueMouseState mouseUI = calculateMouseState(mouseState);
 
-		// Pass the parameters in to check the program's view (tree)
-		_view->checkUpdate(keyboardUI, mouseUI, millisecondsLapsed);
+		for (int index = 0; index < _viewContainer->getViewCount(); index++)
+		{
+			// Retrieve program part name
+			brogueUIProgramPart partName = _viewContainer->getViewAt(index)->getUIData()->getProgramPartName();
+
+			// Check counter to prevent pre-mature update
+			if (_programCounters->get(partName)->update(millisecondsLapsed));
+			{
+				_viewContainer->checkUpdate(partName, keyboardUI, mouseUI, millisecondsLapsed);
+			}			
+		}
+	}
+
+	bool brogueViewProgram::isActive()
+	{
+		return _active;
 	}
 
 	bool brogueViewProgram::needsUpdate()
 	{
-		return _view->needsUpdate();
+		if (!_active)
+			throw simpleException("Brogue View Program not active:  brogueViewProgram::needsUpdate");
+
+		bool result = false;
+
+		for (int index = 0; index < _viewContainer->getViewCount() && !result; index++)
+		{
+			// Retrieve program part name
+			brogueUIProgramPart partName = _viewContainer->getViewAt(index)->getUIData()->getProgramPartName();
+
+			result |= _viewContainer->needsUpdate(partName);
+		}
+
+		return result;
 	}
 	void brogueViewProgram::clearUpdate()
 	{
-		_view->clearUpdate();
+		if (!_active)
+			throw simpleException("Brogue View Program not active:  brogueViewProgram::clearUpdate");
+
+		for (int index = 0; index < _viewContainer->getViewCount(); index++)
+		{
+			// Retrieve program part name
+			brogueUIProgramPart partName = _viewContainer->getViewAt(index)->getUIData()->getProgramPartName();
+
+			_viewContainer->clearUpdate(partName);
+		}
 	}
 	void brogueViewProgram::clearEvents()
 	{
-		_view->clearEvents();
+		if (!_active)
+			throw simpleException("Brogue View Program not active:  brogueViewProgram::clearEvents");
+
+		for (int index = 0; index < _viewContainer->getViewCount(); index++)
+		{
+			// Retrieve program part name
+			brogueUIProgramPart partName = _viewContainer->getViewAt(index)->getUIData()->getProgramPartName();
+
+			_viewContainer->clearEvents(partName);
+		}
 	}
 	void brogueViewProgram::update(const simpleKeyboardState& keyboardState,
 								   const simpleMouseState& mouseState,
 								   int millisecondsLapsed)
 	{
-		//if (_view->needsUpdate())
-		//{
+		if (!_active)
+			throw simpleException("Brogue View Program not active:  brogueViewProgram::update");
+
 		gridRect sceneBoundary = this->getSceneBoundaryUI();
 
-		brogueMouseState mouseStateUI((mouseState.getX() / sceneBoundary.width) * _view->getSceneBoundary().width,
-									  (mouseState.getY() / sceneBoundary.height) * _view->getSceneBoundary().height,
-									  mouseState.getScrolldYPending() != 0 || mouseState.getScrolldXPending() != 0,
-									  mouseState.getScrolldYPending() > 0, mouseState.getLeftButton() > 0);
+		brogueMouseState mouseStateUI = calculateMouseState(mouseState);
 
 		// TODO: Get translator for the key system; and implement hotkeys
 		brogueKeyboardState keyboardStateUI(-1, -1);
 
-		// View will present new data
-		_view->update(keyboardStateUI, mouseStateUI, millisecondsLapsed);
+		for (int index = 0; index < _viewContainer->getViewCount(); index++)
+		{
+			brogueViewBase* view = _viewContainer->getViewAt(index);
+			brogueUIProgramPart partName = view->getUIData()->getProgramPartName();
 
-		// Must update the data stream
-		simpleDataStream* stream = _dataStream->createStream(_view);
+			if (view->needsUpdate())
+			{
+				// View will present new data
+				view->update(keyboardStateUI, mouseStateUI, millisecondsLapsed);
 
-		// Put the new stream online (deletes the old stream)
-		_program->bind();
-		_program->reBuffer(stream);
-		//}
+				// Must update the data stream
+				simpleDataStream* stream = _programBuilder->buildDataStream(view, *_resourceController->getUIPartConfig(partName));
+
+				// Put the new stream online (deletes the old stream)
+				_programs->get(partName)->bind();
+				_programs->get(partName)->reBuffer(stream);
+			}
+		}
 	}
 
 	void brogueViewProgram::run(int millisecondsElapsed)
 	{
-		if (_useAlphaBlending)
+		if (!_active)
+			throw simpleException("Brogue View Program not active:  brogueViewProgram::run");
+
+		// OpenGL:  Run each active program
+		for (int index = 0; index < _viewContainer->getViewCount(); index++)
 		{
-			glEnable(GL_BLEND);
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			brogueViewBase* view = _viewContainer->getViewAt(index);
+			brogueUIProgramPart partName = view->getUIData()->getProgramPartName();
+			brogueUIProgramPartConfiguration* configuration = _resourceController->getUIPartConfig(view->getUIData()->getProgramPartName());
+			simpleShaderProgram* program = _programs->get(partName);
+
+			if (configuration->useAlphaBlending)
+			{
+				glEnable(GL_BLEND);
+				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			}
+
+			program->bind();
+			program->draw();
+
+			if (configuration->useAlphaBlending)
+				glDisable(GL_BLEND);
 		}
-
-		_program->bind();
-		_program->draw();
-
-		if (_useAlphaBlending)
-			glDisable(GL_BLEND);
 	}
 
 	void brogueViewProgram::outputStatus() const
 	{
-		_program->showErrors();
-	}
+		if (!_active)
+			throw simpleException("Brogue View Program not active:  brogueViewProgram::outputStatus");
 
-	bool brogueViewProgram::isCompiled() const
-	{
-		return openglHelper::getProgramCreated(_program->getHandle());
+		for (int index = 0; index < _viewContainer->getViewCount(); index++)
+		{
+			brogueViewBase* view = _viewContainer->getViewAt(index);
+			brogueUIProgramPart partName = view->getUIData()->getProgramPartName();
+			simpleShaderProgram* program = _programs->get(partName);
+			program->showErrors();
+		}
 	}
 
 	bool brogueViewProgram::hasErrors() const
 	{
-		return _program->hasErrors();
+		if (!_active)
+			throw simpleException("Brogue View Program not active:  brogueViewProgram::hasErrors");
+
+		bool result = false;
+
+		for (int index = 0; index < _viewContainer->getViewCount(); index++)
+		{
+			brogueViewBase* view = _viewContainer->getViewAt(index);
+			brogueUIProgramPart partName = view->getUIData()->getProgramPartName();
+			simpleShaderProgram* program = _programs->get(partName);
+			result |= program->hasErrors();
+		}
+
+		return result;
 	}
 }

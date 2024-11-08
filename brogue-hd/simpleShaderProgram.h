@@ -27,6 +27,7 @@ namespace brogueHd::frontend::opengl
 		void compile();
 		void draw();
 		void bind() override;
+		void unBind() override;
 		void teardown() override;
 
 		bool isCreated() const override
@@ -122,6 +123,9 @@ namespace brogueHd::frontend::opengl
 		openglHelper::outputShaderInfoLog(_fragmentShader.getHandle());
 		openglHelper::outputProgramInfoLog(this->handle);
 		openglHelper::outputProgramParameters(this->handle);
+
+		if (!this->isCreated())
+			simpleLogger::logColor(brogueConsoleColor::Red, "Error creating simpleShaderProgram");
 	}
 
 	void simpleShaderProgram::draw()
@@ -154,6 +158,14 @@ namespace brogueHd::frontend::opengl
 			throw simpleException("Must first call compile() to run shader program:  simpleShaderProgram.h");
 
 		glUseProgram(this->handle);
+	}
+
+	void simpleShaderProgram::unBind()
+	{
+		if (!this->isCreated())
+			throw simpleException("Must first call compile() to run shader program:  simpleShaderProgram.h");
+
+		glUseProgram(NULL);
 	}
 
 	void simpleShaderProgram::bindUniforms()

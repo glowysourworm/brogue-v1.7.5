@@ -19,7 +19,7 @@ namespace brogueHd::frontend::ui
 	{
 	public:
 
-		brogueButton(eventController* eventController, brogueUIView viewName, brogueUIData* data, const gridRect& sceneBoundary, const gridRect& viewBoundary);
+		brogueButton(eventController* eventController, const brogueUIData& data, const gridRect& sceneBoundary, const gridRect& viewBoundary);
 		~brogueButton();
 
 		virtual void update(const brogueKeyboardState& keyboardState,
@@ -29,7 +29,7 @@ namespace brogueHd::frontend::ui
 		virtual bool needsUpdate() const override;
 	};
 
-	brogueButton::brogueButton(eventController* eventController, brogueUIView viewName, brogueUIData* data, const gridRect& sceneBoundary, const gridRect& viewBoundary)
+	brogueButton::brogueButton(eventController* eventController, const brogueUIData& data, const gridRect& sceneBoundary, const gridRect& viewBoundary)
 		: brogueView(eventController, data, sceneBoundary, viewBoundary)
 	{
 		// Initialize the view

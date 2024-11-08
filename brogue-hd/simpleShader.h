@@ -265,7 +265,6 @@ namespace brogueHd::frontend::opengl
 		if (!this->isCreated())
 		{
 			simpleLogger::logColor(brogueConsoleColor::Yellow, "simpleShader already deleted from the backend");
-			return;
 		}
 
 		// Deletes the shader object from the GL backend

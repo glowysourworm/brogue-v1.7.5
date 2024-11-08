@@ -3,20 +3,19 @@
 #include "simpleException.h"
 #include "simpleHash.h"
 #include <functional>
-#include <type_traits>
 
 using namespace brogueHd::simple;
 
 namespace brogueHd::backend::controller
 {
-	template<isHashable EventData>
+	template<isHashable EventSender, isHashable EventData>
 	class brogueEventBase : hashableObject
 	{
-		using DelegateType = std::function<void(EventData)>;
+		using DelegateType = std::function<void(EventSender, EventData)>;
 
 	public:
 
-		brogueEventBase() 
+		brogueEventBase()
 		{
 			_delegates = new simpleHash<int, DelegateType*>();
 			_tokenCounter = 0;
@@ -27,14 +26,14 @@ namespace brogueHd::backend::controller
 			{
 				delete _delegates->get(index);
 			}
-				
+
 			delete _delegates;
 		}
 
 	public:
 
 		int subscribe(DelegateType listenerDelegate)
-		{	
+		{
 			// User tokens should start at 1
 			int token = ++_tokenCounter;
 
@@ -51,11 +50,11 @@ namespace brogueHd::backend::controller
 
 			_delegates->remove(token);
 		}
-		void publish(EventData payload)
+		void publish(EventSender sender, EventData payload)
 		{
 			for (int index = 0; index < _delegates->count(); index++)
 			{
-				(*(_delegates->getAt(index)->value))(payload);
+				(*(_delegates->getAt(index)->value))(sender, payload);
 			}
 		}
 

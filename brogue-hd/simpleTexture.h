@@ -232,7 +232,7 @@ namespace brogueHd::frontend::opengl
 		glDeleteTextures(1, &_textureIndex);
 
 		if (this->isCreated())
-			throw simpleException("simpleTexture problem deleting from the backend");
+			simpleLogger::logColor(brogueConsoleColor::Yellow, "simpleTexture still registered after deletion glIsTexture(..)");
 
 		this->handle = simpleGlObject::HandleNull;
 	}

@@ -1,7 +1,10 @@
 #pragma once
+#include "brogueButton.h"
+#include "brogueComposedView.h"
+#include "brogueFlameMenu.h"
 #include "brogueGlobal.h"
-#include "brogueListView.h"
 #include "brogueScoreEntry.h"
+#include "brogueText.h"
 #include "brogueUIConstants.h"
 #include "brogueUIData.h"
 #include "brogueView.h"
@@ -11,7 +14,7 @@
 #include "colorString.h"
 #include "eventController.h"
 #include "gridRect.h"
-#include "openglRenderer.h"
+#include "randomGenerator.h"
 #include "resourceController.h"
 #include "simpleDirectoryEntry.h"
 #include "simpleExt.h"
@@ -92,7 +95,20 @@ namespace brogueHd::frontend::ui
 							boundary.height - (padding * 2));
 		}
 
-		static brogueListView* createMainMenuButtons(eventController* eventController, int zoomLevel)
+		static brogueViewContainer* createFlameMenu(eventController* eventController, randomGenerator* randGenerator, int zoomLevel)
+		{
+			gridRect sceneBounds = getBrogueSceneBoundary();
+			int fadePeriodMilliseconds = 100;
+
+			brogueFlameMenu* flameMenu = new brogueFlameMenu(eventController, randGenerator, fadePeriodMilliseconds, zoomLevel);
+			brogueViewContainer* result = new brogueViewContainer(brogueUIProgram::FlameMenuProgram);
+
+			result->addView(brogueUIProgramPart::None, flameMenu);
+
+			return result;
+		}
+
+		static brogueViewContainer* createMainMenuButtons(eventController* eventController, int zoomLevel)
 		{
 			// Pulled from Brogue v1.7.5
 			color gradient1(0.22, 0.14, 0.29, 0.5);
@@ -106,15 +122,19 @@ namespace brogueHd::frontend::ui
 			gridRect menuBounds = getMainMenuSelectorBoundary();
 			gridRect paddedBounds = getPaddedBoundary(menuBounds, 1);
 
+			brogueViewContainer* result = new brogueViewContainer(brogueUIProgram::MainMenuProgram);
+			brogueUIData composedViewData(brogueUIProgram::MainMenuProgram, brogueUIProgramPart::None, sceneBounds, zoomLevel);
+			brogueComposedView* composedView = new brogueComposedView(composedViewData);
+
 			color menuColor1(0, 0, 0, 1.0f);
 			color menuColor2(0, 0, 0, 0.2f);
 
 			// Menu Background
-			brogueUIData* menuData = new brogueUIData(menuBounds, zoomLevel, menuColor1, menuColor2, brogueGradientType::Circular);
+			brogueUIData menuData(brogueUIProgram::MainMenuProgram, brogueUIProgramPart::MenuBackground, menuBounds, zoomLevel, menuColor1, menuColor2, brogueGradientType::Circular);
 
-			menuData->setUIParameters(-1, -1, "", brogueUIAction::None, false, true, 1, zoomLevel);
+			menuData.setUIParameters(-1, -1, "", brogueUIAction::None, false, true, 1, zoomLevel);
 
-			simpleList<brogueUIData*> buttons;
+			simpleList<brogueUIData> buttons;
 			int buttonPadding = 1;
 
 			for (int index = 0; index < 5; index++)
@@ -126,41 +146,57 @@ namespace brogueHd::frontend::ui
 
 				if (index == 0)
 				{
-					buttons.add(new brogueUIData(boundary, zoomLevel, colorString("New Game"), gradient1, gradient2, active1, active2, pressed1, pressed2, brogueGradientType::Horizontal, brogueTextAlignment::Center));
-					buttons.get(index)->setUIParameters(0, -1, "", brogueUIAction::NewGame, true, true, 0, zoomLevel);
+					buttons.add(brogueUIData(brogueUIProgram::MainMenuProgram, brogueUIProgramPart::MenuButton, boundary, zoomLevel, colorString("New Game"), gradient1, gradient2, active1, active2, pressed1, pressed2, brogueGradientType::Horizontal, brogueTextAlignment::Center));
+					buttons.get(index).setUIParameters(0, -1, "", brogueUIAction::NewGame, true, true, 0, zoomLevel);
 				}
 				else if (index == 1)
 				{
-					buttons.add(new brogueUIData(boundary, zoomLevel, colorString("Open Game"), gradient1, gradient2, active1, active2, pressed1, pressed2, brogueGradientType::Horizontal, brogueTextAlignment::Center));
-					buttons.get(index)->setUIParameters(0, -1, "", brogueUIAction::ViewOpenGameMenu, true, true, 0, zoomLevel);
+					buttons.add(brogueUIData(brogueUIProgram::MainMenuProgram, brogueUIProgramPart::MenuButton, boundary, zoomLevel, colorString("Open Game"), gradient1, gradient2, active1, active2, pressed1, pressed2, brogueGradientType::Horizontal, brogueTextAlignment::Center));
+					buttons.get(index).setUIParameters(0, -1, "", brogueUIAction::ViewOpenGameMenu, true, true, 0, zoomLevel);
 				}
 				else if (index == 2)
 				{
-					buttons.add(new brogueUIData(boundary, zoomLevel, colorString("View Recording"), gradient1, gradient2, active1, active2, pressed1, pressed2, brogueGradientType::Horizontal, brogueTextAlignment::Center));
-					buttons.get(index)->setUIParameters(0, -1, "", brogueUIAction::ViewPlaybackMenu, true, true, 0, zoomLevel);
+					buttons.add(brogueUIData(brogueUIProgram::MainMenuProgram, brogueUIProgramPart::MenuButton, boundary, zoomLevel, colorString("View Recording"), gradient1, gradient2, active1, active2, pressed1, pressed2, brogueGradientType::Horizontal, brogueTextAlignment::Center));
+					buttons.get(index).setUIParameters(0, -1, "", brogueUIAction::ViewPlaybackMenu, true, true, 0, zoomLevel);
 				}
 				else if (index == 3)
 				{
-					buttons.add(new brogueUIData(boundary, zoomLevel, colorString("High Scores"), gradient1, gradient2, active1, active2, pressed1, pressed2, brogueGradientType::Horizontal, brogueTextAlignment::Center));
-					buttons.get(index)->setUIParameters(0, -1, "", brogueUIAction::ViewHighScores, true, true, 0, zoomLevel);
+					buttons.add(brogueUIData(brogueUIProgram::MainMenuProgram, brogueUIProgramPart::MenuButton, boundary, zoomLevel, colorString("High Scores"), gradient1, gradient2, active1, active2, pressed1, pressed2, brogueGradientType::Horizontal, brogueTextAlignment::Center));
+					buttons.get(index).setUIParameters(0, -1, "", brogueUIAction::ViewHighScores, true, true, 0, zoomLevel);
 				}
 				else if (index == 4)
 				{
-					buttons.add(new brogueUIData(boundary, zoomLevel, colorString("Quit"), gradient1, gradient2, active1, active2, pressed1, pressed2, brogueGradientType::Horizontal, brogueTextAlignment::Center));
-					buttons.get(index)->setUIParameters(0, -1, "", brogueUIAction::ShowQuitGameModal, true, true, 0, zoomLevel);
+					buttons.add(brogueUIData(brogueUIProgram::MainMenuProgram, brogueUIProgramPart::MenuButton, boundary, zoomLevel, colorString("Quit"), gradient1, gradient2, active1, active2, pressed1, pressed2, brogueGradientType::Horizontal, brogueTextAlignment::Center));
+					buttons.get(index).setUIParameters(0, -1, "", brogueUIAction::ShowQuitGameModal, true, true, 0, zoomLevel);
 				}
 			}
 
-			brogueView* listBackground = new brogueView(eventController, menuData, sceneBounds, menuBounds);
+			// Finally, create the views
+			brogueView* background = new brogueView(eventController, menuData, sceneBounds, sceneBounds);
 
-			return new brogueListView(eventController, listBackground, brogueUIView::MainMenuSelector, menuData, buttons, nullptr, nullptr);
+			for (int index = 0; index < buttons.count(); index++)
+			{
+				brogueButton* item = new brogueButton(eventController, buttons.get(index), sceneBounds, buttons.get(index).getBounds());
+
+				composedView->addView(item);
+			}
+
+			composedView->addView(background);
+
+			result->addView(brogueUIProgramPart::None, composedView);
+
+			return result;
 		}
 
-		static brogueListView* createMainMenuSelector(eventController* eventController, brogueUIView viewName, const simpleDirectoryEntry& files, int zoomLevel)
+		static brogueViewContainer* createMainMenuSelector(brogueUIProgram programName, eventController* eventController, const simpleDirectoryEntry& files, int zoomLevel)
 		{
 			gridRect sceneBounds = getBrogueSceneBoundary();
 			gridRect menuBounds = getOpenMenuSelectorBoundary();
 			gridRect paddedBounds = getPaddedBoundary(menuBounds, 1);
+
+			brogueViewContainer* result = new brogueViewContainer(brogueUIProgram::MainMenuProgram);
+			brogueUIData composedViewData(programName, brogueUIProgramPart::None, sceneBounds, zoomLevel);
+			brogueComposedView* composedView = new brogueComposedView(composedViewData);
 
 			// Pulled from Brogue v1.7.5
 			color menuColor1(0.067, 0.059, 0.149, 0.8f);
@@ -171,16 +207,10 @@ namespace brogueHd::frontend::ui
 			color pressed2(0.7, 0.7, 0.7, 0.8);
 
 			// Menu Background
-			brogueUIData* menuData = new brogueUIData(menuBounds, zoomLevel, menuColor1, menuColor2, brogueGradientType::Circular);
-			menuData->setUIParameters(-1, -1, "", brogueUIAction::None, true, true, 1, zoomLevel);
+			brogueUIData menuData(programName, brogueUIProgramPart::MenuBackground, menuBounds, zoomLevel, menuColor1, menuColor2, brogueGradientType::Circular);
+			menuData.setUIParameters(-1, -1, "", brogueUIAction::None, true, true, 1, zoomLevel);
 
-			// Header (None)
-			gridRect headerBounds(paddedBounds.column, paddedBounds.row, paddedBounds.width, 1);
-			brogueUIData* headerData = new brogueUIData(headerBounds, zoomLevel, colorString("Open Saved Game", colors::yellow()), menuColor1, menuColor2, brogueTextAlignment::Center);
-
-			headerData->setUIParameters(-1, -1, "", brogueUIAction::None, false, true, 0, zoomLevel);
-
-			simpleList<brogueUIData*> buttons;
+			simpleList<brogueUIData> buttons;
 
 			simpleList<simpleFileEntry*> filesSorted = files.sort();
 
@@ -243,41 +273,57 @@ namespace brogueHd::frontend::ui
 					}
 				}
 
-				brogueUIData* data = new brogueUIData(boundary, zoomLevel, colorString(result.c_str(), colors::white()), menuColor1, menuColor2, active1, active2, pressed1, pressed2, brogueGradientType::Horizontal, brogueTextAlignment::Left);
+				brogueUIData data(programName, brogueUIProgramPart::MenuButton, boundary, zoomLevel, colorString(result.c_str(), colors::white()), menuColor1, menuColor2, active1, active2, pressed1, pressed2, brogueGradientType::Horizontal, brogueTextAlignment::Left);
 
 				// Hotkey is the first letter a), b), etc..
-				data->setUIParameters(0, -1, *(filesSorted.get(index)->getFileFullPath()), brogueUIAction::OpenGame, true, true, 0, zoomLevel);
+				data.setUIParameters(0, -1, *(filesSorted.get(index)->getFileFullPath()), brogueUIAction::OpenGame, true, true, 0, zoomLevel);
 
 				buttons.add(data);
 			}
 
-			brogueView* listBackground = new brogueView(eventController, menuData, sceneBounds, menuBounds);
+			// Finally, create the views
+			brogueView* background = new brogueView(eventController, menuData, sceneBounds, sceneBounds);
 
-			return new brogueListView(eventController, listBackground, viewName, menuData, buttons, headerData, nullptr);
+			for (int index = 0; index < buttons.count(); index++)
+			{
+				brogueButton* item = new brogueButton(eventController, buttons.get(index), sceneBounds, buttons.get(index).getBounds());
+
+				composedView->addView(item);
+			}
+
+			composedView->addView(background);
+
+			result->addView(brogueUIProgramPart::MenuBackground, composedView);
+
+			return result;
 		}
 
-		static brogueListView* createHighScoresView(eventController* eventController, resourceController* resourceController, int zoomLevel)
+		static brogueViewContainer* createHighScoresView(eventController* eventController, resourceController* resourceController, int zoomLevel)
 		{
 			gridRect sceneBounds = getBrogueSceneBoundary();
+
+			brogueViewContainer* result = new brogueViewContainer(brogueUIProgram::HighScoresProgram);
+			brogueUIData composedViewData(brogueUIProgram::HighScoresProgram, brogueUIProgramPart::None, sceneBounds, zoomLevel);
+			brogueComposedView* composedView = new brogueComposedView(composedViewData);
 
 			// Pulled from Brogue v1.7.5
 			color menuColor(0, 0, 0, 0.85);
 			color footerColor(0.596f, 0.494f, 0.996f, 1);
-
-			// Menu Background
-			brogueUIData* menuData = new brogueUIData(sceneBounds, zoomLevel, menuColor);
 			int menuPadding = 2;
 
+			// Menu Background
+			brogueUIData menuData(brogueUIProgram::HighScoresProgram, brogueUIProgramPart::Background, sceneBounds, zoomLevel, menuColor);
+
 			// Padding
-			menuData->setUIParameters(-1, -1, "", brogueUIAction::ViewMainMenu, true, true, menuPadding, zoomLevel);
+			menuData.setUIParameters(-1, -1, "", brogueUIAction::ViewMainMenu, true, true, menuPadding, zoomLevel);
 
 			// Header
 			gridRect headerBounds(sceneBounds.column, sceneBounds.row, sceneBounds.width, 1);
-			brogueUIData* headerData = new brogueUIData(headerBounds, zoomLevel, colorString("-- High Scores --", colors::yellow()), menuColor, brogueTextAlignment::Center);
+			brogueUIData headerData(brogueUIProgram::HighScoresProgram, brogueUIProgramPart::Text, headerBounds, zoomLevel, colorString("-- High Scores --", colors::yellow()), menuColor, brogueTextAlignment::Center);
 
-			headerData->setUIParameters(-1, -1, "", brogueUIAction::None, false, true, 0, zoomLevel);
+			headerData.setUIParameters(-1, -1, "", brogueUIAction::None, false, true, 0, zoomLevel);
 
-			simpleList<brogueUIData*> items;
+			simpleList<brogueUIData> items;
 
 			for (int index = 0; index < resourceController->getHighScoreCount(); index++)
 			{
@@ -299,64 +345,69 @@ namespace brogueHd::frontend::ui
 
 				color foreGround = color::interpolate(colors::white(), colors::black(), index / (float)resourceController->getHighScoreCount());
 
-				brogueUIData* data = new brogueUIData(boundary, zoomLevel, colorString(formattedEntry.c_str(), foreGround), menuColor, brogueTextAlignment::Center);
+				brogueUIData data(brogueUIProgram::HighScoresProgram, brogueUIProgramPart::Text, boundary, zoomLevel, colorString(formattedEntry.c_str(), foreGround), menuColor, brogueTextAlignment::Center);
 
-				data->setUIParameters(-1, -1, "", brogueUIAction::None, true, true, 0, zoomLevel);
+				data.setUIParameters(-1, -1, "", brogueUIAction::None, true, true, 0, zoomLevel);
 
 				items.add(data);
 			}
 
 			// Footer
 			gridRect footerBounds(sceneBounds.column, sceneBounds.height - 1, sceneBounds.width, 1);
-			brogueUIData* footerData = new brogueUIData(footerBounds, zoomLevel, colorString("Press space to continue.", footerColor), menuColor, brogueTextAlignment::Center);
+			brogueUIData footerData(brogueUIProgram::HighScoresProgram, brogueUIProgramPart::Text, footerBounds, zoomLevel, colorString("Press space to continue.", footerColor), menuColor, brogueTextAlignment::Center);
 
-			brogueView* listBackground = new brogueView(eventController, menuData, sceneBounds, sceneBounds);
+			// Finally, create the views
+			brogueView* background = new brogueView(eventController, menuData, sceneBounds, sceneBounds);
+			brogueView* header = new brogueView(eventController, headerData, sceneBounds, headerBounds);
+			brogueView* footer = new brogueView(eventController, footerData, sceneBounds, footerBounds);
 
-			return new brogueListView(eventController, listBackground, brogueUIView::HighScoresView, menuData, items, headerData, footerData);
-		}
+			for (int index = 0; index < items.count(); index++)
+			{
+				brogueText* item = new brogueText(eventController, items.get(index), sceneBounds, items.get(index).getBounds());
 
-		static brogueView* createRectangle(eventController* eventController, 
-										   resourceController* resourceController, 
-										   int zoomLevel, 
-										   const color& color, 
-										   const gridRect& bounds)
-		{
-			gridRect sceneBounds = getBrogueSceneBoundary();
+				composedView->addView(item);
+			}
 
-			brogueUIData* data = new brogueUIData(sceneBounds, zoomLevel, color);
+			composedView->addView(background);
+			composedView->addView(header);
+			composedView->addView(footer);
 
-			return new brogueView(eventController, data, sceneBounds, bounds);
+			result->addView(brogueUIProgramPart::None, composedView);
+
+			return result;
 		}
 
 		static brogueViewContainer* createGameView(eventController* eventController, resourceController* resourceController, int zoomLevel)
 		{
-			gridRect sceneBounds = getBrogueSceneBoundary();
-			gridRect sidebarBounds = getLeftSidebarBoundary();
-			gridRect bottomBarBounds = getBottomBarBoundary();
-			gridRect flavorTextBounds = getFlavorTextBoundary();
-			gridRect gameBounds = getGameBoundary();
+			//gridRect sceneBounds = getBrogueSceneBoundary();
+			//gridRect sidebarBounds = getLeftSidebarBoundary();
+			//gridRect bottomBarBounds = getBottomBarBoundary();
+			//gridRect flavorTextBounds = getFlavorTextBoundary();
+			//gridRect gameBounds = getGameBoundary();
 
-			brogueUIData* backgroundData = new brogueUIData(sceneBounds, zoomLevel, colors::black());
-			brogueUIData* sidebarData = new brogueUIData(sceneBounds, zoomLevel, colors::blue());
-			brogueUIData* bottomBarData = new brogueUIData(sceneBounds, zoomLevel, colors::green());
-			brogueUIData* flavorTextData = new brogueUIData(sceneBounds, zoomLevel, colors::white());
-			brogueUIData* gameData = new brogueUIData(sceneBounds, zoomLevel, colors::getGray(0.5));
+			//brogueUIData* backgroundData = new brogueUIData(sceneBounds, zoomLevel, colors::black());
+			//brogueUIData* sidebarData = new brogueUIData(sceneBounds, zoomLevel, colors::blue());
+			//brogueUIData* bottomBarData = new brogueUIData(sceneBounds, zoomLevel, colors::green());
+			//brogueUIData* flavorTextData = new brogueUIData(sceneBounds, zoomLevel, colors::white());
+			//brogueUIData* gameData = new brogueUIData(sceneBounds, zoomLevel, colors::getGray(0.5));
 
-			brogueView* background = new brogueView(eventController, backgroundData, sceneBounds, sceneBounds);
+			//brogueView* background = new brogueView(eventController, backgroundData, sceneBounds, sceneBounds);
 
-			brogueView* sidebar = new brogueView(eventController, sidebarData, sceneBounds, sidebarBounds);
-			brogueView* bottomBar = new brogueView(eventController, bottomBarData, sceneBounds, bottomBarBounds);
-			brogueView* flavorText = new brogueView(eventController, flavorTextData, sceneBounds, flavorTextBounds);
-			brogueView* gameView = new brogueView(eventController, gameData, sceneBounds, gameBounds);
+			//brogueView* sidebar = new brogueView(eventController, sidebarData, sceneBounds, sidebarBounds);
+			//brogueView* bottomBar = new brogueView(eventController, bottomBarData, sceneBounds, bottomBarBounds);
+			//brogueView* flavorText = new brogueView(eventController, flavorTextData, sceneBounds, flavorTextBounds);
+			//brogueView* gameView = new brogueView(eventController, gameData, sceneBounds, gameBounds);
 
-			brogueViewContainer* container = new brogueViewContainer(background, brogueUIView::GameView, sceneBounds, sceneBounds);
+			//brogueViewContainer* container = new brogueViewContainer(background, brogueUIView::GameView, sceneBounds, sceneBounds);
 
-			container->addView(sidebar);
-			container->addView(bottomBar);
-			container->addView(flavorText);
-			container->addView(gameView);
+			//container->addView(sidebar);
+			//container->addView(bottomBar);
+			//container->addView(flavorText);
+			//container->addView(gameView);
 
-			return container;
+			//return container;
+
+			return nullptr;
 		}
 	};
 }

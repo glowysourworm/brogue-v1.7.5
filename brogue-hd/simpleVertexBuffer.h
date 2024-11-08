@@ -116,7 +116,7 @@ namespace brogueHd::frontend::opengl
 		createVertexAttributes(programHandle);
 
 		if (!this->isCreated())
-			simpleException::show("simpleVertexBuffer creation error");
+			simpleLogger::logColor(brogueConsoleColor::Red, "simpleVertexBuffer creation error");
 	}
 
 	template<typename T>

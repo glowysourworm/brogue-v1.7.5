@@ -151,6 +151,12 @@ namespace brogueHd::component
 			return true;
 		}
 
+		void expand(const gridRect& rect)
+		{
+			expand(rect.left(), rect.top());
+			expand(rect.right(), rect.bottom());
+		}
+
 		void expand(short acolumn, short arow)
 		{
 			if (acolumn < left())

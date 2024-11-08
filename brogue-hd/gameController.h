@@ -29,6 +29,11 @@ namespace brogueHd::backend::controller
 		~gameController();
 
 		/// <summary>
+		/// Initializes backend components; and starts the rendering thread.
+		/// </summary>
+		void initialize();
+
+		/// <summary>
 		/// Loads keymap file into the key processor
 		/// </summary>
 		void loadKeymap();
@@ -135,6 +140,11 @@ namespace brogueHd::backend::controller
 		delete _playbackProcessor;
 		delete _renderingController;
 		delete _eventController;
+	}
+
+	void gameController::initialize()
+	{
+		_renderingController->initialize();
 	}
 
 	void gameController::loadKeymap()

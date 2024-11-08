@@ -99,6 +99,7 @@ namespace brogueHd::console
 
 		// Initialize:  Primary call to init OpenGL Rendering
 		//
+		_gameController->initialize();
 		_gameController->setMode(BrogueGameMode::Title);
 
 		// Operates the current game mode loop to completion

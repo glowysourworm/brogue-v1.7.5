@@ -4,7 +4,6 @@
 #include "brogueKeyboardState.h"
 #include "brogueMouseState.h"
 #include "brogueUIData.h"
-#include "brogueUIEvent.h"
 #include "brogueViewBase.h"
 #include "grid.h"
 #include "gridDefinitions.h"
@@ -27,7 +26,7 @@ namespace brogueHd::frontend::ui
 	{
 	public:
 
-		brogueView(eventController* eventController, brogueUIData* data, const gridRect& sceneBoundary, const gridRect& viewBoundary);
+		brogueView(eventController* eventController, const brogueUIData& data, const gridRect& sceneBoundary, const gridRect& viewBoundary);
 		~brogueView();
 
 		gridRect getSceneBoundary() const override;
@@ -63,7 +62,7 @@ namespace brogueHd::frontend::ui
 
 		virtual void raiseClickEvent(const brogueUITagAction& response) override
 		{
-			_eventController->getUIClickEvent()->publish(response);
+			_eventController->getUIClickEvent()->publish(_uiData->getProgramName(), response);
 		}
 
 		virtual brogueCellDisplay* get(short column, short row) const override;
@@ -74,11 +73,15 @@ namespace brogueHd::frontend::ui
 								 const brogueMouseState& mouseState,
 								 int millisecondsLapsed) override
 		{
+			// Sets primary real time UI data for the mouse / live updates to the UI.
 			_uiData->setUpdate(mouseState.getMouseLeft(), this->isMouseOver(mouseState));
 
 			if (_uiData->getMouseClick() && _uiData->getHasMouseInteraction())
 			{
+				// UI EVENT:  Mouse Click
 				this->raiseClickEvent(*_uiData->getAction());
+
+				// Clears UI event data for the mouse
 				_uiData->clearCapture();
 			}
 		}
@@ -134,11 +137,11 @@ namespace brogueHd::frontend::ui
 		eventController* _eventController;
 	};
 
-	brogueView::brogueView(eventController* eventController, brogueUIData* data, const gridRect& sceneBoundary, const gridRect& viewBoundary)
+	brogueView::brogueView(eventController* eventController, const brogueUIData& data, const gridRect& sceneBoundary, const gridRect& viewBoundary)
 	{
 		_eventController = eventController;
 		_view = new grid<brogueCellDisplay*>(sceneBoundary, viewBoundary);
-		_uiData = data;
+		_uiData = new brogueUIData(data);
 
 		grid<brogueCellDisplay*>* grid = _view;
 

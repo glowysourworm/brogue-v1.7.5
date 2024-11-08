@@ -105,7 +105,7 @@ namespace brogueHd::frontend::opengl
 		_vertexBuffer->glCreate(programHandle);
 
 		if (!this->isCreated())
-			simpleException::show("simpleVertexArray error creating the VAO");
+			simpleLogger::logColor(brogueConsoleColor::Yellow, "simpleVertexArray error creating the VAO");
 	}
 
 	template<typename T>

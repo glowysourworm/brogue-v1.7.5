@@ -4,13 +4,11 @@
 #include "brogueKeyboardState.h"
 #include "brogueMouseState.h"
 #include "brogueUIConstants.h"
-#include "brogueUIData.h"
-#include "brogueView.h"
 #include "brogueViewBase.h"
-#include "gridDefinitions.h"
-#include "gridLocator.h"
 #include "gridRect.h"
 #include "simple.h"
+#include "simpleException.h"
+#include "simpleHash.h"
 #include "simpleList.h"
 
 using namespace brogueHd::component;
@@ -21,225 +19,164 @@ using namespace brogueHd::backend::model::layout;
 namespace brogueHd::frontend::ui
 {
 	/// <summary>
-	/// This container class will provide overrides of the base class and return / utilize
-	/// child views where there are child views defined. Otherwise, it will utilize its own
-	/// grid of cells.
+	/// This container class provide a mechanism to manage views or composed views. 
 	/// </summary>
-	class brogueViewContainer : public brogueViewBase
+	class brogueViewContainer
 	{
 	public:
 
-		/// <summary>
-		/// BrogueViewContainer is the primary brogueUIView for the render path.
-		/// </summary>
-		brogueViewContainer(brogueView* parentView, brogueUIView parentViewName, const gridRect& sceneBoundary, const gridRect& viewBoundary);
+		brogueViewContainer(brogueUIProgram programName);
 		~brogueViewContainer();
 
-		void addView(brogueView* view);
+		void addView(brogueUIProgramPart programPart, brogueViewBase* view);
+		brogueViewBase* getView(brogueUIProgramPart programPart) const;
+		brogueViewBase* getViewAt(int index) const;
+		int getViewCount() const;
 
-		virtual void checkUpdate(const brogueKeyboardState& keyboardState,
-								 const brogueMouseState& mouseState,
-								 int millisecondsLapsed) override;
+	public:
 
-		virtual bool needsUpdate() const override;
-		virtual void clearUpdate() override;
-		virtual void clearEvents() override;
+		void checkUpdate(brogueUIProgramPart programPart,
+						 const brogueKeyboardState& keyboardState,
+						 const brogueMouseState& mouseState,
+						 int millisecondsLapsed);
+		bool needsUpdate(brogueUIProgramPart programPart) const;
+		void clearUpdate(brogueUIProgramPart programPart);
+		void clearEvents(brogueUIProgramPart programPart);
 
-		virtual brogueCellDisplay* get(short column, short row) const override;
+		brogueCellDisplay* get(short column, short row) const;
 
-		/// <summary>
-		/// Iterates child views of the container
-		/// </summary>
-		void iterateChildViews(simpleListCallback<brogueView*> callback) const;
+	public:		// brogueViewBase facade
 
-	public:		// UI Overrides
-
-		virtual gridRect getSceneBoundary() const override
-		{
-			return _parentView->getSceneBoundary();
-		}
-		virtual gridRect getBoundary() const override
-		{
-			return _parentView->getBoundary();
-		}
-		virtual gridRect getPaddedBoundary() const override
-		{
-			return _parentView->getPaddedBoundary();
-		}
-		virtual gridRect getRenderBoundary() const override
-		{
-			return _parentView->getRenderBoundary();
-		}
-
-		virtual gridRect calculateSceneBoundaryUI() const override
-		{
-			return _parentView->calculateSceneBoundaryUI();
-		}
-		virtual gridRect calculateViewBoundaryUI() const override
-		{
-			return _parentView->calculateViewBoundaryUI();
-		}
-
-		virtual void incrementRenderOffset(short columnOffset, short rowOffset)
-		{
-			// Increment Child Views
-			for (int index = 0; index < _childViews->count(); index++)
-			{
-				_childViews->get(index)->incrementRenderOffset(columnOffset, rowOffset);
-			}
-
-			// Increment This View
-			_parentView->incrementRenderOffset(columnOffset, rowOffset);
-		}
-
-		virtual gridLocator getRenderOffset() const
-		{
-			return _parentView->getRenderOffset();
-		}
-
-		virtual bool isMouseOver(const brogueMouseState& mouseState)
-		{
-			return _parentView->isMouseOver(mouseState);
-		}
-
-		virtual int getZoomLevel() const
-		{
-			return _parentView->getZoomLevel();
-		}
-
-		virtual brogueUIData* getUIData() const
-		{
-			return _parentView->getUIData();
-		}
-
-		virtual void iterate(gridCallback<brogueCellDisplay*> callback) const
-		{
-			const brogueViewContainer* that = this;
-
-			_parentView->getBoundary().iterate([&that, &callback] (short column, short row)
-			{
-				return callback(column, row, that->get(column, row));
-			});
-		}
-
-	protected:
-
-		int getViewCount() const
-		{
-			return _childViews->count();
-		}
-
-		brogueUIView getViewName() const
-		{
-			return _parentViewName;
-		}
-
-		brogueView* getParentView() const
-		{
-			return _parentView;
-		}
+		gridRect getSceneBoundary() const;
+		gridRect getBoundary() const;
+		gridRect calculateSceneBoundaryUI() const;
+		gridRect calculateViewBoundaryUI() const;
+		int getZoomLevel() const;
+		brogueUIProgram getProgramName() const;
 
 	private:
 
-		brogueView* _parentView;
-		brogueUIView _parentViewName;
-		simpleList<brogueView*>* _childViews;
+		brogueUIProgram _programName;
+		simpleHash<brogueUIProgramPart, brogueViewBase*>* _views;
 	};
 
-	brogueViewContainer::brogueViewContainer(brogueView* parentView,
-											 brogueUIView parentViewName,
-											 const gridRect& sceneBoundary,
-											 const gridRect& viewBoundary)
+	brogueViewContainer::brogueViewContainer(brogueUIProgram programName)
 	{
-		_childViews = new simpleList<brogueView*>();
-		_parentViewName = parentViewName;
-		_parentView = parentView;
+		_programName = programName;
+		_views = new simpleHash<brogueUIProgramPart, brogueViewBase*>();
 	}
 	brogueViewContainer::~brogueViewContainer()
 	{
-		delete _childViews;
+		delete _views;
 	}
-	void brogueViewContainer::addView(brogueView* view)
+	void brogueViewContainer::addView(brogueUIProgramPart programPart, brogueViewBase* view)
 	{
-		_childViews->add(view);
+		_views->add(programPart, view);
 	}
-	void brogueViewContainer::iterateChildViews(simpleListCallback<brogueView*> callback) const
+	brogueViewBase* brogueViewContainer::getView(brogueUIProgramPart programPart) const
 	{
-		_childViews->forEach(callback);
+		return _views->get(programPart);
+	}
+	brogueViewBase* brogueViewContainer::getViewAt(int index) const
+	{
+		return _views->getAt(index)->value;
+	}
+	brogueUIProgram brogueViewContainer::getProgramName() const
+	{
+		return _programName;
+	}
+	int brogueViewContainer::getViewCount() const
+	{
+		return _views->count();
+	}
+	gridRect brogueViewContainer::getSceneBoundary() const
+	{
+		if (_views->count() == 0)
+			throw simpleException("Must first add views to the brogueViewContainer before accessing data:  brogueViewContainer::getSceneBoundary");
+
+		return _views->getAt(0)->value->getSceneBoundary();
+	}
+	gridRect brogueViewContainer::getBoundary() const
+	{
+		if (_views->count() == 0)
+			throw simpleException("Must first add views to the brogueViewContainer before accessing data:  brogueViewContainer::getBoundary");
+
+		gridRect boundary = default_value::value<gridRect>();
+
+		return _views->getValues().aggregate<gridRect>(boundary, [] (const gridRect& bounds, brogueViewBase* view)
+		{
+			gridRect nextBounds = bounds;
+			gridRect viewBounds = view->getBoundary();
+			nextBounds.expand(viewBounds);
+			return nextBounds;
+		});
+	}
+	gridRect brogueViewContainer::calculateSceneBoundaryUI() const
+	{
+		if (_views->count() == 0)
+			throw simpleException("Must first add views to the brogueViewContainer before accessing data:  brogueViewContainer::calculateSceneBoundaryUI");
+
+		return _views->getAt(0)->value->calculateSceneBoundaryUI();
+	}
+	gridRect brogueViewContainer::calculateViewBoundaryUI() const
+	{
+		if (_views->count() == 0)
+			throw simpleException("Must first add views to the brogueViewContainer before accessing data:  brogueViewContainer::calculateViewBoundaryUI");
+
+		return _views->getAt(0)->value->calculateViewBoundaryUI();
+	}
+	int brogueViewContainer::getZoomLevel() const
+	{
+		if (_views->count() == 0)
+			throw simpleException("Must first add views to the brogueViewContainer before accessing data:  brogueViewContainer::getZoomLevel");
+
+		return _views->getAt(0)->value->getZoomLevel();
 	}
 	brogueCellDisplay* brogueViewContainer::get(short column, short row) const
 	{
-		// Check padding first
-		if (!_parentView->getPaddedBoundary().contains(column, row))
-			return _parentView->get(column, row);
+		if (_views->count() == 0)
+			throw simpleException("Must first add views to the brogueViewContainer before accessing data:  brogueViewContainer::get");
 
-		for (int index = 0; index < _childViews->count(); index++)
+		for (int index = 0; index < _views->count(); index++)
 		{
-			// This offset should be shared with the container (but it's better to check and be sure)
-			gridLocator offset = _childViews->get(index)->getRenderOffset();
-
-			// Check child view boundaries (this will be an improper child view)
-			if (_childViews->get(index)->getBoundary().contains(offset.column + column, offset.row + row))
-			{
-				// Retrieve as if from normal boundaries (go ahead an show the improper child)
-				return _childViews->get(index)->get(offset.column + column, offset.row + row);
-			}
+			if (_views->getAt(index)->value->get(column, row) != nullptr)
+				return _views->getAt(index)->value->get(column, row);
 		}
 
-		return _parentView->get(column, row);
+		return nullptr;
 	}
-	void brogueViewContainer::checkUpdate(const brogueKeyboardState& keyboardState,
+	void brogueViewContainer::checkUpdate(brogueUIProgramPart programPart,
+										  const brogueKeyboardState& keyboardState,
 										  const brogueMouseState& mouseState,
 										  int millisecondsLapsed)
 	{
-		// Check child views first (for performance) (NOTE:  This function updates mouse related data; and must be run on child views)
-		_childViews->forEach([&mouseState, &keyboardState, &millisecondsLapsed] (brogueView* view)
+		if (_views->count() == 0)
+			throw simpleException("Must first add views to the brogueViewContainer before accessing data:  brogueViewContainer::checkUpdate");
+
+		for (int index = 0; index < _views->count(); index++)
 		{
-			view->checkUpdate(keyboardState, mouseState, millisecondsLapsed);
-
-			return iterationCallback::iterate;
-		});
-
-		// Parent View
-		_parentView->checkUpdate(keyboardState, mouseState, millisecondsLapsed);
+			_views->getAt(index)->value->checkUpdate(keyboardState, mouseState, millisecondsLapsed);
+		}
 	}
-	bool brogueViewContainer::needsUpdate() const
+	bool brogueViewContainer::needsUpdate(brogueUIProgramPart programPart) const
 	{
-		bool result = false;
+		if (_views->count() == 0)
+			throw simpleException("Must first add views to the brogueViewContainer before accessing data:  brogueViewContainer::needsUpdate");
 
-		_childViews->forEach([&result] (brogueView* view)
-		{
-			result |= view->needsUpdate();
-
-			if (result)
-				return iterationCallback::breakAndReturn;
-			else
-				return iterationCallback::iterate;
-		});
-
-		// Parent View
-		return result || _parentView->needsUpdate();
+		return _views->get(programPart)->needsUpdate();
 	}
-	void brogueViewContainer::clearUpdate()
+	void brogueViewContainer::clearUpdate(brogueUIProgramPart programPart)
 	{
-		_childViews->forEach([] (brogueView* view)
-		{
-			view->clearUpdate();
+		if (_views->count() == 0)
+			throw simpleException("Must first add views to the brogueViewContainer before accessing data:  brogueViewContainer::clearUpdate");
 
-			return iterationCallback::iterate;
-		});
-
-		_parentView->clearUpdate();
+		_views->get(programPart)->clearUpdate();
 	}
-	void brogueViewContainer::clearEvents()
+	void brogueViewContainer::clearEvents(brogueUIProgramPart programPart)
 	{
-		_childViews->forEach([] (brogueView* view)
-		{
-			view->clearEvents();
+		if (_views->count() == 0)
+			throw simpleException("Must first add views to the brogueViewContainer before accessing data:  brogueViewContainer::clearEvents");
 
-			return iterationCallback::iterate;
-		});
-
-		_parentView->clearEvents();
+		_views->get(programPart)->clearEvents();
 	}
 }

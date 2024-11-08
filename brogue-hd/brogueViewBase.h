@@ -2,7 +2,6 @@
 #include "brogueCellDisplay.h"
 #include "brogueKeyboardState.h"
 #include "brogueMouseState.h"
-#include "brogueUIConstants.h"
 #include "brogueUIData.h"
 #include "brogueUITagAction.h"
 #include "gridDefinitions.h"

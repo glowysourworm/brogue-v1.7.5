@@ -12,36 +12,46 @@ namespace brogueHd::frontend::opengl
 		brogueMouseState()
 		{
 			_location = default_value::value<gridLocator>();
-			_scrollPending = false;
-			_scrollUp = false;
+			_scrollPendingX = false;
+			_scrollPendingY = false;
+			_scrollNegativeX = false;
+			_scrollNegativeY = false;
 			_mouseLeft = false;
 		}
-		brogueMouseState(short column, short row, bool scrollPending, bool scrollUp, bool mouseLeft)
+		brogueMouseState(short column, short row, bool scrollPendingX, bool scrollPendingY, bool negativeX, bool negativeY, bool mouseLeft)
 		{
 			_location = gridLocator(column, row);
-			_scrollPending = scrollPending;
-			_scrollUp = scrollUp;
+			_scrollPendingX = scrollPendingX;
+			_scrollPendingY = scrollPendingY;
+			_scrollNegativeX = negativeX;
+			_scrollNegativeY = negativeY;
 			_mouseLeft = mouseLeft;
 		}
-		brogueMouseState(gridLocator location, bool scrollPending, bool scrollUp, bool mouseLeft)
+		brogueMouseState(gridLocator location, bool scrollPendingX, bool scrollPendingY, bool negativeX, bool negativeY, bool mouseLeft)
 		{
 			_location = location;
-			_scrollPending = scrollPending;
-			_scrollUp = scrollUp;
+			_scrollPendingX = scrollPendingX;
+			_scrollPendingY = scrollPendingY;
+			_scrollNegativeX = negativeX;
+			_scrollNegativeY = negativeY;
 			_mouseLeft = mouseLeft;
 		}
 		brogueMouseState(const brogueMouseState& copy)
 		{
 			_location = copy.getLocation();
-			_scrollPending = copy.getScrollPending();
-			_scrollUp = copy.getIsScrollUp();
+			_scrollPendingX = getScrollPendingX();
+			_scrollPendingY = getScrollPendingY();
+			_scrollNegativeX = getScrollNegativeX();
+			_scrollNegativeY = getScrollNegativeY();
 			_mouseLeft = copy.getMouseLeft();
 		}
 		void operator=(const brogueMouseState& copy)
 		{
 			_location = copy.getLocation();
-			_scrollPending = copy.getScrollPending();
-			_scrollUp = copy.getIsScrollUp();
+			_scrollPendingX = getScrollPendingX();
+			_scrollPendingY = getScrollPendingY();
+			_scrollNegativeX = getScrollNegativeX();
+			_scrollNegativeY = getScrollNegativeY();
 			_mouseLeft = copy.getMouseLeft();
 		}
 
@@ -49,13 +59,21 @@ namespace brogueHd::frontend::opengl
 		{
 			return _location;
 		}
-		bool getScrollPending() const
+		bool getScrollPendingX() const
 		{
-			return _scrollPending;
+			return _scrollPendingX;
 		}
-		bool getIsScrollUp() const
+		bool getScrollPendingY() const
 		{
-			return _scrollUp;
+			return _scrollPendingY;
+		}
+		bool getScrollNegativeX() const
+		{
+			return _scrollNegativeX;
+		}
+		bool getScrollNegativeY() const
+		{
+			return _scrollNegativeY;
 		}
 		bool getMouseLeft() const
 		{
@@ -65,8 +83,10 @@ namespace brogueHd::frontend::opengl
 	private:
 
 		gridLocator _location;
-		bool _scrollPending;
-		bool _scrollUp;
+		bool _scrollPendingX;
+		bool _scrollPendingY;
+		bool _scrollNegativeX;
+		bool _scrollNegativeY;
 		bool _mouseLeft;
 
 	};

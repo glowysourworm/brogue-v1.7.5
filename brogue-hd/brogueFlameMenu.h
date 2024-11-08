@@ -29,7 +29,6 @@ namespace brogueHd::frontend::ui
 	{
 	public:
 		brogueFlameMenu(eventController* eventController,
-						brogueUIView viewName,
 						randomGenerator* randomGenerator,
 						int fadePeriodMilliseconds,
 						int zoomLevel);
@@ -127,13 +126,12 @@ namespace brogueHd::frontend::ui
 	};
 
 	brogueFlameMenu::brogueFlameMenu(eventController* eventController,
-									 brogueUIView viewName,
 									 randomGenerator* randomGenerator,
 									 int fadePeriodMilliseconds,
 									 int zoomLevel)
 
 		: brogueView(eventController, 
-					 new brogueUIData(gridRect(0, 0, COLS, ROWS), zoomLevel), 
+					 brogueUIData(brogueUIProgram::FlameMenuProgram, brogueUIProgramPart::None, gridRect(0, 0, COLS, ROWS), zoomLevel), 
 					 gridRect(0, 0, COLS, ROWS), 
 					 gridRect(0, 0, COLS, ROWS))
 	{

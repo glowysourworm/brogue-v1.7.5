@@ -1,13 +1,20 @@
 #pragma once
+#include "brogueGlobal.h"
+#include "brogueGlyphMap.h"
 #include "brogueKeyboardState.h"
+#include "brogueMainProgram.h"
 #include "brogueMouseState.h"
-#include "brogueProgram.h"
 #include "brogueUIConstants.h"
+#include "brogueViewContainer.h"
+#include "brogueViewProgram.h"
+#include "eventController.h"
 #include "gridRect.h"
+#include "resourceController.h"
 #include "simple.h"
 #include "simpleException.h"
 #include "simpleHash.h"
 #include "simpleKeyboardState.h"
+#include "simpleList.h"
 #include "simpleMouseState.h"
 
 namespace brogueHd::frontend::opengl
@@ -16,287 +23,186 @@ namespace brogueHd::frontend::opengl
 	{
 	public:
 
-		brogueProgramContainer(brogueUIContainer containerName);
+		brogueProgramContainer(resourceController* resourceController,
+							   eventController* eventController,
+							   brogueGlyphMap* glyphMap,
+							   const gridRect& sceneBoundaryUI,
+							   const int zoomLevel,
+							   const simpleList<brogueViewContainer*>& viewList);
 		~brogueProgramContainer();
-
-		void setBackground(brogueProgram* backgroundProgram);
-		void addUIProgram(brogueProgram* uiProgram);
-
-		brogueProgram* getBackgroundProgram();
-		brogueProgram* getUIProgram(brogueUIProgram programName);
-		brogueProgram* getUIProgramAt(int index);
-		int getUIProgramCount();
-		void clearUIPrograms();
 
 		brogueKeyboardState getKeyboardState(const simpleKeyboardState& mouse) const;
 		brogueMouseState getMouseState(const simpleMouseState& mouse) const;
 
+		void setMode(BrogueGameMode gameMode);
+
 		void activateUIProgram(brogueUIProgram programName);
 		void deactivateUIProgram(brogueUIProgram programName);
-		brogueUIProgram getActiveUIProgramName();
+		bool isProgramActive(brogueUIProgram programName);
 
 		void initialize();
-		void teardown();
 		void run(int millisecondsLapsed);
 		void showErrors();
 		bool hasErrors();
-		bool isInitialized();
 
 		/// <summary>
 		/// Following a similar pipeline to the brogueView, checkUpdate checks program parameters needed
 		/// to update the view - also calling the view's checkUpdate method. (creating the pipeline)
 		/// </summary>
-		virtual void checkUpdate(const simpleKeyboardState& keyboardState,
-								 const simpleMouseState& mouseState,
-								 int millisecondsLapsed);
-		virtual void clearUpdate();
-		virtual void clearEvents();
-		virtual bool needsUpdate();
+		void checkUpdate(const simpleKeyboardState& keyboardState,
+						 const simpleMouseState& mouseState,
+						 int millisecondsLapsed);
+		void clearUpdate();
+		void clearEvents();
+		bool needsUpdate();
 
 		/// <summary>
 		/// Following a similar pipeline to the brogueView, update checks program parameters needed
 		/// to update the view - also calling the view's update method. (creating the pipeline)
 		/// </summary>
-		virtual void update(const simpleKeyboardState& keyboardState,
-							const simpleMouseState& mouseState,
-							int millisecondsLapsed);
+		void update(const simpleKeyboardState& keyboardState,
+					const simpleMouseState& mouseState,
+					int millisecondsLapsed);
 
-		gridRect getSceneBoundaryUI() const
-		{
-			return _backgroundProgram->getSceneBoundaryUI();
-		}
+		gridRect getSceneBoundaryUI() const;
 
 	private:
 
-		brogueUIContainer _containerName;
-		brogueProgram* _backgroundProgram;
-		simpleHash<brogueUIProgram, brogueProgram*>* _uiPrograms;
+		resourceController* _resourceController;
+		brogueGlyphMap* _glyphMap;
+
+		brogueMainProgram* _mainProgram;
+
 		bool _initialized;
 	};
 
-	brogueProgramContainer::brogueProgramContainer(brogueUIContainer containerName)
+	brogueProgramContainer::brogueProgramContainer(resourceController* resourceController, 
+												   eventController* eventController,
+												   brogueGlyphMap* glyphMap, 
+												   const gridRect& sceneBoundaryUI,
+												   const int zoomLevel,
+												   const simpleList<brogueViewContainer*>& viewList)
 	{
-		_backgroundProgram = nullptr;
-		_uiPrograms = new simpleHash<brogueUIProgram, brogueProgram*>();
-		_containerName = containerName;
+		_resourceController = resourceController;
+		_glyphMap = glyphMap;
+		_mainProgram = new brogueMainProgram(resourceController, eventController, glyphMap, sceneBoundaryUI, zoomLevel, viewList);
 		_initialized = false;
 	}
-
 	brogueProgramContainer::~brogueProgramContainer()
 	{
-		delete _uiPrograms;
-
+		delete _mainProgram;
+		
 		_initialized = false;
 	}
 
-	bool brogueProgramContainer::isInitialized()
-	{
-		return _initialized;
-	}
-
-	void brogueProgramContainer::setBackground(brogueProgram* backgroundProgram)
-	{
-		_backgroundProgram = backgroundProgram;
-	}
-
-	void brogueProgramContainer::addUIProgram(brogueProgram* uiProgram)
-	{
-		_uiPrograms->add(uiProgram->getProgramName(), uiProgram);
-	}
-
-	brogueProgram* brogueProgramContainer::getBackgroundProgram()
-	{
-		return _backgroundProgram;
-	}
 	brogueKeyboardState brogueProgramContainer::getKeyboardState(const simpleKeyboardState& keyboard) const
 	{
-		return _backgroundProgram->calculateKeyboardState(keyboard);
+		if (!_initialized)
+			throw simpleException("Brogue Program Container must first be initialized:  brogueProgramContainer::getKeyboardState");
+
+		return _mainProgram->calculateKeyboardState(keyboard);
 	}
 	brogueMouseState brogueProgramContainer::getMouseState(const simpleMouseState& mouse) const
 	{
-		return _backgroundProgram->calculateMouseState(mouse);
-	}
-	brogueProgram* brogueProgramContainer::getUIProgram(brogueUIProgram programName)
-	{
-		return _uiPrograms->get(programName);
-	}
+		if (!_initialized)
+			throw simpleException("Brogue Program Container must first be initialized:  brogueProgramContainer::getMouseState");
 
-	brogueProgram* brogueProgramContainer::getUIProgramAt(int index)
-	{
-		return _uiPrograms->getAt(index)->value;
-	}
-
-	int brogueProgramContainer::getUIProgramCount()
-	{
-		return _uiPrograms->count();
-	}
-	void brogueProgramContainer::clearUIPrograms()
-	{
-		_uiPrograms->clear();
+		return _mainProgram->calculateMouseState(mouse);
 	}
 	void brogueProgramContainer::activateUIProgram(brogueUIProgram programName)
 	{
-		_uiPrograms->get(programName)->setIsActive(true);
+		_mainProgram->activateUIProgram(programName);
 	}
 	void brogueProgramContainer::deactivateUIProgram(brogueUIProgram programName)
 	{
-		_uiPrograms->get(programName)->setIsActive(false);
+		_mainProgram->deactivateUIProgram(programName);
 	}
-	brogueUIProgram brogueProgramContainer::getActiveUIProgramName()
+	bool brogueProgramContainer::isProgramActive(brogueUIProgram programName)
 	{
-		return _uiPrograms->firstOrDefaultKey([] (brogueUIProgram uiProgram, brogueProgram* program)
-		{
-			return program->getIsActive();
-		});
+		if (!_initialized)
+			throw simpleException("Brogue Program Container must first be initialized:  brogueProgramContainer::hasErrors");
+
+		return _mainProgram->isProgramActive(programName);
 	}
 	void brogueProgramContainer::initialize()
 	{
-		_backgroundProgram->initialize();
-
-		_uiPrograms->iterate([] (brogueUIProgram programName, brogueProgram* program)
-		{
-			program->initialize();
-
-			return iterationCallback::iterate;
-		});
+		_mainProgram->initialize();
 
 		_initialized = true;
 	}
-	void brogueProgramContainer::teardown()
+	void brogueProgramContainer::setMode(BrogueGameMode gameMode)
 	{
-		_backgroundProgram->teardown();
-
-		_uiPrograms->iterate([] (brogueUIProgram programName, brogueProgram* program)
-		{
-			program->teardown();
-
-			return iterationCallback::iterate;
-		});
-
-		_initialized = false;
+		_mainProgram->setMode(gameMode);
 	}
+	gridRect brogueProgramContainer::getSceneBoundaryUI() const
+	{
+		if (!_initialized)
+			throw simpleException("Brogue Program Container must first be initialized:  brogueProgramContainer::getSceneBoundaryUI");
+
+		return _mainProgram->getSceneBoundaryUI();
+	}
+
 	void brogueProgramContainer::run(int millisecondsLapsed)
 	{
 		if (!_initialized)
 			throw simpleException("Trying to run brogue program container without initializing the programs:  brogueProgramContainer::run");
 
-		_backgroundProgram->run(millisecondsLapsed);
-
-		_uiPrograms->iterate([&millisecondsLapsed] (brogueUIProgram programName, brogueProgram* program)
-		{
-			if (program->getIsActive())
-				program->run(millisecondsLapsed);
-
-			return iterationCallback::iterate;
-		});
+		_mainProgram->run(millisecondsLapsed);
 	}
 
 	void brogueProgramContainer::showErrors()
 	{
-		_backgroundProgram->outputStatus();
+		if (!_initialized)
+			throw simpleException("Brogue Program Container must first be initialized:  brogueProgramContainer::showErrors");
 
-		_uiPrograms->iterate([] (brogueUIProgram programName, brogueProgram* program)
-		{
-			program->outputStatus();
-
-			return iterationCallback::iterate;
-		});
+		_mainProgram->showErrors();
 	}
 
 	bool brogueProgramContainer::hasErrors()
 	{
-		bool hasErrors = _backgroundProgram->hasErrors();
+		if (!_initialized)
+			throw simpleException("Brogue Program Container must first be initialized:  brogueProgramContainer::hasErrors");
 
-		_uiPrograms->iterate([&hasErrors] (brogueUIProgram programName, brogueProgram* program)
-		{
-			hasErrors |= program->hasErrors();
-
-			return iterationCallback::iterate;
-		});
-
-		return hasErrors;
+		return _mainProgram->hasErrors();
 	}
 
 	void brogueProgramContainer::checkUpdate(const simpleKeyboardState& keyboardState,
 											 const simpleMouseState& mouseState,
 											 int millisecondsLapsed)
 	{
-		// Iterate UI Programs
-		_uiPrograms->iterate([&keyboardState, &mouseState, &millisecondsLapsed] (brogueUIProgram programName, brogueProgram* program)
-		{
-			if (program->getIsActive())
-			{
-				program->checkUpdate(keyboardState, mouseState, millisecondsLapsed);
-			}
+		if (!_initialized)
+			throw simpleException("Brogue Program Container must first be initialized:  brogueProgramContainer::checkUpdate");
 
-			return iterationCallback::iterate;
-		});
-
-		// Pass the response down the pipeline -> background program
-		_backgroundProgram->checkUpdate(keyboardState, mouseState, millisecondsLapsed);
+		_mainProgram->checkUpdate(keyboardState, mouseState, millisecondsLapsed);
 	}
 	void brogueProgramContainer::clearUpdate()
 	{
-		// Iterate UI Programs
-		_uiPrograms->iterate([] (brogueUIProgram programName, brogueProgram* program)
-		{
-			// Go ahead and clear non-active view's data
-			program->clearUpdate();
+		if (!_initialized)
+			throw simpleException("Brogue Program Container must first be initialized:  brogueProgramContainer::clearUpdate");
 
-			return iterationCallback::iterate;
-		});
-
-		_backgroundProgram->clearUpdate();
+		_mainProgram->initialize();
 	}
 	void brogueProgramContainer::clearEvents()
 	{
-		// Iterate UI Programs
-		_uiPrograms->iterate([] (brogueUIProgram programName, brogueProgram* program)
-		{
-			// Go ahead and clear non-active view's data
-			program->clearEvents();
+		if (!_initialized)
+			throw simpleException("Brogue Program Container must first be initialized:  brogueProgramContainer::clearEvents");
 
-			return iterationCallback::iterate;
-		});
-
-		_backgroundProgram->clearEvents();
+		_mainProgram->clearEvents();
 	}
 	bool brogueProgramContainer::needsUpdate()
 	{
-		bool result = false;
+		if (!_initialized)
+			throw simpleException("Brogue Program Container must first be initialized:  brogueProgramContainer::needsUpdate");
 
-		// UI Programs
-		_uiPrograms->iterate([&result] (brogueUIProgram programName, brogueProgram* program)
-		{
-			if (program->getIsActive())
-			{
-				result |= program->needsUpdate();
-			}
-
-			if (result)
-				return iterationCallback::breakAndReturn;
-			else
-				return iterationCallback::iterate;
-		});
-
-		// Pass the response down the pipeline -> background program
-		return result || _backgroundProgram->needsUpdate();
+		return _mainProgram->needsUpdate();
 	}
 	void brogueProgramContainer::update(const simpleKeyboardState& keyboardState,
 										const simpleMouseState& mouseState,
 										int millisecondsLapsed)
 	{
-		//if (_backgroundProgram->needsUpdate())
-		_backgroundProgram->update(keyboardState, mouseState, millisecondsLapsed);
+		if (!_initialized)
+			throw simpleException("Brogue Program Container must first be initialized:  brogueProgramContainer::update");
 
-		_uiPrograms->iterate([&keyboardState, &mouseState, &millisecondsLapsed] (brogueUIProgram programName, brogueProgram* program)
-		{
-			if (program->getIsActive() /* && program->needsUpdate() */)
-			{
-				program->update(keyboardState, mouseState, millisecondsLapsed);
-			}
-
-			return iterationCallback::iterate;
-		});
+		_mainProgram->update(keyboardState, mouseState, millisecondsLapsed);
 	}
 }

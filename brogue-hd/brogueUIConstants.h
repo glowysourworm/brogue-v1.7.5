@@ -42,6 +42,20 @@ namespace brogueHd::frontend
 		ModalProgram = 6
 	};
 
+	enum class brogueUIProgramPart : int
+	{
+		None = -1,
+
+		Background = 0,
+		Text = 1,
+		MenuButton = 3,
+		MenuBackground = 4,
+
+		FlameMenuProgram_HeatSourceProgram = 5,
+		FlameMenuProgram_TitleMaskProgram = 6,
+		FlameMenuProgram_HeatDiffuseProgram = 7,
+	};
+
 	enum brogueProgramPurpose : int
 	{
 		/// <summary>
@@ -63,46 +77,6 @@ namespace brogueHd::frontend
 		OnKeyboardEsc = 8,
 		OnKeyboardHotkey = 16,
 		Any = 32
-	};
-
-	enum brogueOpenglDataStream
-	{
-		/// <summary>
-		/// brogueDataStream renders the default brogueView* data - either frame or entire view, with 
-		/// a user inclusion predicate.
-		/// </summary>
-		BrogueView = 0,
-
-		/// <summary>
-		/// Heat source stream for the title menu
-		/// </summary>
-		HeatSourceStream = 1,
-
-		/// <summary>
-		/// Title mask stream for  the title menu
-		/// </summary>
-		TitleMaskStream = 2
-	};
-
-	enum brogueUIContainer
-	{
-		TitleContainer = 0,
-		GameContainer = 1
-	};
-
-	/// <summary>
-	/// Static name list for UI views responsible for sending detailed interaction messages
-	/// back to the opengl primary controller.
-	/// </summary>
-	enum brogueUIView
-	{
-		Unnamed = 0,
-		MainMenuSelector = 1,
-		OpenGameSelector = 2,
-		PlaybackSelector = 3,
-		HighScoresView = 4,
-		QuitModal = 5,
-		GameView = 6,
 	};
 
 	enum class brogueUIAction

@@ -63,9 +63,9 @@ namespace brogueHd::simple
 		simpleHash();
 		~simpleHash();
 
-		V& operator[](const K& key) const;
+		V operator[](const K& key) const;
 
-		V& get(const K& key) const;
+		V get(const K& key) const;
 		void add(const K& key, const V& value);
 		void set(const K& key, const V& value);
 
@@ -77,7 +77,7 @@ namespace brogueHd::simple
 		bool remove(const K& key);
 		void clear();
 
-		void iterate(simpleHashCallback<K, V> callback) const;
+		void iterate(const simpleHashCallback<K, V>& callback) const;
 
 	private:
 
@@ -87,14 +87,17 @@ namespace brogueHd::simple
 
 	public:	// Extension Methods:  mostly queries
 
-		bool any(simpleHashPredicate<K, V> predicate);
-		void forEach(simpleHashCallback<K, V> callback);
-		K& firstKey(simpleHashPredicate<K, V> predicate);
-		K& firstOrDefaultKey(simpleHashPredicate<K, V> predicate);
-		simpleList<simplePair<K, V>> removeWhere(simpleHashPredicate<K, V> predicate);
+		bool any(const simpleHashPredicate<K, V>& predicate);
+		void forEach(const simpleHashCallback<K, V>& callback);
+		V firstValue();
+		V firstValue(const simpleHashPredicate<K, V>& predicate);
+		K firstKey();
+		K firstKey(const simpleHashPredicate<K, V>& predicate);
+		K firstOrDefaultKey(const simpleHashPredicate<K, V>& predicate);
+		simpleList<simplePair<K, V>> removeWhere(const simpleHashPredicate<K, V>& predicate);
 
 		template<typename VResult>
-		simpleList<VResult> selectFromValues(simpleHashSelector<K, V, VResult> selector);
+		simpleList<VResult> selectFromValues(const simpleHashSelector<K, V, VResult>& selector);
 
 		//K getKeyAt(int index);
 		//V getValueAt(const std::map<K, V>& map, int index);
@@ -160,7 +163,7 @@ namespace brogueHd::simple
 	}
 
 	template<isHashable K, isHashable V>
-	V& simpleHash<K, V>::get(const K& key) const
+	V simpleHash<K, V>::get(const K& key) const
 	{
 		size_t hashCode = this->calculateHashCode(key);
 		size_t bucketIndex = this->calculateBucketIndex(hashCode);
@@ -182,7 +185,7 @@ namespace brogueHd::simple
 	}
 
 	template<isHashable K, isHashable V>
-	V& simpleHash<K, V>::operator[](const K& key) const
+	V simpleHash<K, V>::operator[](const K& key) const
 	{
 		return this->get(key);
 	}
@@ -328,7 +331,7 @@ namespace brogueHd::simple
 	}
 
 	template<isHashable K, isHashable V>
-	void simpleHash<K, V>::iterate(simpleHashCallback<K, V> callback) const
+	void simpleHash<K, V>::iterate(const simpleHashCallback<K, V>& callback) const
 	{
 		for (int index = 0; index < _table->count(); index++)
 		{
@@ -386,7 +389,7 @@ namespace brogueHd::simple
 	}
 
 	template<isHashable K, isHashable V>
-	bool simpleHash<K, V>::any(simpleHashPredicate<K, V> predicate)
+	bool simpleHash<K, V>::any(const simpleHashPredicate<K, V>& predicate)
 	{
 		bool result = false;
 
@@ -403,7 +406,7 @@ namespace brogueHd::simple
 	}
 
 	template<isHashable K, isHashable V>
-	simpleList<simplePair<K, V>> simpleHash<K, V>::removeWhere(simpleHashPredicate<K, V> predicate)
+	simpleList<simplePair<K, V>> simpleHash<K, V>::removeWhere(const simpleHashPredicate<K, V>& predicate)
 	{
 		simpleList<simplePair<K, V>> result;
 
@@ -422,9 +425,18 @@ namespace brogueHd::simple
 	}
 
 	template<isHashable K, isHashable V>
-	K& simpleHash<K, V>::firstKey(simpleHashPredicate<K, V> predicate)
+	K simpleHash<K, V>::firstKey()
 	{
-		K result = NULL;
+		if (this->count() == 0)
+			throw simpleException("Trying to access empty simpleHash:  simpleHash::firstKey");
+
+		return this->getAt(0)->key;
+	}
+
+	template<isHashable K, isHashable V>
+	K simpleHash<K, V>::firstKey(const simpleHashPredicate<K, V>& predicate)
+	{
+		K result = default_value::value<K>();
 
 		this->iterate([&result, &predicate](K key, V value)
 		{
@@ -439,7 +451,30 @@ namespace brogueHd::simple
 	}
 
 	template<isHashable K, isHashable V>
-	void simpleHash<K, V>::forEach(simpleHashCallback<K, V> callback)
+	V simpleHash<K, V>::firstValue()
+	{
+		return this->getAt(0)->value;
+	}
+
+	template<isHashable K, isHashable V>
+	V simpleHash<K, V>::firstValue(const simpleHashPredicate<K, V>& predicate)
+	{
+		V result = default_value::value<V>();
+
+		this->iterate([&result, &predicate] (K key, V value)
+		{
+			if (predicate(key, value))
+			{
+				result = value;
+				return iterationCallback::breakAndReturn;
+			}
+		});
+
+		return result;
+	}
+
+	template<isHashable K, isHashable V>
+	void simpleHash<K, V>::forEach(const simpleHashCallback<K, V>& callback)
 	{
 		this->iterate([&callback](K key, V value)
 		{
@@ -448,7 +483,7 @@ namespace brogueHd::simple
 	}
 
 	template<isHashable K, isHashable V>
-	K& simpleHash<K, V>::firstOrDefaultKey(simpleHashPredicate<K, V> predicate)
+	K simpleHash<K, V>::firstOrDefaultKey(const simpleHashPredicate<K, V>& predicate)
 	{
 		K result = default_value::value<K>();
 
@@ -466,7 +501,7 @@ namespace brogueHd::simple
 
 	template<isHashable K, isHashable V>
 	template<typename VResult>
-	simpleList<VResult> simpleHash<K, V>::selectFromValues(simpleHashSelector<K, V, VResult> selector)
+	simpleList<VResult> simpleHash<K, V>::selectFromValues(const simpleHashSelector<K, V, VResult>& selector)
 	{
 		simpleList<VResult> result;
 

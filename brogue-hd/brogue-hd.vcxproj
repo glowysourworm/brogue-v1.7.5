@@ -182,15 +182,15 @@
     <ClInclude Include="brogueButton.h" />
     <ClInclude Include="brogueEvent.h" />
     <ClInclude Include="brogueKeyboardState.h" />
-    <ClInclude Include="brogueListView.h" />
+    <ClInclude Include="brogueComposedView.h" />
     <ClInclude Include="brogueCellQuad.h" />
-    <ClInclude Include="brogueDataStream.h" />
+    <ClInclude Include="brogueMainProgram.h" />
     <ClInclude Include="brogueMouseState.h" />
+    <ClInclude Include="brogueProgramBuilder.h" />
     <ClInclude Include="brogueProgramContainer.h" />
     <ClInclude Include="brogueUIEvent.h" />
+    <ClInclude Include="brogueUIProgramPartConfiguration.h" />
     <ClInclude Include="brogueUITagAction.h" />
-    <ClInclude Include="brogueProgramSignature.h" />
-    <ClInclude Include="brogueProgramState.h" />
     <ClInclude Include="brogueScoreEntry.h" />
     <ClInclude Include="brogueText.h" />
     <ClInclude Include="brogueUIBuilder.h" />
@@ -209,8 +209,6 @@
     <ClInclude Include="brogueImageQuad.h" />
     <ClInclude Include="brogueLevelProfile.h" />
     <ClInclude Include="brogueMacroDeclaration.h" />
-    <ClInclude Include="brogueFlameMenuProgram.h" />
-    <ClInclude Include="brogueProgram.h" />
     <ClInclude Include="brogueTestFunction.h" />
     <ClInclude Include="brogueGlyphMap.h" />
     <ClInclude Include="brogueViewContainer.h" />
@@ -233,7 +231,7 @@
     <ClInclude Include="brogueObject.h" />
     <ClInclude Include="broguePlayer.h" />
     <ClInclude Include="brogueRoom.h" />
-    <ClInclude Include="brogueProgramBuilder.h" />
+    <ClInclude Include="brogueDataStreamBuilder.h" />
     <ClInclude Include="brogueTestPackage.h" />
     <ClInclude Include="cellularAutomataParameters.h" />
     <ClInclude Include="brogueCoordinateConverter.h" />
@@ -357,7 +355,6 @@
     <ClInclude Include="terrainGenerator.h" />
     <ClInclude Include="simpleTriangle.h" />
     <ClInclude Include="simpleGlData.h" />
-    <ClInclude Include="brogueUIResponseData.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\config.json" />

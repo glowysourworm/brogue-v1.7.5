@@ -18,7 +18,7 @@ namespace brogueHd::frontend::ui
 	{
 	public:
 
-		brogueText(eventController* eventController, brogueUIView viewName, brogueUIData* data, const gridRect& sceneBoundary, const gridRect& viewBoundary);
+		brogueText(eventController* eventController, const brogueUIData& data, const gridRect& sceneBoundary, const gridRect& viewBoundary);
 		~brogueText();
 
 		virtual void update(const brogueKeyboardState& keyboardState,
@@ -28,7 +28,7 @@ namespace brogueHd::frontend::ui
 		virtual bool needsUpdate() const override;
 	};
 
-	brogueText::brogueText(eventController* eventController, brogueUIView viewName, brogueUIData* data, const gridRect& sceneBoundary, const gridRect& viewBoundary)
+	brogueText::brogueText(eventController* eventController, const brogueUIData& data, const gridRect& sceneBoundary, const gridRect& viewBoundary)
 		: brogueView(eventController, data, sceneBoundary, viewBoundary)
 	{
 		update(default_value::value<brogueKeyboardState>(), default_value::value<brogueMouseState>(), 0);
