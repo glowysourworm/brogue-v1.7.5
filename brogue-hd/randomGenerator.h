@@ -7,9 +7,9 @@
 #include <cstdlib>
 
 using namespace brogueHd::simple;
-using namespace brogueHd::backend::model::game;
+using namespace brogueHd::backend::model;
 
-namespace brogueHd::backend::generator
+namespace brogueHd::backend
 {
 	class randomGenerator
 	{

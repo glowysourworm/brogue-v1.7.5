@@ -1,6 +1,6 @@
 #pragma once
 
-namespace brogueHd::backend::model::construction
+namespace brogueHd::backend::model
 {
 	struct linearGenerationParameters
 	{

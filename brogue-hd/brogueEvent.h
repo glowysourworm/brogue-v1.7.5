@@ -6,7 +6,7 @@
 
 using namespace brogueHd::simple;
 
-namespace brogueHd::backend::controller
+namespace brogueHd::backend
 {
 	template<isHashable EventSender, isHashable EventData>
 	class brogueEventBase : hashableObject

@@ -2,7 +2,7 @@
 
 #include "brogueGlobal.h"
 
-namespace brogueHd::backend::model::machine
+namespace brogueHd::backend::model
 {
 	enum machineFeatureFlags 
 	{

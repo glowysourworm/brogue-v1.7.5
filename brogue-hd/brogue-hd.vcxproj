@@ -181,6 +181,7 @@
     <ClInclude Include="boudingBox2D.h" />
     <ClInclude Include="brogueButton.h" />
     <ClInclude Include="brogueEvent.h" />
+    <ClInclude Include="brogueFlameMenuHeatView.h" />
     <ClInclude Include="brogueKeyboardState.h" />
     <ClInclude Include="brogueComposedView.h" />
     <ClInclude Include="brogueCellQuad.h" />
@@ -188,8 +189,10 @@
     <ClInclude Include="brogueMouseState.h" />
     <ClInclude Include="brogueProgramBuilder.h" />
     <ClInclude Include="brogueProgramContainer.h" />
+    <ClInclude Include="brogueTitleGrid.h" />
     <ClInclude Include="brogueUIEvent.h" />
     <ClInclude Include="brogueUIProgramPartConfiguration.h" />
+    <ClInclude Include="brogueUIProgramPartId.h" />
     <ClInclude Include="brogueUITagAction.h" />
     <ClInclude Include="brogueScoreEntry.h" />
     <ClInclude Include="brogueText.h" />
@@ -203,7 +206,7 @@
     <ClInclude Include="brogueContentGrid.h" />
     <ClInclude Include="brogueCreature.h" />
     <ClInclude Include="brogueCreatureHorde.h" />
-    <ClInclude Include="brogueFlameMenu.h" />
+    <ClInclude Include="brogueFlameMenuDiffuseView.h" />
     <ClInclude Include="brogueGlobal.h" />
     <ClInclude Include="brogueGameProfile.h" />
     <ClInclude Include="brogueImageQuad.h" />
@@ -214,6 +217,7 @@
     <ClInclude Include="brogueViewContainer.h" />
     <ClInclude Include="colorGradient.h" />
     <ClInclude Include="eventController.h" />
+    <ClInclude Include="brogueFlameMenuTitleMask.h" />
     <ClInclude Include="openglQuadConverter.h" />
     <ClInclude Include="openglHelper.h" />
     <ClInclude Include="brogueUIConstants.h" />

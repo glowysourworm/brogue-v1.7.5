@@ -5,7 +5,7 @@
 
 using namespace brogueHd::simple;
 
-namespace brogueHd::backend::processor
+namespace brogueHd::backend
 {
 	class keyProcessor
 	{

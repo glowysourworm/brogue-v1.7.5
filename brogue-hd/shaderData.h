@@ -10,7 +10,7 @@
 
 using namespace brogueHd::simple;
 
-namespace brogueHd::frontend::opengl
+namespace brogueHd::frontend
 {
 	/// <summary>
 	/// Represents hard coded data for a shader string source. These variables must be filled out to

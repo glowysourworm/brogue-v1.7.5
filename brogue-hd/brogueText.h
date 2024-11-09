@@ -12,7 +12,7 @@
 
 using namespace brogueHd::component;
 
-namespace brogueHd::frontend::ui
+namespace brogueHd::frontend
 {
 	class brogueText : public brogueView
 	{

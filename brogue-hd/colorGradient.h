@@ -3,7 +3,7 @@
 #include "color.h"
 #include "simple.h"
 
-namespace brogueHd::backend::model::game
+namespace brogueHd::backend::model
 {
 	enum brogueGradientType
 	{

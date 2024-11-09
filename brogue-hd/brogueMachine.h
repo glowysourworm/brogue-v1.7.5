@@ -3,9 +3,6 @@
 #include "machineConstants.h"
 #include "machineTemplate.h"
 
-using namespace brogueHd::backend::model::gameTemplate;
-using namespace brogueHd::backend::model::machine;
-
 namespace brogueHd::backend::model
 {
 	class brogueMachine

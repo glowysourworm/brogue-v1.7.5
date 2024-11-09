@@ -4,7 +4,7 @@
 
 using namespace brogueHd::component;
 
-namespace brogueHd::backend::model::layout
+namespace brogueHd::backend::model
 {
 	template<typename T>
 	struct gridCell : gridLocator

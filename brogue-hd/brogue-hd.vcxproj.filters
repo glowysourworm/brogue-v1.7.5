@@ -428,7 +428,7 @@
     <ClInclude Include="simpleHashTests.h">
       <Filter>Header Files\unit-test</Filter>
     </ClInclude>
-    <ClInclude Include="brogueFlameMenu.h">
+    <ClInclude Include="brogueFlameMenuDiffuseView.h">
       <Filter>Header Files\frontend\ui</Filter>
     </ClInclude>
     <ClInclude Include="brogueView.h">
@@ -664,6 +664,18 @@
     </ClInclude>
     <ClInclude Include="brogueMainProgram.h">
       <Filter>Header Files\frontend\opengl\program</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueUIProgramPartId.h">
+      <Filter>Header Files\frontend\opengl\program\programData</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueTitleGrid.h">
+      <Filter>Header Files\frontend\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueFlameMenuTitleMask.h">
+      <Filter>Header Files\frontend\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueFlameMenuHeatView.h">
+      <Filter>Header Files\frontend\ui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -5,7 +5,7 @@
 
 using namespace brogueHd::component;
 
-namespace brogueHd::frontend::opengl
+namespace brogueHd::frontend
 {
 	struct brogueMouseState
 	{

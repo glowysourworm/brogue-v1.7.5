@@ -17,7 +17,7 @@
 #include "simpleList.h"
 #include "simpleMouseState.h"
 
-namespace brogueHd::frontend::opengl
+namespace brogueHd::frontend
 {
 	class brogueProgramContainer
 	{

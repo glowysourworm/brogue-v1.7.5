@@ -3,9 +3,7 @@
 #include "brogueGlobal.h"
 #include "machineTemplate.h"
 
-using namespace brogueHd::backend::model::gameTemplate;
-
-namespace brogueHd::backend::model::layout
+namespace brogueHd::backend::model
 {
 	typedef struct blueprint {
 		short depthRange[2];				// machine must be built between these dungeon depths

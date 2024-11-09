@@ -32,13 +32,8 @@
 using namespace brogueHd::simple;
 using namespace brogueHd::component;
 using namespace brogueHd::frontend;
-using namespace brogueHd::frontend::opengl;
-using namespace brogueHd::backend::processor;
-using namespace brogueHd::backend::model;
-using namespace brogueHd::backend::model::io;
-using namespace brogueHd::backend::model::game;
 
-namespace brogueHd::backend::controller
+namespace brogueHd::backend
 {
 	class resourceController
 	{
@@ -275,6 +270,7 @@ namespace brogueHd::backend::controller
 												 openglDataStreamType::brogueCellQuad, 
 												 openglBrogueCellOutputSelector::DisplayCurrentFrame, 
 												 30,
+												 false,
 												 false);
 
 		brogueUIProgramPartConfiguration* flameMenu_heatSource =
@@ -284,6 +280,7 @@ namespace brogueHd::backend::controller
 												 openglDataStreamType::brogueColorQuad,
 												 openglBrogueCellOutputSelector::DisplayCurrentFrame,
 												 10,
+												 false,
 												 false);
 
 		brogueUIProgramPartConfiguration* flameMenu_titleMask =
@@ -293,9 +290,20 @@ namespace brogueHd::backend::controller
 												 openglDataStreamType::brogueColorQuad,
 												 openglBrogueCellOutputSelector::DisplayCurrentFrame,
 												 0,
+												 false,
 												 false);
 
 		// Generic Parts
+		brogueUIProgramPartConfiguration* viewCompositor =
+			new brogueUIProgramPartConfiguration(brogueUIProgramPart::ViewCompositor,
+												 shaderResource::backgroundColorVert,
+												 shaderResource::backgroundColorFrag,
+												 openglDataStreamType::brogueColorQuad,
+												 openglBrogueCellOutputSelector::DisplayCurrentFrame,
+												 0,
+												 false,
+												 false);
+
 		brogueUIProgramPartConfiguration* menuButton =
 			new brogueUIProgramPartConfiguration(brogueUIProgramPart::MenuButton,
 												 shaderResource::brogueCellDisplayVert,
@@ -303,6 +311,7 @@ namespace brogueHd::backend::controller
 												 openglDataStreamType::brogueCellQuad,
 												 openglBrogueCellOutputSelector::DisplayCurrentFrame,
 												 0,
+												 false,
 												 false);
 
 		brogueUIProgramPartConfiguration* text =
@@ -312,7 +321,8 @@ namespace brogueHd::backend::controller
 												 openglDataStreamType::brogueCellQuad,
 												 openglBrogueCellOutputSelector::DisplayCurrentFrame,
 												 0,
-												 true);
+												 true,
+												 false);
 
 		brogueUIProgramPartConfiguration* background =
 			new brogueUIProgramPartConfiguration(brogueUIProgramPart::Background,
@@ -321,6 +331,7 @@ namespace brogueHd::backend::controller
 												 openglDataStreamType::brogueColorQuad,
 												 openglBrogueCellOutputSelector::DisplayCurrentFrame,
 												 0,
+												 false,
 												 false);
 
 		brogueUIProgramPartConfiguration* menuBackground =
@@ -330,7 +341,8 @@ namespace brogueHd::backend::controller
 												 openglDataStreamType::brogueCellQuad,
 												 openglBrogueCellOutputSelector::DisplayCurrentFrame,
 												 0,
-												 true);
+												 true,
+												 false);
 
 		_programPartConfigs->add(brogueUIProgramPart::FlameMenuProgram_HeatDiffuseProgram, flameMenu_heatDiffuse);
 		_programPartConfigs->add(brogueUIProgramPart::FlameMenuProgram_HeatSourceProgram, flameMenu_heatSource);
@@ -339,6 +351,7 @@ namespace brogueHd::backend::controller
 		_programPartConfigs->add(brogueUIProgramPart::Text, text);
 		_programPartConfigs->add(brogueUIProgramPart::Background, background);
 		_programPartConfigs->add(brogueUIProgramPart::MenuBackground, menuBackground);
+		_programPartConfigs->add(brogueUIProgramPart::ViewCompositor, viewCompositor);
 	}
 
 	void resourceController::loadKeymap(keyProcessor& processor)

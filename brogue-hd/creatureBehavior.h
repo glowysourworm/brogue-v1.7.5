@@ -2,9 +2,7 @@
 
 #include "creatureBehaviorConstants.h"
 
-using namespace brogueHd::backend::modelConstant;
-
-namespace brogueHd::backend::model::creature
+namespace brogueHd::backend::model
 {
 	struct creatureBehavior
 	{

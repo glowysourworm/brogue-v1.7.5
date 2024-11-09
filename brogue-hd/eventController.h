@@ -2,9 +2,7 @@
 
 #include "brogueUIEvent.h"
 
-using namespace brogueHd::simple;
-
-namespace brogueHd::backend::controller
+namespace brogueHd::backend
 {
 	class eventController
 	{

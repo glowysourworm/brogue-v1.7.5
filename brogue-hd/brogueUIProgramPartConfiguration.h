@@ -3,7 +3,7 @@
 #include "brogueUIConstants.h"
 #include <cstdint>
 
-namespace brogueHd::frontend::opengl
+namespace brogueHd::frontend
 {
 	struct brogueUIProgramPartConfiguration
 	{
@@ -13,7 +13,8 @@ namespace brogueHd::frontend::opengl
 										 openglDataStreamType streamType,
 										 openglBrogueCellOutputSelector noDisplayOutput,
 										 uint32_t minUpdatePeriodMilliseconds,
-										 bool alphaBlendingEnable)
+										 bool alphaBlendingEnable,
+										 bool frameType)
 		{
 			programPartName = programPart;
 			vertexShaderName = vertexShader;
@@ -22,6 +23,7 @@ namespace brogueHd::frontend::opengl
 			noDisplaySelector = noDisplayOutput;
 			minimumUpdatePeriodMilliseconds = minUpdatePeriodMilliseconds;
 			useAlphaBlending = alphaBlendingEnable;
+			isFrameType = frameType;
 		}
 		brogueUIProgramPartConfiguration(const brogueUIProgramPartConfiguration& copy)
 		{
@@ -32,6 +34,7 @@ namespace brogueHd::frontend::opengl
 			noDisplaySelector = copy.noDisplaySelector;
 			minimumUpdatePeriodMilliseconds = copy.minimumUpdatePeriodMilliseconds;
 			useAlphaBlending = copy.useAlphaBlending;
+			isFrameType = copy.isFrameType;
 		}
 		~brogueUIProgramPartConfiguration() {};
 		void operator=(const brogueUIProgramPartConfiguration& copy)
@@ -43,6 +46,7 @@ namespace brogueHd::frontend::opengl
 			noDisplaySelector = copy.noDisplaySelector;
 			minimumUpdatePeriodMilliseconds = copy.minimumUpdatePeriodMilliseconds;
 			useAlphaBlending = copy.useAlphaBlending;
+			isFrameType = copy.isFrameType;
 		}
 
 		brogueUIProgramPart programPartName;
@@ -52,5 +56,6 @@ namespace brogueHd::frontend::opengl
 		openglBrogueCellOutputSelector noDisplaySelector;
 		uint32_t minimumUpdatePeriodMilliseconds;
 		bool useAlphaBlending;
+		bool isFrameType;
 	};
 }

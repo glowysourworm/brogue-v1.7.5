@@ -15,11 +15,8 @@
 #include <exception>
 
 using namespace brogueHd::simple;
-using namespace brogueHd::backend::generator;
-using namespace brogueHd::backend::processor;
-using namespace brogueHd::backend::model;
 
-namespace brogueHd::backend::controller
+namespace brogueHd::backend
 {
 	class gameController
 	{

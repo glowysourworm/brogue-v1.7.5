@@ -1,13 +1,11 @@
 #pragma once
 
-#include "color.h"
 #include "simple.h"
-#include "simpleList.h"
 #include "simpleMath.h"
 
 using namespace brogueHd::simple;
 
-namespace brogueHd::backend::model::game
+namespace brogueHd::backend::model
 {
 	struct color : hashable
 	{

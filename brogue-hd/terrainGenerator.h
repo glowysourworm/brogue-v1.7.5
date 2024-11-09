@@ -2,7 +2,7 @@
 
 #include "randomGenerator.h"
 
-namespace brogueHd::backend::generator
+namespace brogueHd::backend
 {
 	class terrainGenerator
 	{

@@ -5,8 +5,6 @@
 #include "itemConstants.h"
 #include <type_traits>
 
-using namespace brogueHd::backend::model::game;
-
 namespace brogueHd::backend::model
 {
 	// Constraint for template function to help cast the brogue item details

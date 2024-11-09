@@ -7,7 +7,7 @@
 
 using namespace brogueHd::simple;
 
-namespace brogueHd::backend::model::io
+namespace brogueHd::backend::model
 {
 	class brogueScoreEntry : hashableObject
 	{

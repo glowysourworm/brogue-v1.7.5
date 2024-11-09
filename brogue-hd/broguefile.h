@@ -6,9 +6,8 @@
 #include <iosfwd>
 
 using namespace brogueHd::simple;
-using namespace brogueHd::backend::modelConstant;
 
-namespace brogueHd::backend::model::io
+namespace brogueHd::backend::model
 {
 	typedef struct fileEntry {
 		char* path;

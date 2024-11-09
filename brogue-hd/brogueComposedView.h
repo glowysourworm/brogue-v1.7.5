@@ -14,8 +14,10 @@
 
 using namespace brogueHd::component;
 using namespace brogueHd::simple;
+using namespace brogueHd::backend;
+using namespace brogueHd::backend::model;
 
-namespace brogueHd::frontend::ui
+namespace brogueHd::frontend
 {
 	class brogueComposedView : public brogueViewBase
 	{

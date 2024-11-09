@@ -4,10 +4,7 @@
 #include "dungeonConstants.h"
 #include "linearGenerationParameters.h"
 
-using namespace brogueHd::backend::modelConstant;
-using namespace brogueHd::backend::model::construction;
-
-namespace brogueHd::backend::model::gameTemplate
+namespace brogueHd::backend::model
 {
 	struct machineBase
 	{

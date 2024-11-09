@@ -2,7 +2,7 @@
 
 #include "brogueGlobal.h"
 
-namespace brogueHd::backend::modelConstant
+namespace brogueHd::backend::model
 {
 	enum creatureStates 
 	{

@@ -14,13 +14,11 @@
 #include "brogueUITagAction.h"
 #include "eventController.h"
 
-using namespace brogueHd::backend::controller;
-using namespace brogueHd::frontend::opengl;
+using namespace brogueHd::backend;
 using namespace brogueHd::component;
 using namespace brogueHd::backend::model;
-using namespace brogueHd::backend::model::layout;
 
-namespace brogueHd::frontend::ui
+namespace brogueHd::frontend
 {
 	class brogueView : public brogueViewBase
 	{
@@ -62,7 +60,7 @@ namespace brogueHd::frontend::ui
 
 		virtual void raiseClickEvent(const brogueUITagAction& response) override
 		{
-			_eventController->getUIClickEvent()->publish(_uiData->getProgramName(), response);
+			_eventController->getUIClickEvent()->publish(_uiData->getId().getName(), response);
 		}
 
 		virtual brogueCellDisplay* get(short column, short row) const override;

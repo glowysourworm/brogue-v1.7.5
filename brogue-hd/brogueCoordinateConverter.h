@@ -11,9 +11,7 @@
 #include "openglQuadConverter.h"
 #include "simpleGlData.h"
 
-using namespace brogueHd::frontend::ui;
-
-namespace brogueHd::frontend::opengl
+namespace brogueHd::frontend
 {
 	class brogueCoordinateConverter
 	{

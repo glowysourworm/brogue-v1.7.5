@@ -4,7 +4,7 @@
 
 using namespace brogueHd::simple;
 
-namespace brogueHd::backend::model::game
+namespace brogueHd::backend::model
 {
     enum featTypes 
     {

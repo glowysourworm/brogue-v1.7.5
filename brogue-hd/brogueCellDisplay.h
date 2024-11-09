@@ -8,10 +8,9 @@
 
 using namespace brogueHd::simple;
 using namespace brogueHd::component;
-using namespace brogueHd::backend::model::game;
-using namespace brogueHd::frontend::ui;
+using namespace brogueHd::frontend;
 
-namespace brogueHd::backend::model::layout
+namespace brogueHd::backend::model
 {
 	struct brogueCellDisplay : gridLocator
 	{

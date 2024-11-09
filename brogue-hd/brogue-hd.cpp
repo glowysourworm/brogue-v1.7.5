@@ -10,12 +10,11 @@
 #include "simpleString.h"
 #include <SDL_main.h>
 
-using namespace brogueHd::simple;
-
 using namespace brogueHd;
+using namespace brogueHd::simple;
 using namespace brogueHd::console;
 using namespace brogueHd::component;
-using namespace brogueHd::backend::controller;
+using namespace brogueHd::backend;
 using namespace brogueHd::backend::model;
 
 int main(int argc, char* argv[])

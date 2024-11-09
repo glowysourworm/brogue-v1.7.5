@@ -10,9 +10,8 @@
 #include "simpleString.h"
 
 using namespace brogueHd::simple;
-using namespace brogueHd::backend::modelConstant;
 
-namespace brogueHd::backend::model::game
+namespace brogueHd::backend::model
 {
 	// Item Declarations:  This struct hierarchy will take care of item types (or "kinds" from Brogue)
 	//					   with enums galore! ...just separated by struct type inference. 

@@ -1,11 +1,8 @@
 #pragma once
 
-#include "simpleList.h"
 #include <GLFW/glfw3.h>
 
-using namespace brogueHd::simple;
-
-namespace brogueHd::frontend::opengl
+namespace brogueHd::frontend
 {
 	struct simpleKeyboardState
 	{
@@ -32,6 +29,7 @@ namespace brogueHd::frontend::opengl
 
 		simpleKeyboardState()
 		{
+
 		}
 		simpleKeyboardState(const simpleKeyboardState& copy)
 		{

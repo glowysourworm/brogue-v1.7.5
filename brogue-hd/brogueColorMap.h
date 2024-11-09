@@ -5,8 +5,6 @@
 #include "simpleHash.h"
 
 using namespace brogueHd::simple;
-using namespace brogueHd::backend::modelConstant;
-using namespace brogueHd::backend::model::game;
 
 namespace brogueHd::backend::model
 {

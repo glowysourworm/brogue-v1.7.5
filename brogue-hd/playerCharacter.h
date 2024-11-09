@@ -3,7 +3,7 @@
 #include "brogueGlobal.h"
 #include <cstdint>
 
-namespace brogueHd::backend::model::game
+namespace brogueHd::backend::model
 {
 	class playerCharacter
 	{

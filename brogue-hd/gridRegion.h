@@ -7,7 +7,6 @@
 #include "simpleArray.h"
 #include "simpleException.h"
 
-using namespace brogueHd::component;
 using namespace brogueHd::simple;
 
 namespace brogueHd::component

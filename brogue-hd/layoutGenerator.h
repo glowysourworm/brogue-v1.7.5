@@ -26,9 +26,8 @@
 
 using namespace brogueHd::component;
 using namespace brogueHd::backend::model;
-using namespace brogueHd::backend::model::layout;
 
-namespace brogueHd::backend::generator
+namespace brogueHd::backend
 {
 	class layoutGenerator
 	{

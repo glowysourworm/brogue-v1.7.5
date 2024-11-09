@@ -2,7 +2,8 @@
 #include "brogueCellDisplay.h"
 #include "brogueCoordinateConverter.h"
 #include "brogueDataStreamBuilder.h"
-#include "brogueFlameMenu.h"
+#include "brogueFlameMenuHeatView.h"
+#include "brogueFlameMenuTitleMask.h"
 #include "brogueGlyphMap.h"
 #include "brogueUIConstants.h"
 #include "brogueUIProgramPartConfiguration.h"
@@ -14,7 +15,11 @@
 #include "simpleException.h"
 #include "simpleShaderProgram.h"
 
-namespace brogueHd::frontend::opengl
+using namespace brogueHd::backend;
+using namespace brogueHd::backend::model;
+using namespace brogueHd::component;
+
+namespace brogueHd::frontend
 {
 	class brogueProgramBuilder
 	{
@@ -48,8 +53,8 @@ namespace brogueHd::frontend::opengl
 									   openglBrogueCellOutputSelector noDisplaySelector,
 									   bool isFrameType);
 		// Specific streams
-		simpleDataStream* createHeatSourceStream(brogueFlameMenu* view, openglDataStreamType type);
-		simpleDataStream* createTitleMaskStream(brogueFlameMenu* view, openglDataStreamType type);
+		simpleDataStream* createHeatSourceStream(brogueFlameMenuHeatView* view, openglDataStreamType type);
+		simpleDataStream* createTitleMaskStream(brogueFlameMenuTitleMask* view, openglDataStreamType type);
 
 	private:
 
@@ -92,16 +97,15 @@ namespace brogueHd::frontend::opengl
 		switch (configuration.programPartName)
 		{
 			case brogueUIProgramPart::FlameMenuProgram_HeatSourceProgram:
-				return createHeatSourceStream((brogueFlameMenu*)view, configuration.dataStreamType);
 			case brogueUIProgramPart::FlameMenuProgram_TitleMaskProgram:
-				return createTitleMaskStream((brogueFlameMenu*)view, configuration.dataStreamType);
 			case brogueUIProgramPart::FlameMenuProgram_HeatDiffuseProgram:
 			case brogueUIProgramPart::Background:
 			case brogueUIProgramPart::MenuBackground:
 			case brogueUIProgramPart::MenuButton:
 			case brogueUIProgramPart::Text:
-				return createStream(view, configuration.dataStreamType, configuration.noDisplaySelector, false);
-			case brogueUIProgramPart::None:
+				return createStream(view, configuration.dataStreamType, configuration.noDisplaySelector, configuration.isFrameType);
+			case brogueUIProgramPart::ViewCompositor:
+				return createStream(view, configuration.dataStreamType, configuration.noDisplaySelector, configuration.isFrameType);
 			default:
 				throw simpleException("Unhandled brogueUIProgram type:  brogueProgramBuilder.h");
 		}
@@ -130,23 +134,5 @@ namespace brogueHd::frontend::opengl
 
 		else
 			return _dataStreamBuilder->createFrameDataStream(view, type);
-	}
-
-	simpleDataStream* brogueProgramBuilder::createHeatSourceStream(brogueFlameMenu* view, openglDataStreamType type)
-	{
-		return _dataStreamBuilder->createSceneDataStream(view, type, openglBrogueCellOutputSelector::DisplayCurrentFrame,
-														 [&view] (short column, short row, brogueCellDisplay* cell)
-		{
-			return view->isTheText(column, row) || row == view->getBoundary().bottom();
-		});
-	}
-
-	simpleDataStream* brogueProgramBuilder::createTitleMaskStream(brogueFlameMenu* view, openglDataStreamType type)
-	{
-		return _dataStreamBuilder->createSceneDataStream(view, type, openglBrogueCellOutputSelector::DisplayCurrentFrame,
-														 [&view] (short column, short row, brogueCellDisplay* cell)
-		{
-			return view->isTheText(column, row);
-		});
 	}
 }

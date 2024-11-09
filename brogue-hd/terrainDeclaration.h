@@ -2,7 +2,7 @@
 
 #include "brogueGlobal.h"
 
-namespace brogueHd::backend::model::layout
+namespace brogueHd::backend::model
 {
 	enum terrainFlagCatalog {
 		T_OBSTRUCTS_PASSABILITY = Fl(0),		// cannot be walked through

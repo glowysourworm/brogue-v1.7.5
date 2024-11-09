@@ -15,7 +15,7 @@
 
 using namespace brogueHd::simple;
 
-namespace brogueHd::frontend::opengl
+namespace brogueHd::frontend
 {
 	class simpleShaderProgram : public simpleGlObject
 	{

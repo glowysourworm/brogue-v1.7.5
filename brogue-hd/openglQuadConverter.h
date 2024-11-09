@@ -3,7 +3,7 @@
 #include "gridLocator.h"
 #include "simpleGlData.h"
 
-namespace brogueHd::frontend::opengl
+namespace brogueHd::frontend
 {
 	struct openglQuadConverter
 	{

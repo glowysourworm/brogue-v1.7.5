@@ -1,6 +1,6 @@
 #pragma once
 
-namespace brogueHd::frontend::opengl
+namespace brogueHd::frontend
 {
 	struct brogueKeyboardState
 	{

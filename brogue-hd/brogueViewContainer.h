@@ -4,6 +4,7 @@
 #include "brogueKeyboardState.h"
 #include "brogueMouseState.h"
 #include "brogueUIConstants.h"
+#include "brogueUIProgramPartId.h"
 #include "brogueViewBase.h"
 #include "gridRect.h"
 #include "simple.h"
@@ -11,12 +12,9 @@
 #include "simpleHash.h"
 #include "simpleList.h"
 
-using namespace brogueHd::component;
 using namespace brogueHd::simple;
-using namespace brogueHd::frontend::opengl;
-using namespace brogueHd::backend::model::layout;
 
-namespace brogueHd::frontend::ui
+namespace brogueHd::frontend
 {
 	/// <summary>
 	/// This container class provide a mechanism to manage views or composed views. 
@@ -28,20 +26,20 @@ namespace brogueHd::frontend::ui
 		brogueViewContainer(brogueUIProgram programName);
 		~brogueViewContainer();
 
-		void addView(brogueUIProgramPart programPart, brogueViewBase* view);
-		brogueViewBase* getView(brogueUIProgramPart programPart) const;
+		void addView(const brogueUIProgramPartId& partId, brogueViewBase* view);
+		brogueViewBase* getView(const brogueUIProgramPartId& programPart) const;
 		brogueViewBase* getViewAt(int index) const;
 		int getViewCount() const;
 
 	public:
 
-		void checkUpdate(brogueUIProgramPart programPart,
+		void checkUpdate(const brogueUIProgramPartId& partId,
 						 const brogueKeyboardState& keyboardState,
 						 const brogueMouseState& mouseState,
 						 int millisecondsLapsed);
-		bool needsUpdate(brogueUIProgramPart programPart) const;
-		void clearUpdate(brogueUIProgramPart programPart);
-		void clearEvents(brogueUIProgramPart programPart);
+		bool needsUpdate(const brogueUIProgramPartId& partId) const;
+		void clearUpdate(const brogueUIProgramPartId& partId);
+		void clearEvents(const brogueUIProgramPartId& partId);
 
 		brogueCellDisplay* get(short column, short row) const;
 
@@ -57,23 +55,23 @@ namespace brogueHd::frontend::ui
 	private:
 
 		brogueUIProgram _programName;
-		simpleHash<brogueUIProgramPart, brogueViewBase*>* _views;
+		simpleHash<brogueUIProgramPartId, brogueViewBase*>* _views;
 	};
 
 	brogueViewContainer::brogueViewContainer(brogueUIProgram programName)
 	{
 		_programName = programName;
-		_views = new simpleHash<brogueUIProgramPart, brogueViewBase*>();
+		_views = new simpleHash<brogueUIProgramPartId, brogueViewBase*>();
 	}
 	brogueViewContainer::~brogueViewContainer()
 	{
 		delete _views;
 	}
-	void brogueViewContainer::addView(brogueUIProgramPart programPart, brogueViewBase* view)
+	void brogueViewContainer::addView(const brogueUIProgramPartId& partId, brogueViewBase* view)
 	{
-		_views->add(programPart, view);
+		_views->add(partId, view);
 	}
-	brogueViewBase* brogueViewContainer::getView(brogueUIProgramPart programPart) const
+	brogueViewBase* brogueViewContainer::getView(const brogueUIProgramPartId& programPart) const
 	{
 		return _views->get(programPart);
 	}
@@ -145,7 +143,7 @@ namespace brogueHd::frontend::ui
 
 		return nullptr;
 	}
-	void brogueViewContainer::checkUpdate(brogueUIProgramPart programPart,
+	void brogueViewContainer::checkUpdate(const brogueUIProgramPartId& partId,
 										  const brogueKeyboardState& keyboardState,
 										  const brogueMouseState& mouseState,
 										  int millisecondsLapsed)
@@ -153,30 +151,27 @@ namespace brogueHd::frontend::ui
 		if (_views->count() == 0)
 			throw simpleException("Must first add views to the brogueViewContainer before accessing data:  brogueViewContainer::checkUpdate");
 
-		for (int index = 0; index < _views->count(); index++)
-		{
-			_views->getAt(index)->value->checkUpdate(keyboardState, mouseState, millisecondsLapsed);
-		}
+		_views->get(partId)->checkUpdate(keyboardState, mouseState, millisecondsLapsed);
 	}
-	bool brogueViewContainer::needsUpdate(brogueUIProgramPart programPart) const
+	bool brogueViewContainer::needsUpdate(const brogueUIProgramPartId& partId) const
 	{
 		if (_views->count() == 0)
 			throw simpleException("Must first add views to the brogueViewContainer before accessing data:  brogueViewContainer::needsUpdate");
 
-		return _views->get(programPart)->needsUpdate();
+		return _views->get(partId)->needsUpdate();
 	}
-	void brogueViewContainer::clearUpdate(brogueUIProgramPart programPart)
+	void brogueViewContainer::clearUpdate(const brogueUIProgramPartId& partId)
 	{
 		if (_views->count() == 0)
 			throw simpleException("Must first add views to the brogueViewContainer before accessing data:  brogueViewContainer::clearUpdate");
 
-		_views->get(programPart)->clearUpdate();
+		_views->get(partId)->clearUpdate();
 	}
-	void brogueViewContainer::clearEvents(brogueUIProgramPart programPart)
+	void brogueViewContainer::clearEvents(const brogueUIProgramPartId& partId)
 	{
 		if (_views->count() == 0)
 			throw simpleException("Must first add views to the brogueViewContainer before accessing data:  brogueViewContainer::clearEvents");
 
-		_views->get(programPart)->clearEvents();
+		_views->get(partId)->clearEvents();
 	}
 }

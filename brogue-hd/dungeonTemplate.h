@@ -1,6 +1,6 @@
 #pragma once
 
-namespace brogueHd::backend::model::gameTemplate
+namespace brogueHd::backend::model
 {
 	struct keyLocation
 	{

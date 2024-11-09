@@ -8,6 +8,7 @@
 #include "brogueProgramBuilder.h"
 #include "brogueUIConstants.h"
 #include "brogueUIProgramPartConfiguration.h"
+#include "brogueUIProgramPartId.h"
 #include "brogueViewBase.h"
 #include "brogueViewContainer.h"
 #include "gl.h"
@@ -25,11 +26,9 @@
 
 using namespace brogueHd::component;
 using namespace brogueHd::simple;
-using namespace brogueHd::frontend;
-using namespace brogueHd::frontend::ui;
-using namespace brogueHd::backend::model::layout;
+using namespace brogueHd::backend::model;
 
-namespace brogueHd::frontend::opengl
+namespace brogueHd::frontend
 {
 	class brogueViewProgram
 	{
@@ -53,7 +52,8 @@ namespace brogueHd::frontend::opengl
 			_programName = programName;
 			_viewContainer = viewContainer;
 			_programBuilder = new brogueProgramBuilder(resourceController, glyphMap);
-			_programs = new simpleHash<brogueUIProgramPart, simpleShaderProgram*>();
+			_programs = new simpleHash<brogueUIProgramPartId, simpleShaderProgram*>();
+			_programCounters = new simpleHash<brogueUIProgramPartId, simplePeriodCounter*>();
 			_active = false;
 		}
 		~brogueViewProgram()
@@ -105,8 +105,8 @@ namespace brogueHd::frontend::opengl
 		brogueViewContainer* _viewContainer;
 		brogueProgramBuilder* _programBuilder;
 
-		simpleHash<brogueUIProgramPart, simpleShaderProgram*>* _programs;
-		simpleHash<brogueUIProgramPart, simplePeriodCounter*>* _programCounters;
+		simpleHash<brogueUIProgramPartId, simpleShaderProgram*>* _programs;
+		simpleHash<brogueUIProgramPartId, simplePeriodCounter*>* _programCounters;
 	};
 
 	void brogueViewProgram::initialize()
@@ -115,12 +115,12 @@ namespace brogueHd::frontend::opengl
 		for (int index = 0; index < _viewContainer->getViewCount(); index++)
 		{
 			brogueViewBase* view = _viewContainer->getViewAt(index);
-			brogueUIProgramPartConfiguration* configuration = _resourceController->getUIPartConfig(view->getUIData()->getProgramPartName());
+			brogueUIProgramPartConfiguration* configuration = _resourceController->getUIPartConfig(view->getUIData()->getId().getPartName());
 			simpleShaderProgram* program = _programBuilder->buildProgram(view, *configuration);
 
 			// Initialize program part to "active"
-			_programs->add(configuration->programPartName, program);
-			_programCounters->add(configuration->programPartName, new simplePeriodCounter(configuration->minimumUpdatePeriodMilliseconds));
+			_programs->add(view->getUIData()->getId(), program);
+			_programCounters->add(view->getUIData()->getId(), new simplePeriodCounter(configuration->minimumUpdatePeriodMilliseconds));
 
 			// *** Load OpenGL Backend
 			program->compile();
@@ -131,7 +131,7 @@ namespace brogueHd::frontend::opengl
 	}
 	void brogueViewProgram::activate()
 	{
-		_programs->iterate([] (brogueUIProgramPart part, simpleShaderProgram* program)
+		_programs->iterate([] (const brogueUIProgramPartId& part, simpleShaderProgram* program)
 		{
 			program->bind();
 
@@ -142,7 +142,7 @@ namespace brogueHd::frontend::opengl
 	}
 	void brogueViewProgram::deactivate()
 	{
-		_programs->iterate([] (brogueUIProgramPart part, simpleShaderProgram* program)
+		_programs->iterate([] (const brogueUIProgramPartId& part, simpleShaderProgram* program)
 		{
 			program->unBind();
 
@@ -200,13 +200,13 @@ namespace brogueHd::frontend::opengl
 		for (int index = 0; index < _viewContainer->getViewCount(); index++)
 		{
 			// Retrieve program part name
-			brogueUIProgramPart partName = _viewContainer->getViewAt(index)->getUIData()->getProgramPartName();
+			brogueUIProgramPartId partId = _viewContainer->getViewAt(index)->getUIData()->getId();
 
 			// Check counter to prevent pre-mature update
-			if (_programCounters->get(partName)->update(millisecondsLapsed));
+			if (_programCounters->get(partId)->update(millisecondsLapsed));
 			{
-				_viewContainer->checkUpdate(partName, keyboardUI, mouseUI, millisecondsLapsed);
-			}			
+				_viewContainer->checkUpdate(partId, keyboardUI, mouseUI, millisecondsLapsed);
+			}
 		}
 	}
 
@@ -225,9 +225,9 @@ namespace brogueHd::frontend::opengl
 		for (int index = 0; index < _viewContainer->getViewCount() && !result; index++)
 		{
 			// Retrieve program part name
-			brogueUIProgramPart partName = _viewContainer->getViewAt(index)->getUIData()->getProgramPartName();
+			brogueUIProgramPartId partId = _viewContainer->getViewAt(index)->getUIData()->getId();
 
-			result |= _viewContainer->needsUpdate(partName);
+			result |= _viewContainer->needsUpdate(partId);
 		}
 
 		return result;
@@ -239,10 +239,10 @@ namespace brogueHd::frontend::opengl
 
 		for (int index = 0; index < _viewContainer->getViewCount(); index++)
 		{
-			// Retrieve program part name
-			brogueUIProgramPart partName = _viewContainer->getViewAt(index)->getUIData()->getProgramPartName();
+			// Retrieve program part
+			brogueUIProgramPartId partId = _viewContainer->getViewAt(index)->getUIData()->getId();
 
-			_viewContainer->clearUpdate(partName);
+			_viewContainer->clearUpdate(partId);
 		}
 	}
 	void brogueViewProgram::clearEvents()
@@ -252,10 +252,10 @@ namespace brogueHd::frontend::opengl
 
 		for (int index = 0; index < _viewContainer->getViewCount(); index++)
 		{
-			// Retrieve program part name
-			brogueUIProgramPart partName = _viewContainer->getViewAt(index)->getUIData()->getProgramPartName();
+			// Retrieve program part
+			brogueUIProgramPartId partId = _viewContainer->getViewAt(index)->getUIData()->getId();
 
-			_viewContainer->clearEvents(partName);
+			_viewContainer->clearEvents(partId);
 		}
 	}
 	void brogueViewProgram::update(const simpleKeyboardState& keyboardState,
@@ -275,7 +275,7 @@ namespace brogueHd::frontend::opengl
 		for (int index = 0; index < _viewContainer->getViewCount(); index++)
 		{
 			brogueViewBase* view = _viewContainer->getViewAt(index);
-			brogueUIProgramPart partName = view->getUIData()->getProgramPartName();
+			brogueUIProgramPartId partId = _viewContainer->getViewAt(index)->getUIData()->getId();
 
 			if (view->needsUpdate())
 			{
@@ -283,11 +283,11 @@ namespace brogueHd::frontend::opengl
 				view->update(keyboardStateUI, mouseStateUI, millisecondsLapsed);
 
 				// Must update the data stream
-				simpleDataStream* stream = _programBuilder->buildDataStream(view, *_resourceController->getUIPartConfig(partName));
+				simpleDataStream* stream = _programBuilder->buildDataStream(view, *_resourceController->getUIPartConfig(partId.getPartName()));
 
 				// Put the new stream online (deletes the old stream)
-				_programs->get(partName)->bind();
-				_programs->get(partName)->reBuffer(stream);
+				_programs->get(partId)->bind();
+				_programs->get(partId)->reBuffer(stream);
 			}
 		}
 	}
@@ -301,9 +301,9 @@ namespace brogueHd::frontend::opengl
 		for (int index = 0; index < _viewContainer->getViewCount(); index++)
 		{
 			brogueViewBase* view = _viewContainer->getViewAt(index);
-			brogueUIProgramPart partName = view->getUIData()->getProgramPartName();
-			brogueUIProgramPartConfiguration* configuration = _resourceController->getUIPartConfig(view->getUIData()->getProgramPartName());
-			simpleShaderProgram* program = _programs->get(partName);
+			brogueUIProgramPartId partId = view->getUIData()->getId();
+			brogueUIProgramPartConfiguration* configuration = _resourceController->getUIPartConfig(partId.getPartName());
+			simpleShaderProgram* program = _programs->get(partId);
 
 			if (configuration->useAlphaBlending)
 			{
@@ -327,8 +327,8 @@ namespace brogueHd::frontend::opengl
 		for (int index = 0; index < _viewContainer->getViewCount(); index++)
 		{
 			brogueViewBase* view = _viewContainer->getViewAt(index);
-			brogueUIProgramPart partName = view->getUIData()->getProgramPartName();
-			simpleShaderProgram* program = _programs->get(partName);
+			brogueUIProgramPartId partId = view->getUIData()->getId();
+			simpleShaderProgram* program = _programs->get(partId);
 			program->showErrors();
 		}
 	}
@@ -343,8 +343,8 @@ namespace brogueHd::frontend::opengl
 		for (int index = 0; index < _viewContainer->getViewCount(); index++)
 		{
 			brogueViewBase* view = _viewContainer->getViewAt(index);
-			brogueUIProgramPart partName = view->getUIData()->getProgramPartName();
-			simpleShaderProgram* program = _programs->get(partName);
+			brogueUIProgramPartId partId = view->getUIData()->getId();
+			simpleShaderProgram* program = _programs->get(partId);
 			result |= program->hasErrors();
 		}
 

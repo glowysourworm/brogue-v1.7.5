@@ -9,9 +9,9 @@
 #include "simple.h"
 
 using namespace brogueHd::component;
-using namespace brogueHd::backend::model::layout;
+using namespace brogueHd::backend::model;
 
-namespace brogueHd::backend::generator
+namespace brogueHd::backend
 {
 	class noiseGenerator
 	{

@@ -2,7 +2,7 @@
 
 #include "light.h"
 
-namespace brogueHd::backend::model::game
+namespace brogueHd::backend::model
 {
 	struct flare
 	{

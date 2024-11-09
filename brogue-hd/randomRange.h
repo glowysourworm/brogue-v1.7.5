@@ -1,6 +1,6 @@
 #pragma once
 
-namespace brogueHd::backend::model::game
+namespace brogueHd::backend::model
 {
 	struct randomRange
 	{

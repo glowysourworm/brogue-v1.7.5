@@ -4,10 +4,11 @@
 #include "simple.h"
 #include "simpleLogger.h"
 #include <limits>
+#include <execution>
 
 using namespace brogueHd::simple;
 
-namespace brogueHd::frontend::opengl
+namespace brogueHd::frontend
 {
 	class simpleGlObject : public hashableObject
 	{

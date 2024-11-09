@@ -1,4 +1,5 @@
 #pragma once
+
 #include "brogueCellDisplay.h"
 #include "brogueKeyboardState.h"
 #include "brogueMouseState.h"
@@ -8,12 +9,9 @@
 #include "gridLocator.h"
 #include "gridRect.h"
 #include "simpleException.h"
+#include "brogueUIData.h"
 
-using namespace brogueHd::backend::model::layout;
-using namespace brogueHd::frontend::opengl;
-
-
-namespace brogueHd::frontend::ui
+namespace brogueHd::frontend
 {
 	/// <summary>
 	/// Function-oriented (abstract) base class for common function signatures.

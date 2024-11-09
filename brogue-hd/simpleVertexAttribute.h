@@ -6,7 +6,7 @@
 
 using namespace brogueHd::simple;
 
-namespace brogueHd::frontend::opengl
+namespace brogueHd::frontend
 {
 	/// <summary>
 	/// Describes a single vertex attribute "in" parameter for a shader

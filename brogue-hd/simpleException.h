@@ -18,7 +18,7 @@ namespace brogueHd::simple
 		{
 		}
 
-		simpleException(const char* message) : std::exception(message)
+		simpleException(const char* message) :  std::exception(message)
 		{
 			std::string result = message;
 

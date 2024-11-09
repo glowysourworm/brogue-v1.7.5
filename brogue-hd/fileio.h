@@ -3,7 +3,7 @@
 #include <cstdio>
 #include <exception>
 
-namespace brogueHd::backend::model::io
+namespace brogueHd::backend::model
 {
 	static class fileio
 	{

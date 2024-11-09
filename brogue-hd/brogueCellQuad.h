@@ -8,9 +8,9 @@
 #include "simpleException.h"
 #include "simpleGlData.h"
 
-using namespace brogueHd::backend::model::layout;
+using namespace brogueHd::backend::model;
 
-namespace brogueHd::frontend::opengl
+namespace brogueHd::frontend
 {
 	struct brogueCellQuad : simpleGlData
 	{
@@ -95,7 +95,7 @@ namespace brogueHd::frontend::opengl
 					glyphUV.topLeft.streamBuffer(primitiveType, outputStream);				// vec2
 					foregroundColor.streamBuffer(primitiveType, outputStream);				// vec4
 					backgroundColor.streamBuffer(primitiveType, outputStream);				// vec4
-					outputStream->writeFloat(outputSelector);								// float
+					outputStream->writeFloat((float)outputSelector);						// float
 
 					// Triangle 1:  Top Right
 					vertexXY.topRight.streamBuffer(primitiveType, outputStream);			// vec2
@@ -103,15 +103,15 @@ namespace brogueHd::frontend::opengl
 					glyphUV.topRight.streamBuffer(primitiveType, outputStream);				// vec2
 					foregroundColor.streamBuffer(primitiveType, outputStream);				// vec4
 					backgroundColor.streamBuffer(primitiveType, outputStream);				// vec4
-					outputStream->writeFloat(outputSelector);								// float
+					outputStream->writeFloat((float)outputSelector);						// float
 
 					// Triangle 1:  Bottom Right
 					vertexXY.bottomRight.streamBuffer(primitiveType, outputStream);			// vec2
 					textureUV.bottomRight.streamBuffer(primitiveType, outputStream);		// vec2
-					glyphUV.bottomRight.streamBuffer(primitiveType, outputStream);				// vec2
+					glyphUV.bottomRight.streamBuffer(primitiveType, outputStream);			// vec2
 					foregroundColor.streamBuffer(primitiveType, outputStream);				// vec4
 					backgroundColor.streamBuffer(primitiveType, outputStream);				// vec4
-					outputStream->writeFloat(outputSelector);								// float
+					outputStream->writeFloat((float)outputSelector);						// float
 
 					// Triangle 2: Top Left
 					vertexXY.topLeft.streamBuffer(primitiveType, outputStream);				// vec2
@@ -119,23 +119,23 @@ namespace brogueHd::frontend::opengl
 					glyphUV.topLeft.streamBuffer(primitiveType, outputStream);				// vec2
 					foregroundColor.streamBuffer(primitiveType, outputStream);				// vec4
 					backgroundColor.streamBuffer(primitiveType, outputStream);				// vec4
-					outputStream->writeFloat(outputSelector);								// float
+					outputStream->writeFloat((float)outputSelector);						// float
 
 					// Triangle 2:  Bottom Right
 					vertexXY.bottomRight.streamBuffer(primitiveType, outputStream);			// vec2
 					textureUV.bottomRight.streamBuffer(primitiveType, outputStream);		// vec2
-					glyphUV.bottomRight.streamBuffer(primitiveType, outputStream);				// vec2
+					glyphUV.bottomRight.streamBuffer(primitiveType, outputStream);			// vec2
 					foregroundColor.streamBuffer(primitiveType, outputStream);				// vec4
 					backgroundColor.streamBuffer(primitiveType, outputStream);				// vec4
-					outputStream->writeFloat(outputSelector);								// float
+					outputStream->writeFloat((float)outputSelector);						// float
 
 					// Triangle 2:  Bottom Left
 					vertexXY.bottomLeft.streamBuffer(primitiveType, outputStream);			// vec2
 					textureUV.bottomLeft.streamBuffer(primitiveType, outputStream);			// vec2
-					glyphUV.bottomLeft.streamBuffer(primitiveType, outputStream);				// vec2
+					glyphUV.bottomLeft.streamBuffer(primitiveType, outputStream);			// vec2
 					foregroundColor.streamBuffer(primitiveType, outputStream);				// vec4
 					backgroundColor.streamBuffer(primitiveType, outputStream);				// vec4
-					outputStream->writeFloat(outputSelector);								// float
+					outputStream->writeFloat((float)outputSelector);						// float
 				}
 				break;
 				default:

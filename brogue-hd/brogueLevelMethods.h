@@ -6,9 +6,8 @@
 #include "terrainDeclaration.h"
 
 using namespace brogueHd::backend::model;
-using namespace brogueHd::backend::model::layout;
 
-namespace brogueHd::backend::methods
+namespace brogueHd::backend
 {
 
 	static bool stairsUpDiscovered(brogueLevel* level)

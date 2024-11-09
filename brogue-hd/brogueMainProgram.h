@@ -7,6 +7,7 @@
 #include "brogueUIConstants.h"
 #include "brogueUIData.h"
 #include "brogueUIProgramPartConfiguration.h"
+#include "brogueUIProgramPartId.h"
 #include "brogueView.h"
 #include "brogueViewContainer.h"
 #include "brogueViewProgram.h"
@@ -30,7 +31,7 @@
 
 using namespace brogueHd::simple;
 
-namespace brogueHd::frontend::opengl
+namespace brogueHd::frontend
 {
 	class brogueMainProgram
 	{
@@ -41,7 +42,7 @@ namespace brogueHd::frontend::opengl
 						  brogueGlyphMap* glyphMap,
 						  const gridRect& sceneBoundaryUI,
 						  int zoomLevel,
-						  const simpleList<brogueViewContainer*> viewList);
+						  const simpleList<brogueViewContainer*>& viewList);
 		~brogueMainProgram();
 
 		brogueKeyboardState calculateKeyboardState(const simpleKeyboardState& keyboard);
@@ -93,16 +94,16 @@ namespace brogueHd::frontend::opengl
 										 brogueGlyphMap* glyphMap,
 										 const gridRect& sceneBoundaryUI,
 										 int zoomLevel,
-										 const simpleList<brogueViewContainer*> viewList)
+										 const simpleList<brogueViewContainer*>& viewList)
 	{
 		_uiPrograms = new simpleHash<brogueUIProgram, brogueViewProgram*>();
-		_uiViews = new simpleList<brogueViewContainer*>();
+		_uiViews = new simpleList<brogueViewContainer*>(viewList);
 		_resourceController = resourceController;
 		_glyphMap = glyphMap;
 		_gameMode = BrogueGameMode::Title;
 		_sceneBoundaryUI = new gridRect(sceneBoundaryUI);
 
-		brogueUIData backgroundData(brogueUIProgram::ContainerControlledProgram, brogueUIProgramPart::None, sceneBoundaryUI, zoomLevel);
+		brogueUIData backgroundData(brogueUIProgramPartId(brogueUIProgram::ContainerControlledProgram, brogueUIProgramPart::ViewCompositor, 0), sceneBoundaryUI, zoomLevel);
 		brogueProgramBuilder builder(resourceController, glyphMap);
 		brogueView background(eventController,
 							  backgroundData,
@@ -115,7 +116,8 @@ namespace brogueHd::frontend::opengl
 															openglDataStreamType::brogueImageQuad,
 															openglBrogueCellOutputSelector::DisplayCurrentFrame,
 															0,
-															false);
+															false,
+															true);
 
 		_frameProgram = builder.buildProgram(&background, frameConfiguration);
 
@@ -394,15 +396,15 @@ namespace brogueHd::frontend::opengl
 
 		switch (mode)
 		{
-			case brogueHd::BrogueGameMode::Title:
+			case BrogueGameMode::Title:
 				_uiPrograms->get(brogueUIProgram::FlameMenuProgram)->activate();
 				_uiPrograms->get(brogueUIProgram::MainMenuProgram)->activate();
 				break;
-			case brogueHd::BrogueGameMode::Game:
+			case BrogueGameMode::Game:
 				break;
-			case brogueHd::BrogueGameMode::Playback:
+			case BrogueGameMode::Playback:
 				break;
-			case brogueHd::BrogueGameMode::Exit:
+			case BrogueGameMode::Exit:
 			default:
 				break;
 		}

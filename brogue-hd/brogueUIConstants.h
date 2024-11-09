@@ -2,7 +2,7 @@
 
 namespace brogueHd::frontend
 {
-	enum brogueUIProgram : int
+	enum class brogueUIProgram : int
 	{
 		/// <summary>
 		/// This type of program is managed by a parent. So, the response should never
@@ -44,10 +44,10 @@ namespace brogueHd::frontend
 
 	enum class brogueUIProgramPart : int
 	{
-		None = -1,
+		ViewCompositor = 0,
 
-		Background = 0,
-		Text = 1,
+		Background = 1,
+		Text = 2,
 		MenuButton = 3,
 		MenuBackground = 4,
 
@@ -56,7 +56,7 @@ namespace brogueHd::frontend
 		FlameMenuProgram_HeatDiffuseProgram = 7,
 	};
 
-	enum brogueProgramPurpose : int
+	enum class brogueProgramPurpose : int
 	{
 		/// <summary>
 		/// No action required by the program. This implies that no data is gathered when the user
@@ -69,7 +69,7 @@ namespace brogueHd::frontend
 		ModalSelector = 5,
 	};
 
-	enum brogueProgramExitCondition : int
+	enum class brogueProgramExitCondition : int
 	{
 		OnMouseButton = 1,
 		OnMouseClickOff = 2,
@@ -92,21 +92,21 @@ namespace brogueHd::frontend
 		QuitGame = 8
 	};
 
-	enum brogueTextAlignment
+	enum class brogueTextAlignment
 	{
 		Left = 0,
 		Center = 1,
 		Right = 2
 	};
 
-	enum openglDataStreamType
+	enum class openglDataStreamType
 	{
 		brogueImageQuad = 0,
 		brogueCellQuad = 1,
 		brogueColorQuad = 2
 	};
 
-	enum openglBrogueCellOutputSelector
+	enum class openglBrogueCellOutputSelector
 	{
 		/// <summary>
 		/// Outputs a default color for the cell display

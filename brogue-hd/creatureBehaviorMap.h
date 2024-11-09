@@ -8,10 +8,8 @@
 #include "simpleList.h"
 
 using namespace brogueHd::component;
-using namespace brogueHd::backend::model::creature;
-using namespace brogueHd::backend::model::layout;
 
-namespace brogueHd::backend::model::creature
+namespace brogueHd::backend::model
 {
 	class creatureBehaviorMap
 	{

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "brogueUIConstants.h"
+#include "brogueUIProgramPartId.h"
 #include "brogueUITagAction.h"
 #include "color.h"
 #include "colorGradient.h"
@@ -13,18 +14,15 @@
 #include "simpleString.h"
 
 using namespace brogueHd::component;
-using namespace brogueHd::frontend::opengl;
-using namespace brogueHd::backend::model::game;
+using namespace brogueHd::backend::model;
 
-namespace brogueHd::frontend::ui
+namespace brogueHd::frontend
 {
 	struct brogueUIData : hashableObject
 	{
 		brogueUIData()
 		{
-			_programName = brogueUIProgram::ContainerControlledProgram;
-			_programPartName = brogueUIProgramPart::None;
-
+			_id = brogueUIProgramPartId();
 			_text = default_value::value<colorString>();
 			_boundary = default_value::value<gridRect>();
 			_background = default_value::value<colorGradient>();
@@ -50,8 +48,7 @@ namespace brogueHd::frontend::ui
 		};
 		brogueUIData(const brogueUIData& copy)
 		{
-			_programName = copy.getProgramName();
-			_programPartName = copy.getProgramPartName();
+			_id = copy.getId();
 
 			_text = copy.getText();
 			_boundary = copy.getBoundary();
@@ -79,20 +76,19 @@ namespace brogueHd::frontend::ui
 		~brogueUIData()
 		{
 		}
-		brogueUIData(brogueUIProgram programName, brogueUIProgramPart programPartName, const gridRect& boundary, int zoomLevel)
-			: brogueUIData(programName, programPartName, boundary, zoomLevel, colors::transparent(), colors::transparent())
+		brogueUIData(brogueUIProgramPartId partId, const gridRect& boundary, int zoomLevel)
+			: brogueUIData(partId, boundary, zoomLevel, colors::transparent(), colors::transparent())
 		{}
-		brogueUIData(brogueUIProgram programName, brogueUIProgramPart programPartName, const gridRect& boundary, int zoomLevel, const color& background)
-			: brogueUIData(programName, programPartName, boundary, zoomLevel, background, background)
+		brogueUIData(brogueUIProgramPartId partId, const gridRect& boundary, int zoomLevel, const color& background)
+			: brogueUIData(partId, boundary, zoomLevel, background, background)
 		{}
-		brogueUIData(brogueUIProgram programName, brogueUIProgramPart programPartName, const gridRect& boundary, int zoomLevel, const color& background1, const color& background2, brogueGradientType gradientType)
-			: brogueUIData(programName, programPartName, boundary, zoomLevel, background1, background2, background1, background2, gradientType)
+		brogueUIData(brogueUIProgramPartId partId, const gridRect& boundary, int zoomLevel, const color& background1, const color& background2, brogueGradientType gradientType)
+			: brogueUIData(partId, boundary, zoomLevel, background1, background2, background1, background2, gradientType)
 		{}
-		brogueUIData(brogueUIProgram programName, brogueUIProgramPart programPartName, const gridRect& boundary, int zoomLevel, const color& background, const color& mouseHoverBackground)
-			: brogueUIData(programName, programPartName, boundary, zoomLevel, background, background, mouseHoverBackground, mouseHoverBackground, brogueGradientType::Horizontal)
+		brogueUIData(brogueUIProgramPartId partId, const gridRect& boundary, int zoomLevel, const color& background, const color& mouseHoverBackground)
+			: brogueUIData(partId, boundary, zoomLevel, background, background, mouseHoverBackground, mouseHoverBackground, brogueGradientType::Horizontal)
 		{}
-		brogueUIData(brogueUIProgram programName, 
-					 brogueUIProgramPart programPartName,
+		brogueUIData(brogueUIProgramPartId partId,
 					 const gridRect& boundary,
 					 int zoomLevel,
 					 const color& background1,
@@ -100,29 +96,26 @@ namespace brogueHd::frontend::ui
 					 const color& mouseBackground1,
 					 const color& mouseBackground2,
 					 brogueGradientType gradientType)
-			: brogueUIData(programName, programPartName, boundary, zoomLevel, "", background1, background2, mouseBackground1, mouseBackground2, mouseBackground1, mouseBackground2, gradientType, brogueTextAlignment::Left)
+			: brogueUIData(partId, boundary, zoomLevel, "", background1, background2, mouseBackground1, mouseBackground2, mouseBackground1, mouseBackground2, gradientType, brogueTextAlignment::Left)
 		{}
-		brogueUIData(brogueUIProgram programName, 
-					 brogueUIProgramPart programPartName,
+		brogueUIData(brogueUIProgramPartId partId,
 					 const gridRect& boundary,
 					 int zoomLevel,
 					 const colorString& text,
 					 const color& background,
 					 brogueTextAlignment alignment)
-			: brogueUIData(programName, programPartName, boundary, zoomLevel, text, background, background, background, background, background, background, brogueGradientType::Horizontal, alignment)
+			: brogueUIData(partId, boundary, zoomLevel, text, background, background, background, background, background, background, brogueGradientType::Horizontal, alignment)
 		{}
-		brogueUIData(brogueUIProgram programName, 
-					 brogueUIProgramPart programPartName,
+		brogueUIData(brogueUIProgramPartId partId,
 					 const gridRect& boundary,
 					 int zoomLevel,
 					 const colorString& text,
 					 const color& gradient1,
 					 const color& gradient2,
 					 brogueTextAlignment alignment)
-			: brogueUIData(programName, programPartName, boundary, zoomLevel, text, gradient1, gradient2, gradient1, gradient2, gradient1, gradient2, brogueGradientType::Horizontal, alignment)
+			: brogueUIData(partId, boundary, zoomLevel, text, gradient1, gradient2, gradient1, gradient2, gradient1, gradient2, brogueGradientType::Horizontal, alignment)
 		{}
-		brogueUIData(brogueUIProgram programName, 
-					 brogueUIProgramPart programPartName,
+		brogueUIData(brogueUIProgramPartId partId,
 					 const gridRect& boundary,
 					 int zoomLevel,
 					 const colorString& text,
@@ -135,10 +128,8 @@ namespace brogueHd::frontend::ui
 					 brogueGradientType gradientType,
 					 brogueTextAlignment alignment)
 		{
-			// Careful with string:  Create new allocation, then copy characters over
+			_id = partId;
 			_text = text;
-			_programName = programName;
-			_programPartName = programPartName;
 			_boundary = boundary;
 			_background = colorGradient(gradient1, gradient2, gradientType);
 			_hoverBackground = colorGradient(mouseBackground1, mouseBackground2, gradientType);
@@ -164,14 +155,9 @@ namespace brogueHd::frontend::ui
 
 	public:
 
-		brogueUIProgram getProgramName() const
+		brogueUIProgramPartId getId() const
 		{
-			return _programName;
-		}
-
-		brogueUIProgramPart getProgramPartName() const
-		{
-			return _programPartName;
+			return _id;
 		}
 
 		/// <summary>
@@ -480,8 +466,7 @@ namespace brogueHd::frontend::ui
 	private:
 
 		// Adding some program identification data
-		brogueUIProgram _programName;
-		brogueUIProgramPart _programPartName;
+		brogueUIProgramPartId _id;
 
 		colorString _text;
 		gridRect _boundary;

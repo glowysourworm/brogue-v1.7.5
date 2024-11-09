@@ -15,7 +15,7 @@
 
 using namespace brogueHd::simple;
 
-namespace brogueHd::frontend::opengl
+namespace brogueHd::frontend
 {
 	/// <summary>
 	/// Representation of a shader shared by the GPU. This contains the shader handle and data needed to

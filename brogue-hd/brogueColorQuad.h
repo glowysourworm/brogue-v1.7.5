@@ -8,9 +8,9 @@
 #include "simpleException.h"
 #include "simpleGlData.h"
 
-using namespace brogueHd::backend::model::layout;
+using namespace brogueHd::backend::model;
 
-namespace brogueHd::frontend::opengl
+namespace brogueHd::frontend
 {
 	struct brogueColorQuad : simpleGlData
 	{

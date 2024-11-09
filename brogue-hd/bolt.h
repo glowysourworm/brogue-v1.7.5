@@ -4,9 +4,8 @@
 #include "simpleString.h"
 
 using namespace brogueHd::simple;
-using namespace brogueHd::backend::model::game;
 
-namespace brogueHd::backend::model::effect
+namespace brogueHd::backend::model
 {
 	struct bolt
 	{

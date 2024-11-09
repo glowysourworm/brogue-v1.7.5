@@ -10,7 +10,7 @@
 
 using namespace brogueHd::simple;
 
-namespace brogueHd::frontend::opengl
+namespace brogueHd::frontend
 {
 	/// <summary>
 	/// Corresponds to the VAO objects in OpenGL. These are used to manage the VBO Vertex Buffer objects

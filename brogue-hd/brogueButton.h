@@ -13,7 +13,7 @@
 using namespace brogueHd::component;
 using namespace brogueHd::simple;
 
-namespace brogueHd::frontend::ui
+namespace brogueHd::frontend
 {
 	class brogueButton : public brogueView
 	{

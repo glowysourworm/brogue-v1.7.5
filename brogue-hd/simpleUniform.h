@@ -10,7 +10,7 @@
 
 using namespace brogueHd::simple;
 
-namespace brogueHd::frontend::opengl
+namespace brogueHd::frontend
 {
 	template<typename T>
 	concept isOpenGlUniform = isHashable<T> &&

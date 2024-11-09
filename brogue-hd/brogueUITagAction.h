@@ -5,7 +5,7 @@
 
 using namespace brogueHd::simple;
 
-namespace brogueHd::frontend::opengl
+namespace brogueHd::frontend
 {
 	struct brogueUITagAction : hashable
 	{
@@ -33,6 +33,14 @@ namespace brogueHd::frontend::opengl
 			glfwHotkey = copy.glfwHotkey;
 			fileName = copy.fileName;
 		}
+		bool operator==(const brogueUITagAction& other)
+		{
+			return compare(other);
+		}
+		bool operator!=(const brogueUITagAction& other)
+		{
+			return !compare(other);
+		}
 
 		/// <summary>
 		/// GLFW key code for the hotkey (modifiers won't matter)
@@ -48,5 +56,14 @@ namespace brogueHd::frontend::opengl
 		/// Action to perform - which is the purpose of the UI control
 		/// </summary>
 		brogueUIAction action;
+
+	private:
+
+		bool compare(const brogueUITagAction& other)
+		{
+			return action == other.action &&
+				glfwHotkey == other.glfwHotkey &&
+				fileName == other.fileName;
+		}
 	};
 }

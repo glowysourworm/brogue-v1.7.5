@@ -7,7 +7,7 @@
 
 using namespace brogueHd::component;
 
-namespace brogueHd::backend::model::layout
+namespace brogueHd::backend::model
 {
 	/// <summary>
 	/// Accretion tile is used to help design the layout. The connection points are desired

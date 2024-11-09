@@ -5,8 +5,6 @@
 #include "simplePixel.h"
 #include <cstdint>
 
-using namespace brogueHd::backend::model::game;
-
 namespace brogueHd::simple
 {
 	class simplePixelFilter

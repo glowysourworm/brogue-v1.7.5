@@ -10,8 +10,7 @@
 #include "simpleMath.h"
 
 using namespace brogueHd::simple;
-using namespace brogueHd::backend::generator;
-using namespace brogueHd::backend::model::game;
+using namespace brogueHd::backend;
 
 namespace brogueHd::backend::model
 {

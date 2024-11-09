@@ -30,7 +30,7 @@
 using namespace brogueHd::simple;
 using namespace brogueHd::component;
 
-namespace brogueHd::frontend::opengl
+namespace brogueHd::frontend
 {
 	// Contended Resources
 	static simpleKeyboardState* KeyState;
@@ -195,31 +195,31 @@ namespace brogueHd::frontend::opengl
 	{
 		if (action == GLFW_PRESS || action == GLFW_REPEAT)
 		{
-			if (!opengl::KeyState->hasKey(key))
-				opengl::KeyState->setKey(key);
+			if (!brogueHd::frontend::KeyState->hasKey(key))
+				brogueHd::frontend::KeyState->setKey(key);
 		}
 		else if (action == GLFW_RELEASE)
 		{
-			opengl::KeyState->clearKey(key);
+			brogueHd::frontend::KeyState->clearKey(key);
 		}
 		else
 			simpleException::show("Unknown GLFW key callback action {}:  openglRenderer::keyCallback", action);
 
-		opengl::KeyState->setModifier(mods);
+		brogueHd::frontend::KeyState->setModifier(mods);
 	}
 	void openglRenderer::mousePositionCallback(GLFWwindow* window, double xpos, double ypos)
 	{
-		opengl::MouseState->updatePosition(xpos, ypos);
+		brogueHd::frontend::MouseState->updatePosition(xpos, ypos);
 	}
 	void openglRenderer::mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 	{
-		opengl::MouseState->updateButtons(glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT),
+		brogueHd::frontend::MouseState->updateButtons(glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT),
 										  glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT),
 										  glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE));
 	}
 	void openglRenderer::mouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 	{
-		opengl::MouseState->updateScroll(xoffset, yoffset);
+		brogueHd::frontend::MouseState->updateScroll(xoffset, yoffset);
 	}
 	void openglRenderer::resizeCallback(GLFWwindow* window, int height, int width)
 	{
@@ -412,8 +412,8 @@ namespace brogueHd::frontend::opengl
 		//			 by the rendering controller. These are nulled here for reference; and to guard
 		//			 other methods during a program change.
 		//
-		opengl::KeyState = nullptr;
-		opengl::MouseState = nullptr;
+		brogueHd::frontend::KeyState = nullptr;
+		brogueHd::frontend::MouseState = nullptr;
 		_program = nullptr;
 	}
 	void openglRenderer::destroyGL()
@@ -442,11 +442,11 @@ namespace brogueHd::frontend::opengl
 
 		_threadLock->lock();
 
-		if (opengl::KeyState == nullptr)
+		if (brogueHd::frontend::KeyState == nullptr)
 			keyboard = default_value::value<brogueKeyboardState>();
 
 		else
-			keyboard = _program->getKeyboardState(*opengl::KeyState);
+			keyboard = _program->getKeyboardState(*brogueHd::frontend::KeyState);
 
 		_threadLock->unlock();
 
@@ -458,11 +458,11 @@ namespace brogueHd::frontend::opengl
 
 		_threadLock->lock();
 
-		if (opengl::MouseState == nullptr)
+		if (brogueHd::frontend::MouseState == nullptr)
 			mouse = default_value::value<brogueMouseState>();
 
 		else
-			mouse = _program->getMouseState(*opengl::MouseState);
+			mouse = _program->getMouseState(*brogueHd::frontend::MouseState);
 
 		_threadLock->unlock();
 
@@ -591,8 +591,8 @@ namespace brogueHd::frontend::opengl
 		}
 
 		// Keyboard / Mouse State
-		opengl::KeyState = new simpleKeyboardState();
-		opengl::MouseState = new simpleMouseState();
+		brogueHd::frontend::KeyState = new simpleKeyboardState();
+		brogueHd::frontend::MouseState = new simpleMouseState();
 
 		// Update the viewport for the current program
 		glViewport(0, 0, sceneBoundaryUI.width, sceneBoundaryUI.height);
@@ -620,8 +620,8 @@ namespace brogueHd::frontend::opengl
 			// 7) Log Errors, Reset Mouse State, finish draw pass.
 			//
 
-			simpleMouseState mouseState(*opengl::MouseState);
-			simpleKeyboardState keyboardState(*opengl::KeyState);
+			simpleMouseState mouseState(*brogueHd::frontend::MouseState);
+			simpleKeyboardState keyboardState(*brogueHd::frontend::KeyState);
 			bool programChangeThisIteration = _gameModeIn != _gameMode;
 
 			// Program Context Change
@@ -649,7 +649,7 @@ namespace brogueHd::frontend::opengl
 				simpleLogger::log(getGLErrorString(error));
 
 			// Scroll data has already been consumed by the view tree
-			opengl::MouseState->resetScroll();
+			brogueHd::frontend::MouseState->resetScroll();
 
 			_threadLock->unlock();
 
@@ -658,8 +658,8 @@ namespace brogueHd::frontend::opengl
 		}
 
 		// Keyboard / Mouse State (cleanup)
-		delete opengl::KeyState;
-		delete opengl::MouseState;
+		delete brogueHd::frontend::KeyState;
+		delete brogueHd::frontend::MouseState;
 
 		//_program->teardown();
 

@@ -29,11 +29,9 @@
 
 using namespace brogueHd::simple;
 using namespace brogueHd::component;
-using namespace brogueHd::backend::controller;
-using namespace brogueHd::backend::model::layout;
-using namespace brogueHd::frontend::ui;
+using namespace brogueHd::backend;
 
-namespace brogueHd::frontend::opengl
+namespace brogueHd::frontend
 {
 	class brogueDataStreamBuilder
 	{

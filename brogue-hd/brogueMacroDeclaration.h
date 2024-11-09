@@ -3,8 +3,6 @@
 
 
 using namespace brogueHd::backend::model;
-using namespace brogueHd::backend::model::game;
-using namespace brogueHd::backend::modelConstant;
 
 // Macro Enum Definitions:  Used for string <-> value methods EnumString<...>::To and EnumString<...>::From
 

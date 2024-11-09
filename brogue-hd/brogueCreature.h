@@ -4,8 +4,6 @@
 #include "brogueObject.h"
 #include "creature.h"
 
-using namespace brogueHd::backend::model::creature;
-
 namespace brogueHd::backend::model
 {
 	class brogueCreature : public brogueObject

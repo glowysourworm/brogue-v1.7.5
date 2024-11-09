@@ -6,7 +6,7 @@
 #include "simpleGlObject.h"
 #include "simpleLogger.h"
 
-namespace brogueHd::frontend::opengl
+namespace brogueHd::frontend
 {
     class simpleFrameBuffer : public simpleGlObject
     {

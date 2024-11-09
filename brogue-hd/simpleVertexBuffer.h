@@ -12,7 +12,7 @@
 
 using namespace brogueHd::simple;
 
-namespace brogueHd::frontend::opengl
+namespace brogueHd::frontend
 {
 	/// <summary>
 	/// Corresponds to the VBO vertex buffer object on the GL backend

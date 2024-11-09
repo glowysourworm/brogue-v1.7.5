@@ -6,7 +6,7 @@
 
 using namespace brogueHd::simple;
 
-namespace brogueHd::frontend::opengl
+namespace brogueHd::frontend
 {
 	/// <summary>
 	/// Rectangle that stores coordinates for a bounding box in all coordinate systems: UI-coordinates, UV-coordinates,

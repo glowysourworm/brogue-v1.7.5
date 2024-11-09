@@ -2,7 +2,7 @@
 
 #include "dungeonTemplate.h"
 
-namespace brogueHd::backend::model::gameTemplate
+namespace brogueHd::backend::model
 {
 	struct itemTemplate
 	{

@@ -18,11 +18,8 @@
 #include "simpleList.h"
 
 using namespace brogueHd::frontend;
-using namespace brogueHd::frontend::ui;
-using namespace brogueHd::backend::controller;
-using namespace brogueHd::frontend::opengl;
 
-namespace brogueHd::backend::controller
+namespace brogueHd::backend
 {
 	class renderingController
 	{

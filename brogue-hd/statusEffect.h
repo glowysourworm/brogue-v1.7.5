@@ -3,9 +3,7 @@
 #include "color.h"
 #include "statusEffectConstants.h"
 
-using namespace brogueHd::backend::modelConstant;
-
-namespace brogueHd::backend::model::effect
+namespace brogueHd::backend::model
 {
 	// This is just termporary
 	struct characterStatusEffect

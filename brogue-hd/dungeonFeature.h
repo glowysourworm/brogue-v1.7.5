@@ -5,10 +5,7 @@
 #include "dungeonConstants.h"
 #include "lightConstants.h"
 
-using namespace brogueHd::backend::modelConstant;
-using namespace brogueHd::backend::model::game;
-
-namespace brogueHd::backend::model::effect
+namespace brogueHd::backend::model
 {
 	struct dungeonFeature 
 	{

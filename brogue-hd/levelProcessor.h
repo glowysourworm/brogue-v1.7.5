@@ -6,7 +6,7 @@
 
 using namespace brogueHd::backend::model;
 
-namespace brogueHd::backend::processor
+namespace brogueHd::backend
 {
 	class levelProcessor
 	{

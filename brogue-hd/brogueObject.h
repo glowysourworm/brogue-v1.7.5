@@ -4,7 +4,6 @@
 #include "simple.h"
 
 using namespace brogueHd::simple;
-using namespace brogueHd::backend::model::game;
 
 namespace brogueHd::backend::model
 {

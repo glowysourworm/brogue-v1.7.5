@@ -34,7 +34,7 @@ using namespace brogueHd::backend::model;
 //                                  what we come up with.
 //
 
-namespace brogueHd::backend::model::game
+namespace brogueHd::backend::model
 {
 	//class brogueCalculations
 	//{

@@ -3,9 +3,7 @@
 #include "creature.h"
 #include "item.h"
 
-using namespace brogueHd::backend::model::creature;
-
-namespace brogueHd::backend::model::game
+namespace brogueHd::backend::model
 {
 	// Stores the necessary info about a level so it can be regenerated:
 	struct levelData 

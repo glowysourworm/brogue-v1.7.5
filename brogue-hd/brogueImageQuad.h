@@ -5,7 +5,7 @@
 #include "simpleException.h"
 #include "simpleGlData.h"
 
-namespace brogueHd::frontend::opengl
+namespace brogueHd::frontend
 {
 	struct brogueImageQuad : simpleGlData
 	{

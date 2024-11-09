@@ -8,7 +8,7 @@
 #include <iostream>
 
 using namespace brogueHd::simple;
-using namespace brogueHd::backend::controller;
+using namespace brogueHd::backend;
 
 namespace brogueHd::console
 {
