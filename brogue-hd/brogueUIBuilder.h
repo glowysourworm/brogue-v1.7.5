@@ -117,9 +117,9 @@ namespace brogueHd::frontend
 
 			brogueViewContainer* result = new brogueViewContainer(brogueUIProgram::FlameMenuProgram);
 
-			result->addView(heatView->getPartId(), heatView);
+			result->addView(heatView);
 			//result->addView(heatDiffuseView->getPartId(), heatDiffuseView);
-			result->addView(titleMask->getPartId(), titleMask);
+			result->addView(titleMask);
 
 			return result;
 		}
@@ -208,7 +208,7 @@ namespace brogueHd::frontend
 
 			composedView->addView(background);
 
-			result->addView(composedView->getPartId(), composedView);
+			result->addView(composedView);
 
 			return result;
 		}
@@ -320,7 +320,7 @@ namespace brogueHd::frontend
 
 			composedView->addView(background);
 
-			result->addView(composedView->getPartId(), composedView);
+			result->addView(composedView);
 
 			return result;
 		}
@@ -406,7 +406,7 @@ namespace brogueHd::frontend
 			composedView->addView(header);
 			composedView->addView(footer);
 
-			result->addView(composedView->getPartId(), composedView);
+			result->addView(composedView);
 
 			return result;
 		}

@@ -6,13 +6,10 @@
 #include "brogueMouseState.h"
 #include "brogueUIConstants.h"
 #include "brogueViewContainer.h"
-#include "brogueViewProgram.h"
 #include "eventController.h"
 #include "gridRect.h"
 #include "resourceController.h"
-#include "simple.h"
 #include "simpleException.h"
-#include "simpleHash.h"
 #include "simpleKeyboardState.h"
 #include "simpleList.h"
 #include "simpleMouseState.h"
@@ -76,9 +73,9 @@ namespace brogueHd::frontend
 		bool _initialized;
 	};
 
-	brogueProgramContainer::brogueProgramContainer(resourceController* resourceController, 
+	brogueProgramContainer::brogueProgramContainer(resourceController* resourceController,
 												   eventController* eventController,
-												   brogueGlyphMap* glyphMap, 
+												   brogueGlyphMap* glyphMap,
 												   const gridRect& sceneBoundaryUI,
 												   const int zoomLevel,
 												   const simpleList<brogueViewContainer*>& viewList)
@@ -91,7 +88,7 @@ namespace brogueHd::frontend
 	brogueProgramContainer::~brogueProgramContainer()
 	{
 		delete _mainProgram;
-		
+
 		_initialized = false;
 	}
 

@@ -8,6 +8,7 @@
 #include "color.h"
 #include "eventController.h"
 #include "gridRect.h"
+#include "simpleList.h"
 
 using namespace brogueHd::component;
 using namespace brogueHd::backend::model;

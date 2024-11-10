@@ -13,6 +13,7 @@
 #include "gridDefinitions.h"
 #include "gridRect.h"
 #include "simple.h"
+#include "simpleList.h"
 
 using namespace brogueHd::backend;
 

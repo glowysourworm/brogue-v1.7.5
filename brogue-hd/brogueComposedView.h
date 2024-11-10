@@ -45,6 +45,9 @@ namespace brogueHd::frontend
 		virtual brogueCellDisplay* get(short column, short row) const override;
 
 		virtual void iterate(gridCallback<brogueCellDisplay*> callback) const override;
+		virtual void iterateChildViews(simpleListCallback<brogueViewBase*> callback) const override;
+		int getChildViewCount() const override;
+		brogueViewBase* getChildView(int index) const override;
 
 	public:
 
@@ -103,6 +106,21 @@ namespace brogueHd::frontend
 
 			return iterationCallback::iterate;
 		});
+	}
+	void brogueComposedView::iterateChildViews(simpleListCallback<brogueViewBase*> callback) const
+	{
+		_views->forEach([&callback] (brogueViewBase* view)
+		{
+			return callback(view);
+		});
+	}
+	int brogueComposedView::getChildViewCount() const
+	{
+		return _views->count();;
+	}
+	brogueViewBase* brogueComposedView::getChildView(int index) const
+	{
+		return _views->get(index);
 	}
 	brogueCellDisplay* brogueComposedView::get(short column, short row) const
 	{

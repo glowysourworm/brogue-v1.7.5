@@ -9,6 +9,7 @@
 #include "eventController.h"
 #include "gridRect.h"
 #include "simple.h"
+#include "simpleList.h"
 
 using namespace brogueHd::component;
 

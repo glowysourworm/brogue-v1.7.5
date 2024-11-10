@@ -9,6 +9,7 @@
 #include "eventController.h"
 #include "gridRect.h"
 #include "simple.h"
+#include "simpleList.h"
 
 using namespace brogueHd::component;
 using namespace brogueHd::simple;
@@ -27,6 +28,11 @@ namespace brogueHd::frontend
 							int millisecondsLapsed) override;
 
 		virtual bool needsUpdate() const override;
+
+		virtual void iterateChildViews(simpleListCallback<brogueViewBase*> callback) const override
+		{
+			callback((brogueViewBase*)this);
+		}
 	};
 
 	brogueButton::brogueButton(eventController* eventController, const brogueUIData& data, const gridRect& sceneBoundary, const gridRect& viewBoundary)

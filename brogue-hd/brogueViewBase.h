@@ -14,6 +14,7 @@
 #include "gridRect.h"
 #include "simple.h"
 #include "simpleException.h"
+#include "simpleList.h"
 
 using namespace brogueHd::backend;
 
@@ -56,6 +57,14 @@ namespace brogueHd::frontend
 		/// Iterates the view's cells. This will happen in the view's relative boundary.
 		/// </summary>
 		virtual void iterate(gridCallback<brogueCellDisplay*> callback) const;
+
+		/// <summary>
+		/// Iterates the view's child views. This must be overridden in the child class; and
+		/// return "this" if necessary.
+		/// </summary>
+		virtual void iterateChildViews(simpleListCallback<brogueViewBase*> callback) const;
+		virtual int getChildViewCount() const;
+		virtual brogueViewBase* getChildView(int index) const;
 
 		/// <summary>
 		/// Overload of the checkUpdate function behaves as though the view is a child of a parent view
@@ -291,5 +300,20 @@ namespace brogueHd::frontend
 	void brogueViewBase::iterate(gridCallback<brogueCellDisplay*> callback) const
 	{
 		_view->iterate(callback);
+	}
+	void brogueViewBase::iterateChildViews(simpleListCallback<brogueViewBase*> callback) const
+	{
+		callback((brogueViewBase*)this);
+	}
+	int brogueViewBase::getChildViewCount() const
+	{
+		return 1;
+	}
+	brogueViewBase* brogueViewBase::getChildView(int index) const
+	{
+		if (index != 0)
+			throw simpleException("Index outside the boundsd of the array:  brogueViewBase.h");
+
+		return (brogueViewBase*)this;
 	}
 }

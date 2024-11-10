@@ -115,6 +115,9 @@ namespace brogueHd::frontend
 
 	void brogueViewProgram::initialize()
 	{
+		resourceController* resourceController = _resourceController;
+		brogueProgramBuilder* programBuilder = _programBuilder;
+
 		// Create shader programs for each program part
 		for (int index = 0; index < _viewContainer->getViewCount(); index++)
 		{
@@ -233,16 +236,15 @@ namespace brogueHd::frontend
 
 		for (int index = 0; index < _viewContainer->getViewCount(); index++)
 		{
-			// Retrieve program part name
-			brogueUIProgramPartId partId = _viewContainer->getViewAt(index)->getPartId();
+			brogueViewBase* view = _viewContainer->getViewAt(index);
 
 			// Check counter to prevent pre-mature update (AutoReset = false) (clear when caller uses clearUpdate)
-			if (_programCounters->get(partId)->update(millisecondsLapsed, false));
+			if (_programCounters->get(view->getPartId())->update(millisecondsLapsed, false));
 			{
 				// Get actual time period (for having waited)
-				int partMillisecondsLapsed = _programCounters->get(partId)->getCounter();
+				int partMillisecondsLapsed = _programCounters->get(view->getPartId())->getCounter();
 
-				_viewContainer->checkUpdate(partId, keyboardUI, mouseUI, partMillisecondsLapsed);
+				_viewContainer->checkUpdate(view->getPartId(), keyboardUI, mouseUI, partMillisecondsLapsed);
 			}
 		}
 	}
@@ -261,10 +263,9 @@ namespace brogueHd::frontend
 
 		for (int index = 0; index < _viewContainer->getViewCount() && !result; index++)
 		{
-			// Retrieve program part name
-			brogueUIProgramPartId partId = _viewContainer->getViewAt(index)->getPartId();
+			brogueViewBase* view = _viewContainer->getViewAt(index);
 
-			result |= _viewContainer->needsUpdate(partId);
+			result |= _viewContainer->needsUpdate(view->getPartId());
 		}
 
 		return result;

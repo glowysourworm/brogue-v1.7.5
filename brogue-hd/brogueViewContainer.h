@@ -26,7 +26,7 @@ namespace brogueHd::frontend
 		brogueViewContainer(brogueUIProgram programName);
 		~brogueViewContainer();
 
-		void addView(const brogueUIProgramPartId& partId, brogueViewBase* view);
+		void addView(brogueViewBase* view);
 		brogueViewBase* getView(const brogueUIProgramPartId& programPart) const;
 		brogueViewBase* getViewAt(int index) const;
 		int getViewCount() const;
@@ -67,9 +67,17 @@ namespace brogueHd::frontend
 	{
 		delete _views;
 	}
-	void brogueViewContainer::addView(const brogueUIProgramPartId& partId, brogueViewBase* view)
+	void brogueViewContainer::addView(brogueViewBase* view)
 	{
-		_views->add(partId, view);
+		// Composed Views:  These will potentially have N number of program parts (buttons, text, background, etc...)
+		//					which will be managed by brogueComposedView. Each will have a shader program and data stream
+		//					to handle here; but the mouse interaction is the composed view. (brogueViewBase has the 
+		//					overload for this function to give the base view.
+		//
+		for (int index = 0; index < view->getChildViewCount(); index++)
+		{
+			_views->add(view->getChildView(index)->getPartId(), view->getChildView(index));
+		}
 	}
 	brogueViewBase* brogueViewContainer::getView(const brogueUIProgramPartId& programPart) const
 	{
