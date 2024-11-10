@@ -6,7 +6,10 @@
 #include "brogueViewBase.h"
 #include "gridRect.h"
 
+#include "brogueCellDisplay.h"
 #include "eventController.h"
+#include "gridDefinitions.h"
+#include "simple.h"
 
 using namespace brogueHd::backend;
 using namespace brogueHd::component;
@@ -37,6 +40,14 @@ namespace brogueHd::frontend
 	brogueBackground::brogueBackground(eventController* eventController, const brogueUIData& data, const gridRect& sceneBoundary, const gridRect& viewBoundary)
 		: brogueViewBase(eventController, data, sceneBoundary, viewBoundary)
 	{
+		brogueBackground* that = this;
+
+		// Initialize to use the background color
+		brogueViewBase::iterate([&that] (short column, short row, brogueCellDisplay* cell)
+		{
+			cell->backColor = that->getBackgroundColor(column, row);
+			return iterationCallback::iterate;
+		});
 	}
 
 	brogueBackground::~brogueBackground()

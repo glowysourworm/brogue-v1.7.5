@@ -677,6 +677,9 @@
     <ClInclude Include="brogueFlameMenuHeatView.h">
       <Filter>Header Files\frontend\ui</Filter>
     </ClInclude>
+    <ClInclude Include="simpleOrderedList.h">
+      <Filter>Header Files\simple</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\resources\model\armor.csv">

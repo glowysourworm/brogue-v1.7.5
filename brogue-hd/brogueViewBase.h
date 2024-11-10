@@ -101,6 +101,7 @@ namespace brogueHd::frontend
 		bool getMouseEnter() const;
 		bool getMouseLeave() const;
 		int getZoomLevel() const;
+		int getZIndex() const;
 
 	protected:
 
@@ -240,6 +241,10 @@ namespace brogueHd::frontend
 	int brogueViewBase::getZoomLevel() const
 	{
 		return _uiData->getZoomLevel();
+	}
+	int brogueViewBase::getZIndex() const
+	{
+		return _uiData->getZIndex();
 	}
 	void brogueViewBase::raiseClickEvent(const brogueUITagAction& response)
 	{

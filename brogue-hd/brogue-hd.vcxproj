@@ -319,6 +319,7 @@
     <ClInclude Include="machineConstants.h" />
     <ClInclude Include="simpleBitmap.h" />
     <ClInclude Include="simpleMouseState.h" />
+    <ClInclude Include="simpleOrderedList.h" />
     <ClInclude Include="simplePeriodCounter.h" />
     <ClInclude Include="simplePixel.h" />
     <ClInclude Include="simplePixelFilter.h" />

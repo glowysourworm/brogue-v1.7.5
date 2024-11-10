@@ -15,10 +15,12 @@ uniform float mixWeight;
 void main()
 {
     // Sample the frame texture
-    //vec4 output0 = texture(frame0Texture, currentTextureUV);
+    vec4 output0 = texture(frame0Texture, currentTextureUV);
     //vec4 output1 = texture(frame1Texture, currentTextureUV);
 
-    //outputColor = mix(output0, output1, mixWeight);
-
-    outputColor = texture(frame0Texture, currentTextureUV);
+    // Favor the non-background UI controls
+    //if (length(output1) > 0)
+    //    outputColor = output1;
+    //else
+        outputColor = output0;
 }

@@ -125,6 +125,8 @@ namespace brogueHd::frontend
 		_height = 0;
 		_pixelFormat = NULL;
 		_pixelType = NULL;
+		_pixelAlignment = NULL;
+		_pixelInternalFormat = NULL;
 	}
 	simpleTexture::simpleTexture(const simpleTexture& copy)
 	{

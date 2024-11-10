@@ -13,6 +13,8 @@
 #include "gridRect.h"
 #include "simple.h"
 #include "simpleList.h"
+#include "simpleOrderedList.h"
+#include <functional>
 
 using namespace brogueHd::component;
 using namespace brogueHd::simple;
@@ -54,7 +56,7 @@ namespace brogueHd::frontend
 	private:
 
 		brogueCellDisplay* _defaultCell;
-		simpleList<brogueViewBase*>* _views;
+		simpleOrderedList<brogueViewBase*>* _views;
 
 	};
 
@@ -62,7 +64,10 @@ namespace brogueHd::frontend
 		: brogueViewBase(eventController, uiData, sceneBoundary, viewBoundary)
 	{
 		_defaultCell = new brogueCellDisplay();
-		_views = new simpleList<brogueViewBase*>();
+		_views = new simpleOrderedList<brogueViewBase*>([] (brogueViewBase* view1, brogueViewBase* view2)
+		{
+			return view1->getZIndex() - view2->getZIndex();
+		});
 
 		// This will be the view cell for the padded boundary
 		_defaultCell->backColor = colors::transparent();
@@ -89,7 +94,7 @@ namespace brogueHd::frontend
 	{
 		const brogueComposedView* that = this;
 
-		this->getSceneBoundary().iterate([&callback, &that] (short column, short row)
+		this->getBoundary().iterate([&callback, &that] (short column, short row)
 		{
 			brogueCellDisplay* cell = that->get(column, row);
 
@@ -107,7 +112,8 @@ namespace brogueHd::frontend
 		if (!paddedBoundary.contains(column, row))
 			return _defaultCell;
 
-		for (int index = 0; index < _views->count(); index++)
+		// SORTED BY Z-INDEX (Ascending)
+		for (int index = _views->count() - 1; index >= 0; index--)
 		{
 			// This offset should be shared with the container (but it's better to check and be sure)
 			gridLocator offset = _views->get(index)->getRenderOffset();

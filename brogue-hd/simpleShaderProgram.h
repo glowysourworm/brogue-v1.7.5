@@ -46,6 +46,7 @@ namespace brogueHd::frontend
 		{
 			openglHelper::outputProgramInfoLog(this->handle);
 		}
+		void showActives();
 
 		/// <summary>
 		/// Call to re-buffer the data glNamedBufferSubData. Will delete the old stream.
@@ -59,9 +60,7 @@ namespace brogueHd::frontend
 		bool bindUniform2i(const simpleString& name, const ivec2& uniformValue);
 		bool bindUniform4(const simpleString& name, const vec4& uniformValue);
 
-	private:
-
-		void bindUniforms();
+		bool bindUniforms();
 
 	private:
 
@@ -116,7 +115,8 @@ namespace brogueHd::frontend
 		glUseProgram(this->handle);
 
 		// Bind Uniforms (default values)
-		bindUniforms();
+		if (!bindUniforms())
+			simpleLogger::logColor(brogueConsoleColor::Blue, "Problem binding uniforms:  Program={}", this->handle);
 
 		// Show output for this program:  errors, actives, etc...
 		openglHelper::outputShaderInfoLog(_vertexShader.getHandle());
@@ -126,6 +126,14 @@ namespace brogueHd::frontend
 
 		if (!this->isCreated())
 			simpleLogger::logColor(brogueConsoleColor::Red, "Error creating simpleShaderProgram");
+	}
+
+	void simpleShaderProgram::showActives()
+	{
+		openglHelper::outputShaderInfoLog(_vertexShader.getHandle());
+		openglHelper::outputShaderInfoLog(_fragmentShader.getHandle());
+		openglHelper::outputProgramInfoLog(this->handle);
+		openglHelper::outputProgramParameters(this->handle);
 	}
 
 	void simpleShaderProgram::draw()
@@ -168,7 +176,7 @@ namespace brogueHd::frontend
 		glUseProgram(NULL);
 	}
 
-	void simpleShaderProgram::bindUniforms()
+	bool simpleShaderProgram::bindUniforms()
 	{
 		if (!this->isCreated())
 			throw simpleException("Must first call compile() to run shader program:  simpleShaderProgram.h");
@@ -176,78 +184,82 @@ namespace brogueHd::frontend
 		if (!this->isBound())
 			throw simpleException("Must first call bind to set the program active");
 
-		// Uniform data is stored in each shader
+		// Uniform data is stored in each shader. Some of these data don't bind until
+		// their backend is properly initialized.
 		//
+		bool result = true;
 
 		// Vertex Shaders: Uniform-1i
 		for (int index = 0; index < _vertexShader.getUniform1iCount(); index++)
 		{
 			simpleUniform<int> uniform = _vertexShader.getUniform1i(index);
-			bindUniform1i(uniform.name, uniform.value);
+			result &= bindUniform1i(uniform.name, uniform.value);
 		}
 
 		// Uniform-1 (1f)
 		for (int index = 0; index < _vertexShader.getUniform1Count(); index++)
 		{
 			simpleUniform<float> uniform = _vertexShader.getUniform1(index);
-			bindUniform1(uniform.name, uniform.value);
+			result &= bindUniform1(uniform.name, uniform.value);
 		}
 
 		// Uniform-2 (2f)
 		for (int index = 0; index < _vertexShader.getUniform2Count(); index++)
 		{
 			simpleUniform<vec2> uniform = _vertexShader.getUniform2(index);
-			bindUniform2(uniform.name, uniform.value);
+			result &= bindUniform2(uniform.name, uniform.value);
 		}
 
 		// Uniform-2i (2i)
 		for (int index = 0; index < _vertexShader.getUniform2iCount(); index++)
 		{
 			simpleUniform<ivec2> uniform = _vertexShader.getUniform2i(index);
-			bindUniform2i(uniform.name, uniform.value);
+			result &= bindUniform2i(uniform.name, uniform.value);
 		}
 
 		// Uniform-4 (4f)
 		for (int index = 0; index < _vertexShader.getUniform4Count(); index++)
 		{
 			simpleUniform<vec4> uniform = _vertexShader.getUniform4(index);
-			bindUniform4(uniform.name, uniform.value);
+			result &= bindUniform4(uniform.name, uniform.value);
 		}
 
 		// Fragment Shaders:  Uniform 1i
 		for (int index = 0; index < _fragmentShader.getUniform1iCount(); index++)
 		{
 			simpleUniform<int> uniform = _fragmentShader.getUniform1i(index);
-			bindUniform1i(uniform.name, uniform.value);
+			result &= bindUniform1i(uniform.name, uniform.value);
 		}
 
 		// Uniform-1 (1f)
 		for (int index = 0; index < _fragmentShader.getUniform1Count(); index++)
 		{
 			simpleUniform<float> uniform = _fragmentShader.getUniform1(index);
-			bindUniform1(uniform.name, uniform.value);
+			result &= bindUniform1(uniform.name, uniform.value);
 		}
 
 		// Uniform-2 (2f)
 		for (int index = 0; index < _fragmentShader.getUniform2Count(); index++)
 		{
 			simpleUniform<vec2> uniform = _fragmentShader.getUniform2(index);
-			bindUniform2(uniform.name, uniform.value);
+			result &= bindUniform2(uniform.name, uniform.value);
 		}
 
 		// Uniform-2i (2i)
 		for (int index = 0; index < _fragmentShader.getUniform2iCount(); index++)
 		{
 			simpleUniform<ivec2> uniform = _fragmentShader.getUniform2i(index);
-			bindUniform2i(uniform.name, uniform.value);
+			result &= bindUniform2i(uniform.name, uniform.value);
 		}
 
 		// Uniform-4 (4f)
 		for (int index = 0; index < _fragmentShader.getUniform4Count(); index++)
 		{
 			simpleUniform<vec4> uniform = _fragmentShader.getUniform4(index);
-			bindUniform4(uniform.name, uniform.value);
+			result &= bindUniform4(uniform.name, uniform.value);
 		}
+
+		return result;
 	}
 
 	bool simpleShaderProgram::bindUniform1i(const simpleString& name, int uniformValue)

@@ -35,6 +35,7 @@ namespace brogueHd::frontend
 			_hotkeyIndex = -1;
 			_padding = 0;
 			_zoomLevel = 0;
+			_zIndex = 0;
 
 			_hasMouseInteraction = false;
 			_mouseClickCapture = false;
@@ -120,6 +121,7 @@ namespace brogueHd::frontend
 			_hotkeyIndex = -1;
 			_padding = 0;
 			_zoomLevel = zoomLevel;
+			_zIndex = 0;
 			_hasMouseInteraction = false;
 
 			// Set during setUIParameters()
@@ -151,12 +153,14 @@ namespace brogueHd::frontend
 							 brogueUIAction action,
 							 bool hasMouseInteraction,
 							 int padding,
-							 int zoomLevel)
+							 int zoomLevel,
+							 int zIndex)
 		{
 			_hotkeyIndex = hotkeyIndex;
 			_hasMouseInteraction = hasMouseInteraction;
 			_padding = padding;
 			_zoomLevel = zoomLevel;
+			_zIndex = zIndex;
 
 			_tagAction.glfwHotkey = actionGLFWHotkey;
 			_tagAction.fileName = actionFileName;
@@ -326,7 +330,10 @@ namespace brogueHd::frontend
 			_renderOffset.column = column;
 			_renderOffset.row = row;
 		}
-
+		int getZIndex() const
+		{
+			return _zIndex;
+		}
 		int getZoomLevel() const
 		{
 			return _zoomLevel;
@@ -362,6 +369,7 @@ namespace brogueHd::frontend
 			_hotkeyIndex = copy.getHotkeyIndex();
 			_padding = copy.getPadding();
 			_zoomLevel = copy.getZoomLevel();
+			_zIndex = copy.getZIndex();
 
 			_hasMouseInteraction = copy.getHasMouseInteraction();
 			_mouseClickCapture = copy.getMouseClick();
@@ -489,6 +497,7 @@ namespace brogueHd::frontend
 		int _hotkeyIndex;
 		int _padding;
 		int _zoomLevel;
+		int _zIndex;
 		bool _hasMouseInteraction;
 
 		// Some real time data

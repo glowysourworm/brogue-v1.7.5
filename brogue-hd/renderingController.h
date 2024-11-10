@@ -61,7 +61,7 @@ namespace brogueHd::backend
 		_eventController = eventController;
 		_randomGenerator = randomGenerator;
 
-		int zoomLevel = 13;
+		int zoomLevel = 10;
 
 		// Title Screen:  Build program parts, load the container
 

@@ -74,6 +74,8 @@ namespace brogueHd::frontend
 		void initialize();
 		void activate();
 		void deactivate();
+		void bindUniforms();
+		void outputActives();
 		void checkUpdate(const simpleKeyboardState& keyboardState,
 						 const simpleMouseState& mouseState,
 						 int millisecondsLapsed);
@@ -130,6 +132,32 @@ namespace brogueHd::frontend
 		}
 
 		_active = true;
+	}
+	void brogueViewProgram::bindUniforms()
+	{
+		if (!_active)
+			throw simpleException("Trying to bind uniforms to inactive program:  brogueViewProgram::bindUniforms");
+
+		_programs->iterate([] (const brogueUIProgramPartId& partId, simpleShaderProgram* program)
+		{
+			if (program->isBound())
+				program->bindUniforms();
+
+			return iterationCallback::iterate;
+		});
+	}
+	void brogueViewProgram::outputActives()
+	{
+		if (!_active)
+			throw simpleException("Trying to output actives for inactive program:  brogueViewProgram::outputActives");
+
+		_programs->iterate([] (const brogueUIProgramPartId& partId, simpleShaderProgram* program)
+		{
+			if (program->isBound())
+				program->showActives();
+
+			return iterationCallback::iterate;
+		});
 	}
 	simpleShaderProgram* brogueViewProgram::getShaderProgram(const brogueUIProgramPartId& partId)
 	{

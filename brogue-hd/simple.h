@@ -131,6 +131,9 @@ namespace brogueHd::simple
 							std::same_as<T, simpleString> ||
 							isStdHashable<T>;
 
+	template<typename T>
+	concept isSimpleCompatible = isHashable<T> && isComparable<T>;
+
 	class hashGenerator
 	{
 	private:

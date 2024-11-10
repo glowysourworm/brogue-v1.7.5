@@ -77,6 +77,7 @@ namespace brogueHd::frontend
 
 		const float FlameNoise = 0.35f;
 		const float FlameFade = 0.35f;
+		const float FlameDiffuse = 0.95f;
 
 		const color FlameBottomColor1 = color(1.0f, 0.0f, 0.0f, 1);
 		const color FlameBottomColor2 = color(1.0f, 0.2f, 0.1f, 1);
@@ -277,7 +278,7 @@ namespace brogueHd::frontend
 				color southWest = that->get(column - 1, row + 1)->backColor;
 
 				// Order may matter
-				cell->backColor.averageIn(1, 1, south, southEast, southWest);
+				cell->backColor.averageIn(1, that->FlameDiffuse, south, southEast, southWest);
 			}
 			else
 			{

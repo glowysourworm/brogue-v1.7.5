@@ -84,11 +84,11 @@ namespace brogueHd::frontend
 		simpleFrameBuffer* _frameBuffer;
 
 		simpleTexture* _frameTexture0;				// GL_TEXTURE0, Color Attachment 0, (same thing), and will carry the flame menu background
-		//simpleTexture* _frameTexture1;				// GL_TEXTURE1, will carry all the rest of the components (overwriting / blending with texture 0)
 		simpleTexture* _fontTexture;				// Glyph Map texture
 		gridRect* _sceneBoundaryUI;
 
 		BrogueGameMode _gameMode;
+		bool _firstRun;
 	};
 
 	brogueMainProgram::brogueMainProgram(resourceController* resourceController,
@@ -130,7 +130,6 @@ namespace brogueHd::frontend
 		int textureIndex = 0;
 
 		_frameTexture0 = new simpleTexture(nullptr, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE0, GL_RGBA, GL_RGBA, 4, GL_FLOAT);
-		//_frameTexture1 = new simpleTexture(nullptr, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE1, GL_RGBA, GL_RGBA, 4, GL_FLOAT);
 
 		// Font Glyphs:  Going to load the max zoom for now
 		simpleBitmap* glyphSheet = resourceController->getFontGlyphs(zoomLevel);
@@ -145,15 +144,16 @@ namespace brogueHd::frontend
 		openglHelper::flipSurface(glyphSurface);
 
 		// void* @_@ (No really good way to own this one until we do it ourselves for each and every data type, that WE own)
-		_fontTexture = new simpleTexture(glyphSurface, glyphSheet->pixelWidth(), glyphSheet->pixelHeight(), textureIndex++, GL_TEXTURE2, GL_RGBA, GL_RGBA, 4, GL_UNSIGNED_BYTE);
+		_fontTexture = new simpleTexture(glyphSurface, glyphSheet->pixelWidth(), glyphSheet->pixelHeight(), textureIndex++, GL_TEXTURE1, GL_RGBA, GL_RGBA, 4, GL_UNSIGNED_BYTE);
 
 		_frameBuffer = new simpleFrameBuffer(sceneBoundaryUI.width, sceneBoundaryUI.height);
+
+		_firstRun = true;
 	}
 	brogueMainProgram::~brogueMainProgram()
 	{
 		delete _frameProgram;
 		delete _frameTexture0;
-		//delete _frameTexture1;
 		delete _fontTexture;
 		delete _frameBuffer;
 		delete _sceneBoundaryUI;
@@ -214,12 +214,17 @@ namespace brogueHd::frontend
 		{
 			case BrogueGameMode::Title:
 
-
+				// Frame Buffer -> GL_TEXTURE0
 				glDrawBuffer(GL_COLOR_ATTACHMENT0);
+
+				_uiPrograms->get(brogueUIProgram::FlameMenuProgram)->activate();
+				if (_firstRun)
+				{
+					_uiPrograms->get(brogueUIProgram::FlameMenuProgram)->bindUniforms();
+					_uiPrograms->get(brogueUIProgram::FlameMenuProgram)->outputActives();
+				}
 				_uiPrograms->get(brogueUIProgram::FlameMenuProgram)->run(millisecondsElapsed);
 
-				//glDrawBuffer(GL_COLOR_ATTACHMENT1);
-				//_uiPrograms->get(brogueUIProgram::MainMenuProgram)->run(millisecondsElapsed);
 				break;
 			case BrogueGameMode::Game:
 				break;
@@ -229,11 +234,38 @@ namespace brogueHd::frontend
 				break;
 		}
 
+		// Unbind the frame buffer -> render output to normal GL output
 		_frameBuffer->unBind();
 
-		// Blend the textures and output the result
+		// Output the frame buffer
 		_frameProgram->bind();
 		_frameProgram->draw();
+
+		glFlush();
+
+		// Draw UI components
+		switch (_gameMode)
+		{
+			case BrogueGameMode::Title:
+
+				_uiPrograms->get(brogueUIProgram::MainMenuProgram)->activate();
+				if (_firstRun)
+				{
+					_uiPrograms->get(brogueUIProgram::MainMenuProgram)->bindUniforms();
+					_uiPrograms->get(brogueUIProgram::MainMenuProgram)->outputActives();
+				}
+				_uiPrograms->get(brogueUIProgram::MainMenuProgram)->run(millisecondsElapsed);
+
+				break;
+			case BrogueGameMode::Game:
+				break;
+			case BrogueGameMode::Playback:
+				break;
+			default:
+				break;
+		}
+
+		_firstRun = false;
 
 		glFlush();
 	}
@@ -247,7 +279,6 @@ namespace brogueHd::frontend
 
 		// Create the textures:  Texture 1 is used for the direct drawing, Texture 0 for the "color diffusion"
 		_frameTexture0->glCreate(-1);		// Textures don't automatically associate w/ a program
-		//_frameTexture1->glCreate(-1);
 		_fontTexture->glCreate(-1);
 
 		//Create Frame buffer:  Uses scene program to render to the frame buffer attached texture
@@ -256,7 +287,6 @@ namespace brogueHd::frontend
 		// Attach texture to frame buffer
 		_frameBuffer->bind();
 		_frameBuffer->attachTexture(_frameTexture0->getHandle(), GL_COLOR_ATTACHMENT0);
-		//_frameBuffer->attachTexture(_frameTexture0->getHandle(), GL_COLOR_ATTACHMENT1);
 		_frameBuffer->attachRenderBuffer();
 		_frameBuffer->unBind();
 
@@ -403,7 +433,7 @@ namespace brogueHd::frontend
 		{
 			case BrogueGameMode::Title:
 				_uiPrograms->get(brogueUIProgram::FlameMenuProgram)->activate();
-				//_uiPrograms->get(brogueUIProgram::MainMenuProgram)->activate();
+				_uiPrograms->get(brogueUIProgram::MainMenuProgram)->activate();
 				break;
 			case BrogueGameMode::Game:
 				break;

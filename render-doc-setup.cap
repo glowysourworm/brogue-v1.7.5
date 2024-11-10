@@ -2,7 +2,7 @@
     "rdocCaptureSettings": 1,
     "settings": {
         "autoStart": false,
-        "commandLine": "C:\\Backup\\_Source\\Git\\brogue-v1.7.5\\resources\\resource-config.json",
+        "commandLine": "C:\\Backup\\_Source\\Git\\brogue-v1.7.5\\config.json",
         "environment": [
         ],
         "executable": "C:\\Backup\\_Source\\Git\\brogue-v1.7.5\\x64\\Debug\\brogue-hd.exe",
