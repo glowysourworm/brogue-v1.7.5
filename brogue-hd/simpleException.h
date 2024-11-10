@@ -22,6 +22,8 @@ namespace brogueHd::simple
 		{
 			std::string result = message;
 
+			result += "\r\n";
+
 			for (int index = 0; index < std::stacktrace::current().size(); index++)
 			{
 				const std::stacktrace_entry stack = std::stacktrace::current().at(index);

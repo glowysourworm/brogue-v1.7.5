@@ -4,17 +4,17 @@
 #include "brogueKeyboardState.h"
 #include "brogueMouseState.h"
 #include "brogueTitleGrid.h"
-#include "brogueUIConstants.h"
 #include "brogueUIData.h"
-#include "brogueUIProgramPartId.h"
 #include "brogueViewBase.h"
 #include "color.h"
+#include "eventController.h"
 #include "grid.h"
 #include "gridDefinitions.h"
 #include "gridRect.h"
 #include "randomGenerator.h"
 #include "simple.h"
 #include "simpleMath.h"
+#include "simplePeriodCounter.h"
 
 using namespace brogueHd::backend;
 using namespace brogueHd::backend::model;
@@ -24,9 +24,12 @@ namespace brogueHd::frontend
 	class brogueFlameMenuHeatView : public brogueViewBase
 	{
 	public:
-		brogueFlameMenuHeatView(randomGenerator* randomGenerator,
+		brogueFlameMenuHeatView(eventController* eventController,
+								randomGenerator* randomGenerator,
 								int fadePeriodMilliseconds,
-								int zoomLevel);
+								const brogueUIData& data,
+								const gridRect& sceneBoundary,
+								const gridRect& viewBoundary);
 		~brogueFlameMenuHeatView();
 
 		void update(const brogueKeyboardState& keyboardState,
@@ -44,43 +47,6 @@ namespace brogueHd::frontend
 
 	public:
 
-		gridRect getBoundary() const override
-		{
-			return _titleGrid->sceneBounds();
-		}
-		gridRect getSceneBoundary() const override
-		{
-			return _titleGrid->sceneBounds();
-		}
-		/// <summary>
-		/// (TODO: MOVE THIS) Calculates the view's boundary is UI coordinates. This is not the same as the
-		/// GL viewport; but the coordinate space relates to it. Zoom, and offset must be
-		/// first added to the calculation.
-		/// </summary>
-		gridRect calculateSceneBoundaryUI() const override
-		{
-			gridRect sceneBoundary = getSceneBoundary();
-			gridRect boundaryUI = gridRect(sceneBoundary.left() * brogueCellDisplay::CellWidth(_uiData->getZoomLevel()),
-										   sceneBoundary.top() * brogueCellDisplay::CellHeight(_uiData->getZoomLevel()),
-										   sceneBoundary.width * brogueCellDisplay::CellWidth(_uiData->getZoomLevel()),
-										   sceneBoundary.height * brogueCellDisplay::CellHeight(_uiData->getZoomLevel()));
-
-			return boundaryUI;
-		}
-		brogueCellDisplay* get(short column, short row) const override
-		{
-			return _heatSourceGrid->get(column, row);
-		}
-
-		brogueUIData* getUIData() const override
-		{
-			return _uiData;
-		}
-		int getZoomLevel() const override
-		{
-			return _uiData->getZoomLevel();
-		}
-
 		bool isTheText(short column, short row)
 		{
 			return _titleGrid->isTheText(column, row);
@@ -91,9 +57,9 @@ namespace brogueHd::frontend
 			brogueTitleGrid* titleGrid = _titleGrid;
 			gridRect sceneBounds = _titleGrid->sceneBounds();
 
-			_heatSourceGrid->iterate([&callback, &titleGrid, &sceneBounds] (short column, short row, brogueCellDisplay* cell)
+			brogueViewBase::iterate([&callback, &titleGrid, &sceneBounds] (short column, short row, brogueCellDisplay* cell)
 			{
-				if (titleGrid->isTheText(column, row) || row == sceneBounds.bottom())
+				//if (titleGrid->isTheText(column, row) || row == sceneBounds.bottom())
 					callback(column, row, cell);
 
 				return iterationCallback::iterate;
@@ -112,72 +78,67 @@ namespace brogueHd::frontend
 		const float FlameNoise = 0.35f;
 		const float FlameFade = 0.35f;
 
-		const color FlameBottomColor1 = color(1.0f, 0.0f, 0.0f, 0.5f);
-		const color FlameBottomColor2 = color(1.0f, 0.2f, 0.1f, 0.5f);
-		const color FlameBottomColor3 = color(0.1f, 0.0f, 0.0f, 0.5f);
+		const color FlameBottomColor1 = color(1.0f, 0.0f, 0.0f, 1);
+		const color FlameBottomColor2 = color(1.0f, 0.2f, 0.1f, 1);
+		const color FlameBottomColor3 = color(0.1f, 0.0f, 0.0f, 1);
 
-		const color FlameTitleColor1 = color(0.0f, 0.0f, 1.0f, 0.3f);
-		const color FlameTitleColor2 = color(0.0f, 0.0f, 0.1f, 0.3f);
-		const color FlameTitleColor3 = color(0.8f, 0.8f, 1.0f, 0.3f);
+		const color FlameTitleColor1 = color(0.0f, 0.0f, 1.0f, 1);
+		const color FlameTitleColor2 = color(0.0f, 0.0f, 0.1f, 1);
+		const color FlameTitleColor3 = color(0.8f, 0.8f, 1.0f, 1);
 
 		const color BottomHeatSources[3] = { FlameBottomColor1, FlameBottomColor2, FlameBottomColor3 };
 		const color TitleHeatSources[3] = { FlameTitleColor1, FlameTitleColor2, FlameTitleColor3 };
 
 	private:
 
+		grid<color*>* _heatSourceGrid;
+
 		randomGenerator* _randomGenerator;
-
 		brogueTitleGrid* _titleGrid;
-		brogueUIData* _uiData;
 
-		grid<brogueCellDisplay*>* _heatSourceGrid;
-
-		int _fadePeriodMilliconds;
-		int _periodCounter;
+		simplePeriodCounter* _periodCounter;
+		simplePeriodCounter* _fadePeriodCounter;
 	};
 
-	brogueFlameMenuHeatView::brogueFlameMenuHeatView(randomGenerator* randomGenerator,
-													 int fadePeriodMilliseconds,
-													 int zoomLevel) : brogueViewBase()
+	brogueFlameMenuHeatView::brogueFlameMenuHeatView(eventController* eventController,
+													randomGenerator* randomGenerator,
+													int fadePeriodMilliseconds,
+													const brogueUIData& data,
+													const gridRect& sceneBoundary,
+													const gridRect& viewBoundary)
+		: brogueViewBase(eventController, data, sceneBoundary, viewBoundary)
 	{
-		gridRect sceneBounds = _titleGrid->sceneBounds();
-
 		_randomGenerator = randomGenerator;
-		_fadePeriodMilliconds = fadePeriodMilliseconds;
-		_periodCounter = 0;
-		_heatSourceGrid = new grid<brogueCellDisplay*>(sceneBounds, sceneBounds);
+
+		_periodCounter = new simplePeriodCounter(10);
+		_fadePeriodCounter = new simplePeriodCounter(fadePeriodMilliseconds);
 		_titleGrid = new brogueTitleGrid();
 
-		grid<brogueCellDisplay*>* grid = _heatSourceGrid;
+		_heatSourceGrid = new grid<color*>(sceneBoundary, viewBoundary);
 
-		sceneBounds.iterate([&grid] (short column, short row)
+		// Initialize the heat source grid
+		grid<color*>* heatSourceGrid = _heatSourceGrid;
+
+		viewBoundary.iterate([&heatSourceGrid] (short column, short row)
 		{
-			grid->set(column, row, new brogueCellDisplay(), true);
-
+			heatSourceGrid->set(column, row, new color(0, 0, 0, 1), true);
 			return iterationCallback::iterate;
 		});
-
-		brogueUIProgramPartId partId(brogueUIProgram::FlameMenuProgram, brogueUIProgramPart::FlameMenuProgram_HeatSourceProgram, 0);
-
-		_uiData = new brogueUIData(partId, _titleGrid->sceneBounds(), zoomLevel);
-		_uiData->setUIParameters(-1, -1, "", brogueUIAction::None, true, 0, zoomLevel);
 
 		cycleHeatSources();
 		nextHeatValues();
 	}
 	brogueFlameMenuHeatView::~brogueFlameMenuHeatView()
 	{
-		grid<brogueCellDisplay*>* grid = _heatSourceGrid;
-
-		_titleGrid->sceneBounds().iterate([&grid] (short column, short row)
+		_heatSourceGrid->iterate([] (short column, short row, color* item)
 		{
-			delete grid->get(column, row);
-
+			delete item;
 			return iterationCallback::iterate;
 		});
 
 		delete _heatSourceGrid;
-		delete _uiData;
+		delete _periodCounter;
+		delete _fadePeriodCounter;
 	}
 	void brogueFlameMenuHeatView::checkUpdate(const brogueKeyboardState& keyboardState,
 											  const brogueMouseState& mouseState,
@@ -186,17 +147,18 @@ namespace brogueHd::frontend
 		// Heat source fade over the fade period; and then they're cycled to the next
 		// color.
 		//
-		_periodCounter += millisecondsLapsed;
+		_periodCounter->update(millisecondsLapsed, false);
+		_fadePeriodCounter->update(millisecondsLapsed, false);
 	}
 	bool brogueFlameMenuHeatView::needsUpdate() const
 	{
 		// The throttle period (for the actual shader program) is set by the part configuration
 		//
-		return true;
+		return _periodCounter->pending();
 	}
 	void brogueFlameMenuHeatView::clearUpdate()
 	{
-		// Nothing to do
+		_periodCounter->reset();
 	}
 	void brogueFlameMenuHeatView::clearEvents()
 	{
@@ -206,15 +168,13 @@ namespace brogueHd::frontend
 										 const brogueMouseState& mouseState,
 										 int millisecondsLapsed)
 	{
-		bool cycleSources = _periodCounter >= _fadePeriodMilliconds;
-
-		if (cycleSources)
+		if (_fadePeriodCounter->pending())
 			cycleHeatSources();
 
 		nextHeatValues();
 
-		if (cycleSources)
-			_periodCounter = 0;
+		if (_fadePeriodCounter->pending())
+			_fadePeriodCounter->reset();
 	}
 
 	float brogueFlameMenuHeatView::calculateHeatEnvelope(short column, short row)
@@ -242,7 +202,7 @@ namespace brogueHd::frontend
 		brogueFlameMenuHeatView* that = this;
 		randomGenerator* randGenerator = _randomGenerator;
 
-		_heatSourceGrid->iterate([&that, &randGenerator] (short column, short row, brogueCellDisplay* currentCell)
+		_heatSourceGrid->iterate([&that, &randGenerator] (short column, short row, color* currentColor)
 		{
 			color nextColor;
 
@@ -269,7 +229,7 @@ namespace brogueHd::frontend
 				nextColor = colors::black();
 			}
 
-			currentCell->backColor = nextColor;
+			currentColor->set(nextColor);
 
 			return iterationCallback::iterate;
 		});
@@ -278,36 +238,47 @@ namespace brogueHd::frontend
 		//
 		for (int index = 1; index < this->getSceneBoundary().width - 1; index++)
 		{
-			color left = _heatSourceGrid->get(index - 1, this->getSceneBoundary().height - 1)->backColor;
-			color right = _heatSourceGrid->get(index + 1, this->getSceneBoundary().height - 1)->backColor;
-			color current = _heatSourceGrid->get(index, this->getSceneBoundary().height - 1)->backColor;
+			color left = *_heatSourceGrid->get(index - 1, this->getSceneBoundary().height - 1);
+			color right = *_heatSourceGrid->get(index + 1, this->getSceneBoundary().height - 1);
+			color current = *_heatSourceGrid->get(index, this->getSceneBoundary().height - 1);
 
 			current.averageIn(1, 1, left, right);
 
-			// Not using heap memory except for the copy with the grid (grid<>.get returns a copy)
-			_heatSourceGrid->get(index, this->getSceneBoundary().height - 1)->backColor = current;
+			_heatSourceGrid->get(index, this->getSceneBoundary().height - 1)->set(current);
 		}
 	}
 	void brogueFlameMenuHeatView::nextHeatValues()
 	{
 		brogueFlameMenuHeatView* that = this;
 		randomGenerator* randGenerator = _randomGenerator;
-		grid<brogueCellDisplay*>* heatSourceGrid = _heatSourceGrid;
+		grid<color*>* heatSourceGrid = _heatSourceGrid;
 
 		this->iterate([&that, &randGenerator, &heatSourceGrid] (short column, short row, brogueCellDisplay* cell)
 		{
+			// Heat Source
 			if (that->isTheText(column, row))
 			{
-				color next = heatSourceGrid->get(column, row)->backColor;
+				color next = *heatSourceGrid->get(column, row);
 				cell->backColor.interpolate(next, that->FlameFade);
 			}
 
+			// Heat Source
 			else if (row == ROWS - 1)
 			{
-				color next = heatSourceGrid->get(column, row)->backColor;
+				color next = *heatSourceGrid->get(column, row);
 				cell->backColor.interpolate(next, that->FlameFade);
 			}
 
+			// Heat "Diffusion"
+			else if (column > 0 && column < COLS - 1)
+			{
+				color south = that->get(column, row + 1)->backColor;
+				color southEast = that->get(column + 1, row + 1)->backColor;
+				color southWest = that->get(column - 1, row + 1)->backColor;
+
+				// Order may matter
+				cell->backColor.averageIn(1, 1, south, southEast, southWest);
+			}
 			else
 			{
 				cell->backColor = color(0, 0, 0, 0);

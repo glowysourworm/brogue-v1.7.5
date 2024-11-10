@@ -9,9 +9,12 @@
 #include "brogueUIProgramPartId.h"
 #include "brogueViewBase.h"
 #include "color.h"
+#include "eventController.h"
 #include "gridDefinitions.h"
 #include "gridRect.h"
 #include "simple.h"
+
+using namespace brogueHd::backend;
 
 namespace brogueHd::frontend
 {
@@ -19,15 +22,12 @@ namespace brogueHd::frontend
 	{
 	public:
 
-		brogueFlameMenuTitleMask(int zoomLevel) : brogueViewBase()
+		brogueFlameMenuTitleMask(eventController* eventController, const brogueUIData& data, const gridRect& sceneBoundary, const gridRect& viewBoundary)
+			: brogueViewBase(eventController, data, sceneBoundary, viewBoundary)
 		{
-			brogueUIProgramPartId partId(brogueUIProgram::FlameMenuProgram, brogueUIProgramPart::FlameMenuProgram_TitleMaskProgram, 0);
-
 			_titleGrid = new brogueTitleGrid();
 			_maskCell = new brogueCellDisplay();
 			_defaultCell = new brogueCellDisplay();
-
-			_uiData = new brogueUIData(partId, _titleGrid->sceneBounds(), zoomLevel);
 
 			_maskCell->backColor = colors::black();
 			_maskCell->noDisplay = false;
@@ -38,7 +38,6 @@ namespace brogueHd::frontend
 		~brogueFlameMenuTitleMask()
 		{
 			delete _titleGrid;
-			delete _uiData;
 			delete _maskCell;
 			delete _defaultCell;
 		}
@@ -54,10 +53,6 @@ namespace brogueHd::frontend
 		{
 			return false;
 		}
-		brogueUIData* getUIData() const override
-		{
-			return _uiData;
-		}
 		gridRect getBoundary() const override
 		{
 			return _titleGrid->sceneBounds();
@@ -65,33 +60,6 @@ namespace brogueHd::frontend
 		gridRect getSceneBoundary() const override
 		{
 			return _titleGrid->sceneBounds();
-		}
-		/// <summary>
-		/// (TODO: MOVE THIS) Calculates the view's boundary is UI coordinates. This is not the same as the
-		/// GL viewport; but the coordinate space relates to it. Zoom, and offset must be
-		/// first added to the calculation.
-		/// </summary>
-		gridRect calculateSceneBoundaryUI() const override
-		{
-			gridRect sceneBoundary = getSceneBoundary();
-			gridRect boundaryUI = gridRect(sceneBoundary.left() * brogueCellDisplay::CellWidth(_uiData->getZoomLevel()),
-										   sceneBoundary.top() * brogueCellDisplay::CellHeight(_uiData->getZoomLevel()),
-										   sceneBoundary.width * brogueCellDisplay::CellWidth(_uiData->getZoomLevel()),
-										   sceneBoundary.height * brogueCellDisplay::CellHeight(_uiData->getZoomLevel()));
-
-			return boundaryUI;
-		}
-		int getZoomLevel() const override
-		{
-			return _uiData->getZoomLevel();
-		}
-
-		brogueCellDisplay* get(short column, short row) const override
-		{
-			if (_titleGrid->isTheText(column, row))
-				return _maskCell;
-			else
-				return _defaultCell;
 		}
 		bool isTheText(short column, short row)
 		{
@@ -104,7 +72,7 @@ namespace brogueHd::frontend
 
 			_titleGrid->sceneBounds().iterate([&callback, &titleGrid, &maskCell] (short column, short row)
 			{
-				if (!titleGrid->isTheText(column, row))
+				if (titleGrid->isTheText(column, row))
 					callback(column, row, maskCell);
 
 				return iterationCallback::iterate;
@@ -113,7 +81,6 @@ namespace brogueHd::frontend
 
 	private:
 
-		brogueUIData* _uiData;
 		brogueTitleGrid* _titleGrid;
 		brogueCellDisplay* _maskCell;
 		brogueCellDisplay* _defaultCell;

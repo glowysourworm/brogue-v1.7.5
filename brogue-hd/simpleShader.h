@@ -5,7 +5,6 @@
 #include "shaderData.h"
 #include "simpleArray.h"
 #include "simpleException.h"
-#include "simpleException.h"
 #include "simpleGlData.h"
 #include "simpleGlObject.h"
 #include "simpleLogger.h"
@@ -274,7 +273,7 @@ namespace brogueHd::frontend
 	void simpleShader::glCreate(GLuint programHandle)
 	{
 		if (this->isCreated())
-			simpleException::show("simpleShader already created on the backend");
+			throw simpleException("simpleShader already created on the backend");
 
 		// Declare the shader on the GL backend
 		this->handle = glCreateShader(_shaderType);
@@ -288,5 +287,8 @@ namespace brogueHd::frontend
 
 		// Compile the shader and check for errors
 		glCompileShader(this->handle);
+
+		if (!this->isCreated())
+			throw simpleException("simpleShader not created properly on the backend");
 	}
 }

@@ -279,7 +279,7 @@ namespace brogueHd::backend
 												 shaderResource::backgroundColorFrag,
 												 openglDataStreamType::brogueColorQuad,
 												 openglBrogueCellOutputSelector::DisplayCurrentFrame,
-												 10,
+												 0,
 												 false,
 												 false);
 

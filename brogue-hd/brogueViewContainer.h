@@ -151,6 +151,10 @@ namespace brogueHd::frontend
 		if (_views->count() == 0)
 			throw simpleException("Must first add views to the brogueViewContainer before accessing data:  brogueViewContainer::checkUpdate");
 
+		/*
+			CAREFUL!  Milliseconds lapsed is for the PART - not the entire view (for this call)
+		*/
+
 		_views->get(partId)->checkUpdate(keyboardState, mouseState, millisecondsLapsed);
 	}
 	bool brogueViewContainer::needsUpdate(const brogueUIProgramPartId& partId) const

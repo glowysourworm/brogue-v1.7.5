@@ -33,7 +33,7 @@ namespace brogueHd::backend::model
 			gradientType = copy.gradientType;
 		}
 
-		color getColor(float interpolationWeight)
+		color getColor(float interpolationWeight) const
 		{
 			return color::interpolate(gradient1, gradient2, interpolationWeight);
 		}

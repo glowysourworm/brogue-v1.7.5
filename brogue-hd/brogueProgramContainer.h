@@ -177,7 +177,7 @@ namespace brogueHd::frontend
 		if (!_initialized)
 			throw simpleException("Brogue Program Container must first be initialized:  brogueProgramContainer::clearUpdate");
 
-		_mainProgram->initialize();
+		_mainProgram->clearUpdate();
 	}
 	void brogueProgramContainer::clearEvents()
 	{

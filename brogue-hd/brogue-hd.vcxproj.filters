@@ -431,7 +431,7 @@
     <ClInclude Include="brogueFlameMenuDiffuseView.h">
       <Filter>Header Files\frontend\ui</Filter>
     </ClInclude>
-    <ClInclude Include="brogueView.h">
+    <ClInclude Include="brogueBackground.h">
       <Filter>Header Files\frontend\ui</Filter>
     </ClInclude>
     <ClInclude Include="simple.h">

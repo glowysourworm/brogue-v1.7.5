@@ -61,7 +61,7 @@ namespace brogueHd::backend
 		_eventController = eventController;
 		_randomGenerator = randomGenerator;
 
-		int zoomLevel = 9;
+		int zoomLevel = 13;
 
 		// Title Screen:  Build program parts, load the container
 
@@ -82,7 +82,7 @@ namespace brogueHd::backend
 		viewList.add(playbackMenu);
 		viewList.add(highScoresMenu);
 
-		gridRect sceneBoundaryUI = titleView->getSceneBoundary();
+		gridRect sceneBoundaryUI = titleView->calculateSceneBoundaryUI();
 
 		_programContainer = new brogueProgramContainer(resourceController, eventController, _glyphMap, sceneBoundaryUI, zoomLevel, viewList);
 	}

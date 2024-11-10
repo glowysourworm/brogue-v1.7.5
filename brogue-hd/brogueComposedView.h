@@ -7,6 +7,8 @@
 #include "brogueUIData.h"
 #include "brogueViewBase.h"
 #include "color.h"
+#include "eventController.h"
+#include "gridDefinitions.h"
 #include "gridLocator.h"
 #include "gridRect.h"
 #include "simple.h"
@@ -23,9 +25,10 @@ namespace brogueHd::frontend
 	{
 	public:
 
-		brogueComposedView(const brogueUIData& uiData);
+		brogueComposedView(eventController* eventController, const brogueUIData& uiData, const gridRect& sceneBoundary, const gridRect& viewBoundary);
 		~brogueComposedView();
 
+		// Overrides manage child views
 		virtual void update(const brogueKeyboardState& keyboardState,
 							const brogueMouseState& mouseState,
 							int millisecondsLapsed) override;
@@ -34,11 +37,12 @@ namespace brogueHd::frontend
 								 const brogueMouseState& mouseState,
 								 int millisecondsLapsed) override;
 
-		// Override needed to check for the header
+		virtual bool needsUpdate() const override;
+		virtual void clearUpdate() override;
+		virtual void clearEvents() override;
 		virtual brogueCellDisplay* get(short column, short row) const override;
 
-		virtual brogueUIData* getUIData() const override;
-		virtual gridRect getRenderBoundary() const override;
+		virtual void iterate(gridCallback<brogueCellDisplay*> callback) const override;
 
 	public:
 
@@ -49,15 +53,14 @@ namespace brogueHd::frontend
 
 	private:
 
-		brogueUIData* _uiData;
 		brogueCellDisplay* _defaultCell;
 		simpleList<brogueViewBase*>* _views;
 
 	};
 
-	brogueComposedView::brogueComposedView(const brogueUIData& uiData)
+	brogueComposedView::brogueComposedView(eventController* eventController, const brogueUIData& uiData, const gridRect& sceneBoundary, const gridRect& viewBoundary)
+		: brogueViewBase(eventController, uiData, sceneBoundary, viewBoundary)
 	{
-		_uiData = new brogueUIData(uiData);
 		_defaultCell = new brogueCellDisplay();
 		_views = new simpleList<brogueViewBase*>();
 
@@ -69,20 +72,6 @@ namespace brogueHd::frontend
 	brogueComposedView::~brogueComposedView()
 	{
 		delete _views;
-		delete _uiData;
-	}
-	brogueUIData* brogueComposedView::getUIData() const
-	{
-		return _uiData;
-	}
-	gridRect brogueComposedView::getRenderBoundary() const
-	{
-		gridRect boundary = _uiData->getPaddedBoundary();
-		gridLocator offset = _uiData->getRenderOffset();
-
-		boundary.translate(-1 * offset.column, -1 * offset.row);
-
-		return boundary;
 	}
 	void brogueComposedView::addView(brogueViewBase* view)
 	{
@@ -96,10 +85,24 @@ namespace brogueHd::frontend
 	{
 		return _views->count();
 	}
+	void brogueComposedView::iterate(gridCallback<brogueCellDisplay*> callback) const
+	{
+		const brogueComposedView* that = this;
+
+		this->getSceneBoundary().iterate([&callback, &that] (short column, short row)
+		{
+			brogueCellDisplay* cell = that->get(column, row);
+
+			if (cell != nullptr)
+				callback(column, row, cell);
+
+			return iterationCallback::iterate;
+		});
+	}
 	brogueCellDisplay* brogueComposedView::get(short column, short row) const
 	{
 		// Check padding first
-		gridRect paddedBoundary = this->getUIData()->getPaddedBoundary();
+		gridRect paddedBoundary = this->getPaddedBoundary();
 
 		if (!paddedBoundary.contains(column, row))
 			return _defaultCell;
@@ -130,11 +133,11 @@ namespace brogueHd::frontend
 		// This View (Behaves as brogueView)
 		bool mouseOver = this->getRenderBoundary().contains(mouseState.getLocation());
 		bool mousePressed = mouseState.getMouseLeft();
-		bool hasInteraction = this->getUIData()->getHasMouseInteraction();
+		bool hasInteraction = this->getHasMouseInteraction();
 		bool scrollEvent = mouseState.getScrollPendingX() || mouseState.getScrollPendingY();
 
-		gridRect boundary = _uiData->getBounds();
-		gridRect paddedBoundary = _uiData->getPaddedBoundary();
+		gridRect boundary = this->getBoundary();
+		gridRect paddedBoundary = this->getPaddedBoundary();
 		gridRect childBoundary = default_value::value<gridRect>();
 
 		// Child Views
@@ -184,16 +187,48 @@ namespace brogueHd::frontend
 		}
 
 		// This View -> Update UI Data (no mouse interaction)
-		_uiData->setUpdate(mouseState.getMouseLeft(), mouseOver, (scrollX != 0 || scrollY != 0));
+		this->setUpdate(mouseState.getMouseLeft(), mouseOver, (scrollX != 0 || scrollY != 0));
+	}
+	bool brogueComposedView::needsUpdate() const
+	{
+		bool result = false;
+
+		// Items
+		_views->forEach([&result] (brogueViewBase* item)
+		{
+			result |= item->needsUpdate();
+
+			return iterationCallback::iterate;
+		});
+
+		return result;
 	}
 	void brogueComposedView::update(const brogueKeyboardState& keyboardState,
 									const brogueMouseState& mouseState,
 									int millisecondsLapsed)
 	{
-		// Items
 		_views->forEach([&keyboardState, &mouseState, &millisecondsLapsed] (brogueViewBase* item)
 		{
-			item->update(keyboardState, mouseState, millisecondsLapsed);
+			if (item->needsUpdate())
+				item->update(keyboardState, mouseState, millisecondsLapsed);
+
+			return iterationCallback::iterate;
+		});
+	}
+	void brogueComposedView::clearUpdate()
+	{
+		_views->forEach([] (brogueViewBase* item)
+		{
+			item->clearUpdate();
+
+			return iterationCallback::iterate;
+		});
+	}
+	void brogueComposedView::clearEvents()
+	{
+		_views->forEach([] (brogueViewBase* item)
+		{
+			item->clearEvents();
 
 			return iterationCallback::iterate;
 		});

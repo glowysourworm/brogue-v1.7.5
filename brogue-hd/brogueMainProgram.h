@@ -1,14 +1,15 @@
 #pragma once
+#include "brogueBackground.h"
 #include "brogueGlobal.h"
 #include "brogueGlyphMap.h"
 #include "brogueKeyboardState.h"
 #include "brogueMouseState.h"
 #include "brogueProgramBuilder.h"
+#include "brogueUIBuilder.h"
 #include "brogueUIConstants.h"
 #include "brogueUIData.h"
 #include "brogueUIProgramPartConfiguration.h"
 #include "brogueUIProgramPartId.h"
-#include "brogueView.h"
 #include "brogueViewContainer.h"
 #include "brogueViewProgram.h"
 #include "eventController.h"
@@ -20,6 +21,7 @@
 #include "simpleBitmap.h"
 #include "simpleExt.h"
 #include "simpleFrameBuffer.h"
+#include "simpleGlData.h"
 #include "simpleHash.h"
 #include "simpleKeyboardState.h"
 #include "simpleList.h"
@@ -82,7 +84,7 @@ namespace brogueHd::frontend
 		simpleFrameBuffer* _frameBuffer;
 
 		simpleTexture* _frameTexture0;				// GL_TEXTURE0, Color Attachment 0, (same thing), and will carry the flame menu background
-		simpleTexture* _frameTexture1;				// GL_TEXTURE1, will carry all the rest of the components (overwriting / blending with texture 0)
+		//simpleTexture* _frameTexture1;				// GL_TEXTURE1, will carry all the rest of the components (overwriting / blending with texture 0)
 		simpleTexture* _fontTexture;				// Glyph Map texture
 		gridRect* _sceneBoundaryUI;
 
@@ -103,12 +105,16 @@ namespace brogueHd::frontend
 		_gameMode = BrogueGameMode::Title;
 		_sceneBoundaryUI = new gridRect(sceneBoundaryUI);
 
-		brogueUIData backgroundData(brogueUIProgramPartId(brogueUIProgram::ContainerControlledProgram, brogueUIProgramPart::ViewCompositor, 0), sceneBoundaryUI, zoomLevel);
+		// Grid Coordinates...
+		gridRect sceneBounds = brogueUIBuilder::getBrogueSceneBoundary();
+
+		brogueUIProgramPartId partId(brogueUIProgram::ContainerControlledProgram, brogueUIProgramPart::ViewCompositor, 0);
+		brogueUIData backgroundData(partId, sceneBounds, zoomLevel);
 		brogueProgramBuilder builder(resourceController, glyphMap);
-		brogueView background(eventController,
-							  backgroundData,
-							  sceneBoundaryUI,
-							  sceneBoundaryUI);
+		brogueBackground background(eventController,
+									  backgroundData,
+									  sceneBounds,
+									  sceneBounds);
 
 		brogueUIProgramPartConfiguration frameConfiguration(brogueUIProgramPart::Background,
 															shaderResource::mixFrameTexturesVert,
@@ -124,7 +130,7 @@ namespace brogueHd::frontend
 		int textureIndex = 0;
 
 		_frameTexture0 = new simpleTexture(nullptr, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE0, GL_RGBA, GL_RGBA, 4, GL_FLOAT);
-		_frameTexture1 = new simpleTexture(nullptr, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE0, GL_RGBA, GL_RGBA, 4, GL_FLOAT);
+		//_frameTexture1 = new simpleTexture(nullptr, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE1, GL_RGBA, GL_RGBA, 4, GL_FLOAT);
 
 		// Font Glyphs:  Going to load the max zoom for now
 		simpleBitmap* glyphSheet = resourceController->getFontGlyphs(zoomLevel);
@@ -139,7 +145,7 @@ namespace brogueHd::frontend
 		openglHelper::flipSurface(glyphSurface);
 
 		// void* @_@ (No really good way to own this one until we do it ourselves for each and every data type, that WE own)
-		_fontTexture = new simpleTexture(glyphSurface, glyphSheet->pixelWidth(), glyphSheet->pixelHeight(), textureIndex++, GL_TEXTURE1, GL_RGBA, GL_RGBA, 4, GL_UNSIGNED_BYTE);
+		_fontTexture = new simpleTexture(glyphSurface, glyphSheet->pixelWidth(), glyphSheet->pixelHeight(), textureIndex++, GL_TEXTURE2, GL_RGBA, GL_RGBA, 4, GL_UNSIGNED_BYTE);
 
 		_frameBuffer = new simpleFrameBuffer(sceneBoundaryUI.width, sceneBoundaryUI.height);
 	}
@@ -147,7 +153,7 @@ namespace brogueHd::frontend
 	{
 		delete _frameProgram;
 		delete _frameTexture0;
-		delete _frameTexture1;
+		//delete _frameTexture1;
 		delete _fontTexture;
 		delete _frameBuffer;
 		delete _sceneBoundaryUI;
@@ -212,8 +218,8 @@ namespace brogueHd::frontend
 				glDrawBuffer(GL_COLOR_ATTACHMENT0);
 				_uiPrograms->get(brogueUIProgram::FlameMenuProgram)->run(millisecondsElapsed);
 
-				glDrawBuffer(GL_COLOR_ATTACHMENT1);
-				_uiPrograms->get(brogueUIProgram::MainMenuProgram)->run(millisecondsElapsed);
+				//glDrawBuffer(GL_COLOR_ATTACHMENT1);
+				//_uiPrograms->get(brogueUIProgram::MainMenuProgram)->run(millisecondsElapsed);
 				break;
 			case BrogueGameMode::Game:
 				break;
@@ -235,6 +241,28 @@ namespace brogueHd::frontend
 	void brogueMainProgram::initialize()
 	{
 		/*
+			Brogue Main Program:  This program has the responsibility of running and rendering the UI Programs using
+								  a frame buffer; and handling the global textures.
+		*/
+
+		// Create the textures:  Texture 1 is used for the direct drawing, Texture 0 for the "color diffusion"
+		_frameTexture0->glCreate(-1);		// Textures don't automatically associate w/ a program
+		//_frameTexture1->glCreate(-1);
+		_fontTexture->glCreate(-1);
+
+		//Create Frame buffer:  Uses scene program to render to the frame buffer attached texture
+		_frameBuffer->glCreate(-1);			// Frame buffers don't automatically associate w/ a program
+
+		// Attach texture to frame buffer
+		_frameBuffer->bind();
+		_frameBuffer->attachTexture(_frameTexture0->getHandle(), GL_COLOR_ATTACHMENT0);
+		//_frameBuffer->attachTexture(_frameTexture0->getHandle(), GL_COLOR_ATTACHMENT1);
+		_frameBuffer->attachRenderBuffer();
+		_frameBuffer->unBind();
+
+		_frameProgram->compile();
+
+		/*
 			Brogue UI Programs:  This will call routines to setup all the "shader programs" that compose UI programs,
 								 one per brogueViewProgram, which are the primary UI components, have names, interact
 								 with the mouse, may be activated and deactivated, and will stay in memory until the
@@ -252,47 +280,20 @@ namespace brogueHd::frontend
 			// Loads GPU (OpenGL backend)
 			program->initialize();
 
+			// Set Specific Uniforms
+			if (view->getProgramName() == brogueUIProgram::FlameMenuProgram)
+			{
+				//brogueUIProgramPartId diffuseId(brogueUIProgram::FlameMenuProgram, brogueUIProgramPart::FlameMenuProgram_HeatDiffuseProgram, 0);
+
+				//simpleQuad cellQuad = program->getCellSizeUV();
+
+				//program->getShaderProgram(diffuseId)->bind();
+				//program->getShaderProgram(diffuseId)->bindUniform2("cellSizeUV", vec2(cellQuad.getWidth(), cellQuad.getHeight()));
+			}
+
 			// Maintain UI program collection
 			_uiPrograms->add(view->getProgramName(), program);
 		}
-
-		/*
-			Brogue Main Program:  This program has the responsibility of running and rendering the UI Programs using
-								  a frame buffer; and handling the global textures.
-		*/
-
-		// Need a cell quad for one of the shaders
-		//simpleQuad cellQuad = _heatDiffuseProgram->getCellSizeUV();
-
-		_frameProgram->compile();
-
-		// Create the textures:  Texture 1 is used for the direct drawing, Texture 0 for the "color diffusion"
-		_frameTexture0->glCreate(-1);		// Textures don't automatically associate w/ a program
-		_frameTexture1->glCreate(-1);
-		_fontTexture->glCreate(-1);
-
-		//Create Frame buffer:  Uses scene program to render to the frame buffer attached texture
-		_frameBuffer->glCreate(-1);			// Frame buffers don't automatically associate w/ a program
-
-		//// Heat Source Uniforms
-		//_heatSourceProgram->getProgram()->bind();
-		//_heatSourceProgram->getProgram()->bindUniform1i("frame0Texture", 0);       // GL_TEXTURE0 "texture unit" Required! USE INDEXES!! (During the run)
-		//_heatSourceProgram->getProgram()->bindUniform1i("fontTexture", 1);		 // GL_TEXTURE1 "texture unit" Required! USE INDEXES!! (During the run)
-
-		//// Heat Diffuse Uniform
-		//// DON'T CHANGE THIS!!! NEED TO FIND A WAY TO GET THE UNIFORM VALUE FOR THE GL_TEXTURE0!!!
-		//_heatDiffuseProgram->getProgram()->bind();
-		//_heatDiffuseProgram->getProgram()->bindUniform1i("frame0Texture", 0);  // GL_TEXTURE0 "texture unit" Required! USE INDEXES!! (During the run)
-		//_heatDiffuseProgram->getProgram()->bindUniform1i("fontTexture", 1);    // GL_TEXTURE0 "texture unit" Required! USE INDEXES!! (During the run)
-		//_heatDiffuseProgram->getProgram()->bindUniform2("cellSizeUV", vec2(cellQuad.getWidth(), cellQuad.getHeight()));		// Gives the size of one cell
-		//_heatDiffuseProgram->getProgram()->bindUniform1("weight", 0.2f);
-
-		// Attach texture to frame buffer
-		_frameBuffer->bind();
-		_frameBuffer->attachTexture(_frameTexture0->getHandle(), GL_COLOR_ATTACHMENT0);
-		_frameBuffer->attachTexture(_frameTexture0->getHandle(), GL_COLOR_ATTACHMENT1);
-		_frameBuffer->attachRenderBuffer();
-		_frameBuffer->unBind();
 	}
 
 	void brogueMainProgram::checkUpdate(const simpleKeyboardState& keyboardState,
@@ -333,7 +334,8 @@ namespace brogueHd::frontend
 	{
 		_uiPrograms->iterate([] (brogueUIProgram programName, brogueViewProgram* program)
 		{
-			program->clearUpdate();
+			if (program->isActive())
+				program->clearUpdate();
 
 			return iterationCallback::iterate;
 		});
@@ -342,7 +344,8 @@ namespace brogueHd::frontend
 	{
 		_uiPrograms->iterate([] (brogueUIProgram programName, brogueViewProgram* program)
 		{
-			program->clearEvents();
+			if (program->isActive())
+				program->clearEvents();
 
 			return iterationCallback::iterate;
 		});
@@ -351,7 +354,7 @@ namespace brogueHd::frontend
 								   const simpleMouseState& mouseState,
 								   int millisecondsLapsed)
 	{
-		// Take frame buffer offline
+		// Take Framebuffer Offline
 		_frameBuffer->unBind();
 
 		_uiPrograms->iterate([&keyboardState, &mouseState, &millisecondsLapsed] (brogueUIProgram programName, brogueViewProgram* program)
@@ -370,7 +373,8 @@ namespace brogueHd::frontend
 
 		_uiPrograms->iterate([&hasErrors] (brogueUIProgram programName, brogueViewProgram* program)
 		{
-			hasErrors |= program->hasErrors();
+			if (program->isActive())
+				hasErrors |= program->hasErrors();
 
 			return iterationCallback::iterate;
 		});
@@ -381,7 +385,8 @@ namespace brogueHd::frontend
 	{
 		_uiPrograms->iterate([] (brogueUIProgram programName, brogueViewProgram* program)
 		{
-			program->outputStatus();
+			if (program->isActive())
+				program->outputStatus();
 
 			return iterationCallback::iterate;
 		});
@@ -398,7 +403,7 @@ namespace brogueHd::frontend
 		{
 			case BrogueGameMode::Title:
 				_uiPrograms->get(brogueUIProgram::FlameMenuProgram)->activate();
-				_uiPrograms->get(brogueUIProgram::MainMenuProgram)->activate();
+				//_uiPrograms->get(brogueUIProgram::MainMenuProgram)->activate();
 				break;
 			case BrogueGameMode::Game:
 				break;

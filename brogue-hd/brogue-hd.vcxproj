@@ -289,7 +289,7 @@
     <ClInclude Include="brogueLevel.h" />
     <ClInclude Include="brogueMessageQueue.h" />
     <ClInclude Include="brogueRememberedCell.h" />
-    <ClInclude Include="brogueView.h" />
+    <ClInclude Include="brogueBackground.h" />
     <ClInclude Include="brogueCellDisplay.h" />
     <ClInclude Include="gridCell.h" />
     <ClInclude Include="color.h" />

@@ -9,18 +9,16 @@ in vec2 currentTextureUV;
 
 // Try and use a 2D sampler to work with the texture. The active texture should be the 0th texture.
 uniform sampler2D frame0Texture;
-//uniform float mixWeight;
+//uniform sampler2D frame1Texture;
+uniform float mixWeight;
 
 void main()
 {
     // Sample the frame texture
-    //vec4 output0 = texture(frame0Texture, currentTexture);
-    //vec4 output1 = texture(frame1Texture, currentTexture);
+    //vec4 output0 = texture(frame0Texture, currentTextureUV);
+    //vec4 output1 = texture(frame1Texture, currentTextureUV);
 
-    //outputColor = mix(output0, output1, weight);
+    //outputColor = mix(output0, output1, mixWeight);
 
-    //outputColor = texelFetch(frame0Texture, currentTextureUI, 0);
     outputColor = texture(frame0Texture, currentTextureUV);
-
-    //outputColor = vec4(1,0,0,0);
 }

@@ -254,47 +254,72 @@ namespace brogueHd::frontend
 	{
 		GLint location = glGetUniformLocation(this->handle, name.c_str());
 
-		if (location == -1)
+		if (location < 0)
+		{
+			simpleLogger::logColor(brogueConsoleColor::Blue, "Uniform not found:  Program={} Uniform={}", this->handle, name.c_str());
 			return false;
+		}
 
 		glUniform1i(location, uniformValue);
+
+		return true;
 	}
 	bool simpleShaderProgram::bindUniform1(const simpleString& name, float uniformValue)
 	{
 
 		GLint location = glGetUniformLocation(this->handle, name.c_str());
 
-		if (location == -1)
+		if (location < 0)
+		{
+			simpleLogger::logColor(brogueConsoleColor::Blue, "Uniform not found:  Program={} Uniform={}", this->handle, name.c_str());
 			return false;
+		}
 
 		glUniform1f(location, uniformValue);
+
+		return true;
 	}
 	bool simpleShaderProgram::bindUniform2(const simpleString& name, const vec2& uniformValue)
 	{
 		GLint location = glGetUniformLocation(this->handle, name.c_str());
 
-		if (location == -1)
+		if (location < 0)
+		{
+			simpleLogger::logColor(brogueConsoleColor::Blue, "Uniform not found:  Program={} Uniform={}", this->handle, name.c_str());
 			return false;
+		}
 
 		glUniform2f(location, uniformValue.x, uniformValue.y);
+
+		return true;
 	}
 	bool simpleShaderProgram::bindUniform2i(const simpleString& name, const ivec2& uniformValue)
 	{
 		GLint location = glGetUniformLocation(this->handle, name.c_str());
 
-		if (location == -1)
+		if (location < 0)
+		{
+			simpleLogger::logColor(brogueConsoleColor::Blue, "Uniform not found:  Program={} Uniform={}", this->handle, name.c_str());
 			return false;
+		}
 
 		glUniform2i(location, uniformValue.x, uniformValue.y);
+
+		return true;
 	}
 	bool simpleShaderProgram::bindUniform4(const simpleString& name, const vec4& uniformValue)
 	{
 		GLint location = glGetUniformLocation(this->handle, name.c_str());
 
-		if (location == -1)
+		if (location < 0)
+		{
+			simpleLogger::logColor(brogueConsoleColor::Blue, "Uniform not found:  Program={} Uniform={}", this->handle, name.c_str());
 			return false;
+		}
 
 		glUniform4f(location, uniformValue.x, uniformValue.y, uniformValue.z, uniformValue.w);
+
+		return true;
 	}
 
 	void simpleShaderProgram::teardown()

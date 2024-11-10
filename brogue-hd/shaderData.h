@@ -91,7 +91,7 @@ namespace brogueHd::frontend
 					break;
 				case shaderResource::mixFrameTexturesFrag:
 					this->uniforms1i.add(simpleUniform<int>("frame0Texture", GL_SAMPLER_2D, 0));        // GLOBAL SETTING:  GL_TEXTURE0
-					this->uniforms1i.add(simpleUniform<int>("frame1Texture", GL_SAMPLER_2D, 1));		// GLOBAL SETTING:  GL_TEXTURE1
+					//this->uniforms1i.add(simpleUniform<int>("frame1Texture", GL_SAMPLER_2D, 1));		// GLOBAL SETTING:  GL_TEXTURE1
 					this->uniforms1.add(simpleUniform<float>("mixWeight", GL_FLOAT, 0.5));
 					break;
 				default:

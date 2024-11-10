@@ -5,9 +5,6 @@
 #include "simpleException.h"
 #include "simpleList.h"
 #include "simpleMath.h"
-#include <chrono>
-#include <cmath>
-#include <functional>
 
 namespace brogueHd::simple
 {
@@ -139,14 +136,14 @@ namespace brogueHd::simple
 	simpleHash<K, V>::~simpleHash()
 	{
 		// (MEMORY!)
-		for (int index = 0; index < _table->count(); index++)
+		for (int arrayIndex = 0; arrayIndex < _table->count(); arrayIndex++)
 		{
-			for (int arrayIndex = 0; arrayIndex < _table->get(index)->count(); arrayIndex++)
+			for (int index = 0; index < _table->get(arrayIndex)->count(); index++)
 			{
-				delete _table->get(index)->get(arrayIndex);
+				delete _table->get(arrayIndex)->get(index);
 			}
 
-			delete _table->get(index);
+			delete _table->get(arrayIndex);
 		}
 
 		delete _table;
@@ -207,7 +204,7 @@ namespace brogueHd::simple
 		//  3) Log_e  -> Ln -> (~6.9, 1000); (~13.8, 1000000). That's much less aggressive.
 		//
 
-		if (_maxBucketSize > log(_table->count()))
+		if (_maxBucketSize > simpleMath::naturalLog(_table->count()))
 		{
 			// Multiply the bucket size by e ~ 2.718281828
 			//

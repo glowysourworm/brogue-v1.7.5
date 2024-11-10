@@ -48,30 +48,11 @@ namespace brogueHd::frontend
 		};
 		brogueUIData(const brogueUIData& copy)
 		{
-			_id = copy.getId();
-
-			_text = copy.getText();
-			_boundary = copy.getBoundary();
-			_background = copy.getBackground();
-			_hoverBackground = copy.getHoverBackground();
-			_pressedBackground = copy.getPressedBackground();
-			_renderOffset = copy.getRenderOffsetPtr();
-			_tagAction = copy.getAction();
-
-			_alignment = copy.getAlignment();
-			_hotkeyIndex = copy.getHotkeyIndex();
-			_padding = copy.getPadding();
-			_zoomLevel = copy.getZoomLevel();
-
-			_hasMouseInteraction = copy.getHasMouseInteraction();
-			_mouseClickCapture = copy.getMouseClick();
-			_mouseUpCapture = copy.getMouseUp();
-			_mouseDownCapture = copy.getMouseDown();
-			_mouseLastPressed = copy.getMousePressedLast();
-			_mouseLastOver = copy.getMouseOverLast();
-			_mousePressed = copy.getMousePressed();
-			_mouseOver = copy.getMouseOver();
-			_needsUpdate = copy.needsUpdate();
+			copyImpl(copy);
+		}
+		void operator=(const brogueUIData& copy)
+		{
+			copyImpl(copy);
 		}
 		~brogueUIData()
 		{
@@ -152,6 +133,7 @@ namespace brogueHd::frontend
 			_mouseOver = false;
 			_needsUpdate = false;
 		}
+
 
 	public:
 
@@ -364,7 +346,35 @@ namespace brogueHd::frontend
 
 	private:
 
-		color calculateGradientImpl(int column, int row, colorGradient gradient)
+		void copyImpl(const brogueUIData& copy)
+		{
+			_id = copy.getId();
+
+			_text = copy.getText();
+			_boundary = copy.getBoundary();
+			_background = copy.getBackground();
+			_hoverBackground = copy.getHoverBackground();
+			_pressedBackground = copy.getPressedBackground();
+			_renderOffset = copy.getRenderOffsetPtr();
+			_tagAction = copy.getAction();
+
+			_alignment = copy.getAlignment();
+			_hotkeyIndex = copy.getHotkeyIndex();
+			_padding = copy.getPadding();
+			_zoomLevel = copy.getZoomLevel();
+
+			_hasMouseInteraction = copy.getHasMouseInteraction();
+			_mouseClickCapture = copy.getMouseClick();
+			_mouseUpCapture = copy.getMouseUp();
+			_mouseDownCapture = copy.getMouseDown();
+			_mouseLastPressed = copy.getMousePressedLast();
+			_mouseLastOver = copy.getMouseOverLast();
+			_mousePressed = copy.getMousePressed();
+			_mouseOver = copy.getMouseOver();
+			_needsUpdate = copy.needsUpdate();
+		}
+
+		color calculateGradientImpl(int column, int row, const colorGradient& gradient)
 		{
 			short menuColumn = column - _boundary.column;
 			short menuRow = row - _boundary.row;

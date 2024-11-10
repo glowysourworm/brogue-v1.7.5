@@ -4,7 +4,7 @@
 #include "brogueMouseState.h"
 #include "brogueUIConstants.h"
 #include "brogueUIData.h"
-#include "brogueView.h"
+#include "brogueViewBase.h"
 #include "color.h"
 #include "eventController.h"
 #include "gridRect.h"
@@ -14,7 +14,7 @@ using namespace brogueHd::component;
 
 namespace brogueHd::frontend
 {
-	class brogueText : public brogueView
+	class brogueText : public brogueViewBase
 	{
 	public:
 
@@ -29,7 +29,7 @@ namespace brogueHd::frontend
 	};
 
 	brogueText::brogueText(eventController* eventController, const brogueUIData& data, const gridRect& sceneBoundary, const gridRect& viewBoundary)
-		: brogueView(eventController, data, sceneBoundary, viewBoundary)
+		: brogueViewBase(eventController, data, sceneBoundary, viewBoundary)
 	{
 		update(default_value::value<brogueKeyboardState>(), default_value::value<brogueMouseState>(), 0);
 	}
@@ -40,31 +40,30 @@ namespace brogueHd::frontend
 	{
 		// Adding the mouse enter / leave events
 		//
-		return this->getUIData()->needsUpdate() || this->getUIData()->getMouseLeave() || this->getUIData()->getMouseEnter();
+		return brogueViewBase::needsUpdate() || this->getMouseLeave() || this->getMouseEnter();
 	}
 	void brogueText::update(const brogueKeyboardState& keyboardState,
 							const brogueMouseState& mouseState,
 							int millisecondsLapsed)
 	{
 		gridRect bounds = this->getBoundary();
-		brogueUIData* data = this->getUIData();
 		brogueText* that = this;
 
 		// Iterate THIS Boundary:  apply mouse data
-		this->getBoundary().iterate([&that, &data, &bounds] (short column, short row)
+		this->getBoundary().iterate([&that, &bounds] (short column, short row)
 		{
 			short menuColumn = column - bounds.column;
 			short menuRow = row - bounds.row;
 			int textOffset = column - bounds.column;
 
-			color nextColor = data->calculateGradient(column, row);
+			color nextColor = that->getBackgroundColor(column, row);
 
-			if (data->getIsHotkey(column, row))
+			if (that->isHotkey(column, row))
 				that->get(column, row)->foreColor = colors::yellow();
 			else
-				that->get(column, row)->foreColor = data->getTextColor(column, row);
+				that->get(column, row)->foreColor = that->getForegroundColor(column, row);
 
-			that->get(column, row)->character = data->getText(column, row);
+			that->get(column, row)->character = that->getText(column, row);
 			that->get(column, row)->backColor = nextColor;
 
 			return iterationCallback::iterate;

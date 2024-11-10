@@ -22,7 +22,7 @@ namespace brogueHd::backend::model
 		//
 		// (Probably just going to need some more "embedded-into-the-ui-components" design)
 		//
-		static float CellWidth(int zoomLevel)
+		static double CellWidth(int zoomLevel)
 		{
 			// Must derive these from dividing the glyph sheet into a grid
 			switch (zoomLevel)
@@ -45,7 +45,7 @@ namespace brogueHd::backend::model
 			}
 		}
 
-		static float CellHeight(int zoomLevel)
+		static double CellHeight(int zoomLevel)
 		{
 			// Must derive these from dividing the glyph sheet into a grid
 			switch (zoomLevel)
@@ -59,10 +59,10 @@ namespace brogueHd::backend::model
 			case 7: return 0;
 			case 8: return 0;
 			case 9: return 25.412f;
-			case 10: return 27.294f;
+			case 10: return 27.29411764705882352941f;
 			case 11: return 29.176f;
 			case 12: return 31.06f;
-			case 13: return 31.06f;
+			case 13: return 31.05882352941176470588f;
 			default:
 			simpleException::show("Invalid zoom level:  brogueCellDisplay::CellHeight");
 			}

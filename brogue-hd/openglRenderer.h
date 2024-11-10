@@ -580,6 +580,7 @@ namespace brogueHd::frontend
 		// *** Compile our program for the main loop:  GL Functions must be called after calling glfwMakeContextCurrent.
 		//
 		_program->initialize();
+		_program->setMode(_gameMode);	// TODO: Make this part of the initialize call
 
 		if (_program->hasErrors())
 		{
