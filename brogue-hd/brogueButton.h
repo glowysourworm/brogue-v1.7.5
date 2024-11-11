@@ -2,14 +2,12 @@
 
 #include "brogueKeyboardState.h"
 #include "brogueMouseState.h"
-#include "brogueUIConstants.h"
 #include "brogueUIData.h"
 #include "brogueViewBase.h"
 #include "color.h"
 #include "eventController.h"
 #include "gridRect.h"
 #include "simple.h"
-#include "simpleList.h"
 
 using namespace brogueHd::component;
 using namespace brogueHd::simple;
@@ -25,7 +23,8 @@ namespace brogueHd::frontend
 
 		virtual void update(const brogueKeyboardState& keyboardState,
 							const brogueMouseState& mouseState,
-							int millisecondsLapsed) override;
+							int millisecondsLapsed,
+							bool forceUpdate) override;
 
 		virtual bool needsUpdate() const override;
 	};
@@ -35,7 +34,7 @@ namespace brogueHd::frontend
 	{
 		// Initialize the view
 		//
-		update(default_value::value<brogueKeyboardState>(), default_value::value<brogueMouseState>(), 0);
+		update(default_value::value<brogueKeyboardState>(), default_value::value<brogueMouseState>(), 0, true);
 	}
 	brogueButton::~brogueButton()
 	{
@@ -48,7 +47,8 @@ namespace brogueHd::frontend
 	}
 	void brogueButton::update(const brogueKeyboardState& keyboardState,
 							  const brogueMouseState& mouseState,
-							  int millisecondsLapsed)
+							  int millisecondsLapsed,
+							  bool forceUpdate)
 	{
 		gridRect bounds = this->getBoundary();
 		brogueButton* that = this;

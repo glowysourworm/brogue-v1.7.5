@@ -63,7 +63,8 @@ namespace brogueHd::frontend
 		void clearEvents();
 		void update(const simpleKeyboardState& keyboardState,
 					const simpleMouseState& mouseState,
-					int millisecondsLapsed);
+					int millisecondsLapsed,
+					bool forceUpdate);
 
 		void initialize();
 		void run(int millisecondsElapsed);
@@ -360,7 +361,7 @@ namespace brogueHd::frontend
 	{
 		_uiPrograms->iterate([] (brogueUIProgram programName, brogueViewProgram* program)
 		{
-			if (program->isActive())
+			//if (program->isActive())
 				program->clearUpdate();
 
 			return iterationCallback::iterate;
@@ -370,7 +371,7 @@ namespace brogueHd::frontend
 	{
 		_uiPrograms->iterate([] (brogueUIProgram programName, brogueViewProgram* program)
 		{
-			if (program->isActive())
+			//if (program->isActive())
 				program->clearEvents();
 
 			return iterationCallback::iterate;
@@ -378,16 +379,17 @@ namespace brogueHd::frontend
 	}
 	void brogueMainProgram::update(const simpleKeyboardState& keyboardState,
 								   const simpleMouseState& mouseState,
-								   int millisecondsLapsed)
+								   int millisecondsLapsed,
+								   bool forceUpdate)
 	{
 		// Take Framebuffer Offline
 		_frameBuffer->unBind();
 
-		_uiPrograms->iterate([&keyboardState, &mouseState, &millisecondsLapsed] (brogueUIProgram programName, brogueViewProgram* program)
+		_uiPrograms->iterate([&keyboardState, &mouseState, &millisecondsLapsed, &forceUpdate] (brogueUIProgram programName, brogueViewProgram* program)
 		{
 			if (program->isActive())
 			{
-				program->update(keyboardState, mouseState, millisecondsLapsed);
+				program->update(keyboardState, mouseState, millisecondsLapsed, forceUpdate);
 			}
 
 			return iterationCallback::iterate;

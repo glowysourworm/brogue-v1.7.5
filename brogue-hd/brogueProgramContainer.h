@@ -59,7 +59,8 @@ namespace brogueHd::frontend
 		/// </summary>
 		void update(const simpleKeyboardState& keyboardState,
 					const simpleMouseState& mouseState,
-					int millisecondsLapsed);
+					int millisecondsLapsed,
+					bool forceUpdate);
 
 		gridRect getSceneBoundaryUI() const;
 
@@ -192,11 +193,12 @@ namespace brogueHd::frontend
 	}
 	void brogueProgramContainer::update(const simpleKeyboardState& keyboardState,
 										const simpleMouseState& mouseState,
-										int millisecondsLapsed)
+										int millisecondsLapsed, 
+										bool forceUpdate)
 	{
 		if (!_initialized)
 			throw simpleException("Brogue Program Container must first be initialized:  brogueProgramContainer::update");
 
-		_mainProgram->update(keyboardState, mouseState, millisecondsLapsed);
+		_mainProgram->update(keyboardState, mouseState, millisecondsLapsed, forceUpdate);
 	}
 }

@@ -27,7 +27,13 @@ namespace brogueHd::frontend
 		{
 			// Prevent updating
 		}
-
+		void update(const brogueKeyboardState& keyboardState,
+					const brogueMouseState& mouseState,
+					int millisecondsLapsed,
+					bool forceUpdate) override
+		{
+			// Prevent updating
+		}
 		void clearUpdate() override {}
 		void clearEvents() override {}
 

@@ -31,7 +31,8 @@ namespace brogueHd::frontend
 		// Overrides manage child views
 		virtual void update(const brogueKeyboardState& keyboardState,
 							const brogueMouseState& mouseState,
-							int millisecondsLapsed) override;
+							int millisecondsLapsed,
+							bool forceUpdate) override;
 
 		virtual void checkUpdate(const brogueKeyboardState& keyboardState,
 								 const brogueMouseState& mouseState,
@@ -149,12 +150,13 @@ namespace brogueHd::frontend
 	}
 	void brogueComposedView::update(const brogueKeyboardState& keyboardState,
 									const brogueMouseState& mouseState,
-									int millisecondsLapsed)
+									int millisecondsLapsed,
+									bool forceUpdate)
 	{
-		_views->forEach([&keyboardState, &mouseState, &millisecondsLapsed] (brogueViewBase* item)
+		_views->forEach([&keyboardState, &mouseState, &millisecondsLapsed, &forceUpdate] (brogueViewBase* item)
 		{
-			if (item->needsUpdate())
-				item->update(keyboardState, mouseState, millisecondsLapsed);
+			if (item->needsUpdate() || forceUpdate)
+				item->update(keyboardState, mouseState, millisecondsLapsed, forceUpdate);
 
 			return iterationCallback::iterate;
 		});

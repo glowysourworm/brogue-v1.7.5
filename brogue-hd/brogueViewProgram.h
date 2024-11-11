@@ -86,7 +86,8 @@ namespace brogueHd::frontend
 
 		void update(const simpleKeyboardState& keyboardState,
 					const simpleMouseState& mouseState,
-					int millisecondsLapsed);
+					int millisecondsLapsed,
+					bool forceUpdate);
 
 		void run(int millisecondsElapsed);
 		void outputStatus() const;
@@ -281,8 +282,8 @@ namespace brogueHd::frontend
 	}
 	void brogueViewProgram::clearUpdate()
 	{
-		if (!_active)
-			throw simpleException("Brogue View Program not active:  brogueViewProgram::clearUpdate");
+		//if (!_active)
+		//	throw simpleException("Brogue View Program not active:  brogueViewProgram::clearUpdate");
 
 		for (int index = 0; index < _viewContainer->getViewCount(); index++)
 		{
@@ -298,8 +299,8 @@ namespace brogueHd::frontend
 	}
 	void brogueViewProgram::clearEvents()
 	{
-		if (!_active)
-			throw simpleException("Brogue View Program not active:  brogueViewProgram::clearEvents");
+		//if (!_active)
+		//	throw simpleException("Brogue View Program not active:  brogueViewProgram::clearEvents");
 
 		for (int index = 0; index < _viewContainer->getViewCount(); index++)
 		{
@@ -311,7 +312,8 @@ namespace brogueHd::frontend
 	}
 	void brogueViewProgram::update(const simpleKeyboardState& keyboardState,
 								   const simpleMouseState& mouseState,
-								   int millisecondsLapsed)
+								   int millisecondsLapsed,
+								   bool forceUpdate)
 	{
 		if (!_active)
 			throw simpleException("Brogue View Program not active:  brogueViewProgram::update");
@@ -330,10 +332,10 @@ namespace brogueHd::frontend
 
 			// This gets set from this->checkUpdate (per program part)
 			//
-			if (view->needsUpdate())
+			if (view->needsUpdate() || forceUpdate)
 			{
 				// View will present new data
-				view->update(keyboardStateUI, mouseStateUI, millisecondsLapsed);
+				view->update(keyboardStateUI, mouseStateUI, millisecondsLapsed, forceUpdate);
 
 				// Must update the data stream
 				simpleDataStream* stream = _programs->get(partId)->getStream();

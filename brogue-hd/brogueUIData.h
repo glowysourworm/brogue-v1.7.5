@@ -196,6 +196,10 @@ namespace brogueHd::frontend
 		{
 			return _needsUpdate;
 		}
+		void forceUpdate()
+		{
+			_needsUpdate = true;
+		}
 		bool getMouseLeave() const
 		{
 			return _mouseLastOver && !_mouseOver;

@@ -122,6 +122,9 @@ namespace brogueHd::frontend
 		BrogueGameMode _gameMode;
 		BrogueGameMode _gameModeIn;
 		BrogueGameMode _gameModeOut;
+
+		// Program View Change:  Happens when UI programs get activated / deactivated
+		bool _programViewChange;
 		
 		GLFWwindow* _window;
 		bool _initializedGL;
@@ -144,6 +147,7 @@ namespace brogueHd::frontend
 		_gameModeOut = BrogueGameMode::Title;
 		_gameModeIn = BrogueGameMode::Title;
 		_gameMode = BrogueGameMode::Title;
+		_programViewChange = false;
 	}
 	openglRenderer::~openglRenderer()
 	{
@@ -488,7 +492,7 @@ namespace brogueHd::frontend
 			// Click registered by a background program (typically)
 			case brogueUIAction::None:
 			{
-				if (sender != brogueUIProgram::MainMenuProgram)
+				if (sender == brogueUIProgram::FlameMenuProgram)
 				{
 					_program->deactivateUIProgram(brogueUIProgram::OpenMenuProgram);
 					_program->deactivateUIProgram(brogueUIProgram::PlaybackMenuProgram);
@@ -569,6 +573,8 @@ namespace brogueHd::frontend
 			default:
 				break;
 		}
+
+		_programViewChange = true;
 	}
 	void openglRenderer::thread_start()
 	{
@@ -630,21 +636,24 @@ namespace brogueHd::frontend
 
 			simpleMouseState mouseState(*brogueHd::frontend::MouseState);
 			simpleKeyboardState keyboardState(*brogueHd::frontend::KeyState);
-			bool programChangeThisIteration = _gameModeIn != _gameMode;
+			bool gameModeChangeThisIteration = _gameModeIn != _gameMode;
 
-			// Program Context Change
-			if (programChangeThisIteration)
+			// Program Context Change (sent from main thread)
+			if (gameModeChangeThisIteration)
 			{
 				_program->setMode(_gameModeIn);
 				_gameMode = _gameModeIn;
 			}
 
-			// Check Update(s)
+			// Check Update(s) -> (Click Events) (can signal view change)
 			_program->checkUpdate(keyboardState, mouseState, intervalMilliseconds);
 
-			// Check normal program update (view state change)
-			if (_program->needsUpdate() || programChangeThisIteration)
-				_program->update(keyboardState, mouseState, intervalMilliseconds);		// Updates program buffers from the UI view
+			// Updates Program Buffers:  brogueViewBase* -> simpleDataStream (gets sent to GPU)
+			//							 Check normal program update (view state change) to force 
+			//							 update (to active programs only!)
+			//
+			if (_program->needsUpdate() || gameModeChangeThisIteration || _programViewChange)
+				_program->update(keyboardState, mouseState, intervalMilliseconds, gameModeChangeThisIteration || _programViewChange);		
 
 			// Run drawing program
 			_program->run(intervalMilliseconds);										// Run() -> Draws the buffers
@@ -658,6 +667,9 @@ namespace brogueHd::frontend
 
 			// Scroll data has already been consumed by the view tree
 			brogueHd::frontend::MouseState->resetScroll();
+
+			// This is set on the render thead -> Click Event
+			_programViewChange = false;
 
 			_threadLock->unlock();
 

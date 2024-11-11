@@ -68,7 +68,8 @@ namespace brogueHd::frontend
 		/// </summary>
 		virtual void update(const brogueKeyboardState& keyboardState,
 							const brogueMouseState& mouseState,
-							int millisecondsLapsed);
+							int millisecondsLapsed,
+							bool forceUpdate);
 
 		/// <summary>
 		/// Clears update flags from the UI tree
@@ -260,8 +261,8 @@ namespace brogueHd::frontend
 		_uiData->clearCapture();
 	}
 	void brogueViewBase::checkUpdate(const brogueKeyboardState& keyboardState,
-						 const brogueMouseState& mouseState,
-						 int millisecondsLapsed)
+										const brogueMouseState& mouseState,
+										int millisecondsLapsed)
 	{
 		// Sets primary real time UI data for the mouse / live updates to the UI.
 		_uiData->setUpdate(mouseState.getMouseLeft(), this->isMouseOver(mouseState));
@@ -272,12 +273,13 @@ namespace brogueHd::frontend
 			this->raiseClickEvent(_uiData->getAction());
 
 			// Clears UI event data for the mouse
-			_uiData->clearCapture();
+			//_uiData->clearCapture();
 		}
 	}
 	void brogueViewBase::update(const brogueKeyboardState& keyboardState,
 								const brogueMouseState& mouseState,
-								int millisecondsLapsed)
+								int millisecondsLapsed,
+								bool forceUpdate)
 	{
 		throw simpleException("brogueViewBase::update must be overridden in the child class");
 	}

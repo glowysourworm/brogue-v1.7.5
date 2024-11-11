@@ -26,7 +26,8 @@ namespace brogueHd::frontend
 
 		virtual void update(const brogueKeyboardState& keyboardState,
 							const brogueMouseState& mouseState,
-							int millisecondsLapsed) override
+							int millisecondsLapsed,
+							bool forceUpdate) override
 		{
 			// May not need this override (needsUpdate -> false)
 		}

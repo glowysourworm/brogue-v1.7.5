@@ -4,16 +4,13 @@
 #include "brogueKeyboardState.h"
 #include "brogueMouseState.h"
 #include "brogueTitleGrid.h"
-#include "brogueUIConstants.h"
 #include "brogueUIData.h"
-#include "brogueUIProgramPartId.h"
 #include "brogueViewBase.h"
 #include "color.h"
 #include "eventController.h"
 #include "gridDefinitions.h"
 #include "gridRect.h"
 #include "simple.h"
-#include "simpleList.h"
 
 using namespace brogueHd::backend;
 
@@ -46,6 +43,14 @@ namespace brogueHd::frontend
 		void checkUpdate(const brogueKeyboardState& keyboardState,
 						 const brogueMouseState& mouseState,
 						 int millisecondsLapsed) override
+		{
+			// Prevent updating
+		}
+
+		void update(const brogueKeyboardState& keyboardState,
+					const brogueMouseState& mouseState,
+					int millisecondsLapsed,
+					bool forceUpdate) override
 		{
 			// Prevent updating
 		}

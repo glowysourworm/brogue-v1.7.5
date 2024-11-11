@@ -38,9 +38,9 @@ namespace brogueHd::frontend
 						  int millisecondsLapsed);
 
 		void checkUpdate(const brogueUIProgramPartId& partId,
-						const brogueKeyboardState& keyboardState,
-						const brogueMouseState& mouseState,
-						int millisecondsLapsed);
+						 const brogueKeyboardState& keyboardState,
+						 const brogueMouseState& mouseState,
+						 int millisecondsLapsed);
 
 		bool needsUpdate(const brogueUIProgramPartId& partId) const;
 		void clearUpdate(const brogueUIProgramPartId& partId);

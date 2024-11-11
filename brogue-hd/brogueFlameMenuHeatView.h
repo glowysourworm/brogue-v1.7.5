@@ -35,7 +35,8 @@ namespace brogueHd::frontend
 
 		void update(const brogueKeyboardState& keyboardState,
 					const brogueMouseState& mouseState,
-					int millisecondsLapsed) override;
+					int millisecondsLapsed,
+					bool forceUpdate) override;
 
 		void checkUpdate(const brogueKeyboardState& keyboardState,
 						 const brogueMouseState& mouseState,
@@ -173,7 +174,8 @@ namespace brogueHd::frontend
 	}
 	void brogueFlameMenuHeatView::update(const brogueKeyboardState& keyboardState,
 										 const brogueMouseState& mouseState,
-										 int millisecondsLapsed)
+										 int millisecondsLapsed,
+										 bool forceUpdate)
 	{
 		if (_fadePeriodCounter->pending())
 			cycleHeatSources();
