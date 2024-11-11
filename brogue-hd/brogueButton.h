@@ -28,11 +28,6 @@ namespace brogueHd::frontend
 							int millisecondsLapsed) override;
 
 		virtual bool needsUpdate() const override;
-
-		virtual void iterateChildViews(simpleListCallback<brogueViewBase*> callback) const override
-		{
-			callback((brogueViewBase*)this);
-		}
 	};
 
 	brogueButton::brogueButton(eventController* eventController, const brogueUIData& data, const gridRect& sceneBoundary, const gridRect& viewBoundary)

@@ -23,7 +23,7 @@ namespace brogueHd::frontend
 	{
 	public:
 
-		brogueViewContainer(brogueUIProgram programName);
+		brogueViewContainer(brogueUIProgram programName, bool hasScrollInteraction, const gridRect& containerBoundary);
 		~brogueViewContainer();
 
 		void addView(brogueViewBase* view);
@@ -33,10 +33,15 @@ namespace brogueHd::frontend
 
 	public:
 
+		void updateScroll(const brogueKeyboardState& keyboardState,
+						  const brogueMouseState& mouseState,
+						  int millisecondsLapsed);
+
 		void checkUpdate(const brogueUIProgramPartId& partId,
-						 const brogueKeyboardState& keyboardState,
-						 const brogueMouseState& mouseState,
-						 int millisecondsLapsed);
+						const brogueKeyboardState& keyboardState,
+						const brogueMouseState& mouseState,
+						int millisecondsLapsed);
+
 		bool needsUpdate(const brogueUIProgramPartId& partId) const;
 		void clearUpdate(const brogueUIProgramPartId& partId);
 		void clearEvents(const brogueUIProgramPartId& partId);
@@ -55,29 +60,26 @@ namespace brogueHd::frontend
 	private:
 
 		brogueUIProgram _programName;
+		bool _hasScrollInteraction;
+		gridRect* _containerBoundary;
 		simpleHash<brogueUIProgramPartId, brogueViewBase*>* _views;
 	};
 
-	brogueViewContainer::brogueViewContainer(brogueUIProgram programName)
+	brogueViewContainer::brogueViewContainer(brogueUIProgram programName, bool hasScrollInteraction, const gridRect& containerBoundary)
 	{
 		_programName = programName;
+		_containerBoundary = new gridRect(containerBoundary);
+		_hasScrollInteraction = hasScrollInteraction;
 		_views = new simpleHash<brogueUIProgramPartId, brogueViewBase*>();
 	}
 	brogueViewContainer::~brogueViewContainer()
 	{
 		delete _views;
+		delete _containerBoundary;
 	}
 	void brogueViewContainer::addView(brogueViewBase* view)
 	{
-		// Composed Views:  These will potentially have N number of program parts (buttons, text, background, etc...)
-		//					which will be managed by brogueComposedView. Each will have a shader program and data stream
-		//					to handle here; but the mouse interaction is the composed view. (brogueViewBase has the 
-		//					overload for this function to give the base view.
-		//
-		for (int index = 0; index < view->getChildViewCount(); index++)
-		{
-			_views->add(view->getChildView(index)->getPartId(), view->getChildView(index));
-		}
+		_views->add(view->getPartId(), view);
 	}
 	brogueViewBase* brogueViewContainer::getView(const brogueUIProgramPartId& programPart) const
 	{
@@ -150,6 +152,64 @@ namespace brogueHd::frontend
 		}
 
 		return nullptr;
+	}
+	void brogueViewContainer::updateScroll(const brogueKeyboardState& keyboardState,
+											  const brogueMouseState& mouseState,
+											  int millisecondsLapsed)
+	{
+		if (!_hasScrollInteraction)
+			return;
+
+		/*
+			UI Behavior:  This will add the scroll behavior. (or x-y scrolling behavior)
+		*/
+
+		bool mouseOver = this->getBoundary().contains(mouseState.getLocation());
+		bool mousePressed = mouseState.getMouseLeft();
+		bool scrollEvent = mouseState.getScrollPendingX() || mouseState.getScrollPendingY();
+
+		if (!mouseOver || !scrollEvent)
+			return;
+
+		// Aggregate child boundary
+		gridRect childBoundary = this->getBoundary();
+
+		// Check scroll bounds
+		int scrollX = 0;
+		int scrollY = 0;
+
+		// Parent View -> Mouse Over -> Scroll
+		if (_hasScrollInteraction && mouseOver && scrollEvent)
+		{
+			if (mouseState.getScrollPendingX())
+			{
+				if (mouseState.getScrollNegativeX() && childBoundary.left() > _containerBoundary->left())
+					scrollX = -1;
+
+				else if (!mouseState.getScrollNegativeX() && childBoundary.right() < _containerBoundary->right())
+					scrollX = 1;
+			}
+			if (mouseState.getScrollPendingY())
+			{
+				if (mouseState.getScrollNegativeY() && childBoundary.top() > _containerBoundary->top())
+					scrollY = -1;
+
+				else if (!mouseState.getScrollNegativeY() && childBoundary.bottom() < _containerBoundary->bottom())
+					scrollY = 1;
+			}
+		}
+
+		if (scrollX == 0 && scrollY == 0)
+			return;
+
+		// Child Views
+		_views->forEach([&scrollX, &scrollY] (const brogueUIProgramPartId& partId, brogueViewBase* view)
+		{
+			// Sets UI Data -> (needsUpdate = true)
+			view->incrementRenderOffset(scrollX, scrollY);
+
+			return iterationCallback::iterate;
+		});
 	}
 	void brogueViewContainer::checkUpdate(const brogueUIProgramPartId& partId,
 										  const brogueKeyboardState& keyboardState,

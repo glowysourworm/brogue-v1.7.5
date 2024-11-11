@@ -151,6 +151,9 @@ namespace brogueHd::frontend
 		//
 		_periodCounter->update(millisecondsLapsed, false);
 		_fadePeriodCounter->update(millisecondsLapsed, false);
+
+		// Mouse Interaction
+		brogueViewBase::checkUpdate(keyboardState, mouseState, millisecondsLapsed);
 	}
 	bool brogueFlameMenuHeatView::needsUpdate() const
 	{
@@ -161,10 +164,12 @@ namespace brogueHd::frontend
 	void brogueFlameMenuHeatView::clearUpdate()
 	{
 		_periodCounter->reset();
+
+		brogueViewBase::clearUpdate();
 	}
 	void brogueFlameMenuHeatView::clearEvents()
 	{
-		// Nothing to do
+		brogueViewBase::clearEvents();
 	}
 	void brogueFlameMenuHeatView::update(const brogueKeyboardState& keyboardState,
 										 const brogueMouseState& mouseState,

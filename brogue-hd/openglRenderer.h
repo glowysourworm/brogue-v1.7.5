@@ -490,7 +490,10 @@ namespace brogueHd::frontend
 			{
 				if (sender != brogueUIProgram::MainMenuProgram)
 				{
-					_program->deactivateUIProgram(sender);
+					_program->deactivateUIProgram(brogueUIProgram::OpenMenuProgram);
+					_program->deactivateUIProgram(brogueUIProgram::PlaybackMenuProgram);
+					_program->deactivateUIProgram(brogueUIProgram::HighScoresProgram);
+
 					_program->activateUIProgram(brogueUIProgram::MainMenuProgram);
 					_program->clearEvents();
 					//_uiEventDebouncer->reset();
@@ -503,7 +506,11 @@ namespace brogueHd::frontend
 				break;
 
 			case brogueUIAction::OpenGame:
-				_gameModeOut = BrogueGameMode::Game;
+			{
+				_program->deactivateUIProgram(brogueUIProgram::MainMenuProgram);
+				_program->activateUIProgram(brogueUIProgram::OpenMenuProgram);
+				_program->clearEvents();
+			}
 				break;
 
 			case brogueUIAction::QuitGame:
@@ -571,7 +578,7 @@ namespace brogueHd::frontend
 		_threadLock->lock();
 
 		// Get the calculated scene boundary from the UI view components
-		gridRect sceneBoundaryUI = _program->getSceneBoundaryUI();
+		gridRect sceneBoundaryUI = _program->getSceneBoundaryUI(); 
 
 		// Initialize GL
 		if (!_initializedGL)

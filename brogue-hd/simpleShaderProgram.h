@@ -49,10 +49,15 @@ namespace brogueHd::frontend
 		void showActives();
 
 		/// <summary>
-		/// Call to re-buffer the data glNamedBufferSubData. Will delete the old stream.
+		/// Call to re-buffer the data glNamedBufferSubData. This will use the shared simpleDataStream* pointer.
 		/// </summary>
-		/// <param name="bufferIndex">Index of VAO</param>
-		void reBuffer(simpleDataStream* newBuffer);
+		void reBuffer();
+		
+		/// <summary>
+		/// Returns a pointer to the VAO's data stream (currently one-per-VAO, assigned to the VBO). Use this
+		/// to rebuffer the stream; but must keep same data size and format!
+		/// </summary>
+		simpleDataStream* getStream() const;
 
 		bool bindUniform1i(const simpleString& name, int uniformValue);
 		bool bindUniform1(const simpleString& name, float uniformValue);
@@ -148,7 +153,7 @@ namespace brogueHd::frontend
 		_programVAO->draw();
 	}
 
-	void simpleShaderProgram::reBuffer(simpleDataStream* newBuffer)
+	void simpleShaderProgram::reBuffer()
 	{
 		if (!this->isCreated())
 			throw simpleException("Must first call compile() to run shader program:  simpleShaderProgram.h");
@@ -157,9 +162,15 @@ namespace brogueHd::frontend
 			throw simpleException("Must first call bind to set the program active");
 
 		_programVAO->bind();
-		_programVAO->reBuffer(this->handle, newBuffer);
+		_programVAO->reBuffer(this->handle);
 	}
+	simpleDataStream* simpleShaderProgram::getStream() const
+	{
+		if (!this->isCreated())
+			throw simpleException("Must first call compile() to run shader program:  simpleShaderProgram.h");
 
+		return _programVAO->getStream();
+	}
 	void simpleShaderProgram::bind()
 	{
 		if (!this->isCreated())

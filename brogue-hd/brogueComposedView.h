@@ -9,10 +9,8 @@
 #include "color.h"
 #include "eventController.h"
 #include "gridDefinitions.h"
-#include "gridLocator.h"
 #include "gridRect.h"
 #include "simple.h"
-#include "simpleList.h"
 #include "simpleOrderedList.h"
 #include <functional>
 
@@ -45,22 +43,15 @@ namespace brogueHd::frontend
 		virtual brogueCellDisplay* get(short column, short row) const override;
 
 		virtual void iterate(gridCallback<brogueCellDisplay*> callback) const override;
-		virtual void iterateChildViews(simpleListCallback<brogueViewBase*> callback) const override;
-		int getChildViewCount() const override;
-		brogueViewBase* getChildView(int index) const override;
 
-	public:
+	public:		// Child Views
 
-		// Child Views
 		void addView(brogueViewBase* view);
-		brogueViewBase* getView(int index) const;
-		int getViewCount() const;
 
 	private:
 
 		brogueCellDisplay* _defaultCell;
 		simpleOrderedList<brogueViewBase*>* _views;
-
 	};
 
 	brogueComposedView::brogueComposedView(eventController* eventController, const brogueUIData& uiData, const gridRect& sceneBoundary, const gridRect& viewBoundary)
@@ -85,62 +76,33 @@ namespace brogueHd::frontend
 	{
 		_views->add(view);
 	}
-	brogueViewBase* brogueComposedView::getView(int index) const
-	{
-		return _views->get(index);
-	}
-	int brogueComposedView::getViewCount() const
-	{
-		return _views->count();
-	}
 	void brogueComposedView::iterate(gridCallback<brogueCellDisplay*> callback) const
 	{
 		const brogueComposedView* that = this;
+		brogueCellDisplay* defaultCell = _defaultCell;
 
-		this->getBoundary().iterate([&callback, &that] (short column, short row)
+		this->getBoundary().iterate([&callback, &that, &defaultCell] (short column, short row)
 		{
 			brogueCellDisplay* cell = that->get(column, row);
 
 			if (cell != nullptr)
 				callback(column, row, cell);
+			else
+				callback(column, row, defaultCell);
 
 			return iterationCallback::iterate;
 		});
 	}
-	void brogueComposedView::iterateChildViews(simpleListCallback<brogueViewBase*> callback) const
-	{
-		_views->forEach([&callback] (brogueViewBase* view)
-		{
-			return callback(view);
-		});
-	}
-	int brogueComposedView::getChildViewCount() const
-	{
-		return _views->count();;
-	}
-	brogueViewBase* brogueComposedView::getChildView(int index) const
-	{
-		return _views->get(index);
-	}
 	brogueCellDisplay* brogueComposedView::get(short column, short row) const
 	{
-		// Check padding first
-		gridRect paddedBoundary = this->getPaddedBoundary();
-
-		if (!paddedBoundary.contains(column, row))
-			return _defaultCell;
-
 		// SORTED BY Z-INDEX (Ascending)
 		for (int index = _views->count() - 1; index >= 0; index--)
 		{
-			// This offset should be shared with the container (but it's better to check and be sure)
-			gridLocator offset = _views->get(index)->getRenderOffset();
-
 			// Check child view boundaries (this will be an improper child view)
-			if (_views->get(index)->getBoundary().contains(offset.column + column, offset.row + row))
+			if (_views->get(index)->getBoundary().contains(column, row))
 			{
 				// Retrieve as if from normal boundaries (go ahead an show the improper child)
-				return _views->get(index)->get(offset.column + column, offset.row + row);
+				return _views->get(index)->get(column, row);
 			}
 		}
 
@@ -151,7 +113,7 @@ namespace brogueHd::frontend
 										 int millisecondsLapsed)
 	{
 		/*
-			UI Behavior:  This will add the scroll behavior. (or x-y scrolling behavior)
+			UI Behavior:  Cater to the child views; and return their cells in z-index order
 		*/
 
 		// This View (Behaves as brogueView)
@@ -160,58 +122,16 @@ namespace brogueHd::frontend
 		bool hasInteraction = this->getHasMouseInteraction();
 		bool scrollEvent = mouseState.getScrollPendingX() || mouseState.getScrollPendingY();
 
-		gridRect boundary = this->getBoundary();
-		gridRect paddedBoundary = this->getPaddedBoundary();
-		gridRect childBoundary = default_value::value<gridRect>();
-
 		// Child Views
-		_views->forEach([&mouseState, &keyboardState, &millisecondsLapsed, &childBoundary] (brogueViewBase* view)
+		_views->forEach([&mouseState, &keyboardState, &millisecondsLapsed] (brogueViewBase* view)
 		{
 			view->checkUpdate(keyboardState, mouseState, millisecondsLapsed);
-
-			gridRect viewBounds = view->getBoundary();
-
-			if (childBoundary == default_value::value<gridRect>())
-				childBoundary = viewBounds;
-
-			else
-			{
-				childBoundary.expand(viewBounds.left(), viewBounds.top());
-				childBoundary.expand(viewBounds.right(), viewBounds.bottom());
-			}
 
 			return iterationCallback::iterate;
 		});
 
-		// Check scroll bounds
-		int scrollX = 0;
-		int scrollY = 0;
-
-		// Parent View -> Mouse Over -> Scroll
-		if (hasInteraction && mouseOver && scrollEvent)
-		{
-			if (mouseState.getScrollPendingX())
-			{
-				if (mouseState.getScrollNegativeX() && childBoundary.left() > paddedBoundary.left())
-					scrollX = -1;
-
-				else if (!mouseState.getScrollNegativeX() && childBoundary.right() < paddedBoundary.right())
-					scrollX = 1;
-			}
-			if (mouseState.getScrollPendingY())
-			{
-				if (mouseState.getScrollNegativeY() && childBoundary.top() > paddedBoundary.top())
-					scrollY = -1;
-
-				else if (!mouseState.getScrollNegativeY() && childBoundary.bottom() < paddedBoundary.bottom())
-					scrollY = 1;
-			}
-
-			this->incrementRenderOffset(scrollX, scrollY);
-		}
-
 		// This View -> Update UI Data (no mouse interaction)
-		this->setUpdate(mouseState.getMouseLeft(), mouseOver, (scrollX != 0 || scrollY != 0));
+		this->setUpdate(mousePressed, mouseOver);
 	}
 	bool brogueComposedView::needsUpdate() const
 	{

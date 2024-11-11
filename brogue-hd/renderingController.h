@@ -70,8 +70,8 @@ namespace brogueHd::backend
 
 		brogueViewContainer* titleView = brogueUIBuilder::createFlameMenu(_eventController, _randomGenerator, zoomLevel);
 		brogueViewContainer* mainMenu = brogueUIBuilder::createMainMenuButtons(_eventController, zoomLevel);
-		brogueViewContainer* openMenu = brogueUIBuilder::createMainMenuSelector(brogueUIProgram::OpenMenuProgram, _eventController, gameFiles, zoomLevel);
-		brogueViewContainer* playbackMenu = brogueUIBuilder::createMainMenuSelector(brogueUIProgram::PlaybackMenuProgram, _eventController, recordingFiles, zoomLevel);
+		brogueViewContainer* openMenu = brogueUIBuilder::createMainMenuSelector(brogueUIProgram::OpenMenuProgram, _eventController, gameFiles, zoomLevel, "~ Open Saved Game ~");
+		brogueViewContainer* playbackMenu = brogueUIBuilder::createMainMenuSelector(brogueUIProgram::PlaybackMenuProgram, _eventController, recordingFiles, zoomLevel, "~ View Recording ~");
 		brogueViewContainer* highScoresMenu = brogueUIBuilder::createHighScoresView(_eventController, _resourceController, zoomLevel);
 
 		simpleList<brogueViewContainer*> viewList;

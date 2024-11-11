@@ -234,6 +234,15 @@ namespace brogueHd::frontend
 		brogueKeyboardState keyboardUI = calculateKeyboardState(keyboardState);
 		brogueMouseState mouseUI = calculateMouseState(mouseState);
 
+		// Scroll Update:  The brogueViewContainer handles scroll events and offsets. These are
+		//				   stored with all the child views' UI data; and consumed during normal
+		//				   updates and checkUpdates.
+		//
+		_viewContainer->updateScroll(keyboardUI, mouseUI, millisecondsLapsed);
+
+		// Iterate Child Views: Each corresponds to a program part; and the composed views are 
+		//						of ViewCompositor type.
+		//
 		for (int index = 0; index < _viewContainer->getViewCount(); index++)
 		{
 			brogueViewBase* view = _viewContainer->getViewAt(index);
@@ -327,11 +336,14 @@ namespace brogueHd::frontend
 				view->update(keyboardStateUI, mouseStateUI, millisecondsLapsed);
 
 				// Must update the data stream
-				simpleDataStream* stream = _programBuilder->buildDataStream(view, *_resourceController->getUIPartConfig(partId.getPartName()));
+				simpleDataStream* stream = _programs->get(partId)->getStream();
+
+				// Rebuilds the current data stream
+				_programBuilder->rebuildDataStream(view, *_resourceController->getUIPartConfig(partId.getPartName()), stream);
 
 				// Put the new stream online (deletes the old stream)
 				_programs->get(partId)->bind();
-				_programs->get(partId)->reBuffer(stream);
+				_programs->get(partId)->reBuffer();
 			}
 		}
 	}

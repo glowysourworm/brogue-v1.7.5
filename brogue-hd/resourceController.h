@@ -296,9 +296,9 @@ namespace brogueHd::backend
 		// Generic Parts
 		brogueUIProgramPartConfiguration* viewCompositor =
 			new brogueUIProgramPartConfiguration(brogueUIProgramPart::ViewCompositor,
-												 shaderResource::backgroundColorVert,
-												 shaderResource::backgroundColorFrag,
-												 openglDataStreamType::brogueColorQuad,
+												 shaderResource::brogueCellDisplayVert,
+												 shaderResource::brogueCellDisplayFrag,
+												 openglDataStreamType::brogueCellQuad,
 												 openglBrogueCellOutputSelector::DisplayCurrentFrame,
 												 0,
 												 true,
@@ -311,7 +311,7 @@ namespace brogueHd::backend
 												 openglDataStreamType::brogueCellQuad,
 												 openglBrogueCellOutputSelector::DisplayCurrentFrame,
 												 0,
-												 false,
+												 true,
 												 false);
 
 		brogueUIProgramPartConfiguration* text =

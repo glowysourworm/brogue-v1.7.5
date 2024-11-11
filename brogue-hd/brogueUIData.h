@@ -33,7 +33,6 @@ namespace brogueHd::frontend
 
 			_alignment = brogueTextAlignment::Left;
 			_hotkeyIndex = -1;
-			_padding = 0;
 			_zoomLevel = 0;
 			_zIndex = 0;
 
@@ -119,7 +118,6 @@ namespace brogueHd::frontend
 			_renderOffset = gridLocator(0, 0);
 			_alignment = alignment;
 			_hotkeyIndex = -1;
-			_padding = 0;
 			_zoomLevel = zoomLevel;
 			_zIndex = 0;
 			_hasMouseInteraction = false;
@@ -152,13 +150,11 @@ namespace brogueHd::frontend
 							 const simpleString& actionFileName,
 							 brogueUIAction action,
 							 bool hasMouseInteraction,
-							 int padding,
 							 int zoomLevel,
 							 int zIndex)
 		{
 			_hotkeyIndex = hotkeyIndex;
 			_hasMouseInteraction = hasMouseInteraction;
-			_padding = padding;
 			_zoomLevel = zoomLevel;
 			_zIndex = zIndex;
 
@@ -193,7 +189,7 @@ namespace brogueHd::frontend
 			_mouseOver = mouseOver;
 
 			// Set Update Flags
-			_needsUpdate = _hasMouseInteraction && ((mouseOver && !_mouseOver) || (mousePressed && !_mousePressed)) || forceUpdate;
+			_needsUpdate = _needsUpdate || (_hasMouseInteraction && ((mouseOver && !_mouseOver) || (mousePressed && !_mousePressed)) || forceUpdate);
 		}
 
 		bool needsUpdate() const
@@ -301,6 +297,19 @@ namespace brogueHd::frontend
 				return colorString::Empty;
 		}
 
+		colorGradient getBackground() const
+		{
+			return _background;
+		}
+		colorGradient getHoverBackground() const
+		{
+			return _hoverBackground;
+		}
+		colorGradient getPressedBackground() const
+		{
+			return _pressedBackground;
+		}
+
 		bool getIsHotkey(int column, int row)
 		{
 			if (_hotkeyIndex == -1)
@@ -312,14 +321,6 @@ namespace brogueHd::frontend
 			return offsetColumn - textIndex == _hotkeyIndex;
 		}
 
-		gridRect getPaddedBoundary() const
-		{
-			return gridRect(_boundary.column + _padding,
-							_boundary.row + _padding,
-							_boundary.width - (2 * _padding),
-							_boundary.height - (2 * _padding));
-		}
-
 		gridLocator getRenderOffset() const
 		{
 			return _renderOffset;
@@ -329,6 +330,8 @@ namespace brogueHd::frontend
 		{
 			_renderOffset.column = column;
 			_renderOffset.row = row;
+
+			_needsUpdate = true;
 		}
 		int getZIndex() const
 		{
@@ -367,7 +370,6 @@ namespace brogueHd::frontend
 
 			_alignment = copy.getAlignment();
 			_hotkeyIndex = copy.getHotkeyIndex();
-			_padding = copy.getPadding();
 			_zoomLevel = copy.getZoomLevel();
 			_zIndex = copy.getZIndex();
 
@@ -452,18 +454,6 @@ namespace brogueHd::frontend
 		{
 			return _boundary;
 		}
-		colorGradient getBackground() const
-		{
-			return _background;
-		}
-		colorGradient getHoverBackground() const
-		{
-			return _hoverBackground;
-		}
-		colorGradient getPressedBackground() const
-		{
-			return _pressedBackground;
-		}
 		gridLocator getRenderOffsetPtr() const
 		{
 			return _renderOffset;
@@ -475,10 +465,6 @@ namespace brogueHd::frontend
 		int getHotkeyIndex() const
 		{
 			return _hotkeyIndex;
-		}
-		int getPadding() const
-		{
-			return _padding;
 		}
 
 	private:
@@ -495,7 +481,6 @@ namespace brogueHd::frontend
 
 		brogueTextAlignment _alignment;
 		int _hotkeyIndex;
-		int _padding;
 		int _zoomLevel;
 		int _zIndex;
 		bool _hasMouseInteraction;

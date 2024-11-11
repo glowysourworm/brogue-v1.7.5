@@ -88,7 +88,6 @@ namespace brogueHd::frontend
 		gridRect* _sceneBoundaryUI;
 
 		BrogueGameMode _gameMode;
-		bool _firstRun;
 	};
 
 	brogueMainProgram::brogueMainProgram(resourceController* resourceController,
@@ -147,8 +146,6 @@ namespace brogueHd::frontend
 		_fontTexture = new simpleTexture(glyphSurface, glyphSheet->pixelWidth(), glyphSheet->pixelHeight(), textureIndex++, GL_TEXTURE1, GL_RGBA, GL_RGBA, 4, GL_UNSIGNED_BYTE);
 
 		_frameBuffer = new simpleFrameBuffer(sceneBoundaryUI.width, sceneBoundaryUI.height);
-
-		_firstRun = true;
 	}
 	brogueMainProgram::~brogueMainProgram()
 	{
@@ -217,13 +214,8 @@ namespace brogueHd::frontend
 				// Frame Buffer -> GL_TEXTURE0
 				glDrawBuffer(GL_COLOR_ATTACHMENT0);
 
-				_uiPrograms->get(brogueUIProgram::FlameMenuProgram)->activate();
-				if (_firstRun)
-				{
-					_uiPrograms->get(brogueUIProgram::FlameMenuProgram)->bindUniforms();
-					_uiPrograms->get(brogueUIProgram::FlameMenuProgram)->outputActives();
-				}
-				_uiPrograms->get(brogueUIProgram::FlameMenuProgram)->run(millisecondsElapsed);
+				if (_uiPrograms->get(brogueUIProgram::FlameMenuProgram)->isActive())
+					_uiPrograms->get(brogueUIProgram::FlameMenuProgram)->run(millisecondsElapsed);
 
 				break;
 			case BrogueGameMode::Game:
@@ -241,20 +233,26 @@ namespace brogueHd::frontend
 		_frameProgram->bind();
 		_frameProgram->draw();
 
-		glFlush();
-
 		// Draw UI components
 		switch (_gameMode)
 		{
 			case BrogueGameMode::Title:
 
-				_uiPrograms->get(brogueUIProgram::MainMenuProgram)->activate();
-				if (_firstRun)
-				{
-					_uiPrograms->get(brogueUIProgram::MainMenuProgram)->bindUniforms();
-					_uiPrograms->get(brogueUIProgram::MainMenuProgram)->outputActives();
-				}
-				_uiPrograms->get(brogueUIProgram::MainMenuProgram)->run(millisecondsElapsed);
+				// Main Menu
+				if (_uiPrograms->get(brogueUIProgram::MainMenuProgram)->isActive())
+					_uiPrograms->get(brogueUIProgram::MainMenuProgram)->run(millisecondsElapsed);
+
+				// Open Menu
+				if (_uiPrograms->get(brogueUIProgram::OpenMenuProgram)->isActive())
+					_uiPrograms->get(brogueUIProgram::OpenMenuProgram)->run(millisecondsElapsed);
+
+				// Playback Menu
+				if (_uiPrograms->get(brogueUIProgram::PlaybackMenuProgram)->isActive())
+					_uiPrograms->get(brogueUIProgram::PlaybackMenuProgram)->run(millisecondsElapsed);
+
+				// High Scores
+				if (_uiPrograms->get(brogueUIProgram::HighScoresProgram)->isActive())
+					_uiPrograms->get(brogueUIProgram::HighScoresProgram)->run(millisecondsElapsed);
 
 				break;
 			case BrogueGameMode::Game:
@@ -264,8 +262,6 @@ namespace brogueHd::frontend
 			default:
 				break;
 		}
-
-		_firstRun = false;
 
 		glFlush();
 	}

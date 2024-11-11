@@ -14,7 +14,6 @@
 #include "gridRect.h"
 #include "simple.h"
 #include "simpleException.h"
-#include "simpleList.h"
 
 using namespace brogueHd::backend;
 
@@ -30,7 +29,6 @@ namespace brogueHd::frontend
 
 		virtual gridRect getSceneBoundary() const;
 		virtual gridRect getBoundary() const;
-		virtual gridRect getPaddedBoundary() const;
 		virtual gridRect getRenderBoundary() const;
 
 		/// <summary>
@@ -57,14 +55,6 @@ namespace brogueHd::frontend
 		/// Iterates the view's cells. This will happen in the view's relative boundary.
 		/// </summary>
 		virtual void iterate(gridCallback<brogueCellDisplay*> callback) const;
-
-		/// <summary>
-		/// Iterates the view's child views. This must be overridden in the child class; and
-		/// return "this" if necessary.
-		/// </summary>
-		virtual void iterateChildViews(simpleListCallback<brogueViewBase*> callback) const;
-		virtual int getChildViewCount() const;
-		virtual brogueViewBase* getChildView(int index) const;
 
 		/// <summary>
 		/// Overload of the checkUpdate function behaves as though the view is a child of a parent view
@@ -157,7 +147,9 @@ namespace brogueHd::frontend
 	}
 	brogueCellDisplay* brogueViewBase::get(short column, short row) const
 	{
-		return _view->get(column, row);
+		gridLocator offset = getRenderOffset();
+
+		return _view->get(offset.column + column, offset.row + row);
 	}
 	gridRect brogueViewBase::calculateSceneBoundaryUI() const
 	{
@@ -183,17 +175,13 @@ namespace brogueHd::frontend
 	{
 		return _view->getRelativeBoundary();
 	}
-	gridRect brogueViewBase::getPaddedBoundary() const
-	{
-		return _uiData->getPaddedBoundary();
-	}
 	gridRect brogueViewBase::getSceneBoundary() const
 	{
 		return _view->getParentBoundary();
 	}
 	gridRect brogueViewBase::getRenderBoundary() const
 	{
-		gridRect boundary = _uiData->getPaddedBoundary();
+		gridRect boundary = _uiData->getBounds();
 		gridLocator offset = _uiData->getRenderOffset();
 
 		boundary.translate(-1 * offset.column, -1 * offset.row);
@@ -278,7 +266,7 @@ namespace brogueHd::frontend
 		// Sets primary real time UI data for the mouse / live updates to the UI.
 		_uiData->setUpdate(mouseState.getMouseLeft(), this->isMouseOver(mouseState));
 
-		if (_uiData->getMouseClick() && _uiData->getHasMouseInteraction())
+		if (_uiData->getMouseOver() && _uiData->getMouseClick() && _uiData->getHasMouseInteraction())
 		{
 			// UI EVENT:  Mouse Click
 			this->raiseClickEvent(_uiData->getAction());
@@ -300,20 +288,5 @@ namespace brogueHd::frontend
 	void brogueViewBase::iterate(gridCallback<brogueCellDisplay*> callback) const
 	{
 		_view->iterate(callback);
-	}
-	void brogueViewBase::iterateChildViews(simpleListCallback<brogueViewBase*> callback) const
-	{
-		callback((brogueViewBase*)this);
-	}
-	int brogueViewBase::getChildViewCount() const
-	{
-		return 1;
-	}
-	brogueViewBase* brogueViewBase::getChildView(int index) const
-	{
-		if (index != 0)
-			throw simpleException("Index outside the boundsd of the array:  brogueViewBase.h");
-
-		return (brogueViewBase*)this;
 	}
 }

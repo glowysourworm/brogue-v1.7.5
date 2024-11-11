@@ -2,8 +2,6 @@
 #include "brogueCellDisplay.h"
 #include "brogueCoordinateConverter.h"
 #include "brogueDataStreamBuilder.h"
-#include "brogueFlameMenuHeatView.h"
-#include "brogueFlameMenuTitleMask.h"
 #include "brogueGlyphMap.h"
 #include "brogueUIConstants.h"
 #include "brogueUIProgramPartConfiguration.h"
@@ -37,24 +35,24 @@ namespace brogueHd::frontend
 		simpleShaderProgram* buildProgram(const brogueViewBase* view,
 										  const brogueUIProgramPartConfiguration& configuration);
 
+		void rebuildDataStream(const brogueViewBase* view,
+							   const brogueUIProgramPartConfiguration& configuration,
+							   simpleDataStream* stream);
+
 		brogueCoordinateConverter buildCoordinateConverter(int sceneWidth, int sceneHeight, int zoomLevel);
 
 	private:
-
-		// Generic w/ or w/o inclusion predicate
-		simpleDataStream* createStream(const brogueViewBase* view,
-									   openglDataStreamType type,
-									   openglBrogueCellOutputSelector noDisplaySelector,
-									   bool isFrameType,
-									   gridPredicate<brogueCellDisplay*> inclusionPredicate);
 
 		simpleDataStream* createStream(const brogueViewBase* view,
 									   openglDataStreamType type,
 									   openglBrogueCellOutputSelector noDisplaySelector,
 									   bool isFrameType);
-		// Specific streams
-		simpleDataStream* createHeatSourceStream(brogueFlameMenuHeatView* view, openglDataStreamType type);
-		simpleDataStream* createTitleMaskStream(brogueFlameMenuTitleMask* view, openglDataStreamType type);
+
+		void recreateDataStream(const brogueViewBase* view,
+								simpleDataStream* stream,
+								openglDataStreamType type,
+								openglBrogueCellOutputSelector noDisplaySelector,
+								bool isFrameType);
 
 	private:
 
@@ -111,6 +109,27 @@ namespace brogueHd::frontend
 		}
 	}
 
+	void brogueProgramBuilder::rebuildDataStream(const brogueViewBase* view,
+												 const brogueUIProgramPartConfiguration& configuration,
+												 simpleDataStream* stream)
+	{
+		switch (configuration.programPartName)
+		{
+			case brogueUIProgramPart::FlameMenuProgram_HeatSourceProgram:
+			case brogueUIProgramPart::FlameMenuProgram_TitleMaskProgram:
+			case brogueUIProgramPart::FlameMenuProgram_HeatDiffuseProgram:
+			case brogueUIProgramPart::Background:
+			case brogueUIProgramPart::MenuBackground:
+			case brogueUIProgramPart::MenuButton:
+			case brogueUIProgramPart::Text:
+				return recreateDataStream(view, stream, configuration.dataStreamType, configuration.noDisplaySelector, configuration.isFrameType);
+			case brogueUIProgramPart::ViewCompositor:
+				return recreateDataStream(view, stream, configuration.dataStreamType, configuration.noDisplaySelector, configuration.isFrameType);
+			default:
+				throw simpleException("Unhandled brogueUIProgram type:  brogueProgramBuilder.h");
+		}
+	}
+
 	simpleDataStream* brogueProgramBuilder::createStream(const brogueViewBase* view,
 														 openglDataStreamType type,
 														 openglBrogueCellOutputSelector noDisplaySelector,
@@ -123,16 +142,16 @@ namespace brogueHd::frontend
 			return _dataStreamBuilder->createFrameDataStream(view, type);
 	}
 
-	simpleDataStream* brogueProgramBuilder::createStream(const brogueViewBase* view,
-														 openglDataStreamType type,
-														 openglBrogueCellOutputSelector noDisplaySelector,
-														 bool isFrameType,
-														 gridPredicate<brogueCellDisplay*> inclusionPredicate)
+	void brogueProgramBuilder::recreateDataStream(const brogueViewBase* view,
+												  simpleDataStream* stream,
+												  openglDataStreamType type,
+												  openglBrogueCellOutputSelector noDisplaySelector,
+												  bool isFrameType)
 	{
 		if (!isFrameType)
-			return _dataStreamBuilder->createSceneDataStream(view, type, noDisplaySelector, inclusionPredicate);
+			return _dataStreamBuilder->recreateSceneDataStream(view, stream, type, noDisplaySelector);
 
 		else
-			return _dataStreamBuilder->createFrameDataStream(view, type);
+			return _dataStreamBuilder->recreateFrameDataStream(view, stream, type);
 	}
 }

@@ -41,11 +41,16 @@ namespace brogueHd::frontend
 		int getBufferLength();
 
 		/// <summary>
-		/// Sets new data stream object for the buffer. Vertex array attributes must be the same as the old stream.
+		/// Calls simpleVertexBuffer to re-sub the data from its simpleDataStream. This would be in the case
+		/// of reloading the data into the data stream; and updating the GPU memory. (shared pointer)
 		/// </summary>
-		/// <param name="newStream">Pointer to new data stream</param>
-		/// <param name="deleteOld">Calls delete on the old simpleDataStream</param>
-		void reBuffer(GLuint programHandle, simpleDataStream* newStream, bool deleteOld = true);
+		void reBuffer(GLuint programHandle);
+
+		/// <summary>
+		/// Gets the simpleDataStream* pointer. Use this to rebuffer the stream; but must keep same size and
+		/// format!
+		/// </summary>
+		simpleDataStream* getStream() const;
 
 		size_t getHash() const override
 		{
@@ -256,20 +261,10 @@ namespace brogueHd::frontend
 	}
 
 	template<typename T>
-	void simpleVertexBuffer<T>::reBuffer(GLuint programHandle, simpleDataStream* newStream, bool deleteOld)
+	void simpleVertexBuffer<T>::reBuffer(GLuint programHandle)
 	{
 		if (!this->isCreated())
 			simpleException::show("simpleVertexBuffer not yet created on the GL backend. Call glCreate first.");
-
-		if (newStream->getStreamSize() != _stream->getStreamSize())
-			simpleException::show("Trying to call glBufferSubData with a different sized data stream. Please check your data stream output.");
-
-		// (MEMORY!) These aren't yet managed. There is a "builder" pattern; but nothing to help manage them. 
-		if (deleteOld)
-			delete _stream;
-
-		// Set new data stream
-		_stream = newStream;
 
 		// Need to try named buffer. Active buffer should find the right buffer index; but it was having .. trouble.
 		glNamedBufferSubData(this->handle, (GLintptr)0, (GLsizeiptr)_stream->getStreamSize(), (void*)_stream->getData());
@@ -280,6 +275,15 @@ namespace brogueHd::frontend
 		//            (GLsizeiptr)_stream->getStreamSize(), 
 		//            _stream->getData(),
 		//            GL_DYNAMIC_DRAW);
+	}
+
+	template<typename T>
+	simpleDataStream* simpleVertexBuffer<T>::getStream() const
+	{
+		if (!this->isCreated())
+			simpleException::show("simpleVertexBuffer not yet created on the GL backend. Call glCreate first.");
+
+		return _stream;
 	}
 
 	template<typename T>

@@ -45,7 +45,13 @@ namespace brogueHd::frontend
 		/// <summary>
 		/// Rebuffers data on the specified VBO (see simpleShaderProgram)
 		/// </summary>
-		void reBuffer(GLuint programHandle, simpleDataStream* stream);
+		void reBuffer(GLuint programHandle);
+
+		/// <summary>
+		/// Returns the simpleDataStream* to the VAO's single VBO. Use this to rebuffer the stream - but
+		/// keeping same size and format!
+		/// </summary>
+		simpleDataStream* getStream() const;
 
 		size_t getHash() const override
 		{
@@ -109,7 +115,7 @@ namespace brogueHd::frontend
 	}
 
 	template<typename T>
-	void simpleVertexArray<T>::reBuffer(GLuint programHandle, simpleDataStream* stream)
+	void simpleVertexArray<T>::reBuffer(GLuint programHandle)
 	{
 		if (!this->isCreated())
 			simpleException::show("simpleVertexArray already deleted from the backend");
@@ -117,7 +123,16 @@ namespace brogueHd::frontend
 		if (!this->isBound())
 			simpleException::show("simpleVertexArray must be bound before calling rebuffer()");
 
-		_vertexBuffer->reBuffer(programHandle, stream, true);
+		_vertexBuffer->reBuffer(programHandle);
+	}
+
+	template<typename T>
+	simpleDataStream* simpleVertexArray<T>::getStream() const
+	{
+		if (!this->isCreated())
+			simpleException::show("simpleVertexArray already deleted from the backend");
+
+		return _vertexBuffer->getStream();
 	}
 
 	template<typename T>

@@ -41,6 +41,11 @@ namespace brogueHd::frontend
 			_cursor = 0;
 		}
 
+		void resetCursor()
+		{
+			_cursor = 0;
+		}
+
 		/// <summary>
 		/// Returns total BYTE length of the stream
 		/// </summary>
