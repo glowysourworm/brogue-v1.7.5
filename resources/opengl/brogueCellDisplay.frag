@@ -14,6 +14,7 @@ in float currentOutputSelector;
 // Current Framebuffer
 //
 uniform sampler2D frame0Texture;
+uniform sampler2D frame1Texture;
 uniform sampler2D fontTexture;
 uniform float glyphThreshold;
 

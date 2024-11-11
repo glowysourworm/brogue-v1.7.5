@@ -21,8 +21,8 @@ namespace brogueHd::component
 
 		gridRect()
 		{
-			column = -1;
-			row = -1;
+			column = 0;
+			row = 0;
 			width = 0;
 			height = 0;
 		}

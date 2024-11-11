@@ -80,19 +80,21 @@ namespace brogueHd::frontend
 					break;
 				case shaderResource::brogueCellDisplayFrag:
 					this->uniforms1i.add(simpleUniform<int>("frame0Texture", GL_SAMPLER_2D, 0));        // GLOBAL SETTING:  GL_TEXTURE0
-					this->uniforms1i.add(simpleUniform<int>("fontTexture", GL_SAMPLER_2D, 1));          // GLOBAL SETTING:  GL_TEXTURE1
+					this->uniforms1i.add(simpleUniform<int>("frame1Texture", GL_SAMPLER_2D, 1));        // GLOBAL SETTING:  GL_TEXTURE1
+					this->uniforms1i.add(simpleUniform<int>("fontTexture", GL_SAMPLER_2D, 2));          // GLOBAL SETTING:  GL_TEXTURE2
 					this->uniforms1.add(simpleUniform<float>("glyphThreshold", GL_FLOAT, 0.05f));
 					break;
 				case shaderResource::diffuseColorUpwardFrag:
 					this->uniforms1i.add(simpleUniform<int>("frame0Texture", GL_SAMPLER_2D, 0));        // GLOBAL SETTING:  GL_TEXTURE0
-					this->uniforms1i.add(simpleUniform<int>("fontTexture", GL_SAMPLER_2D, 1));          // GLOBAL SETTING:  GL_TEXTURE1
+					this->uniforms1i.add(simpleUniform<int>("frame1Texture", GL_SAMPLER_2D, 1));        // GLOBAL SETTING:  GL_TEXTURE1
+					this->uniforms1i.add(simpleUniform<int>("fontTexture", GL_SAMPLER_2D, 2));          // GLOBAL SETTING:  GL_TEXTURE2
 					this->uniforms2.add(simpleUniform<vec2>("cellSizeUV", GL_FLOAT_VEC2, vec2(1, 1)));
 					this->uniforms1.add(simpleUniform<float>("weight", GL_FLOAT, 0.5f));
 					break;
 				case shaderResource::mixFrameTexturesFrag:
 					this->uniforms1i.add(simpleUniform<int>("frame0Texture", GL_SAMPLER_2D, 0));        // GLOBAL SETTING:  GL_TEXTURE0
-					//this->uniforms1i.add(simpleUniform<int>("frame1Texture", GL_SAMPLER_2D, 1));		// GLOBAL SETTING:  GL_TEXTURE1
-					//this->uniforms1.add(simpleUniform<float>("mixWeight", GL_FLOAT, 0.5));
+					this->uniforms1i.add(simpleUniform<int>("frame1Texture", GL_SAMPLER_2D, 1));		// GLOBAL SETTING:  GL_TEXTURE1
+					this->uniforms1.add(simpleUniform<float>("mixWeight", GL_FLOAT, 0.5));
 					break;
 				default:
 					simpleException::show("Unhandled shaderResource type:  shaderData.h");

@@ -239,7 +239,7 @@ namespace brogueHd::frontend
 		//				   stored with all the child views' UI data; and consumed during normal
 		//				   updates and checkUpdates.
 		//
-		_viewContainer->updateScroll(keyboardUI, mouseUI, millisecondsLapsed);
+		//_viewContainer->updateScroll(keyboardUI, mouseUI, millisecondsLapsed);
 
 		// Iterate Child Views: Each corresponds to a program part; and the composed views are 
 		//						of ViewCompositor type.

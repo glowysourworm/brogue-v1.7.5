@@ -5,7 +5,10 @@
 #include "simpleException.h"
 #include "simpleGlObject.h"
 
+#include "color.h"
 #include "openglHelper.h"
+#include "simpleDataStream.h"
+#include "simpleGlData.h"
 #include "simpleLogger.h"
 #include <SDL_surface.h>
 
@@ -40,6 +43,7 @@ namespace brogueHd::frontend
 		void operator=(const simpleTexture& copy);
 
 		void glCreate(GLuint programHandle) override;
+		void clearColor(const color& color);
 		void teardown() override;
 		void bind() override;
 
@@ -226,6 +230,21 @@ namespace brogueHd::frontend
 			simpleException::show("simpleTexture problem creating on the backend");
 	}
 
+	void simpleTexture::clearColor(const color& color)
+	{
+		if (!this->isCreated())
+			throw simpleException("simpleTexture already deleted from the backend");
+
+		if (!this->isBound())
+			throw simpleException("simpleTexture not active before trying to clear color");
+
+		vec4 clearColor(color.red, color.green, color.blue, color.alpha);
+		simpleDataStream clearStream(1, clearColor.getElementVertexSize(GL_POINTS), clearColor.getStreamSize(GL_POINTS));
+
+		// GL substitutes data using the clear color stream
+		glClearTexImage(this->handle, 0, _pixelFormat, _pixelType, clearStream.getData());
+	}
+
 	void simpleTexture::teardown()
 	{
 		if (!this->isCreated())
@@ -242,7 +261,7 @@ namespace brogueHd::frontend
 	void simpleTexture::bind()
 	{
 		if (!this->isCreated())
-			simpleException::showCstr("GLTexture not yet created before calling bind()");
+			throw simpleException("GLTexture not yet created before calling bind()");
 
 		glActiveTexture(_textureUnit);
 		glBindTexture(GL_TEXTURE_2D, this->handle);

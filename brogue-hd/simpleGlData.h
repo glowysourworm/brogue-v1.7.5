@@ -333,6 +333,8 @@ namespace brogueHd::frontend
 		{
 			switch (primitiveType)
 			{
+				case GL_POINTS:
+					return 1;
 				case GL_TRIANGLES:
 					return 1;
 					break;

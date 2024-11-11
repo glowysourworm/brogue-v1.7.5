@@ -1,6 +1,5 @@
 #pragma once
 
-#include "brogueCellDisplay.h"
 #include "brogueKeyboardState.h"
 #include "brogueMouseState.h"
 #include "brogueUIConstants.h"
@@ -45,8 +44,6 @@ namespace brogueHd::frontend
 		bool needsUpdate(const brogueUIProgramPartId& partId) const;
 		void clearUpdate(const brogueUIProgramPartId& partId);
 		void clearEvents(const brogueUIProgramPartId& partId);
-
-		brogueCellDisplay* get(short column, short row) const;
 
 	public:		// brogueViewBase facade
 
@@ -115,7 +112,10 @@ namespace brogueHd::frontend
 		{
 			gridRect nextBounds = bounds;
 			gridRect viewBounds = view->getBoundary();
-			nextBounds.expand(viewBounds);
+			if (nextBounds == default_value::value<gridRect>())
+				nextBounds = viewBounds;
+			else
+				nextBounds.expand(viewBounds);
 			return nextBounds;
 		});
 	}
@@ -139,19 +139,6 @@ namespace brogueHd::frontend
 			throw simpleException("Must first add views to the brogueViewContainer before accessing data:  brogueViewContainer::getZoomLevel");
 
 		return _views->getAt(0)->value->getZoomLevel();
-	}
-	brogueCellDisplay* brogueViewContainer::get(short column, short row) const
-	{
-		if (_views->count() == 0)
-			throw simpleException("Must first add views to the brogueViewContainer before accessing data:  brogueViewContainer::get");
-
-		for (int index = 0; index < _views->count(); index++)
-		{
-			if (_views->getAt(index)->value->get(column, row) != nullptr)
-				return _views->getAt(index)->value->get(column, row);
-		}
-
-		return nullptr;
 	}
 	void brogueViewContainer::updateScroll(const brogueKeyboardState& keyboardState,
 											  const brogueMouseState& mouseState,
@@ -183,19 +170,19 @@ namespace brogueHd::frontend
 		{
 			if (mouseState.getScrollPendingX())
 			{
-				if (mouseState.getScrollNegativeX() && childBoundary.left() > _containerBoundary->left())
-					scrollX = -1;
-
-				else if (!mouseState.getScrollNegativeX() && childBoundary.right() < _containerBoundary->right())
+				if (!mouseState.getScrollNegativeX() && childBoundary.left() < _containerBoundary->left())
 					scrollX = 1;
+
+				else if (mouseState.getScrollNegativeX() && childBoundary.right() > _containerBoundary->right())
+					scrollX = -1;
 			}
 			if (mouseState.getScrollPendingY())
 			{
-				if (mouseState.getScrollNegativeY() && childBoundary.top() > _containerBoundary->top())
-					scrollY = -1;
-
-				else if (!mouseState.getScrollNegativeY() && childBoundary.bottom() < _containerBoundary->bottom())
+				if (mouseState.getScrollNegativeY() && childBoundary.top() < _containerBoundary->top())
 					scrollY = 1;
+
+				else if (mouseState.getScrollNegativeY() && childBoundary.bottom() > _containerBoundary->bottom())
+					scrollY = -1;
 			}
 		}
 

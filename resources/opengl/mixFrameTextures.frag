@@ -9,18 +9,18 @@ in vec2 currentTextureUV;
 
 // Try and use a 2D sampler to work with the texture. The active texture should be the 0th texture.
 uniform sampler2D frame0Texture;
-//uniform sampler2D frame1Texture;
+uniform sampler2D frame1Texture;
 uniform float mixWeight;
 
 void main()
 {
     // Sample the frame texture
     vec4 output0 = texture(frame0Texture, currentTextureUV);
-    //vec4 output1 = texture(frame1Texture, currentTextureUV);
+    vec4 output1 = texture(frame1Texture, currentTextureUV);
 
     // Favor the non-background UI controls
-    //if (length(output1) > 0)
-    //    outputColor = output1;
-    //else
+    if (output1.w > 0)
+        outputColor = mix(output1, output0, 1 - output1.w);
+    else
         outputColor = output0;
 }

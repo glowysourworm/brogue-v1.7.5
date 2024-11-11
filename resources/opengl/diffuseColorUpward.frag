@@ -13,6 +13,7 @@ in float currentOutputSelector;
 
 // Try and use a 2D sampler to work with the texture. The active texture should be the 0th texture.
 uniform sampler2D frame0Texture;
+uniform sampler2D frame1Texture;
 uniform sampler2D fontTexture;
 uniform vec2 cellSizeUV;
 uniform float weight;

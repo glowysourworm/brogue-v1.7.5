@@ -130,24 +130,23 @@ namespace brogueHd::frontend
 		static brogueViewContainer* createMainMenuButtons(eventController* eventController, int zoomLevel)
 		{
 			// Pulled from Brogue v1.7.5
-			color gradient1(0.22, 0.14, 0.29, 0.5);
-			color gradient2(0.11, 0.06, 0.15, 0.5);
+			color gradient1(0.22, 0.14, 0.29, 0.8);
+			color gradient2(0.11, 0.06, 0.15, 0.8);
 			color active1(0.7, 0.7, 0.7, 0.4);
 			color active2(0.7, 0.7, 0.7, 0.4);
-			color pressed1(0.7, 0.7, 0.7, 0.8);
-			color pressed2(0.7, 0.7, 0.7, 0.8);
+			color pressed1(0.7, 0.7, 0.7, 0.6);
+			color pressed2(0.7, 0.7, 0.7, 0.6);
+			color menuColor1(0, 0, 0, 1.0f);
+			color menuColor2(0, 0, 0, 0.5f);
 
 			gridRect sceneBounds = getBrogueSceneBoundary();
 			gridRect menuBounds = getMainMenuSelectorBoundary();
 			gridRect paddedBounds = getPaddedBoundary(menuBounds, 1);
 
 			brogueViewContainer* result = new brogueViewContainer(brogueUIProgram::MainMenuProgram, false, menuBounds);
-			brogueUIProgramPartId composedId(brogueUIProgram::MainMenuProgram, brogueUIProgramPart::ViewCompositor, 0);
-			brogueUIData composedViewData(composedId, sceneBounds, zoomLevel);
-			brogueComposedView* composedView = new brogueComposedView(eventController, composedViewData, sceneBounds, menuBounds);
-
-			color menuColor1(0, 0, 0, 1.0f);
-			color menuColor2(0, 0, 0, 0.2f);
+			//brogueUIProgramPartId composedId(brogueUIProgram::MainMenuProgram, brogueUIProgramPart::ViewCompositor, 0);
+			//brogueUIData composedViewData(composedId, sceneBounds, zoomLevel);
+			//brogueComposedView* composedView = new brogueComposedView(eventController, composedViewData, sceneBounds, menuBounds);
 
 			// Menu Background
 			brogueUIProgramPartId menuId(brogueUIProgram::MainMenuProgram, brogueUIProgramPart::MenuBackground, 0);
@@ -202,16 +201,14 @@ namespace brogueHd::frontend
 			// Finally, create the views
 			brogueBackground* background = new brogueBackground(eventController, menuData, sceneBounds, menuBounds);
 
+			result->addView(background);
+
 			for (int index = 0; index < buttons.count(); index++)
 			{
 				brogueButton* item = new brogueButton(eventController, buttons.get(index), sceneBounds, buttons.get(index).getBounds());
 
-				composedView->addView(item);
+				result->addView(item);
 			}
-
-			composedView->addView(background);
-
-			result->addView(composedView);
 
 			return result;
 		}
@@ -231,13 +228,13 @@ namespace brogueHd::frontend
 			gridRect paddedBounds = getPaddedBoundary(menuBounds, 1);
 
 			brogueViewContainer* result = new brogueViewContainer(programName, true, menuBounds);
-			brogueUIProgramPartId composedId(programName, brogueUIProgramPart::ViewCompositor, 0);
-			brogueUIData composedViewData(composedId, sceneBounds, zoomLevel, menuColor1);
+			//brogueUIProgramPartId composedId(programName, brogueUIProgramPart::ViewCompositor, 0);
+			//brogueUIData composedViewData(composedId, sceneBounds, zoomLevel, menuColor1);
 
 			// Mouse Interaction
-			composedViewData.setUIParameters(-1, -1, "", brogueUIAction::None, true, zoomLevel, 0);
+			//composedViewData.setUIParameters(-1, -1, "", brogueUIAction::None, true, zoomLevel, 0);
 
-			brogueComposedView* composedView = new brogueComposedView(eventController, composedViewData, sceneBounds, paddedBounds);
+			//brogueComposedView* composedView = new brogueComposedView(eventController, composedViewData, sceneBounds, paddedBounds);
 
 			// Menu Background
 			brogueUIProgramPartId menuId(programName, brogueUIProgramPart::MenuBackground, 0);
@@ -345,13 +342,13 @@ namespace brogueHd::frontend
 			{
 				brogueButton* item = new brogueButton(eventController, buttons.get(index), sceneBounds, buttons.get(index).getBounds());
 
-				composedView->addView(item);
+				result->addView(item);
 			}
 
 			// Footer
 			//composedView->addView(new brogueText(eventController, footerData, sceneBounds, footerData.getBounds()));
 
-			result->addView(composedView);
+			//result->addView(composedView);
 
 			return result;
 		}
