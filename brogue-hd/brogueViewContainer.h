@@ -22,7 +22,7 @@ namespace brogueHd::frontend
 	{
 	public:
 
-		brogueViewContainer(brogueUIProgram programName, bool hasScrollInteraction, const gridRect& containerBoundary);
+		brogueViewContainer(brogueUIProgram programName, bool hasScrollInteraction, bool applyClipping, const gridRect& containerBoundary);
 		~brogueViewContainer();
 
 		void addView(brogueViewBase* view);
@@ -49,24 +49,28 @@ namespace brogueHd::frontend
 
 		gridRect getSceneBoundary() const;
 		gridRect getBoundary() const;
+		gridRect getContainerBoundary() const;
 		gridRect calculateSceneBoundaryUI() const;
 		gridRect calculateViewBoundaryUI() const;
 		int getZoomLevel() const;
+		bool getClipping() const;
 		brogueUIProgram getProgramName() const;
 
 	private:
 
 		brogueUIProgram _programName;
 		bool _hasScrollInteraction;
+		bool _applyClipping;
 		gridRect* _containerBoundary;
 		simpleHash<brogueUIProgramPartId, brogueViewBase*>* _views;
 	};
 
-	brogueViewContainer::brogueViewContainer(brogueUIProgram programName, bool hasScrollInteraction, const gridRect& containerBoundary)
+	brogueViewContainer::brogueViewContainer(brogueUIProgram programName, bool hasScrollInteraction, bool applyClipping, const gridRect& containerBoundary)
 	{
 		_programName = programName;
 		_containerBoundary = new gridRect(containerBoundary);
 		_hasScrollInteraction = hasScrollInteraction;
+		_applyClipping = applyClipping;
 		_views = new simpleHash<brogueUIProgramPartId, brogueViewBase*>();
 	}
 	brogueViewContainer::~brogueViewContainer()
@@ -118,6 +122,14 @@ namespace brogueHd::frontend
 				nextBounds.expand(viewBounds);
 			return nextBounds;
 		});
+	}
+	bool brogueViewContainer::getClipping() const
+	{
+		return _applyClipping;
+	}
+	gridRect brogueViewContainer::getContainerBoundary() const
+	{
+		return *_containerBoundary;
 	}
 	gridRect brogueViewContainer::calculateSceneBoundaryUI() const
 	{

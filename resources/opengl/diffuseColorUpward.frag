@@ -15,12 +15,24 @@ in vec4 currentBackgroundColor;
 uniform sampler2D frame0Texture;
 uniform sampler2D frame1Texture;
 uniform sampler2D fontTexture;
-//uniform vec2 cellSizeUV;
 uniform float weight;
+uniform vec4 clipXY;
+uniform vec2 scrollXY;
 
 void main()
 {
-	//outputColor = texture(frame0Texture, currentTextureUV);
+    // Clipping (x, y, width, height) (where (x,y) is the topLeft vertex)
+    if (length(clipXY) > 0)
+    {
+        if (currentVertex.x < clipXY.x ||
+            currentVertex.x > clipXY.x + clipXY.z ||
+            currentVertex.y < clipXY.y - clipXY.w ||
+            currentVertex.y > clipXY.y)
+        {
+            outputColor = vec4(0,0,0,0);
+            return;
+        }
+    }
 
     // Skip the edges
     if (currentTextureS.y < 0 || currentTextureSW.x < 0 || currentTextureSE.x > 1)
@@ -28,11 +40,6 @@ void main()
 
     else
     {
-//        vec2 current = currentTextureUV;
-//        vec2 south = vec2(currentTextureUV.x, (currentTextureUV.y - cellSizeUV.y));
-//        vec2 southEast = vec2(currentTextureUV.x + cellSizeUV.x, currentTextureUV.y - cellSizeUV.y);
-//        vec2 southWest = vec2(currentTextureUV.x - cellSizeUV.x, currentTextureUV.y - cellSizeUV.y);
-
         vec4 currentColor = texture(frame0Texture, currentTexture);
         vec4 southColor = texture(frame0Texture, currentTextureS);
         vec4 southWestColor = texture(frame0Texture, currentTextureSW);
@@ -43,9 +50,8 @@ void main()
         southColor = mix(southColor, southEWColor, weight);
 
         outputColor = mix(currentColor, southColor, weight);
-        //outputColor = vec4(1,0,0,1);
     }
 
-//    if (length(abs(outputColor)) < 0.05)
-//        outputColor = vec4(0,0,0,0);
+    if (length(abs(outputColor)) < 0.05)
+        outputColor = vec4(0,0,0,0);
 }

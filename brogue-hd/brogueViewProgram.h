@@ -56,6 +56,7 @@ namespace brogueHd::frontend
 			_programs = new simpleHash<brogueUIProgramPartId, simpleShaderProgram*>();
 			_programCounters = new simpleHash<brogueUIProgramPartId, simplePeriodCounter*>();
 			_active = false;
+			_clipXY = nullptr;
 		}
 		~brogueViewProgram()
 		{
@@ -69,6 +70,7 @@ namespace brogueHd::frontend
 
 			delete _programBuilder;
 			delete _programs;
+			delete _clipXY;
 		}
 
 		bool isActive();
@@ -111,6 +113,12 @@ namespace brogueHd::frontend
 		brogueViewContainer* _viewContainer;
 		brogueProgramBuilder* _programBuilder;
 
+		// TODO: Move this. OpenGL coordinates are creeping into the program. It's probably most
+		// efficient to create a View-Stream-Program; but that's not on the agenda, right now. So,
+		// this will just get stored here until everything is consolidated.
+		//
+		vec4* _clipXY;
+
 		simpleHash<brogueUIProgramPartId, simpleShaderProgram*>* _programs;
 		simpleHash<brogueUIProgramPartId, simplePeriodCounter*>* _programCounters;
 	};
@@ -119,6 +127,17 @@ namespace brogueHd::frontend
 	{
 		resourceController* resourceController = _resourceController;
 		brogueProgramBuilder* programBuilder = _programBuilder;
+
+		// Calculate clipping rectangle for the view container
+		gridRect sceneBoundaryUI = _viewContainer->calculateSceneBoundaryUI();
+		gridRect clip = _viewContainer->getContainerBoundary();
+		brogueCoordinateConverter converter = _programBuilder->buildCoordinateConverter(sceneBoundaryUI.width, sceneBoundaryUI.height, _viewContainer->getZoomLevel());
+
+		vec2 topLeft = converter.getViewConverter().createQuadNormalizedXY_FromLocator(clip.left(), clip.top()).topLeft;
+		vec2 bottomRight = converter.getViewConverter().createQuadNormalizedXY_FromLocator(clip.right(), clip.bottom()).bottomRight;
+
+		// (MEMORY!) This is calculated once for the run loop
+		_clipXY = new vec4(topLeft.x, topLeft.y, bottomRight.x - topLeft.x, topLeft.y - bottomRight.y);
 
 		// Create shader programs for each program part
 		for (int index = 0; index < _viewContainer->getViewCount(); index++)
@@ -134,6 +153,10 @@ namespace brogueHd::frontend
 			// *** Load OpenGL Backend
 			program->compile();
 			program->bind();
+
+			// Specific Uniforms
+			if (_viewContainer->getClipping())
+				program->bindUniform4("clipXY", *_clipXY);
 		}
 
 		_active = true;
@@ -375,15 +398,23 @@ namespace brogueHd::frontend
 			}
 
 			program->bind();
+
+			//if (_viewContainer->getClipping())
+			//{
+			//	program->bindUniform4("clipXY", vec4(clipXY.topLeft.x, clipXY.topLeft.y, clipXY.getWidth(), clipXY.getHeight()));
+			//}
+			//else
+			//	program->bindUniform4("clipXY", vec4(0, 0, 0, 0));
+
 			program->draw();
 
 			glFlush();
 			glFinish();
 
+			// Lookup NVIDIA bug:  glNamedCopyBufferSubData
+			//
 			if (partId.getPartName() == brogueUIProgramPart::FlameMenuProgram_HeatSourceProgram)
 			{
-
-
 				//// Buffer copy the elements back into the heat source buffer; and let the next draw pass
 				//// render them
 				////

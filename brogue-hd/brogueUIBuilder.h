@@ -118,7 +118,7 @@ namespace brogueHd::frontend
 			brogueFlameMenuHeatView* heatView = new brogueFlameMenuHeatView(eventController, randGenerator, fadePeriodMilliseconds, heatData, sceneBounds, sceneBounds);
 			brogueFlameMenuDiffuseView* heatDiffuseView = new brogueFlameMenuDiffuseView(eventController, diffuseData, sceneBounds, sceneBounds);
 
-			brogueViewContainer* result = new brogueViewContainer(brogueUIProgram::FlameMenuProgram, false, sceneBounds);
+			brogueViewContainer* result = new brogueViewContainer(brogueUIProgram::FlameMenuProgram, false, false, sceneBounds);
 
 			result->addView(heatView);
 			result->addView(heatDiffuseView);
@@ -143,7 +143,7 @@ namespace brogueHd::frontend
 			gridRect menuBounds = getMainMenuSelectorBoundary();
 			gridRect paddedBounds = getPaddedBoundary(menuBounds, 1);
 
-			brogueViewContainer* result = new brogueViewContainer(brogueUIProgram::MainMenuProgram, false, menuBounds);
+			brogueViewContainer* result = new brogueViewContainer(brogueUIProgram::MainMenuProgram, false, false, menuBounds);
 			//brogueUIProgramPartId composedId(brogueUIProgram::MainMenuProgram, brogueUIProgramPart::ViewCompositor, 0);
 			//brogueUIData composedViewData(composedId, sceneBounds, zoomLevel);
 			//brogueComposedView* composedView = new brogueComposedView(eventController, composedViewData, sceneBounds, menuBounds);
@@ -227,7 +227,7 @@ namespace brogueHd::frontend
 			gridRect menuBounds = getOpenMenuSelectorBoundary();
 			gridRect paddedBounds = getPaddedBoundary(menuBounds, 1);
 
-			brogueViewContainer* result = new brogueViewContainer(programName, true, menuBounds);
+			brogueViewContainer* result = new brogueViewContainer(programName, true, true, menuBounds);
 			//brogueUIProgramPartId composedId(programName, brogueUIProgramPart::ViewCompositor, 0);
 			//brogueUIData composedViewData(composedId, sceneBounds, zoomLevel, menuColor1);
 
@@ -357,7 +357,7 @@ namespace brogueHd::frontend
 		{
 			gridRect sceneBounds = getBrogueSceneBoundary();
 
-			brogueViewContainer* result = new brogueViewContainer(brogueUIProgram::HighScoresProgram, false, sceneBounds);
+			brogueViewContainer* result = new brogueViewContainer(brogueUIProgram::HighScoresProgram, false, false, sceneBounds);
 			brogueUIProgramPartId composedId(brogueUIProgram::HighScoresProgram, brogueUIProgramPart::ViewCompositor, 0);
 			brogueUIData composedViewData(composedId, sceneBounds, zoomLevel);
 			brogueComposedView* composedView = new brogueComposedView(eventController, composedViewData, sceneBounds, sceneBounds);

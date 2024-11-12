@@ -82,14 +82,20 @@ namespace brogueHd::frontend
 					// FRAGMENT SHADERS
 				case shaderResource::colorMaskFrag:
 					this->uniforms4.add(simpleUniform<vec4>("maskColor", GL_FLOAT_VEC4, vec4(0, 0, 0, 0)));
+					this->uniforms4.add(simpleUniform<vec4>("clipXY", GL_FLOAT_VEC4, vec4(0, 0, 0, 0)));
+					this->uniforms2.add(simpleUniform<vec2>("scrollXY", GL_FLOAT_VEC2, vec2(0, 0)));
 					break;
 				case shaderResource::backgroundColorFrag:
+					this->uniforms4.add(simpleUniform<vec4>("clipXY", GL_FLOAT_VEC4, vec4(0, 0, 0, 0)));
+					this->uniforms2.add(simpleUniform<vec2>("scrollXY", GL_FLOAT_VEC2, vec2(0, 0)));
 					break;
 				case shaderResource::brogueCellDisplayFrag:
 					this->uniforms1i.add(simpleUniform<int>("frame0Texture", GL_SAMPLER_2D, 0));        // GLOBAL SETTING:  GL_TEXTURE0
 					this->uniforms1i.add(simpleUniform<int>("frame1Texture", GL_SAMPLER_2D, 1));        // GLOBAL SETTING:  GL_TEXTURE1
 					this->uniforms1i.add(simpleUniform<int>("fontTexture", GL_SAMPLER_2D, 2));          // GLOBAL SETTING:  GL_TEXTURE2
 					this->uniforms1.add(simpleUniform<float>("glyphThreshold", GL_FLOAT, 0.05f));
+					this->uniforms4.add(simpleUniform<vec4>("clipXY", GL_FLOAT_VEC4, vec4(0, 0, 0, 0)));
+					this->uniforms2.add(simpleUniform<vec2>("scrollXY", GL_FLOAT_VEC2, vec2(0, 0)));
 					break;
 				case shaderResource::diffuseColorUpwardFrag:
 					this->uniforms1i.add(simpleUniform<int>("frame0Texture", GL_SAMPLER_2D, 0));        // GLOBAL SETTING:  GL_TEXTURE0
@@ -97,11 +103,15 @@ namespace brogueHd::frontend
 					this->uniforms1i.add(simpleUniform<int>("fontTexture", GL_SAMPLER_2D, 2));          // GLOBAL SETTING:  GL_TEXTURE2
 					//this->uniforms2.add(simpleUniform<vec2>("cellSizeUV", GL_FLOAT_VEC2, vec2(1, 1)));
 					this->uniforms1.add(simpleUniform<float>("weight", GL_FLOAT, 0.5f));
+					this->uniforms4.add(simpleUniform<vec4>("clipXY", GL_FLOAT_VEC4, vec4(0, 0, 0, 0)));
+					this->uniforms2.add(simpleUniform<vec2>("scrollXY", GL_FLOAT_VEC2, vec2(0, 0)));
 					break;
 				case shaderResource::mixFrameTexturesFrag:
 					this->uniforms1i.add(simpleUniform<int>("frame0Texture", GL_SAMPLER_2D, 0));        // GLOBAL SETTING:  GL_TEXTURE0
 					this->uniforms1i.add(simpleUniform<int>("frame1Texture", GL_SAMPLER_2D, 1));		// GLOBAL SETTING:  GL_TEXTURE1
 					this->uniforms1.add(simpleUniform<float>("mixWeight", GL_FLOAT, 0.5));
+					this->uniforms4.add(simpleUniform<vec4>("clipXY", GL_FLOAT_VEC4, vec4(0, 0, 0, 0)));
+					this->uniforms2.add(simpleUniform<vec2>("scrollXY", GL_FLOAT_VEC2, vec2(0, 0)));
 					break;
 				default:
 					simpleException::show("Unhandled shaderResource type:  shaderData.h");
