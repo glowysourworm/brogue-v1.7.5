@@ -7,6 +7,7 @@
 #include "brogueViewBase.h"
 #include "color.h"
 #include "eventController.h"
+#include "gridDefinitions.h"
 #include "gridRect.h"
 #include "simpleList.h"
 
@@ -41,9 +42,14 @@ namespace brogueHd::frontend
 		{
 			return false;
 		}
-		brogueCellDisplay* get(short column, short row) const override
+		void iterate(gridCallback<brogueCellDisplay*> callback) const override
 		{
-			return _defaultCell;
+			brogueCellDisplay* defaultCell = _defaultCell;
+
+			this->getBoundary().iterate([&callback, &defaultCell] (short column, short row)
+			{
+				return callback(column, row, defaultCell);
+			});
 		}
 
 	private:
@@ -55,7 +61,7 @@ namespace brogueHd::frontend
 		: brogueViewBase(eventController, data, sceneBoundary, viewBoundary)
 	{
 		_defaultCell = new brogueCellDisplay();
-		_defaultCell->backColor = colors::transparent();
+		_defaultCell->backColor = colors::white();
 		_defaultCell->noDisplay = false;
 	}
 	brogueFlameMenuDiffuseView::~brogueFlameMenuDiffuseView()

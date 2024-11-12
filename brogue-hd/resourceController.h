@@ -267,8 +267,8 @@ namespace brogueHd::backend
 			new brogueUIProgramPartConfiguration(brogueUIProgramPart::FlameMenuProgram_HeatDiffuseProgram, 
 												 shaderResource::diffuseColorUpwardVert, 
 												 shaderResource::diffuseColorUpwardFrag, 
-												 openglDataStreamType::brogueCellQuad, 
-												 openglBrogueCellOutputSelector::DisplayCurrentFrame, 
+												 openglDataStreamType::brogueAdjacencyColorQuad, 
+												 openglBrogueCellOutputSelector::NoDisplay, 
 												 30,
 												 false,
 												 false);
@@ -279,7 +279,7 @@ namespace brogueHd::backend
 												 shaderResource::backgroundColorFrag,
 												 openglDataStreamType::brogueColorQuad,
 												 openglBrogueCellOutputSelector::DisplayCurrentFrame,
-												 0,
+												 30,
 												 false,
 												 false);
 
@@ -289,7 +289,7 @@ namespace brogueHd::backend
 												 shaderResource::backgroundColorFrag,
 												 openglDataStreamType::brogueColorQuad,
 												 openglBrogueCellOutputSelector::DisplayCurrentFrame,
-												 0,
+												 30,
 												 false,
 												 false);
 

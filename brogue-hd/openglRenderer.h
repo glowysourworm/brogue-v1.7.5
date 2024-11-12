@@ -578,7 +578,7 @@ namespace brogueHd::frontend
 	}
 	void openglRenderer::thread_start()
 	{
-		int intervalMilliseconds = 10;
+		int intervalMilliseconds = 5;
 
 		// THREAD:  LOCK TO INITIALIZE
 		_threadLock->lock();

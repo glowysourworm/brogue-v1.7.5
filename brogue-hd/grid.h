@@ -109,6 +109,12 @@ namespace brogueHd::component
 		void iterate(gridCallback<T> callback) const;
 
 		/// <summary>
+		/// Iterates the grid in the same manner as "iterate", column first, then row. So, the start and end
+		/// locations will be honored as such.
+		/// </summary>
+		void iterateFrom(const gridLocator& start, const gridLocator& end, gridCallback<T> callback) const;
+
+		/// <summary>
 		/// Iterates around a specific point by one-cell in the 4 cardinal directions
 		/// </summary>
 		void iterateAroundCardinal(short column, short row, bool withinBounds, gridCallback<T> callback) const;
@@ -526,6 +532,39 @@ namespace brogueHd::component
 			{
 				if (callback(i, j, this->get(i, j)) == iterationCallback::breakAndReturn)
 					userBreak = true;
+			}
+		}
+	}
+
+	template<typename T>
+	void grid<T>::iterateFrom(const gridLocator& start, const gridLocator& end, gridCallback<T> callback) const
+	{
+		if (start.row > end.row ||
+		   (start.row == end.row && start.column > end.column))
+			throw simpleException("Start location is greater than end location in order of iteration:  grid<>::iterateFrom");
+
+		gridRect boundary = this->getRelativeBoundary();
+
+		if (!boundary.contains(start) ||
+			!boundary.contains(end))
+			throw simpleException("Start or end location is not inside the relative boundary of the grid:  grid<>::iterateFrom");
+
+		bool userBreak = false;
+
+		int column = start.column;
+		int row = start.row;
+
+		while (column <= end.column && row <= end.row && !userBreak)
+		{
+			if (callback(column, row, this->get(column, row)) == iterationCallback::breakAndReturn)
+				userBreak = true;
+
+			column++;
+
+			if (column == boundary.right())
+			{
+				column = boundary.left();
+				row++;
 			}
 		}
 	}

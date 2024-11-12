@@ -105,23 +105,23 @@ namespace brogueHd::frontend
 
 			brogueUIProgramPartId titleId(brogueUIProgram::FlameMenuProgram, brogueUIProgramPart::FlameMenuProgram_TitleMaskProgram, 0);
 			brogueUIProgramPartId heatId(brogueUIProgram::FlameMenuProgram, brogueUIProgramPart::FlameMenuProgram_HeatSourceProgram, 0);
-			//brogueUIProgramPartId diffuseId(brogueUIProgram::FlameMenuProgram, brogueUIProgramPart::FlameMenuProgram_HeatDiffuseProgram, 0);
+			brogueUIProgramPartId diffuseId(brogueUIProgram::FlameMenuProgram, brogueUIProgramPart::FlameMenuProgram_HeatDiffuseProgram, 0);
 
 			brogueUIData titleMaskData(titleId, sceneBounds, zoomLevel);
 			brogueUIData heatData(heatId, sceneBounds, zoomLevel);
-			//brogueUIData diffuseData(diffuseId, sceneBounds, zoomLevel);
+			brogueUIData diffuseData(diffuseId, sceneBounds, zoomLevel);
 
 			// Mouse Interaction:  This will deactivate the open menu selectors
 			heatData.setUIParameters(-1, -1, "", brogueUIAction::None, true, zoomLevel, 0);
 
 			brogueFlameMenuTitleMask* titleMask = new brogueFlameMenuTitleMask(eventController, titleMaskData, sceneBounds, sceneBounds);
 			brogueFlameMenuHeatView* heatView = new brogueFlameMenuHeatView(eventController, randGenerator, fadePeriodMilliseconds, heatData, sceneBounds, sceneBounds);
-			//brogueFlameMenuDiffuseView* heatDiffuseView = new brogueFlameMenuDiffuseView(eventController, diffuseData, sceneBounds, sceneBounds);
+			brogueFlameMenuDiffuseView* heatDiffuseView = new brogueFlameMenuDiffuseView(eventController, diffuseData, sceneBounds, sceneBounds);
 
 			brogueViewContainer* result = new brogueViewContainer(brogueUIProgram::FlameMenuProgram, false, sceneBounds);
 
 			result->addView(heatView);
-			//result->addView(heatDiffuseView->getPartId(), heatDiffuseView);
+			result->addView(heatDiffuseView);
 			result->addView(titleMask);
 
 			return result;

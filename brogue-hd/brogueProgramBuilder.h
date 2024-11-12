@@ -1,17 +1,24 @@
 #pragma once
 #include "brogueCellDisplay.h"
+#include "brogueCellQuad.h"
+#include "brogueColorQuad.h"
 #include "brogueCoordinateConverter.h"
 #include "brogueDataStreamBuilder.h"
 #include "brogueGlyphMap.h"
+#include "brogueImageQuad.h"
 #include "brogueUIConstants.h"
 #include "brogueUIProgramPartConfiguration.h"
 #include "brogueViewBase.h"
-#include "gridDefinitions.h"
+#include "gl.h"
+#include "gridLocator.h"
+#include "gridRect.h"
 #include "resourceController.h"
 #include "shaderData.h"
+#include "simple.h"
 #include "simpleDataStream.h"
 #include "simpleException.h"
 #include "simpleShaderProgram.h"
+#include "brogueAdjacencyColorQuad.h"
 
 using namespace brogueHd::backend;
 using namespace brogueHd::backend::model;
@@ -38,6 +45,19 @@ namespace brogueHd::frontend
 		void rebuildDataStream(const brogueViewBase* view,
 							   const brogueUIProgramPartConfiguration& configuration,
 							   simpleDataStream* stream);
+
+		/// <summary>
+		/// Calculates a datastream range for the specified stream configuration. Returns true if
+		/// there is a contiguous stream block; false otherwise.
+		/// </summary>
+		bool calculateStreamRange(const brogueViewBase* source,
+									const brogueViewBase* dest,
+									const brogueUIProgramPartConfiguration& configuration,
+									const gridLocator& start,
+									const gridLocator& end,
+									bool copyView,
+									int& offsetStart,
+									int& offsetEnd);
 
 		brogueCoordinateConverter buildCoordinateConverter(int sceneWidth, int sceneHeight, int zoomLevel);
 
@@ -153,5 +173,80 @@ namespace brogueHd::frontend
 
 		else
 			return _dataStreamBuilder->recreateFrameDataStream(view, stream, type);
+	}
+
+	bool brogueProgramBuilder::calculateStreamRange(const brogueViewBase* source,
+													const brogueViewBase* dest,
+													const brogueUIProgramPartConfiguration& configuration,
+													const gridLocator& start,
+													const gridLocator& end,
+													bool copyView,
+													int& offsetStart,
+													int& offsetEnd)
+	{
+		if (source->getBoundary() != dest->getBoundary())
+			throw simpleException("Invalid view boundaries:  cannot perform stream copy.");
+
+		// The stream is built as the iterator of brogueViewBase iterates its cells. So, any breaks in the 
+		// chain will result in an offset error for the data stream.
+
+		gridRect boundary = source->getBoundary();
+		bool result = true;
+
+		source->iterateFrom(start, end, [&configuration, &source, &dest, &result, &copyView] (short column, short row, brogueCellDisplay* cell)
+		{
+			if (cell == nullptr || dest->get(column, row) == nullptr)
+			{
+				result = false;
+				return iterationCallback::breakAndReturn;
+			}
+
+			// Check Copy:
+			if (copyView)
+				cell->setUI(*dest->get(column, row));
+
+			return iterationCallback::iterate;
+		});
+
+		int cellStreamSizeBytes = 0;
+
+		switch (configuration.dataStreamType)
+		{
+			case openglDataStreamType::brogueCellQuad:
+			{
+				brogueCellQuad quad;
+				cellStreamSizeBytes = quad.getStreamSize(GL_TRIANGLES);
+			}
+				break;
+			case openglDataStreamType::brogueColorQuad:
+			{
+				brogueColorQuad quad;
+				cellStreamSizeBytes = quad.getStreamSize(GL_TRIANGLES);
+			}
+				break;
+			case openglDataStreamType::brogueAdjacencyColorQuad:
+			{
+				brogueAdjacencyColorQuad quad;
+				cellStreamSizeBytes = quad.getStreamSize(GL_TRIANGLES);
+			}
+			break;
+			case openglDataStreamType::brogueImageQuad:
+			{
+				brogueImageQuad quad;
+				cellStreamSizeBytes = quad.getStreamSize(GL_TRIANGLES);
+			}
+				break;
+			default:
+				throw simpleException("Unhandled data stream type:  brogueProgramBuilder::calculateStreamRange");
+		}
+
+		// Calculate data stream offsets
+		int startRangeCells = start.row > 0 ? ((start.row - 1) * boundary.width) + start.column : start.column;
+		int endRangeCells = end.row > 0 ? ((end.row - 1) * boundary.width) + end.column : end.column;
+
+		offsetStart = startRangeCells * cellStreamSizeBytes;
+		offsetEnd = endRangeCells * cellStreamSizeBytes;
+
+		return result;
 	}
 }

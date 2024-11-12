@@ -1,5 +1,6 @@
 #pragma once
 
+#include "brogueAdjacencyColorQuad.h"
 #include "brogueCellDisplay.h"
 #include "brogueCellQuad.h"
 #include "brogueColorQuad.h"
@@ -8,7 +9,9 @@
 #include "brogueUIConstants.h"
 #include "color.h"
 #include "gridLocator.h"
+#include "gridRect.h"
 #include "openglQuadConverter.h"
+#include "simpleException.h"
 #include "simpleGlData.h"
 
 namespace brogueHd::frontend
@@ -33,6 +36,7 @@ namespace brogueHd::frontend
 		brogueImageQuad createBrogueImageQuadScene(const brogueCellDisplay& cell, int column, int row);
 		brogueCellQuad createBrogueCellQuadScene(const brogueCellDisplay& cell, int column, int row, openglBrogueCellOutputSelector outputSelector);
 		brogueColorQuad createBrogueColorQuadScene(const brogueCellDisplay& cell, int column, int row);
+		brogueAdjacencyColorQuad createBrogueAdjacencyColorQuadScene(const brogueCellDisplay& cell, int column, int row);
 
 		brogueImageQuad createBrogueImageQuadFrame();
 		brogueColorQuad createBrogueColorQuadFrame(const color& theColor);
@@ -97,7 +101,21 @@ namespace brogueHd::frontend
 
 		return brogueColorQuad(cell, quadXY);
 	}
+	brogueAdjacencyColorQuad brogueCoordinateConverter::createBrogueAdjacencyColorQuadScene(const brogueCellDisplay& cell, int column, int row)
+	{
+		gridLocator south(column, row + 1);
+		gridLocator southEast(column + 1, row + 1);
+		gridLocator southWest(column - 1, row + 1);
 
+		// Some of these will be out of bounds; but easily filtered out in the shader
+		simpleQuad vertex = _viewConverter.createQuadNormalizedXY_FromLocator(column, row);
+		simpleQuad texture = _viewConverter.createQuadNormalizedUV_FromLocator(column, row);
+		simpleQuad textureS = _viewConverter.createQuadNormalizedUV_FromLocator(south);
+		simpleQuad textureSE = _viewConverter.createQuadNormalizedUV_FromLocator(southEast);
+		simpleQuad textureSW = _viewConverter.createQuadNormalizedUV_FromLocator(southWest);
+
+		return brogueAdjacencyColorQuad(cell, vertex, texture, textureS, textureSE, textureSW);
+	}
 	brogueImageQuad brogueCoordinateConverter::createBrogueImageQuadFrame()
 	{
 		simpleQuad quadXY = _viewConverter.createQuadNormalizedXY(0, 0, _viewConverter.getViewWidth(), _viewConverter.getViewHeight());

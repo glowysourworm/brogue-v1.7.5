@@ -680,6 +680,9 @@
     <ClInclude Include="simpleOrderedList.h">
       <Filter>Header Files\simple</Filter>
     </ClInclude>
+    <ClInclude Include="brogueAdjacencyColorQuad.h">
+      <Filter>Header Files\frontend\opengl\streamObjects</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\resources\model\armor.csv">

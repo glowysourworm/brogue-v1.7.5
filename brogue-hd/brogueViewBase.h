@@ -14,6 +14,7 @@
 #include "gridRect.h"
 #include "simple.h"
 #include "simpleException.h"
+#include "simpleMath.h"
 
 using namespace brogueHd::backend;
 
@@ -55,6 +56,13 @@ namespace brogueHd::frontend
 		/// Iterates the view's cells. This will happen in the view's relative boundary.
 		/// </summary>
 		virtual void iterate(gridCallback<brogueCellDisplay*> callback) const;
+
+		/// <summary>
+		/// Iterates the view's cells, inside the view's relative boundary, starting
+		/// from the start location -> end location. This will mirror the way the data
+		/// stream for openGL is built. So, it would be useful to use for stream operations.
+		/// </summary>
+		void iterateFrom(const gridLocator& start, const gridLocator& end, gridCallback<brogueCellDisplay*> callback) const;
 
 		/// <summary>
 		/// Overload of the checkUpdate function behaves as though the view is a child of a parent view
@@ -129,7 +137,7 @@ namespace brogueHd::frontend
 
 		viewBoundary.iterate([&grid] (short column, short row)
 		{
-			grid->set(column, row, new brogueCellDisplay());
+			grid->set(column, row, new brogueCellDisplay(column, row));
 			return iterationCallback::iterate;
 		});
 	}
@@ -290,5 +298,9 @@ namespace brogueHd::frontend
 	void brogueViewBase::iterate(gridCallback<brogueCellDisplay*> callback) const
 	{
 		_view->iterate(callback);
+	}
+	void brogueViewBase::iterateFrom(const gridLocator& start, const gridLocator& end, gridCallback<brogueCellDisplay*> callback) const
+	{
+		_view->iterateFrom(start, end, callback);
 	}
 }

@@ -1,5 +1,6 @@
 #pragma once
 #include "brogueBackground.h"
+#include "brogueCellDisplay.h"
 #include "brogueGlobal.h"
 #include "brogueGlyphMap.h"
 #include "brogueKeyboardState.h"
@@ -92,6 +93,7 @@ namespace brogueHd::frontend
 		gridRect* _sceneBoundaryUI;
 
 		BrogueGameMode _gameMode;
+		int _zoomLevel;
 	};
 
 	brogueMainProgram::brogueMainProgram(resourceController* resourceController,
@@ -107,6 +109,7 @@ namespace brogueHd::frontend
 		_glyphMap = glyphMap;
 		_gameMode = BrogueGameMode::Title;
 		_sceneBoundaryUI = new gridRect(sceneBoundaryUI);
+		_zoomLevel = zoomLevel;
 
 		// Grid Coordinates...
 		gridRect sceneBounds = brogueUIBuilder::getBrogueSceneBoundary();
@@ -134,8 +137,14 @@ namespace brogueHd::frontend
 		//
 		int textureIndex = 0;
 
-		_frameTexture0 = new simpleTexture(nullptr, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE0, GL_RGBA, GL_RGBA, 4, GL_FLOAT);
-		_frameTexture1 = new simpleTexture(nullptr, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE1, GL_RGBA, GL_RGBA, 4, GL_FLOAT);
+		// We're not sure about how this is handling the data format: The specifics aren't solving the texture sampling issue which is showing
+		//															  on the title screen.
+		// 
+		// https://www.khronos.org/opengl/wiki/Common_Mistakes#Image_precision
+		//
+
+		_frameTexture0 = new simpleTexture(nullptr, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE0, GL_RGBA, GL_RGBA8, 4, GL_FLOAT);
+		_frameTexture1 = new simpleTexture(nullptr, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE1, GL_RGBA, GL_RGBA8, 4, GL_FLOAT);
 
 		// Font Glyphs:  Going to load the max zoom for now
 		simpleBitmap* glyphSheet = resourceController->getFontGlyphs(zoomLevel);
@@ -211,7 +220,7 @@ namespace brogueHd::frontend
 		//
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glClearColor(0, 0, 0, 0);
+		//glClearColor(0, 0, 0, 0);
 
 		_frameBuffer->bind();
 
@@ -274,14 +283,9 @@ namespace brogueHd::frontend
 		// Unbind the frame buffer -> render output to normal GL output
 		_frameBuffer->unBind();
 
-		//glEnable(GL_BLEND);
-		//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
 		// Output the frame buffer
 		_frameProgram->bind();
 		_frameProgram->draw();
-
-		//glDisable(GL_BLEND);
 
 		glFlush();
 	}
@@ -331,12 +335,12 @@ namespace brogueHd::frontend
 			// Set Specific Uniforms
 			if (view->getProgramName() == brogueUIProgram::FlameMenuProgram)
 			{
-				//brogueUIProgramPartId diffuseId(brogueUIProgram::FlameMenuProgram, brogueUIProgramPart::FlameMenuProgram_HeatDiffuseProgram, 0);
+				brogueUIProgramPartId diffuseId(brogueUIProgram::FlameMenuProgram, brogueUIProgramPart::FlameMenuProgram_HeatDiffuseProgram, 0);
 
-				//simpleQuad cellQuad = program->getCellSizeUV();
+				simpleQuad cellQuad = program->getCellSizeUV();
 
-				//program->getShaderProgram(diffuseId)->bind();
-				//program->getShaderProgram(diffuseId)->bindUniform2("cellSizeUV", vec2(cellQuad.getWidth(), cellQuad.getHeight()));
+				program->getShaderProgram(diffuseId)->bind();
+				program->getShaderProgram(diffuseId)->bindUniform2("cellSizeUV", vec2(cellQuad.getWidth(), cellQuad.getHeight()));
 			}
 
 			// Maintain UI program collection

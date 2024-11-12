@@ -61,7 +61,7 @@ namespace brogueHd::frontend
 
 			brogueViewBase::iterate([&callback, &titleGrid, &sceneBounds] (short column, short row, brogueCellDisplay* cell)
 			{
-				//if (titleGrid->isTheText(column, row) || row == sceneBounds.bottom())
+				if (titleGrid->isTheText(column, row) || row == sceneBounds.bottom())
 					callback(column, row, cell);
 
 				return iterationCallback::iterate;
@@ -128,8 +128,11 @@ namespace brogueHd::frontend
 			return iterationCallback::iterate;
 		});
 
-		cycleHeatSources();
-		nextHeatValues();
+		for (int i = 0; i < 10; i++)
+		{
+			cycleHeatSources();
+			nextHeatValues();
+		}
 	}
 	brogueFlameMenuHeatView::~brogueFlameMenuHeatView()
 	{
@@ -160,7 +163,9 @@ namespace brogueHd::frontend
 	{
 		// The throttle period (for the actual shader program) is set by the part configuration
 		//
-		return _periodCounter->pending();
+		//return _periodCounter->pending();
+
+		return false;
 	}
 	void brogueFlameMenuHeatView::clearUpdate()
 	{

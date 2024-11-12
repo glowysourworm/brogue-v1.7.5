@@ -2,8 +2,6 @@
 
 
 
-using namespace brogueHd::backend::model;
-
 // Macro Enum Definitions:  Used for string <-> value methods EnumString<...>::To and EnumString<...>::From
 
 //Register_Enum(colorCollections)

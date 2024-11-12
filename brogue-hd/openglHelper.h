@@ -140,18 +140,17 @@ namespace brogueHd::frontend
 				simpleLogger::logColor(brogueConsoleColor::Red, buffer);
 		}
 
-		static void outputActiveBufferParameters()
+		static void outputBufferParameters(GLuint vertexBufferHandle)
 		{
-			GLint handle = getActiveVBO();
 			GLint usage = 0;
 			GLint size = 0;
 			GLint mapOffset = 0;
 
-			glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_USAGE, &usage);
-			glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
-			glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_MAP_OFFSET, &mapOffset);
+			glGetNamedBufferParameteriv(vertexBufferHandle, GL_BUFFER_USAGE, &usage);
+			glGetNamedBufferParameteriv(vertexBufferHandle, GL_BUFFER_SIZE, &size);
+			glGetNamedBufferParameteriv(vertexBufferHandle, GL_BUFFER_MAP_OFFSET, &mapOffset);
 
-			simpleLogger::log("Active Buffer:  Id={} Usage={} Size={} MapOffset={}", handle, usage, size, mapOffset);
+			simpleLogger::log("Vertex Buffer:  Id={} Usage={} Size={} MapOffset={}", vertexBufferHandle, usage, size, mapOffset);
 		}
 
 		static void outputProgramParameters(GLuint programHandle)

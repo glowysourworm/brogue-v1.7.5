@@ -8,6 +8,7 @@
 #include "openglQuadConverter.h"
 #include "resourceController.h"
 
+#include "brogueAdjacencyColorQuad.h"
 #include "brogueColorQuad.h"
 #include "brogueCoordinateConverter.h"
 #include "brogueUIConstants.h"
@@ -149,6 +150,12 @@ namespace brogueHd::frontend
 				result = new simpleDataStream(cellCount, quad.getElementVertexSize(GL_TRIANGLES), quad.getStreamSize(GL_TRIANGLES));
 			}
 			break;
+			case openglDataStreamType::brogueAdjacencyColorQuad:
+			{
+				brogueAdjacencyColorQuad quad;
+				result = new simpleDataStream(cellCount, quad.getElementVertexSize(GL_TRIANGLES), quad.getStreamSize(GL_TRIANGLES));
+			}
+			break;
 			default:
 				throw simpleException("Unknown openglDataStreamType:  brogueDataStreamBuilder::initializeDataStream");
 		}
@@ -169,20 +176,16 @@ namespace brogueHd::frontend
 				result = new simpleDataStream(1, quad.getElementVertexSize(GL_TRIANGLES), quad.getStreamSize(GL_TRIANGLES));
 			}
 			break;
-			case openglDataStreamType::brogueCellQuad:
-			{
-				brogueCellQuad quad;
-				result = new simpleDataStream(1, quad.getElementVertexSize(GL_TRIANGLES), quad.getStreamSize(GL_TRIANGLES));
-			}
-			break;
 			case openglDataStreamType::brogueColorQuad:
 			{
 				brogueColorQuad quad;
 				result = new simpleDataStream(1, quad.getElementVertexSize(GL_TRIANGLES), quad.getStreamSize(GL_TRIANGLES));
 			}
 			break;
+			case openglDataStreamType::brogueAdjacencyColorQuad:
+			case openglDataStreamType::brogueCellQuad:
 			default:
-				throw simpleException("Unknown openglDataStreamType:  brogueDataStreamBuilder::initializeDataStream");
+				throw simpleException("Invalid openglDataStreamType (for frame):  brogueDataStreamBuilder::initializeDataStream");
 		}
 
 		return result;
@@ -219,6 +222,7 @@ namespace brogueHd::frontend
 		// Starting with the raw data, build a simpleQuad data vector to pass to the simpleDataStream<float>
 		//
 		gridRect sceneBoundaryUI = view->calculateSceneBoundaryUI();
+		gridRect viewBoundary = view->getBoundary();
 
 		// Create coordinate converter for this view
 		//
@@ -228,12 +232,13 @@ namespace brogueHd::frontend
 		simpleList<brogueImageQuad> imageQuads;
 		simpleList<brogueCellQuad> cellQuads;
 		simpleList<brogueColorQuad> colorQuads;
+		simpleList<brogueAdjacencyColorQuad> adjColorQuads;
 
 		// Iterator scope could be removed; but want to be able to handle the root issue. Should be able to copy data
 		// up the stack.
 		//
 		view->iterate(
-			[&sceneBoundaryUI, &cellQuads, &colorQuads, &imageQuads, &view, &dataType, &coordinateConverter, &noDisplayOutputSelector] (short column, short row, brogueCellDisplay* cell)
+			[&sceneBoundaryUI, &viewBoundary, &cellQuads, &colorQuads, &adjColorQuads, &imageQuads, &view, &dataType, &coordinateConverter, &noDisplayOutputSelector] (short column, short row, brogueCellDisplay* cell)
 		{
 			switch (dataType)
 			{
@@ -245,6 +250,9 @@ namespace brogueHd::frontend
 						cellQuads.add(coordinateConverter.createBrogueCellQuadScene(*cell, column, row, noDisplayOutputSelector));
 					else
 						cellQuads.add(coordinateConverter.createBrogueCellQuadScene(*cell, column, row, openglBrogueCellOutputSelector::Display));
+					break;
+				case openglDataStreamType::brogueAdjacencyColorQuad:
+					adjColorQuads.add(coordinateConverter.createBrogueAdjacencyColorQuadScene(*cell, column, row));
 					break;
 				case openglDataStreamType::brogueColorQuad:
 					colorQuads.add(coordinateConverter.createBrogueColorQuadScene(*cell, column, row));
@@ -269,7 +277,7 @@ namespace brogueHd::frontend
 		{
 			case openglDataStreamType::brogueImageQuad:
 			{
-				imageQuads.forEach([&dataStream] (brogueImageQuad quad)
+				imageQuads.forEach([&dataStream] (const brogueImageQuad& quad)
 				{
 					quad.streamBuffer(GL_TRIANGLES, dataStream);
 					return iterationCallback::iterate;
@@ -278,7 +286,7 @@ namespace brogueHd::frontend
 			break;
 			case openglDataStreamType::brogueCellQuad:
 			{
-				cellQuads.forEach([&dataStream] (brogueCellQuad quad)
+				cellQuads.forEach([&dataStream] (const brogueCellQuad& quad)
 				{
 					quad.streamBuffer(GL_TRIANGLES, dataStream);
 					return iterationCallback::iterate;
@@ -287,7 +295,16 @@ namespace brogueHd::frontend
 			break;
 			case openglDataStreamType::brogueColorQuad:
 			{
-				colorQuads.forEach([&dataStream] (brogueColorQuad quad)
+				colorQuads.forEach([&dataStream] (const brogueColorQuad& quad)
+				{
+					quad.streamBuffer(GL_TRIANGLES, dataStream);
+					return iterationCallback::iterate;
+				});
+			}
+			break;
+			case openglDataStreamType::brogueAdjacencyColorQuad:
+			{
+				adjColorQuads.forEach([&dataStream] (const brogueAdjacencyColorQuad& quad)
 				{
 					quad.streamBuffer(GL_TRIANGLES, dataStream);
 					return iterationCallback::iterate;
@@ -333,6 +350,7 @@ namespace brogueHd::frontend
 				colorQuad.streamBuffer(GL_TRIANGLES, dataStream);
 			}
 			break;
+			case openglDataStreamType::brogueAdjacencyColorQuad:
 			case openglDataStreamType::brogueCellQuad:
 			default:
 				simpleException::show("Unhandled openglDataStreamType:  brogueProgramBuilder.h");

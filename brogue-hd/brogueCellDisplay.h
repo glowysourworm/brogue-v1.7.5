@@ -27,44 +27,48 @@ namespace brogueHd::backend::model
 			// Must derive these from dividing the glyph sheet into a grid
 			switch (zoomLevel)
 			{
-			case 1:	return 0;
-			case 2: return 0;
-			case 3: return 0;
-			case 4: return 0;
-			case 5: return 0;
-			case 6: return 0;
-			case 7: return 0;
-			case 8: return 0;
-			case 9: return 15.0f;
-			case 10: return 16.0f;
-			case 11: return 17.0f;
-			case 12: return 18.0f;
-			case 13: return 19.0f;
-			default:
-			simpleException::show("Invalid zoom level:  brogueCellDisplay::CellWidth");
+				case 1:	return 0;
+				case 2: return 0;
+				case 3: return 0;
+				case 4: return 0;
+				case 5: return 0;
+				case 6: return 0;
+				case 7: return 0;
+				case 8: return 0;
+				case 9: return 15.0;
+				case 10: return 16.0;
+				case 11: return 17.0;
+				case 12: return 18.0;
+				case 13: return 19.0;
+				default:
+					simpleException::show("Invalid zoom level:  brogueCellDisplay::CellWidth");
 			}
 		}
 
 		static double CellHeight(int zoomLevel)
 		{
 			// Must derive these from dividing the glyph sheet into a grid
+			// The texture height is rounded to fit the view port. So, the cell
+			// size affects texture sampling. This cell width / height must be
+			// as close as possible to an integral number of cells to match the
+			// height. (which matches the glyph sheeet)
 			switch (zoomLevel)
 			{
-			case 1:	return 0;
-			case 2: return 0;
-			case 3: return 0;
-			case 4: return 0;
-			case 5: return 0;
-			case 6: return 0;
-			case 7: return 0;
-			case 8: return 0;
-			case 9: return 25.412f;
-			case 10: return 27.29411764705882352941f;
-			case 11: return 29.176f;
-			case 12: return 31.06f;
-			case 13: return 31.05882352941176470588f;
-			default:
-			simpleException::show("Invalid zoom level:  brogueCellDisplay::CellHeight");
+				case 1:	return 0;
+				case 2: return 0;
+				case 3: return 0;
+				case 4: return 0;
+				case 5: return 0;
+				case 6: return 0;
+				case 7: return 0;
+				case 8: return 0;
+				case 9: return 25.4118;
+				case 10: return 27.2942;
+				case 11: return 29.0;
+				case 12: return 31.0;
+				case 13: return 31.0;
+				default:
+					simpleException::show("Invalid zoom level:  brogueCellDisplay::CellHeight");
 			}
 		}
 
@@ -117,6 +121,17 @@ namespace brogueHd::backend::model
 			needsUpdate = false;
 			noDisplay = false;
 		}
+		brogueCellDisplay(short column, short row)
+		{
+			column = column;
+			row = row;
+			character = brogueGlyphMap::Empty;
+			foreColor = default_value::value<color>();
+			backColor = default_value::value<color>();
+			opacity = 1.0f;
+			needsUpdate = false;
+			noDisplay = false;
+		}
 		brogueCellDisplay(const brogueCellDisplay& copy)
 		{
 			copyImpl(copy);
@@ -135,9 +150,16 @@ namespace brogueHd::backend::model
 			return !compare(other);
 		}
 
-		void update(const brogueCellDisplay& copy)
+		/// <summary>
+		/// Sets UI parameteres of the cell; but not the location data
+		/// </summary>
+		void setUI(const brogueCellDisplay& other)
 		{
-			copyImpl(copy);
+			character = other.character;
+			foreColor = other.foreColor;									// Careful with instances. These are non-unique
+			backColor = other.backColor;									// Careful with instances. These are non-unique
+			opacity = other.opacity;
+			noDisplay = other.noDisplay;
 		}
 
 		bool compare(const brogueCellDisplay& display) const

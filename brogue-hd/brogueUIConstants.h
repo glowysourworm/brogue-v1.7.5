@@ -103,7 +103,8 @@ namespace brogueHd::frontend
 	{
 		brogueImageQuad = 0,
 		brogueCellQuad = 1,
-		brogueColorQuad = 2
+		brogueColorQuad = 2,
+		brogueAdjacencyColorQuad = 3
 	};
 
 	enum class openglBrogueCellOutputSelector

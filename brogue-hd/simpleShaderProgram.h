@@ -139,6 +139,8 @@ namespace brogueHd::frontend
 		openglHelper::outputShaderInfoLog(_fragmentShader.getHandle());
 		openglHelper::outputProgramInfoLog(this->handle);
 		openglHelper::outputProgramParameters(this->handle);
+		
+		_programVAO->showActives();
 	}
 
 	void simpleShaderProgram::draw()

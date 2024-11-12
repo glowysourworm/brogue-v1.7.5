@@ -28,6 +28,7 @@ namespace brogueHd::frontend
 		void bind() override;
 		void glCreate(GLuint programHandle) override;
 		void teardown() override;
+		void showActives() const;
 
 		bool isCreated() const override
 		{
@@ -111,17 +112,29 @@ namespace brogueHd::frontend
 		// Bind to array buffer type in OpenGL
 		glBindBuffer(GL_ARRAY_BUFFER, this->handle);
 
+		// Create Dynamic Storage:  (Trying this API method for a while!) This should allow us to modify the buffer after creation.
+		//
+		glNamedBufferStorage(this->handle, (GLsizeiptr)_stream->getStreamSize(), _stream->getData(), GL_DYNAMIC_STORAGE_BIT);
+
 		// COPY DATA TO GPU BUFFER:  This is one of the ways to take application memory to the GPU. 
 		//
-		glNamedBufferData(this->handle,
-						  (GLsizeiptr)_stream->getStreamSize(),
-						  _stream->getData(),
-						  GL_DYNAMIC_DRAW);
+		//glNamedBufferData(this->handle,
+		//				  (GLsizeiptr)_stream->getStreamSize(),
+		//				  _stream->getData(),
+		//				  GL_DYNAMIC_DRAW);
 
-		createVertexAttributes(programHandle);
+		createVertexAttributes(programHandle); 
+
+		showActives();
 
 		if (!this->isCreated())
 			simpleLogger::logColor(brogueConsoleColor::Red, "simpleVertexBuffer creation error");
+	}
+
+	template<typename T>
+	void simpleVertexBuffer<T>::showActives() const
+	{
+		openglHelper::outputBufferParameters(this->handle);
 	}
 
 	template<typename T>

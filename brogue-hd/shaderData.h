@@ -59,13 +59,20 @@ namespace brogueHd::frontend
 					this->attributes.add(vertexAttributeData(1, "backgroundColor", GL_FLOAT_VEC4));
 					break;
 				case shaderResource::brogueCellDisplayVert:
-				case shaderResource::diffuseColorUpwardVert:
 					this->attributes.add(vertexAttributeData(0, "vertexXY", GL_FLOAT_VEC2));
 					this->attributes.add(vertexAttributeData(1, "textureUV", GL_FLOAT_VEC2));
 					this->attributes.add(vertexAttributeData(2, "glyphUV", GL_FLOAT_VEC2));
 					this->attributes.add(vertexAttributeData(3, "foregroundColor", GL_FLOAT_VEC4));
 					this->attributes.add(vertexAttributeData(4, "backgroundColor", GL_FLOAT_VEC4));
 					this->attributes.add(vertexAttributeData(5, "outputSelector", GL_FLOAT));
+					break;
+				case shaderResource::diffuseColorUpwardVert:
+					this->attributes.add(vertexAttributeData(0, "vertexCurrent", GL_FLOAT_VEC2));
+					this->attributes.add(vertexAttributeData(1, "textureCurrent", GL_FLOAT_VEC2));
+					this->attributes.add(vertexAttributeData(2, "textureS", GL_FLOAT_VEC2));
+					this->attributes.add(vertexAttributeData(3, "textureSE", GL_FLOAT_VEC2));
+					this->attributes.add(vertexAttributeData(4, "textureSW", GL_FLOAT_VEC2));
+					this->attributes.add(vertexAttributeData(5, "backgroundColor", GL_FLOAT_VEC4));
 					break;
 				case shaderResource::mixFrameTexturesVert:
 					this->attributes.add(vertexAttributeData(0, "vertexXY", GL_FLOAT_VEC2));
@@ -88,7 +95,7 @@ namespace brogueHd::frontend
 					this->uniforms1i.add(simpleUniform<int>("frame0Texture", GL_SAMPLER_2D, 0));        // GLOBAL SETTING:  GL_TEXTURE0
 					this->uniforms1i.add(simpleUniform<int>("frame1Texture", GL_SAMPLER_2D, 1));        // GLOBAL SETTING:  GL_TEXTURE1
 					this->uniforms1i.add(simpleUniform<int>("fontTexture", GL_SAMPLER_2D, 2));          // GLOBAL SETTING:  GL_TEXTURE2
-					this->uniforms2.add(simpleUniform<vec2>("cellSizeUV", GL_FLOAT_VEC2, vec2(1, 1)));
+					//this->uniforms2.add(simpleUniform<vec2>("cellSizeUV", GL_FLOAT_VEC2, vec2(1, 1)));
 					this->uniforms1.add(simpleUniform<float>("weight", GL_FLOAT, 0.5f));
 					break;
 				case shaderResource::mixFrameTexturesFrag:

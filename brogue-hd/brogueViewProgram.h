@@ -12,6 +12,7 @@
 #include "brogueViewBase.h"
 #include "brogueViewContainer.h"
 #include "gl.h"
+#include "gridLocator.h"
 #include "gridRect.h"
 #include "resourceController.h"
 #include "simple.h"
@@ -249,13 +250,13 @@ namespace brogueHd::frontend
 			brogueViewBase* view = _viewContainer->getViewAt(index);
 
 			// Check counter to prevent pre-mature update (AutoReset = false) (clear when caller uses clearUpdate)
-			if (_programCounters->get(view->getPartId())->update(millisecondsLapsed, false));
-			{
+			//if (_programCounters->get(view->getPartId())->update(millisecondsLapsed, false));
+			//{
 				// Get actual time period (for having waited)
-				int partMillisecondsLapsed = _programCounters->get(view->getPartId())->getCounter();
+				//int partMillisecondsLapsed = _programCounters->get(view->getPartId())->getCounter();
 
-				_viewContainer->checkUpdate(view->getPartId(), keyboardUI, mouseUI, partMillisecondsLapsed);
-			}
+				_viewContainer->checkUpdate(view->getPartId(), keyboardUI, mouseUI, millisecondsLapsed);
+			//}
 		}
 	}
 
@@ -363,6 +364,10 @@ namespace brogueHd::frontend
 			brogueUIProgramPartConfiguration* configuration = _resourceController->getUIPartConfig(partId.getPartName());
 			simpleShaderProgram* program = _programs->get(partId);
 
+			// Check period counter
+			if (!_programCounters->get(partId)->update(millisecondsElapsed))
+				continue;
+
 			if (configuration->useAlphaBlending)
 			{
 				glEnable(GL_BLEND);
@@ -371,6 +376,40 @@ namespace brogueHd::frontend
 
 			program->bind();
 			program->draw();
+
+			glFlush();
+			glFinish();
+
+			if (partId.getPartName() == brogueUIProgramPart::FlameMenuProgram_HeatSourceProgram)
+			{
+
+
+				//// Buffer copy the elements back into the heat source buffer; and let the next draw pass
+				//// render them
+				////
+				//brogueUIProgramPartId diffuseId(brogueUIProgram::FlameMenuProgram, brogueUIProgramPart::FlameMenuProgram_HeatDiffuseProgram, 0);
+				//brogueViewBase* diffuseView = _viewContainer->getView(diffuseId);
+				//simpleShaderProgram* diffuseProgram = _programs->get(diffuseId);
+				//gridRect boundary = view->getBoundary();
+
+				//gridLocator fromStart(0, boundary.bottom());
+				//gridLocator fromEnd(boundary.right(), boundary.bottom());
+				//gridLocator toStart(0, boundary.bottom() - 1);
+				//gridLocator toEnd(boundary.right(), boundary.bottom() - 1);
+
+				//int fromStreamStart = 0;
+				//int fromStreamEnd = 0;
+				//int toStreamStart = 0;
+				//int toStreamEnd = 0;
+
+				//program->showActives();
+
+				//// These must match (anyway). This is a POC for the stream copy (on the GPU)
+				//_programBuilder->calculateStreamRange(view, view, *configuration, fromStart, fromEnd, false, fromStreamStart, fromStreamEnd);
+				//_programBuilder->calculateStreamRange(view, view, *configuration, toStart, toEnd, false, toStreamStart, toStreamEnd);
+				//
+				//glNamedCopyBufferSubDataEXT(program->getHandle(), program->getHandle(), fromStreamStart, toStreamStart, toStreamEnd - toStreamStart);
+			}
 
 			if (configuration->useAlphaBlending)
 				glDisable(GL_BLEND);

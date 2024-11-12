@@ -38,6 +38,11 @@ namespace brogueHd::frontend
 		}
 
 		/// <summary>
+		/// Shows active parameters of the VAO
+		/// </summary>
+		void showActives() const;
+
+		/// <summary>
 		/// Draws the contents of the VAO's vertex buffer (currently only a single VBO per VAO)
 		/// </summary>
 		void draw();
@@ -112,6 +117,12 @@ namespace brogueHd::frontend
 
 		if (!this->isCreated())
 			simpleLogger::logColor(brogueConsoleColor::Yellow, "simpleVertexArray error creating the VAO");
+	}
+
+	template<typename T>
+	void simpleVertexArray<T>::showActives() const
+	{
+		_vertexBuffer->showActives();
 	}
 
 	template<typename T>
