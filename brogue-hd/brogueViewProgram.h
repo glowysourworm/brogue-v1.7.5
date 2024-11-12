@@ -314,7 +314,8 @@ namespace brogueHd::frontend
 			// Retrieve program part
 			brogueUIProgramPartId partId = _viewContainer->getViewAt(index)->getPartId();
 
-			_viewContainer->clearUpdate(partId);
+			if (_viewContainer->needsUpdate(partId))
+				_viewContainer->clearUpdate(partId);
 
 			// Reset program counter (IF PENDING!)
 			if (_programCounters->get(partId)->pending())
@@ -398,18 +399,9 @@ namespace brogueHd::frontend
 			}
 
 			program->bind();
-
-			//if (_viewContainer->getClipping())
-			//{
-			//	program->bindUniform4("clipXY", vec4(clipXY.topLeft.x, clipXY.topLeft.y, clipXY.getWidth(), clipXY.getHeight()));
-			//}
-			//else
-			//	program->bindUniform4("clipXY", vec4(0, 0, 0, 0));
-
 			program->draw();
 
 			glFlush();
-			glFinish();
 
 			// Lookup NVIDIA bug:  glNamedCopyBufferSubData
 			//

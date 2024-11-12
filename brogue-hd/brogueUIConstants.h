@@ -27,19 +27,29 @@ namespace brogueHd::frontend
 		OpenMenuProgram = 3,
 
 		/// <summary>
+		/// The title screen's open menu header'd background program
+		/// </summary>
+		OpenMenuProgram_HeaderProgram = 4,
+
+		/// <summary>
 		/// The title screen's view recording program
 		/// </summary>
-		PlaybackMenuProgram = 4,
+		PlaybackMenuProgram = 5,
+
+		/// <summary>
+		/// The title screen's view recording menu header'd background program
+		/// </summary>
+		PlaybackMenuProgram_HeaderProgram = 6,
 
 		/// <summary>
 		/// The title screen's high scores program
 		/// </summary>
-		HighScoresProgram = 5,
+		HighScoresProgram = 7,
 
 		/// <summary>
 		/// The quit modal program
 		/// </summary>
-		ModalProgram = 6
+		ModalProgram = 8
 	};
 
 	enum class brogueUIProgramPart : int

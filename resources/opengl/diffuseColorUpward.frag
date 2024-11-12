@@ -47,11 +47,14 @@ void main()
 
         vec4 southEWColor = mix(southWestColor, southEastColor, 0.5);
 
-        southColor = mix(southColor, southEWColor, weight);
+        southColor = mix(southColor, southEWColor, 0.5);
 
         outputColor = mix(currentColor, southColor, weight);
+
+        // Color Fade
+        outputColor = mix(outputColor, vec4(0,0,0,0), 0.05);
     }
 
-    if (length(abs(outputColor)) < 0.05)
+    if (length(outputColor) < 0.05)
         outputColor = vec4(0,0,0,0);
 }

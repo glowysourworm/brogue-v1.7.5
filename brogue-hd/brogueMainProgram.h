@@ -259,9 +259,17 @@ namespace brogueHd::frontend
 				if (_uiPrograms->get(brogueUIProgram::MainMenuProgram)->isActive())
 					_uiPrograms->get(brogueUIProgram::MainMenuProgram)->run(millisecondsElapsed);
 
+				// Open Menu Header
+				if (_uiPrograms->get(brogueUIProgram::OpenMenuProgram_HeaderProgram)->isActive())
+					_uiPrograms->get(brogueUIProgram::OpenMenuProgram_HeaderProgram)->run(millisecondsElapsed);
+
 				// Open Menu
 				if (_uiPrograms->get(brogueUIProgram::OpenMenuProgram)->isActive())
 					_uiPrograms->get(brogueUIProgram::OpenMenuProgram)->run(millisecondsElapsed);
+
+				// Playback Menu Header
+				if (_uiPrograms->get(brogueUIProgram::PlaybackMenuProgram_HeaderProgram)->isActive())
+					_uiPrograms->get(brogueUIProgram::PlaybackMenuProgram_HeaderProgram)->run(millisecondsElapsed);
 
 				// Playback Menu
 				if (_uiPrograms->get(brogueUIProgram::PlaybackMenuProgram)->isActive())

@@ -8,6 +8,8 @@
 #include "brogueUIBuilder.h"
 #include "brogueUIConstants.h"
 #include "brogueViewContainer.h"
+#include "color.h"
+#include "colorString.h"
 #include "eventController.h"
 #include "gridRect.h"
 #include "openglRenderer.h"
@@ -70,15 +72,19 @@ namespace brogueHd::backend
 
 		brogueViewContainer* titleView = brogueUIBuilder::createFlameMenu(_eventController, _randomGenerator, zoomLevel);
 		brogueViewContainer* mainMenu = brogueUIBuilder::createMainMenuButtons(_eventController, zoomLevel);
-		brogueViewContainer* openMenu = brogueUIBuilder::createMainMenuSelector(brogueUIProgram::OpenMenuProgram, _eventController, gameFiles, zoomLevel, "~ Open Saved Game ~");
-		brogueViewContainer* playbackMenu = brogueUIBuilder::createMainMenuSelector(brogueUIProgram::PlaybackMenuProgram, _eventController, recordingFiles, zoomLevel, "~ View Recording ~");
+		brogueViewContainer* openMenu = brogueUIBuilder::createMainMenuSelector(brogueUIProgram::OpenMenuProgram, _eventController, gameFiles, zoomLevel);
+		brogueViewContainer* openMenuBackground = brogueUIBuilder::createHeaderedBackground(_eventController, brogueUIProgram::OpenMenuProgram_HeaderProgram, colorString("~ Open Saved Game ~", colors::yellow()), zoomLevel);
+		brogueViewContainer* playbackMenu = brogueUIBuilder::createMainMenuSelector(brogueUIProgram::PlaybackMenuProgram, _eventController, recordingFiles, zoomLevel);
+		brogueViewContainer* playbackMenuBackground = brogueUIBuilder::createHeaderedBackground(_eventController, brogueUIProgram::PlaybackMenuProgram_HeaderProgram, colorString("~ View Recording ~", colors::yellow()), zoomLevel);
 		brogueViewContainer* highScoresMenu = brogueUIBuilder::createHighScoresView(_eventController, _resourceController, zoomLevel);
 
 		simpleList<brogueViewContainer*> viewList;
 
 		viewList.add(titleView);
 		viewList.add(mainMenu);
+		viewList.add(openMenuBackground);
 		viewList.add(openMenu);
+		viewList.add(playbackMenuBackground);
 		viewList.add(playbackMenu);
 		viewList.add(highScoresMenu);
 

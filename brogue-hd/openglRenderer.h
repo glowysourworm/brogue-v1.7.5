@@ -484,9 +484,6 @@ namespace brogueHd::frontend
 		if (_gameModeOut != _gameMode)
 			return;
 
-		//if (!_uiEventDebouncer->update(1, false))
-		//	return;
-
 		switch (tagAction.action)
 		{
 			// Click registered by a background program (typically)
@@ -495,12 +492,14 @@ namespace brogueHd::frontend
 				if (sender == brogueUIProgram::FlameMenuProgram)
 				{
 					_program->deactivateUIProgram(brogueUIProgram::OpenMenuProgram);
+					_program->deactivateUIProgram(brogueUIProgram::OpenMenuProgram_HeaderProgram);
 					_program->deactivateUIProgram(brogueUIProgram::PlaybackMenuProgram);
+					_program->deactivateUIProgram(brogueUIProgram::PlaybackMenuProgram_HeaderProgram);
 					_program->deactivateUIProgram(brogueUIProgram::HighScoresProgram);
 
 					_program->activateUIProgram(brogueUIProgram::MainMenuProgram);
 					_program->clearEvents();
-					//_uiEventDebouncer->reset();
+					_programViewChange = true;
 				}
 			}
 				break;
@@ -511,11 +510,18 @@ namespace brogueHd::frontend
 
 			case brogueUIAction::OpenGame:
 			{
+				//_program->deactivateUIProgram(brogueUIProgram::FlameMenuProgram);
+				_program->deactivateUIProgram(brogueUIProgram::PlaybackMenuProgram);
+				_program->deactivateUIProgram(brogueUIProgram::PlaybackMenuProgram_HeaderProgram);
+				_program->deactivateUIProgram(brogueUIProgram::HighScoresProgram);
 				_program->deactivateUIProgram(brogueUIProgram::MainMenuProgram);
+
+				_program->activateUIProgram(brogueUIProgram::OpenMenuProgram_HeaderProgram);
 				_program->activateUIProgram(brogueUIProgram::OpenMenuProgram);
 				_program->clearEvents();
+				_programViewChange = true;
 			}
-				break;
+			break;
 
 			case brogueUIAction::QuitGame:
 				break;
@@ -525,56 +531,66 @@ namespace brogueHd::frontend
 
 			case brogueUIAction::ViewMainMenu:
 			{
-				if (sender != brogueUIProgram::MainMenuProgram)
-				{
-					_program->deactivateUIProgram(sender);
-					_program->activateUIProgram(brogueUIProgram::MainMenuProgram);
-					_program->clearEvents();
-					_uiEventDebouncer->reset();
-				}
+				//_program->deactivateUIProgram(brogueUIProgram::FlameMenuProgram);
+				_program->deactivateUIProgram(brogueUIProgram::OpenMenuProgram);
+				_program->deactivateUIProgram(brogueUIProgram::OpenMenuProgram_HeaderProgram);
+				_program->deactivateUIProgram(brogueUIProgram::PlaybackMenuProgram);
+				_program->deactivateUIProgram(brogueUIProgram::PlaybackMenuProgram_HeaderProgram);
+				_program->deactivateUIProgram(brogueUIProgram::HighScoresProgram);
+
+				_program->activateUIProgram(brogueUIProgram::MainMenuProgram);
+				_program->clearEvents();
+				_programViewChange = true;
 			}
 			break;
 
 			case brogueUIAction::ViewHighScores:
 			{
-				if (sender != brogueUIProgram::HighScoresProgram)
-				{
-					_program->deactivateUIProgram(sender);
-					_program->activateUIProgram(brogueUIProgram::HighScoresProgram);
-					_program->clearEvents();
-					_uiEventDebouncer->reset();
-				}
+				//_program->deactivateUIProgram(brogueUIProgram::FlameMenuProgram);
+				_program->deactivateUIProgram(brogueUIProgram::OpenMenuProgram);
+				_program->deactivateUIProgram(brogueUIProgram::OpenMenuProgram_HeaderProgram);
+				_program->deactivateUIProgram(brogueUIProgram::PlaybackMenuProgram);
+				_program->deactivateUIProgram(brogueUIProgram::PlaybackMenuProgram_HeaderProgram);
+				_program->deactivateUIProgram(brogueUIProgram::MainMenuProgram);
+
+				_program->activateUIProgram(brogueUIProgram::HighScoresProgram);
+				_program->clearEvents();
+				_programViewChange = true;
 			}
 			break;
 
 			case brogueUIAction::ViewOpenGameMenu:
 			{
-				if (sender != brogueUIProgram::OpenMenuProgram)
-				{
-					_program->deactivateUIProgram(sender);
-					_program->activateUIProgram(brogueUIProgram::OpenMenuProgram);
-					_program->clearEvents();
-					_uiEventDebouncer->reset();
-				}
+				//_program->deactivateUIProgram(brogueUIProgram::FlameMenuProgram);
+				_program->deactivateUIProgram(brogueUIProgram::PlaybackMenuProgram);
+				_program->deactivateUIProgram(brogueUIProgram::PlaybackMenuProgram_HeaderProgram);
+				_program->deactivateUIProgram(brogueUIProgram::HighScoresProgram);
+				_program->deactivateUIProgram(brogueUIProgram::MainMenuProgram);
+
+				_program->activateUIProgram(brogueUIProgram::OpenMenuProgram);
+				_program->activateUIProgram(brogueUIProgram::OpenMenuProgram_HeaderProgram);
+				_program->clearEvents();
+				_programViewChange = true;
 			}
 			break;
 
 			case brogueUIAction::ViewPlaybackMenu:
 			{
-				if (sender != brogueUIProgram::PlaybackMenuProgram)
-				{
-					_program->deactivateUIProgram(sender);
-					_program->activateUIProgram(brogueUIProgram::PlaybackMenuProgram);
-					_program->clearEvents();
-					_uiEventDebouncer->reset();
-				}
+				//_program->deactivateUIProgram(brogueUIProgram::FlameMenuProgram);
+				_program->deactivateUIProgram(brogueUIProgram::OpenMenuProgram);
+				_program->deactivateUIProgram(brogueUIProgram::OpenMenuProgram_HeaderProgram);
+				_program->deactivateUIProgram(brogueUIProgram::HighScoresProgram);
+				_program->deactivateUIProgram(brogueUIProgram::MainMenuProgram);
+
+				_program->activateUIProgram(brogueUIProgram::PlaybackMenuProgram_HeaderProgram);
+				_program->activateUIProgram(brogueUIProgram::PlaybackMenuProgram);
+				_program->clearEvents();
+				_programViewChange = true;
 			}
 			break;
 			default:
 				break;
 		}
-
-		_programViewChange = true;
 	}
 	void openglRenderer::thread_start()
 	{

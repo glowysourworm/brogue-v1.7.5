@@ -269,7 +269,7 @@ namespace brogueHd::backend
 												 shaderResource::diffuseColorUpwardFrag, 
 												 openglDataStreamType::brogueAdjacencyColorQuad, 
 												 openglBrogueCellOutputSelector::NoDisplay, 
-												 30,
+												 15,
 												 false,
 												 false);
 
@@ -279,7 +279,7 @@ namespace brogueHd::backend
 												 shaderResource::backgroundColorFrag,
 												 openglDataStreamType::brogueColorQuad,
 												 openglBrogueCellOutputSelector::DisplayCurrentFrame,
-												 30,
+												 15,
 												 false,
 												 false);
 
@@ -289,7 +289,7 @@ namespace brogueHd::backend
 												 shaderResource::backgroundColorFrag,
 												 openglDataStreamType::brogueColorQuad,
 												 openglBrogueCellOutputSelector::DisplayCurrentFrame,
-												 30,
+												 15,
 												 false,
 												 false);
 
