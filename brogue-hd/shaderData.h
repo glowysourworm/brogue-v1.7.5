@@ -86,19 +86,22 @@ namespace brogueHd::frontend
 				case shaderResource::backgroundColorFrag:
 					break;
 				case shaderResource::brogueCellDisplayFrag:
-					this->uniforms1i.add(simpleUniform<int>("frame0Texture", GL_SAMPLER_2D, 0));        // GLOBAL SETTING:  GL_TEXTURE0
-					this->uniforms1i.add(simpleUniform<int>("fontTexture", GL_SAMPLER_2D, 4));          // GLOBAL SETTING:  GL_TEXTURE4
+					this->uniforms1i.add(simpleUniform<int>("frameTexture", GL_SAMPLER_2D, 0));         // GLOBAL SETTING:  GL_TEXTURE0
+					this->uniforms1i.add(simpleUniform<int>("fontTexture", GL_SAMPLER_2D, 6));          // GLOBAL SETTING:  GL_TEXTURE6
 					this->uniforms1.add(simpleUniform<float>("glyphThreshold", GL_FLOAT, 0.05f));
 					break;
 				case shaderResource::diffuseColorUpwardFrag:
-					this->uniforms1i.add(simpleUniform<int>("frame0Texture", GL_SAMPLER_2D, 0));        // GLOBAL SETTING:  GL_TEXTURE0
+					this->uniforms1i.add(simpleUniform<int>("flameTexture", GL_SAMPLER_2D, 0));         // Program Setting
+					this->uniforms2i.add(simpleUniform<ivec2>("cellSizeUI", GL_INT_VEC2, ivec2(0, 0)));
 					this->uniforms1.add(simpleUniform<float>("weight", GL_FLOAT, 1.0f));
 					break;
 				case shaderResource::mixFrameTexturesFrag:
-					this->uniforms1i.add(simpleUniform<int>("frame0Texture", GL_SAMPLER_2D, 0));        // GLOBAL SETTING:  GL_TEXTURE0
-					this->uniforms1i.add(simpleUniform<int>("frame1Texture", GL_SAMPLER_2D, 1));		// GLOBAL SETTING:  GL_TEXTURE1
-					this->uniforms1i.add(simpleUniform<int>("openMenuTexture", GL_SAMPLER_2D, 2));		// GLOBAL SETTING:  GL_TEXTURE2
-					this->uniforms1i.add(simpleUniform<int>("playbackMenuTexture", GL_SAMPLER_2D, 3));	// GLOBAL SETTING:  GL_TEXTURE3
+					this->uniforms1i.add(simpleUniform<int>("frameTexture", GL_SAMPLER_2D, 0));         // GLOBAL SETTING:  GL_TEXTURE0
+					this->uniforms1i.add(simpleUniform<int>("redFlameTexture", GL_SAMPLER_2D, 1));      // GLOBAL SETTING:  GL_TEXTURE1
+					this->uniforms1i.add(simpleUniform<int>("blueFlameTexture", GL_SAMPLER_2D, 2));     // GLOBAL SETTING:  GL_TEXTURE2
+					this->uniforms1i.add(simpleUniform<int>("uiTexture", GL_SAMPLER_2D, 3));			// GLOBAL SETTING:  GL_TEXTURE3
+					this->uniforms1i.add(simpleUniform<int>("openMenuTexture", GL_SAMPLER_2D, 4));		// GLOBAL SETTING:  GL_TEXTURE4
+					this->uniforms1i.add(simpleUniform<int>("playbackMenuTexture", GL_SAMPLER_2D, 5));	// GLOBAL SETTING:  GL_TEXTURE5
 					this->uniforms4.add(simpleUniform<vec4>("openMenuClipXY", GL_FLOAT_VEC4, vec4(0, 0, 0, 0)));
 					this->uniforms4.add(simpleUniform<vec4>("playbackMenuClipXY", GL_FLOAT_VEC4, vec4(0, 0, 0, 0)));
 					this->uniforms2.add(simpleUniform<vec2>("openMenuScrollUV", GL_FLOAT_VEC2, vec2(0, 0)));

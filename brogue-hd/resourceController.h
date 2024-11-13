@@ -304,8 +304,8 @@ namespace brogueHd::backend
 												 true,
 												 false);
 
-		brogueUIProgramPartConfiguration* menuButton =
-			new brogueUIProgramPartConfiguration(brogueUIProgramPart::MenuButton,
+		brogueUIProgramPartConfiguration* button =
+			new brogueUIProgramPartConfiguration(brogueUIProgramPart::Button,
 												 shaderResource::brogueCellDisplayVert,
 												 shaderResource::brogueCellDisplayFrag,
 												 openglDataStreamType::brogueCellQuad,
@@ -347,7 +347,7 @@ namespace brogueHd::backend
 		_programPartConfigs->add(brogueUIProgramPart::FlameMenuProgram_HeatDiffuseProgram, flameMenu_heatDiffuse);
 		_programPartConfigs->add(brogueUIProgramPart::FlameMenuProgram_HeatSourceProgram, flameMenu_heatSource);
 		_programPartConfigs->add(brogueUIProgramPart::FlameMenuProgram_TitleMaskProgram, flameMenu_titleMask);
-		_programPartConfigs->add(brogueUIProgramPart::MenuButton, menuButton);
+		_programPartConfigs->add(brogueUIProgramPart::Button, button);
 		_programPartConfigs->add(brogueUIProgramPart::Text, text);
 		_programPartConfigs->add(brogueUIProgramPart::Background, background);
 		_programPartConfigs->add(brogueUIProgramPart::MenuBackground, menuBackground);

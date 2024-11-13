@@ -42,12 +42,13 @@ namespace brogueHd::frontend
 	{
 	public:
 
-		brogueMainProgram(resourceController* resourceController,
-						  eventController* eventController,
-						  brogueGlyphMap* glyphMap,
-						  const gridRect& sceneBoundaryUI,
-						  int zoomLevel,
-						  const simpleList<brogueViewContainer*>& viewList);
+		brogueMainProgram(brogueUIBuilder* uiBuilder,
+							resourceController* resourceController,
+							eventController* eventController,
+							brogueGlyphMap* glyphMap,
+							const gridRect& sceneBoundaryUI,
+							int zoomLevel,
+							const simpleList<brogueViewContainer*>& viewList);
 		~brogueMainProgram();
 
 		brogueKeyboardState calculateKeyboardState(const simpleKeyboardState& keyboard);
@@ -77,6 +78,7 @@ namespace brogueHd::frontend
 
 	private:
 
+		brogueUIBuilder* _uiBuilder;
 		resourceController* _resourceController;
 		brogueGlyphMap* _glyphMap;
 
@@ -87,18 +89,21 @@ namespace brogueHd::frontend
 
 		simpleFrameBuffer* _frameBuffer;
 
-		simpleTexture* _frameTexture0;				// GL_TEXTURE0, Color Attachment 0, (same thing), and will carry the flame menu background
-		simpleTexture* _frameTexture1;				// GL_TEXTURE1, Color Attachment 1, carries the UI components
-		simpleTexture* _openMenuTexture;			// GL_TEXTURE2 (Open Menu Selector) (Clipping / Scrolling Behavior)
-		simpleTexture* _playbackMenuTexture;		// GL_TEXTURE3 (Playback Menu Selector) (Clipping / Scrolling Behavior)
-		simpleTexture* _fontTexture;				// GL_TEXTURE4 (Glyph Map texture) (Clipping / Scrolling Behavior)
+		simpleTexture* _frameTexture;				// GL_TEXTURE0, Color Attachment 0, (same thing), will carry the primary frame output (background(s))
+		simpleTexture* _redFlameTexture;			// GL_TEXTURE1, Red Flame Background
+		simpleTexture* _blueFlameTexture;			// GL_TEXTURE2, Blue Flame Background
+		simpleTexture* _uiTexture;					// GL_TEXTURE3, Color Attachment 1, carries the UI components
+		simpleTexture* _openMenuTexture;			// GL_TEXTURE4 (Open Menu Selector) (Clipping / Scrolling Behavior)
+		simpleTexture* _playbackMenuTexture;		// GL_TEXTURE5 (Playback Menu Selector) (Clipping / Scrolling Behavior)
+		simpleTexture* _fontTexture;				// GL_TEXTURE6 (Glyph Map texture) (Clipping / Scrolling Behavior)
 		gridRect* _sceneBoundaryUI;
 
 		BrogueGameMode _gameMode;
 		int _zoomLevel;
 	};
 
-	brogueMainProgram::brogueMainProgram(resourceController* resourceController,
+	brogueMainProgram::brogueMainProgram(brogueUIBuilder* uiBuilder,
+										 resourceController* resourceController,
 										 eventController* eventController,
 										 brogueGlyphMap* glyphMap,
 										 const gridRect& sceneBoundaryUI,
@@ -112,9 +117,10 @@ namespace brogueHd::frontend
 		_gameMode = BrogueGameMode::Title;
 		_sceneBoundaryUI = new gridRect(sceneBoundaryUI);
 		_zoomLevel = zoomLevel;
+		_uiBuilder = uiBuilder;
 
 		// Grid Coordinates...
-		gridRect sceneBounds = brogueUIBuilder::getBrogueSceneBoundary();
+		gridRect sceneBounds = _uiBuilder->getBrogueSceneBoundary();
 
 		brogueUIProgramPartId partId(brogueUIProgram::ContainerControlledProgram, brogueUIProgramPart::ViewCompositor, 0);
 		brogueUIData backgroundData(partId, sceneBounds, zoomLevel);
@@ -145,10 +151,12 @@ namespace brogueHd::frontend
 		// https://www.khronos.org/opengl/wiki/Common_Mistakes#Image_precision
 		//
 
-		_frameTexture0 = new simpleTexture(nullptr, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE0, GL_RGBA, GL_RGBA8, 4, GL_FLOAT);
-		_frameTexture1 = new simpleTexture(nullptr, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE1, GL_RGBA, GL_RGBA8, 4, GL_FLOAT);
-		_openMenuTexture = new simpleTexture(nullptr, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE2, GL_RGBA, GL_RGBA8, 4, GL_FLOAT);
-		_playbackMenuTexture = new simpleTexture(nullptr, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE3, GL_RGBA, GL_RGBA8, 4, GL_FLOAT);
+		_frameTexture = new simpleTexture(nullptr, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE0, GL_RGBA, GL_RGBA8, 4, GL_FLOAT);
+		_redFlameTexture = new simpleTexture(nullptr, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE1, GL_RGBA, GL_RGBA8, 4, GL_FLOAT);
+		_blueFlameTexture = new simpleTexture(nullptr, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE2, GL_RGBA, GL_RGBA8, 4, GL_FLOAT);
+		_uiTexture = new simpleTexture(nullptr, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE3, GL_RGBA, GL_RGBA8, 4, GL_FLOAT);
+		_openMenuTexture = new simpleTexture(nullptr, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE4, GL_RGBA, GL_RGBA8, 4, GL_FLOAT);
+		_playbackMenuTexture = new simpleTexture(nullptr, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE5, GL_RGBA, GL_RGBA8, 4, GL_FLOAT);
 
 		// Font Glyphs:  Going to load the max zoom for now
 		simpleBitmap* glyphSheet = resourceController->getFontGlyphs(zoomLevel);
@@ -163,15 +171,17 @@ namespace brogueHd::frontend
 		openglHelper::flipSurface(glyphSurface);
 
 		// void* @_@ (No really good way to own this one until we do it ourselves for each and every data type, that WE own)
-		_fontTexture = new simpleTexture(glyphSurface, glyphSheet->pixelWidth(), glyphSheet->pixelHeight(), textureIndex++, GL_TEXTURE4, GL_RGBA, GL_RGBA, 4, GL_UNSIGNED_BYTE);
+		_fontTexture = new simpleTexture(glyphSurface, glyphSheet->pixelWidth(), glyphSheet->pixelHeight(), textureIndex++, GL_TEXTURE6, GL_RGBA, GL_RGBA, 4, GL_UNSIGNED_BYTE);
 
 		_frameBuffer = new simpleFrameBuffer(sceneBoundaryUI.width, sceneBoundaryUI.height);
 	}
 	brogueMainProgram::~brogueMainProgram()
 	{
 		delete _frameProgram;
-		delete _frameTexture0;
-		delete _frameTexture1;
+		delete _frameTexture;
+		delete _redFlameTexture;
+		delete _blueFlameTexture;
+		delete _uiTexture;
 		delete _openMenuTexture;
 		delete _playbackMenuTexture;
 		delete _fontTexture;
@@ -225,20 +235,31 @@ namespace brogueHd::frontend
 		// 4) Run Frame Program (Blend Texture 0 / Texture 1 -> Output Rendering)
 		//
 
-		glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		//glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		//glClearColor(0, 0, 0, 0);
 
 		_frameBuffer->bind();
 
 		// Frame Buffer -> GL_TEXTURE0
 		glDrawBuffer(GL_COLOR_ATTACHMENT0);
+		_frameTexture->bind();
+		_frameTexture->clearColor(color(0, 0, 0, 0));		// Runs GL sub data function to clear color from texture
 
 		switch (_gameMode)
 		{
 			case BrogueGameMode::Title:
 
-				if (_uiPrograms->get(brogueUIProgram::FlameMenuProgram)->isActive())
-					_uiPrograms->get(brogueUIProgram::FlameMenuProgram)->run(millisecondsElapsed);
+				glDrawBuffer(GL_COLOR_ATTACHMENT1);
+
+				// Red Flame Texture (buffer feedback, doesn't get cleared)
+				if (_uiPrograms->get(brogueUIProgram::FlameMenuProgram1)->isActive())
+					_uiPrograms->get(brogueUIProgram::FlameMenuProgram1)->run(millisecondsElapsed);
+
+				glDrawBuffer(GL_COLOR_ATTACHMENT2);
+
+				// Blue Flame Texture (buffer feedback, doesn't get cleared)
+				if (_uiPrograms->get(brogueUIProgram::FlameMenuProgram2)->isActive())
+					_uiPrograms->get(brogueUIProgram::FlameMenuProgram2)->run(millisecondsElapsed);
 
 				break;
 			case BrogueGameMode::Game:
@@ -249,12 +270,11 @@ namespace brogueHd::frontend
 				break;
 		}
 
-		// Frame Buffer -> GL_TEXTURE1 (Holds UI component output)
-		glDrawBuffer(GL_COLOR_ATTACHMENT1);
+		// UI  Texture
+		glDrawBuffer(GL_COLOR_ATTACHMENT3);
 
-		// Runs a GL function to sub texture image data with zeros.
-		_frameTexture1->bind();
-		_frameTexture1->clearColor(colors::transparent());
+		_uiTexture->bind();
+		_uiTexture->clearColor(colors::transparent());
 
 		// Draw UI components
 		switch (_gameMode)
@@ -266,11 +286,11 @@ namespace brogueHd::frontend
 					_uiPrograms->get(brogueUIProgram::MainMenuProgram)->run(millisecondsElapsed);
 
 				// Open Menu Header
-				if (_uiPrograms->get(brogueUIProgram::OpenMenuProgram_HeaderProgram)->isActive())
-					_uiPrograms->get(brogueUIProgram::OpenMenuProgram_HeaderProgram)->run(millisecondsElapsed);
+				if (_uiPrograms->get(brogueUIProgram::OpenMenuBackgroundProgram)->isActive())
+					_uiPrograms->get(brogueUIProgram::OpenMenuBackgroundProgram)->run(millisecondsElapsed);
 
 				// Put the open menu (scrollable area) on a separate texture to control rendering
-				glDrawBuffer(GL_COLOR_ATTACHMENT2);
+				glDrawBuffer(GL_COLOR_ATTACHMENT4);
 				_openMenuTexture->bind();
 				_openMenuTexture->clearColor(colors::transparent());
 
@@ -278,14 +298,14 @@ namespace brogueHd::frontend
 				if (_uiPrograms->get(brogueUIProgram::OpenMenuProgram)->isActive())
 					_uiPrograms->get(brogueUIProgram::OpenMenuProgram)->run(millisecondsElapsed);
 
-				glDrawBuffer(GL_COLOR_ATTACHMENT1);
+				glDrawBuffer(GL_COLOR_ATTACHMENT3);
 
 				// Playback Menu Header
-				if (_uiPrograms->get(brogueUIProgram::PlaybackMenuProgram_HeaderProgram)->isActive())
-					_uiPrograms->get(brogueUIProgram::PlaybackMenuProgram_HeaderProgram)->run(millisecondsElapsed);
+				if (_uiPrograms->get(brogueUIProgram::PlaybackMenuBackgroundProgram)->isActive())
+					_uiPrograms->get(brogueUIProgram::PlaybackMenuBackgroundProgram)->run(millisecondsElapsed);
 
 				// Put the open menu (scrollable area) on a separate texture to control rendering
-				glDrawBuffer(GL_COLOR_ATTACHMENT3);
+				glDrawBuffer(GL_COLOR_ATTACHMENT5);
 				_playbackMenuTexture->bind();
 				_playbackMenuTexture->clearColor(colors::transparent());
 
@@ -293,7 +313,7 @@ namespace brogueHd::frontend
 				if (_uiPrograms->get(brogueUIProgram::PlaybackMenuProgram)->isActive())
 					_uiPrograms->get(brogueUIProgram::PlaybackMenuProgram)->run(millisecondsElapsed);
 
-				glDrawBuffer(GL_COLOR_ATTACHMENT1);
+				glDrawBuffer(GL_COLOR_ATTACHMENT3);
 
 				// High Scores
 				if (_uiPrograms->get(brogueUIProgram::HighScoresProgram)->isActive())
@@ -307,6 +327,8 @@ namespace brogueHd::frontend
 			default:
 				break;
 		}
+
+		//glDrawBuffer(GL_COLOR_ATTACHMENT0);
 
 		// Unbind the frame buffer -> render output to normal GL output
 		_frameBuffer->unBind();
@@ -337,8 +359,10 @@ namespace brogueHd::frontend
 		*/
 
 		// Create the textures:  Texture 1 is used for the direct drawing, Texture 0 for the "color diffusion"
-		_frameTexture0->glCreate(-1);		// Textures don't automatically associate w/ a program
-		_frameTexture1->glCreate(-1);
+		_frameTexture->glCreate(-1);		// Textures don't automatically associate w/ a program
+		_redFlameTexture->glCreate(-1);
+		_blueFlameTexture->glCreate(-1);
+		_uiTexture->glCreate(-1);
 		_openMenuTexture->glCreate(-1);
 		_playbackMenuTexture->glCreate(-1);
 		_fontTexture->glCreate(-1);
@@ -348,10 +372,12 @@ namespace brogueHd::frontend
 
 		// Attach texture to frame buffer
 		_frameBuffer->bind();
-		_frameBuffer->attachTexture(_frameTexture0->getHandle(), GL_COLOR_ATTACHMENT0);
-		_frameBuffer->attachTexture(_frameTexture1->getHandle(), GL_COLOR_ATTACHMENT1);
-		_frameBuffer->attachTexture(_openMenuTexture->getHandle(), GL_COLOR_ATTACHMENT2);
-		_frameBuffer->attachTexture(_playbackMenuTexture->getHandle(), GL_COLOR_ATTACHMENT3);
+		_frameBuffer->attachTexture(_frameTexture->getHandle(), GL_COLOR_ATTACHMENT0);
+		_frameBuffer->attachTexture(_redFlameTexture->getHandle(), GL_COLOR_ATTACHMENT1);
+		_frameBuffer->attachTexture(_blueFlameTexture->getHandle(), GL_COLOR_ATTACHMENT2);
+		_frameBuffer->attachTexture(_uiTexture->getHandle(), GL_COLOR_ATTACHMENT3);
+		_frameBuffer->attachTexture(_openMenuTexture->getHandle(), GL_COLOR_ATTACHMENT4);
+		_frameBuffer->attachTexture(_playbackMenuTexture->getHandle(), GL_COLOR_ATTACHMENT5);
 		_frameBuffer->attachRenderBuffer();
 		_frameBuffer->unBind();
 
@@ -487,7 +513,8 @@ namespace brogueHd::frontend
 		switch (mode)
 		{
 			case BrogueGameMode::Title:
-				_uiPrograms->get(brogueUIProgram::FlameMenuProgram)->activate();
+				_uiPrograms->get(brogueUIProgram::FlameMenuProgram1)->activate();
+				_uiPrograms->get(brogueUIProgram::FlameMenuProgram2)->activate();
 				_uiPrograms->get(brogueUIProgram::MainMenuProgram)->activate();
 				break;
 			case BrogueGameMode::Game:

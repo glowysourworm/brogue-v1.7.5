@@ -12,44 +12,107 @@ namespace brogueHd::frontend
 		ContainerControlledProgram = 0,
 
 		/// <summary>
-		/// The primary brogue flame menu title program
+		/// The primary brogue flame menu title program (1) (Red Flames)
 		/// </summary>
-		FlameMenuProgram = 1,
+		FlameMenuProgram1 = 1,
+
+		/// <summary>
+		/// The primary brogue flame menu title program (2) (Blue Flames)
+		/// </summary>
+		FlameMenuProgram2 = 2,
 
 		/// <summary>
 		/// The main menu button menu program
 		/// </summary>
-		MainMenuProgram = 2,
+		MainMenuProgram = 3,
 
 		/// <summary>
-		/// The title screen's open menu program
+		/// The title screen's open menu program (scrollable area)
 		/// </summary>
-		OpenMenuProgram = 3,
+		OpenMenuProgram = 4,
 
 		/// <summary>
 		/// The title screen's open menu header'd background program
 		/// </summary>
-		OpenMenuProgram_HeaderProgram = 4,
+		OpenMenuBackgroundProgram = 5,
 
 		/// <summary>
-		/// The title screen's view recording program
+		/// The title screen's view recording program (scrollable area)
 		/// </summary>
-		PlaybackMenuProgram = 5,
+		PlaybackMenuProgram = 6,
 
 		/// <summary>
 		/// The title screen's view recording menu header'd background program
 		/// </summary>
-		PlaybackMenuProgram_HeaderProgram = 6,
+		PlaybackMenuBackgroundProgram = 7,
 
 		/// <summary>
 		/// The title screen's high scores program
 		/// </summary>
-		HighScoresProgram = 7,
+		HighScoresProgram = 8,
 
 		/// <summary>
-		/// The quit modal program
+		/// The generic modal program
 		/// </summary>
-		ModalProgram = 8
+		ModalProgram = 9,
+
+		/// <summary>
+		/// The bottom menu bar in the game
+		/// </summary>
+		BottomBarMenuProgram = 10,
+
+		/// <summary>
+		/// Upper left hand corner status panel (permanent, static). Search bar is part of this panel.
+		/// </summary>
+		PlayerStatusPanelProgram = 11,
+
+		/// <summary>
+		/// Scrollable object list program on the left hand side.
+		/// </summary>
+		GameObjectListProgram = 12,
+
+		/// <summary>
+		/// Flavor text panel program across the bottom above the menu bar
+		/// </summary>
+		FlavorTextPanelProgram = 13,
+
+		/// <summary>
+		/// Primary Brogue game display program
+		/// </summary>
+		GameProgram = 15,
+
+		/// <summary>
+		/// Game menu program, bottom right
+		/// </summary>
+		GameMenuProgram = 16,
+
+		/// <summary>
+		/// Dynamically sized inventory program - right side - non-scrollable
+		/// </summary>
+		GameInventoryProgram = 17,
+
+		/// <summary>
+		/// Program to show text to the user in a briefly "modal" fashion (darkening the background). This
+		/// must be positioned in one of the 4 quadrants of the screen to avoid covering up the object of
+		/// the text description. 
+		/// </summary>
+		GameHoverTextProgram = 18,
+
+		/// <summary>
+		/// Program to show the game log - minimized to the top 3 rows; and expanded to show 34 total rows
+		/// of text. This will require dynamic sizing. 
+		/// </summary>
+		GameLogProgram = 19,
+
+		/// <summary>
+		/// Program to show the help display
+		/// </summary>
+		GameHelpProgram = 20,
+
+		/// <summary>
+		/// Program to show the discovered items display
+		/// </summary>
+		GameDiscoveredItems = 21
 	};
 
 	enum class brogueUIProgramPart : int
@@ -58,12 +121,12 @@ namespace brogueHd::frontend
 
 		Background = 1,
 		Text = 2,
-		MenuButton = 3,
+		Button = 3,
 		MenuBackground = 4,
 
 		FlameMenuProgram_HeatSourceProgram = 5,
 		FlameMenuProgram_TitleMaskProgram = 6,
-		FlameMenuProgram_HeatDiffuseProgram = 7,
+		FlameMenuProgram_HeatDiffuseProgram = 7
 	};
 
 	enum class brogueProgramPurpose : int

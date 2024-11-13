@@ -26,7 +26,8 @@ namespace brogueHd::frontend
 	class brogueFlameMenuHeatView : public brogueViewBase
 	{
 	public:
-		brogueFlameMenuHeatView(eventController* eventController,
+		brogueFlameMenuHeatView(bool flameMenu2,
+								eventController* eventController,
 								randomGenerator* randomGenerator,
 								int fadePeriodMilliseconds,
 								const brogueUIData& data,
@@ -57,12 +58,14 @@ namespace brogueHd::frontend
 		{
 			brogueTitleGrid* titleGrid = _titleGrid;
 			gridRect sceneBounds = _titleGrid->sceneBounds();
+			bool flameMenu2 = _flameMenu2;
 
-			brogueViewBase::iterate([&callback, &titleGrid, &sceneBounds] (short column, short row, brogueCellDisplay* cell)
+			brogueViewBase::iterate([&callback, &titleGrid, &sceneBounds, &flameMenu2] (short column, short row, brogueCellDisplay* cell)
 			{
-				if (titleGrid->isTheText(column, row) || row == sceneBounds.bottom())
+				if ((flameMenu2 && titleGrid->isTheText(column, row)) || 
+				   (!flameMenu2 && row == sceneBounds.bottom()))
 					callback(column, row, cell);
-
+				
 				return iterationCallback::iterate;
 			});
 		}
@@ -102,16 +105,19 @@ namespace brogueHd::frontend
 		grid<color*>* _heatSourceGrid;
 
 		bool _firstPass;
+		bool _flameMenu2;
 	};
 
-	brogueFlameMenuHeatView::brogueFlameMenuHeatView(eventController* eventController,
-													randomGenerator* randomGenerator,
-													int fadePeriodMilliseconds,
-													const brogueUIData& data,
-													const gridRect& sceneBoundary,
-													const gridRect& viewBoundary)
+	brogueFlameMenuHeatView::brogueFlameMenuHeatView(bool flameMenu2,
+													 eventController* eventController,
+													 randomGenerator* randomGenerator,
+													 int fadePeriodMilliseconds,
+													 const brogueUIData& data,
+													 const gridRect& sceneBoundary,
+													 const gridRect& viewBoundary)
 		: brogueViewBase(eventController, data, sceneBoundary, viewBoundary)
 	{
+		_flameMenu2 = flameMenu2;
 		_randomGenerator = randomGenerator;
 
 		_periodCounter = new simplePeriodCounter(5);
@@ -216,25 +222,28 @@ namespace brogueHd::frontend
 		brogueFlameMenuHeatView* that = this;
 		randomGenerator* randGenerator = _randomGenerator;
 		bool firstPass = _firstPass;
+		bool flameMenu2 = _flameMenu2;
 		grid<color*>* heatGrid = _heatSourceGrid;
 
-		this->iterate([&that, &randGenerator, &firstPass, &heatGrid] (short column, short row, brogueCellDisplay* currentColor)
+		this->iterate([&that, &randGenerator, &firstPass, &heatGrid, &flameMenu2] (short column, short row, brogueCellDisplay* currentColor)
 		{
 			color nextColor;
 
 			float heatEnvelope = that->calculateHeatEnvelope(column, row);
 
-			if (that->isTheText(column, row))
+			if (that->isTheText(column, row) && flameMenu2)
 			{
 				int nextIndex = randGenerator->randomIndex(0, 3);
 				nextColor = randGenerator->nextColorNear(that->TitleHeatSources[nextIndex], that->FlameNoise);
+				nextColor.alpha = heatEnvelope;
 			}
-			else if (row == ROWS - 1)
+			else if (row == ROWS - 1 && !flameMenu2)
 			{
 				int nextIndex = randGenerator->randomIndex(0, 3);
 				nextColor = randGenerator->nextColorNear(that->BottomHeatSources[nextIndex], that->FlameNoise);
-
+				nextColor.alpha = heatEnvelope;
 			}
+
 
 			// Take color channels and apply heat envelope
 			//if (heatEnvelope < 0.25)
@@ -251,8 +260,6 @@ namespace brogueHd::frontend
 				//nextColor.green *= heatEnvelope * 4;
 				//nextColor.red *= heatEnvelope * 4;
 			//}
-
-			nextColor.alpha = heatEnvelope;
 
 			heatGrid->get(column, row)->set(nextColor);
 
@@ -281,27 +288,7 @@ namespace brogueHd::frontend
 		this->iterate([&that, &randGenerator, &heatGrid] (short column, short row, brogueCellDisplay* cell)
 		{
 			// Heat Source
-			if (that->isTheText(column, row))
-			{
-				cell->backColor.interpolate(*heatGrid->get(column, row), that->FlameFade);
-			}
-
-			// Heat Source
-			else if (row == ROWS - 1)
-			{
-				cell->backColor.interpolate(*heatGrid->get(column, row), that->FlameFade);
-			}
-
-			//// Heat "Diffusion"
-			//else if (column > 0 && column < COLS - 1)
-			//{
-			//	color south = that->get(column, row + 1)->backColor;
-			//	color southEast = that->get(column + 1, row + 1)->backColor;
-			//	color southWest = that->get(column - 1, row + 1)->backColor;
-
-			//	// Order may matter
-			//	cell->backColor.averageIn(1, that->FlameDiffuse, south, southEast, southWest);
-			//}
+			cell->backColor.interpolate(*heatGrid->get(column, row), that->FlameFade);
 
 			return iterationCallback::iterate;
 		});

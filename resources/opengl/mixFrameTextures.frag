@@ -8,8 +8,10 @@ in vec2 currentVertex;
 in vec2 currentTextureUV;
 
 // Try and use a 2D sampler to work with the texture. The active texture should be the 0th texture.
-uniform sampler2D frame0Texture;
-uniform sampler2D frame1Texture;
+uniform sampler2D frameTexture;
+uniform sampler2D redFlameTexture;
+uniform sampler2D blueFlameTexture;
+uniform sampler2D uiTexture;
 uniform sampler2D openMenuTexture;
 uniform sampler2D playbackMenuTexture;
 uniform vec4 openMenuClipXY;
@@ -54,8 +56,10 @@ void main()
     outputColor = vec4(0,0,0,0);
 
     // Sample the frame texture
-    vec4 output0 = texture(frame0Texture, currentTextureUV);
-    vec4 output1 = texture(frame1Texture, currentTextureUV);
+    vec4 frameOutput = texture(frameTexture, currentTextureUV);
+    vec4 redFlameOutput = texture(redFlameTexture, currentTextureUV);
+    vec4 blueFlameOutput = texture(blueFlameTexture, currentTextureUV);
+    vec4 uiOutput = texture(uiTexture, currentTextureUV);
 
     // Favor the UI controls first (one of these may be turned on)
     if (openMenuColor.w > 0)
@@ -64,13 +68,18 @@ void main()
     else if (playbackMenuColor.w > 0)
         outputColor = playbackMenuColor;
 
+    else if (uiOutput.w > 0)
+        outputColor = uiOutput;
+
     // Blend in the backgrounds
     if (outputColor.w < 1.0)
     {
-        // Favor frame texture 1 (on top of the background)
-        vec4 background = mix(output1, output0, 1 - output1.w);
+        vec4 flameOutput = redFlameOutput;
+        
+        if (blueFlameOutput.w > 0)
+            flameOutput = mix(redFlameOutput, blueFlameOutput, blueFlameOutput.w);
 
         // Any room left in the alpha channel is used for the background(s)
-        outputColor = mix(outputColor, background, 1 - outputColor.w);
+        outputColor = mix(outputColor, flameOutput, 1 - outputColor.w);
     }
 }

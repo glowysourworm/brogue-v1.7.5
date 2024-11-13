@@ -191,7 +191,7 @@ namespace brogueHd::frontend
 	}
 	bool simpleShaderProgram::hasUniform(const simpleString& name)
 	{
-		return glGetUniformLocation(this->handle, name.c_str()) > 0;
+		return glGetUniformLocation(this->handle, name.c_str()) >= 0;
 	}
 	bool simpleShaderProgram::bindUniforms()
 	{

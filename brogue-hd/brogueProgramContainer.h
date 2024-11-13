@@ -4,6 +4,8 @@
 #include "brogueKeyboardState.h"
 #include "brogueMainProgram.h"
 #include "brogueMouseState.h"
+#include "brogueUIBuilder.h"
+#include "brogueUIBuilder.h"
 #include "brogueUIConstants.h"
 #include "brogueViewContainer.h"
 #include "eventController.h"
@@ -20,12 +22,13 @@ namespace brogueHd::frontend
 	{
 	public:
 
-		brogueProgramContainer(resourceController* resourceController,
-							   eventController* eventController,
-							   brogueGlyphMap* glyphMap,
-							   const gridRect& sceneBoundaryUI,
-							   const int zoomLevel,
-							   const simpleList<brogueViewContainer*>& viewList);
+		brogueProgramContainer(brogueUIBuilder* uiBuilder,
+								resourceController* resourceController,
+								eventController* eventController,
+								brogueGlyphMap* glyphMap,
+								const gridRect& sceneBoundaryUI,
+								const int zoomLevel,
+								const simpleList<brogueViewContainer*>& viewList);
 		~brogueProgramContainer();
 
 		brogueKeyboardState getKeyboardState(const simpleKeyboardState& mouse) const;
@@ -74,7 +77,8 @@ namespace brogueHd::frontend
 		bool _initialized;
 	};
 
-	brogueProgramContainer::brogueProgramContainer(resourceController* resourceController,
+	brogueProgramContainer::brogueProgramContainer(brogueUIBuilder* uiBuilder,
+												   resourceController* resourceController,
 												   eventController* eventController,
 												   brogueGlyphMap* glyphMap,
 												   const gridRect& sceneBoundaryUI,
@@ -83,7 +87,7 @@ namespace brogueHd::frontend
 	{
 		_resourceController = resourceController;
 		_glyphMap = glyphMap;
-		_mainProgram = new brogueMainProgram(resourceController, eventController, glyphMap, sceneBoundaryUI, zoomLevel, viewList);
+		_mainProgram = new brogueMainProgram(uiBuilder, resourceController, eventController, glyphMap, sceneBoundaryUI, zoomLevel, viewList);
 		_initialized = false;
 	}
 	brogueProgramContainer::~brogueProgramContainer()
@@ -193,7 +197,7 @@ namespace brogueHd::frontend
 	}
 	void brogueProgramContainer::update(const simpleKeyboardState& keyboardState,
 										const simpleMouseState& mouseState,
-										int millisecondsLapsed, 
+										int millisecondsLapsed,
 										bool forceUpdate)
 	{
 		if (!_initialized)

@@ -47,7 +47,7 @@ namespace brogueHd::backend
 	private:
 
 		brogueProgramContainer* _programContainer;
-
+		brogueUIBuilder* _uiBuilder;
 		randomGenerator* _randomGenerator;
 		eventController* _eventController;
 		resourceController* _resourceController;
@@ -57,30 +57,30 @@ namespace brogueHd::backend
 
 	renderingController::renderingController(eventController* eventController, resourceController* resourceController, randomGenerator* randomGenerator)
 	{
+		int zoomLevel = 10;
+
 		_glyphMap = new brogueGlyphMap();
 		_openglRenderer = new openglRenderer(eventController);
 		_resourceController = resourceController;
 		_eventController = eventController;
 		_randomGenerator = randomGenerator;
-
-		int zoomLevel = 10;
+		_uiBuilder = new brogueUIBuilder(eventController, resourceController, randomGenerator, zoomLevel);
 
 		// Title Screen:  Build program parts, load the container
 
-		simpleDirectoryEntry gameFiles = simpleFileIO::readDirectory(_resourceController->getGamesDirectory()->c_str(), ".broguesave");
-		simpleDirectoryEntry recordingFiles = simpleFileIO::readDirectory(_resourceController->getPlaybackDirectory()->c_str(), ".broguerec");
-
-		brogueViewContainer* titleView = brogueUIBuilder::createFlameMenu(_eventController, _randomGenerator, zoomLevel);
-		brogueViewContainer* mainMenu = brogueUIBuilder::createMainMenuButtons(_eventController, zoomLevel);
-		brogueViewContainer* openMenu = brogueUIBuilder::createMainMenuSelector(brogueUIProgram::OpenMenuProgram, _eventController, gameFiles, zoomLevel);
-		brogueViewContainer* openMenuBackground = brogueUIBuilder::createHeaderedBackground(_eventController, brogueUIProgram::OpenMenuProgram_HeaderProgram, colorString("~ Open Saved Game ~", colors::yellow()), zoomLevel);
-		brogueViewContainer* playbackMenu = brogueUIBuilder::createMainMenuSelector(brogueUIProgram::PlaybackMenuProgram, _eventController, recordingFiles, zoomLevel);
-		brogueViewContainer* playbackMenuBackground = brogueUIBuilder::createHeaderedBackground(_eventController, brogueUIProgram::PlaybackMenuProgram_HeaderProgram, colorString("~ View Recording ~", colors::yellow()), zoomLevel);
-		brogueViewContainer* highScoresMenu = brogueUIBuilder::createHighScoresView(_eventController, _resourceController, zoomLevel);
+		brogueViewContainer* titleView1 = _uiBuilder->buildProgramView(brogueUIProgram::FlameMenuProgram1);
+		brogueViewContainer* titleView2 = _uiBuilder->buildProgramView(brogueUIProgram::FlameMenuProgram2);
+		brogueViewContainer* mainMenu = _uiBuilder->buildProgramView(brogueUIProgram::MainMenuProgram);
+		brogueViewContainer* openMenu = _uiBuilder->buildProgramView(brogueUIProgram::OpenMenuProgram);
+		brogueViewContainer* openMenuBackground = _uiBuilder->buildProgramView(brogueUIProgram::OpenMenuBackgroundProgram);
+		brogueViewContainer* playbackMenu = _uiBuilder->buildProgramView(brogueUIProgram::PlaybackMenuProgram);
+		brogueViewContainer* playbackMenuBackground = _uiBuilder->buildProgramView(brogueUIProgram::PlaybackMenuBackgroundProgram);
+		brogueViewContainer* highScoresMenu = _uiBuilder->buildProgramView(brogueUIProgram::HighScoresProgram);
 
 		simpleList<brogueViewContainer*> viewList;
 
-		viewList.add(titleView);
+		viewList.add(titleView1);
+		viewList.add(titleView2);
 		viewList.add(mainMenu);
 		viewList.add(openMenuBackground);
 		viewList.add(openMenu);
@@ -88,15 +88,16 @@ namespace brogueHd::backend
 		viewList.add(playbackMenu);
 		viewList.add(highScoresMenu);
 
-		gridRect sceneBoundaryUI = titleView->calculateSceneBoundaryUI();
+		gridRect sceneBoundaryUI = titleView1->calculateSceneBoundaryUI();
 
-		_programContainer = new brogueProgramContainer(resourceController, eventController, _glyphMap, sceneBoundaryUI, zoomLevel, viewList);
+		_programContainer = new brogueProgramContainer(_uiBuilder, resourceController, eventController, _glyphMap, sceneBoundaryUI, zoomLevel, viewList);
 	}
 	renderingController::~renderingController()
 	{
 		delete _openglRenderer;
 		delete _glyphMap;
 		delete _programContainer;
+		delete _uiBuilder;
 	}
 
 	void renderingController::initialize()

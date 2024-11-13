@@ -119,7 +119,7 @@ namespace brogueHd::frontend
 			case brogueUIProgramPart::FlameMenuProgram_HeatDiffuseProgram:
 			case brogueUIProgramPart::Background:
 			case brogueUIProgramPart::MenuBackground:
-			case brogueUIProgramPart::MenuButton:
+			case brogueUIProgramPart::Button:
 			case brogueUIProgramPart::Text:
 				return createStream(view, configuration.dataStreamType, configuration.noDisplaySelector, configuration.isFrameType);
 			case brogueUIProgramPart::ViewCompositor:
@@ -140,7 +140,7 @@ namespace brogueHd::frontend
 			case brogueUIProgramPart::FlameMenuProgram_HeatDiffuseProgram:
 			case brogueUIProgramPart::Background:
 			case brogueUIProgramPart::MenuBackground:
-			case brogueUIProgramPart::MenuButton:
+			case brogueUIProgramPart::Button:
 			case brogueUIProgramPart::Text:
 				return recreateDataStream(view, stream, configuration.dataStreamType, configuration.noDisplaySelector, configuration.isFrameType);
 			case brogueUIProgramPart::ViewCompositor:

@@ -19,7 +19,7 @@ namespace brogueHd::frontend
 	class brogueFlameMenuDiffuseView : public brogueViewBase
 	{
 	public:
-		brogueFlameMenuDiffuseView(eventController* eventController, const brogueUIData& data, const gridRect& sceneBoundary, const gridRect& viewBoundary);
+		brogueFlameMenuDiffuseView(bool flameMenu2, eventController* eventController, const brogueUIData& data, const gridRect& sceneBoundary, const gridRect& viewBoundary);
 		~brogueFlameMenuDiffuseView();
 
 		void checkUpdate(const brogueKeyboardState& keyboardState,
@@ -53,11 +53,14 @@ namespace brogueHd::frontend
 	private:
 
 		brogueCellDisplay* _defaultCell;
+
+		bool _flameMenu2;
 	};
 
-	brogueFlameMenuDiffuseView::brogueFlameMenuDiffuseView(eventController* eventController, const brogueUIData& data, const gridRect& sceneBoundary, const gridRect& viewBoundary)
+	brogueFlameMenuDiffuseView::brogueFlameMenuDiffuseView(bool flameMenu2, eventController* eventController, const brogueUIData& data, const gridRect& sceneBoundary, const gridRect& viewBoundary)
 		: brogueViewBase(eventController, data, sceneBoundary, viewBoundary)
 	{
+		_flameMenu2 = flameMenu2;
 		_defaultCell = new brogueCellDisplay();
 		_defaultCell->backColor = colors::white();
 		_defaultCell->noDisplay = false;

@@ -52,6 +52,11 @@ namespace brogueHd::backend::model
 			// size affects texture sampling. This cell width / height must be
 			// as close as possible to an integral number of cells to match the
 			// height. (which matches the glyph sheeet)
+			//
+			// Update:  Texel fetch fixed the texture 2D feedback error. So, the
+			//			glyph sheets will be fixed to an integral number of pixels
+			//			as well.
+			//
 			switch (zoomLevel)
 			{
 				case 1:	return 0;
@@ -62,8 +67,8 @@ namespace brogueHd::backend::model
 				case 6: return 0;
 				case 7: return 0;
 				case 8: return 0;
-				case 9: return 25.4118;
-				case 10: return 27.2942;
+				case 9: return 25.0;
+				case 10: return 27.0;
 				case 11: return 29.0;
 				case 12: return 31.0;
 				case 13: return 31.0;

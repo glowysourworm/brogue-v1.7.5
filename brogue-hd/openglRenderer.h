@@ -489,12 +489,12 @@ namespace brogueHd::frontend
 			// Click registered by a background program (typically)
 			case brogueUIAction::None:
 			{
-				if (sender == brogueUIProgram::FlameMenuProgram)
+				if (sender == brogueUIProgram::FlameMenuProgram1)
 				{
 					_program->deactivateUIProgram(brogueUIProgram::OpenMenuProgram);
-					_program->deactivateUIProgram(brogueUIProgram::OpenMenuProgram_HeaderProgram);
+					_program->deactivateUIProgram(brogueUIProgram::OpenMenuBackgroundProgram);
 					_program->deactivateUIProgram(brogueUIProgram::PlaybackMenuProgram);
-					_program->deactivateUIProgram(brogueUIProgram::PlaybackMenuProgram_HeaderProgram);
+					_program->deactivateUIProgram(brogueUIProgram::PlaybackMenuBackgroundProgram);
 					_program->deactivateUIProgram(brogueUIProgram::HighScoresProgram);
 
 					_program->activateUIProgram(brogueUIProgram::MainMenuProgram);
@@ -512,11 +512,11 @@ namespace brogueHd::frontend
 			{
 				//_program->deactivateUIProgram(brogueUIProgram::FlameMenuProgram);
 				_program->deactivateUIProgram(brogueUIProgram::PlaybackMenuProgram);
-				_program->deactivateUIProgram(brogueUIProgram::PlaybackMenuProgram_HeaderProgram);
+				_program->deactivateUIProgram(brogueUIProgram::PlaybackMenuBackgroundProgram);
 				_program->deactivateUIProgram(brogueUIProgram::HighScoresProgram);
 				_program->deactivateUIProgram(brogueUIProgram::MainMenuProgram);
 
-				_program->activateUIProgram(brogueUIProgram::OpenMenuProgram_HeaderProgram);
+				_program->activateUIProgram(brogueUIProgram::OpenMenuBackgroundProgram);
 				_program->activateUIProgram(brogueUIProgram::OpenMenuProgram);
 				_program->clearEvents();
 				_programViewChange = true;
@@ -533,9 +533,9 @@ namespace brogueHd::frontend
 			{
 				//_program->deactivateUIProgram(brogueUIProgram::FlameMenuProgram);
 				_program->deactivateUIProgram(brogueUIProgram::OpenMenuProgram);
-				_program->deactivateUIProgram(brogueUIProgram::OpenMenuProgram_HeaderProgram);
+				_program->deactivateUIProgram(brogueUIProgram::OpenMenuBackgroundProgram);
 				_program->deactivateUIProgram(brogueUIProgram::PlaybackMenuProgram);
-				_program->deactivateUIProgram(brogueUIProgram::PlaybackMenuProgram_HeaderProgram);
+				_program->deactivateUIProgram(brogueUIProgram::PlaybackMenuBackgroundProgram);
 				_program->deactivateUIProgram(brogueUIProgram::HighScoresProgram);
 
 				_program->activateUIProgram(brogueUIProgram::MainMenuProgram);
@@ -548,9 +548,9 @@ namespace brogueHd::frontend
 			{
 				//_program->deactivateUIProgram(brogueUIProgram::FlameMenuProgram);
 				_program->deactivateUIProgram(brogueUIProgram::OpenMenuProgram);
-				_program->deactivateUIProgram(brogueUIProgram::OpenMenuProgram_HeaderProgram);
+				_program->deactivateUIProgram(brogueUIProgram::OpenMenuBackgroundProgram);
 				_program->deactivateUIProgram(brogueUIProgram::PlaybackMenuProgram);
-				_program->deactivateUIProgram(brogueUIProgram::PlaybackMenuProgram_HeaderProgram);
+				_program->deactivateUIProgram(brogueUIProgram::PlaybackMenuBackgroundProgram);
 				_program->deactivateUIProgram(brogueUIProgram::MainMenuProgram);
 
 				_program->activateUIProgram(brogueUIProgram::HighScoresProgram);
@@ -563,12 +563,12 @@ namespace brogueHd::frontend
 			{
 				//_program->deactivateUIProgram(brogueUIProgram::FlameMenuProgram);
 				_program->deactivateUIProgram(brogueUIProgram::PlaybackMenuProgram);
-				_program->deactivateUIProgram(brogueUIProgram::PlaybackMenuProgram_HeaderProgram);
+				_program->deactivateUIProgram(brogueUIProgram::PlaybackMenuBackgroundProgram);
 				_program->deactivateUIProgram(brogueUIProgram::HighScoresProgram);
 				_program->deactivateUIProgram(brogueUIProgram::MainMenuProgram);
 
 				_program->activateUIProgram(brogueUIProgram::OpenMenuProgram);
-				_program->activateUIProgram(brogueUIProgram::OpenMenuProgram_HeaderProgram);
+				_program->activateUIProgram(brogueUIProgram::OpenMenuBackgroundProgram);
 				_program->clearEvents();
 				_programViewChange = true;
 			}
@@ -578,11 +578,11 @@ namespace brogueHd::frontend
 			{
 				//_program->deactivateUIProgram(brogueUIProgram::FlameMenuProgram);
 				_program->deactivateUIProgram(brogueUIProgram::OpenMenuProgram);
-				_program->deactivateUIProgram(brogueUIProgram::OpenMenuProgram_HeaderProgram);
+				_program->deactivateUIProgram(brogueUIProgram::OpenMenuBackgroundProgram);
 				_program->deactivateUIProgram(brogueUIProgram::HighScoresProgram);
 				_program->deactivateUIProgram(brogueUIProgram::MainMenuProgram);
 
-				_program->activateUIProgram(brogueUIProgram::PlaybackMenuProgram_HeaderProgram);
+				_program->activateUIProgram(brogueUIProgram::PlaybackMenuBackgroundProgram);
 				_program->activateUIProgram(brogueUIProgram::PlaybackMenuProgram);
 				_program->clearEvents();
 				_programViewChange = true;

@@ -1,0 +1,25 @@
+Brogue HD Backlog
+-----------------
+
+Game View Program Design:
+
+	- (Program) Bottom Menu Bar (includes depth indicator, so is the full length of the screen)
+	- (Program) Status Bar (left side) (two programs)
+		-> One monster list scrollable program (dynamic sizing)
+		-> One player status program
+		** The search bar will be permanently shown
+			-> [   Search   ]  (fills up when player searches) (all menu items are sub-programs)
+			
+	- (Program) Flavor Text
+	- (Program) Game View (may just end up being a single program)
+	- (Program) Menu (non-scrollable)
+	- (Program) Inventory (non-scrollable) (dynamic sizing)
+	- (Program) Hover Text (dynamic sizing / positioning)
+	- (Program) Brogue Log Text (dynamic sizing / scrolling / data setting with scroll)
+	- (Program) Modal Program (generic, and with UI Tag actions, generic views can change game state)
+	- (Program) Command (Help) Display
+	- (Program) Discovered Items Display
+	
+Player Status Panel:
+
+	- TODO: Add name of player to the game data, and display it proudly. 

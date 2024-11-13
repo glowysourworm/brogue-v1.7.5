@@ -141,6 +141,14 @@ namespace brogueHd::frontend
 			// *** Load OpenGL Backend
 			program->compile();
 			program->bind();
+
+			if (view->getPartId().getPartName() == brogueUIProgramPart::FlameMenuProgram_HeatDiffuseProgram)
+			{
+				int zoomLevel = view->getZoomLevel();
+				ivec2 cellSizeUI(brogueCellDisplay::CellWidth(zoomLevel), brogueCellDisplay::CellHeight(zoomLevel));
+
+				program->bindUniform2i("cellSizeUI", cellSizeUI);
+			}
 		}
 
 		_active = true;
@@ -408,6 +416,13 @@ namespace brogueHd::frontend
 			}
 
 			program->bind();
+
+			if (program->hasUniform("flameTexture") && partId.getName() == brogueUIProgram::FlameMenuProgram1)
+				program->bindUniform1i("flameTexture", 1);
+
+			else if (program->hasUniform("flameTexture") && partId.getName() == brogueUIProgram::FlameMenuProgram2)
+				program->bindUniform1i("flameTexture", 2);
+
 			program->draw();
 
 			if (configuration->useAlphaBlending)
