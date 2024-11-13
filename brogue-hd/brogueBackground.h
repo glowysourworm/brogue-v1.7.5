@@ -24,10 +24,7 @@ namespace brogueHd::frontend
 		brogueBackground(eventController* eventController, const brogueUIData& data, const gridRect& sceneBoundary, const gridRect& viewBoundary);
 		~brogueBackground();
 
-		virtual void update(const brogueKeyboardState& keyboardState,
-							const brogueMouseState& mouseState,
-							int millisecondsLapsed,
-							bool forceUpdate) override
+		virtual void update(int millisecondsLapsed, bool forceUpdate) override
 		{
 			// May not need this override (needsUpdate -> false)
 		}

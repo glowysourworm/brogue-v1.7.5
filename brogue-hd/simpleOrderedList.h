@@ -87,7 +87,7 @@ namespace brogueHd::simple
 	template<isHashable T>
 	simpleListComparer<T> simpleOrderedList<T>::getComparer() const
 	{
-		return _comparer;
+		return *_comparer;
 	}
 
 	template<isHashable T>

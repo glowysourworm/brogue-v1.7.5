@@ -1,4 +1,5 @@
 #pragma once
+#include "brogueBackground.h"
 #include "brogueButton.h"
 #include "brogueComposedView.h"
 #include "brogueFlameMenuDiffuseView.h"
@@ -18,12 +19,13 @@
 #include "gridRect.h"
 #include "randomGenerator.h"
 #include "resourceController.h"
+#include "simple.h"
 #include "simpleDirectoryEntry.h"
 #include "simpleExt.h"
 #include "simpleFileEntry.h"
 #include "simpleList.h"
+#include "simpleOrderedList.h"
 #include "simpleString.h"
-#include "brogueBackground.h"
 
 using namespace brogueHd::simple;
 using namespace brogueHd::backend::model;
@@ -218,20 +220,20 @@ namespace brogueHd::frontend
 			// Pulled from Brogue v1.7.5
 			color menuColor1(0.067, 0.059, 0.149, 0.8f);
 			color menuColor2(0.067, 0.059, 0.149, 0.8f);
-			color active1(0.7, 0.7, 0.7, 0.4);
-			color active2(0.7, 0.7, 0.7, 0.4);
-			color pressed1(0.7, 0.7, 0.7, 0.8);
-			color pressed2(0.7, 0.7, 0.7, 0.8);
+			color itemColor1(0, 0, 0, 0);
+			color itemColor2(0, 0, 0, 0);
+			color active1(0.3, 0.3, 0.3, 0.4);
+			color active2(0.3, 0.3, 0.3, 0.4);
+			color pressed1(0.3, 0.3, 0.3, 0.8);
+			color pressed2(0.3, 0.3, 0.3, 0.8);
 
 			gridRect sceneBounds = getBrogueSceneBoundary();
 			gridRect menuBackgroundBounds = getOpenMenuSelectorBoundary();
 			gridRect menuBounds = getPaddedBoundary(menuBackgroundBounds, 1);
-
-			brogueViewContainer* result = new brogueViewContainer(programName, true, true, menuBounds);
+			gridRect itemBounds(menuBounds);
 
 			simpleList<brogueUIData> buttons;
-
-			simpleList<simpleFileEntry*> filesSorted = files.sort();
+			simpleOrderedList<simpleFileEntry*> filesSorted = files.sort();
 
 			for (int index = 0; index < filesSorted.count(); index++)
 			{
@@ -243,66 +245,46 @@ namespace brogueHd::frontend
 				if (fileName.count() > ((menuBounds.width / 2.0f) - 3))
 					fileNameTrimmed = fileName.subString(0, (menuBounds.width / 2.0f) - 3);
 
-				char offsetChar[2]{};
 				simpleString result = "";
 
-				offsetChar[0] = (char)((int)'a' + index);
-				offsetChar[1] = '\0';
-
-				// Format the result
-				int column = menuBounds.left();
-				while (column < menuBounds.right())
+				if (fileNameTrimmed.count() > 0)
 				{
-					int textIndex = column - menuBounds.left();
-
-					if (textIndex == 0)
-					{
-						result.append(offsetChar);
-						column++;
-					}
-					else if (textIndex == 1)
-					{
-						result.append(") ");
-						column += 2;
-					}
-					else if (textIndex == 3)
-					{
-						if (fileNameTrimmed.count() > 0)
-						{
-							result.append(fileNameTrimmed);
-							result.append("...");
-
-							column += fileNameTrimmed.count() + 3;
-						}
-						else
-						{
-							result.append(fileName);
-
-							column += fileName.count();
-						}
-					}
-
-					// Date -> break;
-					else
-					{
-						int space = menuBounds.width - textIndex - filesSorted.get(index)->getWriteTimeShort()->count() - 1;
-						result.appendPadding(' ', space);
-						result.append(*(filesSorted.get(index)->getWriteTimeShort()));
-						break;
-					}
+					result.append(fileNameTrimmed);
+					result.append("...");
+				}
+				else
+				{
+					result.append(fileName);
 				}
 
+				int space = menuBounds.width - result.count() - filesSorted.get(index)->getWriteTimeShort()->count() - 1;
+				result.appendPadding(' ', space);
+				result.append(*(filesSorted.get(index)->getWriteTimeShort()));
+
 				brogueUIProgramPartId dataPartId(programName, brogueUIProgramPart::MenuButton, index);
-				brogueUIData data(dataPartId, boundary, zoomLevel, colorString(result.c_str(), colors::white()), menuColor1, menuColor2, active1, active2, pressed1, pressed2, brogueGradientType::Horizontal, brogueTextAlignment::Left);
+				brogueUIData data(dataPartId, boundary, zoomLevel, colorString(result.c_str(), colors::white()), itemColor1, itemColor1, active1, active2, pressed1, pressed2, brogueGradientType::Horizontal, brogueTextAlignment::Left);
+
+				// Expand total item container boundary for the background
+				itemBounds.expand(boundary);
 
 				// Hotkey is the first letter a), b), etc..
-				data.setUIParameters(0, -1, *(filesSorted.get(index)->getFileFullPath()), brogueUIAction::OpenGame, true, zoomLevel, 1);
+				data.setUIParameters(-1, -1, *(filesSorted.get(index)->getFileFullPath()), brogueUIAction::OpenGame, true, zoomLevel, 1);
 
 				buttons.add(data);
 			}
 
 			// Finally, create the views. The view container will handle the scroll and clipping behavior.
 			//
+			brogueViewContainer* result = new brogueViewContainer(programName, true, true, menuBounds);
+			
+			// This background will take the color of the menu while the scroll is applied; and carries the item dimensions.
+			//
+			brogueUIProgramPartId backgroundId(programName, brogueUIProgramPart::MenuBackground, 0);
+			brogueUIData backgroundData(backgroundId, itemBounds, zoomLevel, menuColor1, menuColor2, brogueGradientType::Circular);
+			backgroundData.setUIParameters(-1, -1, "", brogueUIAction::None, false, zoomLevel, 1);
+			brogueBackground* background = new brogueBackground(eventController, backgroundData, sceneBounds, itemBounds);
+
+			result->addView(background);
 
 			// Buttons
 			for (int index = 0; index < buttons.count(); index++)

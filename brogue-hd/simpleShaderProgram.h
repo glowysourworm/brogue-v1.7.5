@@ -66,6 +66,7 @@ namespace brogueHd::frontend
 		bool bindUniform4(const simpleString& name, const vec4& uniformValue);
 
 		bool bindUniforms();
+		bool hasUniform(const simpleString& name);
 
 	private:
 
@@ -188,7 +189,10 @@ namespace brogueHd::frontend
 
 		glUseProgram(NULL);
 	}
-
+	bool simpleShaderProgram::hasUniform(const simpleString& name)
+	{
+		return glGetUniformLocation(this->handle, name.c_str()) > 0;
+	}
 	bool simpleShaderProgram::bindUniforms()
 	{
 		if (!this->isCreated())

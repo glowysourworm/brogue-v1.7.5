@@ -5,6 +5,7 @@
 #include "brogueUIConstants.h"
 #include "brogueUIProgramPartId.h"
 #include "brogueViewBase.h"
+#include "gridLocator.h"
 #include "gridRect.h"
 #include "simple.h"
 #include "simpleException.h"
@@ -48,8 +49,8 @@ namespace brogueHd::frontend
 	public:		// brogueViewBase facade
 
 		gridRect getSceneBoundary() const;
-		gridRect getBoundary() const;
 		gridRect getContainerBoundary() const;
+		gridLocator getRenderOffset() const;
 		gridRect calculateSceneBoundaryUI() const;
 		gridRect calculateViewBoundaryUI() const;
 		int getZoomLevel() const;
@@ -58,10 +59,18 @@ namespace brogueHd::frontend
 
 	private:
 
+		/// <summary>
+		/// Returns aggregate child boundary with scroll offset
+		/// </summary>
+		gridRect getChildOffsetBoundary() const;
+
+	private:
+
 		brogueUIProgram _programName;
 		bool _hasScrollInteraction;
 		bool _applyClipping;
 		gridRect* _containerBoundary;
+		gridLocator* _renderOffset;
 		simpleHash<brogueUIProgramPartId, brogueViewBase*>* _views;
 	};
 
@@ -69,6 +78,7 @@ namespace brogueHd::frontend
 	{
 		_programName = programName;
 		_containerBoundary = new gridRect(containerBoundary);
+		_renderOffset = new gridLocator(0,0);
 		_hasScrollInteraction = hasScrollInteraction;
 		_applyClipping = applyClipping;
 		_views = new simpleHash<brogueUIProgramPartId, brogueViewBase*>();
@@ -77,6 +87,7 @@ namespace brogueHd::frontend
 	{
 		delete _views;
 		delete _containerBoundary;
+		delete _renderOffset;
 	}
 	void brogueViewContainer::addView(brogueViewBase* view)
 	{
@@ -105,14 +116,14 @@ namespace brogueHd::frontend
 
 		return _views->getAt(0)->value->getSceneBoundary();
 	}
-	gridRect brogueViewContainer::getBoundary() const
+	gridRect brogueViewContainer::getChildOffsetBoundary() const
 	{
 		if (_views->count() == 0)
 			throw simpleException("Must first add views to the brogueViewContainer before accessing data:  brogueViewContainer::getBoundary");
 
 		gridRect boundary = default_value::value<gridRect>();
 
-		return _views->getValues().aggregate<gridRect>(boundary, [] (const gridRect& bounds, brogueViewBase* view)
+		boundary = _views->getValues().aggregate<gridRect>(boundary, [] (const gridRect& bounds, brogueViewBase* view)
 		{
 			gridRect nextBounds = bounds;
 			gridRect viewBounds = view->getBoundary();
@@ -122,6 +133,11 @@ namespace brogueHd::frontend
 				nextBounds.expand(viewBounds);
 			return nextBounds;
 		});
+
+		// Apply scroll offset
+		boundary.translate(_renderOffset->column, _renderOffset->row);
+
+		return boundary;
 	}
 	bool brogueViewContainer::getClipping() const
 	{
@@ -130,6 +146,10 @@ namespace brogueHd::frontend
 	gridRect brogueViewContainer::getContainerBoundary() const
 	{
 		return *_containerBoundary;
+	}
+	gridLocator brogueViewContainer::getRenderOffset() const
+	{
+		return *_renderOffset;
 	}
 	gridRect brogueViewContainer::calculateSceneBoundaryUI() const
 	{
@@ -160,10 +180,13 @@ namespace brogueHd::frontend
 			return;
 
 		/*
-			UI Behavior:  This will add the scroll behavior. (or x-y scrolling behavior)
+			UI Behavior:  This will add the scroll behavior. (or x-y scrolling behavior). The
+						  getBoundary() method will allow for all child controls. The other
+						  getContainerBoundary() method will check the clipping boundary for
+						  this view container. 
 		*/
 
-		bool mouseOver = this->getBoundary().contains(mouseState.getLocation());
+		bool mouseOver = this->getContainerBoundary().contains(mouseState.getLocation());
 		bool mousePressed = mouseState.getMouseLeft();
 		bool scrollEvent = mouseState.getScrollPendingX() || mouseState.getScrollPendingY();
 
@@ -171,7 +194,7 @@ namespace brogueHd::frontend
 			return;
 
 		// Aggregate child boundary
-		gridRect childBoundary = this->getBoundary();
+		gridRect childBoundary = this->getChildOffsetBoundary();
 
 		// Check scroll bounds
 		int scrollX = 0;
@@ -190,25 +213,18 @@ namespace brogueHd::frontend
 			}
 			if (mouseState.getScrollPendingY())
 			{
-				if (mouseState.getScrollNegativeY() && childBoundary.top() < _containerBoundary->top())
-					scrollY = 1;
-
-				else if (mouseState.getScrollNegativeY() && childBoundary.bottom() > _containerBoundary->bottom())
+				// Up
+				if (mouseState.getScrollNegativeY() && childBoundary.bottom() > _containerBoundary->bottom())
 					scrollY = -1;
+
+				// Down
+				else if (!mouseState.getScrollNegativeY() && childBoundary.top() < _containerBoundary->top())
+					scrollY = 1;
 			}
 		}
 
-		if (scrollX == 0 && scrollY == 0)
-			return;
-
-		// Child Views
-		_views->forEach([&scrollX, &scrollY] (const brogueUIProgramPartId& partId, brogueViewBase* view)
-		{
-			// Sets UI Data -> (needsUpdate = true)
-			view->incrementRenderOffset(scrollX, scrollY);
-
-			return iterationCallback::iterate;
-		});
+		_renderOffset->row += scrollY;
+		_renderOffset->column += scrollX;
 	}
 	void brogueViewContainer::checkUpdate(const brogueUIProgramPartId& partId,
 										  const brogueKeyboardState& keyboardState,
@@ -218,11 +234,24 @@ namespace brogueHd::frontend
 		if (_views->count() == 0)
 			throw simpleException("Must first add views to the brogueViewContainer before accessing data:  brogueViewContainer::checkUpdate");
 
-		/*
-			CAREFUL!  Milliseconds lapsed is for the PART - not the entire view (for this call)
-		*/
+		// The view container must apply clipping container to the part. (Unless the
+		// child view requires an update anyway. Currently, this is not the behavior
+		// of child views for the view container; but would be easy to add)
+		//
+		if (!this->getContainerBoundary().contains(mouseState.getLocation()))
+			return;
 
-		_views->get(partId)->checkUpdate(keyboardState, mouseState, millisecondsLapsed);
+		// Apply mouse transform to the mouse state for the child views (apply scrolling
+		// and clipping.
+		//
+		brogueMouseState adjustedMouse(mouseState.getLocation().subtract(*_renderOffset), 
+									   mouseState.getScrollPendingX(), 
+									   mouseState.getScrollPendingY(),
+									   mouseState.getScrollPendingX(), 
+									   mouseState.getScrollNegativeY(), 
+									   mouseState.getMouseLeft());
+
+		_views->get(partId)->checkUpdate(keyboardState, adjustedMouse, millisecondsLapsed);
 	}
 	bool brogueViewContainer::needsUpdate(const brogueUIProgramPartId& partId) const
 	{

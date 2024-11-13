@@ -26,7 +26,6 @@ namespace brogueHd::frontend
 			_text = default_value::value<colorString>();
 			_boundary = default_value::value<gridRect>();
 			_background = default_value::value<colorGradient>();
-			_renderOffset = default_value::value<gridLocator>();
 			_hoverBackground = default_value::value<colorGradient>();
 			_pressedBackground = default_value::value<colorGradient>();
 			_tagAction = default_value::value<brogueUITagAction>();
@@ -115,7 +114,6 @@ namespace brogueHd::frontend
 			_background = colorGradient(gradient1, gradient2, gradientType);
 			_hoverBackground = colorGradient(mouseBackground1, mouseBackground2, gradientType);
 			_pressedBackground = colorGradient(mousePressed1, mousePressed2, gradientType);
-			_renderOffset = gridLocator(0, 0);
 			_alignment = alignment;
 			_hotkeyIndex = -1;
 			_zoomLevel = zoomLevel;
@@ -325,18 +323,6 @@ namespace brogueHd::frontend
 			return offsetColumn - textIndex == _hotkeyIndex;
 		}
 
-		gridLocator getRenderOffset() const
-		{
-			return _renderOffset;
-		}
-
-		void setRenderOffset(short column, short row)
-		{
-			_renderOffset.column = column;
-			_renderOffset.row = row;
-
-			_needsUpdate = true;
-		}
 		int getZIndex() const
 		{
 			return _zIndex;
@@ -369,7 +355,6 @@ namespace brogueHd::frontend
 			_background = copy.getBackground();
 			_hoverBackground = copy.getHoverBackground();
 			_pressedBackground = copy.getPressedBackground();
-			_renderOffset = copy.getRenderOffsetPtr();
 			_tagAction = copy.getAction();
 
 			_alignment = copy.getAlignment();
@@ -458,10 +443,6 @@ namespace brogueHd::frontend
 		{
 			return _boundary;
 		}
-		gridLocator getRenderOffsetPtr() const
-		{
-			return _renderOffset;
-		}
 		brogueTextAlignment getAlignment() const
 		{
 			return _alignment;
@@ -478,7 +459,6 @@ namespace brogueHd::frontend
 
 		colorString _text;
 		gridRect _boundary;
-		gridLocator _renderOffset;
 		colorGradient _background;
 		colorGradient _hoverBackground;
 		colorGradient _pressedBackground;

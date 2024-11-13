@@ -30,7 +30,6 @@ namespace brogueHd::frontend
 
 		virtual gridRect getSceneBoundary() const;
 		virtual gridRect getBoundary() const;
-		virtual gridRect getRenderBoundary() const;
 
 		/// <summary>
 		/// (TODO: MOVE THIS) Calculates the view's scene boundary is UI coordinates. This is not the same as the
@@ -74,9 +73,7 @@ namespace brogueHd::frontend
 		/// <summary>
 		/// Updates the view's grid cells when there has been a change to the view
 		/// </summary>
-		virtual void update(const brogueKeyboardState& keyboardState,
-							const brogueMouseState& mouseState,
-							int millisecondsLapsed,
+		virtual void update(int millisecondsLapsed,
 							bool forceUpdate);
 
 		/// <summary>
@@ -98,8 +95,6 @@ namespace brogueHd::frontend
 
 		brogueUIProgramPartId getPartId() const;
 
-		void incrementRenderOffset(short columnOffset, short rowOffset);
-		gridLocator getRenderOffset() const;
 		color getBackgroundColor(short column, short row) const;
 		color getForegroundColor(short column, short row) const;
 		char getText(short column, short row) const;
@@ -156,9 +151,7 @@ namespace brogueHd::frontend
 	}
 	brogueCellDisplay* brogueViewBase::get(short column, short row) const
 	{
-		gridLocator offset = getRenderOffset();
-
-		return _view->get(offset.column + column, offset.row + row);
+		return _view->get(column, row);
 	}
 	gridRect brogueViewBase::calculateSceneBoundaryUI() const
 	{
@@ -188,29 +181,9 @@ namespace brogueHd::frontend
 	{
 		return _view->getParentBoundary();
 	}
-	gridRect brogueViewBase::getRenderBoundary() const
-	{
-		gridRect boundary = _uiData->getBounds();
-		gridLocator offset = _uiData->getRenderOffset();
-
-		boundary.translate(-1 * offset.column, -1 * offset.row);
-
-		return boundary;
-	}
 	brogueUIProgramPartId brogueViewBase::getPartId() const
 	{
 		return _uiData->getId();
-	}
-	void brogueViewBase::incrementRenderOffset(short columnOffset, short rowOffset)
-	{
-		gridLocator offset = _uiData->getRenderOffset();
-
-		_uiData->setRenderOffset(offset.column + columnOffset, offset.row + rowOffset);
-	}
-
-	gridLocator brogueViewBase::getRenderOffset() const
-	{
-		return _uiData->getRenderOffset();
 	}
 	color brogueViewBase::getBackgroundColor(short column, short row) const
 	{
@@ -234,7 +207,7 @@ namespace brogueHd::frontend
 	}
 	bool brogueViewBase::isMouseOver(const brogueMouseState& mouseState) const
 	{
-		return this->getRenderBoundary().contains(mouseState.getLocation());
+		return this->getBoundary().contains(mouseState.getLocation());
 	}
 	bool brogueViewBase::getMouseEnter() const
 	{
@@ -269,8 +242,8 @@ namespace brogueHd::frontend
 		_uiData->clearCapture();
 	}
 	void brogueViewBase::checkUpdate(const brogueKeyboardState& keyboardState,
-										const brogueMouseState& mouseState,
-										int millisecondsLapsed)
+									 const brogueMouseState& mouseState,
+									 int millisecondsLapsed)
 	{
 		// Sets primary real time UI data for the mouse / live updates to the UI.
 		_uiData->setUpdate(mouseState.getMouseLeft(), this->isMouseOver(mouseState));
@@ -279,14 +252,9 @@ namespace brogueHd::frontend
 		{
 			// UI EVENT:  Mouse Click
 			this->raiseClickEvent(_uiData->getAction());
-
-			// Clears UI event data for the mouse
-			//_uiData->clearCapture();
 		}
 	}
-	void brogueViewBase::update(const brogueKeyboardState& keyboardState,
-								const brogueMouseState& mouseState,
-								int millisecondsLapsed,
+	void brogueViewBase::update(int millisecondsLapsed,
 								bool forceUpdate)
 	{
 		throw simpleException("brogueViewBase::update must be overridden in the child class");

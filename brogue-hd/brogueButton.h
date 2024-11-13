@@ -21,11 +21,7 @@ namespace brogueHd::frontend
 		brogueButton(eventController* eventController, const brogueUIData& data, const gridRect& sceneBoundary, const gridRect& viewBoundary);
 		~brogueButton();
 
-		virtual void update(const brogueKeyboardState& keyboardState,
-							const brogueMouseState& mouseState,
-							int millisecondsLapsed,
-							bool forceUpdate) override;
-
+		virtual void update(int millisecondsLapsed, bool forceUpdate) override;
 		virtual bool needsUpdate() const override;
 	};
 
@@ -34,7 +30,7 @@ namespace brogueHd::frontend
 	{
 		// Initialize the view
 		//
-		update(default_value::value<brogueKeyboardState>(), default_value::value<brogueMouseState>(), 0, true);
+		update(0, true);
 	}
 	brogueButton::~brogueButton()
 	{
@@ -45,10 +41,7 @@ namespace brogueHd::frontend
 		//
 		return brogueViewBase::needsUpdate() || this->getMouseLeave() || this->getMouseEnter();
 	}
-	void brogueButton::update(const brogueKeyboardState& keyboardState,
-							  const brogueMouseState& mouseState,
-							  int millisecondsLapsed,
-							  bool forceUpdate)
+	void brogueButton::update(int millisecondsLapsed, bool forceUpdate)
 	{
 		gridRect bounds = this->getBoundary();
 		brogueButton* that = this;

@@ -3,6 +3,7 @@
 #include "simple.h"
 #include "simpleFileEntry.h"
 #include "simpleList.h"
+#include "simpleOrderedList.h"
 #include <corecrt.h>
 
 namespace brogueHd::simple
@@ -44,12 +45,20 @@ namespace brogueHd::simple
 			return _files->count();
 		}
 
-		simpleList<simpleFileEntry*> sort() const
+		simpleOrderedList<simpleFileEntry*> sort() const
 		{
-			return _files->sort([] (simpleFileEntry* item1, simpleFileEntry* item2)
+			simpleOrderedList<simpleFileEntry*> result([] (simpleFileEntry* item1, simpleFileEntry* item2)
 			{
 				return simpleFileEntry::comparePath(*item1, *item2);
 			});
+
+			_files->forEach([&result] (simpleFileEntry* item)
+			{
+				result.add(item);
+				return iterationCallback::iterate;
+			});
+
+			return result;
 		}
 
 	protected:

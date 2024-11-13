@@ -34,9 +34,7 @@ namespace brogueHd::frontend
 								const gridRect& viewBoundary);
 		~brogueFlameMenuHeatView();
 
-		void update(const brogueKeyboardState& keyboardState,
-					const brogueMouseState& mouseState,
-					int millisecondsLapsed,
+		void update(int millisecondsLapsed,
 					bool forceUpdate) override;
 
 		void checkUpdate(const brogueKeyboardState& keyboardState,
@@ -181,10 +179,7 @@ namespace brogueHd::frontend
 	{
 		brogueViewBase::clearEvents();
 	}
-	void brogueFlameMenuHeatView::update(const brogueKeyboardState& keyboardState,
-										 const brogueMouseState& mouseState,
-										 int millisecondsLapsed,
-										 bool forceUpdate)
+	void brogueFlameMenuHeatView::update(int millisecondsLapsed, bool forceUpdate)
 	{
 		if (_fadePeriodCounter->pending())
 			cycleHeatSources();

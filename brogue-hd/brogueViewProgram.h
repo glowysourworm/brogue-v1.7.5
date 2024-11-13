@@ -56,7 +56,12 @@ namespace brogueHd::frontend
 			_programs = new simpleHash<brogueUIProgramPartId, simpleShaderProgram*>();
 			_programCounters = new simpleHash<brogueUIProgramPartId, simplePeriodCounter*>();
 			_active = false;
-			_clipXY = nullptr;
+
+			// Create a coordinate converter to use during the render loop
+			gridRect sceneBoundaryUI = _viewContainer->calculateSceneBoundaryUI();
+			
+			_coordinateConverter = new brogueCoordinateConverter(
+				_programBuilder->buildCoordinateConverter(sceneBoundaryUI.width, sceneBoundaryUI.height, _viewContainer->getZoomLevel()));
 		}
 		~brogueViewProgram()
 		{
@@ -70,7 +75,7 @@ namespace brogueHd::frontend
 
 			delete _programBuilder;
 			delete _programs;
-			delete _clipXY;
+			delete _coordinateConverter;
 		}
 
 		bool isActive();
@@ -98,6 +103,8 @@ namespace brogueHd::frontend
 
 		gridRect getSceneBoundaryUI() const;
 		simpleQuad getCellSizeUV() const;
+		vec2 getScrollUV() const;
+		vec4 getClipXY() const;
 
 		brogueKeyboardState calculateKeyboardState(const simpleKeyboardState& keyboard);
 		brogueMouseState calculateMouseState(const simpleMouseState& mouse);
@@ -112,12 +119,7 @@ namespace brogueHd::frontend
 		bool _active;
 		brogueViewContainer* _viewContainer;
 		brogueProgramBuilder* _programBuilder;
-
-		// TODO: Move this. OpenGL coordinates are creeping into the program. It's probably most
-		// efficient to create a View-Stream-Program; but that's not on the agenda, right now. So,
-		// this will just get stored here until everything is consolidated.
-		//
-		vec4* _clipXY;
+		brogueCoordinateConverter* _coordinateConverter;
 
 		simpleHash<brogueUIProgramPartId, simpleShaderProgram*>* _programs;
 		simpleHash<brogueUIProgramPartId, simplePeriodCounter*>* _programCounters;
@@ -125,20 +127,6 @@ namespace brogueHd::frontend
 
 	void brogueViewProgram::initialize()
 	{
-		resourceController* resourceController = _resourceController;
-		brogueProgramBuilder* programBuilder = _programBuilder;
-
-		// Calculate clipping rectangle for the view container
-		gridRect sceneBoundaryUI = _viewContainer->calculateSceneBoundaryUI();
-		gridRect clip = _viewContainer->getContainerBoundary();
-		brogueCoordinateConverter converter = _programBuilder->buildCoordinateConverter(sceneBoundaryUI.width, sceneBoundaryUI.height, _viewContainer->getZoomLevel());
-
-		vec2 topLeft = converter.getViewConverter().createQuadNormalizedXY_FromLocator(clip.left(), clip.top()).topLeft;
-		vec2 bottomRight = converter.getViewConverter().createQuadNormalizedXY_FromLocator(clip.right(), clip.bottom()).bottomRight;
-
-		// (MEMORY!) This is calculated once for the run loop
-		_clipXY = new vec4(topLeft.x, topLeft.y, bottomRight.x - topLeft.x, topLeft.y - bottomRight.y);
-
 		// Create shader programs for each program part
 		for (int index = 0; index < _viewContainer->getViewCount(); index++)
 		{
@@ -153,10 +141,6 @@ namespace brogueHd::frontend
 			// *** Load OpenGL Backend
 			program->compile();
 			program->bind();
-
-			// Specific Uniforms
-			if (_viewContainer->getClipping())
-				program->bindUniform4("clipXY", *_clipXY);
 		}
 
 		_active = true;
@@ -229,6 +213,31 @@ namespace brogueHd::frontend
 									brogueCellDisplay::CellHeight(_viewContainer->getZoomLevel()));
 	}
 
+	vec2 brogueViewProgram::getScrollUV() const
+	{
+		// Scroll Offset (Not quite a simple coordinate transfer. It's also backwards in the y-space)
+		vec2 offsetUI = vec2(_viewContainer->getRenderOffset().column * brogueCellDisplay::CellWidth(_viewContainer->getZoomLevel()),
+							 _viewContainer->getRenderOffset().row * brogueCellDisplay::CellHeight(_viewContainer->getZoomLevel()));
+
+		// Points to an inverted y-coordinate
+		vec2 offsetUV = _coordinateConverter->getViewConverter().convertToNormalizedUV(offsetUI.x, offsetUI.y);
+
+		offsetUV.y = 1 - offsetUV.y;
+
+		return offsetUV;
+	}
+
+	vec4 brogueViewProgram::getClipXY() const
+	{
+		// Clipping Boundary
+		//
+		gridRect clip = _viewContainer->getContainerBoundary();
+		vec2 topLeft = _coordinateConverter->getViewConverter().createQuadNormalizedXY_FromLocator(clip.left(), clip.top()).topLeft;
+		vec2 bottomRight = _coordinateConverter->getViewConverter().createQuadNormalizedXY_FromLocator(clip.right(), clip.bottom()).bottomRight;
+
+		return vec4(topLeft.x, topLeft.y, bottomRight.x - topLeft.x, topLeft.y - bottomRight.y);
+	}
+
 	brogueKeyboardState brogueViewProgram::calculateKeyboardState(const simpleKeyboardState& keyboard)
 	{
 		// TODO: Get translator for the key system; and implement hotkeys
@@ -259,11 +268,11 @@ namespace brogueHd::frontend
 		brogueKeyboardState keyboardUI = calculateKeyboardState(keyboardState);
 		brogueMouseState mouseUI = calculateMouseState(mouseState);
 
-		// Scroll Update:  The brogueViewContainer handles scroll events and offsets. These are
-		//				   stored with all the child views' UI data; and consumed during normal
-		//				   updates and checkUpdates.
+		// Scroll Update:  The brogueViewContainer handles offsets during checkUpdate. These
+		//				   render offsets are stored with the view container; and consumed by
+		//				   the main program during rendering.
 		//
-		//_viewContainer->updateScroll(keyboardUI, mouseUI, millisecondsLapsed);
+		_viewContainer->updateScroll(keyboardUI, mouseUI, millisecondsLapsed);
 
 		// Iterate Child Views: Each corresponds to a program part; and the composed views are 
 		//						of ViewCompositor type.
@@ -272,14 +281,9 @@ namespace brogueHd::frontend
 		{
 			brogueViewBase* view = _viewContainer->getViewAt(index);
 
-			// Check counter to prevent pre-mature update (AutoReset = false) (clear when caller uses clearUpdate)
-			//if (_programCounters->get(view->getPartId())->update(millisecondsLapsed, false));
-			//{
-				// Get actual time period (for having waited)
-				//int partMillisecondsLapsed = _programCounters->get(view->getPartId())->getCounter();
-
-				_viewContainer->checkUpdate(view->getPartId(), keyboardUI, mouseUI, millisecondsLapsed);
-			//}
+			// Program Part's Update
+			//
+			_viewContainer->checkUpdate(view->getPartId(), keyboardUI, mouseUI, millisecondsLapsed);
 		}
 	}
 
@@ -343,6 +347,11 @@ namespace brogueHd::frontend
 		if (!_active)
 			throw simpleException("Brogue View Program not active:  brogueViewProgram::update");
 
+		/*
+			Scroll / Clip Behavior:  The clipping rectangle is set once during initialization. The 
+									 scroll is handled during the render / update loop (here)
+		*/
+
 		gridRect sceneBoundary = this->getSceneBoundaryUI();
 
 		brogueMouseState mouseStateUI = calculateMouseState(mouseState);
@@ -360,7 +369,7 @@ namespace brogueHd::frontend
 			if (view->needsUpdate() || forceUpdate)
 			{
 				// View will present new data
-				view->update(keyboardStateUI, mouseStateUI, millisecondsLapsed, forceUpdate);
+				view->update(millisecondsLapsed, forceUpdate);
 
 				// Must update the data stream
 				simpleDataStream* stream = _programs->get(partId)->getStream();
@@ -368,7 +377,7 @@ namespace brogueHd::frontend
 				// Rebuilds the current data stream
 				_programBuilder->rebuildDataStream(view, *_resourceController->getUIPartConfig(partId.getPartName()), stream);
 
-				// Put the new stream online (deletes the old stream)
+				// Put the new stream online (GPU memory transfer, no allocation on the heap)
 				_programs->get(partId)->bind();
 				_programs->get(partId)->reBuffer();
 			}
@@ -400,6 +409,9 @@ namespace brogueHd::frontend
 
 			program->bind();
 			program->draw();
+
+			if (configuration->useAlphaBlending)
+				glDisable(GL_BLEND);
 
 			glFlush();
 
@@ -433,9 +445,6 @@ namespace brogueHd::frontend
 				//
 				//glNamedCopyBufferSubDataEXT(program->getHandle(), program->getHandle(), fromStreamStart, toStreamStart, toStreamEnd - toStreamStart);
 			}
-
-			if (configuration->useAlphaBlending)
-				glDisable(GL_BLEND);
 		}
 	}
 

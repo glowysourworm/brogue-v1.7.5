@@ -29,9 +29,7 @@ namespace brogueHd::frontend
 		~brogueComposedView();
 
 		// Overrides manage child views
-		virtual void update(const brogueKeyboardState& keyboardState,
-							const brogueMouseState& mouseState,
-							int millisecondsLapsed,
+		virtual void update(int millisecondsLapsed,
 							bool forceUpdate) override;
 
 		virtual void checkUpdate(const brogueKeyboardState& keyboardState,
@@ -118,7 +116,7 @@ namespace brogueHd::frontend
 		*/
 
 		// This View (Behaves as brogueView)
-		bool mouseOver = this->getRenderBoundary().contains(mouseState.getLocation());
+		bool mouseOver = this->getBoundary().contains(mouseState.getLocation());
 		bool mousePressed = mouseState.getMouseLeft();
 		bool hasInteraction = this->getHasMouseInteraction();
 		bool scrollEvent = mouseState.getScrollPendingX() || mouseState.getScrollPendingY();
@@ -148,15 +146,12 @@ namespace brogueHd::frontend
 
 		return result;
 	}
-	void brogueComposedView::update(const brogueKeyboardState& keyboardState,
-									const brogueMouseState& mouseState,
-									int millisecondsLapsed,
-									bool forceUpdate)
+	void brogueComposedView::update(int millisecondsLapsed, bool forceUpdate)
 	{
-		_views->forEach([&keyboardState, &mouseState, &millisecondsLapsed, &forceUpdate] (brogueViewBase* item)
+		_views->forEach([&millisecondsLapsed, &forceUpdate] (brogueViewBase* item)
 		{
 			if (item->needsUpdate() || forceUpdate)
-				item->update(keyboardState, mouseState, millisecondsLapsed, forceUpdate);
+				item->update(millisecondsLapsed, forceUpdate);
 
 			return iterationCallback::iterate;
 		});
