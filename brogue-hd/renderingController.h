@@ -8,15 +8,11 @@
 #include "brogueUIBuilder.h"
 #include "brogueUIConstants.h"
 #include "brogueViewContainer.h"
-#include "color.h"
-#include "colorString.h"
 #include "eventController.h"
 #include "gridRect.h"
 #include "openglRenderer.h"
 #include "randomGenerator.h"
 #include "resourceController.h"
-#include "simpleDirectoryEntry.h"
-#include "simpleFileIO.h"
 #include "simpleList.h"
 
 using namespace brogueHd::frontend;
@@ -68,8 +64,8 @@ namespace brogueHd::backend
 
 		// Title Screen:  Build program parts, load the container
 
-		brogueViewContainer* titleView1 = _uiBuilder->buildProgramView(brogueUIProgram::FlameMenuProgram1);
-		brogueViewContainer* titleView2 = _uiBuilder->buildProgramView(brogueUIProgram::FlameMenuProgram2);
+		brogueViewContainer* flameView = _uiBuilder->buildProgramView(brogueUIProgram::FlameMenuProgram);
+		brogueViewContainer* titleMask = _uiBuilder->buildProgramView(brogueUIProgram::FlameMenuTitleMaskProgram);
 		brogueViewContainer* mainMenu = _uiBuilder->buildProgramView(brogueUIProgram::MainMenuProgram);
 		brogueViewContainer* openMenu = _uiBuilder->buildProgramView(brogueUIProgram::OpenMenuProgram);
 		brogueViewContainer* openMenuBackground = _uiBuilder->buildProgramView(brogueUIProgram::OpenMenuBackgroundProgram);
@@ -79,8 +75,8 @@ namespace brogueHd::backend
 
 		simpleList<brogueViewContainer*> viewList;
 
-		viewList.add(titleView1);
-		viewList.add(titleView2);
+		viewList.add(flameView);
+		viewList.add(titleMask);
 		viewList.add(mainMenu);
 		viewList.add(openMenuBackground);
 		viewList.add(openMenu);
@@ -88,7 +84,7 @@ namespace brogueHd::backend
 		viewList.add(playbackMenu);
 		viewList.add(highScoresMenu);
 
-		gridRect sceneBoundaryUI = titleView1->calculateSceneBoundaryUI();
+		gridRect sceneBoundaryUI = flameView->calculateSceneBoundaryUI();
 
 		_programContainer = new brogueProgramContainer(_uiBuilder, resourceController, eventController, _glyphMap, sceneBoundaryUI, zoomLevel, viewList);
 	}

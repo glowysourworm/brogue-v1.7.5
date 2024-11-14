@@ -1,6 +1,5 @@
 #pragma once
 #include "brogueBackground.h"
-#include "brogueCellDisplay.h"
 #include "brogueGlobal.h"
 #include "brogueGlyphMap.h"
 #include "brogueKeyboardState.h"
@@ -21,7 +20,6 @@
 #include "resourceController.h"
 #include "simple.h"
 #include "simpleBitmap.h"
-#include "simpleDataStream.h"
 #include "simpleExt.h"
 #include "simpleFrameBuffer.h"
 #include "simpleGlData.h"
@@ -90,8 +88,8 @@ namespace brogueHd::frontend
 		simpleFrameBuffer* _frameBuffer;
 
 		simpleTexture* _frameTexture;				// GL_TEXTURE0, Color Attachment 0, (same thing), will carry the primary frame output (background(s))
-		simpleTexture* _redFlameTexture;			// GL_TEXTURE1, Red Flame Background
-		simpleTexture* _blueFlameTexture;			// GL_TEXTURE2, Blue Flame Background
+		simpleTexture* _flameTexture;				// GL_TEXTURE1, Blue Flame Background
+		simpleTexture* _titleMaskTexture;			// GL_TEXTURE2, Title Mask - separated due to frame buffer thrashing.
 		simpleTexture* _uiTexture;					// GL_TEXTURE3, Color Attachment 1, carries the UI components
 		simpleTexture* _openMenuTexture;			// GL_TEXTURE4 (Open Menu Selector) (Clipping / Scrolling Behavior)
 		simpleTexture* _playbackMenuTexture;		// GL_TEXTURE5 (Playback Menu Selector) (Clipping / Scrolling Behavior)
@@ -152,8 +150,8 @@ namespace brogueHd::frontend
 		//
 
 		_frameTexture = new simpleTexture(nullptr, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE0, GL_RGBA, GL_RGBA8, 4, GL_FLOAT);
-		_redFlameTexture = new simpleTexture(nullptr, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE1, GL_RGBA, GL_RGBA8, 4, GL_FLOAT);
-		_blueFlameTexture = new simpleTexture(nullptr, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE2, GL_RGBA, GL_RGBA8, 4, GL_FLOAT);
+		_flameTexture = new simpleTexture(nullptr, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE1, GL_RGBA, GL_RGBA8, 4, GL_FLOAT);
+		_titleMaskTexture = new simpleTexture(nullptr, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE2, GL_RGBA, GL_RGBA8, 4, GL_FLOAT);
 		_uiTexture = new simpleTexture(nullptr, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE3, GL_RGBA, GL_RGBA8, 4, GL_FLOAT);
 		_openMenuTexture = new simpleTexture(nullptr, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE4, GL_RGBA, GL_RGBA8, 4, GL_FLOAT);
 		_playbackMenuTexture = new simpleTexture(nullptr, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE5, GL_RGBA, GL_RGBA8, 4, GL_FLOAT);
@@ -179,8 +177,8 @@ namespace brogueHd::frontend
 	{
 		delete _frameProgram;
 		delete _frameTexture;
-		delete _redFlameTexture;
-		delete _blueFlameTexture;
+		delete _flameTexture;
+		delete _titleMaskTexture;
 		delete _uiTexture;
 		delete _openMenuTexture;
 		delete _playbackMenuTexture;
@@ -251,15 +249,15 @@ namespace brogueHd::frontend
 
 				glDrawBuffer(GL_COLOR_ATTACHMENT1);
 
-				// Red Flame Texture (buffer feedback, doesn't get cleared)
-				if (_uiPrograms->get(brogueUIProgram::FlameMenuProgram1)->isActive())
-					_uiPrograms->get(brogueUIProgram::FlameMenuProgram1)->run(millisecondsElapsed);
+				// Flame Texture
+				if (_uiPrograms->get(brogueUIProgram::FlameMenuProgram)->isActive())
+					_uiPrograms->get(brogueUIProgram::FlameMenuProgram)->run(millisecondsElapsed);
 
 				glDrawBuffer(GL_COLOR_ATTACHMENT2);
 
-				// Blue Flame Texture (buffer feedback, doesn't get cleared)
-				if (_uiPrograms->get(brogueUIProgram::FlameMenuProgram2)->isActive())
-					_uiPrograms->get(brogueUIProgram::FlameMenuProgram2)->run(millisecondsElapsed);
+				// Title Mask
+				if (_uiPrograms->get(brogueUIProgram::FlameMenuTitleMaskProgram)->isActive())
+					_uiPrograms->get(brogueUIProgram::FlameMenuTitleMaskProgram)->run(millisecondsElapsed);
 
 				break;
 			case BrogueGameMode::Game:
@@ -333,6 +331,10 @@ namespace brogueHd::frontend
 		// Unbind the frame buffer -> render output to normal GL output
 		_frameBuffer->unBind();
 
+		glFlush();
+		glFinish();
+
+
 		// Get frame program uniforms
 		vec4 openMenuClipXY = _uiPrograms->get(brogueUIProgram::OpenMenuProgram)->getClipXY();
 		vec4 playbackMenuClipXY = _uiPrograms->get(brogueUIProgram::PlaybackMenuProgram)->getClipXY();
@@ -360,8 +362,8 @@ namespace brogueHd::frontend
 
 		// Create the textures:  Texture 1 is used for the direct drawing, Texture 0 for the "color diffusion"
 		_frameTexture->glCreate(-1);		// Textures don't automatically associate w/ a program
-		_redFlameTexture->glCreate(-1);
-		_blueFlameTexture->glCreate(-1);
+		_flameTexture->glCreate(-1);
+		_titleMaskTexture->glCreate(-1);
 		_uiTexture->glCreate(-1);
 		_openMenuTexture->glCreate(-1);
 		_playbackMenuTexture->glCreate(-1);
@@ -373,8 +375,8 @@ namespace brogueHd::frontend
 		// Attach texture to frame buffer
 		_frameBuffer->bind();
 		_frameBuffer->attachTexture(_frameTexture->getHandle(), GL_COLOR_ATTACHMENT0);
-		_frameBuffer->attachTexture(_redFlameTexture->getHandle(), GL_COLOR_ATTACHMENT1);
-		_frameBuffer->attachTexture(_blueFlameTexture->getHandle(), GL_COLOR_ATTACHMENT2);
+		_frameBuffer->attachTexture(_flameTexture->getHandle(), GL_COLOR_ATTACHMENT1);
+		_frameBuffer->attachTexture(_titleMaskTexture->getHandle(), GL_COLOR_ATTACHMENT2);
 		_frameBuffer->attachTexture(_uiTexture->getHandle(), GL_COLOR_ATTACHMENT3);
 		_frameBuffer->attachTexture(_openMenuTexture->getHandle(), GL_COLOR_ATTACHMENT4);
 		_frameBuffer->attachTexture(_playbackMenuTexture->getHandle(), GL_COLOR_ATTACHMENT5);
@@ -445,7 +447,7 @@ namespace brogueHd::frontend
 		_uiPrograms->iterate([] (brogueUIProgram programName, brogueViewProgram* program)
 		{
 			//if (program->isActive())
-				program->clearUpdate();
+			program->clearUpdate();
 
 			return iterationCallback::iterate;
 		});
@@ -455,7 +457,7 @@ namespace brogueHd::frontend
 		_uiPrograms->iterate([] (brogueUIProgram programName, brogueViewProgram* program)
 		{
 			//if (program->isActive())
-				program->clearEvents();
+			program->clearEvents();
 
 			return iterationCallback::iterate;
 		});
@@ -513,8 +515,8 @@ namespace brogueHd::frontend
 		switch (mode)
 		{
 			case BrogueGameMode::Title:
-				_uiPrograms->get(brogueUIProgram::FlameMenuProgram1)->activate();
-				_uiPrograms->get(brogueUIProgram::FlameMenuProgram2)->activate();
+				_uiPrograms->get(brogueUIProgram::FlameMenuProgram)->activate();
+				_uiPrograms->get(brogueUIProgram::FlameMenuTitleMaskProgram)->activate();
 				_uiPrograms->get(brogueUIProgram::MainMenuProgram)->activate();
 				break;
 			case BrogueGameMode::Game:

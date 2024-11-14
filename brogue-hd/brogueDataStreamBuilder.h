@@ -8,9 +8,10 @@
 #include "openglQuadConverter.h"
 #include "resourceController.h"
 
-#include "brogueAdjacencyColorQuad.h"
 #include "brogueColorQuad.h"
 #include "brogueCoordinateConverter.h"
+#include "brogueFlameMenuHeatView.h"
+#include "brogueFlameQuad.h"
 #include "brogueUIConstants.h"
 #include "brogueViewBase.h"
 #include "color.h"
@@ -150,9 +151,9 @@ namespace brogueHd::frontend
 				result = new simpleDataStream(cellCount, quad.getElementVertexSize(GL_TRIANGLES), quad.getStreamSize(GL_TRIANGLES));
 			}
 			break;
-			case openglDataStreamType::brogueAdjacencyColorQuad:
+			case openglDataStreamType::brogueFlameQuad:
 			{
-				brogueAdjacencyColorQuad quad;
+				brogueFlameQuad quad;
 				result = new simpleDataStream(cellCount, quad.getElementVertexSize(GL_TRIANGLES), quad.getStreamSize(GL_TRIANGLES));
 			}
 			break;
@@ -182,7 +183,7 @@ namespace brogueHd::frontend
 				result = new simpleDataStream(1, quad.getElementVertexSize(GL_TRIANGLES), quad.getStreamSize(GL_TRIANGLES));
 			}
 			break;
-			case openglDataStreamType::brogueAdjacencyColorQuad:
+			case openglDataStreamType::brogueFlameQuad:
 			case openglDataStreamType::brogueCellQuad:
 			default:
 				throw simpleException("Invalid openglDataStreamType (for frame):  brogueDataStreamBuilder::initializeDataStream");
@@ -232,7 +233,7 @@ namespace brogueHd::frontend
 		simpleList<brogueImageQuad> imageQuads;
 		simpleList<brogueCellQuad> cellQuads;
 		simpleList<brogueColorQuad> colorQuads;
-		simpleList<brogueAdjacencyColorQuad> adjColorQuads;
+		simpleList<brogueFlameQuad> adjColorQuads;
 
 		// Iterator scope could be removed; but want to be able to handle the root issue. Should be able to copy data
 		// up the stack.
@@ -251,8 +252,8 @@ namespace brogueHd::frontend
 					else
 						cellQuads.add(coordinateConverter.createBrogueCellQuadScene(*cell, column, row, openglBrogueCellOutputSelector::Display));
 					break;
-				case openglDataStreamType::brogueAdjacencyColorQuad:
-					adjColorQuads.add(coordinateConverter.createBrogueAdjacencyColorQuadScene(*cell, column, row));
+				case openglDataStreamType::brogueFlameQuad:
+					adjColorQuads.add(coordinateConverter.createBrogueFlameQuadScene((brogueFlameMenuHeatView*)view, *cell, column, row));
 					break;
 				case openglDataStreamType::brogueColorQuad:
 					colorQuads.add(coordinateConverter.createBrogueColorQuadScene(*cell, column, row));
@@ -302,9 +303,9 @@ namespace brogueHd::frontend
 				});
 			}
 			break;
-			case openglDataStreamType::brogueAdjacencyColorQuad:
+			case openglDataStreamType::brogueFlameQuad:
 			{
-				adjColorQuads.forEach([&dataStream] (const brogueAdjacencyColorQuad& quad)
+				adjColorQuads.forEach([&dataStream] (const brogueFlameQuad& quad)
 				{
 					quad.streamBuffer(GL_TRIANGLES, dataStream);
 					return iterationCallback::iterate;
@@ -350,7 +351,7 @@ namespace brogueHd::frontend
 				colorQuad.streamBuffer(GL_TRIANGLES, dataStream);
 			}
 			break;
-			case openglDataStreamType::brogueAdjacencyColorQuad:
+			case openglDataStreamType::brogueFlameQuad:
 			case openglDataStreamType::brogueCellQuad:
 			default:
 				simpleException::show("Unhandled openglDataStreamType:  brogueProgramBuilder.h");

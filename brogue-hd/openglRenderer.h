@@ -489,7 +489,7 @@ namespace brogueHd::frontend
 			// Click registered by a background program (typically)
 			case brogueUIAction::None:
 			{
-				if (sender == brogueUIProgram::FlameMenuProgram1)
+				if (sender == brogueUIProgram::FlameMenuProgram)
 				{
 					_program->deactivateUIProgram(brogueUIProgram::OpenMenuProgram);
 					_program->deactivateUIProgram(brogueUIProgram::OpenMenuBackgroundProgram);

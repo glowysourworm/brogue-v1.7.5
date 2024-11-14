@@ -2,7 +2,6 @@
 #include "brogueBackground.h"
 #include "brogueButton.h"
 #include "brogueComposedView.h"
-#include "brogueFlameMenuDiffuseView.h"
 #include "brogueFlameMenuHeatView.h"
 #include "brogueFlameMenuTitleMask.h"
 #include "brogueGlobal.h"
@@ -51,14 +50,15 @@ namespace brogueHd::frontend
 
 	protected:
 
-		const int FlamePeriodFadeMilliseconds = 150;
+		const int FlamePeriodFadeMilliseconds = 1500;
 
 	private:
 
 		gridRect getBrogueStaticBoundary(const brogueUIProgramPartId& partId);
 		gridRect getBrogueDynamicBoundary(const brogueUIProgramPartId& partId, int numberOfItems);
 
-		brogueViewContainer* createFlameMenu(brogueUIProgram programName);
+		brogueViewContainer* createFlameMenu();
+		brogueViewContainer* createFlameMenuTitleMask();
 		brogueViewContainer* createMainMenu();
 		brogueViewContainer* createMainMenuSelector(brogueUIProgram programName, const simpleDirectoryEntry& files);
 		brogueViewContainer* createHighScoresView();
@@ -99,10 +99,10 @@ namespace brogueHd::frontend
 	{
 		switch (programName)
 		{
-			case brogueUIProgram::FlameMenuProgram1:
-				return createFlameMenu(programName);
-			case brogueUIProgram::FlameMenuProgram2:
-				return createFlameMenu(programName);
+			case brogueUIProgram::FlameMenuProgram:
+				return createFlameMenu();
+			case brogueUIProgram::FlameMenuTitleMaskProgram:
+				return createFlameMenuTitleMask();
 			case brogueUIProgram::MainMenuProgram:
 				return createMainMenu();
 			case brogueUIProgram::OpenMenuProgram:
@@ -201,11 +201,9 @@ namespace brogueHd::frontend
 						throw simpleException("Unhandled brogueUIProgram part boundary:  brogueUIBuilder::getBrogueBoundary");
 				}
 				break;
-			case brogueUIProgramPart::FlameMenuProgram_HeatDiffuseProgram:
+			case brogueUIProgramPart::FlameDisplay:
 				return getBrogueSceneBoundary();
-			case brogueUIProgramPart::FlameMenuProgram_HeatSourceProgram:
-				return getBrogueSceneBoundary();
-			case brogueUIProgramPart::FlameMenuProgram_TitleMaskProgram:
+			case brogueUIProgramPart::ColorMask:
 				return getBrogueSceneBoundary();
 			case brogueUIProgramPart::Button:
 			case brogueUIProgramPart::Text:
@@ -252,47 +250,36 @@ namespace brogueHd::frontend
 		}
 	}
 
-	brogueViewContainer* brogueUIBuilder::createFlameMenu(brogueUIProgram programName)
+	brogueViewContainer* brogueUIBuilder::createFlameMenu()
 	{
 		gridRect sceneBounds = getBrogueSceneBoundary();
 
-		brogueUIProgramPartId titleId(programName, brogueUIProgramPart::FlameMenuProgram_TitleMaskProgram, 0);
-		brogueUIProgramPartId heatId(programName, brogueUIProgramPart::FlameMenuProgram_HeatSourceProgram, 0);
-		brogueUIProgramPartId diffuseId(programName, brogueUIProgramPart::FlameMenuProgram_HeatDiffuseProgram, 0);
-
-		brogueUIData titleMaskData(titleId, sceneBounds, _zoomLevel);
+		brogueUIProgramPartId heatId(brogueUIProgram::FlameMenuProgram, brogueUIProgramPart::FlameDisplay, 0);
 		brogueUIData heatData(heatId, sceneBounds, _zoomLevel);
-		brogueUIData diffuseData(diffuseId, sceneBounds, _zoomLevel);
 
 		// Mouse Interaction:  This will deactivate the open menu selectors
 		heatData.setUIParameters(-1, -1, "", brogueUIAction::None, true, _zoomLevel, 0);
 
-		if (programName == brogueUIProgram::FlameMenuProgram2)
-		{
-			brogueFlameMenuTitleMask* titleMask = new brogueFlameMenuTitleMask(programName == brogueUIProgram::FlameMenuProgram2, _eventController, titleMaskData, sceneBounds, sceneBounds);
-			brogueFlameMenuHeatView* heatView = new brogueFlameMenuHeatView(programName == brogueUIProgram::FlameMenuProgram2, _eventController, _randomGenerator, this->FlamePeriodFadeMilliseconds, heatData, sceneBounds, sceneBounds);
-			brogueFlameMenuDiffuseView* heatDiffuseView = new brogueFlameMenuDiffuseView(programName == brogueUIProgram::FlameMenuProgram2, _eventController, diffuseData, sceneBounds, sceneBounds);
+		brogueFlameMenuHeatView* heatView = new brogueFlameMenuHeatView(_eventController, _randomGenerator, this->FlamePeriodFadeMilliseconds, heatData, sceneBounds, sceneBounds);
+		brogueViewContainer* result = new brogueViewContainer(brogueUIProgram::FlameMenuProgram, false, false, sceneBounds);
 
-			brogueViewContainer* result = new brogueViewContainer(programName, false, false, sceneBounds);
+		result->addView(heatView);
 
-			result->addView(heatView);
-			result->addView(heatDiffuseView);
-			result->addView(titleMask);
+		return result;
+	}
 
-			return result;
-		}
-		else
-		{
-			brogueFlameMenuHeatView* heatView = new brogueFlameMenuHeatView(programName == brogueUIProgram::FlameMenuProgram2, _eventController, _randomGenerator, this->FlamePeriodFadeMilliseconds, heatData, sceneBounds, sceneBounds);
-			brogueFlameMenuDiffuseView* heatDiffuseView = new brogueFlameMenuDiffuseView(programName == brogueUIProgram::FlameMenuProgram2, _eventController, diffuseData, sceneBounds, sceneBounds);
+	brogueViewContainer* brogueUIBuilder::createFlameMenuTitleMask()
+	{
+		gridRect sceneBounds = getBrogueSceneBoundary();
 
-			brogueViewContainer* result = new brogueViewContainer(programName, false, false, sceneBounds);
+		brogueUIProgramPartId titleId(brogueUIProgram::FlameMenuTitleMaskProgram, brogueUIProgramPart::ColorMask, 0);
+		brogueUIData titleMaskData(titleId, sceneBounds, _zoomLevel);
+		brogueFlameMenuTitleMask* titleMask = new brogueFlameMenuTitleMask(_eventController, titleMaskData, sceneBounds, sceneBounds);
 
-			result->addView(heatView);
-			result->addView(heatDiffuseView);
+		brogueViewContainer* result = new brogueViewContainer(brogueUIProgram::FlameMenuTitleMaskProgram, false, false, sceneBounds);
 
-			return result;
-		}
+		result->addView(titleMask);
+		return result;
 	}
 
 	brogueViewContainer* brogueUIBuilder::createMainMenu()

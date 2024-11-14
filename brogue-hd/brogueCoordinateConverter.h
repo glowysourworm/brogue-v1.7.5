@@ -1,9 +1,10 @@
 #pragma once
 
-#include "brogueAdjacencyColorQuad.h"
 #include "brogueCellDisplay.h"
 #include "brogueCellQuad.h"
 #include "brogueColorQuad.h"
+#include "brogueFlameMenuHeatView.h"
+#include "brogueFlameQuad.h"
 #include "brogueGlyphMap.h"
 #include "brogueImageQuad.h"
 #include "brogueUIConstants.h"
@@ -36,7 +37,9 @@ namespace brogueHd::frontend
 		brogueImageQuad createBrogueImageQuadScene(const brogueCellDisplay& cell, int column, int row);
 		brogueCellQuad createBrogueCellQuadScene(const brogueCellDisplay& cell, int column, int row, openglBrogueCellOutputSelector outputSelector);
 		brogueColorQuad createBrogueColorQuadScene(const brogueCellDisplay& cell, int column, int row);
-		brogueAdjacencyColorQuad createBrogueAdjacencyColorQuadScene(const brogueCellDisplay& cell, int column, int row);
+		brogueFlameQuad createBrogueFlameQuadScene(const brogueFlameMenuHeatView* view,
+													const brogueCellDisplay& cell,
+													int column, int row);
 
 		brogueImageQuad createBrogueImageQuadFrame();
 		brogueColorQuad createBrogueColorQuadFrame(const color& theColor);
@@ -101,20 +104,25 @@ namespace brogueHd::frontend
 
 		return brogueColorQuad(cell, quadXY);
 	}
-	brogueAdjacencyColorQuad brogueCoordinateConverter::createBrogueAdjacencyColorQuadScene(const brogueCellDisplay& cell, int column, int row)
+	brogueFlameQuad brogueCoordinateConverter::createBrogueFlameQuadScene(const brogueFlameMenuHeatView* view, 
+																		  const brogueCellDisplay& cell, 
+																		  int column, int row)
 	{
-		gridLocator south(column, row + 1);
-		gridLocator southEast(column + 1, row + 1);
-		gridLocator southWest(column - 1, row + 1);
-
 		// Some of these will be out of bounds; but easily filtered out in the shader
 		simpleQuad vertex = _viewConverter.createQuadNormalizedXY_FromLocator(column, row);
 		simpleQuad texture = _viewConverter.createQuadNormalizedUV_FromLocator(column, row);
-		simpleQuad textureS = _viewConverter.createQuadNormalizedUV_FromLocator(south);
-		simpleQuad textureSE = _viewConverter.createQuadNormalizedUV_FromLocator(southEast);
-		simpleQuad textureSW = _viewConverter.createQuadNormalizedUV_FromLocator(southWest);
 
-		return brogueAdjacencyColorQuad(cell, vertex, texture, textureS, textureSE, textureSW);
+		// HARD-CODED LOGIC: Didn't want to mess up the design for new data streams. This is a quick solution for 
+		//					 adding the view here.
+		//
+		if (view->isTheText(column, row))
+			return brogueFlameQuad(view->FlameTitleColor1, view->FlameTitleColor2, view->FlameBottomColor3, vertex, texture);
+
+		else if (row == view->getBoundary().bottom())
+			return brogueFlameQuad(view->FlameBottomColor1, view->FlameBottomColor2, view->FlameBottomColor3, vertex, texture);
+
+		else
+			return brogueFlameQuad(colors::transparent(), colors::transparent(), colors::transparent(), vertex, texture);
 	}
 	brogueImageQuad brogueCoordinateConverter::createBrogueImageQuadFrame()
 	{

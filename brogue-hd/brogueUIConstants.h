@@ -12,14 +12,14 @@ namespace brogueHd::frontend
 		ContainerControlledProgram = 0,
 
 		/// <summary>
-		/// The primary brogue flame menu title program (1) (Red Flames)
+		/// The primary brogue flame menu title program
 		/// </summary>
-		FlameMenuProgram1 = 1,
+		FlameMenuProgram = 1,
 
 		/// <summary>
-		/// The primary brogue flame menu title program (2) (Blue Flames)
+		/// The primary brogue flame menu title mask program
 		/// </summary>
-		FlameMenuProgram2 = 2,
+		FlameMenuTitleMaskProgram = 2,
 
 		/// <summary>
 		/// The main menu button menu program
@@ -124,9 +124,8 @@ namespace brogueHd::frontend
 		Button = 3,
 		MenuBackground = 4,
 
-		FlameMenuProgram_HeatSourceProgram = 5,
-		FlameMenuProgram_TitleMaskProgram = 6,
-		FlameMenuProgram_HeatDiffuseProgram = 7
+		FlameDisplay = 5,
+		ColorMask = 6
 	};
 
 	enum class brogueProgramPurpose : int
@@ -177,7 +176,7 @@ namespace brogueHd::frontend
 		brogueImageQuad = 0,
 		brogueCellQuad = 1,
 		brogueColorQuad = 2,
-		brogueAdjacencyColorQuad = 3
+		brogueFlameQuad = 3
 	};
 
 	enum class openglBrogueCellOutputSelector

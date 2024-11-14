@@ -179,7 +179,7 @@
     <ClInclude Include="bitmap.h" />
     <ClInclude Include="boltConstants.h" />
     <ClInclude Include="boudingBox2D.h" />
-    <ClInclude Include="brogueAdjacencyColorQuad.h" />
+    <ClInclude Include="brogueFlameQuad.h" />
     <ClInclude Include="brogueButton.h" />
     <ClInclude Include="brogueEvent.h" />
     <ClInclude Include="brogueFlameMenuHeatView.h" />
@@ -207,7 +207,6 @@
     <ClInclude Include="brogueContentGrid.h" />
     <ClInclude Include="brogueCreature.h" />
     <ClInclude Include="brogueCreatureHorde.h" />
-    <ClInclude Include="brogueFlameMenuDiffuseView.h" />
     <ClInclude Include="brogueGlobal.h" />
     <ClInclude Include="brogueGameProfile.h" />
     <ClInclude Include="brogueImageQuad.h" />

@@ -9,8 +9,8 @@ in vec2 currentTextureUV;
 
 // Try and use a 2D sampler to work with the texture. The active texture should be the 0th texture.
 uniform sampler2D frameTexture;
-uniform sampler2D redFlameTexture;
-uniform sampler2D blueFlameTexture;
+uniform sampler2D flameTexture;
+uniform sampler2D titleMaskTexture;
 uniform sampler2D uiTexture;
 uniform sampler2D openMenuTexture;
 uniform sampler2D playbackMenuTexture;
@@ -57,8 +57,8 @@ void main()
 
     // Sample the frame texture
     vec4 frameOutput = texture(frameTexture, currentTextureUV);
-    vec4 redFlameOutput = texture(redFlameTexture, currentTextureUV);
-    vec4 blueFlameOutput = texture(blueFlameTexture, currentTextureUV);
+    vec4 flameOutput = texture(flameTexture, currentTextureUV);
+    vec4 maskOutput = texture(titleMaskTexture, currentTextureUV);
     vec4 uiOutput = texture(uiTexture, currentTextureUV);
 
     // Favor the UI controls first (one of these may be turned on)
@@ -72,13 +72,8 @@ void main()
         outputColor = uiOutput;
 
     // Blend in the backgrounds
-    if (outputColor.w < 1.0)
+    if (outputColor.w < 1.0 && length(maskOutput) == 0)
     {
-        vec4 flameOutput = redFlameOutput;
-        
-        if (blueFlameOutput.w > 0)
-            flameOutput = mix(redFlameOutput, blueFlameOutput, blueFlameOutput.w);
-
         // Any room left in the alpha channel is used for the background(s)
         outputColor = mix(outputColor, flameOutput, 1 - outputColor.w);
     }

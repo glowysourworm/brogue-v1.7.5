@@ -20,7 +20,7 @@ namespace brogueHd::frontend
 	{
 	public:
 
-		brogueFlameMenuTitleMask(bool flameMenu2, eventController* eventController, const brogueUIData& data, const gridRect& sceneBoundary, const gridRect& viewBoundary)
+		brogueFlameMenuTitleMask(eventController* eventController, const brogueUIData& data, const gridRect& sceneBoundary, const gridRect& viewBoundary)
 			: brogueViewBase(eventController, data, sceneBoundary, viewBoundary)
 		{
 			_titleGrid = new brogueTitleGrid();
@@ -32,8 +32,6 @@ namespace brogueHd::frontend
 
 			_defaultCell->backColor = colors::transparent();
 			_defaultCell->noDisplay = true;
-
-			_flameMenu2 = flameMenu2;
 		}
 		~brogueFlameMenuTitleMask()
 		{

@@ -428,9 +428,6 @@
     <ClInclude Include="simpleHashTests.h">
       <Filter>Header Files\unit-test</Filter>
     </ClInclude>
-    <ClInclude Include="brogueFlameMenuDiffuseView.h">
-      <Filter>Header Files\frontend\ui</Filter>
-    </ClInclude>
     <ClInclude Include="brogueBackground.h">
       <Filter>Header Files\frontend\ui</Filter>
     </ClInclude>
@@ -680,7 +677,7 @@
     <ClInclude Include="simpleOrderedList.h">
       <Filter>Header Files\simple</Filter>
     </ClInclude>
-    <ClInclude Include="brogueAdjacencyColorQuad.h">
+    <ClInclude Include="brogueFlameQuad.h">
       <Filter>Header Files\frontend\opengl\streamObjects</Filter>
     </ClInclude>
   </ItemGroup>

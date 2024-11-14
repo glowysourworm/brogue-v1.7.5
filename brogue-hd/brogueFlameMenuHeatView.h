@@ -1,6 +1,5 @@
 #pragma once
 #include "brogueCellDisplay.h"
-#include "brogueGlobal.h"
 #include "brogueKeyboardState.h"
 #include "brogueMouseState.h"
 #include "brogueTitleGrid.h"
@@ -8,13 +7,10 @@
 #include "brogueViewBase.h"
 #include "color.h"
 #include "eventController.h"
-#include "grid.h"
 #include "gridDefinitions.h"
 #include "gridRect.h"
 #include "randomGenerator.h"
 #include "simple.h"
-#include "simpleList.h"
-#include "simpleMath.h"
 #include "simplePeriodCounter.h"
 
 using namespace brogueHd::simple;
@@ -23,11 +19,15 @@ using namespace brogueHd::backend::model;
 
 namespace brogueHd::frontend
 {
+	/// <summary>
+	/// Component responsibility is to provide "heat" constants to the GPU. The data stream of brogueFlameQuad 
+	/// elements will provide the constant colors below. This view will keep track of a random sequence to provide
+	/// also as uniforms to the GPU shaders to add variability.
+	/// </summary>
 	class brogueFlameMenuHeatView : public brogueViewBase
 	{
 	public:
-		brogueFlameMenuHeatView(bool flameMenu2,
-								eventController* eventController,
+		brogueFlameMenuHeatView(eventController* eventController,
 								randomGenerator* randomGenerator,
 								int fadePeriodMilliseconds,
 								const brogueUIData& data,
@@ -47,9 +47,33 @@ namespace brogueHd::frontend
 
 		bool needsUpdate() const override;
 
+		/// <summary>
+		/// Returns a normalized time value for the current fade period
+		/// </summary>
+		float currentFadePeriod() const
+		{
+			return _fadePeriodCounter->getCounter() / (float)_fadePeriodCounter->getPeriod();
+		}
+
+		int currentFadePeriodRandom1() const
+		{
+			return _fadePeriodRandom1;
+		}
+		int currentFadePeriodRandom2() const
+		{
+			return _fadePeriodRandom2;
+		}
+		/// <summary>
+		/// Returns total number of fade periods so far
+		/// </summary>
+		int fadePeriodCount() const
+		{
+			return _fadePeriodCounter->getNumberOfPeriods();
+		}
+
 	public:
 
-		bool isTheText(short column, short row)
+		bool isTheText(short column, short row) const
 		{
 			return _titleGrid->isTheText(column, row);
 		}
@@ -58,41 +82,25 @@ namespace brogueHd::frontend
 		{
 			brogueTitleGrid* titleGrid = _titleGrid;
 			gridRect sceneBounds = _titleGrid->sceneBounds();
-			bool flameMenu2 = _flameMenu2;
 
-			brogueViewBase::iterate([&callback, &titleGrid, &sceneBounds, &flameMenu2] (short column, short row, brogueCellDisplay* cell)
+			brogueViewBase::iterate([&callback, &titleGrid, &sceneBounds] (short column, short row, brogueCellDisplay* cell)
 			{
-				if ((flameMenu2 && titleGrid->isTheText(column, row)) || 
-				   (!flameMenu2 && row == sceneBounds.bottom()))
-					callback(column, row, cell);
-				
+				//if (titleGrid->isTheText(column, row) || row == sceneBounds.bottom())
+				callback(column, row, cell);
+
 				return iterationCallback::iterate;
 			});
 		}
 
-	protected:
-
-		float calculateHeatEnvelope(short column, short row);
-
-		void cycleHeatSources();
-		void nextHeatValues();
-
 	public:
 
-		const float FlameNoise = 0.2f;
-		const float FlameFade = 0.01f;
-		const float FlameDiffuse = 0.95f;
-
 		const color FlameBottomColor1 = color(1.0f, 0.0f, 0.0f, 1);
-		const color FlameBottomColor2 = color(1.0f, 0.2f, 0.1f, 1);
-		const color FlameBottomColor3 = color(0.1f, 0.0f, 0.0f, 1);
+		const color FlameBottomColor2 = color(1.0f, 1.0f, 0.6f, 1);
+		const color FlameBottomColor3 = color(1.0f, 1.0f, 0.8f, 1);
 
 		const color FlameTitleColor1 = color(0.0f, 0.0f, 1.0f, 1);
-		const color FlameTitleColor2 = color(0.0f, 0.0f, 0.1f, 1);
-		const color FlameTitleColor3 = color(0.8f, 0.8f, 1.0f, 1);
-
-		const color BottomHeatSources[3] = { FlameBottomColor1, FlameBottomColor2, FlameBottomColor3 };
-		const color TitleHeatSources[3] = { FlameTitleColor1, FlameTitleColor2, FlameTitleColor3 };
+		const color FlameTitleColor2 = color(0.0f, 0.1f, 0.9f, 1);
+		const color FlameTitleColor3 = color(0.0f, 0.0f, 1.0f, 1);
 
 	private:
 
@@ -102,14 +110,11 @@ namespace brogueHd::frontend
 		simplePeriodCounter* _periodCounter;
 		simplePeriodCounter* _fadePeriodCounter;
 
-		grid<color*>* _heatSourceGrid;
-
-		bool _firstPass;
-		bool _flameMenu2;
+		int _fadePeriodRandom1;
+		int _fadePeriodRandom2;
 	};
 
-	brogueFlameMenuHeatView::brogueFlameMenuHeatView(bool flameMenu2,
-													 eventController* eventController,
+	brogueFlameMenuHeatView::brogueFlameMenuHeatView(eventController* eventController,
 													 randomGenerator* randomGenerator,
 													 int fadePeriodMilliseconds,
 													 const brogueUIData& data,
@@ -117,44 +122,17 @@ namespace brogueHd::frontend
 													 const gridRect& viewBoundary)
 		: brogueViewBase(eventController, data, sceneBoundary, viewBoundary)
 	{
-		_flameMenu2 = flameMenu2;
 		_randomGenerator = randomGenerator;
-
+		_fadePeriodRandom1 = randomGenerator->next() * 10000;
+		_fadePeriodRandom2 = randomGenerator->next() * 10000;
 		_periodCounter = new simplePeriodCounter(5);
 		_fadePeriodCounter = new simplePeriodCounter(fadePeriodMilliseconds);
 		_titleGrid = new brogueTitleGrid();
-		_firstPass = true;
-
-		_heatSourceGrid = new grid<color*>(sceneBoundary, viewBoundary);
-
-		grid<color*>* heatGrid = _heatSourceGrid;
-
-		// Use THIS iterator (which will skip the majority of the grid)
-		this->iterate([&heatGrid] (short column, short row, brogueCellDisplay* cell)
-		{
-			heatGrid->set(column, row, new color(0, 0, 0, 0));
-			return iterationCallback::iterate;
-		});
-
-		cycleHeatSources();
-		nextHeatValues();
-
-		_firstPass = false;
 	}
 	brogueFlameMenuHeatView::~brogueFlameMenuHeatView()
 	{
-		grid<color*>* heatGrid = _heatSourceGrid;
-
-		// Use THIS iterator (which will skip the majority of the grid)
-		this->iterate([&heatGrid] (short column, short row, brogueCellDisplay* cell)
-		{
-			delete heatGrid->get(column, row);
-			return iterationCallback::iterate;
-		});
-
 		delete _periodCounter;
 		delete _fadePeriodCounter;
-		delete _heatSourceGrid;
 	}
 	void brogueFlameMenuHeatView::checkUpdate(const brogueKeyboardState& keyboardState,
 											  const brogueMouseState& mouseState,
@@ -166,18 +144,32 @@ namespace brogueHd::frontend
 		_periodCounter->update(millisecondsLapsed, false);
 		_fadePeriodCounter->update(millisecondsLapsed, false);
 
+		// REMOVE THIS
+		if (_fadePeriodCounter->pending())
+		{
+			_fadePeriodRandom2 = _fadePeriodRandom1;
+			_fadePeriodRandom1 = _randomGenerator->next() * 10000;
+		}
+
 		// Mouse Interaction
 		brogueViewBase::checkUpdate(keyboardState, mouseState, millisecondsLapsed);
 	}
 	bool brogueFlameMenuHeatView::needsUpdate() const
 	{
+		if (_fadePeriodCounter->pending())
+		{
+			_fadePeriodCounter->reset();
+		}
+
 		// The throttle period (for the actual shader program) is set by the part configuration
 		//
-		return _periodCounter->pending();
+		//return _periodCounter->pending();
+		return false;
 	}
 	void brogueFlameMenuHeatView::clearUpdate()
 	{
 		_periodCounter->reset();
+
 
 		brogueViewBase::clearUpdate();
 	}
@@ -187,110 +179,5 @@ namespace brogueHd::frontend
 	}
 	void brogueFlameMenuHeatView::update(int millisecondsLapsed, bool forceUpdate)
 	{
-		if (_fadePeriodCounter->pending())
-			cycleHeatSources();
-
-		nextHeatValues();
-
-		if (_fadePeriodCounter->pending())
-			_fadePeriodCounter->reset();
-	}
-
-	float brogueFlameMenuHeatView::calculateHeatEnvelope(short column, short row)
-	{
-		// Column Sine-Wave Pseudo-Heat Function
-		//
-		int timeValue = _fadePeriodCounter->getCounter();
-		float width = (float)this->getBoundary().width;
-		float frequency = 7.0f;																		// Number of "candles" across the bottom
-		float lowValue = 0.2f;
-		float triangleLeft = 2 * (column / width);
-		float triangleRight = (triangleLeft * (lowValue - 1)) + (2 - lowValue);
-		float timeArg = 0.3f * simpleMath::sin(2 * simpleMath::Pi * timeValue);
-		//float timeArg = 0;
-		float sinArg = (frequency * ((column / width) * simpleMath::Pi)) + (timeArg);
-		float sinAmplitude = (column < (width / 2.0f)) ? triangleLeft : triangleRight;
-
-		// Calculate the heat along the bottom
-		float heatValue = sinAmplitude * simpleMath::abs(simpleMath::sin(sinArg));
-
-		return heatValue;
-	}
-
-	void brogueFlameMenuHeatView::cycleHeatSources()
-	{
-		brogueFlameMenuHeatView* that = this;
-		randomGenerator* randGenerator = _randomGenerator;
-		bool firstPass = _firstPass;
-		bool flameMenu2 = _flameMenu2;
-		grid<color*>* heatGrid = _heatSourceGrid;
-
-		this->iterate([&that, &randGenerator, &firstPass, &heatGrid, &flameMenu2] (short column, short row, brogueCellDisplay* currentColor)
-		{
-			color nextColor;
-
-			float heatEnvelope = that->calculateHeatEnvelope(column, row);
-
-			if (that->isTheText(column, row) && flameMenu2)
-			{
-				int nextIndex = randGenerator->randomIndex(0, 3);
-				nextColor = randGenerator->nextColorNear(that->TitleHeatSources[nextIndex], that->FlameNoise);
-				nextColor.alpha = heatEnvelope;
-			}
-			else if (row == ROWS - 1 && !flameMenu2)
-			{
-				int nextIndex = randGenerator->randomIndex(0, 3);
-				nextColor = randGenerator->nextColorNear(that->BottomHeatSources[nextIndex], that->FlameNoise);
-				nextColor.alpha = heatEnvelope;
-			}
-
-
-			// Take color channels and apply heat envelope
-			//if (heatEnvelope < 0.25)
-			//	nextColor.blue *= heatEnvelope;
-
-			//else if (heatEnvelope < 0.1)
-			//{
-			//	nextColor.blue *= heatEnvelope;
-			//	nextColor.green *= heatEnvelope;
-			//}
-			//else
-			//{
-				//nextColor.blue *= heatEnvelope * 4;
-				//nextColor.green *= heatEnvelope * 4;
-				//nextColor.red *= heatEnvelope * 4;
-			//}
-
-			heatGrid->get(column, row)->set(nextColor);
-
-			return iterationCallback::iterate;
-		});
-
-		// Smooth out the random noise across the bottom row
-		//
-		//for (int index = 1; index < this->getSceneBoundary().width - 1; index++)
-		//{
-		//	color left = this->get(index - 1, this->getSceneBoundary().height - 1)->backColor;
-		//	color right = this->get(index + 1, this->getSceneBoundary().height - 1)->backColor;
-		//	color current = this->get(index, this->getSceneBoundary().height - 1)->backColor;
-
-		//	current.averageIn(1, 1, left, right);
-
-		//	this->get(index, this->getSceneBoundary().height - 1)->backColor = current;
-		//}
-	}
-	void brogueFlameMenuHeatView::nextHeatValues()
-	{
-		brogueFlameMenuHeatView* that = this;
-		randomGenerator* randGenerator = _randomGenerator;
-		grid<color*>* heatGrid = _heatSourceGrid;
-
-		this->iterate([&that, &randGenerator, &heatGrid] (short column, short row, brogueCellDisplay* cell)
-		{
-			// Heat Source
-			cell->backColor.interpolate(*heatGrid->get(column, row), that->FlameFade);
-
-			return iterationCallback::iterate;
-		});
 	}
 }

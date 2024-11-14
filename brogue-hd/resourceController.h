@@ -263,28 +263,19 @@ namespace brogueHd::backend
 	void resourceController::loadPartConfigs()
 	{
 		// Title View
-		brogueUIProgramPartConfiguration* flameMenu_heatDiffuse = 
-			new brogueUIProgramPartConfiguration(brogueUIProgramPart::FlameMenuProgram_HeatDiffuseProgram, 
+		brogueUIProgramPartConfiguration* flameDisplay = 
+			new brogueUIProgramPartConfiguration(brogueUIProgramPart::FlameDisplay, 
 												 shaderResource::diffuseColorUpwardVert, 
 												 shaderResource::diffuseColorUpwardFrag, 
-												 openglDataStreamType::brogueAdjacencyColorQuad, 
+												 openglDataStreamType::brogueFlameQuad, 
 												 openglBrogueCellOutputSelector::NoDisplay, 
 												 15,
 												 false,
 												 false);
 
-		brogueUIProgramPartConfiguration* flameMenu_heatSource =
-			new brogueUIProgramPartConfiguration(brogueUIProgramPart::FlameMenuProgram_HeatSourceProgram,
-												 shaderResource::backgroundColorVert,
-												 shaderResource::backgroundColorFrag,
-												 openglDataStreamType::brogueColorQuad,
-												 openglBrogueCellOutputSelector::DisplayCurrentFrame,
-												 15,
-												 false,
-												 false);
-
-		brogueUIProgramPartConfiguration* flameMenu_titleMask =
-			new brogueUIProgramPartConfiguration(brogueUIProgramPart::FlameMenuProgram_TitleMaskProgram,
+		// Title View - Color Mask (Generic Part)
+		brogueUIProgramPartConfiguration* colorMask =
+			new brogueUIProgramPartConfiguration(brogueUIProgramPart::ColorMask,
 												 shaderResource::backgroundColorVert,
 												 shaderResource::backgroundColorFrag,
 												 openglDataStreamType::brogueColorQuad,
@@ -344,9 +335,8 @@ namespace brogueHd::backend
 												 true,
 												 false);
 
-		_programPartConfigs->add(brogueUIProgramPart::FlameMenuProgram_HeatDiffuseProgram, flameMenu_heatDiffuse);
-		_programPartConfigs->add(brogueUIProgramPart::FlameMenuProgram_HeatSourceProgram, flameMenu_heatSource);
-		_programPartConfigs->add(brogueUIProgramPart::FlameMenuProgram_TitleMaskProgram, flameMenu_titleMask);
+		_programPartConfigs->add(brogueUIProgramPart::FlameDisplay, flameDisplay);
+		_programPartConfigs->add(brogueUIProgramPart::ColorMask, colorMask);
 		_programPartConfigs->add(brogueUIProgramPart::Button, button);
 		_programPartConfigs->add(brogueUIProgramPart::Text, text);
 		_programPartConfigs->add(brogueUIProgramPart::Background, background);

@@ -5,19 +5,17 @@
 //
 layout (location = 0) in vec2 vertexCurrent;
 layout (location = 1) in vec2 textureCurrent;
-layout (location = 2) in vec2 textureS;
-layout (location = 3) in vec2 textureSE;
-layout (location = 4) in vec2 textureSW;
-layout (location = 5) in vec4 backgroundColor;
+layout (location = 2) in vec4 backgroundColor1;
+layout (location = 3) in vec4 backgroundColor2;
+layout (location = 4) in vec4 backgroundColor3;
 
 // Define a data type to be output by the shader to the next stages
 //
 out vec2 currentVertex;
 out vec2 currentTexture;
-out vec2 currentTextureS;
-out vec2 currentTextureSE;
-out vec2 currentTextureSW;
-out vec4 currentBackgroundColor;
+out vec4 currentBackgroundColor1;
+out vec4 currentBackgroundColor2;
+out vec4 currentBackgroundColor3;
 
 void main()
 {
@@ -35,8 +33,7 @@ void main()
     //
     currentVertex = vertexCurrent;
     currentTexture = textureCurrent;
-    currentTextureS = textureS;
-    currentTextureSE = textureSE;
-    currentTextureSW = textureSW;
-    currentBackgroundColor = backgroundColor;
+    currentBackgroundColor1 = backgroundColor1;
+    currentBackgroundColor2 = backgroundColor2;
+    currentBackgroundColor3 = backgroundColor3;
 }

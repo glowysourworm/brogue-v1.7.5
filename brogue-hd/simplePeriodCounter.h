@@ -9,16 +9,19 @@ namespace brogueHd::frontend
 		{
 			_period = 0;
 			_counter = 0;
+			_periodNumber = 0;
 		}
 		simplePeriodCounter(uint32_t period)
 		{
 			_period = period;
 			_counter = 0;
+			_periodNumber = 0;
 		}
 		simplePeriodCounter(const simplePeriodCounter& copy)
 		{
 			_period = copy.getPeriod();
 			_counter = copy.getCounter();
+			_periodNumber = copy.getNumberOfPeriods();
 		}
 		~simplePeriodCounter() {}
 
@@ -54,11 +57,21 @@ namespace brogueHd::frontend
 		void reset()
 		{
 			_counter = 0;
+			_periodNumber++;
 		}
+
+		uint64_t getNumberOfPeriods() const
+		{
+			return _periodNumber;
+		}
+
 
 	private:
 
 		uint32_t _period;
 		uint32_t _counter;
+
+		// How many periods has this counter ticked?
+		uint64_t _periodNumber;
 	};
 }

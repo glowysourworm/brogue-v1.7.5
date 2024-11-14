@@ -13,39 +13,36 @@ using namespace brogueHd::backend::model;
 
 namespace brogueHd::frontend
 {
-	struct brogueAdjacencyColorQuad : simpleGlData
+	struct brogueFlameQuad : simpleGlData
 	{
-		brogueAdjacencyColorQuad()
+		brogueFlameQuad()
 		{
 			vertexCurrent = default_value::value<simpleQuad>();
 			textureCurrent = default_value::value<simpleQuad>();
-			textureS = default_value::value<simpleQuad>();
-			textureSE = default_value::value<simpleQuad>();
-			textureSW = default_value::value<simpleQuad>();
-			backgroundColor = default_value::value<vec4>();
+			backgroundColor1 = default_value::value<vec4>();
+			backgroundColor2 = default_value::value<vec4>();
+			backgroundColor3 = default_value::value<vec4>();
 		}
-		brogueAdjacencyColorQuad(const brogueAdjacencyColorQuad& copy)
+		brogueFlameQuad(const brogueFlameQuad& copy)
 		{
 			copyImpl(copy);
 		}
-		brogueAdjacencyColorQuad(const brogueCellDisplay& cell,
-								 const simpleQuad& vertexXY,
-								 const simpleQuad& tex,
-								 const simpleQuad& texS,
-								 const simpleQuad& texSE,
-								 const simpleQuad& texSW)
+		brogueFlameQuad(const color& color1,
+						const color& color2,
+						const color& color3,
+						const simpleQuad& vertex,
+						const simpleQuad& texture)
 		{
 			// Consider translating these perhaps INTO the cell display - the view bounds.
 			//
-			backgroundColor = vec4(cell.backColor.red, cell.backColor.green, cell.backColor.blue, cell.backColor.alpha);
+			backgroundColor1 = vec4(color1.red, color1.green, color1.blue, color1.alpha);
+			backgroundColor2 = vec4(color2.red, color2.green, color2.blue, color2.alpha);
+			backgroundColor3 = vec4(color3.red, color3.green, color3.blue, color3.alpha);
 			
-			vertexCurrent = vertexXY;
-			textureCurrent = tex;
-			textureS = texS;
-			textureSE = texSE;
-			textureSW = texSW;
+			vertexCurrent = vertex;
+			textureCurrent = texture;
 		}
-		void operator=(const brogueAdjacencyColorQuad& copy)
+		void operator=(const brogueFlameQuad& copy)
 		{
 			copyImpl(copy);
 		}
@@ -67,7 +64,7 @@ namespace brogueHd::frontend
 			switch (primitiveType)
 			{
 				case GL_TRIANGLES:
-					return 84 * sizeof(float);
+					return 96 * sizeof(float);
 				default:
 					simpleException::show("Unhandled primitive type for GLQuad:  {}", primitiveType);
 					break;
@@ -89,55 +86,49 @@ namespace brogueHd::frontend
 					//
 					// Data:		vertex, texture
 					//
-					// Total Data:  14 floats per vertex * 6 vertices = 84 (floats)
+					// Total Data:  16 floats per vertex * 6 vertices = 96 (floats)
 
 					// Triangle 1: Top Left (32 floats total)
 					vertexCurrent.topLeft.streamBuffer(primitiveType, outputStream);				// vec2
 					textureCurrent.topLeft.streamBuffer(primitiveType, outputStream);				// vec2
-					textureS.topLeft.streamBuffer(primitiveType, outputStream);						// vec2
-					textureSE.topLeft.streamBuffer(primitiveType, outputStream);					// vec2
-					textureSW.topLeft.streamBuffer(primitiveType, outputStream);					// vec2
-					backgroundColor.streamBuffer(primitiveType, outputStream);						// vec4
+					backgroundColor1.streamBuffer(primitiveType, outputStream);						// vec4
+					backgroundColor2.streamBuffer(primitiveType, outputStream);						// vec4
+					backgroundColor3.streamBuffer(primitiveType, outputStream);						// vec4
 
 					// Triangle 1:  Top Right
 					vertexCurrent.topRight.streamBuffer(primitiveType, outputStream);				// vec2
 					textureCurrent.topRight.streamBuffer(primitiveType, outputStream);				// vec2
-					textureS.topRight.streamBuffer(primitiveType, outputStream);					// vec2
-					textureSE.topRight.streamBuffer(primitiveType, outputStream);					// vec2
-					textureSW.topRight.streamBuffer(primitiveType, outputStream);					// vec2
-					backgroundColor.streamBuffer(primitiveType, outputStream);						// vec4
+					backgroundColor1.streamBuffer(primitiveType, outputStream);						// vec4
+					backgroundColor2.streamBuffer(primitiveType, outputStream);						// vec4
+					backgroundColor3.streamBuffer(primitiveType, outputStream);						// vec4
 
 					// Triangle 1:  Bottom Right
 					vertexCurrent.bottomRight.streamBuffer(primitiveType, outputStream);			// vec2
 					textureCurrent.bottomRight.streamBuffer(primitiveType, outputStream);			// vec2
-					textureS.bottomRight.streamBuffer(primitiveType, outputStream);					// vec2
-					textureSE.bottomRight.streamBuffer(primitiveType, outputStream);				// vec2
-					textureSW.bottomRight.streamBuffer(primitiveType, outputStream);				// vec2
-					backgroundColor.streamBuffer(primitiveType, outputStream);						// vec4
+					backgroundColor1.streamBuffer(primitiveType, outputStream);						// vec4
+					backgroundColor2.streamBuffer(primitiveType, outputStream);						// vec4
+					backgroundColor3.streamBuffer(primitiveType, outputStream);						// vec4
 
 					// Triangle 2: Top Left
 					vertexCurrent.topLeft.streamBuffer(primitiveType, outputStream);				// vec2
 					textureCurrent.topLeft.streamBuffer(primitiveType, outputStream);				// vec2
-					textureS.topLeft.streamBuffer(primitiveType, outputStream);						// vec2
-					textureSE.topLeft.streamBuffer(primitiveType, outputStream);					// vec2
-					textureSW.topLeft.streamBuffer(primitiveType, outputStream);					// vec2
-					backgroundColor.streamBuffer(primitiveType, outputStream);						// vec4
+					backgroundColor1.streamBuffer(primitiveType, outputStream);						// vec4
+					backgroundColor2.streamBuffer(primitiveType, outputStream);						// vec4
+					backgroundColor3.streamBuffer(primitiveType, outputStream);						// vec4
 
 					// Triangle 2:  Bottom Right
 					vertexCurrent.bottomRight.streamBuffer(primitiveType, outputStream);			// vec2
 					textureCurrent.bottomRight.streamBuffer(primitiveType, outputStream);			// vec2
-					textureS.bottomRight.streamBuffer(primitiveType, outputStream);					// vec2
-					textureSE.bottomRight.streamBuffer(primitiveType, outputStream);				// vec2
-					textureSW.bottomRight.streamBuffer(primitiveType, outputStream);				// vec2
-					backgroundColor.streamBuffer(primitiveType, outputStream);						// vec4
+					backgroundColor1.streamBuffer(primitiveType, outputStream);						// vec4
+					backgroundColor2.streamBuffer(primitiveType, outputStream);						// vec4
+					backgroundColor3.streamBuffer(primitiveType, outputStream);						// vec4
 
 					// Triangle 2:  Bottom Left
 					vertexCurrent.bottomLeft.streamBuffer(primitiveType, outputStream);				// vec2
 					textureCurrent.bottomLeft.streamBuffer(primitiveType, outputStream);			// vec2
-					textureS.bottomLeft.streamBuffer(primitiveType, outputStream);					// vec2
-					textureSE.bottomLeft.streamBuffer(primitiveType, outputStream);					// vec2
-					textureSW.bottomLeft.streamBuffer(primitiveType, outputStream);					// vec2
-					backgroundColor.streamBuffer(primitiveType, outputStream);						// vec4
+					backgroundColor1.streamBuffer(primitiveType, outputStream);						// vec4
+					backgroundColor2.streamBuffer(primitiveType, outputStream);						// vec4
+					backgroundColor3.streamBuffer(primitiveType, outputStream);						// vec4
 				}
 				break;
 				default:
@@ -150,7 +141,7 @@ namespace brogueHd::frontend
 		{
 			// Wouldn't worry about hashing the whole data structure
 			//
-			return hashGenerator::generateHash(backgroundColor, vertexCurrent, textureCurrent, textureS, textureSE, textureSW);
+			return hashGenerator::generateHash(vertexCurrent, textureCurrent, backgroundColor1, backgroundColor2, backgroundColor3);
 		}
 
 		const char* toString() const override
@@ -160,24 +151,22 @@ namespace brogueHd::frontend
 
 	private:
 
-		void copyImpl(const brogueAdjacencyColorQuad& copy)
+		void copyImpl(const brogueFlameQuad& copy)
 		{
 			vertexCurrent = copy.vertexCurrent;
 			textureCurrent = copy.textureCurrent;
-			textureS = copy.textureS;
-			textureSE = copy.textureSE;
-			textureSW = copy.textureSW;
-			backgroundColor = copy.backgroundColor;
+			backgroundColor1 = copy.backgroundColor1;
+			backgroundColor2 = copy.backgroundColor2;
+			backgroundColor3 = copy.backgroundColor3;
 		}
 
 	public:
 
 		simpleQuad vertexCurrent;
 		simpleQuad textureCurrent;
-		simpleQuad textureS;
-		simpleQuad textureSE;
-		simpleQuad textureSW;
 
-		vec4 backgroundColor;
+		vec4 backgroundColor1;
+		vec4 backgroundColor2;
+		vec4 backgroundColor3;
 	};
 }

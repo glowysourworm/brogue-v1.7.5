@@ -18,7 +18,7 @@
 #include "simpleDataStream.h"
 #include "simpleException.h"
 #include "simpleShaderProgram.h"
-#include "brogueAdjacencyColorQuad.h"
+#include "brogueFlameQuad.h"
 
 using namespace brogueHd::backend;
 using namespace brogueHd::backend::model;
@@ -114,9 +114,8 @@ namespace brogueHd::frontend
 	{
 		switch (configuration.programPartName)
 		{
-			case brogueUIProgramPart::FlameMenuProgram_HeatSourceProgram:
-			case brogueUIProgramPart::FlameMenuProgram_TitleMaskProgram:
-			case brogueUIProgramPart::FlameMenuProgram_HeatDiffuseProgram:
+			case brogueUIProgramPart::FlameDisplay:
+			case brogueUIProgramPart::ColorMask:
 			case brogueUIProgramPart::Background:
 			case brogueUIProgramPart::MenuBackground:
 			case brogueUIProgramPart::Button:
@@ -135,9 +134,8 @@ namespace brogueHd::frontend
 	{
 		switch (configuration.programPartName)
 		{
-			case brogueUIProgramPart::FlameMenuProgram_HeatSourceProgram:
-			case brogueUIProgramPart::FlameMenuProgram_TitleMaskProgram:
-			case brogueUIProgramPart::FlameMenuProgram_HeatDiffuseProgram:
+			case brogueUIProgramPart::FlameDisplay:
+			case brogueUIProgramPart::ColorMask:
 			case brogueUIProgramPart::Background:
 			case brogueUIProgramPart::MenuBackground:
 			case brogueUIProgramPart::Button:
@@ -224,9 +222,9 @@ namespace brogueHd::frontend
 				cellStreamSizeBytes = quad.getStreamSize(GL_TRIANGLES);
 			}
 				break;
-			case openglDataStreamType::brogueAdjacencyColorQuad:
+			case openglDataStreamType::brogueFlameQuad:
 			{
-				brogueAdjacencyColorQuad quad;
+				brogueFlameQuad quad;
 				cellStreamSizeBytes = quad.getStreamSize(GL_TRIANGLES);
 			}
 			break;

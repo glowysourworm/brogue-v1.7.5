@@ -2,6 +2,7 @@
 
 #include "brogueCellDisplay.h"
 #include "brogueCoordinateConverter.h"
+#include "brogueFlameMenuHeatView.h"
 #include "brogueGlyphMap.h"
 #include "brogueKeyboardState.h"
 #include "brogueMouseState.h"
@@ -142,12 +143,14 @@ namespace brogueHd::frontend
 			program->compile();
 			program->bind();
 
-			if (view->getPartId().getPartName() == brogueUIProgramPart::FlameMenuProgram_HeatDiffuseProgram)
+			if (view->getPartId().getPartName() == brogueUIProgramPart::FlameDisplay)
 			{
 				int zoomLevel = view->getZoomLevel();
 				ivec2 cellSizeUI(brogueCellDisplay::CellWidth(zoomLevel), brogueCellDisplay::CellHeight(zoomLevel));
+				simpleQuad cellSizeUV = this->getCellSizeUV();
 
 				program->bindUniform2i("cellSizeUI", cellSizeUI);
+				program->bindUniform2("cellSizeUV", vec2(cellSizeUV.getWidth(), cellSizeUV.getHeight()));
 			}
 		}
 
@@ -417,11 +420,17 @@ namespace brogueHd::frontend
 
 			program->bind();
 
-			if (program->hasUniform("flameTexture") && partId.getName() == brogueUIProgram::FlameMenuProgram1)
-				program->bindUniform1i("flameTexture", 1);
+			if (program->hasUniform("fadePeriodTime") && partId.getName() == brogueUIProgram::FlameMenuProgram)
+				program->bindUniform1("fadePeriodTime", ((brogueFlameMenuHeatView*)view)->currentFadePeriod());
 
-			else if (program->hasUniform("flameTexture") && partId.getName() == brogueUIProgram::FlameMenuProgram2)
-				program->bindUniform1i("flameTexture", 2);
+			if (program->hasUniform("fadePeriodRandom1") && partId.getName() == brogueUIProgram::FlameMenuProgram)
+				program->bindUniform1i("fadePeriodRandom1", ((brogueFlameMenuHeatView*)view)->currentFadePeriodRandom1());
+
+			if (program->hasUniform("fadePeriodRandom2") && partId.getName() == brogueUIProgram::FlameMenuProgram)
+				program->bindUniform1i("fadePeriodRandom2", ((brogueFlameMenuHeatView*)view)->currentFadePeriodRandom2());
+
+			if (program->hasUniform("nextColorNumber") && partId.getName() == brogueUIProgram::FlameMenuProgram)
+				program->bindUniform1i("nextColorNumber", ((brogueFlameMenuHeatView*)view)->fadePeriodCount() % 3);
 
 			program->draw();
 
@@ -429,10 +438,11 @@ namespace brogueHd::frontend
 				glDisable(GL_BLEND);
 
 			glFlush();
+			glFinish();
 
 			// Lookup NVIDIA bug:  glNamedCopyBufferSubData
 			//
-			if (partId.getPartName() == brogueUIProgramPart::FlameMenuProgram_HeatSourceProgram)
+			if (partId.getPartName() == brogueUIProgramPart::FlameDisplay)
 			{
 				//// Buffer copy the elements back into the heat source buffer; and let the next draw pass
 				//// render them
