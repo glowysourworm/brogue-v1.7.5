@@ -112,15 +112,37 @@ namespace brogueHd::frontend
 
 	enum class brogueUIProgramPart : int
 	{
-		ViewCompositor = 0,
+		/// <summary>
+		/// Frame-type data stream for a single color output to the GPU. Can carry mouse interaction.
+		/// </summary>
+		Background = 0,
 
-		Background = 1,
-		Text = 2,
-		Button = 3,
-		MenuBackground = 4,
+		/// <summary>
+		/// A single (or) multi-line non-updating view of color string characters. Does not utilize the mouse
+		/// for individual cell update; but can forward click, and hover events.
+		/// </summary>
+		Text = 1,
 
-		FlameDisplay = 5,
-		ColorMask = 6
+		/// <summary>
+		/// A cell-type data stream with mouse interaction, click events, and hotkey events.
+		/// </summary>
+		Button = 2,
+
+		/// <summary>
+		/// Cell-type data stream for a more detailed color output to the GPU. Can carry mouse interaction.
+		/// </summary>
+		MenuBackground = 3,
+
+		/// <summary>
+		/// A specific data stream type for "flame quads". This has, at the moment, only a single use - the
+		/// title display.
+		/// </summary>
+		FlameDisplay = 4,
+
+		/// <summary>
+		/// A color mask cell-type data stream with reduced data output; and non-mouse interacting handling.
+		/// </summary>
+		ColorMask = 5
 	};
 
 	enum class brogueProgramExitCondition : int

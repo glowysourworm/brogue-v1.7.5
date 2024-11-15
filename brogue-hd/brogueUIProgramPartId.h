@@ -11,7 +11,7 @@ namespace brogueHd::frontend
 		brogueUIProgramPartId()
 		{
 			_name = brogueUIProgram::ContainerControlledProgram;
-			_partName = brogueUIProgramPart::ViewCompositor;
+			_partName = brogueUIProgramPart::Background;
 			_partNumber = -1;
 		}
 		brogueUIProgramPartId(brogueUIProgram name, brogueUIProgramPart partName, int partNumber)
@@ -27,6 +27,12 @@ namespace brogueHd::frontend
 			_partNumber = copy.getPartNumber();
 		}
 		void operator=(const brogueUIProgramPartId& copy)
+		{
+			_name = copy.getName();
+			_partName = copy.getPartName();
+			_partNumber = copy.getPartNumber();
+		}
+		void set(const brogueUIProgramPartId& copy)
 		{
 			_name = copy.getName();
 			_partName = copy.getPartName();

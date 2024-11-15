@@ -33,6 +33,12 @@ namespace brogueHd::frontend
 			fileName = copy.fileName;
 			desiredState = copy.desiredState;
 		}
+		void set(const brogueUITagAction& copy)
+		{
+			action = copy.action;
+			fileName = copy.fileName;
+			desiredState = copy.desiredState;
+		}
 		void operator=(const brogueUITagAction& copy)
 		{
 			action = copy.action;

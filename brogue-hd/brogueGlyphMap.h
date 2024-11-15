@@ -66,6 +66,9 @@ namespace brogueHd::frontend
 
 		gridLocator getGlyphLocation(int character);
 
+		bool isGlyphDefined(int character);
+		bool isGlyphDefined(char character);
+
 	protected:
 
 		void initialize();
@@ -235,5 +238,14 @@ namespace brogueHd::frontend
 		gridLocator location = _glyphLocations->get(character);
 
 		return gridLocator(location.column, location.row + this->GlyphSheetRowOffset);
+	}
+
+	bool brogueGlyphMap::isGlyphDefined(int character)
+	{
+		return _glyphLocations->contains(character);
+	}
+	bool brogueGlyphMap::isGlyphDefined(char character)
+	{
+		return isGlyphDefined((int)character);
 	}
 }

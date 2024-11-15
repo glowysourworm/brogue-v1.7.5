@@ -78,6 +78,10 @@ namespace brogueHd::frontend
 		void setMode(BrogueGameMode mode);
 		void showErrors() const;
 		bool hasErrors() const;
+		
+	private:
+
+		void clearAllTextures();
 
 	private:
 
@@ -126,13 +130,10 @@ namespace brogueHd::frontend
 		// Grid Coordinates...
 		gridRect sceneBounds = _uiBuilder->getBrogueSceneBoundary();
 
-		brogueUIProgramPartId partId(brogueUIProgram::ContainerControlledProgram, brogueUIProgramPart::ViewCompositor, 0);
-		brogueUIData backgroundData(partId, sceneBounds, zoomLevel);
+		brogueUIProgramPartId partId(brogueUIProgram::ContainerControlledProgram, brogueUIProgramPart::Background, 0);
+		brogueUIData backgroundData(zoomLevel, colors::transparent());
 		brogueProgramBuilder builder(resourceController, glyphMap);
-		brogueBackground background(eventController,
-									  backgroundData,
-									  sceneBounds,
-									  sceneBounds);
+		brogueBackground background(eventController, partId, backgroundData, sceneBounds, sceneBounds);
 
 		brogueUIProgramPartConfiguration frameConfiguration(brogueUIProgramPart::Background,
 															shaderResource::mixFrameTexturesVert,
@@ -485,6 +486,9 @@ namespace brogueHd::frontend
 			// Maintain UI program collection
 			_uiPrograms->add(view->getProgramName(), program);
 		}
+
+		// Initialize the textures by clearing
+		clearAllTextures();
 	}
 
 	void brogueMainProgram::checkUpdate(const simpleKeyboardState& keyboardState,
@@ -594,20 +598,7 @@ namespace brogueHd::frontend
 		}
 
 		// Clear All Textures
-		_frameTexture->bind();
-		_frameTexture->clearColor(colors::transparent());
-		_flameTexture->bind();
-		_flameTexture->clearColor(colors::transparent());
-		_titleMaskTexture->bind();
-		_titleMaskTexture->clearColor(colors::transparent());
-		_uiTexture->bind();
-		_uiTexture->clearColor(colors::transparent());
-		_openMenuTexture->bind();
-		_openMenuTexture->clearColor(colors::transparent());
-		_playbackMenuTexture->bind();
-		_playbackMenuTexture->clearColor(colors::transparent());
-		_gameLogTexture->bind();
-		_gameLogTexture->clearColor(colors::transparent());
+		clearAllTextures();
 
 		switch (mode)
 		{
@@ -629,5 +620,29 @@ namespace brogueHd::frontend
 			default:
 				break;
 		}
+	}
+
+	void brogueMainProgram::clearAllTextures()
+	{
+		_frameTexture->bind();
+		_frameTexture->clearColor(colors::transparent());
+
+		_flameTexture->bind();
+		_flameTexture->clearColor(colors::transparent());
+
+		_titleMaskTexture->bind();
+		_titleMaskTexture->clearColor(colors::transparent());
+
+		_uiTexture->bind();
+		_uiTexture->clearColor(colors::transparent());
+
+		_openMenuTexture->bind();
+		_openMenuTexture->clearColor(colors::transparent());
+
+		_playbackMenuTexture->bind();
+		_playbackMenuTexture->clearColor(colors::transparent());
+
+		_gameLogTexture->bind();
+		_gameLogTexture->clearColor(colors::transparent());
 	}
 }

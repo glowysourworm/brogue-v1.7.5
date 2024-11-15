@@ -1,14 +1,12 @@
 #pragma once
 
-#include "brogueKeyboardState.h"
-#include "brogueMouseState.h"
 #include "brogueUIData.h"
 #include "brogueViewBase.h"
 #include "gridRect.h"
 
 #include "brogueCellDisplay.h"
+#include "brogueUIProgramPartId.h"
 #include "eventController.h"
-#include "gridDefinitions.h"
 #include "simple.h"
 
 using namespace brogueHd::backend;
@@ -21,7 +19,7 @@ namespace brogueHd::frontend
 	{
 	public:
 
-		brogueBackground(eventController* eventController, const brogueUIData& data, const gridRect& sceneBoundary, const gridRect& viewBoundary);
+		brogueBackground(eventController* eventController, const brogueUIProgramPartId& partId, const brogueUIData& data, const gridRect& sceneBoundary, const gridRect& viewBoundary);
 		~brogueBackground();
 
 		virtual void update(int millisecondsLapsed, bool forceUpdate) override
@@ -35,8 +33,8 @@ namespace brogueHd::frontend
 		}
 	};
 
-	brogueBackground::brogueBackground(eventController* eventController, const brogueUIData& data, const gridRect& sceneBoundary, const gridRect& viewBoundary)
-		: brogueViewBase(eventController, data, sceneBoundary, viewBoundary)
+	brogueBackground::brogueBackground(eventController* eventController, const brogueUIProgramPartId& partId, const brogueUIData& data, const gridRect& sceneBoundary, const gridRect& viewBoundary)
+		: brogueViewBase(eventController, partId, data, sceneBoundary, viewBoundary)
 	{
 		brogueBackground* that = this;
 

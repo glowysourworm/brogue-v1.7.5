@@ -8,6 +8,7 @@
 #include "brogueUIProgramPartId.h"
 #include "brogueUITagAction.h"
 #include "color.h"
+#include "colorGradient.h"
 #include "eventController.h"
 #include "grid.h"
 #include "gridDefinitions.h"
@@ -16,7 +17,9 @@
 #include "simple.h"
 #include "simpleException.h"
 #include "simpleMath.h"
+#include "brogueUIMouseData.h"
 
+using namespace brogueHd::backend::model;
 using namespace brogueHd::backend;
 
 namespace brogueHd::frontend
@@ -26,7 +29,11 @@ namespace brogueHd::frontend
 
 	public:
 
-		brogueViewBase(eventController* eventController, const brogueUIData& data, const gridRect& sceneBoundary, const gridRect& viewBoundary);
+		brogueViewBase(eventController* eventController,
+						const brogueUIProgramPartId& partId,
+						const brogueUIData& data,
+						const gridRect& sceneBoundary,
+						const gridRect& viewBoundary);
 		~brogueViewBase();
 
 		virtual gridRect getSceneBoundary() const;
@@ -115,15 +122,16 @@ namespace brogueHd::frontend
 		brogueUIProgramPartId getPartId() const;
 
 		color getBackgroundColor(short column, short row) const;
-		color getForegroundColor(short column, short row) const;
-		char getText(short column, short row) const;
 		bool isMouseOver(const brogueMouseState& mouseState) const;
-		bool isHotkey(short column, short row) const;
 		bool getHasMouseInteraction() const;
 		bool getMouseEnter() const;
 		bool getMouseLeave() const;
 		int getZoomLevel() const;
 		int getZIndex() const;
+
+	public:		// UI Setters
+
+		void setUIAction(const brogueUITagAction& action);
 
 	protected:
 
@@ -132,20 +140,39 @@ namespace brogueHd::frontend
 
 	private:
 
-		grid<brogueCellDisplay*>* _view;
+		color calculateGradientImpl(int column, int row, const colorGradient& gradient) const;
+		color calculateGradient(int column, int row) const;
 
+	private:
+
+		bool _hasMouseInteraction;
+
+	private:
+
+		grid<brogueCellDisplay*>* _view;
+		brogueUIProgramPartId* _partId;
+		brogueUITagAction* _tagAction;
 		brogueUIData* _uiData;
+		brogueUIMouseData* _mouseData;
 
 	private:
 
 		eventController* _eventController;
 	};
 
-	brogueViewBase::brogueViewBase(eventController* eventController, const brogueUIData& data, const gridRect& sceneBoundary, const gridRect& viewBoundary)
+	brogueViewBase::brogueViewBase(eventController* eventController, 
+								   const brogueUIProgramPartId& partId, 
+								   const brogueUIData& data, 
+								   const gridRect& sceneBoundary, 
+								   const gridRect& viewBoundary)
 	{
 		_eventController = eventController;
 		_view = new grid<brogueCellDisplay*>(sceneBoundary, viewBoundary);
+		_partId = new brogueUIProgramPartId(partId);
 		_uiData = new brogueUIData(data);
+		_mouseData = new brogueUIMouseData();
+		_tagAction = new brogueUITagAction();
+		_hasMouseInteraction = false;											// Set Tag Action -> (Has Mouse Interactin = true)
 
 		grid<brogueCellDisplay*>* grid = _view;
 
@@ -167,6 +194,8 @@ namespace brogueHd::frontend
 
 		delete _view;
 		delete _uiData;
+		delete _mouseData;
+		delete _tagAction;
 	}
 	brogueCellDisplay* brogueViewBase::get(short column, short row) const
 	{
@@ -202,27 +231,15 @@ namespace brogueHd::frontend
 	}
 	brogueUIProgramPartId brogueViewBase::getPartId() const
 	{
-		return _uiData->getId();
+		return *_partId;
 	}
 	color brogueViewBase::getBackgroundColor(short column, short row) const
 	{
-		return _uiData->calculateGradient(column, row);
-	}
-	color brogueViewBase::getForegroundColor(short column, short row) const
-	{
-		return _uiData->getTextColor(column, row);
-	}
-	char brogueViewBase::getText(short column, short row) const
-	{
-		return _uiData->getText(column, row);
-	}
-	bool brogueViewBase::isHotkey(short column, short row) const
-	{
-		return _uiData->getIsHotkey(column, row);
+		return calculateGradient(column, row);
 	}
 	bool brogueViewBase::getHasMouseInteraction() const
 	{
-		return _uiData->getHasMouseInteraction();
+		return _hasMouseInteraction;
 	}
 	bool brogueViewBase::isMouseOver(const brogueMouseState& mouseState) const
 	{
@@ -230,11 +247,11 @@ namespace brogueHd::frontend
 	}
 	bool brogueViewBase::getMouseEnter() const
 	{
-		return _uiData->getMouseEnter();
+		return _mouseData->getMouseEnter();
 	}
 	bool brogueViewBase::getMouseLeave() const
 	{
-		return _uiData->getMouseLeave();
+		return _mouseData->getMouseLeave();
 	}
 	int brogueViewBase::getZoomLevel() const
 	{
@@ -244,13 +261,20 @@ namespace brogueHd::frontend
 	{
 		return _uiData->getZIndex();
 	}
+	void brogueViewBase::setUIAction(const brogueUITagAction& action)
+	{
+		_tagAction->set(action);
+
+		// Turn on mouse interaction
+		_hasMouseInteraction = true;
+	}
 	void brogueViewBase::raiseClickEvent(const brogueUITagAction& response)
 	{
-		_eventController->getUIClickEvent()->publish(_uiData->getId().getName(), response);
+		_eventController->getUIClickEvent()->publish(_partId->getName(), response);
 	}
 	void brogueViewBase::setUpdate(bool mousePressed, bool mouseOver, bool forceUpdate)
 	{
-		_uiData->setUpdate(mousePressed, mouseOver, forceUpdate);
+		_mouseData->setUpdate(mousePressed, mouseOver, forceUpdate);
 	}
 	void brogueViewBase::initiateStateChange(brogueUIState fromState, brogueUIState toState)
 	{
@@ -267,23 +291,23 @@ namespace brogueHd::frontend
 	}
 	void brogueViewBase::clearUpdate()
 	{
-		_uiData->clearUpdate();
+		_mouseData->clearUpdate();
 	}
 	void brogueViewBase::clearEvents()
 	{
-		_uiData->clearCapture();
+		_mouseData->clearCapture();
 	}
 	void brogueViewBase::checkUpdate(const brogueKeyboardState& keyboardState,
 									 const brogueMouseState& mouseState,
 									 int millisecondsLapsed)
 	{
 		// Sets primary real time UI data for the mouse / live updates to the UI.
-		_uiData->setUpdate(mouseState.getMouseLeft(), this->isMouseOver(mouseState));
+		_mouseData->setUpdate(mouseState.getMouseLeft(), this->isMouseOver(mouseState));
 
-		if (_uiData->getMouseOver() && _uiData->getMouseClick() && _uiData->getHasMouseInteraction())
+		if (_mouseData->getMouseOver() && _mouseData->getMouseClick() && _hasMouseInteraction)
 		{
 			// UI EVENT:  Mouse Click
-			this->raiseClickEvent(_uiData->getAction());
+			this->raiseClickEvent(*_tagAction);
 		}
 	}
 	void brogueViewBase::update(int millisecondsLapsed,
@@ -293,7 +317,7 @@ namespace brogueHd::frontend
 	}
 	bool brogueViewBase::needsUpdate() const
 	{
-		return _uiData->needsUpdate();
+		return _mouseData->needsUpdate();
 	}
 	void brogueViewBase::iterate(gridCallback<brogueCellDisplay*> callback) const
 	{
@@ -302,5 +326,56 @@ namespace brogueHd::frontend
 	void brogueViewBase::iterateFrom(const gridLocator& start, const gridLocator& end, gridCallback<brogueCellDisplay*> callback) const
 	{
 		_view->iterateFrom(start, end, callback);
+	}
+	color brogueViewBase::calculateGradient(int column, int row) const
+	{
+		if (_mouseData->getMouseOver() && _mouseData->getMouseDown() && _hasMouseInteraction)
+			return calculateGradientImpl(column, row, _uiData->getPressedBackground());
+
+		else if (_mouseData->getMouseOver() && _hasMouseInteraction)
+			return calculateGradientImpl(column, row, _uiData->getHoverBackground());
+
+		else
+			return calculateGradientImpl(column, row, _uiData->getBackground());
+	}
+	color brogueViewBase::calculateGradientImpl(int column, int row, const colorGradient& gradient) const
+	{
+		gridRect boundary = this->getBoundary();
+
+		short menuColumn = column - boundary.column;
+		short menuRow = row - boundary.row;
+
+		switch (gradient.gradientType)
+		{
+			case brogueGradientType::Horizontal:
+			{
+				if (menuColumn < (boundary.width / 2.0f))
+					return gradient.getColor((boundary.width - (2 * (menuColumn))) / (float)boundary.width);
+				else
+					return gradient.getColor((2 * ((menuColumn)-(boundary.width / 2.0f))) / (float)boundary.width);
+			}
+			break;
+			case brogueGradientType::Vertical:
+			{
+				if (menuRow < (boundary.height / 2.0f))
+					return gradient.getColor((boundary.height - (2 * (menuRow))) / (float)boundary.height);
+				else
+					return gradient.getColor((2 * ((menuRow)-(boundary.height / 2.0f))) / (float)boundary.height);
+			}
+			break;
+			case brogueGradientType::Circular:
+			{
+				// This was made slightly non-linear to match Brogue v1.7.5
+				//
+				float dx = simpleMath::abs(column - boundary.centerX()) / ((float)boundary.width / 2.0f);
+				float dy = simpleMath::abs(row - boundary.centerY()) / ((float)boundary.height / 2.0f);
+				float weight = simpleMath::sqrt((dx * dx) + (dy * dy));
+
+				return gradient.getColor(weight);
+			}
+			break;
+			default:
+				simpleException::show("Unhandled brogueGradientType:  brogueUIData.h");
+		}
 	}
 }

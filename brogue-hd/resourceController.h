@@ -285,16 +285,6 @@ namespace brogueHd::backend
 												 false);
 
 		// Generic Parts
-		brogueUIProgramPartConfiguration* viewCompositor =
-			new brogueUIProgramPartConfiguration(brogueUIProgramPart::ViewCompositor,
-												 shaderResource::brogueCellDisplayVert,
-												 shaderResource::brogueCellDisplayFrag,
-												 openglDataStreamType::brogueCellQuad,
-												 openglBrogueCellOutputSelector::DisplayCurrentFrame,
-												 0,
-												 true,
-												 false);
-
 		brogueUIProgramPartConfiguration* button =
 			new brogueUIProgramPartConfiguration(brogueUIProgramPart::Button,
 												 shaderResource::brogueCellDisplayVert,
@@ -341,7 +331,6 @@ namespace brogueHd::backend
 		_programPartConfigs->add(brogueUIProgramPart::Text, text);
 		_programPartConfigs->add(brogueUIProgramPart::Background, background);
 		_programPartConfigs->add(brogueUIProgramPart::MenuBackground, menuBackground);
-		_programPartConfigs->add(brogueUIProgramPart::ViewCompositor, viewCompositor);
 	}
 
 	void resourceController::loadKeymap(keyProcessor& processor)

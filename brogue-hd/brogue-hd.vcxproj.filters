@@ -596,10 +596,10 @@
     <ClInclude Include="brogueProgramContainer.h">
       <Filter>Header Files\frontend\opengl\program</Filter>
     </ClInclude>
-    <ClInclude Include="brogueText.h">
+    <ClInclude Include="brogueTextView.h">
       <Filter>Header Files\frontend\ui</Filter>
     </ClInclude>
-    <ClInclude Include="brogueUIData.h">
+    <ClInclude Include="brogueUIMouseData.h">
       <Filter>Header Files\frontend\ui</Filter>
     </ClInclude>
     <ClInclude Include="brogueUIBuilder.h">
@@ -616,9 +616,6 @@
     </ClInclude>
     <ClInclude Include="simpleDirectoryEntry.h">
       <Filter>Header Files\simple</Filter>
-    </ClInclude>
-    <ClInclude Include="brogueComposedView.h">
-      <Filter>Header Files\frontend\ui</Filter>
     </ClInclude>
     <ClInclude Include="brogueUIConstants.h">
       <Filter>Header Files\frontend</Filter>
@@ -684,6 +681,12 @@
       <Filter>Header Files\frontend\ui</Filter>
     </ClInclude>
     <ClInclude Include="brogueGameLogContainer.h">
+      <Filter>Header Files\frontend\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueUIData.h">
+      <Filter>Header Files\frontend\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueUIText.h">
       <Filter>Header Files\frontend\ui</Filter>
     </ClInclude>
   </ItemGroup>

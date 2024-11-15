@@ -4,7 +4,9 @@
 #include "brogueKeyboardState.h"
 #include "brogueMouseState.h"
 #include "brogueTitleGrid.h"
+#include "brogueUIConstants.h"
 #include "brogueUIData.h"
+#include "brogueUIProgramPartId.h"
 #include "brogueViewBase.h"
 #include "color.h"
 #include "eventController.h"
@@ -21,7 +23,11 @@ namespace brogueHd::frontend
 	public:
 
 		brogueFlameMenuTitleMask(eventController* eventController, const brogueUIData& data, const gridRect& sceneBoundary, const gridRect& viewBoundary)
-			: brogueViewBase(eventController, data, sceneBoundary, viewBoundary)
+			: brogueViewBase(eventController, 
+							 brogueUIProgramPartId(brogueUIProgram::FlameMenuTitleMaskProgram, brogueUIProgramPart::ColorMask, 0),
+							 data, 
+							 sceneBoundary, 
+							 viewBoundary)
 		{
 			_titleGrid = new brogueTitleGrid();
 			_maskCell = new brogueCellDisplay();

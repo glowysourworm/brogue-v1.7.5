@@ -3,7 +3,9 @@
 #include "brogueKeyboardState.h"
 #include "brogueMouseState.h"
 #include "brogueTitleGrid.h"
+#include "brogueUIConstants.h"
 #include "brogueUIData.h"
+#include "brogueUIProgramPartId.h"
 #include "brogueViewBase.h"
 #include "color.h"
 #include "eventController.h"
@@ -120,7 +122,11 @@ namespace brogueHd::frontend
 													 const brogueUIData& data,
 													 const gridRect& sceneBoundary,
 													 const gridRect& viewBoundary)
-		: brogueViewBase(eventController, data, sceneBoundary, viewBoundary)
+		: brogueViewBase(eventController,
+						 brogueUIProgramPartId(brogueUIProgram::FlameMenuProgram, brogueUIProgramPart::FlameDisplay, 0),
+						 data,
+						 sceneBoundary,
+						 viewBoundary)
 	{
 		_randomGenerator = randomGenerator;
 		_fadePeriodRandom1 = randomGenerator->next() * 10000;

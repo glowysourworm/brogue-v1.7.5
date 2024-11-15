@@ -4,6 +4,7 @@
 #include "color.h"
 #include "simple.h"
 #include "simpleArray.h"
+#include "simpleString.h"
 #include <cstring>
 
 using namespace brogueHd::simple;
@@ -12,12 +13,6 @@ namespace brogueHd::backend::model
 {
 	struct colorString : hashable
 	{
-	public:
-
-		// Character that corresponds to the empty char and also works with the
-		// glyph sheets.
-		static const char Empty = ' ';
-
 	public:
 
 		colorString()
@@ -56,8 +51,8 @@ namespace brogueHd::backend::model
 		}
 		colorString(const colorString& copy)
 		{
-			_characters = nullptr;
-			_colors = nullptr;
+			_characters = new simpleArray<int>(copy.getCount());
+			_colors = new simpleArray<color>(copy.getCount());
 
 			copyImpl(copy);
 		}
@@ -68,6 +63,15 @@ namespace brogueHd::backend::model
 		}
 		void operator=(const colorString& copy)
 		{
+			if (_characters != nullptr)
+			{
+				delete _characters;
+				delete _colors;
+			}
+
+			_characters = new simpleArray<int>(copy.getCount());
+			_colors = new simpleArray<color>(copy.getCount());
+
 			copyImpl(copy);
 		}
 		bool operator==(const colorString& other)
@@ -77,6 +81,23 @@ namespace brogueHd::backend::model
 		bool operator!=(const colorString& other)
 		{
 			return !compare(other);
+		}
+		simpleString getString() const
+		{
+			simpleString result(_characters->count());
+
+			for (int index = 0; index < _characters->count(); index++)
+			{
+				result.set(index, (char)_characters->get(index));
+			}
+
+			return result;
+		}
+		simpleString getSubstring(int startIndex, int length) const
+		{
+			simpleString result = getString();
+
+			return result.subString(startIndex, length);
 		}
 		char getChar(short index) const
 		{
@@ -111,11 +132,8 @@ namespace brogueHd::backend::model
 
 		void copyImpl(const colorString& copy)
 		{
-			delete _characters;
-			delete _colors;
-
-			_characters = new simpleArray<int>(copy.getCount());
-			_colors = new simpleArray<color>(copy.getCount());
+			// The arrays must already be new'd in the constructor
+			// for this length.
 
 			for (int index = 0; index < copy.getCount(); index++)
 			{
