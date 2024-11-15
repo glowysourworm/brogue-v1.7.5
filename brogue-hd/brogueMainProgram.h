@@ -55,7 +55,12 @@ namespace brogueHd::frontend
 
 		void activateUIProgram(brogueUIProgram programName);
 		void deactivateUIProgram(brogueUIProgram programName);
+		void deactivateUIAll();
 		bool isProgramActive(brogueUIProgram programName) const;
+
+		void initiateStateChange(brogueUIState fromState, brogueUIState toState);
+		void clearStateChange();
+		bool checkStateChange();
 
 		void checkUpdate(const simpleKeyboardState& keyboardState,
 						 const simpleMouseState& mouseState,
@@ -93,7 +98,8 @@ namespace brogueHd::frontend
 		simpleTexture* _uiTexture;					// GL_TEXTURE3, Color Attachment 1, carries the UI components
 		simpleTexture* _openMenuTexture;			// GL_TEXTURE4 (Open Menu Selector) (Clipping / Scrolling Behavior)
 		simpleTexture* _playbackMenuTexture;		// GL_TEXTURE5 (Playback Menu Selector) (Clipping / Scrolling Behavior)
-		simpleTexture* _fontTexture;				// GL_TEXTURE6 (Glyph Map texture) (Clipping / Scrolling Behavior)
+		simpleTexture* _gameLogTexture;				// GL_TEXTURE6 (Game Log) (Clipping / Scrolling Behavior)
+		simpleTexture* _fontTexture;				// GL_TEXTURE7 (Glyph Map texture) (Clipping / Scrolling Behavior)
 		gridRect* _sceneBoundaryUI;
 
 		BrogueGameMode _gameMode;
@@ -155,6 +161,7 @@ namespace brogueHd::frontend
 		_uiTexture = new simpleTexture(nullptr, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE3, GL_RGBA, GL_RGBA8, 4, GL_FLOAT);
 		_openMenuTexture = new simpleTexture(nullptr, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE4, GL_RGBA, GL_RGBA8, 4, GL_FLOAT);
 		_playbackMenuTexture = new simpleTexture(nullptr, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE5, GL_RGBA, GL_RGBA8, 4, GL_FLOAT);
+		_gameLogTexture = new simpleTexture(nullptr, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE6, GL_RGBA, GL_RGBA8, 4, GL_FLOAT);
 
 		// Font Glyphs:  Going to load the max zoom for now
 		simpleBitmap* glyphSheet = resourceController->getFontGlyphs(zoomLevel);
@@ -169,7 +176,7 @@ namespace brogueHd::frontend
 		openglHelper::flipSurface(glyphSurface);
 
 		// void* @_@ (No really good way to own this one until we do it ourselves for each and every data type, that WE own)
-		_fontTexture = new simpleTexture(glyphSurface, glyphSheet->pixelWidth(), glyphSheet->pixelHeight(), textureIndex++, GL_TEXTURE6, GL_RGBA, GL_RGBA, 4, GL_UNSIGNED_BYTE);
+		_fontTexture = new simpleTexture(glyphSurface, glyphSheet->pixelWidth(), glyphSheet->pixelHeight(), textureIndex++, GL_TEXTURE7, GL_RGBA, GL_RGBA, 4, GL_UNSIGNED_BYTE);
 
 		_frameBuffer = new simpleFrameBuffer(sceneBoundaryUI.width, sceneBoundaryUI.height);
 	}
@@ -182,6 +189,7 @@ namespace brogueHd::frontend
 		delete _uiTexture;
 		delete _openMenuTexture;
 		delete _playbackMenuTexture;
+		delete _gameLogTexture;
 		delete _fontTexture;
 		delete _frameBuffer;
 		delete _sceneBoundaryUI;
@@ -204,6 +212,48 @@ namespace brogueHd::frontend
 	void brogueMainProgram::deactivateUIProgram(brogueUIProgram programName)
 	{
 		_uiPrograms->get(programName)->deactivate();
+	}
+	void brogueMainProgram::deactivateUIAll()
+	{
+		_uiPrograms->iterate([] (brogueUIProgram name, brogueViewProgram* program)
+		{
+			program->deactivate();
+			return iterationCallback::iterate;
+		});
+	}
+	void brogueMainProgram::initiateStateChange(brogueUIState fromState, brogueUIState toState)
+	{
+		_uiPrograms->iterate([&fromState, &toState] (brogueUIProgram programName, brogueViewProgram* program)
+		{
+			if (program->isActive())
+				program->initiateStateChange(fromState, toState);
+
+			return iterationCallback::iterate;
+		});
+	}
+	void brogueMainProgram::clearStateChange()
+	{
+		_uiPrograms->iterate([] (brogueUIProgram programName, brogueViewProgram* program)
+		{
+			if (program->isActive())
+				program->clearStateChange();
+
+			return iterationCallback::iterate;
+		});
+	}
+	bool brogueMainProgram::checkStateChange()
+	{
+		bool result = false;
+
+		_uiPrograms->iterate([&result] (brogueUIProgram programName, brogueViewProgram* program)
+		{
+			if (program->isActive())
+				result |= program->checkStateChange();
+
+			return iterationCallback::iterate;
+		});
+
+		return result;
 	}
 	bool brogueMainProgram::isProgramActive(brogueUIProgram programName) const
 	{
@@ -319,6 +369,29 @@ namespace brogueHd::frontend
 
 				break;
 			case BrogueGameMode::Game:
+
+				// Currently, all on the UI texture
+				//
+				if (_uiPrograms->get(brogueUIProgram::GameProgram)->isActive())
+					_uiPrograms->get(brogueUIProgram::GameProgram)->run(millisecondsElapsed);
+
+				if (_uiPrograms->get(brogueUIProgram::GameObjectListProgram)->isActive())
+					_uiPrograms->get(brogueUIProgram::GameObjectListProgram)->run(millisecondsElapsed);
+
+				if (_uiPrograms->get(brogueUIProgram::FlavorTextPanelProgram)->isActive())
+					_uiPrograms->get(brogueUIProgram::FlavorTextPanelProgram)->run(millisecondsElapsed);
+
+				if (_uiPrograms->get(brogueUIProgram::BottomBarMenuProgram)->isActive())
+					_uiPrograms->get(brogueUIProgram::BottomBarMenuProgram)->run(millisecondsElapsed);
+
+				// Put the game log (scrollable area) on a separate texture to control rendering
+				glDrawBuffer(GL_COLOR_ATTACHMENT6);
+				_gameLogTexture->bind();
+				_gameLogTexture->clearColor(colors::transparent());
+
+				if (_uiPrograms->get(brogueUIProgram::GameLogProgram)->isActive())
+					_uiPrograms->get(brogueUIProgram::GameLogProgram)->run(millisecondsElapsed);
+
 				break;
 			case BrogueGameMode::Playback:
 				break;
@@ -338,15 +411,19 @@ namespace brogueHd::frontend
 		// Get frame program uniforms
 		vec4 openMenuClipXY = _uiPrograms->get(brogueUIProgram::OpenMenuProgram)->getClipXY();
 		vec4 playbackMenuClipXY = _uiPrograms->get(brogueUIProgram::PlaybackMenuProgram)->getClipXY();
+		vec4 gameLogClipXY = _uiPrograms->get(brogueUIProgram::GameLogProgram)->getClipXY();
 		vec2 openMenuScrollUV = _uiPrograms->get(brogueUIProgram::OpenMenuProgram)->getScrollUV();
 		vec2 playbackMenuScrollUV = _uiPrograms->get(brogueUIProgram::PlaybackMenuProgram)->getScrollUV();
+		vec2 gameLogScrollUV = _uiPrograms->get(brogueUIProgram::GameLogProgram)->getScrollUV();
 
 		// Output the frame buffer
 		_frameProgram->bind();
 		_frameProgram->bindUniform4("openMenuClipXY", openMenuClipXY);
 		_frameProgram->bindUniform4("playbackMenuClipXY", playbackMenuClipXY);
+		_frameProgram->bindUniform4("gameLogClipXY", gameLogClipXY);
 		_frameProgram->bindUniform2("openMenuScrollUV", openMenuScrollUV);
 		_frameProgram->bindUniform2("playbackMenuScrollUV", playbackMenuScrollUV);
+		_frameProgram->bindUniform2("gameLogScrollUV", gameLogScrollUV);
 		_frameProgram->draw();
 
 		glFlush();
@@ -367,6 +444,7 @@ namespace brogueHd::frontend
 		_uiTexture->glCreate(-1);
 		_openMenuTexture->glCreate(-1);
 		_playbackMenuTexture->glCreate(-1);
+		_gameLogTexture->glCreate(-1);
 		_fontTexture->glCreate(-1);
 
 		//Create Frame buffer:  Uses scene program to render to the frame buffer attached texture
@@ -380,6 +458,7 @@ namespace brogueHd::frontend
 		_frameBuffer->attachTexture(_uiTexture->getHandle(), GL_COLOR_ATTACHMENT3);
 		_frameBuffer->attachTexture(_openMenuTexture->getHandle(), GL_COLOR_ATTACHMENT4);
 		_frameBuffer->attachTexture(_playbackMenuTexture->getHandle(), GL_COLOR_ATTACHMENT5);
+		_frameBuffer->attachTexture(_gameLogTexture->getHandle(), GL_COLOR_ATTACHMENT6);
 		_frameBuffer->attachRenderBuffer();
 		_frameBuffer->unBind();
 
@@ -506,11 +585,29 @@ namespace brogueHd::frontend
 	}
 	void brogueMainProgram::setMode(BrogueGameMode mode)
 	{
+		_gameMode = mode;
+
 		// Deactivate All
 		for (int index = 0; index < _uiPrograms->count(); index++)
 		{
 			_uiPrograms->getAt(index)->value->deactivate();
 		}
+
+		// Clear All Textures
+		_frameTexture->bind();
+		_frameTexture->clearColor(colors::transparent());
+		_flameTexture->bind();
+		_flameTexture->clearColor(colors::transparent());
+		_titleMaskTexture->bind();
+		_titleMaskTexture->clearColor(colors::transparent());
+		_uiTexture->bind();
+		_uiTexture->clearColor(colors::transparent());
+		_openMenuTexture->bind();
+		_openMenuTexture->clearColor(colors::transparent());
+		_playbackMenuTexture->bind();
+		_playbackMenuTexture->clearColor(colors::transparent());
+		_gameLogTexture->bind();
+		_gameLogTexture->clearColor(colors::transparent());
 
 		switch (mode)
 		{
@@ -520,6 +617,11 @@ namespace brogueHd::frontend
 				_uiPrograms->get(brogueUIProgram::MainMenuProgram)->activate();
 				break;
 			case BrogueGameMode::Game:
+				_uiPrograms->get(brogueUIProgram::BottomBarMenuProgram)->activate();
+				_uiPrograms->get(brogueUIProgram::GameObjectListProgram)->activate();
+				_uiPrograms->get(brogueUIProgram::FlavorTextPanelProgram)->activate();
+				_uiPrograms->get(brogueUIProgram::GameLogProgram)->activate();
+				_uiPrograms->get(brogueUIProgram::GameProgram)->activate();
 				break;
 			case BrogueGameMode::Playback:
 				break;

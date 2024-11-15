@@ -89,6 +89,10 @@ namespace brogueHd::frontend
 						 const simpleMouseState& mouseState,
 						 int millisecondsLapsed);
 
+		void initiateStateChange(brogueUIState fromState, brogueUIState toState);
+		void clearStateChange();
+		bool checkStateChange();
+
 		bool needsUpdate();
 		void clearUpdate();
 		void clearEvents();
@@ -208,6 +212,27 @@ namespace brogueHd::frontend
 
 		_active = false;
 	}
+	void brogueViewProgram::initiateStateChange(brogueUIState fromState, brogueUIState toState)
+	{
+		if (!_active)
+			throw simpleException("Trying to change state for inactive program:  brogueViewProgram::initiateStateChange");
+
+		_viewContainer->initiateStateChange(fromState, toState);
+	}
+	void brogueViewProgram::clearStateChange()
+	{
+		if (!_active)
+			throw simpleException("Trying to change state for inactive program:  brogueViewProgram::clearStateChange");
+
+		_viewContainer->clearStateChange();
+	}
+	bool brogueViewProgram::checkStateChange()
+	{
+		if (!_active)
+			throw simpleException("Trying to change state for inactive program:  brogueViewProgram::checkStateChange");
+
+		return _viewContainer->checkStateChange();
+	}
 	gridRect brogueViewProgram::getSceneBoundaryUI() const
 	{
 		return _viewContainer->calculateSceneBoundaryUI();
@@ -279,23 +304,7 @@ namespace brogueHd::frontend
 		brogueKeyboardState keyboardUI = calculateKeyboardState(keyboardState);
 		brogueMouseState mouseUI = calculateMouseState(mouseState);
 
-		// Scroll Update:  The brogueViewContainer handles offsets during checkUpdate. These
-		//				   render offsets are stored with the view container; and consumed by
-		//				   the main program during rendering.
-		//
-		_viewContainer->updateScroll(keyboardUI, mouseUI, millisecondsLapsed);
-
-		// Iterate Child Views: Each corresponds to a program part; and the composed views are 
-		//						of ViewCompositor type.
-		//
-		for (int index = 0; index < _viewContainer->getViewCount(); index++)
-		{
-			brogueViewBase* view = _viewContainer->getViewAt(index);
-
-			// Program Part's Update
-			//
-			_viewContainer->checkUpdate(view->getPartId(), keyboardUI, mouseUI, millisecondsLapsed);
-		}
+		_viewContainer->checkUpdate(keyboardUI, mouseUI, millisecondsLapsed);
 	}
 
 	bool brogueViewProgram::isActive()

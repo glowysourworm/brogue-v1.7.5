@@ -14,10 +14,13 @@ uniform sampler2D titleMaskTexture;
 uniform sampler2D uiTexture;
 uniform sampler2D openMenuTexture;
 uniform sampler2D playbackMenuTexture;
+uniform sampler2D gameLogTexture;
 uniform vec4 openMenuClipXY;
 uniform vec2 openMenuScrollUV;
 uniform vec4 playbackMenuClipXY;
 uniform vec2 playbackMenuScrollUV;
+uniform vec4 gameLogClipXY;
+uniform vec2 gameLogScrollUV;
 
 void main()
 {
@@ -25,9 +28,11 @@ void main()
     //
     vec2 openMenuUV = currentTextureUV + openMenuScrollUV;
     vec2 playbackUV = currentTextureUV + playbackMenuScrollUV;
+    vec2 gameLogUV = currentTextureUV + gameLogScrollUV;
 
     vec4 openMenuColor = texture(openMenuTexture, openMenuUV);
     vec4 playbackMenuColor = texture(playbackMenuTexture, playbackUV);
+    vec4 gameLogColor = texture(gameLogTexture, gameLogUV);
 
     // Clipping (x, y, width, height) (where (x,y) is the topLeft vertex)
     if (length(openMenuClipXY) > 0)
@@ -52,6 +57,17 @@ void main()
         }
     }
 
+    if (length(gameLogClipXY) > 0)
+    {
+        if (currentVertex.x < gameLogClipXY.x ||
+            currentVertex.x > gameLogClipXY.x + gameLogClipXY.z ||
+            currentVertex.y < gameLogClipXY.y - gameLogClipXY.w ||
+            currentVertex.y > gameLogClipXY.y)
+        {
+            gameLogColor = vec4(0,0,0,0);
+        }
+    }
+
     // Finish output
     outputColor = vec4(0,0,0,0);
 
@@ -67,6 +83,9 @@ void main()
 
     else if (playbackMenuColor.w > 0)
         outputColor = playbackMenuColor;
+
+    else if (gameLogColor.w > 0)
+        outputColor = gameLogColor;
 
     else if (uiOutput.w > 0)
         outputColor = uiOutput;

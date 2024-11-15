@@ -3,6 +3,7 @@
 #include "brogueCellDisplay.h"
 #include "brogueKeyboardState.h"
 #include "brogueMouseState.h"
+#include "brogueUIConstants.h"
 #include "brogueUIData.h"
 #include "brogueUIProgramPartId.h"
 #include "brogueUITagAction.h"
@@ -62,6 +63,24 @@ namespace brogueHd::frontend
 		/// stream for openGL is built. So, it would be useful to use for stream operations.
 		/// </summary>
 		void iterateFrom(const gridLocator& start, const gridLocator& end, gridCallback<brogueCellDisplay*> callback) const;
+
+		/// <summary>
+		/// Starts animation sequences for the UI. Normal reports are drawn from checkUpdate; but the
+		/// additional report checkStateChange must be handled. The updating of data for the primary
+		/// rendering is still done during the checkUpdate function - while these animations are playing.
+		/// </summary>
+		virtual void initiateStateChange(brogueUIState fromState, brogueUIState toState);
+
+		/// <summary>
+		/// Clears state change (data). This is run once after all state changes have completed.
+		/// </summary>
+		virtual void clearStateChange();
+
+		/// <summary>
+		/// Requests a UI update for state change animations. Return true to signal that there are still
+		/// active animations in progress.
+		/// </summary>
+		virtual bool checkStateChange();
 
 		/// <summary>
 		/// Overload of the checkUpdate function behaves as though the view is a child of a parent view
@@ -232,6 +251,19 @@ namespace brogueHd::frontend
 	void brogueViewBase::setUpdate(bool mousePressed, bool mouseOver, bool forceUpdate)
 	{
 		_uiData->setUpdate(mousePressed, mouseOver, forceUpdate);
+	}
+	void brogueViewBase::initiateStateChange(brogueUIState fromState, brogueUIState toState)
+	{
+		// Must inherit this function
+	}
+	void brogueViewBase::clearStateChange()
+	{
+		// Nothing to do
+	}
+	bool brogueViewBase::checkStateChange()
+	{
+		// Finished with changes (nothing to do)
+		return false;
 	}
 	void brogueViewBase::clearUpdate()
 	{

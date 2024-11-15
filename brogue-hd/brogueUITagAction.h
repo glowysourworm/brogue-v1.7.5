@@ -12,26 +12,32 @@ namespace brogueHd::frontend
 		brogueUITagAction()
 		{
 			action = brogueUIAction::None;
-			glfwHotkey = -1;
+			desiredState = brogueUIState::MainMenu;
 			fileName = default_value::value<simpleString>();
 		}
-		brogueUITagAction(brogueUIAction aaction, int hotkeyCodeGLFW, simpleString fileChosen)
+		brogueUITagAction(brogueUIState stateChange)
 		{
-			action = aaction;
-			glfwHotkey = hotkeyCodeGLFW;
+			action = brogueUIAction::StateChange;
+			desiredState = stateChange;
+			fileName = default_value::value<simpleString>();
+		}
+		brogueUITagAction(brogueUIAction fileAction, simpleString fileChosen)
+		{
+			action = fileAction;
 			fileName = fileChosen;
+			desiredState = brogueUIState::MainMenu;
 		}
 		brogueUITagAction(const brogueUITagAction& copy)
 		{
 			action = copy.action;
-			glfwHotkey = copy.glfwHotkey;
 			fileName = copy.fileName;
+			desiredState = copy.desiredState;
 		}
 		void operator=(const brogueUITagAction& copy)
 		{
 			action = copy.action;
-			glfwHotkey = copy.glfwHotkey;
 			fileName = copy.fileName;
+			desiredState = copy.desiredState;
 		}
 		bool operator==(const brogueUITagAction& other)
 		{
@@ -43,14 +49,14 @@ namespace brogueHd::frontend
 		}
 
 		/// <summary>
-		/// GLFW key code for the hotkey (modifiers won't matter)
-		/// </summary>
-		int glfwHotkey;
-
-		/// <summary>
 		/// File name from the chosen file
 		/// </summary>
 		simpleString fileName;
+
+		/// <summary>
+		/// Change of state action
+		/// </summary>
+		brogueUIState desiredState;
 
 		/// <summary>
 		/// Action to perform - which is the purpose of the UI control
@@ -62,7 +68,7 @@ namespace brogueHd::frontend
 		bool compare(const brogueUITagAction& other)
 		{
 			return action == other.action &&
-				glfwHotkey == other.glfwHotkey &&
+				desiredState == other.desiredState &&
 				fileName == other.fileName;
 		}
 	};

@@ -26,6 +26,7 @@
 #include "brogueMouseState.h"
 #include "brogueKeyboardState.h"
 #include "simple.h"
+#include "brogueUIStateChanger.h"
 
 using namespace brogueHd::simple;
 using namespace brogueHd::component;
@@ -117,14 +118,12 @@ namespace brogueHd::frontend
 
 		brogueProgramContainer* _program;
 		simplePeriodCounter* _uiEventDebouncer;
+		brogueUIStateChanger* _uiStateChanger;
 
 		// Two way communication for the rendering context
 		BrogueGameMode _gameMode;
 		BrogueGameMode _gameModeIn;
 		BrogueGameMode _gameModeOut;
-
-		// Program View Change:  Happens when UI programs get activated / deactivated
-		bool _programViewChange;
 		
 		GLFWwindow* _window;
 		bool _initializedGL;
@@ -142,12 +141,12 @@ namespace brogueHd::frontend
 		_threadLock = new std::mutex();
 		_eventController = eventController;
 		_uiEventDebouncer = new simplePeriodCounter(2);
+		_uiStateChanger = new brogueUIStateChanger(brogueUIState::MainMenu);
 
 		_clickToken = eventController->getUIClickEvent()->subscribe(std::bind(&openglRenderer::thread_brogueUIClickEvent, this, std::placeholders::_1, std::placeholders::_2));
 		_gameModeOut = BrogueGameMode::Title;
 		_gameModeIn = BrogueGameMode::Title;
 		_gameMode = BrogueGameMode::Title;
-		_programViewChange = false;
 	}
 	openglRenderer::~openglRenderer()
 	{
@@ -173,6 +172,7 @@ namespace brogueHd::frontend
 			_eventController->getUIClickEvent()->unSubscribe(_clickToken);
 
 		delete _uiEventDebouncer;
+		delete _uiStateChanger;
 	}
 
 #pragma region GLFW Callbacks
@@ -491,18 +491,72 @@ namespace brogueHd::frontend
 			{
 				if (sender == brogueUIProgram::FlameMenuProgram)
 				{
-					_program->deactivateUIProgram(brogueUIProgram::OpenMenuProgram);
-					_program->deactivateUIProgram(brogueUIProgram::OpenMenuBackgroundProgram);
-					_program->deactivateUIProgram(brogueUIProgram::PlaybackMenuProgram);
-					_program->deactivateUIProgram(brogueUIProgram::PlaybackMenuBackgroundProgram);
-					_program->deactivateUIProgram(brogueUIProgram::HighScoresProgram);
-
+					_program->deactivateUIAll();
 					_program->activateUIProgram(brogueUIProgram::MainMenuProgram);
 					_program->clearEvents();
-					_programViewChange = true;
 				}
 			}
-				break;
+			break;
+
+			case brogueUIAction::StateChange:
+			{
+				switch (tagAction.desiredState)
+				{
+					case brogueUIState::MainMenu:
+					{
+						_program->deactivateUIAll();
+						_program->activateUIProgram(brogueUIProgram::MainMenuProgram);
+					}
+					break;
+					case brogueUIState::OpenMenu:
+					{
+						_program->deactivateUIAll();
+						_program->activateUIProgram(brogueUIProgram::OpenMenuBackgroundProgram);
+						_program->activateUIProgram(brogueUIProgram::OpenMenuProgram);
+					}
+					break;
+					case brogueUIState::PlaybackMenu:
+					{
+						_program->deactivateUIAll();
+						_program->activateUIProgram(brogueUIProgram::PlaybackMenuBackgroundProgram);
+						_program->activateUIProgram(brogueUIProgram::PlaybackMenuProgram);
+					}
+					break;
+					case brogueUIState::HighScores:
+					{
+						_program->deactivateUIAll();
+						_program->activateUIProgram(brogueUIProgram::HighScoresProgram);
+					}
+					break;
+					case brogueUIState::GameNormal:
+					{
+
+					}
+					break;
+					case brogueUIState::GameLogOpen:
+					{
+						
+					}
+					break;
+					case brogueUIState::GameMenuOpen:
+					case brogueUIState::GameInventoryOpen:
+					case brogueUIState::GameDiscoveredItemsOpen:
+					case brogueUIState::GameHelpOpen:
+					case brogueUIState::Modal:
+					default:
+						break;
+				}
+
+				// Clear out mouse events (action handled)
+				_program->clearEvents();
+
+				// Initiate a state change signal to the view tree
+				_program->initiateStateChange(_uiStateChanger->getCurrentState(), tagAction.desiredState);
+
+				// Keep a record of the state change for use in the render loop
+				_uiStateChanger->set(tagAction.desiredState);
+			}
+			break;
 
 			case brogueUIAction::NewGame:
 				_gameModeOut = BrogueGameMode::Game;
@@ -510,82 +564,12 @@ namespace brogueHd::frontend
 
 			case brogueUIAction::OpenGame:
 			{
-				//_program->deactivateUIProgram(brogueUIProgram::FlameMenuProgram);
-				_program->deactivateUIProgram(brogueUIProgram::PlaybackMenuProgram);
-				_program->deactivateUIProgram(brogueUIProgram::PlaybackMenuBackgroundProgram);
-				_program->deactivateUIProgram(brogueUIProgram::HighScoresProgram);
-				_program->deactivateUIProgram(brogueUIProgram::MainMenuProgram);
-
-				_program->activateUIProgram(brogueUIProgram::OpenMenuBackgroundProgram);
-				_program->activateUIProgram(brogueUIProgram::OpenMenuProgram);
-				_program->clearEvents();
-				_programViewChange = true;
 			}
 			break;
 
 			case brogueUIAction::QuitGame:
-				break;
-
-			case brogueUIAction::ShowQuitGameModal:
-				break;
-
-			case brogueUIAction::ViewMainMenu:
 			{
-				//_program->deactivateUIProgram(brogueUIProgram::FlameMenuProgram);
-				_program->deactivateUIProgram(brogueUIProgram::OpenMenuProgram);
-				_program->deactivateUIProgram(brogueUIProgram::OpenMenuBackgroundProgram);
-				_program->deactivateUIProgram(brogueUIProgram::PlaybackMenuProgram);
-				_program->deactivateUIProgram(brogueUIProgram::PlaybackMenuBackgroundProgram);
-				_program->deactivateUIProgram(brogueUIProgram::HighScoresProgram);
 
-				_program->activateUIProgram(brogueUIProgram::MainMenuProgram);
-				_program->clearEvents();
-				_programViewChange = true;
-			}
-			break;
-
-			case brogueUIAction::ViewHighScores:
-			{
-				//_program->deactivateUIProgram(brogueUIProgram::FlameMenuProgram);
-				_program->deactivateUIProgram(brogueUIProgram::OpenMenuProgram);
-				_program->deactivateUIProgram(brogueUIProgram::OpenMenuBackgroundProgram);
-				_program->deactivateUIProgram(brogueUIProgram::PlaybackMenuProgram);
-				_program->deactivateUIProgram(brogueUIProgram::PlaybackMenuBackgroundProgram);
-				_program->deactivateUIProgram(brogueUIProgram::MainMenuProgram);
-
-				_program->activateUIProgram(brogueUIProgram::HighScoresProgram);
-				_program->clearEvents();
-				_programViewChange = true;
-			}
-			break;
-
-			case brogueUIAction::ViewOpenGameMenu:
-			{
-				//_program->deactivateUIProgram(brogueUIProgram::FlameMenuProgram);
-				_program->deactivateUIProgram(brogueUIProgram::PlaybackMenuProgram);
-				_program->deactivateUIProgram(brogueUIProgram::PlaybackMenuBackgroundProgram);
-				_program->deactivateUIProgram(brogueUIProgram::HighScoresProgram);
-				_program->deactivateUIProgram(brogueUIProgram::MainMenuProgram);
-
-				_program->activateUIProgram(brogueUIProgram::OpenMenuProgram);
-				_program->activateUIProgram(brogueUIProgram::OpenMenuBackgroundProgram);
-				_program->clearEvents();
-				_programViewChange = true;
-			}
-			break;
-
-			case brogueUIAction::ViewPlaybackMenu:
-			{
-				//_program->deactivateUIProgram(brogueUIProgram::FlameMenuProgram);
-				_program->deactivateUIProgram(brogueUIProgram::OpenMenuProgram);
-				_program->deactivateUIProgram(brogueUIProgram::OpenMenuBackgroundProgram);
-				_program->deactivateUIProgram(brogueUIProgram::HighScoresProgram);
-				_program->deactivateUIProgram(brogueUIProgram::MainMenuProgram);
-
-				_program->activateUIProgram(brogueUIProgram::PlaybackMenuBackgroundProgram);
-				_program->activateUIProgram(brogueUIProgram::PlaybackMenuProgram);
-				_program->clearEvents();
-				_programViewChange = true;
 			}
 			break;
 			default:
@@ -661,15 +645,29 @@ namespace brogueHd::frontend
 				_gameMode = _gameModeIn;
 			}
 
-			// Check Update(s) -> (Click Events) (can signal view change)
+			// UI Animations
+			if (_uiStateChanger->isChanging())
+			{
+				// Are animations still running on the UI tree?
+				if (!_program->checkStateChange())
+				{
+					// Animations are finished -> clear UI tree.
+					_program->clearStateChange();
+
+					// Reset the state changer
+					_uiStateChanger->clear();
+				}
+			}
+
+			// Check Update(s) -> (Click Events) (can signal view change) (animations will also be aware for state changes)
 			_program->checkUpdate(keyboardState, mouseState, intervalMilliseconds);
 
 			// Updates Program Buffers:  brogueViewBase* -> simpleDataStream (gets sent to GPU)
 			//							 Check normal program update (view state change) to force 
 			//							 update (to active programs only!)
 			//
-			if (_program->needsUpdate() || gameModeChangeThisIteration || _programViewChange)
-				_program->update(keyboardState, mouseState, intervalMilliseconds, gameModeChangeThisIteration || _programViewChange);		
+			if (_program->needsUpdate() || gameModeChangeThisIteration)
+				_program->update(keyboardState, mouseState, intervalMilliseconds, gameModeChangeThisIteration);
 
 			// Run drawing program
 			_program->run(intervalMilliseconds);										// Run() -> Draws the buffers
@@ -683,9 +681,6 @@ namespace brogueHd::frontend
 
 			// Scroll data has already been consumed by the view tree
 			brogueHd::frontend::MouseState->resetScroll();
-
-			// This is set on the render thead -> Click Event
-			_programViewChange = false;
 
 			_threadLock->unlock();
 

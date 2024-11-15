@@ -38,7 +38,12 @@ namespace brogueHd::frontend
 
 		void activateUIProgram(brogueUIProgram programName);
 		void deactivateUIProgram(brogueUIProgram programName);
+		void deactivateUIAll();
 		bool isProgramActive(brogueUIProgram programName);
+
+		void initiateStateChange(brogueUIState fromState, brogueUIState toState);
+		void clearStateChange();
+		bool checkStateChange();
 
 		void initialize();
 		void run(int millisecondsLapsed);
@@ -118,6 +123,22 @@ namespace brogueHd::frontend
 	void brogueProgramContainer::deactivateUIProgram(brogueUIProgram programName)
 	{
 		_mainProgram->deactivateUIProgram(programName);
+	}
+	void brogueProgramContainer::deactivateUIAll()
+	{
+		_mainProgram->deactivateUIAll();
+	}
+	void brogueProgramContainer::initiateStateChange(brogueUIState fromState, brogueUIState toState)
+	{
+		_mainProgram->initiateStateChange(fromState, toState);
+	}
+	void brogueProgramContainer::clearStateChange()
+	{
+		_mainProgram->clearStateChange();
+	}
+	bool brogueProgramContainer::checkStateChange()
+	{
+		return _mainProgram->checkStateChange();
 	}
 	bool brogueProgramContainer::isProgramActive(brogueUIProgram programName)
 	{

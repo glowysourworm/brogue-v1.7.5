@@ -680,6 +680,12 @@
     <ClInclude Include="brogueFlameQuad.h">
       <Filter>Header Files\frontend\opengl\streamObjects</Filter>
     </ClInclude>
+    <ClInclude Include="brogueUIStateChanger.h">
+      <Filter>Header Files\frontend\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueGameLogContainer.h">
+      <Filter>Header Files\frontend\ui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\resources\model\armor.csv">

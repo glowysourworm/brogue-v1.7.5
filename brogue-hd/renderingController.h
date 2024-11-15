@@ -73,8 +73,18 @@ namespace brogueHd::backend
 		brogueViewContainer* playbackMenuBackground = _uiBuilder->buildProgramView(brogueUIProgram::PlaybackMenuBackgroundProgram);
 		brogueViewContainer* highScoresMenu = _uiBuilder->buildProgramView(brogueUIProgram::HighScoresProgram);
 
+		// Game Screen:  Build program parts
+
+		brogueViewContainer* gameView = _uiBuilder->buildProgramView(brogueUIProgram::GameProgram);
+		brogueViewContainer* gameMenu = _uiBuilder->buildProgramView(brogueUIProgram::GameMenuProgram);
+		brogueViewContainer* gameLog = _uiBuilder->buildProgramView(brogueUIProgram::GameLogProgram);
+		brogueViewContainer* gameObjectList = _uiBuilder->buildProgramView(brogueUIProgram::GameObjectListProgram);
+		brogueViewContainer* flavorTextPanel = _uiBuilder->buildProgramView(brogueUIProgram::FlavorTextPanelProgram);
+		brogueViewContainer* bottomMenuBar = _uiBuilder->buildProgramView(brogueUIProgram::BottomBarMenuProgram);
+
 		simpleList<brogueViewContainer*> viewList;
 
+		// Title Views
 		viewList.add(flameView);
 		viewList.add(titleMask);
 		viewList.add(mainMenu);
@@ -83,6 +93,14 @@ namespace brogueHd::backend
 		viewList.add(playbackMenuBackground);
 		viewList.add(playbackMenu);
 		viewList.add(highScoresMenu);
+
+		// Game Views
+		viewList.add(gameView);
+		viewList.add(gameMenu);
+		viewList.add(gameLog);
+		viewList.add(gameObjectList);
+		viewList.add(flavorTextPanel);
+		viewList.add(bottomMenuBar);
 
 		gridRect sceneBoundaryUI = flameView->calculateSceneBoundaryUI();
 

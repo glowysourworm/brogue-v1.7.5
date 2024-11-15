@@ -23,3 +23,49 @@ Game View Program Design:
 Player Status Panel:
 
 	- TODO: Add name of player to the game data, and display it proudly. 
+	
+Brogue UI State:
+
+	Definition: The UI state which will accept user interaction.
+	
+	enum class brogueUIState
+	{
+		MainMenu = 0,
+		OpenMenu = 1,
+		PlaybackMenu = 2,
+		HighScores = 3,
+		Modal = 4,
+		GameNormal = 5,
+		GameLogOpen = 6,
+		GameMenuOpen = 7,
+		GameInventoryOpen = 8,
+		GameDiscoveredItemsOpen = 9,
+		GameHelpOpen = 10
+	};
+	
+Brogue UI Animation Sequence: (brogueUIStateChanger)
+
+	Definition: The UI animation would be something that affects only the UI elements.  
+				So, a non-game animation.
+				
+	- This animation data class would be a single instance held by the openglRenderer. Any UI
+	  interaction could start a UI animation sequence.
+	  
+	- The beginning and end points of an animation sequence will correspond to a UI state. 
+	
+	- Each UI state will have a user interaction (state) associated with it. So, normal 
+	  gameplay would be one of those states.
+	  
+	- brogueUIAnimation (enum class)
+		- GameLogScrollOpen
+		- GameLogScrollClose
+	  
+	- brogueUIStateChanger:
+		- brogueUIState startState
+		- brogueUIState endState
+		- brogueUIAnimation animation
+		- bool pending
+		- bool running
+		// State Specific (these will be animation data)
+		- int gameLogScrollOffset
+		

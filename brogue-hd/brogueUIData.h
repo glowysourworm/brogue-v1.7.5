@@ -143,10 +143,18 @@ namespace brogueHd::frontend
 		/// <summary>
 		/// Sets ancillary parameters (that wouldn't fit nicely into the ctor's)
 		/// </summary>
-		void setUIParameters(int hotkeyIndex,
-							 int actionGLFWHotkey,
-							 const simpleString& actionFileName,
-							 brogueUIAction action,
+		void setUIParameters(bool hasMouseInteraction,
+							 int zoomLevel,
+							 int zIndex)
+		{
+			setUIParameters(brogueUITagAction(brogueUIAction::None, ""), -1, hasMouseInteraction, zoomLevel, zIndex);
+		}
+
+		/// <summary>
+		/// Sets ancillary parameters (that wouldn't fit nicely into the ctor's)
+		/// </summary>
+		void setUIParameters(const brogueUITagAction& tagAction,
+							 int hotkeyIndex,							 
 							 bool hasMouseInteraction,
 							 int zoomLevel,
 							 int zIndex)
@@ -156,9 +164,9 @@ namespace brogueHd::frontend
 			_zoomLevel = zoomLevel;
 			_zIndex = zIndex;
 
-			_tagAction.glfwHotkey = actionGLFWHotkey;
-			_tagAction.fileName = actionFileName;
-			_tagAction.action = action;
+			_tagAction.desiredState = tagAction.desiredState;
+			_tagAction.fileName = tagAction.fileName;
+			_tagAction.action = tagAction.action;
 		}
 
 		/// <summary>

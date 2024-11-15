@@ -62,12 +62,7 @@ namespace brogueHd::frontend
 		BottomBarMenuProgram = 10,
 
 		/// <summary>
-		/// Upper left hand corner status panel (permanent, static). Search bar is part of this panel.
-		/// </summary>
-		PlayerStatusPanelProgram = 11,
-
-		/// <summary>
-		/// Scrollable object list program on the left hand side.
+		/// Scrollable object list program on the left hand side. (This includes the player status panel)
 		/// </summary>
 		GameObjectListProgram = 12,
 
@@ -128,19 +123,6 @@ namespace brogueHd::frontend
 		ColorMask = 6
 	};
 
-	enum class brogueProgramPurpose : int
-	{
-		/// <summary>
-		/// No action required by the program. This implies that no data is gathered when the user
-		/// interacts with the program which will be needed for further processing.
-		/// </summary>
-		None = 0,
-		Game_XYZ = 2, 
-		MenuItem = 3,
-		OpenFileItem = 4,
-		ModalSelector = 5,
-	};
-
 	enum class brogueProgramExitCondition : int
 	{
 		OnMouseButton = 1,
@@ -154,14 +136,42 @@ namespace brogueHd::frontend
 	enum class brogueUIAction
 	{
 		None = 0,
-		ViewMainMenu = 1,
-		ViewOpenGameMenu = 2,
-		ViewPlaybackMenu = 3,
-		ViewHighScores = 4,
-		NewGame = 5,
-		OpenGame = 6,
-		ShowQuitGameModal = 7,
-		QuitGame = 8
+
+		/// <summary>
+		/// Generic game command to change the state of the game or UI
+		/// </summary>
+		StateChange = 1,
+		NewGame = 2,
+		OpenGame = 3,
+		QuitGame = 4,
+
+		GameCommand_Explore = 5,
+		GameCommand_Rest = 6,
+		GameCommand_Search = 7,
+		GameCommand_Menu = 8,
+		GameCommand_Inventory = 9
+	};
+
+	enum class brogueUIState : int
+	{
+		MainMenu = 0,
+		OpenMenu = 1,
+		PlaybackMenu = 2,
+		HighScores = 3,
+		Modal = 4,
+		GameNormal = 5,
+		GameLogOpen = 6,
+		GameMenuOpen = 7,
+		GameInventoryOpen = 8,
+		GameDiscoveredItemsOpen = 9,
+		GameHelpOpen = 10
+	};
+
+	enum class brogueUIAnimation
+	{
+		None = 0,
+		GameLogScrollOpen = 1,
+		GameLogScrollClose = 2
 	};
 
 	enum class brogueTextAlignment
