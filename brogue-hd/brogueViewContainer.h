@@ -9,6 +9,7 @@
 #include "gridRect.h"
 #include "simple.h"
 #include "simpleException.h"
+#include "simpleGlData.h"
 #include "simpleHash.h"
 #include "simpleList.h"
 
@@ -23,7 +24,7 @@ namespace brogueHd::frontend
 	{
 	public:
 
-		brogueViewContainer(brogueUIProgram programName, bool hasScrollInteraction, bool applyClipping, const gridRect& containerBoundary);
+		brogueViewContainer(brogueUIProgram programName, int zoomLevel, bool hasScrollInteraction, bool applyClipping, const gridRect& containerBoundary);
 		~brogueViewContainer();
 
 		void addView(brogueViewBase* view);
@@ -49,7 +50,8 @@ namespace brogueHd::frontend
 
 		gridRect getSceneBoundary() const;
 		gridRect getContainerBoundary() const;
-		gridLocator getRenderOffset() const;
+		gridLocator getScrollOffset() const;
+		vec2 getRenderOffsetUI() const;
 		gridRect calculateSceneBoundaryUI() const;
 		gridRect calculateViewBoundaryUI() const;
 		int getZoomLevel() const;
@@ -58,8 +60,8 @@ namespace brogueHd::frontend
 
 	protected:
 
-		void setRenderOffset(short column, short row);
-
+		void setScrollOffset(short column, short row);
+		void setRenderOffsetUI(int pixelX, float pixelY);
 
 	private:
 
@@ -77,16 +79,20 @@ namespace brogueHd::frontend
 		brogueUIProgram _programName;
 		bool _hasScrollInteraction;
 		bool _applyClipping;
+		int _zoomLevel;
 		gridRect* _containerBoundary;
-		gridLocator* _renderOffset;
+		gridLocator* _scrollOffset;
+		vec2* _renderOffset;											// Hard render offset for shader animation
 		simpleHash<brogueUIProgramPartId, brogueViewBase*>* _views;
 	};
 
-	brogueViewContainer::brogueViewContainer(brogueUIProgram programName, bool hasScrollInteraction, bool applyClipping, const gridRect& containerBoundary)
+	brogueViewContainer::brogueViewContainer(brogueUIProgram programName, int zoomLevel, bool hasScrollInteraction, bool applyClipping, const gridRect& containerBoundary)
 	{
 		_programName = programName;
+		_zoomLevel = zoomLevel;
 		_containerBoundary = new gridRect(containerBoundary);
-		_renderOffset = new gridLocator(0,0);
+		_scrollOffset = new gridLocator(0,0);
+		_renderOffset = new vec2(0, 0);
 		_hasScrollInteraction = hasScrollInteraction;
 		_applyClipping = applyClipping;
 		_views = new simpleHash<brogueUIProgramPartId, brogueViewBase*>();
@@ -96,6 +102,7 @@ namespace brogueHd::frontend
 		delete _views;
 		delete _containerBoundary;
 		delete _renderOffset;
+		delete _scrollOffset;
 	}
 	void brogueViewContainer::addView(brogueViewBase* view)
 	{
@@ -143,7 +150,7 @@ namespace brogueHd::frontend
 		});
 
 		// Apply scroll offset
-		boundary.translate(_renderOffset->column, _renderOffset->row);
+		boundary.translate(_scrollOffset->column, _scrollOffset->row);
 
 		return boundary;
 	}
@@ -155,14 +162,23 @@ namespace brogueHd::frontend
 	{
 		return *_containerBoundary;
 	}
-	gridLocator brogueViewContainer::getRenderOffset() const
+	gridLocator brogueViewContainer::getScrollOffset() const
+	{
+		return *_scrollOffset;
+	}
+	vec2 brogueViewContainer::getRenderOffsetUI() const
 	{
 		return *_renderOffset;
 	}
-	void brogueViewContainer::setRenderOffset(short column, short row)
+	void brogueViewContainer::setScrollOffset(short column, short row)
 	{
-		_renderOffset->column = column;
-		_renderOffset->row = row;
+		_scrollOffset->column = column;
+		_scrollOffset->row = row;
+	}
+	void brogueViewContainer::setRenderOffsetUI(int pixelX, float pixelY)
+	{
+		_renderOffset->x = pixelX;
+		_renderOffset->y = pixelY;
 	}
 	gridRect brogueViewContainer::calculateSceneBoundaryUI() const
 	{
@@ -180,10 +196,7 @@ namespace brogueHd::frontend
 	}
 	int brogueViewContainer::getZoomLevel() const
 	{
-		if (_views->count() == 0)
-			throw simpleException("Must first add views to the brogueViewContainer before accessing data:  brogueViewContainer::getZoomLevel");
-
-		return _views->getAt(0)->value->getZoomLevel();
+		return _zoomLevel;
 	}
 	void brogueViewContainer::initiateStateChange(brogueUIState fromState, brogueUIState toState)
 	{
@@ -261,8 +274,8 @@ namespace brogueHd::frontend
 			}
 		}
 
-		_renderOffset->row += scrollY;
-		_renderOffset->column += scrollX;
+		_scrollOffset->row += scrollY;
+		_scrollOffset->column += scrollX;
 	}
 	void brogueViewContainer::checkUpdate(const brogueKeyboardState& keyboardState,
 										  const brogueMouseState& mouseState,
@@ -286,7 +299,7 @@ namespace brogueHd::frontend
 
 		// Apply mouse transform to the mouse state for the child views (utilizes scrolling).
 		//
-		brogueMouseState adjustedMouse(mouseState.getLocation().subtract(*_renderOffset), 
+		brogueMouseState adjustedMouse(mouseState.getLocation().subtract(*_scrollOffset),
 									   mouseState.getScrollPendingX(), 
 									   mouseState.getScrollPendingY(),
 									   mouseState.getScrollPendingX(), 

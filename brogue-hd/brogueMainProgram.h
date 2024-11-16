@@ -412,19 +412,17 @@ namespace brogueHd::frontend
 		// Get frame program uniforms
 		vec4 openMenuClipXY = _uiPrograms->get(brogueUIProgram::OpenMenuProgram)->getClipXY();
 		vec4 playbackMenuClipXY = _uiPrograms->get(brogueUIProgram::PlaybackMenuProgram)->getClipXY();
-		vec4 gameLogClipXY = _uiPrograms->get(brogueUIProgram::GameLogProgram)->getClipXY();
 		vec2 openMenuScrollUV = _uiPrograms->get(brogueUIProgram::OpenMenuProgram)->getScrollUV();
 		vec2 playbackMenuScrollUV = _uiPrograms->get(brogueUIProgram::PlaybackMenuProgram)->getScrollUV();
-		vec2 gameLogScrollUV = _uiPrograms->get(brogueUIProgram::GameLogProgram)->getScrollUV();
+		vec2 gameLogOffsetUV = _uiPrograms->get(brogueUIProgram::GameLogProgram)->getOffsetUV();
 
 		// Output the frame buffer
 		_frameProgram->bind();
 		_frameProgram->bindUniform4("openMenuClipXY", openMenuClipXY);
 		_frameProgram->bindUniform4("playbackMenuClipXY", playbackMenuClipXY);
-		_frameProgram->bindUniform4("gameLogClipXY", gameLogClipXY);
 		_frameProgram->bindUniform2("openMenuScrollUV", openMenuScrollUV);
 		_frameProgram->bindUniform2("playbackMenuScrollUV", playbackMenuScrollUV);
-		_frameProgram->bindUniform2("gameLogScrollUV", gameLogScrollUV);
+		_frameProgram->bindUniform2("gameLogOffsetUV", gameLogOffsetUV);
 		_frameProgram->draw();
 
 		glFlush();

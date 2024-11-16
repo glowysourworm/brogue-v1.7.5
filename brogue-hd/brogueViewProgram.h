@@ -106,10 +106,15 @@ namespace brogueHd::frontend
 		void outputStatus() const;
 		bool hasErrors() const;
 
+		/// <summary>
+		/// Returns an additional offset that may be used by the view container. This is not
+		/// the scroll offset or the clip; but is applied additionally to the texture sampler.
+		/// </summary>
+		vec2 getOffsetUV() const;
+		vec4 getClipXY() const;
 		gridRect getSceneBoundaryUI() const;
 		simpleQuad getCellSizeUV() const;
 		vec2 getScrollUV() const;
-		vec4 getClipXY() const;
 
 		brogueKeyboardState calculateKeyboardState(const simpleKeyboardState& keyboard);
 		brogueMouseState calculateMouseState(const simpleMouseState& mouse);
@@ -249,11 +254,23 @@ namespace brogueHd::frontend
 									brogueCellDisplay::CellHeight(_viewContainer->getZoomLevel()));
 	}
 
+	vec2 brogueViewProgram::getOffsetUV() const
+	{
+		vec2 offsetUI = _viewContainer->getRenderOffsetUI();
+
+		// Points to an inverted y-coordinate
+		vec2 offsetUV = _coordinateConverter->getViewConverter().convertToNormalizedUV(offsetUI.x, offsetUI.y);
+
+		offsetUV.y = 1 - offsetUV.y;
+
+		return offsetUV;
+	}
+
 	vec2 brogueViewProgram::getScrollUV() const
 	{
 		// Scroll Offset (Not quite a simple coordinate transfer. It's also backwards in the y-space)
-		vec2 offsetUI = vec2(_viewContainer->getRenderOffset().column * brogueCellDisplay::CellWidth(_viewContainer->getZoomLevel()),
-							 _viewContainer->getRenderOffset().row * brogueCellDisplay::CellHeight(_viewContainer->getZoomLevel()));
+		vec2 offsetUI = vec2(_viewContainer->getScrollOffset().column * brogueCellDisplay::CellWidth(_viewContainer->getZoomLevel()),
+							 _viewContainer->getScrollOffset().row * brogueCellDisplay::CellHeight(_viewContainer->getZoomLevel()));
 
 		// Points to an inverted y-coordinate
 		vec2 offsetUV = _coordinateConverter->getViewConverter().convertToNormalizedUV(offsetUI.x, offsetUI.y);

@@ -1,4 +1,5 @@
 #pragma once
+#include "brogueCellDisplay.h"
 #include "brogueKeyboardState.h"
 #include "brogueMouseState.h"
 #include "brogueUIBuilder.h"
@@ -14,7 +15,7 @@ namespace brogueHd::frontend
 	{
 	public:
 
-		brogueGameLogContainer(brogueUIProgram programName, bool hasScrollInteraction, bool applyClipping, const gridRect& containerBoundary);
+		brogueGameLogContainer(brogueUIProgram programName, int zoomLevel, bool hasScrollInteraction, bool applyClipping, const gridRect& containerBoundary);
 		~brogueGameLogContainer();
 
 		virtual void initiateStateChange(brogueUIState fromState, brogueUIState toState) override;
@@ -37,8 +38,8 @@ namespace brogueHd::frontend
 
 	};
 
-	brogueGameLogContainer::brogueGameLogContainer(brogueUIProgram programName, bool hasScrollInteraction, bool applyClipping, const gridRect& containerBoundary)
-		: brogueViewContainer(programName, hasScrollInteraction, applyClipping, containerBoundary)
+	brogueGameLogContainer::brogueGameLogContainer(brogueUIProgram programName, int zoomLevel, bool hasScrollInteraction, bool applyClipping, const gridRect& containerBoundary)
+		: brogueViewContainer(programName, zoomLevel, hasScrollInteraction, applyClipping, containerBoundary)
 	{
 		_animationCounter = new simplePeriodCounter(800);
 		_animating = false;
@@ -58,7 +59,10 @@ namespace brogueHd::frontend
 		// Set a rough offset
 		int offset = -1 * periodValue * (this->getContainerBoundary().height - 3);	// Offset from the top of the screen
 
-		this->setRenderOffset(0, offset);
+		// Convert to UI coordinates
+		int offsetUI = offset * brogueCellDisplay::CellHeight(this->getZoomLevel());
+
+		this->setRenderOffsetUI(0, offsetUI);
 	}
 	void brogueGameLogContainer::checkUpdate(const brogueKeyboardState& keyboardState,
 											 const brogueMouseState& mouseState,

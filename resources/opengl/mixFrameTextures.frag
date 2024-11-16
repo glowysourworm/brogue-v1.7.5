@@ -19,8 +19,7 @@ uniform vec4 openMenuClipXY;
 uniform vec2 openMenuScrollUV;
 uniform vec4 playbackMenuClipXY;
 uniform vec2 playbackMenuScrollUV;
-uniform vec4 gameLogClipXY;
-uniform vec2 gameLogScrollUV;
+uniform vec2 gameLogOffsetUV;
 
 void main()
 {
@@ -28,11 +27,18 @@ void main()
     //
     vec2 openMenuUV = currentTextureUV + openMenuScrollUV;
     vec2 playbackUV = currentTextureUV + playbackMenuScrollUV;
-    vec2 gameLogUV = currentTextureUV + gameLogScrollUV;
+    vec2 gameLogUV = currentTextureUV + gameLogOffsetUV;
 
     vec4 openMenuColor = texture(openMenuTexture, openMenuUV);
     vec4 playbackMenuColor = texture(playbackMenuTexture, playbackUV);
     vec4 gameLogColor = texture(gameLogTexture, gameLogUV);
+
+    // Have to check this because of GL_CLAMP_TO_EDGE texture behavior
+    if (gameLogUV.x < 0 || 
+        gameLogUV.x > 1 ||
+        gameLogUV.y < 0 ||
+        gameLogUV.y > 1)
+        gameLogColor = vec4(0,0,0,0);
 
     // Clipping (x, y, width, height) (where (x,y) is the topLeft vertex)
     if (length(openMenuClipXY) > 0)
@@ -54,17 +60,6 @@ void main()
             currentVertex.y > playbackMenuClipXY.y)
         {
             playbackMenuColor = vec4(0,0,0,0);
-        }
-    }
-
-    if (length(gameLogClipXY) > 0)
-    {
-        if (currentVertex.x < gameLogClipXY.x ||
-            currentVertex.x > gameLogClipXY.x + gameLogClipXY.z ||
-            currentVertex.y < gameLogClipXY.y - gameLogClipXY.w ||
-            currentVertex.y > gameLogClipXY.y)
-        {
-            gameLogColor = vec4(0,0,0,0);
         }
     }
 

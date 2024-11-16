@@ -111,8 +111,7 @@ namespace brogueHd::frontend
 					this->uniforms2.add(simpleUniform<vec2>("openMenuScrollUV", GL_FLOAT_VEC2, vec2(0, 0)));
 					this->uniforms4.add(simpleUniform<vec4>("playbackMenuClipXY", GL_FLOAT_VEC4, vec4(0, 0, 0, 0)));
 					this->uniforms2.add(simpleUniform<vec2>("playbackMenuScrollUV", GL_FLOAT_VEC2, vec2(0, 0)));
-					this->uniforms4.add(simpleUniform<vec4>("gameLogClipXY", GL_FLOAT_VEC4, vec4(0, 0, 0, 0)));
-					this->uniforms2.add(simpleUniform<vec2>("gameLogScrollUV", GL_FLOAT_VEC2, vec2(0, 0)));
+					this->uniforms2.add(simpleUniform<vec2>("gameLogOffsetUV", GL_FLOAT_VEC2, vec2(0, 0)));
 					break;
 				default:
 					simpleException::show("Unhandled shaderResource type:  shaderData.h");
