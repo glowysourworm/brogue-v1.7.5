@@ -102,6 +102,9 @@ namespace brogueHd::frontend
 					int millisecondsLapsed,
 					bool forceUpdate);
 
+		void invalidate(const simpleKeyboardState& keyboardState,
+						const simpleMouseState& mouseState);
+
 		void run(int millisecondsElapsed);
 		void outputStatus() const;
 		bool hasErrors() const;
@@ -323,7 +326,14 @@ namespace brogueHd::frontend
 
 		_viewContainer->checkUpdate(keyboardUI, mouseUI, millisecondsLapsed);
 	}
+	void brogueViewProgram::invalidate(const simpleKeyboardState& keyboardState,
+									   const simpleMouseState& mouseState)
+	{
+		brogueKeyboardState keyboardUI = calculateKeyboardState(keyboardState);
+		brogueMouseState mouseUI = calculateMouseState(mouseState);
 
+		_viewContainer->invalidate(keyboardUI, mouseUI);
+	}
 	bool brogueViewProgram::isActive()
 	{
 		return _active;

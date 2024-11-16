@@ -13,36 +13,36 @@ namespace brogueHd::frontend
 		{
 			action = brogueUIAction::None;
 			desiredState = brogueUIState::MainMenu;
-			fileName = default_value::value<simpleString>();
+			tag = default_value::value<simpleString>();
 		}
 		brogueUITagAction(brogueUIState stateChange)
 		{
 			action = brogueUIAction::StateChange;
 			desiredState = stateChange;
-			fileName = default_value::value<simpleString>();
+			tag = default_value::value<simpleString>();
 		}
 		brogueUITagAction(brogueUIAction fileAction, simpleString fileChosen)
 		{
 			action = fileAction;
-			fileName = fileChosen;
+			tag = fileChosen;
 			desiredState = brogueUIState::MainMenu;
 		}
 		brogueUITagAction(const brogueUITagAction& copy)
 		{
 			action = copy.action;
-			fileName = copy.fileName;
+			tag = copy.tag;
 			desiredState = copy.desiredState;
 		}
 		void set(const brogueUITagAction& copy)
 		{
 			action = copy.action;
-			fileName = copy.fileName;
+			tag = copy.tag;
 			desiredState = copy.desiredState;
 		}
 		void operator=(const brogueUITagAction& copy)
 		{
 			action = copy.action;
-			fileName = copy.fileName;
+			tag = copy.tag;
 			desiredState = copy.desiredState;
 		}
 		bool operator==(const brogueUITagAction& other)
@@ -57,7 +57,7 @@ namespace brogueHd::frontend
 		/// <summary>
 		/// File name from the chosen file
 		/// </summary>
-		simpleString fileName;
+		simpleString tag;
 
 		/// <summary>
 		/// Change of state action
@@ -75,7 +75,7 @@ namespace brogueHd::frontend
 		{
 			return action == other.action &&
 				desiredState == other.desiredState &&
-				fileName == other.fileName;
+				tag == other.tag;
 		}
 	};
 }

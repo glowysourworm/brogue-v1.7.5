@@ -4,6 +4,7 @@
 #include "brogueKeyboardState.h"
 #include "brogueMouseState.h"
 #include "brogueUIConstants.h"
+#include "brogueUIMouseData.h"
 #include "brogueUIProgramPartId.h"
 #include "brogueViewBase.h"
 #include "gridLocator.h"
@@ -43,6 +44,9 @@ namespace brogueHd::frontend
 								 const brogueMouseState& mouseState,
 								 int millisecondsLapsed);
 
+		virtual void invalidate(const brogueKeyboardState& keyboardState,
+								 const brogueMouseState& mouseState);
+
 		bool needsUpdate(const brogueUIProgramPartId& partId) const;
 		void clearUpdate(const brogueUIProgramPartId& partId);
 		void clearEvents(const brogueUIProgramPartId& partId);
@@ -63,6 +67,7 @@ namespace brogueHd::frontend
 
 		void setScrollOffset(short column, short row);
 		void setRenderOffsetUI(int pixelX, float pixelY);
+		brogueMouseState getAdjustedMouse(const brogueMouseState& mouseState) const;
 
 	private:
 
@@ -81,6 +86,7 @@ namespace brogueHd::frontend
 		bool _hasScrollInteraction;
 		bool _applyClipping;
 		int _zoomLevel;
+		brogueUIMouseData* _mouseData;									// Container mouse data (need enter / leave handling)
 		gridRect* _containerBoundary;
 		gridLocator* _scrollOffset;
 		vec2* _renderOffset;											// Hard render offset for shader animation
@@ -91,6 +97,7 @@ namespace brogueHd::frontend
 	{
 		_programName = programName;
 		_zoomLevel = zoomLevel;
+		_mouseData = new brogueUIMouseData();
 		_containerBoundary = new gridRect(containerBoundary);
 		_scrollOffset = new gridLocator(0,0);
 		_renderOffset = new vec2(0, 0);
@@ -101,6 +108,7 @@ namespace brogueHd::frontend
 	brogueViewContainer::~brogueViewContainer()
 	{
 		delete _views;
+		delete _mouseData;
 		delete _containerBoundary;
 		delete _renderOffset;
 		delete _scrollOffset;
@@ -180,6 +188,22 @@ namespace brogueHd::frontend
 	{
 		_renderOffset->x = pixelX;
 		_renderOffset->y = pixelY;
+	}
+	brogueMouseState brogueViewContainer::getAdjustedMouse(const brogueMouseState& mouseState) const
+	{
+		// Apply mouse transform to the mouse state for the child views (utilizes scrolling).
+		//
+		brogueMouseState adjustedMouse(mouseState.getLocation()
+												 .subtract(*_scrollOffset)
+												 .subtract(_renderOffset->x / brogueCellDisplay::CellWidth(_zoomLevel),
+									   _renderOffset->y / brogueCellDisplay::CellHeight(_zoomLevel)),
+									   mouseState.getScrollPendingX(),
+									   mouseState.getScrollPendingY(),
+									   mouseState.getScrollPendingX(),
+									   mouseState.getScrollNegativeY(),
+									   mouseState.getMouseLeft());
+
+		return adjustedMouse;
 	}
 	gridRect brogueViewContainer::calculateSceneBoundaryUI() const
 	{
@@ -295,12 +319,28 @@ namespace brogueHd::frontend
 		if (_views->count() == 0)
 			throw simpleException("Must first add views to the brogueViewContainer before accessing data:  brogueViewContainer::checkUpdate");
 
-		// The view container must apply clipping container to the part. (Unless the
-		// child view requires an update anyway. Currently, this is not the behavior
-		// of child views for the view container; but would be easy to add)
+		// The view container must track mouse events for specific UI invalidation (and perhaps later,
+		// click and drag events)
 		//
-		if (!this->getContainerBoundary().contains(mouseState.getLocation()))
+		bool containerMouseOver = this->getContainerBoundary().contains(mouseState.getLocation());
+
+		// Update View Container:  Keeps track of its own mouse events
+		_mouseData->setUpdate(mouseState.getMouseLeft(), containerMouseOver);
+
+		// The view container must apply clipping container to the part to avoid unwanted behavior.
+		//
+		if (!containerMouseOver && !_mouseData->getMouseEnter() && !_mouseData->getMouseLeave())
 			return;
+
+		// (TODO: SOME REDESIGN)
+		if (!containerMouseOver)
+		{
+			// Pre-maturely clearing the view container's mouse data because it's not supposed to be
+			// handled by the render loop. The view container is acting like a view.
+			_mouseData->clear();
+
+			// The child views will now process their mouse-leave event
+		}
 
 		// Scroll Behavior:  The updating of the scroll is done at the container level. So,
 		//					 this function must be run once during the normal checkUpdate path
@@ -308,17 +348,9 @@ namespace brogueHd::frontend
 		//
 		updateScroll(keyboardState, mouseState, millisecondsLapsed);
 
-		// Apply mouse transform to the mouse state for the child views (utilizes scrolling).
+		// Apply mouse transform to the mouse state for the child views (utilizes scrolling and render offsets)
 		//
-		brogueMouseState adjustedMouse(mouseState.getLocation()
-												 .subtract(*_scrollOffset)
-												 .subtract(_renderOffset->x / brogueCellDisplay::CellWidth(_zoomLevel),
-													  _renderOffset->y / brogueCellDisplay::CellHeight(_zoomLevel)),
-									   mouseState.getScrollPendingX(), 
-									   mouseState.getScrollPendingY(),
-									   mouseState.getScrollPendingX(), 
-									   mouseState.getScrollNegativeY(), 
-									   mouseState.getMouseLeft());
+		brogueMouseState adjustedMouse = getAdjustedMouse(mouseState);
 
 		_views->forEach([&keyboardState, &adjustedMouse, &millisecondsLapsed] (const brogueUIProgramPartId& partId, brogueViewBase* view)
 		{
@@ -326,6 +358,20 @@ namespace brogueHd::frontend
 
 			return iterationCallback::iterate;
 		});		
+	}
+	void brogueViewContainer::invalidate(const brogueKeyboardState& keyboardState,
+										 const brogueMouseState& mouseState)
+	{
+		// Apply mouse transform to the mouse state for the child views (utilizes scrolling and render offsets)
+		//
+		brogueMouseState adjustedMouse = getAdjustedMouse(mouseState);
+
+		_views->forEach([&keyboardState, &adjustedMouse] (const brogueUIProgramPartId& partId, brogueViewBase* view)
+		{
+			view->invalidate(keyboardState, adjustedMouse);
+
+			return iterationCallback::iterate;
+		});
 	}
 	bool brogueViewContainer::needsUpdate(const brogueUIProgramPartId& partId) const
 	{
@@ -346,6 +392,10 @@ namespace brogueHd::frontend
 		if (_views->count() == 0)
 			throw simpleException("Must first add views to the brogueViewContainer before accessing data:  brogueViewContainer::clearEvents");
 
+		// Container mouse data
+		_mouseData->clear();
+
+		// Child View mouse data
 		_views->get(partId)->clearEvents();
 	}
 }

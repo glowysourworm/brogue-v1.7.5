@@ -11,6 +11,7 @@ namespace brogueHd::backend
 		eventController()
 		{
 			_uiClickEvent = new brogueUIEvent();
+			_uiHoverEvent = new brogueUIEvent();
 			_uiDeactivatedEvent = new brogueUIEvent();
 		}
 		~eventController()
@@ -23,6 +24,10 @@ namespace brogueHd::backend
 		{
 			return _uiClickEvent;
 		}
+		brogueUIEvent* getUIHoverEvent()
+		{
+			return _uiHoverEvent;
+		}
 		brogueUIEvent* getUIDeactivatedEvent()
 		{
 			return _uiDeactivatedEvent;
@@ -31,6 +36,7 @@ namespace brogueHd::backend
 	private:
 
 		brogueUIEvent* _uiClickEvent;
+		brogueUIEvent* _uiHoverEvent;
 		brogueUIEvent* _uiDeactivatedEvent;
 
 	};

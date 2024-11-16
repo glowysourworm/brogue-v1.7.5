@@ -635,12 +635,10 @@ namespace brogueHd::frontend
 		// Pulled from Brogue v1.7.5
 		color gradient1(0.156, 0.137, 0.329, 1);
 		color gradient2(0.078, 0.058, 0.156, 1);
-		//color gradient1(0.22, 0.14, 0.29, 0.8);
-		//color gradient2(0.11, 0.06, 0.15, 0.8);
-		color active1(0.7, 0.7, 0.7, 0.4);
-		color active2(0.7, 0.7, 0.7, 0.4);
-		color pressed1(0.7, 0.7, 0.7, 0.6);
-		color pressed2(0.7, 0.7, 0.7, 0.6);
+		color active1(0.312, 0.274, 0.658, 1);
+		color active2(0.078, 0.058, 0.156, 1);
+		color pressed1(0.234, 0.205, 0.493, 1);
+		color pressed2(0.078, 0.058, 0.156, 1);
 
 		brogueUIProgramPartId partId(programName, brogueUIProgramPart::Button, _buttonCounter++);
 

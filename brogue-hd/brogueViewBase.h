@@ -97,6 +97,12 @@ namespace brogueHd::frontend
 								 int millisecondsLapsed);
 
 		/// <summary>
+		/// Invalidate function that is used to check view re-buffer conditions
+		/// </summary>
+		virtual void invalidate(const brogueKeyboardState& keyboardState,
+								const brogueMouseState& mouseState);
+
+		/// <summary>
 		/// Updates the view's grid cells when there has been a change to the view
 		/// </summary>
 		virtual void update(int millisecondsLapsed,
@@ -126,6 +132,7 @@ namespace brogueHd::frontend
 		bool getHasMouseInteraction() const;
 		bool getMouseEnter() const;
 		bool getMouseLeave() const;
+		bool getMousePressedChanged() const;
 		int getZoomLevel() const;
 		int getZIndex() const;
 
@@ -136,7 +143,8 @@ namespace brogueHd::frontend
 	protected:
 
 		void raiseClickEvent(const brogueUITagAction& response);
-		virtual void setUpdate(bool mousePressed, bool mouseOver, bool forceUpdate = false);
+		void raiseHoverEvent(const brogueUITagAction& response);
+		virtual void setUpdate(bool mousePressed, bool mouseOver);
 
 	private:
 
@@ -253,6 +261,10 @@ namespace brogueHd::frontend
 	{
 		return _mouseData->getMouseLeave();
 	}
+	bool brogueViewBase::getMousePressedChanged() const
+	{
+		return _mouseData->getMousePressedChanged();
+	}
 	int brogueViewBase::getZoomLevel() const
 	{
 		return _uiData->getZoomLevel();
@@ -272,9 +284,13 @@ namespace brogueHd::frontend
 	{
 		_eventController->getUIClickEvent()->publish(_partId->getName(), response);
 	}
-	void brogueViewBase::setUpdate(bool mousePressed, bool mouseOver, bool forceUpdate)
+	void brogueViewBase::raiseHoverEvent(const brogueUITagAction& response)
 	{
-		_mouseData->setUpdate(mousePressed, mouseOver, forceUpdate);
+		_eventController->getUIHoverEvent()->publish(_partId->getName(), response);
+	}
+	void brogueViewBase::setUpdate(bool mousePressed, bool mouseOver)
+	{
+		_mouseData->setUpdate(mousePressed, mouseOver);
 	}
 	void brogueViewBase::initiateStateChange(brogueUIState fromState, brogueUIState toState)
 	{
@@ -291,11 +307,16 @@ namespace brogueHd::frontend
 	}
 	void brogueViewBase::clearUpdate()
 	{
-		_mouseData->clearUpdate();
+		// Nothing to do
 	}
 	void brogueViewBase::clearEvents()
 	{
-		_mouseData->clearCapture();
+		_mouseData->clear();
+	}
+	void brogueViewBase::invalidate(const brogueKeyboardState& keyboardState,
+									const brogueMouseState& mouseState)
+	{
+		// Needs to be overriden in child class
 	}
 	void brogueViewBase::checkUpdate(const brogueKeyboardState& keyboardState,
 									 const brogueMouseState& mouseState,
@@ -304,10 +325,17 @@ namespace brogueHd::frontend
 		// Sets primary real time UI data for the mouse / live updates to the UI.
 		_mouseData->setUpdate(mouseState.getMouseLeft(), this->isMouseOver(mouseState));
 
-		if (_mouseData->getMouseOver() && _mouseData->getMouseClick() && _hasMouseInteraction)
+		if (_hasMouseInteraction)
 		{
-			// UI EVENT:  Mouse Click
-			this->raiseClickEvent(*_tagAction);
+			if (_mouseData->getMouseOver() && _mouseData->getMouseClick())
+			{
+				// UI EVENT:  Mouse Click
+				this->raiseClickEvent(*_tagAction);
+			}
+			else if (_mouseData->getMouseOver())
+			{
+				this->raiseHoverEvent(*_tagAction);
+			}
 		}
 	}
 	void brogueViewBase::update(int millisecondsLapsed,
@@ -317,7 +345,7 @@ namespace brogueHd::frontend
 	}
 	bool brogueViewBase::needsUpdate() const
 	{
-		return _mouseData->needsUpdate();
+		return false;
 	}
 	void brogueViewBase::iterate(gridCallback<brogueCellDisplay*> callback) const
 	{

@@ -78,6 +78,8 @@ namespace brogueHd::frontend
 		void setMode(BrogueGameMode mode);
 		void showErrors() const;
 		bool hasErrors() const;
+
+		void invalidate(const simpleMouseState& mouse, const simpleKeyboardState& keyboard);
 		
 	private:
 
@@ -263,6 +265,16 @@ namespace brogueHd::frontend
 	gridRect brogueMainProgram::getSceneBoundaryUI() const
 	{
 		return *_sceneBoundaryUI;
+	}
+	void brogueMainProgram::invalidate(const simpleMouseState& mouse, const simpleKeyboardState& keyboard)
+	{
+		_uiPrograms->iterate([&mouse, &keyboard] (brogueUIProgram programName, brogueViewProgram* program)
+		{
+			if (program->isActive())
+				program->invalidate(keyboard, mouse);
+
+			return iterationCallback::iterate;
+		});
 	}
 	void brogueMainProgram::run(int millisecondsElapsed)
 	{

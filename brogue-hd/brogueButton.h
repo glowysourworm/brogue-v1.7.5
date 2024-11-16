@@ -1,6 +1,8 @@
 #pragma once
 
 #include "brogueGlyphMap.h"
+#include "brogueKeyboardState.h"
+#include "brogueMouseState.h"
 #include "brogueUIConstants.h"
 #include "brogueUIData.h"
 #include "brogueUIProgramPartId.h"
@@ -28,6 +30,7 @@ namespace brogueHd::frontend
 		virtual void update(int millisecondsLapsed, bool forceUpdate) override;
 		virtual bool needsUpdate() const override;
 		virtual void clearUpdate() override;
+		virtual void invalidate(const brogueKeyboardState& keyboard, const brogueMouseState& mouse) override;
 
 		void setUI(const simpleString& text, int hotkeyIndex, const color& foreground, const color& hotkeyForeground, brogueTextAlignment alignment);
 
@@ -67,11 +70,18 @@ namespace brogueHd::frontend
 
 		_invalid = false;
 	}
+	void brogueButton::invalidate(const brogueKeyboardState& keyboard, const brogueMouseState& mouse)
+	{
+		_invalid = true;
+	}
 	bool brogueButton::needsUpdate() const
 	{
 		// Adding the mouse enter / leave events
 		//
-		return brogueViewBase::needsUpdate() || _invalid || this->getMouseLeave() || this->getMouseEnter();
+		return _invalid ||
+			   this->getMouseLeave() ||
+			   this->getMouseEnter() ||
+			   this->getMousePressedChanged();
 	}
 	void brogueButton::update(int millisecondsLapsed, bool forceUpdate)
 	{

@@ -10,14 +10,14 @@ namespace brogueHd::frontend
 
 		brogueUIMouseData()
 		{
-			_mouseClickCapture = false;
 			_mouseUpCapture = false;
 			_mouseDownCapture = false;
+			_mouseUpCaptureLast = false;
+			_mouseDownCaptureLast = false;
 			_mouseLastPressed = false;
 			_mouseLastOver = false;
 			_mousePressed = false;
 			_mouseOver = false;
-			_needsUpdate = false;
 		}
 		~brogueUIMouseData()
 		{
@@ -32,20 +32,8 @@ namespace brogueHd::frontend
 		/// <summary>
 		/// Returns true if a mouse click has occurred
 		/// </summary>
-		void setUpdate(bool mousePressed, bool mouseOver, bool forceUpdate = false)
+		void setUpdate(bool mousePressed, bool mouseOver)
 		{
-			// Reset Mouse Capture if mouse-up occurs out-of-bounds
-			if (!mousePressed && !mouseOver)
-			{
-				_mouseDownCapture = false;
-				_mouseUpCapture = false;
-				_mouseClickCapture = false;
-			}
-
-			_mouseDownCapture = _mouseDownCapture || (!_mouseLastPressed && mousePressed && mouseOver);
-			_mouseUpCapture = _mouseUpCapture || (_mouseLastPressed && !mousePressed && mouseOver);
-			_mouseClickCapture = _mouseClickCapture || (_mouseDownCapture && _mouseUpCapture);
-
 			// Last Cycle
 			_mouseLastPressed = _mousePressed;
 			_mouseLastOver = _mouseOver;
@@ -54,27 +42,21 @@ namespace brogueHd::frontend
 			_mousePressed = mousePressed;
 			_mouseOver = mouseOver;
 
-			// Set Update Flags
-			_needsUpdate = _needsUpdate || (((mouseOver && !_mouseOver) || (mousePressed && !_mousePressed)) || forceUpdate);
+			// (see getMouseClick())
+			_mouseDownCaptureLast = _mouseDownCapture;
+			_mouseUpCaptureLast = _mouseUpCapture;
+
+			_mouseDownCapture = mousePressed && mouseOver;
+			_mouseUpCapture = !mousePressed && mouseOver;
 		}
 
-		bool needsUpdate() const
-		{
-			return _needsUpdate;
-		}
-		void forceUpdate()
-		{
-			_needsUpdate = true;
-		}
-		void clearUpdate()
-		{
-			_needsUpdate = false;
-		}
-		void clearCapture()
+		void clear()
 		{
 			_mouseDownCapture = false;
 			_mouseUpCapture = false;
-			_mouseClickCapture = false;
+
+			_mouseDownCaptureLast = false;
+			_mouseUpCaptureLast = false;
 
 			_mouseOver = false;
 			_mousePressed = false;
@@ -84,10 +66,6 @@ namespace brogueHd::frontend
 
 	public:
 
-		bool getMousePressed() const
-		{
-			return _mousePressed;
-		}
 		bool getMouseOver() const
 		{
 			return _mouseOver;
@@ -100,9 +78,13 @@ namespace brogueHd::frontend
 		{
 			return !_mouseLastOver && _mouseOver;
 		}
+		bool getMousePressedChanged() const
+		{
+			return _mousePressed != _mouseLastPressed;
+		}
 		bool getMouseClick() const
 		{
-			return _mouseClickCapture;
+			return _mouseDownCaptureLast && _mouseUpCapture;
 		}
 		bool getMouseUp() const
 		{
@@ -112,6 +94,9 @@ namespace brogueHd::frontend
 		{
 			return _mouseDownCapture;
 		}
+
+	protected:
+
 		bool getMousePressedLast() const
 		{
 			return _mouseLastPressed;
@@ -120,31 +105,43 @@ namespace brogueHd::frontend
 		{
 			return _mouseLastOver;
 		}
+		bool getMousePressed() const
+		{
+			return _mousePressed;
+		}
+		bool getMouseUpCaptureLast() const
+		{
+			return _mouseUpCaptureLast;
+		}
+		bool getMouseDownCaptureLast() const
+		{
+			return _mouseDownCaptureLast;
+		}
 
 	private:
 
 		void copyImpl(const brogueUIMouseData& copy)
 		{
-			_mouseClickCapture = copy.getMouseClick();
 			_mouseUpCapture = copy.getMouseUp();
 			_mouseDownCapture = copy.getMouseDown();
+			_mouseUpCaptureLast = copy.getMouseUpCaptureLast();
+			_mouseDownCaptureLast = copy.getMouseDownCaptureLast();
 			_mouseLastPressed = copy.getMousePressedLast();
 			_mouseLastOver = copy.getMouseOverLast();
 			_mousePressed = copy.getMousePressed();
 			_mouseOver = copy.getMouseOver();
-			_needsUpdate = copy.needsUpdate();
 		}
 
 	private:
 
 		// Some real time data
-		bool _mouseClickCapture;
 		bool _mouseDownCapture;
+		bool _mouseDownCaptureLast;
 		bool _mouseUpCapture;
+		bool _mouseUpCaptureLast;
 		bool _mouseLastPressed;
 		bool _mouseLastOver;
 		bool _mousePressed;
 		bool _mouseOver;
-		bool _needsUpdate;
 	};
 }

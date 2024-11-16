@@ -360,7 +360,6 @@
     <ClInclude Include="simpleVertexBuffer.h" />
     <ClInclude Include="statusEffectConstants.h" />
     <ClInclude Include="statusEffect.h" />
-    <ClInclude Include="stopwatch.hpp" />
     <ClInclude Include="terrainDeclaration.h" />
     <ClInclude Include="terrainGenerator.h" />
     <ClInclude Include="simpleTriangle.h" />

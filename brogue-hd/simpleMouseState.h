@@ -24,6 +24,8 @@ namespace brogueHd::frontend
 			_leftButton = copy.getLeftButton();
 			_rightButton = copy.getRightButton();
 			_middleButton = copy.getMiddleButton();
+			_windowEnterPending = copy.getWindowEnterPending();
+			_windowLeavePending = copy.getWindowLeavePending();
 		}
 		~simpleMouseState() {}
 
@@ -43,6 +45,14 @@ namespace brogueHd::frontend
 		{
 			return _scrolldYPending;
 		}
+		bool getWindowEnterPending() const
+		{
+			return _windowEnterPending;
+		}
+		bool getWindowLeavePending() const
+		{
+			return _windowLeavePending;
+		}
 		int getLeftButton() const
 		{
 			return _leftButton;
@@ -58,12 +68,15 @@ namespace brogueHd::frontend
 
 		/// <summary>
 		/// Must acknowledge that scroll delta has been read; and 
-		/// it will be reset for the next iteration.
+		/// it will be reset for the next iteration. Same for window enter / leave.
 		/// </summary>
-		void resetScroll()
+		void reset()
 		{
 			_scrolldXPending = 0;
 			_scrolldYPending = 0;
+
+			_windowEnterPending = false;
+			_windowLeavePending = false;
 		}
 
 		void updatePosition(double x, double y)
@@ -84,6 +97,14 @@ namespace brogueHd::frontend
 			_scrolldXPending = dx;
 			_scrolldYPending = dy;
 		}
+		void updateWindowEnter(bool value)
+		{
+			_windowEnterPending = value;
+		}
+		void updateWindowLeave(bool value)
+		{
+			_windowLeavePending = value;
+		}
 
 	private:
 
@@ -95,5 +116,8 @@ namespace brogueHd::frontend
 
 		double _scrolldXPending;
 		double _scrolldYPending;
+
+		bool _windowEnterPending;
+		bool _windowLeavePending;
 	};
 }

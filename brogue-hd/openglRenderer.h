@@ -41,7 +41,7 @@ namespace brogueHd::frontend
 	class openglRenderer
 	{
 	public:
-		
+
 		openglRenderer(eventController* eventController);
 		~openglRenderer();
 
@@ -87,6 +87,7 @@ namespace brogueHd::frontend
 		static void errorCallback(int error, const char* message);
 		static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 		static void mousePositionCallback(GLFWwindow* window, double xpos, double ypos);
+		static void mouseEnterLeaveCallback(GLFWwindow* window, int entered);
 		static void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
 		static void mouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 
@@ -107,6 +108,7 @@ namespace brogueHd::frontend
 	public:
 
 		void thread_brogueUIClickEvent(brogueUIProgram sender, const brogueUITagAction& response);
+		void thread_brogueUIHoverEvent(brogueUIProgram sender, const brogueUITagAction& response);
 
 	private:
 
@@ -116,6 +118,7 @@ namespace brogueHd::frontend
 
 		eventController* _eventController;
 		int _clickToken;
+		int _hoverToken;
 
 		brogueProgramContainer* _program;
 		simplePeriodCounter* _uiEventDebouncer;
@@ -126,7 +129,7 @@ namespace brogueHd::frontend
 		BrogueGameMode _gameMode;
 		BrogueGameMode _gameModeIn;
 		BrogueGameMode _gameModeOut;
-		
+
 		GLFWwindow* _window;
 		bool _initializedGL;
 
@@ -147,6 +150,7 @@ namespace brogueHd::frontend
 		_stopwatch = new simpleTimer();
 
 		_clickToken = eventController->getUIClickEvent()->subscribe(std::bind(&openglRenderer::thread_brogueUIClickEvent, this, std::placeholders::_1, std::placeholders::_2));
+		_hoverToken = eventController->getUIHoverEvent()->subscribe(std::bind(&openglRenderer::thread_brogueUIHoverEvent, this, std::placeholders::_1, std::placeholders::_2));
 		_gameModeOut = BrogueGameMode::Title;
 		_gameModeIn = BrogueGameMode::Title;
 		_gameMode = BrogueGameMode::Title;
@@ -218,6 +222,11 @@ namespace brogueHd::frontend
 	void openglRenderer::mousePositionCallback(GLFWwindow* window, double xpos, double ypos)
 	{
 		brogueHd::frontend::MouseState->updatePosition(xpos, ypos);
+	}
+	void openglRenderer::mouseEnterLeaveCallback(GLFWwindow* window, int entered)
+	{
+		brogueHd::frontend::MouseState->updateWindowEnter(entered > 0);
+		brogueHd::frontend::MouseState->updateWindowLeave(entered <= 0);
 	}
 	void openglRenderer::mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 	{
@@ -347,6 +356,7 @@ namespace brogueHd::frontend
 
 		// Mouse Handlers
 		glfwSetCursorPosCallback(_window, mousePositionCallback);
+		glfwSetCursorEnterCallback(_window, mouseEnterLeaveCallback);
 		glfwSetMouseButtonCallback(_window, mouseButtonCallback);
 		glfwSetScrollCallback(_window, mouseScrollCallback);
 
@@ -506,6 +516,15 @@ namespace brogueHd::frontend
 		return _initializedGL;
 	}
 
+	void openglRenderer::thread_brogueUIHoverEvent(brogueUIProgram sender, const brogueUITagAction& tagAction)
+	{
+		// This event was forwarded for two purposes:
+		//
+		// 1) To help clear the UI tree for mouse-leave
+		// 2) To handle the hover text (tag action)
+		//
+
+	}
 	void openglRenderer::thread_brogueUIClickEvent(brogueUIProgram sender, const brogueUITagAction& tagAction)
 	{
 		// Thread Mutex Lock (Still Active)
@@ -573,7 +592,7 @@ namespace brogueHd::frontend
 					break;
 					case brogueUIState::GameLogOpen:
 					{
-						
+
 					}
 					break;
 					case brogueUIState::GameMenuOpen:
@@ -642,7 +661,7 @@ namespace brogueHd::frontend
 		_threadLock->lock();
 
 		// Get the calculated scene boundary from the UI view components
-		gridRect sceneBoundaryUI = _program->getSceneBoundaryUI(); 
+		gridRect sceneBoundaryUI = _program->getSceneBoundaryUI();
 
 		// Initialize GL
 		if (!_initializedGL)
@@ -747,6 +766,11 @@ namespace brogueHd::frontend
 			// Check Update(s) -> (Click Events) (can signal view change) (animations will also be aware for state changes)
 			_program->checkUpdate(keyboardState, mouseState, milliSecondsActual);
 
+			// Add extra invalidate for window focus change
+			if (mouseState.getWindowEnterPending() ||
+				mouseState.getWindowLeavePending())
+				_program->invalidate(mouseState, keyboardState);
+
 			// Updates Program Buffers:  brogueViewBase* -> simpleDataStream (gets sent to GPU)
 			//							 Check normal program update (view state change) to force 
 			//							 update (to active programs only!)
@@ -757,15 +781,15 @@ namespace brogueHd::frontend
 			// Run drawing program
 			_program->run(milliSecondsActual);											// Run() -> Draws the buffers
 			_program->showErrors();														// Log Errors to simpleLogger -> std::cout
-			_program->clearUpdate();													// Clear Update Flags
+			_program->clearUpdate();													// Clear Update (and invalidate) Flags
 
 			GLenum error = glGetError();
 
 			if (error)
 				simpleLogger::log(getGLErrorString(error));
 
-			// Scroll data has already been consumed by the view tree
-			brogueHd::frontend::MouseState->resetScroll();
+			// Scroll / Window Focus data has already been consumed by the view tree
+			brogueHd::frontend::MouseState->reset();
 
 			_threadLock->unlock();
 

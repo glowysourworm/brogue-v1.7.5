@@ -51,6 +51,11 @@ namespace brogueHd::frontend
 		bool hasErrors();
 
 		/// <summary>
+		/// Forces UI to re-evaluate its re-buffer conditions for one pass
+		/// </summary>
+		void invalidate(const simpleMouseState& mouse, const simpleKeyboardState& keyboard);
+
+		/// <summary>
 		/// Following a similar pipeline to the brogueView, checkUpdate checks program parameters needed
 		/// to update the view - also calling the view's checkUpdate method. (creating the pipeline)
 		/// </summary>
@@ -143,7 +148,7 @@ namespace brogueHd::frontend
 	bool brogueProgramContainer::isProgramActive(brogueUIProgram programName)
 	{
 		if (!_initialized)
-			throw simpleException("Brogue Program Container must first be initialized:  brogueProgramContainer::hasErrors");
+			throw simpleException("Brogue Program Container must first be initialized:  brogueProgramContainer::isProgramActive");
 
 		return _mainProgram->isProgramActive(programName);
 	}
@@ -152,6 +157,13 @@ namespace brogueHd::frontend
 		_mainProgram->initialize();
 
 		_initialized = true;
+	}
+	void brogueProgramContainer::invalidate(const simpleMouseState& mouse, const simpleKeyboardState& keyboard)
+	{
+		if (!_initialized)
+			throw simpleException("Brogue Program Container must first be initialized:  brogueProgramContainer::invalidate");
+
+		_mainProgram->invalidate(mouse, keyboard);
 	}
 	void brogueProgramContainer::setMode(BrogueGameMode gameMode)
 	{
