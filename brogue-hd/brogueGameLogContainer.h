@@ -41,7 +41,7 @@ namespace brogueHd::frontend
 	brogueGameLogContainer::brogueGameLogContainer(brogueUIProgram programName, int zoomLevel, bool hasScrollInteraction, bool applyClipping, const gridRect& containerBoundary)
 		: brogueViewContainer(programName, zoomLevel, hasScrollInteraction, applyClipping, containerBoundary)
 	{
-		_animationCounter = new simplePeriodCounter(800);
+		_animationCounter = new simplePeriodCounter(50);
 		_animating = false;
 		_closing = true;
 
@@ -57,7 +57,7 @@ namespace brogueHd::frontend
 			periodValue = 1 - periodValue;
 
 		// Set a rough offset
-		int offset = -1 * periodValue * (this->getContainerBoundary().height - 3);	// Offset from the top of the screen
+		float offset = -1 * periodValue * (this->getContainerBoundary().height - 3);	// Offset from the top of the screen
 
 		// Convert to UI coordinates
 		int offsetUI = offset * brogueCellDisplay::CellHeight(this->getZoomLevel());
@@ -69,7 +69,7 @@ namespace brogueHd::frontend
 											 int millisecondsLapsed)
 	{
 		// Check for state animation
-		if (_animating)
+		if (_animating && !_animationCounter->pending())
 		{
 			_animationCounter->update(millisecondsLapsed, false);
 

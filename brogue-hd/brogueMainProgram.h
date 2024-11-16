@@ -527,8 +527,8 @@ namespace brogueHd::frontend
 	{
 		_uiPrograms->iterate([] (brogueUIProgram programName, brogueViewProgram* program)
 		{
-			//if (program->isActive())
-			program->clearUpdate();
+			if (program->isActive())
+				program->clearUpdate();
 
 			return iterationCallback::iterate;
 		});
@@ -537,8 +537,8 @@ namespace brogueHd::frontend
 	{
 		_uiPrograms->iterate([] (brogueUIProgram programName, brogueViewProgram* program)
 		{
-			//if (program->isActive())
-			program->clearEvents();
+			if (program->isActive())
+				program->clearEvents();
 
 			return iterationCallback::iterate;
 		});
@@ -597,6 +597,10 @@ namespace brogueHd::frontend
 
 		// Clear All Textures
 		clearAllTextures();
+
+		// Set "gameMode" uniform (see frame mixing texture)
+		_frameProgram->bind();
+		_frameProgram->bindUniform1i("gameMode", (int)mode);
 
 		switch (mode)
 		{

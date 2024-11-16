@@ -107,6 +107,7 @@ namespace brogueHd::frontend
 					this->uniforms1i.add(simpleUniform<int>("openMenuTexture", GL_SAMPLER_2D, 4));					// GLOBAL SETTING:  GL_TEXTURE4
 					this->uniforms1i.add(simpleUniform<int>("playbackMenuTexture", GL_SAMPLER_2D, 5));				// GLOBAL SETTING:  GL_TEXTURE5
 					this->uniforms1i.add(simpleUniform<int>("gameLogTexture", GL_SAMPLER_2D, 6));					// GLOBAL SETTING:  GL_TEXTURE6
+					this->uniforms1i.add(simpleUniform<int>("gameMode", GL_INT, 0));								// BrogueGameMode enum
 					this->uniforms4.add(simpleUniform<vec4>("openMenuClipXY", GL_FLOAT_VEC4, vec4(0, 0, 0, 0)));
 					this->uniforms2.add(simpleUniform<vec2>("openMenuScrollUV", GL_FLOAT_VEC2, vec2(0, 0)));
 					this->uniforms4.add(simpleUniform<vec4>("playbackMenuClipXY", GL_FLOAT_VEC4, vec4(0, 0, 0, 0)));

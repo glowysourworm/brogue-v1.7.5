@@ -504,13 +504,14 @@ namespace brogueHd::frontend
 
 		gridRect sceneBounds = getBrogueSceneBoundary();
 		gridRect boundary = getBrogueStaticBoundary(brogueUIProgramPartId(program, brogueUIProgramPart::Background, 0));
-		gridRect itemBounds(COLS - DCOLS, 0, DCOLS, 1);
 
 		brogueGameLogContainer* result = new brogueGameLogContainer(program, _zoomLevel, false, false, boundary);
 
 		brogueUIProgramPartId partId(program, brogueUIProgramPart::Text, 0);
 		brogueUIData uiData(_zoomLevel, menuColor);
 		brogueTextView* view = new brogueTextView(_eventController, partId, uiData, sceneBounds, boundary);
+
+		view->setUIAction(brogueUITagAction(brogueUIAction::GameCommand_ToggleLog, ""));
 
 		for (int index = 0; index < ROWS; index++)
 		{
@@ -536,6 +537,8 @@ namespace brogueHd::frontend
 		brogueUIProgramPartId partId(brogueUIProgram::HighScoresProgram, brogueUIProgramPart::Text, 0);
 		brogueUIData uiData(_zoomLevel, menuColor);
 		brogueTextView* textView = new brogueTextView(_eventController, partId, uiData, sceneBounds, sceneBounds);
+
+		textView->setUIAction(brogueUITagAction(brogueUIState::MainMenu));
 
 		// Header and Footer
 		textView->setLine(0, "-- High Scores --", colors::yellow(), brogueTextAlignment::Center);

@@ -20,6 +20,7 @@ uniform vec2 openMenuScrollUV;
 uniform vec4 playbackMenuClipXY;
 uniform vec2 playbackMenuScrollUV;
 uniform vec2 gameLogOffsetUV;
+uniform int gameMode;
 
 void main()
 {
@@ -72,23 +73,42 @@ void main()
     vec4 maskOutput = texture(titleMaskTexture, currentTextureUV);
     vec4 uiOutput = texture(uiTexture, currentTextureUV);
 
-    // Favor the UI controls first (one of these may be turned on)
-    if (openMenuColor.w > 0)
-        outputColor = openMenuColor;
-
-    else if (playbackMenuColor.w > 0)
-        outputColor = playbackMenuColor;
-
-    else if (gameLogColor.w > 0)
-        outputColor = gameLogColor;
-
-    else if (uiOutput.w > 0)
-        outputColor = uiOutput;
-
-    // Blend in the backgrounds
-    if (outputColor.w < 1.0 && length(maskOutput) == 0)
+    // Brogue Game Mode:  Title = 0, Game = 1, Playback = 2, Exit = 3
+    switch(gameMode)
     {
-        // Any room left in the alpha channel is used for the background(s)
-        outputColor = mix(outputColor, flameOutput, 1 - outputColor.w);
+        default:
+        case 0:
+        {            
+            // Favor the UI controls first (one of these may be turned on)
+            if (openMenuColor.w > 0)
+                outputColor = openMenuColor;
+
+            else if (playbackMenuColor.w > 0)
+                outputColor = playbackMenuColor;
+
+            else if (uiOutput.w > 0)
+                outputColor = uiOutput;
+
+            // Blend in the flame background
+            if (outputColor.w < 1.0 && length(maskOutput) == 0)
+            {
+                // Any room left in the alpha channel is used for the background(s)
+                outputColor = mix(outputColor, flameOutput, 1 - outputColor.w);
+            }
+        }
+        break;
+        case 1:
+        {
+            if (uiOutput.w > 0)
+                outputColor = uiOutput;
+
+            if (gameLogColor.w > 0)
+                outputColor = mix(outputColor, gameLogColor, gameLogColor.w);
+        }
+        break;
+        case 2:
+        {
+        }
+        break;
     }
 }

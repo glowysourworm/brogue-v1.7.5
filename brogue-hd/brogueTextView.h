@@ -89,15 +89,11 @@ namespace brogueHd::frontend
 	{
 		_uiText->setLine(row, text, alignment);
 
-		update(0, true);
-
 		_invalid = true;
 	}
 	void brogueTextView::setLine(int row, const simpleString& text, brogueTextAlignment alignment)
 	{
 		_uiText->setLine(row, text, alignment);
-
-		update(0, true);
 
 		_invalid = true;
 	}
@@ -109,15 +105,11 @@ namespace brogueHd::frontend
 	{
 		_uiText->setText(text);
 
-		update(0, true);
-
 		_invalid = true;
 	}
 	void brogueTextView::setText(const simpleString& text)
 	{
 		_uiText->setText(text);
-
-		update(0, true);
 
 		_invalid = true;
 	}

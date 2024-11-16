@@ -1,5 +1,6 @@
 #pragma once
 
+#include "brogueCellDisplay.h"
 #include "brogueKeyboardState.h"
 #include "brogueMouseState.h"
 #include "brogueUIConstants.h"
@@ -231,11 +232,24 @@ namespace brogueHd::frontend
 			return;
 
 		/*
-			UI Behavior:  This will add the scroll behavior. (or x-y scrolling behavior). The
-						  getBoundary() method will allow for all child controls. The other
-						  getContainerBoundary() method will check the clipping boundary for
-						  this view container. 
+			UI Behavior:    This will add the scroll behavior. (or x-y scrolling behavior). The
+						    getBoundary() method will allow for all child controls. The other
+						    getContainerBoundary() method will check the clipping boundary for
+						    this view container. 
+
+			Render Offset:  Must add the UI offset to the container boundary to get the proper
+							mouse position.
 		*/
+
+		// Aggregate child boundary
+		gridRect childBoundary = this->getChildOffsetBoundary();
+		gridRect boundary = this->getContainerBoundary();
+		
+		// TODO: CLEAN THIS UP
+
+		// UI Translation:  This is the ultimate position of the mouse pointer
+		boundary.translate(_renderOffset->x / brogueCellDisplay::CellWidth(_zoomLevel), 
+						   _renderOffset->y / brogueCellDisplay::CellHeight(_zoomLevel));
 
 		bool mouseOver = this->getContainerBoundary().contains(mouseState.getLocation());
 		bool mousePressed = mouseState.getMouseLeft();
@@ -243,9 +257,6 @@ namespace brogueHd::frontend
 
 		if (!mouseOver || !scrollEvent)
 			return;
-
-		// Aggregate child boundary
-		gridRect childBoundary = this->getChildOffsetBoundary();
 
 		// Check scroll bounds
 		int scrollX = 0;
@@ -299,7 +310,10 @@ namespace brogueHd::frontend
 
 		// Apply mouse transform to the mouse state for the child views (utilizes scrolling).
 		//
-		brogueMouseState adjustedMouse(mouseState.getLocation().subtract(*_scrollOffset),
+		brogueMouseState adjustedMouse(mouseState.getLocation()
+												 .subtract(*_scrollOffset)
+												 .subtract(_renderOffset->x / brogueCellDisplay::CellWidth(_zoomLevel),
+													  _renderOffset->y / brogueCellDisplay::CellHeight(_zoomLevel)),
 									   mouseState.getScrollPendingX(), 
 									   mouseState.getScrollPendingY(),
 									   mouseState.getScrollPendingX(), 

@@ -388,7 +388,32 @@ namespace brogueHd::frontend
 	void openglRenderer::setGameMode(BrogueGameMode gameMode)
 	{
 		_threadLock->lock();
+
+		if (_uiStateChanger->isChanging())
+			throw simpleException("Trying to set game mode while UI is running animation:  openglRenderer.h");
+
 		_gameModeIn = gameMode;
+
+		_uiStateChanger->clear();
+
+		switch (gameMode)
+		{
+			case BrogueGameMode::Game:
+				_uiStateChanger->set(brogueUIState::GameNormal);
+				break;
+			case BrogueGameMode::Playback:
+				_uiStateChanger->set(brogueUIState::MainMenu);		// TODO
+				break;
+			case BrogueGameMode::Title:
+				_uiStateChanger->set(brogueUIState::MainMenu);
+				break;
+			default:
+				break;
+		}
+
+		// Force state change to clear - signals a fresh UI pass
+		_uiStateChanger->clear();
+
 		_threadLock->unlock();
 	}
 	void openglRenderer::startProgram()
@@ -484,6 +509,9 @@ namespace brogueHd::frontend
 		if (_gameModeOut != _gameMode)
 			return;
 
+		if (_uiStateChanger->isChanging())
+			return;
+
 		switch (tagAction.action)
 		{
 			// Click registered by a background program (typically)
@@ -505,12 +533,16 @@ namespace brogueHd::frontend
 					case brogueUIState::MainMenu:
 					{
 						_program->deactivateUIAll();
+						_program->activateUIProgram(brogueUIProgram::FlameMenuProgram);
+						_program->activateUIProgram(brogueUIProgram::FlameMenuTitleMaskProgram);
 						_program->activateUIProgram(brogueUIProgram::MainMenuProgram);
 					}
 					break;
 					case brogueUIState::OpenMenu:
 					{
 						_program->deactivateUIAll();
+						_program->activateUIProgram(brogueUIProgram::FlameMenuProgram);
+						_program->activateUIProgram(brogueUIProgram::FlameMenuTitleMaskProgram);
 						_program->activateUIProgram(brogueUIProgram::OpenMenuBackgroundProgram);
 						_program->activateUIProgram(brogueUIProgram::OpenMenuProgram);
 					}
@@ -518,6 +550,8 @@ namespace brogueHd::frontend
 					case brogueUIState::PlaybackMenu:
 					{
 						_program->deactivateUIAll();
+						_program->activateUIProgram(brogueUIProgram::FlameMenuProgram);
+						_program->activateUIProgram(brogueUIProgram::FlameMenuTitleMaskProgram);
 						_program->activateUIProgram(brogueUIProgram::PlaybackMenuBackgroundProgram);
 						_program->activateUIProgram(brogueUIProgram::PlaybackMenuProgram);
 					}
@@ -570,6 +604,26 @@ namespace brogueHd::frontend
 			case brogueUIAction::QuitGame:
 			{
 
+			}
+			break;
+
+			case brogueUIAction::GameCommand_ToggleLog:
+			{
+				brogueUIState desiredState;
+
+				if (_uiStateChanger->getCurrentState() == brogueUIState::GameNormal)
+					desiredState = brogueUIState::GameLogOpen;
+				else
+					desiredState = brogueUIState::GameNormal;
+
+				// Signal a state change
+				_uiStateChanger->set(desiredState);
+
+				// Clear out mouse events (action handled)
+				_program->clearEvents();
+
+				// Initiate a state change signal to the view tree
+				_program->initiateStateChange(_uiStateChanger->getCurrentState(), desiredState);
 			}
 			break;
 			default:

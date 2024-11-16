@@ -44,11 +44,18 @@ namespace brogueHd::component
 		{
 			return gridLocator(cell.column + column, cell.row + row);
 		}
+		gridLocator add(short acolumn, short arow)
+		{
+			return gridLocator(acolumn + column, arow + row);
+		}
 		gridLocator subtract(const gridLocator& cell)
 		{
 			return gridLocator(column - cell.column, row - cell.row);
 		}
-		
+		gridLocator subtract(short acolumn, short arow)
+		{
+			return gridLocator(column - acolumn, row - arow);
+		}
 		double distance(const gridLocator& location)
 		{
 			double dx = location.column - column;

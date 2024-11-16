@@ -63,9 +63,9 @@ namespace brogueHd::frontend
 	}
 	void brogueButton::clearUpdate()
 	{
-		_invalid = false;
-
 		brogueViewBase::clearUpdate();
+
+		_invalid = false;
 	}
 	bool brogueButton::needsUpdate() const
 	{

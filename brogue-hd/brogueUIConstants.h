@@ -171,7 +171,8 @@ namespace brogueHd::frontend
 		GameCommand_Rest = 6,
 		GameCommand_Search = 7,
 		GameCommand_Menu = 8,
-		GameCommand_Inventory = 9
+		GameCommand_Inventory = 9,
+		GameCommand_ToggleLog = 10
 	};
 
 	enum class brogueUIState : int
