@@ -107,14 +107,21 @@ namespace brogueHd::backend::model
 		{
 			return _colors->get(index);
 		}
-		void set(short index, char character, color color)
+		void set(short index, char character, const color& color)
 		{
 			_characters->set(index, character);
 			_colors->set(index, color);
 		}
-		void setColor(short index, color color)
+		void setColor(short index, const color& color)
 		{
 			_colors->set(index, color);
+		}
+		void setColorRange(short index, short count, const color& color)
+		{
+			for (int i = index; i < index + count; i++)
+			{
+				_colors->set(i, color);
+			}
 		}
 		int getCount() const
 		{

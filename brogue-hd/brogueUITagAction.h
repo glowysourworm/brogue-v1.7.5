@@ -21,6 +21,12 @@ namespace brogueHd::frontend
 			desiredState = stateChange;
 			tag = default_value::value<simpleString>();
 		}
+		brogueUITagAction(brogueUIAction tagAction)
+		{
+			action = tagAction;
+			tag = "";
+			desiredState = brogueUIState::MainMenu;
+		}
 		brogueUITagAction(brogueUIAction fileAction, simpleString fileChosen)
 		{
 			action = fileAction;

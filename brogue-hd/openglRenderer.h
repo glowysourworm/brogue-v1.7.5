@@ -546,6 +546,16 @@ namespace brogueHd::frontend
 					_program->activateUIProgram(brogueUIProgram::MainMenuProgram);
 					_program->clearEvents();
 				}
+				else if (sender == brogueUIProgram::GameProgram)
+				{
+					_program->deactivateUIAll();
+					_program->activateUIProgram(brogueUIProgram::GameProgram);
+					_program->activateUIProgram(brogueUIProgram::GameLogProgram);
+					_program->activateUIProgram(brogueUIProgram::BottomBarMenuProgram);
+					_program->activateUIProgram(brogueUIProgram::GameObjectListProgram);
+					_program->activateUIProgram(brogueUIProgram::FlavorTextPanelProgram);
+					_program->clearEvents();
+				}
 			}
 			break;
 
@@ -587,7 +597,12 @@ namespace brogueHd::frontend
 					break;
 					case brogueUIState::GameNormal:
 					{
-
+						_program->deactivateUIAll();
+						_program->activateUIProgram(brogueUIProgram::GameProgram);
+						_program->activateUIProgram(brogueUIProgram::GameLogProgram);
+						_program->activateUIProgram(brogueUIProgram::BottomBarMenuProgram);
+						_program->activateUIProgram(brogueUIProgram::GameObjectListProgram);
+						_program->activateUIProgram(brogueUIProgram::FlavorTextPanelProgram);
 					}
 					break;
 					case brogueUIState::GameLogOpen:
@@ -596,7 +611,27 @@ namespace brogueHd::frontend
 					}
 					break;
 					case brogueUIState::GameMenuOpen:
+					{
+						_program->deactivateUIAll();
+						_program->activateUIProgram(brogueUIProgram::GameProgram);
+						_program->activateUIProgram(brogueUIProgram::GameLogProgram);
+						_program->activateUIProgram(brogueUIProgram::GameMenuProgram);
+						_program->activateUIProgram(brogueUIProgram::BottomBarMenuProgram);
+						_program->activateUIProgram(brogueUIProgram::GameObjectListProgram);
+						_program->activateUIProgram(brogueUIProgram::FlavorTextPanelProgram);
+					}
+					break;
 					case brogueUIState::GameInventoryOpen:
+					{
+						_program->deactivateUIAll();
+						_program->activateUIProgram(brogueUIProgram::GameProgram);
+						_program->activateUIProgram(brogueUIProgram::GameLogProgram);
+						_program->activateUIProgram(brogueUIProgram::GameInventoryProgram);
+						_program->activateUIProgram(brogueUIProgram::BottomBarMenuProgram);
+						_program->activateUIProgram(brogueUIProgram::GameObjectListProgram);
+						_program->activateUIProgram(brogueUIProgram::FlavorTextPanelProgram);
+					}
+					break;
 					case brogueUIState::GameDiscoveredItemsOpen:
 					case brogueUIState::GameHelpOpen:
 					case brogueUIState::Modal:
@@ -627,6 +662,44 @@ namespace brogueHd::frontend
 			case brogueUIAction::QuitGame:
 			{
 
+			}
+			break;
+
+			case brogueUIAction::GameCommand_Menu:
+			{
+				// TODO: REDESIGN STATE HANDLING INTO THE PROGRAM CONTAINER
+				if (_uiStateChanger->getCurrentState() == brogueUIState::GameMenuOpen)
+				{
+					_program->deactivateUIProgram(brogueUIProgram::GameMenuProgram);
+					_uiStateChanger->set(brogueUIState::GameNormal);
+				}
+				else
+				{
+					_program->activateUIProgram(brogueUIProgram::GameMenuProgram);
+					_uiStateChanger->set(brogueUIState::GameMenuOpen);
+				}
+
+				// No animation (REDESIGN)
+				_uiStateChanger->clear();
+			}
+			break;
+
+			case brogueUIAction::GameCommand_Inventory:
+			{
+				// TODO: REDESIGN STATE HANDLING INTO THE PROGRAM CONTAINER
+				if (_uiStateChanger->getCurrentState() == brogueUIState::GameInventoryOpen)
+				{
+					_program->deactivateUIProgram(brogueUIProgram::GameInventoryProgram);
+					_uiStateChanger->set(brogueUIState::GameNormal);
+				}
+				else
+				{
+					_program->activateUIProgram(brogueUIProgram::GameInventoryProgram);
+					_uiStateChanger->set(brogueUIState::GameInventoryOpen);
+				}
+
+				// No animation (REDESIGN)
+				_uiStateChanger->clear();
 			}
 			break;
 

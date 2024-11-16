@@ -692,6 +692,9 @@
     <ClInclude Include="simplePeriodCounter.h">
       <Filter>Header Files\frontend\opengl\program</Filter>
     </ClInclude>
+    <ClInclude Include="brogueGameView.h">
+      <Filter>Header Files\frontend\ui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\resources\model\armor.csv">

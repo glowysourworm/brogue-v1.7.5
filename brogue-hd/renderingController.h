@@ -78,6 +78,7 @@ namespace brogueHd::backend
 		brogueViewContainer* gameView = _uiBuilder->buildProgramView(brogueUIProgram::GameProgram);
 		brogueViewContainer* gameMenu = _uiBuilder->buildProgramView(brogueUIProgram::GameMenuProgram);
 		brogueViewContainer* gameLog = _uiBuilder->buildProgramView(brogueUIProgram::GameLogProgram);
+		brogueViewContainer* gameInventory = _uiBuilder->buildProgramView(brogueUIProgram::GameInventoryProgram);
 		brogueViewContainer* gameObjectList = _uiBuilder->buildProgramView(brogueUIProgram::GameObjectListProgram);
 		brogueViewContainer* flavorTextPanel = _uiBuilder->buildProgramView(brogueUIProgram::FlavorTextPanelProgram);
 		brogueViewContainer* bottomMenuBar = _uiBuilder->buildProgramView(brogueUIProgram::BottomBarMenuProgram);
@@ -98,6 +99,7 @@ namespace brogueHd::backend
 		viewList.add(gameView);
 		viewList.add(gameMenu);
 		viewList.add(gameLog);
+		viewList.add(gameInventory);
 		viewList.add(gameObjectList);
 		viewList.add(flavorTextPanel);
 		viewList.add(bottomMenuBar);

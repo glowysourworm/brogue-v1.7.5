@@ -167,13 +167,19 @@ namespace brogueHd::frontend
 		OpenGame = 3,
 		QuitGame = 4,
 
-		GameCommand_Explore = 5,
-		GameCommand_Rest = 6,
-		GameCommand_Search = 7,
-		GameCommand_Menu = 8,
+		GameCommand_Autopilot = 5,
+		GameCommand_EasyMode = 6,
+		GameCommand_Explore = 7,
+		GameCommand_HoverText = 8,
 		GameCommand_Inventory = 9,
-		GameCommand_ToggleLog = 10,
-		GameCommand_HoverText = 11
+		GameCommand_InventorySelect = 10,
+		GameCommand_Menu = 11,
+		GameCommand_Rest = 12,
+		GameCommand_Save = 13,
+		GameCommand_Search = 14,
+		GameCommand_ToggleLog = 15,
+		GameCommand_ToggleStealthRange = 16,
+		GameCommand_ViewDungeonSeed = 17
 	};
 
 	enum class brogueUIState : int

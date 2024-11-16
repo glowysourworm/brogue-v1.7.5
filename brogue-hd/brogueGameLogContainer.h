@@ -120,6 +120,6 @@ namespace brogueHd::frontend
 	bool brogueGameLogContainer::checkStateChange()
 	{
 		// Pending => period has elapsed. Return true to signal we're still animating.
-		return !_animationCounter->pending();
+		return _animating && !_animationCounter->pending();
 	}
 }

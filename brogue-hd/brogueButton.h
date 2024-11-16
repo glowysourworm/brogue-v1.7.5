@@ -33,6 +33,7 @@ namespace brogueHd::frontend
 		virtual void invalidate(const brogueKeyboardState& keyboard, const brogueMouseState& mouse) override;
 
 		void setUI(const simpleString& text, int hotkeyIndex, const color& foreground, const color& hotkeyForeground, brogueTextAlignment alignment);
+		void setUI(const colorString& text, brogueTextAlignment alignment);
 
 	private:
 
@@ -61,6 +62,12 @@ namespace brogueHd::frontend
 
 		else
 			_uiText->setLine(this->getBoundary().top(), colorString(text.c_str(), foreground), alignment);
+
+		_invalid = true;
+	}
+	void brogueButton::setUI(const colorString& text, brogueTextAlignment alignment)
+	{
+		_uiText->setLine(this->getBoundary().top(), text, alignment);
 
 		_invalid = true;
 	}

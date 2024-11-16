@@ -176,6 +176,39 @@ namespace brogueHd::backend::model
 			blue = color.blue;
 			alpha = color.alpha;
 		}
+		void operator+(const color& color)
+		{
+			red = red + color.red;
+			green = green + color.green;
+			blue = blue + color.blue;
+			alpha = alpha + color.alpha;
+		}
+		friend static color operator+(const color& instance, float constant)
+		{
+			color result(instance);
+			result += constant;
+			return result;
+		}
+		friend static color operator*(const color& instance, float constant)
+		{
+			color result(instance);
+			result *= constant;
+			return result;
+		}
+		void operator*(const color& color)
+		{
+			red = red * color.red;
+			green = green * color.green;
+			blue = blue * color.blue;
+			alpha = alpha * color.alpha;
+		}
+		void operator*(float constant)
+		{
+			red = red * constant;
+			green = green * constant;
+			blue = blue * constant;
+			alpha = alpha * constant;
+		}
 		void operator*=(const color& color)
 		{
 			red = red * color.red;
@@ -183,12 +216,26 @@ namespace brogueHd::backend::model
 			blue = blue * color.blue;
 			alpha = alpha * color.alpha;
 		}
+		void operator*=(float constant)
+		{
+			red *= constant;
+			green *= constant;
+			blue *= constant;
+			alpha *= constant;
+		}
 		void operator+=(const color& color)
 		{
 			red += color.red;
 			green += color.green;
 			blue += color.blue;
 			alpha += color.alpha;
+		}
+		void operator+=(float constant)
+		{
+			red += constant;
+			green += constant;
+			blue += constant;
+			alpha += constant;
 		}
 		void clamp(color low, color high)
 		{

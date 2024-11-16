@@ -397,6 +397,12 @@ namespace brogueHd::frontend
 				if (_uiPrograms->get(brogueUIProgram::BottomBarMenuProgram)->isActive())
 					_uiPrograms->get(brogueUIProgram::BottomBarMenuProgram)->run(millisecondsElapsed);
 
+				if (_uiPrograms->get(brogueUIProgram::GameMenuProgram)->isActive())
+					_uiPrograms->get(brogueUIProgram::GameMenuProgram)->run(millisecondsElapsed);
+
+				if (_uiPrograms->get(brogueUIProgram::GameInventoryProgram)->isActive())
+					_uiPrograms->get(brogueUIProgram::GameInventoryProgram)->run(millisecondsElapsed);
+
 				// Put the game log (scrollable area) on a separate texture to control rendering
 				glDrawBuffer(GL_COLOR_ATTACHMENT6);
 				_gameLogTexture->bind();
