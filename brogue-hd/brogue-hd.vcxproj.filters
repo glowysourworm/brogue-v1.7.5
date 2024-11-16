@@ -115,6 +115,9 @@
     <Filter Include="Header Files\backend\controller\eventData">
       <UniqueIdentifier>{1edd2cb2-45a7-49eb-ba2a-0b273cf92c2d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\vendor\stopwatch">
+      <UniqueIdentifier>{e4e93dc2-0555-462e-a3e9-e9b742243919}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="brogue-hd.cpp">
@@ -688,6 +691,12 @@
     </ClInclude>
     <ClInclude Include="brogueUIText.h">
       <Filter>Header Files\frontend\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="stopwatch.hpp">
+      <Filter>Header Files\vendor\stopwatch</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleTimer.h">
+      <Filter>Header Files\simple</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

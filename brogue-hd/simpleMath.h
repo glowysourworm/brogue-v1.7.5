@@ -53,6 +53,26 @@ namespace brogueHd::simple
 			return x;
 		}
 
+		// Cheat sheet:  https://easings.net/
+
+		template<isNumber TMath>
+		static TMath easeInCubic(const TMath x)
+		{
+			return powerImpl(x, 3);
+		}
+
+		template<isNumber TMath>
+		static TMath easeOutCubic(const TMath x)
+		{
+			return 1 - powerImpl(1 - x, 3);
+		}
+
+		template<isNumber TMath>
+		static TMath power(const TMath x, const TMath raisedTo)
+		{
+			return powerImpl(x, raisedTo);
+		}
+
 		template<isNumber TMath>
 		static TMath sqrt(TMath x)
 		{
@@ -163,6 +183,18 @@ namespace brogueHd::simple
 		static TMath maxOf(const TMath x)
 		{
 			return x;
+		}
+
+		template<isNumber TMath>
+		static TMath powerImpl(const TMath x, const int raisedTo)
+		{
+			return pow(x, raisedTo);
+		}
+
+		template<isNumber TMath>
+		static TMath powerImpl(const TMath x, const float raisedTo)
+		{
+			return pow(x, raisedTo);
 		}
 	};
 }

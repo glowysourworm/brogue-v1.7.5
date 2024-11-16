@@ -7,7 +7,10 @@
 #include "brogueViewContainer.h"
 #include "gridRect.h"
 #include "simpleException.h"
+#include "simpleMath.h"
 #include "simplePeriodCounter.h"
+
+using namespace brogueHd::simple;
 
 namespace brogueHd::frontend
 {
@@ -41,7 +44,7 @@ namespace brogueHd::frontend
 	brogueGameLogContainer::brogueGameLogContainer(brogueUIProgram programName, int zoomLevel, bool hasScrollInteraction, bool applyClipping, const gridRect& containerBoundary)
 		: brogueViewContainer(programName, zoomLevel, hasScrollInteraction, applyClipping, containerBoundary)
 	{
-		_animationCounter = new simplePeriodCounter(50);
+		_animationCounter = new simplePeriodCounter(300);
 		_animating = false;
 		_closing = true;
 
@@ -75,6 +78,12 @@ namespace brogueHd::frontend
 
 			// Perform the animation
 			float periodRatio = _animationCounter->getCounter() / (float)_animationCounter->getPeriod();
+
+			// De-noise
+			periodRatio = simpleMath::clamp(periodRatio, 0.0f, 1.0f);
+
+			// Ease-out: Slows the final portion of the rendering
+			periodRatio = simpleMath::easeOutCubic(periodRatio);
 
 			setAnimation(periodRatio);
 		}

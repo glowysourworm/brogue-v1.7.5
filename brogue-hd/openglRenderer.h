@@ -27,6 +27,7 @@
 #include "brogueKeyboardState.h"
 #include "simple.h"
 #include "brogueUIStateChanger.h"
+#include "simpleTimer.h"
 
 using namespace brogueHd::simple;
 using namespace brogueHd::component;
@@ -119,6 +120,7 @@ namespace brogueHd::frontend
 		brogueProgramContainer* _program;
 		simplePeriodCounter* _uiEventDebouncer;
 		brogueUIStateChanger* _uiStateChanger;
+		simpleTimer* _stopwatch;
 
 		// Two way communication for the rendering context
 		BrogueGameMode _gameMode;
@@ -142,6 +144,7 @@ namespace brogueHd::frontend
 		_eventController = eventController;
 		_uiEventDebouncer = new simplePeriodCounter(2);
 		_uiStateChanger = new brogueUIStateChanger(brogueUIState::MainMenu);
+		_stopwatch = new simpleTimer();
 
 		_clickToken = eventController->getUIClickEvent()->subscribe(std::bind(&openglRenderer::thread_brogueUIClickEvent, this, std::placeholders::_1, std::placeholders::_2));
 		_gameModeOut = BrogueGameMode::Title;
@@ -173,6 +176,7 @@ namespace brogueHd::frontend
 
 		delete _uiEventDebouncer;
 		delete _uiStateChanger;
+		delete _stopwatch;
 	}
 
 #pragma region GLFW Callbacks
@@ -668,10 +672,37 @@ namespace brogueHd::frontend
 		// THREAD:  UNLOCK TO ENTER PRIMARY LOOP
 		_threadLock->unlock();
 
+		// Stopwatch:  Set the timer
+		_stopwatch->mark();
+
+		// Loop Periods:  Before Sleep, After Sleep, Rendering
+		int milliSecondsActual = 0;
+
 		// Main Rendering Loop (haven't seen any issues with this on the other thread.)
 		while (!glfwWindowShouldClose(_window) /* && (_gameModeRequest == _gameMode) */)
 		{
-			std::this_thread::sleep_for(std::chrono::milliseconds(intervalMilliseconds));
+			/*
+				Attempting Real Time Calculation:  Try adjusting the thread sleep period based
+												   on the timer.
+			*/
+
+			// Stopwatch:  Check the time
+			int milliSecondsBeforeSleep = _stopwatch->markMilliseconds();
+
+			int delta = intervalMilliseconds - milliSecondsBeforeSleep;
+
+			// Sleep for the delta to adjust loop
+			std::this_thread::sleep_for(std::chrono::milliseconds(delta));
+
+			int milliSecondsAfterSleep = _stopwatch->markMilliseconds();
+
+			// These two add up to give the actual rendering interval
+			milliSecondsActual = milliSecondsAfterSleep + milliSecondsBeforeSleep;
+
+			// Protect Rendering Loop! (This is fairly critical; but the throttling of
+			// animations could be protected also);
+			if (milliSecondsActual < intervalMilliseconds)
+				milliSecondsActual = intervalMilliseconds;
 
 			// Update from main thread's brogueView*
 			_threadLock->lock();
@@ -714,17 +745,17 @@ namespace brogueHd::frontend
 			}
 
 			// Check Update(s) -> (Click Events) (can signal view change) (animations will also be aware for state changes)
-			_program->checkUpdate(keyboardState, mouseState, intervalMilliseconds);
+			_program->checkUpdate(keyboardState, mouseState, milliSecondsActual);
 
 			// Updates Program Buffers:  brogueViewBase* -> simpleDataStream (gets sent to GPU)
 			//							 Check normal program update (view state change) to force 
 			//							 update (to active programs only!)
 			//
 			if (_program->needsUpdate() || gameModeChangeThisIteration)
-				_program->update(keyboardState, mouseState, intervalMilliseconds, gameModeChangeThisIteration);
+				_program->update(keyboardState, mouseState, milliSecondsActual, gameModeChangeThisIteration);
 
 			// Run drawing program
-			_program->run(intervalMilliseconds);										// Run() -> Draws the buffers
+			_program->run(milliSecondsActual);											// Run() -> Draws the buffers
 			_program->showErrors();														// Log Errors to simpleLogger -> std::cout
 			_program->clearUpdate();													// Clear Update Flags
 

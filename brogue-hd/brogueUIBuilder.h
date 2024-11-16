@@ -52,7 +52,7 @@ namespace brogueHd::frontend
 
 	protected:
 
-		const int FlamePeriodFadeMilliseconds = 1500;
+		const int FlamePeriodFadeMilliseconds = 5000;
 
 	private:
 
