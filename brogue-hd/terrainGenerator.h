@@ -1,5 +1,6 @@
 #pragma once
 
+#include "brogueLayout.h"
 #include "randomGenerator.h"
 
 namespace brogueHd::backend
@@ -10,6 +11,8 @@ namespace brogueHd::backend
 
 		terrainGenerator(randomGenerator* randomGenerator);
 		~terrainGenerator();
+
+		void generateTerrain(brogueLayout* layout);
 
 	private:
 
@@ -22,6 +25,11 @@ namespace brogueHd::backend
 	}
 
 	terrainGenerator::~terrainGenerator()
+	{
+
+	}
+
+	void terrainGenerator::generateTerrain(brogueLayout* layout)
 	{
 
 	}

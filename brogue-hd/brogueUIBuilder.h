@@ -48,6 +48,7 @@ namespace brogueHd::frontend
 		/// Defines the primary scene boundary for the brogue game
 		/// </summary>
 		gridRect getBrogueSceneBoundary();
+		gridRect getBrogueGameBoundary();
 		gridRect getPaddedBoundary(const gridRect& boundary, int padding);
 
 		brogueViewContainer* buildProgramView(brogueUIProgram programName);
@@ -181,7 +182,10 @@ namespace brogueHd::frontend
 	{
 		return gridRect(0, 0, COLS, ROWS);
 	}
-
+	gridRect brogueUIBuilder::getBrogueGameBoundary()
+	{
+		return getBrogueStaticBoundary(brogueUIProgramPartId(brogueUIProgram::GameProgram, brogueUIProgramPart::Background, 0));
+	}
 	gridRect brogueUIBuilder::getPaddedBoundary(const gridRect& boundary, int padding)
 	{
 		return gridRect(boundary.column + padding,

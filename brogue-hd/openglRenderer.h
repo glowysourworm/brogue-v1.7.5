@@ -28,6 +28,9 @@
 #include "simple.h"
 #include "brogueUIStateChanger.h"
 #include "simpleTimer.h"
+#include "simpleString.h"
+#include "brogueLevel.h"
+#include "brogueCell.h"
 
 using namespace brogueHd::simple;
 using namespace brogueHd::component;
@@ -58,6 +61,14 @@ namespace brogueHd::frontend
 		void setGameMode(BrogueGameMode gameMode);
 
 		/// <summary>
+		/// Game data will be passed off to the rendering thread. This must be copied into the 
+		/// view heap memory and not altered, otherwise. There will be a brogueCellDisplay* heap
+		/// object on the primary game thread that may be copied onto the rendering thread by
+		/// a simple de-referencing operation.
+		/// </summary>
+		void setGameData(const brogueLevel* level);
+
+		/// <summary>
 		/// Starts program rendering thread, and opens window using GLFW
 		/// </summary>
 		void startProgram();
@@ -69,7 +80,7 @@ namespace brogueHd::frontend
 		void terminateProgram();
 
 		// Shared resources
-		BrogueGameMode getRequestedMode() const;
+		BrogueGameMode getRequestedMode(bool& newGame, bool& openGame, simpleString& fileName);
 		brogueKeyboardState getKeyboardState() const;
 		brogueMouseState getMouseState() const;
 
@@ -129,6 +140,10 @@ namespace brogueHd::frontend
 		BrogueGameMode _gameMode;
 		BrogueGameMode _gameModeIn;
 		BrogueGameMode _gameModeOut;
+		simpleString* _fileNameOut;
+		bool _newGameOut;
+		bool _openGameOut;
+		
 
 		GLFWwindow* _window;
 		bool _initializedGL;
@@ -148,6 +163,7 @@ namespace brogueHd::frontend
 		_uiEventDebouncer = new simplePeriodCounter(2);
 		_uiStateChanger = new brogueUIStateChanger(brogueUIState::MainMenu);
 		_stopwatch = new simpleTimer();
+		_fileNameOut = new simpleString();
 
 		_clickToken = eventController->getUIClickEvent()->subscribe(std::bind(&openglRenderer::thread_brogueUIClickEvent, this, std::placeholders::_1, std::placeholders::_2));
 		_hoverToken = eventController->getUIHoverEvent()->subscribe(std::bind(&openglRenderer::thread_brogueUIHoverEvent, this, std::placeholders::_1, std::placeholders::_2));
@@ -430,6 +446,29 @@ namespace brogueHd::frontend
 
 		_threadLock->unlock();
 	}
+	void openglRenderer::setGameData(const brogueLevel* level)
+	{
+		// Primary Backend -> Frontend Data Handoff:
+		//
+		// Iterate the level cells, and copy the data onto the view heap using
+		// the brogueCellDisplay.
+		//
+
+		_threadLock->lock();
+
+		brogueProgramContainer* program = _program;
+
+		level->iterate([&program] (short column, short row, brogueCell* cell)
+		{
+			// Stack copy of brogueCellDisplay
+			program->setGameUpdate(column, row, cell->getDisplay());
+
+			return iterationCallback::iterate;
+		});
+
+
+		_threadLock->unlock();
+	}
 	void openglRenderer::startProgram()
 	{
 		if (_program == nullptr)
@@ -469,12 +508,23 @@ namespace brogueHd::frontend
 		_initializedGL = false;
 	}
 
-	BrogueGameMode openglRenderer::getRequestedMode() const
+	BrogueGameMode openglRenderer::getRequestedMode(bool& newGame, bool& openGame, simpleString& fileName)
 	{
 		BrogueGameMode mode;
 
 		_threadLock->lock();
+
+		// Copy this data to the other thread
+		fileName = *_fileNameOut;
+		openGame = _openGameOut;
+		newGame = _newGameOut;
 		mode = _gameModeOut;
+
+		// Go ahead and clear our data
+		_openGameOut = false;
+		_newGameOut = false;
+		_fileNameOut->clear();
+
 		_threadLock->unlock();
 
 		return mode;
@@ -651,11 +701,21 @@ namespace brogueHd::frontend
 			break;
 
 			case brogueUIAction::NewGame:
+			{
+				_newGameOut = true;
+				_openGameOut = false;
 				_gameModeOut = BrogueGameMode::Game;
-				break;
+				_fileNameOut->clear();
+			}
+			break;
 
 			case brogueUIAction::OpenGame:
 			{
+				_newGameOut = false;
+				_openGameOut = true;
+				_gameModeOut = BrogueGameMode::Game;
+				_fileNameOut->clear();
+				_fileNameOut->append(tagAction.tag);
 			}
 			break;
 

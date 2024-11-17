@@ -1,4 +1,5 @@
 #pragma once
+#include "brogueCellDisplay.h"
 #include "brogueGlobal.h"
 #include "brogueGlyphMap.h"
 #include "brogueKeyboardState.h"
@@ -74,6 +75,13 @@ namespace brogueHd::frontend
 					const simpleMouseState& mouseState,
 					int millisecondsLapsed,
 					bool forceUpdate);
+
+		/// <summary>
+		/// (CRITICAL!) This is a forced data handoff from the primary game thread's data heap. So, this
+		/// must invalidate all views that require a cell from the game display. The brogueViewBase must
+		/// enter an invalid state after this update - so that its data can be re-buffered.
+		/// </summary>
+		void setGameUpdate(short column, short row, const brogueCellDisplay& data);
 
 		gridRect getSceneBoundaryUI() const;
 
@@ -168,6 +176,10 @@ namespace brogueHd::frontend
 	void brogueProgramContainer::setMode(BrogueGameMode gameMode)
 	{
 		_mainProgram->setMode(gameMode);
+	}
+	void brogueProgramContainer::setGameUpdate(short column, short row, const brogueCellDisplay& data)
+	{
+		_mainProgram->setGameUpdate(column, row, data);
 	}
 	gridRect brogueProgramContainer::getSceneBoundaryUI() const
 	{

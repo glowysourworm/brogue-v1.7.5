@@ -40,23 +40,20 @@ namespace brogueHd::backend
 		layoutGenerator(randomGenerator* randomGenerator);
 		~layoutGenerator();
 
-		void initialize(brogueLevelProfile* profile);
-		void clear();
-
-		brogueLayout* generateLayout();
+		brogueLayout* generateLayout(brogueLevelProfile* profile);
 
 	private:
 
-		void createRooms();
+		void createRooms(brogueLayout* layout);
 
 		// (MEMORY!) Creates a new room according to the specified room info
-		gridRegion<gridLocator>* createRoom(gridRect levelBoundary, gridRect levelPaddedBoundary, const brogueRoomInfo& roomInfo);
+		gridRegion<gridLocator>* createRoom(brogueLayout* layout, const brogueRoomInfo& roomInfo);
 
 		bool attemptConnection(accretionTile& roomTile, const gridRect& attemptRect, short interRoomPadding) const;
 
 		//void designateMachineRooms();
-		void triangulateRooms();
-		void connectRooms();
+		void triangulateRooms(brogueLayout* layout);
+		void connectRooms(brogueLayout* layout);
 		//void createTerrain();
 
 		/// <summary>
@@ -67,15 +64,7 @@ namespace brogueHd::backend
 		// Managed On: clear(), initialize(...)
 	private:
 
-		grid<gridLocator>* _grid;
-
 		simpleList<accretionTile>* _roomTiles;
-
-		graph<gridLocator, gridLocatorEdge>* _delaunayGraph;
-
-		brogueLevelProfile* _profile;
-
-		bool _initialized;
 
 	private:
 
@@ -91,38 +80,11 @@ namespace brogueHd::backend
 
 		_roomTiles = new simpleList<accretionTile>();
 		_randomGenerator = randomGenerator;
-		_initialized = false;
 	}
 
 	layoutGenerator::~layoutGenerator()
 	{
-		this->clear();
-
 		delete _roomTiles;
-
-		_initialized = false;
-	}
-
-	void layoutGenerator::clear()
-	{
-		_roomTiles->clear();
-
-		delete _grid;
-
-		_initialized = false;
-	}
-
-	void layoutGenerator::initialize(brogueLevelProfile* profile)
-	{
-		this->clear();
-
-		gridRect levelBoundary = this->getPaddedBoundary(0);
-		gridRect levelPaddedBoundary = this->getPaddedBoundary(1);
-
-		_profile = profile;
-		_grid = new grid<gridLocator>(levelBoundary, levelPaddedBoundary);
-
-		_initialized = true;
 	}
 
 	gridRect layoutGenerator::getPaddedBoundary(short padding) const
@@ -133,11 +95,8 @@ namespace brogueHd::backend
 		return gridRect(padding, padding, DCOLS - padding, DROWS - padding);
 	}
 
-	brogueLayout* layoutGenerator::generateLayout()
+	brogueLayout* layoutGenerator::generateLayout(brogueLevelProfile* profile)
 	{
-		if (!_initialized)
-			simpleException::showCstr("Layout generator not properly intiialized:  call initialize() before generateLayout()");
-
 		// Procedure
 		//
 		// 1) Create Rooms:
@@ -177,22 +136,27 @@ namespace brogueHd::backend
 		//          -> Store the results (adds to difficulty rating of cells)
 		//
 
+		gridRect levelBoundary = this->getPaddedBoundary(0);
+		gridRect levelPaddedBoundary = this->getPaddedBoundary(1);
+
+		brogueLayout* result = new brogueLayout(levelBoundary, levelPaddedBoundary);
+
 		// Create Rooms
-		this->createRooms();
+		createRooms(result);
 
 		// Machine Rooms
 
 		// Triangulate Rooms:  Creates Delaunay Triangulation of the connection point vertices
-		this->triangulateRooms();
+		triangulateRooms(result);
 
 		// Connect Rooms:  Create cells in the grid for the delaunay triangulation of the 
 		//                 connection points of the room tiles
-		this->connectRooms();
+		connectRooms(result);
 
-		return NULL;
+		return result;
 	}
 
-	void layoutGenerator::createRooms()
+	void layoutGenerator::createRooms(brogueLayout* layout)
 	{
 		// Brogue v1.7.5 Creates up to 35 rooms using accretion (bolt-on) to fill up the space
 		//
@@ -206,8 +170,8 @@ namespace brogueHd::backend
 		for (short index = 0; index < maxAttempts; index++)
 		{
 			// MEMORY!
-			gridRegion<gridLocator>* nextRegion = index == 0 ? this->createRoom(_grid->getParentBoundary(), _grid->getRelativeBoundary(), _profile->getEntranceRoom()) :
-				this->createRoom(_grid->getParentBoundary(), _grid->getRelativeBoundary(), _profile->getRandomRoomInfo());
+			gridRegion<gridLocator>* nextRegion = index == 0 ? this->createRoom(_grid->getParentBoundary(), _grid->getRelativeBoundary(), _profile->getEntranceRoom(_randomGenerator)) :
+				this->createRoom(_grid->getParentBoundary(), _grid->getRelativeBoundary(), _profile->getRandomRoomInfo(_randomGenerator));
 
 			// Connection Points
 			simpleArray<gridLocator> northEdge = nextRegion->getBoundaryEdges(brogueCompass::N);
@@ -492,7 +456,7 @@ namespace brogueHd::backend
 		return constructor.complete();
 	}
 
-	void layoutGenerator::triangulateRooms()
+	void layoutGenerator::triangulateRooms(brogueLayout* layout)
 	{
 		// Create delaunay triangulator with graph edge constructor
 		delaunayAlgorithm<gridLocator, gridLocatorEdge> triangulator([] (gridLocator node1, gridLocator node2)
@@ -525,7 +489,7 @@ namespace brogueHd::backend
 		_delaunayGraph = triangulator.run(connectionNodes);
 	}
 
-	void layoutGenerator::connectRooms()
+	void layoutGenerator::connectRooms(brogueLayout* layout)
 	{
 		// Procedure
 		//

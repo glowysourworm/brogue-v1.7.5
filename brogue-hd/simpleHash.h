@@ -239,7 +239,7 @@ namespace brogueHd::simple
 		// Iterate to set the item value
 		for (int index = 0; index < _table->get(bucketIndex)->count(); index++)
 		{
-			if (_table->get(bucketIndex)->get(index).value == oldValue)
+			if (_table->get(bucketIndex)->get(index)->value == oldValue)
 			{
 				simplePair<K, V>* pair = _table->get(bucketIndex)->get(index);
 

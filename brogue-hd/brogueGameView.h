@@ -23,6 +23,17 @@ namespace brogueHd::frontend
 		~brogueGameView() {};
 
 		virtual void update(int millisecondsLapsed, bool forceUpdate) override;
+		virtual bool needsUpdate() const override;
+		virtual void clearUpdate() override;
+
+		/// <summary>
+		/// Overload of invalidate to handle a simple invalidate flag
+		/// </summary>
+		void invalidate();
+
+	private:
+
+		bool _invalid;
 	};
 
 	brogueGameView::brogueGameView(eventController* eventController,
@@ -33,6 +44,8 @@ namespace brogueHd::frontend
 		: brogueViewBase(eventController, partId, data, sceneBoundary, viewBoundary)
 	{
 		this->setUIAction(brogueUITagAction(brogueUIState::GameNormal));
+
+		_invalid = true;
 	}
 
 	void brogueGameView::update(int millisecondsLapsed, bool forceUpdate)
@@ -49,5 +62,18 @@ namespace brogueHd::frontend
 
 			return iterationCallback::iterate;
 		});
+	}
+
+	bool brogueGameView::needsUpdate() const
+	{
+		return _invalid || brogueViewBase::needsUpdate();
+	}
+	void brogueGameView::clearUpdate()
+	{
+		_invalid = false;
+	}
+	void brogueGameView::invalidate()
+	{
+		_invalid = true;
 	}
 }

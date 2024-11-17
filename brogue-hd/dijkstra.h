@@ -346,7 +346,7 @@ namespace brogueHd::component
 			if (_frontier->count() > 0)
 			{
 				// Lists in the frontier must have an entry
-				simpleHash<T, T>* nextCostDict = _frontier->min();
+				simpleHash<T, T>* nextCostDict = _frontier->minValue();
 				float nextCost = _frontier->minKey();
 
 				// Get the first from the dictionary
@@ -374,7 +374,7 @@ namespace brogueHd::component
 
 				// Otherwise, set to the next location (should be first dictionary key)
 				if (nextNode == default_value::value<T>())
-					nextNode = nextCostDict->getAt(0).key;
+					nextNode = nextCostDict->getAt(0)->key;
 
 				// Maintain frontier hash
 				nextCostDict->remove(nextNode);

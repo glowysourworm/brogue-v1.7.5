@@ -1,5 +1,6 @@
 #pragma once
 
+#include "brogueCellDisplay.h"
 #include "gridLocator.h"
 
 using namespace brogueHd::component;
@@ -33,7 +34,14 @@ namespace brogueHd::backend::model
 		}
 		~brogueCell() {};
 
+		brogueCellDisplay getDisplay() const
+		{
+			return *_display;
+		}
+
 	public:
+
+		brogueCellDisplay* _display;
 
 		short terrainRandomValues[8];					// TODO: Figure this out!
 		bool isWayPoint;

@@ -14,9 +14,12 @@
 
 #include "json.hpp"
 
+#include "brogueGameTemplate.h"
 #include "brogueGlobal.h"
+#include "brogueLevelTemplate.h"
 #include "brogueUIConstants.h"
 #include "brogueUIProgramPartConfiguration.h"
+#include "dungeonConstants.h"
 #include "gl.h"
 #include "simpleArray.h"
 #include "simpleException.h"
@@ -74,6 +77,11 @@ namespace brogueHd::backend
 		/// Loads game data from file
 		/// </summary>
 		gameData* loadGame(const char* path);
+
+		/// <summary>
+		/// Gets the design plans for the brogueGame* (O_o)
+		/// </summary>
+		brogueGameTemplate* getBrogueDesign_v1_7_5();
 
 		/// <summary>
 		/// Loads playback data from file
@@ -215,6 +223,24 @@ namespace brogueHd::backend
 		}
 
 		return false;
+	}
+
+	brogueGameTemplate* resourceController::getBrogueDesign_v1_7_5()
+	{
+		// TODO: This will go to a game editor; but we're going to need a static version of this. So, 
+		//		 most of the data will be in our resource folder, the .csv files. Those can be loaded
+		//		 to eliminate some of the coding work... but, they'll be moved to a fully serialized
+		//		 binary version when the game editor is built.
+		//
+
+		// (move this to private member list and delete later)
+		brogueGameTemplate* result = new brogueGameTemplate();
+
+		brogueLevelTemplate* level = new brogueLevelTemplate(1, levelTypes::DP_BASIC_FIRST_ROOM);
+
+		result->addLevel(level);
+
+		return result;
 	}
 
 	shaderData* resourceController::getShader(shaderResource resource)

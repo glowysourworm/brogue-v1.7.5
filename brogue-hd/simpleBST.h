@@ -34,7 +34,7 @@ namespace brogueHd::simple
 
 		size_t getHash() const override
 		{
-			return key.getHash();
+			return hashGenerator::generateHash(key);
 		}
 	};
 

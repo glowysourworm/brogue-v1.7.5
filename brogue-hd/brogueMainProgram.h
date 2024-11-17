@@ -1,5 +1,6 @@
 #pragma once
 #include "brogueBackground.h"
+#include "brogueCellDisplay.h"
 #include "brogueGlobal.h"
 #include "brogueGlyphMap.h"
 #include "brogueKeyboardState.h"
@@ -80,6 +81,11 @@ namespace brogueHd::frontend
 		bool hasErrors() const;
 
 		void invalidate(const simpleMouseState& mouse, const simpleKeyboardState& keyboard);
+
+		/// <summary>
+		/// Primary game data update (see program container)
+		/// </summary>
+		void setGameUpdate(short column, short row, const brogueCellDisplay& data);
 		
 	private:
 
@@ -275,6 +281,10 @@ namespace brogueHd::frontend
 
 			return iterationCallback::iterate;
 		});
+	}
+	void brogueMainProgram::setGameUpdate(short column, short row, const brogueCellDisplay& data)
+	{
+		_uiPrograms->get(brogueUIProgram::GameProgram)->setGameUpdate(column, row, data);
 	}
 	void brogueMainProgram::run(int millisecondsElapsed)
 	{

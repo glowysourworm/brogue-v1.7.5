@@ -74,11 +74,6 @@ namespace brogueHd::component
 			return gridLocator(-1, -1);
 		}
 
-		virtual void getString(std::string& result) const
-		{
-			result = simpleExt::format("Column={}, Row={}", column, row);
-		}
-
 		size_t getHash() const override
 		{
 			return hashGenerator::generateHash(column, row);

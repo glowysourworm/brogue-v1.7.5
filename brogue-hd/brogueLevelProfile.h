@@ -4,6 +4,7 @@
 #include "dungeon.h"
 #include "dungeonConstants.h"
 #include "randomGenerator.h"
+#include "simple.h"
 #include "simpleException.h"
 #include "simpleHash.h"
 #include "simpleList.h"
@@ -18,11 +19,11 @@ namespace brogueHd::backend::model
 	{
 	public:
 
-		brogueLevelProfile(const randomGenerator* randomGenerator, short depth, levelTypes type);
+		brogueLevelProfile(short depth, levelTypes type);
 		~brogueLevelProfile();
 
-		brogueRoomInfo getRandomRoomInfo();
-		brogueRoomInfo getEntranceRoom();
+		brogueRoomInfo getRandomRoomInfo(randomGenerator* randomMain);
+		brogueRoomInfo getEntranceRoom(randomGenerator* randomMain);
 
 	private:
 
@@ -30,8 +31,6 @@ namespace brogueHd::backend::model
 		brogueRoomInfo createRoomInfo(roomTypes roomType);
 
 	private:
-
-		randomGenerator* _randomGenerator;
 
 		simpleHash<roomTypes, brogueRoomInfo>* _roomInfo;
 
@@ -67,12 +66,14 @@ namespace brogueHd::backend::model
 
 	*/
 
-	brogueLevelProfile::brogueLevelProfile(const randomGenerator* randomGenerator, short depth, levelTypes type)
+	brogueLevelProfile::brogueLevelProfile(short depth, levelTypes type)
 	{
 		if (depth == 1 && type != levelTypes::DP_BASIC_FIRST_ROOM)
 			simpleException::show("Invalid first level type:  brogueLevelProfile.cpp");
 
 		_roomInfo = new simpleHash<roomTypes, brogueRoomInfo>();
+		_roomFrequencyMap = new simpleHash<levelTypes, simpleHash<roomTypes, short>*>();
+		_corridorFrequencyMap = new simpleHash< levelTypes, short>();
 		_levelType = type;
 		_depth = depth;
 
@@ -132,7 +133,16 @@ namespace brogueHd::backend::model
 
 	brogueLevelProfile::~brogueLevelProfile()
 	{
-		//delete _roomInfo;
+		_roomFrequencyMap->iterate([] (levelTypes type, simpleHash<roomTypes, short>* map)
+		{
+			delete map;
+
+			return iterationCallback::iterate;
+		});
+
+		delete _roomInfo;
+		delete _roomFrequencyMap;
+		delete _corridorFrequencyMap;
 	}
 
 	void brogueLevelProfile::initialize()
@@ -196,23 +206,20 @@ namespace brogueHd::backend::model
 		return brogueRoomInfo(roomType, roomFrequency, corridorFrequency);
 	}
 
-	brogueRoomInfo brogueLevelProfile::getEntranceRoom()
+	brogueRoomInfo brogueLevelProfile::getEntranceRoom(randomGenerator* randomMaim)
 	{
-		//return _roomInfo->get(roomTypes::MainEntranceRoom);
-		return brogueRoomInfo();
+		return _roomInfo->get(roomTypes::MainEntranceRoom);
 	}
 
-	brogueRoomInfo brogueLevelProfile::getRandomRoomInfo()
+	brogueRoomInfo brogueLevelProfile::getRandomRoomInfo(randomGenerator* randomMaim)
 	{
 		simpleList<short> weights = _roomInfo->selectFromValues<short>([] (brogueRoomInfo info)
 		{
 			return info.frequency;
 		});
 
-		short randomIndex = _randomGenerator->randWeighted(weights.toArray());
+		short randomIndex = randomMaim->randWeighted(weights.toArray());
 
 		return _roomInfo->getAt(randomIndex)->value;
-
-		return brogueRoomInfo();
 	}
 }

@@ -1,7 +1,9 @@
 #pragma once
 
+#include "brogueCell.h"
 #include "brogueContentGrid.h"
 #include "brogueLayout.h"
+#include "gridDefinitions.h"
 #include "gridLocator.h"
 
 using namespace brogueHd::component;
@@ -12,22 +14,21 @@ namespace brogueHd::backend::model
 	{
 	public:
 
-		brogueLevel(short depth, unsigned long levelSeed);
+		brogueLevel(short depth, brogueLayout* layout, brogueContentGrid* content);
 		~brogueLevel();
 
 		short getDepth() const;
 
-	public:
+		void iterate(gridCallback<brogueCell*> callback) const;
 
-		brogueLayout* layout;
+	private:
 
-		brogueContentGrid* contentGrid;
+		brogueLayout* _layout;
+		brogueContentGrid* _contentGrid;
 
 		// (old variable name)
 		// pcell mapStorage[DCOLS][DROWS];
 		// short** scentMap;
-
-	private:
 
 		bool _visited;
 		short _depth;
@@ -39,16 +40,22 @@ namespace brogueHd::backend::model
 		gridLocator* _playerExitedVia;
 	};
 
-	brogueLevel::brogueLevel(short depth, unsigned long levelSeed)
+	brogueLevel::brogueLevel(short depth, brogueLayout* layout, brogueContentGrid* content)
 	{
-
+		_depth = depth;
+		_layout = layout;
+		_contentGrid = content;
 	}
 	brogueLevel::~brogueLevel()
 	{
 	}
 	short brogueLevel::getDepth() const
 	{
-		return 1;
+		return _depth;
+	}
+	void brogueLevel::iterate(gridCallback<brogueCell*> callback) const
+	{
+		_layout->iterate(callback);
 	}
 }
 

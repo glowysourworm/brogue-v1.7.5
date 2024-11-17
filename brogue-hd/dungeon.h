@@ -41,12 +41,28 @@ namespace brogueHd::backend::model
 		short corridorChance;
 
 		brogueRoomInfo()
-		{}
+		{
+			type = roomTypes::MainEntranceRoom;
+			frequency = 0;
+			corridorChance = 0;
+		}
 		brogueRoomInfo(roomTypes atype, short afrequency, short acorridorChance)
 		{
 			type = atype;
 			frequency = afrequency;
 			corridorChance = acorridorChance;
+		}
+		brogueRoomInfo(const brogueRoomInfo& copy)
+		{
+			type = copy.type;
+			frequency = copy.frequency;
+			corridorChance = copy.corridorChance;
+		}
+		void operator=(const brogueRoomInfo& copy)
+		{
+			type = copy.type;
+			frequency = copy.frequency;
+			corridorChance = copy.corridorChance;
 		}
 
 		bool operator==(const brogueRoomInfo& info) const

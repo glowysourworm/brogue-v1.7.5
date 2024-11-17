@@ -1,10 +1,14 @@
 #pragma once
 
 #include "brogueCell.h"
+#include "brogueContentGrid.h"
 #include "brogueGlobal.h"
+#include "brogueLayout.h"
 #include "brogueLevel.h"
+#include "brogueUIBuilder.h"
 #include "creature.h"
 #include "grid.h"
+#include "gridRect.h"
 #include "item.h"
 
 using namespace brogueHd::component;
@@ -15,11 +19,16 @@ namespace brogueHd::backend
 	{
 	public:
 
-		contentGenerator(brogueLevel* level);
-		~contentGenerator();
+		contentGenerator(const gridRect& levelBoundary)
+		{
+			_validLocations = new grid<bool>(levelBoundary, levelBoundary);
+		}
+		~contentGenerator()
+		{
+			delete _validLocations;
+		}
 
-		void initialize();
-		void generateLevelContents();
+		brogueContentGrid* generateLevelContents(brogueLayout* layout);
 
 	private:
 
@@ -27,38 +36,18 @@ namespace brogueHd::backend
 
 	private:
 
-		brogueLevel* _level;
-
-		grid<bool>* _validLocations;	// This should be initialized from the terrain layers. Each dungeon content placed will 
-		// set its location to "false".
-
+		grid<bool>* _validLocations;
 	};
 
-	contentGenerator::contentGenerator(brogueLevel* level)
-	{
-		_level = level;
-		//_validLocations = new grid<bool>(DCOLS, DROWS, false, true);
-	}
-	contentGenerator::~contentGenerator()
-	{
-
-	}
-
-	void contentGenerator::initialize()
-	{
-		// Procedure
-		//
-		// 1) Set valid locations grid from the terrain layers
-		// 
-	}
-
-	void contentGenerator::generateLevelContents()
+	brogueContentGrid* contentGenerator::generateLevelContents(brogueLayout* layout)
 	{
 		short i, j, dir;
 		short upLoc[2], downLoc[2], ** mapToStairs, ** mapToPit;
 		creatureInfo* monst;
 		itemBase* theItem;
 		char grid[DCOLS][DROWS];
+
+		return nullptr;
 		//short n = rogue.depthLevel - 1;
 
 		// Procedure:

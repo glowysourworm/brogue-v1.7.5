@@ -319,7 +319,7 @@ namespace brogueHd::component
 			case brogueCompass::W:
 				return *_westExposedLocations;
 			default:
-				simpleException::show("Must use cardinal direction for gridRegion<>::getEdges");
+				throw simpleException("Must use cardinal direction for gridRegion<>::getEdges");
 		}
 	}
 
@@ -331,27 +331,27 @@ namespace brogueHd::component
 		switch (direction)
 		{
 			case brogueCompass::N:
-				return simpleArrayExtension::whereArray<T>(*_northExposedLocations, [&boundary] (T item)
+				return _northExposedLocations->whereArray([&boundary] (T item)
 				{
-					return item.column == boundary.top();
+					return item.row == boundary.top();
 				});
 			case brogueCompass::S:
-				return simpleArrayExtension::whereArray<T>(*_southExposedLocations, [&boundary] (T item)
+				return _southExposedLocations->whereArray([&boundary] (T item)
 				{
-					return item.column == boundary.bottom();
+					return item.row == boundary.bottom();
 				});
 			case brogueCompass::E:
-				return simpleArrayExtension::whereArray<T>(*_eastExposedLocations, [&boundary] (T item)
+				return _eastExposedLocations->whereArray([&boundary] (T item)
 				{
-					return item.row == boundary.right();
+					return item.column == boundary.right();
 				});
 			case brogueCompass::W:
-				return simpleArrayExtension::whereArray<T>(*_westExposedLocations, [&boundary] (T item)
+				return _westExposedLocations->whereArray([&boundary] (T item)
 				{
-					return item.row == boundary.left();
+					return item.column == boundary.left();
 				});
 			default:
-				simpleException::showCstr("Must use cardinal direction for gridRegion<>::getEdges");
+				throw simpleException("Must use cardinal direction for gridRegion<>::getEdges");
 		}
 	}
 

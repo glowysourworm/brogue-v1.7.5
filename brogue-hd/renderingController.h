@@ -3,6 +3,7 @@
 #include "brogueGlobal.h"
 #include "brogueGlyphMap.h"
 #include "brogueKeyboardState.h"
+#include "brogueLevel.h"
 #include "brogueMouseState.h"
 #include "brogueProgramContainer.h"
 #include "brogueUIBuilder.h"
@@ -14,6 +15,7 @@
 #include "randomGenerator.h"
 #include "resourceController.h"
 #include "simpleList.h"
+#include "simpleString.h"
 
 using namespace brogueHd::frontend;
 
@@ -38,7 +40,12 @@ namespace brogueHd::backend
 
 		brogueKeyboardState getKeyboardState() const;
 		brogueMouseState getMouseState() const;
-		BrogueGameMode getGameModeRequest() const;
+		BrogueGameMode getGameModeRequest(bool& newGame, bool& openGame, simpleString& fileName) const;
+		
+		/// <summary>
+		/// Primary rendering data hand-over to the rendering thread
+		/// </summary>
+		void updateGameData(const brogueLevel* level);
 
 	private:
 
@@ -129,9 +136,14 @@ namespace brogueHd::backend
 	{
 		return _openglRenderer->getMouseState();
 	}
-	BrogueGameMode renderingController::getGameModeRequest() const
+	BrogueGameMode renderingController::getGameModeRequest(bool& newGame, bool& openGame, simpleString& fileName) const
 	{
-		return _openglRenderer->getRequestedMode();
+		return _openglRenderer->getRequestedMode(newGame, openGame, fileName);
+	}
+
+	void renderingController::updateGameData(const brogueLevel* level)
+	{
+		_openglRenderer->setGameData(level);
 	}
 
 	void renderingController::setGameMode(BrogueGameMode mode)

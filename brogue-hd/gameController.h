@@ -1,10 +1,15 @@
 #pragma once
 
+#include "brogueGame.h"
+#include "brogueGameTemplate.h"
 #include "brogueGlobal.h"
 #include "brogueKeyboardState.h"
 #include "brogueMouseState.h"
+#include "brogueUIBuilder.h"
 #include "eventController.h"
 #include "gameData.h"
+#include "gameGenerator.h"
+#include "gridRect.h"
 #include "keyProcessor.h"
 #include "playbackProcessor.h"
 #include "randomGenerator.h"
@@ -45,13 +50,7 @@ namespace brogueHd::backend
 		/// <summary>
 		/// Initializes game from game data (from file)
 		/// </summary>
-		void initGame(gameData* data);
-
-		/// <summary>
-		/// Returns current mode of controller. This is part of a state machine involving
-		/// the run() method. 
-		/// </summary>
-		BrogueGameMode getMode();
+		void initGame(brogueGame* data);
 
 		/// <summary>
 		/// Returns current mouse state maintained by rendering thread (GLFW / OpenGL)
@@ -95,6 +94,7 @@ namespace brogueHd::backend
 	private:
 
 		renderingController* _renderingController;
+		resourceController* _resourceController;
 		eventController* _eventController;
 		BrogueGameMode _gameMode;
 
@@ -106,29 +106,31 @@ namespace brogueHd::backend
 		// File path for current game
 		simpleString _gamePath;
 
-		gameData* _gameData;
+		// Primary game data set
+		brogueGame* _game;
 	};
 
 
 	gameController::gameController(resourceController* resourceController)
 	{
-		_gameData = nullptr;
+		_game = nullptr;
 		_keyProcessor = new keyProcessor();
 		_playbackProcessor = new playbackProcessor();
 		_randomMain = new randomGenerator(RANDOM_GENERATOR_MAIN);
 		_randomCosmetic = new randomGenerator(RANDOM_GENERATOR_COSMETIC);
 		_eventController = new eventController();
+		_resourceController = resourceController;
 		_renderingController = new renderingController(_eventController, resourceController, _randomCosmetic);
 		_gameMode = BrogueGameMode::Title;
 	}
 
 	gameController::~gameController()
 	{
-		if (_gameData != nullptr)
+		if (_game != nullptr)
 		{
-			delete _gameData;
+			delete _game;
 
-			_gameData = nullptr;
+			_game = nullptr;
 		}
 
 		delete _keyProcessor;
@@ -169,44 +171,35 @@ namespace brogueHd::backend
 
 	void gameController::initNewGame(unsigned long seed)
 	{
-		//if (_gameData != NULL)
-		//	simpleException::show("Trying to initialize game while a current one is loaded:  call closeGame() first");
+		if (_game != nullptr)
+			throw simpleException("Trying to initialize game while a current one is loaded:  gameController.h");
 
-		//_randomMain->reset(seed);
+		// Reseed Random Main
+		_randomMain->reset(seed);
 
-		//// Reset Game Data
-		//if (_gameData != NULL)
-		//{
-		//	delete _gameData;
-		//}
+		brogueGameTemplate* gameTemplate = _resourceController->getBrogueDesign_v1_7_5();
+		brogueUIBuilder uiBuilder(_eventController, _resourceController, _randomMain, 0);
+		gridRect boundary = uiBuilder.getBrogueSceneBoundary();
+		gameGenerator generator(_randomMain, boundary);
 
-		//_gameData = new gameData();
-
-		//gameController::openWindow();
+		_game = generator.createGame(seed, gameTemplate);
 	}
 
-	void gameController::initGame(gameData* data)
+	void gameController::initGame(brogueGame* data)
 	{
-		if (_gameData != NULL)
-			simpleException::showCstr("Trying to initialize game while a current one is loaded:  call closeGame() first");
+		if (_game != nullptr)
+			throw simpleException("Trying to initialize game while a current one is loaded:  call closeGame() first");
 
-		// unsigned long gameSeed (GET FROM GAME DATA)
+		// unsigned long gameSeed (GET FROM GAME DATA) (??) (Deterministic?)
 
 		_randomMain->reset(0);
-
-		// Reset Game Data
-		if (_gameData != NULL)
-		{
-			delete _gameData;
-		}
-
-		_gameData = data;
+		_game = data;
 	}
 
 	void gameController::initPlayback(const char* recordingPath)
 	{
-		if (_gameData != NULL)
-			simpleException::showCstr("Trying to initialize playback while a current one is loaded:  call closeGame() first");
+		if (_game != nullptr)
+			throw simpleException("Trying to initialize playback while a current one is loaded:  call closeGame() first");
 
 		if (recordingPath == NULL)
 			simpleException::showCstr("Recording path not specified");
@@ -248,12 +241,6 @@ namespace brogueHd::backend
 		return false;
 	}
 
-	BrogueGameMode gameController::getMode()
-	{
-		// Forwards game mode request input from the rendering game thread
-		return _renderingController->getGameModeRequest();
-	}
-
 	brogueKeyboardState gameController::getKeyboard()
 	{
 		return _renderingController->getKeyboardState();
@@ -273,7 +260,19 @@ namespace brogueHd::backend
 
 		// Check the game mode from the rendering thread
 		//
-		BrogueGameMode requestedMode = _renderingController->getGameModeRequest();
+		bool newGame;
+		bool openGame;
+		simpleString fileName;
+		BrogueGameMode requestedMode = _renderingController->getGameModeRequest(newGame, openGame, fileName);
+
+		if (newGame)
+		{
+			initNewGame(1234);
+		}
+		else if (openGame)
+		{
+			initNewGame(1234); // TODO
+		}
 
 		// Game Mode Change
 		if (requestedMode != _gameMode)
@@ -288,6 +287,10 @@ namespace brogueHd::backend
 		switch (_gameMode)
 		{
 			case BrogueGameMode::Game:
+			{
+				_renderingController->updateGameData(_game->getCurrentLevel());
+				return true;
+			}
 			case BrogueGameMode::Playback:
 			case BrogueGameMode::Title:
 				return true;

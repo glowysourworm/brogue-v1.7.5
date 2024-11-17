@@ -3,6 +3,7 @@
 #include "brogueCellDisplay.h"
 #include "brogueCoordinateConverter.h"
 #include "brogueFlameMenuHeatView.h"
+#include "brogueGameView.h"
 #include "brogueGlyphMap.h"
 #include "brogueKeyboardState.h"
 #include "brogueMouseState.h"
@@ -104,6 +105,8 @@ namespace brogueHd::frontend
 
 		void invalidate(const simpleKeyboardState& keyboardState,
 						const simpleMouseState& mouseState);
+
+		void setGameUpdate(short column, short row, const brogueCellDisplay& data);
 
 		void run(int millisecondsElapsed);
 		void outputStatus() const;
@@ -333,6 +336,23 @@ namespace brogueHd::frontend
 		brogueMouseState mouseUI = calculateMouseState(mouseState);
 
 		_viewContainer->invalidate(keyboardUI, mouseUI);
+	}
+	void brogueViewProgram::setGameUpdate(short column, short row, const brogueCellDisplay& data)
+	{
+		if (!_active)
+			throw simpleException("Brogue View Program not active:  brogueViewProgram::setGameUpdate");
+
+		brogueGameView* gameView = (brogueGameView*)_viewContainer->getView(brogueUIProgramPartId(brogueUIProgram::GameProgram, brogueUIProgramPart::Background, 0));
+
+		// Get current cell
+		brogueCellDisplay* cell = gameView->get(column, row);
+
+		// Update values
+		cell->backColor = data.backColor;
+		cell->foreColor = data.foreColor;
+		cell->character = data.character;
+
+		gameView->invalidate();
 	}
 	bool brogueViewProgram::isActive()
 	{

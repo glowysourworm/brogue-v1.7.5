@@ -18,13 +18,15 @@ namespace brogueHd::backend::model
 	{
 	public:
 
-		brogueGame(bool serverMode, bool noMenu);
+		brogueGame(bool serverMode, bool noMenu, const simpleList<brogueLevel*>& levels);
 		~brogueGame();
 
 		bool getServerMode();
 		bool getNoMenu();
 
 		void outputMessage(char* msg, color theColor, bool requireAcknowledgment);
+
+		brogueLevel* getCurrentLevel() const;
 
 	private:
 
@@ -106,9 +108,10 @@ namespace brogueHd::backend::model
 				//boolean noMenu = false;
 	};
 
-	brogueGame::brogueGame(bool serverMode, bool noMenu)
+	brogueGame::brogueGame(bool serverMode, bool noMenu, const simpleList<brogueLevel*>& levels)
 	{
 		_messageQueue = new brogueMessageQueue();
+		_levels = new simpleList<brogueLevel*>(levels);
 
 		_serverMode = serverMode;
 		_noMenu = noMenu;
@@ -116,6 +119,7 @@ namespace brogueHd::backend::model
 	brogueGame::~brogueGame()
 	{
 		delete _messageQueue;
+		delete _levels;
 	}
 
 	bool brogueGame::getServerMode()
@@ -125,6 +129,11 @@ namespace brogueHd::backend::model
 	bool brogueGame::getNoMenu()
 	{
 		return _noMenu;
+	}
+
+	brogueLevel* brogueGame::getCurrentLevel() const
+	{
+		return _levels->get(currentDepth - 1);
 	}
 
 	void brogueGame::outputMessage(char* msg, color theColor, bool requireAcknowledgment)

@@ -325,7 +325,7 @@ namespace brogueHd::component
 		_locations->forEach([&grid] (T key, T value)
 		{
 			if (grid->get(key.column, key.row) != key)
-				simpleException::show("RegionConstructor grid was not valid:  {}", key.getString());
+				simpleException::show("RegionConstructor grid was not valid:  Column={} Row={}", key.column, key.row);
 
 			return iterationCallback::iterate;
 		});

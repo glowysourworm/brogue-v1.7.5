@@ -23,7 +23,7 @@ namespace brogueHd::backend::model
 
 	public:
 
-		brogueLayout();
+		brogueLayout(const gridRect& levelParentBoundary, const gridRect& levelBoundary);
 		~brogueLayout();
 
 		bool isDefined(short column, short row) const;
@@ -42,6 +42,11 @@ namespace brogueHd::backend::model
 		/// Iterates adjacent cells and calls the user callback
 		/// </summary>
 		void iterateAdjacentCells(short column, short row, gridCallback<brogueCell*> callback);
+
+		/// <summary>
+		/// Iterates cells and calls the user callback
+		/// </summary>
+		void iterate(gridCallback<brogueCell*> callback) const;
 
 	private:
 
@@ -74,23 +79,30 @@ namespace brogueHd::backend::model
 
 	};
 
-	brogueLayout::brogueLayout()
+	brogueLayout::brogueLayout(const gridRect& levelParentBoundary, const gridRect& levelBoundary)
 	{
-		_mainGrid = new grid<brogueCell*>(gridRect(0, 0, DCOLS, DROWS), gridRect(0, 0, DCOLS, DROWS));
-		//_scentMap = new grid<short>(DCOLS, DROWS, 0, 1);
-		//_safetyMap = new grid<short>(DCOLS, DROWS, 0, 1);
-		//_allySafetyMap = new grid<short>(DCOLS, DROWS, 0, 1);
-		//_chokePointMap = new grid<short>(DCOLS, DROWS, 0, 1);
+		_mainGrid = new grid<brogueCell*>(levelParentBoundary, levelBoundary);
+
+		grid<brogueCell*>* grid = _mainGrid;
+
+		levelBoundary.iterate([&grid] (short column, short row)
+		{
+			grid->set(column, row, new brogueCell(column, row), true);
+
+			return iterationCallback::iterate;
+		});
 	}
 
 	brogueLayout::~brogueLayout()
 	{
-		delete _mainGrid;
+		_mainGrid->iterate([] (short column, short row, brogueCell* cell)
+		{
+			delete cell;
 
-		//delete _scentMap;
-		//delete _safetyMap;
-		//delete _allySafetyMap;
-		//delete _chokePointMap;
+			return iterationCallback::iterate;
+		});
+
+		delete _mainGrid;
 	}
 
 	gridRect brogueLayout::getBoundary() const
@@ -114,6 +126,10 @@ namespace brogueHd::backend::model
 		{
 			return callback(column, row, item);
 		});
+	}
+	void brogueLayout::iterate(gridCallback<brogueCell*> callback) const
+	{
+		_mainGrid->iterate(callback);
 	}
 
 	brogueCell* brogueLayout::firstAdjacent(short column, short row, gridPredicate<brogueCell*> predicate)

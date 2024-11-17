@@ -134,6 +134,7 @@
       <LanguageStandard_C>stdclatest</LanguageStandard_C>
       <DisableSpecificWarnings>4267;4244;4104;4101;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -187,10 +188,12 @@
     <ClInclude Include="brogueGameView.h" />
     <ClInclude Include="brogueKeyboardState.h" />
     <ClInclude Include="brogueCellQuad.h" />
+    <ClInclude Include="brogueLevelTemplate.h" />
     <ClInclude Include="brogueMainProgram.h" />
     <ClInclude Include="brogueMouseState.h" />
     <ClInclude Include="brogueProgramBuilder.h" />
     <ClInclude Include="brogueProgramContainer.h" />
+    <ClInclude Include="brogueGameTemplate.h" />
     <ClInclude Include="brogueTitleGrid.h" />
     <ClInclude Include="brogueUIData.h" />
     <ClInclude Include="brogueUIStateChanger.h" />
@@ -222,6 +225,7 @@
     <ClInclude Include="colorGradient.h" />
     <ClInclude Include="eventController.h" />
     <ClInclude Include="brogueFlameMenuTitleMask.h" />
+    <ClInclude Include="gameGenerator.h" />
     <ClInclude Include="openglQuadConverter.h" />
     <ClInclude Include="openglHelper.h" />
     <ClInclude Include="brogueUIConstants.h" />

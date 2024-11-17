@@ -695,6 +695,15 @@
     <ClInclude Include="brogueGameView.h">
       <Filter>Header Files\frontend\ui</Filter>
     </ClInclude>
+    <ClInclude Include="gameGenerator.h">
+      <Filter>Header Files\backend\generator</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueGameTemplate.h">
+      <Filter>Header Files\backend\model\gameTemplate</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueLevelTemplate.h">
+      <Filter>Header Files\backend\model\gameTemplate</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\resources\model\armor.csv">
