@@ -69,6 +69,7 @@ namespace brogueHd::simple
 	public:
 
 		void forEach(simpleArrayCallback<T> callback);
+		void iterate(simpleArrayCallback<T> callback);
 		bool areAll(const T& value);
 		bool areAllWhere(simpleArrayPredicate<T> predicate);
 
@@ -329,6 +330,13 @@ namespace brogueHd::simple
 
 	template<isHashable T>
 	void simpleArray<T>::forEach(simpleArrayCallback<T> callback)
+	{
+		// Probably will go with iterate (naming issue)
+		iterate(callback);
+	}
+
+	template<isHashable T>
+	void simpleArray<T>::iterate(simpleArrayCallback<T> callback)
 	{
 		for (int index = 0; index < _count; index++)
 		{

@@ -27,7 +27,6 @@ namespace brogueHd::backend::model
 
 	private:
 
-		void initialize();
 		brogueRoomInfo createRoomInfo(roomTypes roomType);
 
 	private:
@@ -129,6 +128,16 @@ namespace brogueHd::backend::model
 		_corridorFrequencyMap->add(levelTypes::DP_GOBLIN_WARREN, 0);
 		_corridorFrequencyMap->add(levelTypes::DP_SENTINEL_SANCTUARY, 0);
 
+		// Set up room info's
+		_roomInfo->add(roomTypes::CrossRoom, createRoomInfo(roomTypes::CrossRoom));
+		_roomInfo->add(roomTypes::SmallSymmetricalCrossRoom, createRoomInfo(roomTypes::SmallSymmetricalCrossRoom));
+		_roomInfo->add(roomTypes::SmallRoom, createRoomInfo(roomTypes::SmallRoom));
+		_roomInfo->add(roomTypes::CircularRoom, createRoomInfo(roomTypes::CircularRoom));
+		_roomInfo->add(roomTypes::ChunkyRoom, createRoomInfo(roomTypes::ChunkyRoom));
+		_roomInfo->add(roomTypes::Cave, createRoomInfo(roomTypes::Cave));
+		_roomInfo->add(roomTypes::Cavern, createRoomInfo(roomTypes::Cavern));
+		_roomInfo->add(roomTypes::MainEntranceRoom, createRoomInfo(roomTypes::MainEntranceRoom));
+
 	}
 
 	brogueLevelProfile::~brogueLevelProfile()
@@ -143,19 +152,6 @@ namespace brogueHd::backend::model
 		delete _roomInfo;
 		delete _roomFrequencyMap;
 		delete _corridorFrequencyMap;
-	}
-
-	void brogueLevelProfile::initialize()
-	{
-		// Set up room info's
-		_roomInfo->add(roomTypes::CrossRoom, createRoomInfo(roomTypes::CrossRoom));
-		_roomInfo->add(roomTypes::CrossRoom, createRoomInfo(roomTypes::SmallSymmetricalCrossRoom));
-		_roomInfo->add(roomTypes::CrossRoom, createRoomInfo(roomTypes::SmallRoom));
-		_roomInfo->add(roomTypes::CrossRoom, createRoomInfo(roomTypes::CircularRoom));
-		_roomInfo->add(roomTypes::CrossRoom, createRoomInfo(roomTypes::ChunkyRoom));
-		_roomInfo->add(roomTypes::CrossRoom, createRoomInfo(roomTypes::Cave));
-		_roomInfo->add(roomTypes::CrossRoom, createRoomInfo(roomTypes::Cavern));
-		_roomInfo->add(roomTypes::CrossRoom, createRoomInfo(roomTypes::MainEntranceRoom));
 	}
 
 	brogueRoomInfo brogueLevelProfile::createRoomInfo(roomTypes roomType)

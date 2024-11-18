@@ -50,6 +50,11 @@ namespace brogueHd::component
 			height = copy.height;
 		}
 
+		friend gridRect operator+(const gridRect& instance, const gridLocator& translation)
+		{
+			return gridRect(instance.column + translation.column, instance.row + translation.row, instance.width, instance.height);
+		}
+
 		bool operator==(const gridRect& rect) const
 		{
 			return column == rect.column &&
@@ -110,6 +115,23 @@ namespace brogueHd::component
 		long area() const
 		{
 			return width * height;
+		}
+
+		gridLocator topLeft() const
+		{
+			return gridLocator(left(), top());
+		}
+		gridLocator topRight() const
+		{
+			return gridLocator(right(), top());
+		}
+		gridLocator bottomLeft() const
+		{
+			return gridLocator(left(), bottom());
+		}
+		gridLocator bottomRight() const
+		{
+			return gridLocator(right(), bottom());
 		}
 
 		bool contains(short acolumn, short arow) const
@@ -184,6 +206,12 @@ namespace brogueHd::component
 			column += columnOffset;
 			row += rowOffset;
 		}
+
+		void translate(const gridLocator& translation)
+		{
+			translate(translation.column, translation.row);
+		}
+
 
 		void iterate(gridRectIterator callback) const
 		{

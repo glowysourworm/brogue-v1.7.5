@@ -51,7 +51,7 @@ namespace brogueHd::backend
 			contentGenerator contentGen(*_gameBoundary);
 
 			// Level Layout
-			brogueLayout* layout = layoutGen.generateLayout();
+			brogueLayout* layout = layoutGen.generateLayout(levelTemplate->getProfile());
 
 			// Level Terrain
 			terrainGen.generateTerrain(layout);

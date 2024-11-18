@@ -2,9 +2,12 @@
 
 #include "graph.h"
 #include "graphDefinitions.h"
+#include "simple.h"
 #include "simpleException.h"
 #include "simpleList.h"
 #include "simpleListExtension.h"
+
+using namespace brogueHd::simple;
 
 namespace brogueHd::component
 {
@@ -16,9 +19,9 @@ namespace brogueHd::component
 		graphAlgorithm(graphEdgeConstructor<TNode, TEdge> graphEdgeConstructor);
 		~graphAlgorithm();
 
-		virtual graph<TNode, TEdge>* run(const simpleList<TNode>& vertices)
+		virtual graph<TNode, TEdge> run(const simpleList<TNode>& vertices)
 		{
-			return nullptr;
+			return default_value::value<graph<TNode, TEdge>>();
 		}
 
 	protected:
@@ -26,7 +29,7 @@ namespace brogueHd::component
 		/// <summary>
 		/// Returns FULL GRAPH:  Fully connected graph of all nodes
 		/// </summary>
-		graph<TNode, TEdge>* createDefaultGraph(const simpleList<TNode>& vertices);
+		graph<TNode, TEdge> createDefaultGraph(const simpleList<TNode>& vertices);
 
 		/// <summary>
 		/// Delegate that constructs the proper node type
@@ -58,14 +61,14 @@ namespace brogueHd::component
 	}
 
 	template<isGridLocatorNode TNode, isGridLocatorEdge<TNode> TEdge>
-	graph<TNode, TEdge>* graphAlgorithm<TNode, TEdge>::createDefaultGraph(const simpleList<TNode>& vertices)
+	graph<TNode, TEdge> graphAlgorithm<TNode, TEdge>::createDefaultGraph(const simpleList<TNode>& vertices)
 	{
 		if (vertices.count() == 0)
 			simpleException::showCstr("Trying to make a graph with zero vertices: delaunay.h");
 
 		else if (vertices.count() == 1)
 		{
-			return new graph<TNode, TEdge>(vertices.toArray());
+			return graph<TNode, TEdge>(vertices.toArray());
 		}
 
 		else
@@ -78,7 +81,7 @@ namespace brogueHd::component
 				edges.add(that->edgeConstructor(node1, node2));
 			});
 
-			return new graph<TNode, TEdge>(vertices.toArray(), edges.toArray());
+			return graph<TNode, TEdge>(vertices.toArray(), edges.toArray());
 		}
 	}
 }

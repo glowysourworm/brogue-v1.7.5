@@ -57,12 +57,12 @@ namespace brogueHd::component
 		/// </summary>
 		/// <param name="mapCostPredicate">Delegate used to fetch a cost for the specified column / row of the grid</param>
 		/// <param name="mapPredicate">Delegate used to mask off areas of the map from the entire algorithm. Set to TRUE to ALLOW use of the location for the algorithm.</param>
-		dijkstra(gridRect parentBoundary,
-			gridRect relativeBoundary,
-			bool obeyCardinalMovement,
-			dijkstraPredicate mapPredicate,
-			dijkstraCostCallback mapCostPredicate,
-			dijkstraLocatorCallback<T> locatorCallback);
+		dijkstra(const gridRect& parentBoundary,
+				 const gridRect& relativeBoundary,
+				 bool obeyCardinalMovement,
+				 const dijkstraPredicate& mapPredicate,
+				 const dijkstraCostCallback& mapCostPredicate,
+				 const dijkstraLocatorCallback<T>& locatorCallback);
 
 		~dijkstra();
 
@@ -151,12 +151,12 @@ namespace brogueHd::component
 	};
 
 	template<isGridLocator T>
-	dijkstra<T>::dijkstra(gridRect parentBoundary,
-		gridRect relativeBoundary,
-		bool obeyCardinalMovement,
-		dijkstraPredicate mapPredicate,
-		dijkstraCostCallback mapCostPredicate,
-		dijkstraLocatorCallback<T> locatorCallback)
+	dijkstra<T>::dijkstra(const gridRect& parentBoundary,
+						  const gridRect& relativeBoundary,
+						  bool obeyCardinalMovement,
+						  const dijkstraPredicate& mapPredicate,
+						  const dijkstraCostCallback& mapCostPredicate,
+						  const dijkstraLocatorCallback<T>& locatorCallback)
 	{
 		_parentBoundary = parentBoundary;
 		_relativeBoundary = relativeBoundary;

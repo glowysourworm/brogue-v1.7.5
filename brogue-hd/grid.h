@@ -17,7 +17,7 @@ namespace brogueHd::component
 	public:
 
 		grid() {};
-		grid(gridRect parentBoundary, gridRect relativeBoundary);
+		grid(const gridRect& parentBoundary, const gridRect& relativeBoundary);
 		~grid();
 
 		/// <summary>
@@ -31,12 +31,12 @@ namespace brogueHd::component
 		T getAdjacent(short column, short row, brogueCompass direction) const;
 
 		/// <summary>
-		/// Gets adjacent element from the grid (OR NULL)
+		/// Gets adjacent element from the grid (OR default_value::value)
 		/// </summary>
 		T getAdjacentUnsafe(short column, short row, brogueCompass direction) const;
 
 		/// <summary>
-		/// Gets adjacent as cell's locator (or NULL if out of bounds)
+		/// Gets adjacent as cell's locator (or default_value::value if out of bounds)
 		/// </summary>
 		gridLocator getAdjacentLocator(short column, short row, brogueCompass direction) const;
 
@@ -79,29 +79,35 @@ namespace brogueHd::component
 		T search(gridAggregateComparer<T> aggregateComparator) const;
 
 		/// <summary>
-		/// Returns true if the location is at the edge of the grid (using NULL comparison).
+		/// Returns true if the location is at the edge of the grid (using default_value::value comparison).
 		/// </summary>
 		bool isEdge(short column, short row) const;
 
 		/// <summary>
-		/// Returns true if the location is at the edge of the grid (using NULL comparison), or 
+		/// Returns true if the location is at the edge of the grid (using default_value::value comparison), or 
 		/// the provided predicate.
 		/// </summary>
 		bool isEdgeWhere(short column, short row, gridPredicate<T> predicate) const;
 
 		/// <summary>
 		/// Returns true if the adjacent element is positive with respect to the provided predicate OR is
-		/// out of bounds OR is null FOR the provided direction.
+		/// out of bounds OR is default_value::value FOR the provided direction.
 		/// </summary>
 		/// <param name="direction">Compass direction treated with DIRECT EQUALITY! (DOESN'T USE FLAGS)</param>
 		bool isExposedEdge(int column, int row, brogueCompass direction, gridPredicate<T> predicate) const;
 
 		/// <summary>
 		/// Returns true if the adjacent element is positive with respect to the provided predicate OR is
-		/// out of bounds OR is null FOR the provided NON-CARDINAL direction.
+		/// out of bounds OR is default_value::value FOR the provided NON-CARDINAL direction.
 		/// </summary>
 		/// <param name="direction">Compass direction treated with DIRECT EQUALITY! (DOESN'T USE FLAGS)</param>
 		bool isExposedCorner(int column, int row, brogueCompass direction, gridPredicate<T> predicate) const;
+
+		/// <summary>
+		/// MODIFIES LAYOUT!  This will translate the grid's sub-grid by the specified amount. The result
+		/// must lie within the parent boundary.
+		/// </summary>
+		void translate(int column, int row);
 
 		/// <summary>
 		/// Iterates entire grid and calls user callback
@@ -138,43 +144,45 @@ namespace brogueHd::component
 
 		T** _grid;
 
-		gridRect _parentBoundary;
-		gridRect _relativeBoundary;
+		gridRect* _parentBoundary;
+		gridRect* _relativeBoundary;
 	};
 
 	template<typename T>
-	grid<T>::grid(gridRect parentBoundary, gridRect relativeBoundary)
+	grid<T>::grid(const gridRect& parentBoundary, const gridRect& relativeBoundary)
 	{
 		_grid = new T * [relativeBoundary.width];
+		_parentBoundary = new gridRect(parentBoundary);
+		_relativeBoundary = new gridRect(relativeBoundary);
 
 		for (int index = 0; index < relativeBoundary.width; index++)
 			_grid[index] = new T[relativeBoundary.height]{ default_value::value<T>() };
-
-		_relativeBoundary = relativeBoundary;
-		_parentBoundary = parentBoundary;
 	}
 
 	template<typename T>
 	grid<T>::~grid()
 	{
 		// Added grid cells from this class
-		for (int index = 0; index < _relativeBoundary.height; index++)
+		for (int index = 0; index < _relativeBoundary->height; index++)
 			delete[] _grid[index];
 
 		delete[] _grid;
+
+		delete _parentBoundary;
+		delete _relativeBoundary;
 	}
 
 	template<typename T>
 	T grid<T>::get(short column, short row) const
 	{
-		if (column < _relativeBoundary.column ||
-			row < _relativeBoundary.row ||
-			column > _relativeBoundary.right() ||
-			row > _relativeBoundary.bottom())
+		if (column < _relativeBoundary->column ||
+			row < _relativeBoundary->row ||
+			column > _relativeBoundary->right() ||
+			row > _relativeBoundary->bottom())
 			simpleException::show("Index outside the bounds of the array:  grid.h");
 
 		// Must subtract off the offset to address the primary grid
-		return _grid[column - _relativeBoundary.column][row - _relativeBoundary.row];
+		return _grid[column - _relativeBoundary->column][row - _relativeBoundary->row];
 	}
 
 	template<typename T>
@@ -266,73 +274,73 @@ namespace brogueHd::component
 	template<typename T>
 	gridLocator grid<T>::getAdjacentLocator(short column, short row, brogueCompass direction) const
 	{
-		switch (brogueCompass)
+		switch (direction)
 		{
 			case brogueCompass::None:
-				return NULL;
+				return default_value::value<T>();
 
 			case brogueCompass::N:
 				if (!this->isInBounds(column, row - 1))
-					return NULL;
+					return default_value::value<T>();
 
 				return gridLocator(column, row - 1);
 
 			case brogueCompass::S:
 				if (!this->isInBounds(column, row + 1))
-					return NULL;
+					return default_value::value<T>();
 
 				return gridLocator(column, row + 1);
 
 			case brogueCompass::E:
 				if (!this->isInBounds(column + 1, row))
-					return NULL;
+					return default_value::value<T>();
 
 				return gridLocator(column + 1, row);
 
 			case brogueCompass::W:
 				if (!this->isInBounds(column - 1, row))
-					return NULL;
+					return default_value::value<T>();
 
 				return gridLocator(column - 1, row);
 
 			case brogueCompass::NW:
 				if (!this->isInBounds(column - 1, row - 1))
-					return NULL;
+					return default_value::value<T>();
 
 				return gridLocator(column - 1, row - 1);
 
 			case brogueCompass::NE:
 				if (!this->isInBounds(column + 1, row - 1))
-					return NULL;
+					return default_value::value<T>();
 
 				return gridLocator(column + 1, row - 1);
 
 			case brogueCompass::SW:
 				if (!this->isInBounds(column - 1, row + 1))
-					return NULL;
+					return default_value::value<T>();
 
 				return gridLocator(column - 1, row + 1);
 
 			case brogueCompass::SE:
 				if (!this->isInBounds(column + 1, row + 1))
-					return NULL;
+					return default_value::value<T>();
 
 				return gridLocator(column + 1, row + 1);
 			default:
-				return NULL;
+				return default_value::value<T>();
 		}
 	}
 
 	template<typename T>
 	gridRect grid<T>::getRelativeBoundary() const
 	{
-		return _relativeBoundary;
+		return *_relativeBoundary;
 	}
 
 	template<typename T>
 	gridRect grid<T>::getParentBoundary() const
 	{
-		return _parentBoundary;
+		return *_parentBoundary;
 	}
 
 	template<typename T>
@@ -344,7 +352,7 @@ namespace brogueHd::component
 	template<typename T>
 	bool grid<T>::isInBounds(short column, short row) const
 	{
-		return _relativeBoundary.contains(column, row);
+		return _relativeBoundary->contains(column, row);
 	}
 
 	template<typename T>
@@ -357,56 +365,13 @@ namespace brogueHd::component
 			simpleException::showCstr("Trying to overwrite grid value:  grid.cpp (use remove first)");
 
 		// Must subtract off the relative boundary offset to address the primary grid
-		_grid[column - _relativeBoundary.column][row - _relativeBoundary.row] = value;
+		_grid[column - _relativeBoundary->column][row - _relativeBoundary->row] = value;
 	}
-
-	// Fills grid locations with the given value if they match any terrain flags or map flags.
-	// Otherwise does not change the grid location.
-
-	//template<typename T>
-	//void grid<T>::getTerrainGrid(short** grid, short value, unsigned long terrainFlags, unsigned long mapFlags) 
-	//{
-	//    short i, j;
-	//    for (i = 0; i < DCOLS; i++) {
-	//        for (j = 0; j < DROWS; j++) {
-	//            if (grid[i][j] != value && cellHasTerrainFlag(i, j, terrainFlags) || (pmap[i][j].flags & mapFlags)) {
-	//                grid[i][j] = value;
-	//            }
-	//        }
-	//    }
-	//}
-
-	//template<typename T>
-	//void grid<T>::getTMGrid(short** grid, short value, unsigned long TMflags) {
-	//    short i, j;
-	//    for (i = 0; i < DCOLS; i++) {
-	//        for (j = 0; j < DROWS; j++) {
-	//            if (grid[i][j] != value && cellHasTMFlag(i, j, TMflags)) {
-	//                grid[i][j] = value;
-	//            }
-	//        }
-	//    }
-	//}
-
-	//template<typename T>
-	//void grid<T>::getPassableArcGrid(short** grid, short minPassableArc, short maxPassableArc, short value) {
-	//    short i, j, count;
-	//    for (i = 0; i < DCOLS; i++) {
-	//        for (j = 0; j < DROWS; j++) {
-	//            if (grid[i][j] != value) {
-	//                count = passableArcCount(i, j);
-	//                if (count >= minPassableArc && count <= maxPassableArc) {
-	//                    grid[i][j] = value;
-	//                }
-	//            }
-	//        }
-	//    }
-	//}
 
 	template<typename T>
 	T grid<T>::search(gridAggregateComparer<T> aggregateComparator) const
 	{
-		T searchValue;
+		T searchValue = default_value::value<T>();
 
 		grid<T>* grid = this;
 
@@ -428,10 +393,6 @@ namespace brogueHd::component
 		});
 	}
 
-	/// <summary>
-	/// Returns true if the location is at the edge of the grid (using NULL comparison), or 
-	/// the provided predicate.
-	/// </summary>
 	template<typename T>
 	bool grid<T>::isEdgeWhere(short column, short row, gridPredicate<T> predicate) const
 	{
@@ -517,6 +478,17 @@ namespace brogueHd::component
 			return false;
 
 		return true;
+	}
+
+	template<typename T>
+	void grid<T>::translate(int column, int row)
+	{
+		gridLocator translation(column, row);
+
+		if (!_parentBoundary->contains((*_relativeBoundary) + translation))
+			throw simpleException("Grid translation falls outside of parent bounds:  grid.h");
+
+		_relativeBoundary->translate(translation);
 	}
 
 	template<typename T>
@@ -617,8 +589,6 @@ namespace brogueHd::component
 	template<typename T>
 	void grid<T>::iterateAdjacent(short column, short row, bool withinBounds, gridCallbackAdjacent<T> callback) const
 	{
-		short newX, newY;
-
 		bool userBreak = false;
 
 		// N
@@ -660,7 +630,7 @@ namespace brogueHd::component
 		iterationCallback response = iterationCallback::iterate;
 
 		// North
-		T north = grid->getAdjacentUnsafe(column, row - 1);
+		T north = this->getAdjacentUnsafe(column, row - 1);
 
 		if (this->isInBounds(column, row - 1))
 			response = callback(column, row - 1, north);

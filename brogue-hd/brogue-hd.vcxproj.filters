@@ -704,6 +704,9 @@
     <ClInclude Include="brogueLevelTemplate.h">
       <Filter>Header Files\backend\model\gameTemplate</Filter>
     </ClInclude>
+    <ClInclude Include="cppstopwatch.h">
+      <Filter>Header Files\vendor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\resources\model\armor.csv">

@@ -21,6 +21,11 @@ namespace brogueHd::component
 	{
 	public:
 
+		/// <summary>
+		/// Grid Region Constructor:  Flood fill mode ensures that a SINGLE region of connected cells is produced. This is
+		/// the suggested usage. Otherwise, the location data is filled in during construction; and a potentially invalid
+		/// region is created.
+		/// </summary>
 		gridRegionConstructor(gridRect parentBoundary, gridPredicate<T> inclusionPredicate);
 		~gridRegionConstructor();
 
@@ -54,12 +59,12 @@ namespace brogueHd::component
 		/// </summary>
 		bool isDefined(short column, short row);
 
-		/// <summary>
-		/// Translates a gridRegion using the specified offset - creating a new gridRegion instance
-		/// </summary>
-		/// <param name="region"></param>
-		/// <returns></returns>
-		static gridRegion<T>* translate(const gridRegion<T>& region, gridLocator translation);
+		///// <summary>
+		///// Translates a gridRegion using the specified offset - creating a new gridRegion instance
+		///// </summary>
+		///// <param name="region"></param>
+		///// <returns></returns>
+		//static gridRegion<T>* translate(const gridRegion<T>& region, gridLocator translation);
 
 	private:
 
@@ -88,7 +93,7 @@ namespace brogueHd::component
 		simpleHash<T, T>* _seCorners;
 		simpleHash<T, T>* _swCorners;
 
-		gridRect _calculatedBoundary;
+		gridRect* _calculatedBoundary;
 
 		short _top;
 		short _left;
@@ -97,7 +102,7 @@ namespace brogueHd::component
 
 		bool _completed;
 
-		gridPredicate<T> _predicate;
+		gridPredicate<T>* _predicate;
 	};
 
 	template<isGridLocator T>
@@ -109,7 +114,20 @@ namespace brogueHd::component
 		// Create a grid that is the size of the parent boundary - then make it smaller afterwards
 		_grid = new grid<T>(parentBoundary, parentBoundary);
 
-		_predicate = inclusionPredicate;
+		_predicate = new gridPredicate<T>(inclusionPredicate);
+
+		_locations = new simpleHash<T, T>();
+		_edgeLocations = new simpleHash<T, T>();
+
+		_northEdges = new simpleHash<T, T>();
+		_southEdges = new simpleHash<T, T>();
+		_eastEdges = new simpleHash<T, T>();
+		_westEdges = new simpleHash<T, T>();
+
+		_nwCorners = new simpleHash<T, T>();
+		_neCorners = new simpleHash<T, T>();
+		_seCorners = new simpleHash<T, T>();
+		_swCorners = new simpleHash<T, T>();
 
 		_top = std::numeric_limits<short>::max();
 		_left = std::numeric_limits<short>::max();
@@ -117,6 +135,7 @@ namespace brogueHd::component
 		_bottom = std::numeric_limits<short>::min();
 
 		_completed = false;
+		_calculatedBoundary = nullptr;
 	}
 
 	template<isGridLocator T>
@@ -136,33 +155,33 @@ namespace brogueHd::component
 		gridRect largestSubRegionRect = calculateLargestRectangle();
 
 		return new gridRegion<T>(_locations->getKeys().toArray(),
-			_edgeLocations->getKeys().toArray(),
-			_westEdges->getKeys().toArray(),
-			_northEdges->getKeys().toArray(),
-			_eastEdges->getKeys().toArray(),
-			_southEdges->getKeys().toArray(),
-			_nwCorners->getKeys().toArray(),
-			_neCorners->getKeys().toArray(),
-			_seCorners->getKeys().toArray(),
-			_swCorners->getKeys().toArray(),
-			_grid->getParentBoundary(),
-			_calculatedBoundary,
-			largestSubRegionRect);
+								_edgeLocations->getKeys().toArray(),
+								_westEdges->getKeys().toArray(),
+								_northEdges->getKeys().toArray(),
+								_eastEdges->getKeys().toArray(),
+								_southEdges->getKeys().toArray(),
+								_nwCorners->getKeys().toArray(),
+								_neCorners->getKeys().toArray(),
+								_seCorners->getKeys().toArray(),
+								_swCorners->getKeys().toArray(),
+								_grid->getParentBoundary(),
+								*_calculatedBoundary,
+								largestSubRegionRect);
 	}
 
 	template<isGridLocator T>
 	void gridRegionConstructor<T>::add(short column, short row, T location)
 	{
 		if (_completed)
-			simpleException::showCstr("Trying to add location to a completed region constructor:  gridRegionConstructor.addCell");
+			throw simpleException("Trying to add location to a completed region constructor:  gridRegionConstructor.add");
 
 		else if (_locations->contains(location))
-			return;
+			throw simpleException("Trying to add duplicate location to a region constructor:  gridRegionConstructor.add");
 
 		else
 		{
 			if (_locations->count() > 0 && !isConnected(column, row, location))
-				simpleException::showCstr("Trying to add un-connected cell to the region:  gridRegionConstructor.addCell");
+				throw simpleException("Trying to add un-connected cell to the region:  gridRegionConstructor.add (try unsafe non-flood fill mode?)");
 
 			// Keep locations up to date
 			_grid->set(column, row, location);
@@ -204,7 +223,7 @@ namespace brogueHd::component
 
 		gridRegionConstructor<T>* that = this;
 
-		_calculatedBoundary = gridRect(_left, _top, _right, _bottom);
+		_calculatedBoundary = new gridRect(_left, _top, _right, _bottom);
 
 		// Complete the edge collections
 		_locations->iterate([&that] (T key, T value)
@@ -233,7 +252,7 @@ namespace brogueHd::component
 	template<isGridLocator T>
 	bool gridRegionConstructor<T>::isConnected(short column, short row, T item)
 	{
-		if (!_predicate(item.column, item.row, item))
+		if (!(*_predicate)(item.column, item.row, item))
 			return false;
 
 		// ONE of the adjacent elements MUST be in the grid - using the predicate to verify
@@ -242,16 +261,16 @@ namespace brogueHd::component
 		T east = _grid->getAdjacent(column, row, brogueCompass::E);
 		T west = _grid->getAdjacent(column, row, brogueCompass::W);
 
-		if (north != default_value::value<T>() && _predicate(column, row - 1, north))
+		if (north != default_value::value<T>() && (*_predicate)(column, row - 1, north))
 			return true;
 
-		if (south != default_value::value<T>() && _predicate(column, row + 1, south))
+		if (south != default_value::value<T>() && (*_predicate)(column, row + 1, south))
 			return true;
 
-		if (east != default_value::value<T>() && _predicate(column + 1, row, east))
+		if (east != default_value::value<T>() && (*_predicate)(column + 1, row, east))
 			return true;
 
-		if (west != default_value::value<T>() && _predicate(column - 1, row, west))
+		if (west != default_value::value<T>() && (*_predicate)(column - 1, row, west))
 			return true;
 
 		return false;
@@ -261,42 +280,42 @@ namespace brogueHd::component
 	void gridRegionConstructor<T>::addEdges(short column, short row, T location)
 	{
 		// Edges and Corners
-		if (_grid->isEdge(column, row) && _predicate(column, row, location))
+		if (_grid->isEdge(column, row) && (*_predicate)(column, row, location))
 		{
 			_edgeLocations->add(location, location);
 
 			// Check for specificity:  Storing addition information about exposed edges, corners, and geometry
 
 			// N
-			if (_grid->isExposedEdge(column, row, brogueCompass::N, _predicate))
+			if (_grid->isExposedEdge(column, row, brogueCompass::N, (*_predicate)))
 				_northEdges->add(location, location);
 
 			// S
-			if (_grid->isExposedEdge(column, row, brogueCompass::S, _predicate))
+			if (_grid->isExposedEdge(column, row, brogueCompass::S, (*_predicate)))
 				_southEdges->add(location, location);
 
 			// E
-			if (_grid->isExposedEdge(column, row, brogueCompass::E, _predicate))
+			if (_grid->isExposedEdge(column, row, brogueCompass::E, (*_predicate)))
 				_eastEdges->add(location, location);
 
 			// W
-			if (_grid->isExposedEdge(column, row, brogueCompass::W, _predicate))
+			if (_grid->isExposedEdge(column, row, brogueCompass::W, (*_predicate)))
 				_westEdges->add(location, location);
 
 			// NW Corner
-			if (_grid->isExposedCorner(column, row, brogueCompass::NW, _predicate))
+			if (_grid->isExposedCorner(column, row, brogueCompass::NW, (*_predicate)))
 				_nwCorners->add(location, location);
 
 			// NE Corner
-			if (_grid->isExposedCorner(column, row, brogueCompass::NE, _predicate))
+			if (_grid->isExposedCorner(column, row, brogueCompass::NE, (*_predicate)))
 				_neCorners->add(location, location);
 
 			// SE Corner
-			if (_grid->isExposedCorner(column, row, brogueCompass::SE, _predicate))
+			if (_grid->isExposedCorner(column, row, brogueCompass::SE, (*_predicate)))
 				_seCorners->add(location, location);
 
 			// SW Corner
-			if (_grid->isExposedCorner(column, row, brogueCompass::SW, _predicate))
+			if (_grid->isExposedCorner(column, row, brogueCompass::SW, (*_predicate)))
 				_swCorners->add(location, location);
 		}
 	}
@@ -363,7 +382,7 @@ namespace brogueHd::component
 		//
 		// TODO: Use a stack-based approach to cut down on iterating
 
-		gridRect regionBoundary = _calculatedBoundary;
+		gridRect regionBoundary = *_calculatedBoundary;
 		short rowCountersLength = regionBoundary.width;
 		simpleArray<short> rowCounters(rowCountersLength);
 		short bestStartColumn = -1;
@@ -435,32 +454,32 @@ namespace brogueHd::component
 		return gridRect(bestStartColumn, bestStartRow, (bestEndColumn - bestStartColumn) + 1, (bestEndRow - bestStartRow) + 1);
 	}
 
-	template<isGridLocator T>
-	gridRegion<T>* gridRegionConstructor<T>::translate(const gridRegion<T>& region, gridLocator translation)
-	{
-		gridRegionConstructor<T> constructor(region.getParentBoundary(), [] (short column, short row, T item)
-		{
-			return true;
-		});
+	//template<isGridLocator T>
+	//gridRegion<T>* gridRegionConstructor<T>::translate(const gridRegion<T>& region, gridLocator translation)
+	//{
+	//	gridRegionConstructor<T> constructor(region.getParentBoundary(), [] (short column, short row, T item)
+	//	{
+	//		return true;
+	//	});
 
-		// MODIFIES GRID LOCATORS!
-		region.iterateLocations([&constructor, &translation] (short column, short row, T item)
-		{
-			short newColumn = item.column + translation.column;
-			short newRow = item.row + translation.row;
+	//	// MODIFIES GRID LOCATORS!
+	//	region.iterateLocations([&constructor, &translation] (short column, short row, T item)
+	//	{
+	//		short newColumn = item.column + translation.column;
+	//		short newRow = item.row + translation.row;
 
-			gridLocator locator = (gridLocator)(item);
+	//		gridLocator locator = (gridLocator)(item);
 
-			locator.column = newColumn;
-			locator.row = newRow;
+	//		locator.column = newColumn;
+	//		locator.row = newRow;
 
-			constructor.add(newColumn, newRow, locator);
+	//		constructor.add(newColumn, newRow, locator);
 
-			return iterationCallback::iterate;
-		});
+	//		return iterationCallback::iterate;
+	//	});
 
-		// Commit the translated region to memory - calculating the rest of the data
-		return constructor.complete();
-	}
+	//	// Commit the translated region to memory - calculating the rest of the data
+	//	return constructor.complete();
+	//}
 }
 

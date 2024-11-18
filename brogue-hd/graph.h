@@ -19,17 +19,32 @@ namespace brogueHd::component
 	{
 	public:
 
+		graph();
 		graph(const simpleArray<TNode>& nodes, const simpleArray<TEdge>& edges);
 		graph(const simpleArray<TNode>& nodes);
+		graph(const graph<TNode, TEdge>& copy);
 		~graph();
+
+		void operator=(const graph<TNode, TEdge>& other);
 
 		void addEdge(TEdge edge);
 		void modify(TEdge existingEdge, TEdge newEdge);
-		simpleList<TEdge> getAdjacentEdges(TNode node);
-		TEdge findEdge(TNode node1, TNode node2);
+		simpleList<TEdge> getAdjacentEdges(TNode node) const;
+		TEdge findEdge(TNode node1, TNode node2) const;
 
-		void iterateNodes(simpleListCallback<TNode> callback);
-		void iterateEdges(simpleListCallback<TEdge> callback);
+		void iterateNodes(simpleListCallback<TNode> callback) const;
+		void iterateEdges(simpleListCallback<TEdge> callback) const;
+
+	private:
+
+		simpleList<TNode> getNodes() const
+		{
+			return *_nodes;
+		}
+		graphEdgeCollection<TNode, TEdge> getEdges() const
+		{
+			return *_edgeCollection;
+		}
 
 	private:
 
@@ -39,15 +54,17 @@ namespace brogueHd::component
 	};
 
 	template<graphNodeType TNode, graphEdgeType<TNode> TEdge>
+	graph<TNode, TEdge>::graph()
+	{
+		_nodes = new simpleList<TNode>();
+		_edgeCollection = new graphEdgeCollection<TNode, TEdge>();
+	}
+
+	template<graphNodeType TNode, graphEdgeType<TNode> TEdge>
 	graph<TNode, TEdge>::graph(const simpleArray<TNode>& nodes, const simpleArray<TEdge>& edges)
 	{
 		_nodes = new simpleList<TNode>(nodes);
 		_edgeCollection = new graphEdgeCollection<TNode, TEdge>(nodes, edges);
-
-		//arrayExtension::forEach(nodes, [](TNode* node)
-		//{
-		//    _nodes->push_back(node);
-		//});
 	}
 
 	template<graphNodeType TNode, graphEdgeType<TNode> TEdge>
@@ -58,10 +75,27 @@ namespace brogueHd::component
 	}
 
 	template<graphNodeType TNode, graphEdgeType<TNode> TEdge>
+	graph<TNode, TEdge>::graph(const graph<TNode, TEdge>& copy)
+	{
+		_nodes = new simpleList<TNode>(copy.getNodes());
+		_edgeCollection = new graphEdgeCollection(copy.getNodes(), copy.getEdges());
+	}
+
+	template<graphNodeType TNode, graphEdgeType<TNode> TEdge>
 	graph<TNode, TEdge>::~graph()
 	{
 		delete _nodes;
 		delete _edgeCollection;
+	}
+
+	template<graphNodeType TNode, graphEdgeType<TNode> TEdge>
+	void graph<TNode, TEdge>::operator=(const graph<TNode, TEdge>& other)
+	{
+		delete _nodes;
+		delete _edgeCollection;
+
+		_nodes = new simpleList<TNode>(other.getNodes());
+		_edgeCollection = new graphEdgeCollection(other.getNodes(), other.getEdges());
 	}
 
 	template<graphNodeType TNode, graphEdgeType<TNode> TEdge>
@@ -92,25 +126,25 @@ namespace brogueHd::component
 	}
 
 	template<graphNodeType TNode, graphEdgeType<TNode> TEdge>
-	simpleList<TEdge> graph<TNode, TEdge>::getAdjacentEdges(TNode node)
+	simpleList<TEdge> graph<TNode, TEdge>::getAdjacentEdges(TNode node) const
 	{
 		return _edgeCollection->getAdjacentEdges(node);
 	}
 
 	template<graphNodeType TNode, graphEdgeType<TNode> TEdge>
-	TEdge graph<TNode, TEdge>::findEdge(TNode node1, TNode node2)
+	TEdge graph<TNode, TEdge>::findEdge(TNode node1, TNode node2) const
 	{
 		return _edgeCollection->findEdge(node1, node2);
 	}
 
 	template<graphNodeType TNode, graphEdgeType<TNode> TEdge>
-	void graph<TNode, TEdge>::iterateNodes(simpleListCallback<TNode> callback)
+	void graph<TNode, TEdge>::iterateNodes(simpleListCallback<TNode> callback) const
 	{
 		_nodes->forEach(callback);
 	}
 
 	template<graphNodeType TNode, graphEdgeType<TNode> TEdge>
-	void graph<TNode, TEdge>::iterateEdges(simpleListCallback<TEdge> callback)
+	void graph<TNode, TEdge>::iterateEdges(simpleListCallback<TEdge> callback) const
 	{
 		_edgeCollection->getEdges().forEach(callback);
 	}

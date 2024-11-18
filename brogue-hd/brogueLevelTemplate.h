@@ -21,6 +21,11 @@ namespace brogueHd::backend::model
 			delete _profile;
 		};
 
+		brogueLevelProfile* getProfile() const
+		{
+			return _profile;
+		}
+
 	private:
 
 		brogueLevelProfile* _profile;

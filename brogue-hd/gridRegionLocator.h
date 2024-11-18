@@ -131,7 +131,7 @@ namespace brogueHd::component
 			simpleException::show("Trying to start FloodFill in non-region location");
 
 		// Collect the region data in a constructor
-		gridRegionConstructor<T> regionConstructor(gridRect(column, row, 0, 0), inclusionPredicate);
+		gridRegionConstructor<T> regionConstructor(grid.getParentBoundary(), inclusionPredicate);
 
 		// Use queue to know what locations have been verified. Starting with test location - continue 
 		// until all connected cells have been added to the resulting region using the predicate.
@@ -140,7 +140,7 @@ namespace brogueHd::component
 		// Process the first location
 		T firstElement = grid.get(column, row);
 
-		regionConstructor.add(column, row, firstElement);
+		regionConstructor.add(firstElement.column, firstElement.row, firstElement);
 		resultQueue.add(firstElement);
 
 		while (resultQueue.count() > 0)
@@ -148,11 +148,11 @@ namespace brogueHd::component
 			// Centered Location
 			T regionLocation = resultQueue.removeAt(0);
 
-			if (regionConstructor.contains(regionLocation))
-				simpleException::showCstr("Trying to add location duplicate:  gridRegionLocator.runFloodFill");
+			//if (regionConstructor.contains(regionLocation))
+			//	simpleException::showCstr("Trying to add location duplicate:  gridRegionLocator.runFloodFill");
 
 			// Add to region constructor (also prevents requeueing)
-			regionConstructor.add(regionLocation.column, regionLocation.row, regionLocation);
+			//regionConstructor.add(regionLocation.column, regionLocation.row, regionLocation);
 
 			// Search cardinally adjacent cells (N,S,E,W)
 			T north = grid.get(regionLocation.column, regionLocation.row - 1);
@@ -176,6 +176,9 @@ namespace brogueHd::component
 				!regionConstructor.isDefined(north.column, north.row) &&
 				inclusionPredicate(north.column, north.row, north))
 			{
+				// Add to region constructor (also prevents requeueing)
+				regionConstructor.add(north.column, north.row, north);
+
 				// Push cell onto the queue to be iterated
 				resultQueue.add(north);
 			}
@@ -185,6 +188,9 @@ namespace brogueHd::component
 				!regionConstructor.isDefined(south.column, south.row) &&
 				inclusionPredicate(south.column, south.row, south))
 			{
+				// Add to region constructor (also prevents requeueing)
+				regionConstructor.add(south.column, south.row, south);
+
 				// Push cell onto the queue to be iterated
 				resultQueue.add(south);
 			}
@@ -194,6 +200,9 @@ namespace brogueHd::component
 				!regionConstructor.isDefined(east.column, east.row) &&
 				inclusionPredicate(east.column, east.row, east))
 			{
+				// Add to region constructor (also prevents requeueing)
+				regionConstructor.add(east.column, east.row, east);
+
 				// Push cell onto the queue to be iterated
 				resultQueue.add(east);
 			}
@@ -203,6 +212,9 @@ namespace brogueHd::component
 				!regionConstructor.isDefined(west.column, west.row) &&
 				inclusionPredicate(west.column, west.row, west))
 			{
+				// Add to region constructor (also prevents requeueing)
+				regionConstructor.add(west.column, west.row, west);
+
 				// Push cell onto the queue to be iterated
 				resultQueue.add(west);
 			}

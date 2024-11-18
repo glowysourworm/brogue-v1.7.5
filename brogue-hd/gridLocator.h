@@ -39,7 +39,11 @@ namespace brogueHd::component
 			return column != cell.column ||
 				   row != cell.row;
 		}
-
+		void translate(short columnOffset, short rowOffset)
+		{
+			column += columnOffset;
+			row += rowOffset;
+		}
 		gridLocator add(const gridLocator& cell)
 		{
 			return gridLocator(cell.column + column, cell.row + row);

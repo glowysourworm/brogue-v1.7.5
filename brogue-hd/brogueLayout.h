@@ -10,6 +10,7 @@
 #include "brogueGlobal.h"
 #include "gridDefinitions.h"
 #include "gridRect.h"
+#include "gridRegion.h"
 #include "simple.h"
 #include <functional>
 
@@ -28,9 +29,10 @@ namespace brogueHd::backend::model
 
 		bool isDefined(short column, short row) const;
 
-		brogueCell* getCell(short column, short row) const;
+		brogueCell* get(short column, short row) const;
 
 		gridRect getBoundary() const;
+		gridRect getParentBoundary() const;
 
 		/// <summary>
 		/// Iterates adjacent cells to satisfy the user predicate. Returns the result cell, (or null), and 
@@ -47,6 +49,18 @@ namespace brogueHd::backend::model
 		/// Iterates cells and calls the user callback
 		/// </summary>
 		void iterate(gridCallback<brogueCell*> callback) const;
+
+		/// <summary>
+		/// Ensures that the layout has cells in the specified region
+		/// </summary>
+		template<isGridLocator T>
+		void createCells(const gridRegion<T>& region);
+
+		/// <summary>
+		/// Ensures that cell is created for specified location
+		/// </summary>
+		template<isGridLocator T>
+		void createCells(const T& locator);
 
 	private:
 
@@ -82,15 +96,6 @@ namespace brogueHd::backend::model
 	brogueLayout::brogueLayout(const gridRect& levelParentBoundary, const gridRect& levelBoundary)
 	{
 		_mainGrid = new grid<brogueCell*>(levelParentBoundary, levelBoundary);
-
-		grid<brogueCell*>* grid = _mainGrid;
-
-		levelBoundary.iterate([&grid] (short column, short row)
-		{
-			grid->set(column, row, new brogueCell(column, row), true);
-
-			return iterationCallback::iterate;
-		});
 	}
 
 	brogueLayout::~brogueLayout()
@@ -109,15 +114,39 @@ namespace brogueHd::backend::model
 	{
 		return _mainGrid->getRelativeBoundary();
 	}
-
+	gridRect brogueLayout::getParentBoundary() const
+	{
+		return _mainGrid->getParentBoundary();
+	}
 	bool brogueLayout::isDefined(short column, short row) const
 	{
 		return _mainGrid->isDefined(column, row);
 	}
 
-	brogueCell* brogueLayout::getCell(short column, short row) const
+	brogueCell* brogueLayout::get(short column, short row) const
 	{
 		return _mainGrid->get(column, row);
+	}
+
+	template<isGridLocator T>
+	void brogueLayout::createCells(const T& locator)
+	{
+		if (!_mainGrid->isDefined(locator.column, locator.row))
+			_mainGrid->set(locator.column, locator.row, new brogueCell(locator.column, locator.row), true);
+	}
+
+	template<isGridLocator T>
+	void brogueLayout::createCells(const gridRegion<T>& region)
+	{
+		grid<brogueCell*>* mainGrid = _mainGrid;
+
+		region.iterateLocations([&mainGrid] (short column, short row, const T& locator)
+		{
+			if (!mainGrid->isDefined(locator.column, locator.row))
+				mainGrid->set(locator.column, locator.row, new brogueCell(locator.column, locator.row), true);
+
+			return iterationCallback::iterate;
+		});
 	}
 
 	void brogueLayout::iterateAdjacentCells(short column, short row, gridCallback<brogueCell*> callback)

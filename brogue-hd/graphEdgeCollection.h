@@ -17,8 +17,10 @@ namespace brogueHd::component
 	{
 	public:
 
+		graphEdgeCollection();
 		graphEdgeCollection(const simpleArray<TEdge>& edges);
 		graphEdgeCollection(const simpleArray<TNode>& nodes, const simpleArray<TEdge>& edges);
+		graphEdgeCollection(const graphEdgeCollection& copy);
 		~graphEdgeCollection();
 
 		short edgeCount() const;
@@ -54,13 +56,21 @@ namespace brogueHd::component
 	};
 
 	template<graphNodeType TNode, graphEdgeType<TNode> TEdge>
+	graphEdgeCollection<TNode, TEdge>::graphEdgeCollection()
+	{
+		_nodes = new simpleHash<TNode, TNode>();
+		_edges = new simpleHash<TEdge, TEdge>();
+		_nodeAdjacentEdges = new simpleHash<TNode, simpleHash<TEdge, TEdge>*>();
+	}
+
+	template<graphNodeType TNode, graphEdgeType<TNode> TEdge>
 	graphEdgeCollection<TNode, TEdge>::graphEdgeCollection(const simpleArray<TEdge>& edges)
 	{
 		_nodes = new simpleHash<TNode, TNode>();
 		_edges = new simpleHash<TEdge, TEdge>();
 		_nodeAdjacentEdges = new simpleHash<TNode*, simpleHash<TEdge, TEdge>*>();
 
-		initialize(edges, TNode[0]);
+		initialize(simpleArray<TNode>(), edges);
 	}
 
 	template<graphNodeType TNode, graphEdgeType<TNode> TEdge>
@@ -71,6 +81,17 @@ namespace brogueHd::component
 		_nodeAdjacentEdges = new simpleHash<TNode, simpleHash<TEdge, TEdge>*>();
 
 		initialize(nodes, edges);
+	}
+
+	template<graphNodeType TNode, graphEdgeType<TNode> TEdge>
+	graphEdgeCollection<TNode, TEdge>::graphEdgeCollection(const graphEdgeCollection& copy)
+	{
+		// Use copy contrustors! Keep the two node / edge hash table copies; and construct our own nodeAdjacentEdges.
+		_nodes = new simpleHash<TNode, TNode>();
+		_edges = new simpleHash<TEdge, TEdge>();
+		_nodeAdjacentEdges = new simpleHash<TNode, simpleHash<TEdge, TEdge>*>();
+
+		initialize(copy.getNodes(), copy.getEdges());
 	}
 
 	template<graphNodeType TNode, graphEdgeType<TNode> TEdge>

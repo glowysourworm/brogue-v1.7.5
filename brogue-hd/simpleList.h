@@ -56,6 +56,8 @@ namespace brogueHd::simple
 		simpleList(const simpleList<T>& copy);
 		~simpleList();
 
+		void operator=(const simpleList<T>& other);
+
 		T get(int index) const;
 		int count() const;
 
@@ -163,6 +165,19 @@ namespace brogueHd::simple
 		_array = nullptr;
 		_count = 0;
 	}
+
+	template<isHashable T>
+	void simpleList<T>::operator=(const simpleList<T>& other)
+	{
+		delete _array;
+
+		_array = new simpleArray<T>(other.count());
+		_count = _array->count();
+
+		for (int index = 0; index < _count; index++)
+			_array->set(index, other.get(index));
+	}
+
 
 	template<isHashable T>
 	T simpleList<T>::get(int index) const

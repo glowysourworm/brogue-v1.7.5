@@ -31,9 +31,11 @@
 #include "simpleString.h"
 #include "brogueLevel.h"
 #include "brogueCell.h"
+#include "cppstopwatch.h"
 
 using namespace brogueHd::simple;
 using namespace brogueHd::component;
+using namespace sw;
 
 namespace brogueHd::frontend
 {

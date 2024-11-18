@@ -223,6 +223,7 @@
     <ClInclude Include="brogueGlyphMap.h" />
     <ClInclude Include="brogueViewContainer.h" />
     <ClInclude Include="colorGradient.h" />
+    <ClInclude Include="cppstopwatch.h" />
     <ClInclude Include="eventController.h" />
     <ClInclude Include="brogueFlameMenuTitleMask.h" />
     <ClInclude Include="gameGenerator.h" />
