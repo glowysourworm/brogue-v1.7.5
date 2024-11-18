@@ -223,7 +223,7 @@ namespace brogueHd::component
 
 		gridRegionConstructor<T>* that = this;
 
-		_calculatedBoundary = new gridRect(_left, _top, _right, _bottom);
+		_calculatedBoundary = new gridRect(_left, _top, _right - _left + 1, _bottom - _top + 1);
 
 		// Complete the edge collections
 		_locations->iterate([&that] (T key, T value)
@@ -372,6 +372,9 @@ namespace brogueHd::component
 	template<isGridLocator T>
 	gridRect gridRegionConstructor<T>::calculateLargestRectangle()
 	{
+		if (!_completed)
+			throw simpleException("Trying to run largest rectangle calculation before calling complete:  gridRegionConstructor.h");
+
 		// Procedure
 		// 
 		// 1) For each row:  - Count across and add to row counters foreach non-null cell
@@ -403,8 +406,6 @@ namespace brogueHd::component
 				else
 					rowCounters.set(index, 0);
 			}
-
-
 
 			for (short index1 = 0; index1 < rowCountersLength; index1++)
 			{
@@ -451,7 +452,23 @@ namespace brogueHd::component
 			}
 		}
 
-		return gridRect(bestStartColumn, bestStartRow, (bestEndColumn - bestStartColumn) + 1, (bestEndRow - bestStartRow) + 1);
+		// Validation: Check boundaries; check that grid is defined
+		//
+		gridRegionConstructor<T>* that = this;
+		gridRect result(bestStartColumn, bestStartRow, (bestEndColumn - bestStartColumn) + 1, (bestEndRow - bestStartRow) + 1);
+
+		if (!_calculatedBoundary->contains(result))
+			throw simpleException("Invalid sub-region rectangle calculation:  gridRegionConstructor::calculateLargestRectangle");
+
+		result.iterate([&that] (short column, short row)
+		{
+			if (!that->isDefined(column, row))
+				throw simpleException("Invalid sub-region rectangle calculation:  gridRegionConstructor::calculateLargestRectangle");
+
+			return iterationCallback::iterate;
+		});
+
+		return result;
 	}
 
 	//template<isGridLocator T>

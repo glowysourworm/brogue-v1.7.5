@@ -252,6 +252,17 @@ namespace brogueHd::component
 		_northWestCornerLocations = new simpleArray<T>(northWestCornerLocations);
 		_southEastCornerLocations = new simpleArray<T>(southEastCornerLocations);
 		_southWestCornerLocations = new simpleArray<T>(southWestCornerLocations);
+
+		grid<T>* grid = _grid;
+
+		// Initialize Grid
+		_locations->iterate([&grid] (T item)
+		{
+			// Validates that each cell is at a unique location
+			grid->set(item.column, item.row, item);
+
+			return iterationCallback::iterate;
+		});
 	}
 
 	template<isGridLocator T>
@@ -292,6 +303,13 @@ namespace brogueHd::component
 	template<isGridLocator T>
 	bool gridRegion<T>::isDefined(short column, short row) const
 	{
+		// Checking "bounds" for a region isn't really an appropriate meaning for
+		// an amorphous region. The grid needs to be protected from out of bounds
+		// indexing.
+		//
+		if (!_grid->isInBounds(column, row))
+			return false;
+
 		return _grid->isDefined(column, row);
 	}
 

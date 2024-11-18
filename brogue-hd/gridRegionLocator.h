@@ -38,7 +38,7 @@ namespace brogueHd::component
 
 	private:
 
-		gridRegionConstructor<T> runFloodFill(const grid<T>& grid, short column, short row, gridPredicate<T> inclusionPredicate);
+		gridRegionConstructor<T>* runFloodFill(const grid<T>& grid, short column, short row, gridPredicate<T> inclusionPredicate);
 	};
 
 	template<isGridLocator T>
@@ -94,10 +94,12 @@ namespace brogueHd::component
 			if (inclusionPredicate(column, row, grid.get(column, row)))
 			{
 				// Recurse to fill out the grid
-				gridRegionConstructor<T> constructor = that->runFloodFill(grid, column, row, inclusionPredicate);
+				gridRegionConstructor<T>* constructor = that->runFloodFill(grid, column, row, inclusionPredicate);
 
 				// Validate / Complete the region
-				gridRegion<T>* region = constructor.complete();
+				gridRegion<T>* region = constructor->complete();
+
+				delete constructor;
 
 				// Set result
 				result.add(region);
@@ -115,23 +117,25 @@ namespace brogueHd::component
 		if (!grid.isDefined(column, row))
 			return NULL;
 
-		// Create the constructor
-		gridRegionConstructor<T> constructor = this->runFloodFill(grid, column, row, inclusionPredicate);
+		// (MEMORY!) Create the constructor
+		gridRegionConstructor<T>* constructor = this->runFloodFill(grid, column, row, inclusionPredicate);
 
 		// (MEMORY!) Validate -> Setup Region
-		gridRegion<T>* finalRegion = constructor.complete();
+		gridRegion<T>* finalRegion = constructor->complete();
+
+		delete constructor;
 
 		return finalRegion;
 	}
 
 	template<isGridLocator T>
-	gridRegionConstructor<T> gridRegionLocator<T>::runFloodFill(const grid<T>& grid, short column, short row, gridPredicate<T> inclusionPredicate)
+	gridRegionConstructor<T>* gridRegionLocator<T>::runFloodFill(const grid<T>& grid, short column, short row, gridPredicate<T> inclusionPredicate)
 	{
 		if (!grid.isDefined(column, row) || !inclusionPredicate(column, row, grid.get(column, row)))
 			simpleException::show("Trying to start FloodFill in non-region location");
 
-		// Collect the region data in a constructor
-		gridRegionConstructor<T> regionConstructor(grid.getParentBoundary(), inclusionPredicate);
+		// (MEMORY!) Collect the region data in a constructor
+		gridRegionConstructor<T>* regionConstructor = new gridRegionConstructor(grid.getParentBoundary(), inclusionPredicate);
 
 		// Use queue to know what locations have been verified. Starting with test location - continue 
 		// until all connected cells have been added to the resulting region using the predicate.
@@ -140,7 +144,7 @@ namespace brogueHd::component
 		// Process the first location
 		T firstElement = grid.get(column, row);
 
-		regionConstructor.add(firstElement.column, firstElement.row, firstElement);
+		regionConstructor->add(firstElement.column, firstElement.row, firstElement);
 		resultQueue.add(firstElement);
 
 		while (resultQueue.count() > 0)
@@ -173,11 +177,11 @@ namespace brogueHd::component
 
 			// N
 			if (north != default_value::value<T>() &&
-				!regionConstructor.isDefined(north.column, north.row) &&
+				!regionConstructor->isDefined(north.column, north.row) &&
 				inclusionPredicate(north.column, north.row, north))
 			{
 				// Add to region constructor (also prevents requeueing)
-				regionConstructor.add(north.column, north.row, north);
+				regionConstructor->add(north.column, north.row, north);
 
 				// Push cell onto the queue to be iterated
 				resultQueue.add(north);
@@ -185,11 +189,11 @@ namespace brogueHd::component
 
 			// S
 			if (south != default_value::value<T>() &&
-				!regionConstructor.isDefined(south.column, south.row) &&
+				!regionConstructor->isDefined(south.column, south.row) &&
 				inclusionPredicate(south.column, south.row, south))
 			{
 				// Add to region constructor (also prevents requeueing)
-				regionConstructor.add(south.column, south.row, south);
+				regionConstructor->add(south.column, south.row, south);
 
 				// Push cell onto the queue to be iterated
 				resultQueue.add(south);
@@ -197,11 +201,11 @@ namespace brogueHd::component
 
 			// E
 			if (east != default_value::value<T>() &&
-				!regionConstructor.isDefined(east.column, east.row) &&
+				!regionConstructor->isDefined(east.column, east.row) &&
 				inclusionPredicate(east.column, east.row, east))
 			{
 				// Add to region constructor (also prevents requeueing)
-				regionConstructor.add(east.column, east.row, east);
+				regionConstructor->add(east.column, east.row, east);
 
 				// Push cell onto the queue to be iterated
 				resultQueue.add(east);
@@ -209,11 +213,11 @@ namespace brogueHd::component
 
 			// W
 			if (west != default_value::value<T>() &&
-				!regionConstructor.isDefined(west.column, west.row) &&
+				!regionConstructor->isDefined(west.column, west.row) &&
 				inclusionPredicate(west.column, west.row, west))
 			{
 				// Add to region constructor (also prevents requeueing)
-				regionConstructor.add(west.column, west.row, west);
+				regionConstructor->add(west.column, west.row, west);
 
 				// Push cell onto the queue to be iterated
 				resultQueue.add(west);
