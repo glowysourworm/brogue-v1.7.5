@@ -17,12 +17,27 @@ namespace brogueHd::component
 		gridLocator node2;
 
 		gridLocatorEdge()
-		{}
+		{
+			node1 = default_value::value<gridLocator>();
+			node2 = default_value::value<gridLocator>();
+		}
+
+		gridLocatorEdge(const gridLocatorEdge& copy)
+		{
+			node1 = copy.node1;
+			node2 = copy.node2;
+		}
 
 		gridLocatorEdge(gridLocator anode1, gridLocator anode2)
 		{
 			node1 = anode1;
 			node2 = anode2;
+		}
+
+		void operator=(const gridLocatorEdge& copy)
+		{
+			node1 = copy.node1;
+			node2 = copy.node2;
 		}
 
 		bool operator==(const gridLocatorEdge& edge) const

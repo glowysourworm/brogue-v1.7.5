@@ -115,7 +115,7 @@ namespace brogueHd::frontend
 					this->uniforms2.add(simpleUniform<vec2>("gameLogOffsetUV", GL_FLOAT_VEC2, vec2(0, 0)));
 					break;
 				default:
-					simpleException::show("Unhandled shaderResource type:  shaderData.h");
+					throw simpleException("Unhandled shaderResource type:  shaderData.h");
 					break;
 			}
 		}

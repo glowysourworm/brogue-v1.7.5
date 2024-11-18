@@ -69,7 +69,7 @@ namespace brogueHd::frontend
     bool simpleFrameBuffer::isReady()
     {
         if (!this->isCreated())
-            simpleException::showCstr("simpleFrameBuffer has not yet been created on the backend");
+            throw simpleException("simpleFrameBuffer has not yet been created on the backend");
 
         // Have to check for the status of the buffer before drawing
         //
@@ -81,7 +81,7 @@ namespace brogueHd::frontend
     void simpleFrameBuffer::bind()
     {
         if (!this->isCreated())
-            simpleException::show("simpleFrameBuffer has not yet been created on the backend");
+            throw simpleException("simpleFrameBuffer has not yet been created on the backend");
 
         glBindFramebuffer(GL_FRAMEBUFFER, this->handle);
         // glBindRenderbuffer(GL_RENDERBUFFER, this->handle);
@@ -90,7 +90,7 @@ namespace brogueHd::frontend
     void simpleFrameBuffer::unBind()
     {
         if (!this->isCreated())
-            simpleException::show("simpleFrameBuffer has not yet been created on the backend");
+            throw simpleException("simpleFrameBuffer has not yet been created on the backend");
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         //glBindRenderbuffer(GL_RENDERBUFFER, 0);
@@ -99,10 +99,10 @@ namespace brogueHd::frontend
     void simpleFrameBuffer::attachTexture(GLuint textureHandle, GLenum attachment)
     {
         if (!this->isCreated())
-            simpleException::show("simpleFrameBuffer has not yet been created on the backend");
+            throw simpleException("simpleFrameBuffer has not yet been created on the backend");
 
         if (!this->isBound())
-            simpleException::show("simpleFrameBuffer must be bound before use");
+            throw simpleException("simpleFrameBuffer must be bound before use");
 
         // Using NAMED* for anything I can find so it doesn't assume a program structure...
         //
@@ -128,7 +128,7 @@ namespace brogueHd::frontend
 
         // Need to learn about this:
         if (this->handle != _renderBufferHandle)
-            simpleException::show("Handle mismatch for the simpleFrameBuffer / Render Buffer Handle");
+            throw simpleException("Handle mismatch for the simpleFrameBuffer / Render Buffer Handle");
     }
 
     void simpleFrameBuffer::teardown()

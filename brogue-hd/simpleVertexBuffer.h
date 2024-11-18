@@ -95,7 +95,7 @@ namespace brogueHd::frontend
 	void simpleVertexBuffer<T>::glCreate(GLuint programHandle)
 	{
 		if (this->isCreated())
-			simpleException::show("simpleVertexBuffer already created in the backend");
+			throw simpleException("simpleVertexBuffer already created in the backend");
 
 		// Procedure
 		//
@@ -239,7 +239,7 @@ namespace brogueHd::frontend
 				}
 				break;
 				default:
-					simpleException::show("Unhandled vertex array attribute data type:  ", attribute.getAttributeType());
+					throw simpleException("Unhandled vertex array attribute data type:  ", attribute.getAttributeType());
 			}
 
 			// Enable the vertex attribute
@@ -277,7 +277,7 @@ namespace brogueHd::frontend
 	void simpleVertexBuffer<T>::reBuffer(GLuint programHandle)
 	{
 		if (!this->isCreated())
-			simpleException::show("simpleVertexBuffer not yet created on the GL backend. Call glCreate first.");
+			throw simpleException("simpleVertexBuffer not yet created on the GL backend. Call glCreate first.");
 
 		// Need to try named buffer. Active buffer should find the right buffer index; but it was having .. trouble.
 		glNamedBufferSubData(this->handle, (GLintptr)0, (GLsizeiptr)_stream->getStreamSize(), (void*)_stream->getData());
@@ -294,7 +294,7 @@ namespace brogueHd::frontend
 	simpleDataStream* simpleVertexBuffer<T>::getStream() const
 	{
 		if (!this->isCreated())
-			simpleException::show("simpleVertexBuffer not yet created on the GL backend. Call glCreate first.");
+			throw simpleException("simpleVertexBuffer not yet created on the GL backend. Call glCreate first.");
 
 		return _stream;
 	}
@@ -331,7 +331,7 @@ namespace brogueHd::frontend
 			else if (attribute.getAttributeType() == GL_FLOAT_VEC4)
 				return stride + (4 * sizeof(float));
 			else
-				simpleException::show("Unhandled vertex array attribute data type:  ", attribute.getAttributeType());
+				throw simpleException("Unhandled vertex array attribute data type:  ", attribute.getAttributeType());
 		});
 	}
 
@@ -339,7 +339,7 @@ namespace brogueHd::frontend
 	void simpleVertexBuffer<T>::bind()
 	{
 		if (!this->isCreated())
-			simpleException::show("simpleVertexBuffer already deleted from the backend");
+			throw simpleException("simpleVertexBuffer already deleted from the backend");
 
 		// Bind VBO before using
 		glBindBuffer(GL_ARRAY_BUFFER, this->handle);

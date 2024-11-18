@@ -104,7 +104,7 @@ namespace brogueHd::backend
 			// Birth
 			if (!resultGrid.isDefined(columnRect, rowRect) && count >= parameters.birthCount)
 			{
-				resultGrid.set(columnRect, rowRect, true);
+				resultGrid.set(columnRect, rowRect, true, true);
 			}
 
 			// Survival
@@ -116,7 +116,7 @@ namespace brogueHd::backend
 			// Death
 			else
 			{
-				resultGrid.set(columnRect, rowRect, false);
+				resultGrid.set(columnRect, rowRect, false, true);
 			}
 
 			return iterationCallback::iterate;

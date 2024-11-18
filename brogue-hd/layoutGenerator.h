@@ -1,27 +1,24 @@
 #pragma once
 
 #include "accretionTile.h"
-#include "brogueGlobal.h"
 #include "brogueLayout.h"
 #include "brogueLevelProfile.h"
 #include "randomGenerator.h"
 #include "roomGenerator.h"
 
+#include "brogueUIBuilder.h"
 #include "delaunayAlgorithm.h"
 #include "dijkstra.h"
 #include "dungeon.h"
-#include "dungeonConstants.h"
 #include "graph.h"
 #include "gridDefinitions.h"
 #include "gridLocator.h"
 #include "gridLocatorEdge.h"
 #include "gridRect.h"
 #include "gridRegion.h"
-#include "gridRegionConstructor.h"
 #include "noiseGenerator.h"
 #include "simple.h"
 #include "simpleArray.h"
-#include "simpleException.h"
 #include "simpleList.h"
 #include "simpleOrderedList.h"
 
@@ -35,60 +32,99 @@ namespace brogueHd::backend
 	public:
 
 		/// <summary>
-		/// Creates the base layout, terrain, and machine terrain for the leve
+		/// Creates the base layout, terrain, and machine terrain for the level.
 		/// </summary>
-		/// <param name="profile">The dungeon profile:  must contain all parameters</param>
-		layoutGenerator(randomGenerator* randomGenerator, noiseGenerator* noiseGenerator);
+		layoutGenerator(brogueUIBuilder* uiBuilder, randomGenerator* randomGenerator, noiseGenerator* noiseGenerator);
 		~layoutGenerator();
 
 		brogueLayout* generateLayout(brogueLevelProfile* profile);
 
+		/// <summary>
+		/// Clears the layout generation data out for another use. Must set up once per level.
+		/// </summary>
+		void clear();
+
 	private:
 
-		simpleList<accretionTile> createRooms(brogueLayout* layout, brogueLevelProfile* profile);
+		void initialize(brogueLevelProfile* profile);
 
-		bool attemptConnection(brogueLayout* layout, const simpleList<accretionTile>& roomTiles, accretionTile& roomTile, const gridRect& attemptRect, short interRoomPadding) const;
+		void createRooms();
+
+		bool attemptConnection(accretionTile* roomTile, const gridRect& attemptRect, short interRoomPadding) const;
 
 		//void designateMachineRooms();
 
-		graph<gridLocator, gridLocatorEdge> triangulateRooms(brogueLayout* layout, const simpleList<accretionTile>& roomTiles);
+		void triangulateRooms();
 
-		void connectRooms(brogueLayout* layout, const simpleList<accretionTile>& roomTiles, const graph<gridLocator, gridLocatorEdge>& delaunayGraph);
-		//void createTerrain();
-
-		/// <summary>
-		/// Returns the Brogue level boundary with padding
-		/// </summary>
-		gridRect getPaddedBoundary(short padding) const;
+		void connectRooms();
 
 	private:
 
 		roomGenerator* _roomGenerator;
 		randomGenerator* _randomGenerator;
+		brogueUIBuilder* _uiBuilder;
+
+		// Generation Data Stores:
+		//
+		brogueLayout* _layout;
+		brogueLevelProfile* _profile;
+		simpleList<accretionTile*>* _roomTiles;
+		graph<gridLocator, gridLocatorEdge>* _delaunayGraph;
 	};
 
 
-	layoutGenerator::layoutGenerator(randomGenerator* randomGenerator, noiseGenerator* noiseGenerator)
+	layoutGenerator::layoutGenerator(brogueUIBuilder* uiBuilder, randomGenerator* randomGenerator, noiseGenerator* noiseGenerator)
 	{
+		_uiBuilder = uiBuilder;
 		_randomGenerator = randomGenerator;
 		_roomGenerator = new roomGenerator(noiseGenerator, randomGenerator);
+
+		// Layout Data
+		_layout = nullptr;
+		_profile = nullptr;
+		_roomTiles = nullptr;
+		_delaunayGraph = nullptr;
 	}
 
 	layoutGenerator::~layoutGenerator()
 	{
+		if (_layout != nullptr)
+			delete _layout;
+
+		if (_roomTiles != nullptr)
+			delete _roomTiles;
+
+		if (_delaunayGraph != nullptr)
+			delete _delaunayGraph;
+
 		delete _roomGenerator;
 	}
 
-	gridRect layoutGenerator::getPaddedBoundary(short padding) const
+	void layoutGenerator::initialize(brogueLevelProfile* profile)
 	{
-		if (padding >= 10)
-			simpleException::showCstr("Invalid level padding:  must be <= 10");
+		if (_layout != nullptr)
+			delete _layout;
 
-		return gridRect(padding, padding, DCOLS - padding, DROWS - padding);
+		if (_roomTiles != nullptr)
+			delete _roomTiles;
+
+		if (_delaunayGraph != nullptr)
+			delete _delaunayGraph;
+
+		gridRect levelBoundary = _uiBuilder->getBrogueGameBoundary();
+		gridRect levelPaddedBoundary = _uiBuilder->getPaddedBoundary(levelBoundary, 1);
+
+		_layout = new brogueLayout(levelBoundary, levelPaddedBoundary);
+		_profile = profile;
+		_roomTiles = new simpleList<accretionTile*>();
+		_delaunayGraph = nullptr;
 	}
 
 	brogueLayout* layoutGenerator::generateLayout(brogueLevelProfile* profile)
 	{
+		// Setup memory for the next layout generation
+		initialize(profile);
+
 		// Procedure
 		//
 		// 1) Create Rooms:
@@ -128,45 +164,40 @@ namespace brogueHd::backend
 		//          -> Store the results (adds to difficulty rating of cells)
 		//
 
-		gridRect levelBoundary = this->getPaddedBoundary(0);
-		gridRect levelPaddedBoundary = this->getPaddedBoundary(1);
-
-		brogueLayout* layout = new brogueLayout(levelBoundary, levelPaddedBoundary);
-
-		// Create Rooms
-		simpleList<accretionTile> roomTiles = createRooms(layout, profile);
+		// Create Rooms (new _roomTiles)
+		createRooms();
 
 		// Machine Rooms
 
-		// Triangulate Rooms:  Creates Delaunay Triangulation of the connection point vertices
-		graph<gridLocator, gridLocatorEdge> delaunayGraph = triangulateRooms(layout, roomTiles);
+		// Triangulate Rooms:  Creates Delaunay Triangulation of the connection point vertices (new _delaunayGraph)
+		triangulateRooms();
 
 		// Connect Rooms:  Create cells in the grid for the delaunay triangulation of the 
-		//                 connection points of the room tiles
-		connectRooms(layout, roomTiles, delaunayGraph);
+		//                 connection points of the room tiles. Runs dijkstra's algorithm to
+		//				   create corridor cells inside the brogueLayout*
+		connectRooms();
 
-		return layout;
+		return _layout;
 	}
 
-	simpleList<accretionTile> layoutGenerator::createRooms(brogueLayout* layout, brogueLevelProfile* profile)
+	void layoutGenerator::createRooms()
 	{
 		// Brogue v1.7.5 Creates up to 35 rooms using accretion (bolt-on) to fill up the space
 		//
 
 		short maxAttempts = 35;
 		short interRoomPadding = 1;
-		simpleList<accretionTile> attemptRegions;
-		simpleList<accretionTile> roomTiles;
+		simpleList<accretionTile*> attemptRegions;
 
 		// 1) Create 35 room (up front), 2) Attempt bolt-on until there are no more fits
 		//
 		for (short index = 0; index < maxAttempts; index++)
 		{
 			// Room configuration from the template
-			brogueRoomInfo configuration = index == 0 ? profile->getEntranceRoom(_randomGenerator) : profile->getRandomRoomInfo(_randomGenerator);
+			brogueRoomInfo configuration = index == 0 ? _profile->getEntranceRoom(_randomGenerator) : _profile->getRandomRoomInfo(_randomGenerator);
 
-			// MEMORY!
-			gridRegion<gridLocator>* nextRegion = _roomGenerator->designRoom(configuration, layout->getParentBoundary(), layout->getBoundary());
+			// (MEMORY!)
+			gridRegion<gridLocator>* nextRegion = _roomGenerator->designRoom(configuration, _layout->getParentBoundary(), _layout->getBoundary());
 
 			// Connection Points					
 			simpleOrderedList<gridLocator> northEdge = nextRegion->getBestEdges(brogueCompass::N);
@@ -182,14 +213,15 @@ namespace brogueHd::backend
 			int randE = _randomGenerator->randomIndex_exp(0, eastEdge.count(), 10);
 			int randW = _randomGenerator->randomIndex_exp(0, westEdge.count(), 10);
 
-			accretionTile nextRoom;
+			// (MEMORY!) (Must delete region explicitly - see below)
+			accretionTile* nextRoom = new accretionTile();
 
 			// (Pointer to allocated region memory)
-			nextRoom.region = nextRegion;
-			nextRoom.connectionPointN = northEdge.get(randN);
-			nextRoom.connectionPointS = southEdge.get(randS);
-			nextRoom.connectionPointE = eastEdge.get(randE);
-			nextRoom.connectionPointW = westEdge.get(randW);
+			nextRoom->region = nextRegion;
+			nextRoom->connectionPointN = northEdge.get(randN);
+			nextRoom->connectionPointS = southEdge.get(randS);
+			nextRoom->connectionPointE = eastEdge.get(randE);
+			nextRoom->connectionPointW = westEdge.get(randW);
 
 			attemptRegions.add(nextRoom);
 		}
@@ -197,7 +229,7 @@ namespace brogueHd::backend
 		// Bolt-on
 		for (int index = 0; index < attemptRegions.count(); index++)
 		{
-			accretionTile attemptRegion = attemptRegions.get(index);
+			accretionTile* attemptRegion = attemptRegions.get(index);
 
 			// First Room
 			if (index == 0)
@@ -206,44 +238,31 @@ namespace brogueHd::backend
 				//        have been by design (Brogue v1.7.5); but probably only matters for
 				//        the first level.
 				//
-				roomTiles.add(attemptRegion);
+				_roomTiles->add(attemptRegion);
 
-				// Set final room locations
-				layout->createCells(*attemptRegion.region);
+				// Set final room location (creates new brogueCell* instances, so delete our local one afterwards)
+				_layout->createCells(attemptRegion->region);
 			}
 
 			// Accrete rooms - translating the attempt room into place (modifies attempt region)
-			else if (attemptConnection(layout, roomTiles, attemptRegion, layout->getParentBoundary(), interRoomPadding))
+			else if (attemptConnection(attemptRegion, _layout->getParentBoundary(), interRoomPadding))
 			{
-				roomTiles.add(attemptRegion);
+				_roomTiles->add(attemptRegion);
 
-				// Set final room locations
-				layout->createCells(*attemptRegion.region);
+				// Set final room location (creates new brogueCell* instances, so delete our local one afterwards)
+				_layout->createCells(attemptRegion->region);
 			}
 		}
 
-
-		//if (doorSites) {
-		//    chooseRandomDoorSites(grid, doorSites);
-		//    if (attachHallway) {
-		//        dir = rand_range(0, 3);
-		//        for (i = 0; doorSites[dir][0] == -1 && i < 3; i++) {
-		//            dir = (dir + 1) % 4; // Each room will have at least 2 valid directions for doors.
-		//        }
-		//        attachHallwayTo(grid, doorSites);
-		//    }
-		//}
-
-		//attachRooms(grid, &theDP, 35, 35);\\
-
-		return roomTiles;
+		// Cleanup Memory:  Delete unused room tiles
+		for (int index = 0; index < attemptRegions.count(); index++)
+		{
+			if (!_roomTiles->contains(attemptRegions.get(index)))
+				delete attemptRegions.get(index);
+		}
 	}
 
-	bool layoutGenerator::attemptConnection(brogueLayout* layout,
-											const simpleList<accretionTile>& roomTiles,
-											accretionTile& roomTile,
-											const gridRect& attemptRect,
-											short interRoomPadding) const
+	bool layoutGenerator::attemptConnection(accretionTile* roomTile, const gridRect& attemptRect, short interRoomPadding) const
 	{
 		// Procedure
 		//
@@ -259,9 +278,9 @@ namespace brogueHd::backend
 		//                 padding.
 		//
 
-		for (int index = 0; index < roomTiles.count(); index++)
+		for (int index = 0; index < _roomTiles->count(); index++)
 		{
-			accretionTile tile = roomTiles.get(index);
+			accretionTile* tile = _roomTiles->get(index);
 
 			bool northAttempt = false;
 			bool southAttempt = false;
@@ -273,9 +292,9 @@ namespace brogueHd::backend
 				gridLocator translation = gridLocator::getEmpty();
 
 				// Left, Top, Right, Bottom
-				if (!roomTile.hasEastConnection && !tile.hasWestConnection && !westAttempt)
+				if (!roomTile->hasEastConnection && !tile->hasWestConnection && !westAttempt)
 				{
-					translation = tile.connectionPointW.subtract(roomTile.connectionPointE);
+					translation = tile->connectionPointW.subtract(roomTile->connectionPointE);
 
 					// Adjust the connection point by one cell + padding
 					translation.column -= (1 + interRoomPadding);
@@ -283,9 +302,9 @@ namespace brogueHd::backend
 					westAttempt = true;
 				}
 
-				else if (!roomTile.hasNorthConnection && !tile.hasSouthConnection && !northAttempt)
+				else if (!roomTile->hasNorthConnection && !tile->hasSouthConnection && !northAttempt)
 				{
-					translation = tile.connectionPointN.subtract(roomTile.connectionPointS);
+					translation = tile->connectionPointN.subtract(roomTile->connectionPointS);
 
 					// Adjust the connection point by one cell + padding
 					translation.row -= (1 + interRoomPadding);
@@ -293,9 +312,9 @@ namespace brogueHd::backend
 					northAttempt = true;
 				}
 
-				else if (!roomTile.hasEastConnection && !tile.hasWestConnection && !eastAttempt)
+				else if (!roomTile->hasEastConnection && !tile->hasWestConnection && !eastAttempt)
 				{
-					translation = tile.connectionPointE.subtract(roomTile.connectionPointW);
+					translation = tile->connectionPointE.subtract(roomTile->connectionPointW);
 
 					// Adjust the connection point by one cell + padding
 					translation.column += (1 + interRoomPadding);
@@ -303,9 +322,9 @@ namespace brogueHd::backend
 					eastAttempt = true;
 				}
 
-				else if (!roomTile.hasSouthConnection && !tile.hasNorthConnection && !southAttempt)
+				else if (!roomTile->hasSouthConnection && !tile->hasNorthConnection && !southAttempt)
 				{
-					translation = tile.connectionPointS.subtract(roomTile.connectionPointN);
+					translation = tile->connectionPointS.subtract(roomTile->connectionPointN);
 
 					// Adjust the connection point by one cell + padding
 					translation.row += (1 + interRoomPadding);
@@ -316,21 +335,22 @@ namespace brogueHd::backend
 					break;
 
 				// Translate the region into position (HEAP ALLOCATED! ALSO CHANGES LOCATOR INSTANCES)
-				roomTile.region->translate_StackLike(translation.column, translation.row);
+				roomTile->region->translate_StackLike(translation.column, translation.row);
 
 				// Check the boundary:  1) outer gridRect first to reduce iteration, and 2) the grid overlap per cell
-				if (attemptRect.contains(roomTile.region->getBoundary()))
+				if (attemptRect.contains(roomTile->region->getBoundary()))
 				{
-					if (tile.region->overlaps(*roomTile.region))
+					if (tile->region->overlaps(roomTile->region))
 					{
-						delete roomTile.region;
+						//delete roomTile->region;
 						continue;
 					}
 
 					bool gridOverlaps = false;
+					brogueLayout* layout = _layout;
 
 					// Double check the already-set rooms
-					roomTile.region->iterateLocations([&layout, &gridOverlaps] (short column, short row, gridLocator item)
+					roomTile->region->iterateLocations([&layout, &gridOverlaps] (short column, short row, gridLocator item)
 					{
 						if (layout->isDefined(item.column, item.row))
 						{
@@ -343,30 +363,30 @@ namespace brogueHd::backend
 
 					if (gridOverlaps)
 					{
-						delete roomTile.region;
+						//delete roomTile->region;
 						continue;
 					}
 
 					// Set connection point data (should be using a direction iterator) [1, 4] -> [W,N,E,S]
 					if (index == 1)
 					{
-						roomTile.connectionPointE = tile.connectionPointW;
-						roomTile.hasEastConnection = true;
+						roomTile->connectionPointE = tile->connectionPointW;
+						roomTile->hasEastConnection = true;
 					}
 					else if (index == 2)
 					{
-						roomTile.connectionPointS = tile.connectionPointN;
-						roomTile.hasSouthConnection = true;
+						roomTile->connectionPointS = tile->connectionPointN;
+						roomTile->hasSouthConnection = true;
 					}
 					else if (index == 3)
 					{
-						roomTile.connectionPointW = tile.connectionPointE;
-						roomTile.hasWestConnection = true;
+						roomTile->connectionPointW = tile->connectionPointE;
+						roomTile->hasWestConnection = true;
 					}
 					else
 					{
-						roomTile.connectionPointN = tile.connectionPointS;
-						roomTile.hasNorthConnection = true;
+						roomTile->connectionPointN = tile->connectionPointS;
+						roomTile->hasNorthConnection = true;
 					}
 
 					return true;
@@ -377,7 +397,7 @@ namespace brogueHd::backend
 		return false;
 	}
 
-	graph<gridLocator, gridLocatorEdge> layoutGenerator::triangulateRooms(brogueLayout* layout, const simpleList<accretionTile>& roomTiles)
+	void layoutGenerator::triangulateRooms()
 	{
 		// Create delaunay triangulator with graph edge constructor
 		delaunayAlgorithm<gridLocator, gridLocatorEdge> triangulator([] (gridLocator node1, gridLocator node2)
@@ -390,27 +410,27 @@ namespace brogueHd::backend
 		// Create connection point vertices
 		simpleList<gridLocator> connectionNodes;
 
-		roomTiles.forEach([&connectionNodes] (accretionTile item)
+		_roomTiles->forEach([&connectionNodes] (accretionTile* item)
 		{
-			if (item.hasEastConnection)
-				connectionNodes.add(gridLocator(item.connectionPointE));
+			if (item->hasEastConnection)
+				connectionNodes.add(gridLocator(item->connectionPointE));
 
-			if (item.hasNorthConnection)
-				connectionNodes.add(gridLocator(item.connectionPointN));
+			if (item->hasNorthConnection)
+				connectionNodes.add(gridLocator(item->connectionPointN));
 
-			if (item.hasSouthConnection)
-				connectionNodes.add(gridLocator(item.connectionPointS));
+			if (item->hasSouthConnection)
+				connectionNodes.add(gridLocator(item->connectionPointS));
 
-			if (item.hasWestConnection)
-				connectionNodes.add(gridLocator(item.connectionPointW));
+			if (item->hasWestConnection)
+				connectionNodes.add(gridLocator(item->connectionPointW));
 
 			return iterationCallback::iterate;
 		});
 
-		return triangulator.run(connectionNodes);
+		_delaunayGraph = triangulator.run(connectionNodes);
 	}
 
-	void layoutGenerator::connectRooms(brogueLayout* layout, const simpleList<accretionTile>& roomTiles, const graph<gridLocator, gridLocatorEdge>& delaunayGraph)
+	void layoutGenerator::connectRooms()
 	{
 		// Procedure
 		//
@@ -422,37 +442,39 @@ namespace brogueHd::backend
 		//
 
 		simpleList<gridLocatorEdge> corridorEdges;
+		simpleList<accretionTile*>* roomTiles = _roomTiles;
+		brogueLayout* layout = _layout;
 
-		delaunayGraph.iterateEdges([&roomTiles, &corridorEdges] (gridLocatorEdge edge)
+		_delaunayGraph->iterateEdges([&roomTiles, &corridorEdges] (const gridLocatorEdge& edge)
 		{
 			bool isCorridorEdge = false;
 
-			roomTiles.forEach([&edge, &isCorridorEdge] (accretionTile tile)
+			roomTiles->forEach([&edge, &isCorridorEdge] (accretionTile* tile)
 			{
 				int connectionCount = 0;
 
 				// North
-				if (tile.hasNorthConnection &&
-					(tile.connectionPointN == edge.node1 ||
-					tile.connectionPointN == edge.node2))
+				if (tile->hasNorthConnection &&
+					(tile->connectionPointN == edge.node1 ||
+					tile->connectionPointN == edge.node2))
 					connectionCount++;
 
 				// South
-				if (tile.hasSouthConnection &&
-					(tile.connectionPointS == edge.node1 ||
-					tile.connectionPointS == edge.node2))
+				if (tile->hasSouthConnection &&
+					(tile->connectionPointS == edge.node1 ||
+					tile->connectionPointS == edge.node2))
 					connectionCount++;
 
 				// East
-				if (tile.hasEastConnection &&
-					(tile.connectionPointE == edge.node1 ||
-					tile.connectionPointE == edge.node2))
+				if (tile->hasEastConnection &&
+					(tile->connectionPointE == edge.node1 ||
+					tile->connectionPointE == edge.node2))
 					connectionCount++;
 
 				// West
-				if (tile.hasWestConnection &&
-					(tile.connectionPointW == edge.node1 ||
-					tile.connectionPointW == edge.node2))
+				if (tile->hasWestConnection &&
+					(tile->connectionPointW == edge.node1 ||
+					tile->connectionPointW == edge.node2))
 					connectionCount++;
 
 				if (connectionCount == 1)
@@ -472,8 +494,8 @@ namespace brogueHd::backend
 
 		// (MEMORY!) Use the corridor edges to call dijkstra (on stack usgae has predicate copying)
 		dijkstra<gridLocator>* algorithm = new dijkstra<gridLocator>(
-			layout->getParentBoundary(),
-			layout->getBoundary(),
+			_layout->getParentBoundary(),
+			_layout->getBoundary(),
 			true,                           // Cardinal Movement (for laying corridors)
 
 		// Primary Inclusion Predicate (is it in the grid?)
@@ -496,7 +518,7 @@ namespace brogueHd::backend
 		});
 
 		// Iterate each corridor edge and run dijkstra to finalize the connection
-		corridorEdges.forEach([&algorithm, &layout] (gridLocatorEdge edge)
+		corridorEdges.forEach([&algorithm, &layout] (const gridLocatorEdge& edge)
 		{
 			gridLocator source = edge.node1;
 			gridLocator targets[1] = { edge.node2 };

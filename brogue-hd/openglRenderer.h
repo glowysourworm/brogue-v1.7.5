@@ -233,7 +233,7 @@ namespace brogueHd::frontend
 			brogueHd::frontend::KeyState->clearKey(key);
 		}
 		else
-			simpleException::show("Unknown GLFW key callback action {}:  openglRenderer::keyCallback", action);
+			throw simpleException("Unknown GLFW key callback action {}:  openglRenderer::keyCallback", action);
 
 		brogueHd::frontend::KeyState->setModifier(mods);
 	}
@@ -328,7 +328,7 @@ namespace brogueHd::frontend
 		else
 		{
 			// error
-			simpleException::show("Initialization of GLFW failed! Cannot render graphics!");
+			throw simpleException("Initialization of GLFW failed! Cannot render graphics!");
 		}
 
 		// Windowed Mode
@@ -474,10 +474,10 @@ namespace brogueHd::frontend
 	void openglRenderer::startProgram()
 	{
 		if (_program == nullptr)
-			simpleException::show("Trying to start program before setting it. Please call setProgram(..)");
+			throw simpleException("Trying to start program before setting it. Please call setProgram(..)");
 
 		if (_thread != nullptr)
-			simpleException::show("Trying to start program on opengl renderer - which is currently running. Must call terminateProgram() first.");
+			throw simpleException("Trying to start program on opengl renderer - which is currently running. Must call terminateProgram() first.");
 
 		// Hook anything specific to the window on the other thread
 		//
@@ -503,7 +503,7 @@ namespace brogueHd::frontend
 	void openglRenderer::destroyGL()
 	{
 		if (_thread != nullptr)
-			simpleException::show("Trying to terminate GL backend before shutting down rendering thread. Please call terminateProgram() first.");
+			throw simpleException("Trying to terminate GL backend before shutting down rendering thread. Please call terminateProgram() first.");
 
 		glfwTerminate();
 

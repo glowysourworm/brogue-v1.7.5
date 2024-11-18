@@ -403,7 +403,7 @@ namespace brogueHd::frontend
 			}
 			break;
 			default:
-				simpleException::show("Unhandled brogueGradientType:  brogueUIData.h");
+				throw simpleException("Unhandled brogueGradientType:  brogueUIData.h");
 		}
 	}
 }

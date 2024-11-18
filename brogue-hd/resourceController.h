@@ -218,8 +218,7 @@ namespace brogueHd::backend
 		}
 		catch (std::exception& ex)
 		{
-			simpleException::show("Error reading resource config JSON file:  {}", ex.what());
-			return false;
+			throw simpleException("Error reading resource config JSON file:  {}", ex.what());
 		}
 
 		return false;
@@ -282,7 +281,7 @@ namespace brogueHd::backend
 		}
 		catch (std::exception& ex)
 		{
-			simpleException::show("Error reading high scores file:  {}", ex.what());
+			throw simpleException("Error reading high scores file:  {}", ex.what());
 		}
 	}
 
@@ -367,7 +366,7 @@ namespace brogueHd::backend
 
 			if (!stream.is_open())
 			{
-				simpleException::showCstr("Error opening keymap file:  either missing, or locked");
+				throw simpleException("Error opening keymap file:  either missing, or locked");
 				return;
 			}
 
@@ -379,7 +378,7 @@ namespace brogueHd::backend
 				simpleArray<simpleString> linePieces = line.split(' ');
 
 				if (sizeof(linePieces) != 2)
-					simpleException::showCstr("Invalid keymap file:  looking for two character split by only whitespace");
+					throw simpleException("Invalid keymap file:  looking for two character split by only whitespace");
 
 				processor.addKeyMap(linePieces.get(0).c_str(), linePieces.get(1).c_str());
 			}
@@ -388,7 +387,7 @@ namespace brogueHd::backend
 		}
 		catch (std::exception& ex)
 		{
-			simpleException::show("gameController::loadKeyMap:  ", ex.what());
+			throw simpleException("gameController::loadKeyMap:  ", ex.what());
 			throw ex;
 		}
 	}
@@ -495,7 +494,7 @@ namespace brogueHd::backend
 		}
 		catch (std::exception ex)
 		{
-			simpleException::show("Error opening colors.csv:  ", ex.what());
+			throw simpleException("Error opening colors.csv:  ", ex.what());
 
 			delete result;
 		}

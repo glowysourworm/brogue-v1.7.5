@@ -215,14 +215,14 @@ namespace brogueHd::simple
 				colorDataBufferSize = fileSize - signature->ImageDataOffset;
 
 				if (colorDataBufferSize % 4 != 0)
-					simpleException::show("Invalid bitmap file decoding:  Image Data alignment not aligned to 4 byte value");
+					throw simpleException("Invalid bitmap file decoding:  Image Data alignment not aligned to 4 byte value");
 
 				colorDataBufferIn = new char[colorDataBufferSize];
 
 				if (resolvedWidth < fileSize && resolvedHeight < fileSize)
 				{
 					if (resolvedWidth * resolvedHeight * 4 != colorDataBufferSize)
-						simpleException::show("Invalid bitmap file decoding:  Image Data doesn't align with header values");
+						throw simpleException("Invalid bitmap file decoding:  Image Data doesn't align with header values");
 				}
 
 				// Re-calculate the height and width of the image; and correct the dib header.
@@ -246,11 +246,11 @@ namespace brogueHd::simple
 						resolvedWidth = (uint16_t)(colorDataBufferSize / 4.0f / (float)resolvedHeight);
 
 					else
-						simpleException::show("Invalid bitmap file decoding:  Image Data doesn't align with header values");
+						throw simpleException("Invalid bitmap file decoding:  Image Data doesn't align with header values");
 				}
 
 				//if (resolvedWidth * resolvedHeight * 4 != colorDataBufferSize)
-				//	simpleException::show("Invalid bitmap file decoding:  Image Data doesn't align with header values");
+				//	throw simpleException("Invalid bitmap file decoding:  Image Data doesn't align with header values");
 
 				// Direct Buffer Copy
 				for (int index = signature->ImageDataOffset; index < fileSize; index++)
@@ -259,7 +259,7 @@ namespace brogueHd::simple
 				}
 			}
 			else
-				simpleException::show("Invalid bitmap file decoding:  Either corrupt file or improper use of DIB header");
+				throw simpleException("Invalid bitmap file decoding:  Either corrupt file or improper use of DIB header");
 
 
 			//colorDataBufferSize = dibHeader->bV5Width * dibHeader->bV5Height * 4;
@@ -278,7 +278,7 @@ namespace brogueHd::simple
 			//	if (dibHeader->bV5Compression == BI_BITFIELDS)
 			//	{
 			//		if (extraMaskHeaderSize == 16)
-			//			simpleException::show("Invalid bitmap file decoding:  The compression header supposes BI_ALPHABITFIELDS, not BI_BITFIELDS");
+			//			throw simpleException("Invalid bitmap file decoding:  The compression header supposes BI_ALPHABITFIELDS, not BI_BITFIELDS");
 			//	}
 
 			//	// Color Table:  32-bit words, one per pixel (see bitmap.h for more documentation)
@@ -289,7 +289,7 @@ namespace brogueHd::simple
 
 			//else
 			//{
-			//	simpleException::show("Invalid bitmap file decoding:  Either corrupt file or improper use of DIB header");
+			//	throw simpleException("Invalid bitmap file decoding:  Either corrupt file or improper use of DIB header");
 			//}
 			//
 			//BitmapOptionalMasks* optionalMasks = decodeOptionalMasks(fileBuffer, BitmapFileHeader::HEADER_SIZE + dibHeader->bV5Size, false);
@@ -300,7 +300,7 @@ namespace brogueHd::simple
 		}
 		catch (std::exception& ex)
 		{
-			simpleException::show("Error reading bitmap file:  {}", ex.what());
+			throw simpleException("Error reading bitmap file:  {}", ex.what());
 		}
 	}
 	void simpleBitmap::toFile(const simpleString& filename)
@@ -340,7 +340,7 @@ namespace brogueHd::simple
 		}
 		catch (std::exception& ex)
 		{
-			simpleException::show("Error reading png file:  {}", ex.what());
+			throw simpleException("Error reading png file:  {}", ex.what());
 		}
 	}
 
@@ -367,7 +367,7 @@ namespace brogueHd::simple
 			header->SignatureDecoded = BitmapFileHeader::BMPSignature::PT;
 
 		else
-			simpleException::show("Unhandled bitmap signature type:  simpleBitmap.h");
+			throw simpleException("Unhandled bitmap signature type:  simpleBitmap.h");
 
 		// Reserved data not needed:  Just grab these data points at their specified offsets
 		//
@@ -513,7 +513,7 @@ namespace brogueHd::simple
 	void simpleBitmap::decodeColorData(const simpleMapColorFilter& filter, simpleArray<simplePixel>& output)
 	{
 		if (output.count() != _dibHeader->bV5Width * _dibHeader->bV5Height)
-			simpleException::show("Invalid color data array count:  simpleBitmap.h");
+			throw simpleException("Invalid color data array count:  simpleBitmap.h");
 
 		// Color Table:  According to wikipedia's article the color table is an array of 32-bit words
 		//				 that begin the image data from the bottom left hand corner to the top right.

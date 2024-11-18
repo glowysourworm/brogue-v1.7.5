@@ -99,7 +99,7 @@ namespace brogueHd::frontend
 					return 1;
 					break;
 				default:
-					simpleException::show("Unhandled primitive GLenum type:  vec2 in simpleGlData.h");
+					throw simpleException("Unhandled primitive GLenum type:  vec2 in simpleGlData.h");
 			}
 		}
 		int getStreamSize(GLenum primitiveType) const override
@@ -115,7 +115,7 @@ namespace brogueHd::frontend
 					outputStream->writeFloat(y);
 					break;
 				default:
-					simpleException::show("Unhandled primitive GLenum type:  vec2 in simpleGlData.h");
+					throw simpleException("Unhandled primitive GLenum type:  vec2 in simpleGlData.h");
 			}
 		}
 
@@ -179,7 +179,7 @@ namespace brogueHd::frontend
 					return 1;
 					break;
 				default:
-					simpleException::show("Unhandled primitive GLenum type:  vec2 in simpleGlData.h");
+					throw simpleException("Unhandled primitive GLenum type:  vec2 in simpleGlData.h");
 			}
 		}
 		int getStreamSize(GLenum primitiveType) const override
@@ -196,7 +196,7 @@ namespace brogueHd::frontend
 					outputStream->writeInt(y);
 					break;
 				default:
-					simpleException::show("Unhandled primitive GLenum type:  vec2 in simpleGlData.h");
+					throw simpleException("Unhandled primitive GLenum type:  vec2 in simpleGlData.h");
 			}
 		}
 
@@ -254,7 +254,7 @@ namespace brogueHd::frontend
 					return 1;
 					break;
 				default:
-					simpleException::show("Unhandled primitive GLenum type:  vec2 in simpleGlData.h");
+					throw simpleException("Unhandled primitive GLenum type:  vec2 in simpleGlData.h");
 			}
 		}
 		int getStreamSize(GLenum primitiveType) const override
@@ -271,7 +271,7 @@ namespace brogueHd::frontend
 					outputStream->writeFloat(z);
 					break;
 				default:
-					simpleException::show("Unhandled primitive GLenum type:  vec2 in simpleGlData.h");
+					throw simpleException("Unhandled primitive GLenum type:  vec2 in simpleGlData.h");
 			}
 		}
 		size_t getHash() const override
@@ -339,7 +339,7 @@ namespace brogueHd::frontend
 					return 1;
 					break;
 				default:
-					simpleException::show("Unhandled primitive GLenum type:  vec2 in simpleGlData.h");
+					throw simpleException("Unhandled primitive GLenum type:  vec2 in simpleGlData.h");
 			}
 		}
 		int getStreamSize(GLenum primitiveType) const override
@@ -357,7 +357,7 @@ namespace brogueHd::frontend
 					outputStream->writeFloat(w);
 					break;
 				default:
-					simpleException::show("Unhandled primitive GLenum type:  vec2 in simpleGlData.h");
+					throw simpleException("Unhandled primitive GLenum type:  vec2 in simpleGlData.h");
 			}
 		}
 		size_t getHash() const override
@@ -431,7 +431,7 @@ namespace brogueHd::frontend
 				case GL_TRIANGLES:
 					return 6;
 				default:
-					simpleException::show("Unhandled primitive type for GLQuad:  {}", primitiveType);
+					throw simpleException("Unhandled primitive type for GLQuad:  {}", primitiveType);
 					break;
 			}
 		}
@@ -442,7 +442,7 @@ namespace brogueHd::frontend
 				case GL_TRIANGLES:
 					return 12 * sizeof(float);
 				default:
-					simpleException::show("Unhandled primitive type for GLQuad:  {}", primitiveType);
+					throw simpleException("Unhandled primitive type for GLQuad:  {}", primitiveType);
 					break;
 			}
 		}
@@ -466,7 +466,7 @@ namespace brogueHd::frontend
 				}
 				break;
 				default:
-					simpleException::show("Unhandled primitive type for GLQuad:  {}", primitiveType);
+					throw simpleException("Unhandled primitive type for GLQuad:  {}", primitiveType);
 					break;
 			}
 		}
@@ -523,7 +523,7 @@ namespace brogueHd::frontend
 				case GL_TRIANGLES:
 					return 6;
 				default:
-					simpleException::show("Unhandled primitive type for GLQuad:  {}", primitiveType);
+					throw simpleException("Unhandled primitive type for GLQuad:  {}", primitiveType);
 					break;
 			}
 		}
@@ -534,7 +534,7 @@ namespace brogueHd::frontend
 				case GL_TRIANGLES:
 					return 12 * sizeof(int);
 				default:
-					simpleException::show("Unhandled primitive type for GLQuad:  {}", primitiveType);
+					throw simpleException("Unhandled primitive type for GLQuad:  {}", primitiveType);
 					break;
 			}
 		}
@@ -558,7 +558,7 @@ namespace brogueHd::frontend
 				}
 				break;
 				default:
-					simpleException::show("Unhandled primitive type for GLQuad:  {}", primitiveType);
+					throw simpleException("Unhandled primitive type for GLQuad:  {}", primitiveType);
 					break;
 			}
 		}
@@ -624,7 +624,7 @@ namespace brogueHd::frontend
 				case GL_TRIANGLES:
 					return 6;
 				default:
-					simpleException::show("Unhandled primitive type for GLQuad:  {}", primitiveType);
+					throw simpleException("Unhandled primitive type for GLQuad:  {}", primitiveType);
 					break;
 			}
 		}
@@ -635,7 +635,7 @@ namespace brogueHd::frontend
 				case GL_TRIANGLES:
 					return 18 * sizeof(float);
 				default:
-					simpleException::show("Unhandled primitive type for GLQuad:  {}", primitiveType);
+					throw simpleException("Unhandled primitive type for GLQuad:  {}", primitiveType);
 					break;
 			}
 		}
@@ -659,7 +659,7 @@ namespace brogueHd::frontend
 				}
 				break;
 				default:
-					simpleException::show("Unhandled primitive type for GLQuad:  {}", primitiveType);
+					throw simpleException("Unhandled primitive type for GLQuad:  {}", primitiveType);
 					break;
 			}
 		}

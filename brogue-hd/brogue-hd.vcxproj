@@ -227,6 +227,7 @@
     <ClInclude Include="eventController.h" />
     <ClInclude Include="brogueFlameMenuTitleMask.h" />
     <ClInclude Include="gameGenerator.h" />
+    <ClInclude Include="gridRegionExtension.h" />
     <ClInclude Include="openglQuadConverter.h" />
     <ClInclude Include="openglHelper.h" />
     <ClInclude Include="brogueUIConstants.h" />

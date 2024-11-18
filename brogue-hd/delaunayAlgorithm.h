@@ -24,14 +24,14 @@ namespace brogueHd::component
 		delaunayAlgorithm(graphEdgeConstructor<TNode, TEdge> graphEdgeConstructor);
 		~delaunayAlgorithm();
 
-		graph<TNode, TEdge> run(const simpleList<TNode>& vertices) override;
+		graph<TNode, TEdge>* run(const simpleList<TNode>& vertices) override;
 
 	protected:
 
 		/// <summary>
 		/// Creates Delaunay triangulation using the Bowyer-Watson algorithm O(n log n). 
 		/// </summary>
-		graph<TNode, TEdge> bowyerWatson(const simpleList<TNode>& vertices);
+		graph<TNode, TEdge>* bowyerWatson(const simpleList<TNode>& vertices);
 	};
 
 	template<isGridLocatorNode TNode, isGridLocatorEdge<TNode> TEdge>
@@ -46,7 +46,7 @@ namespace brogueHd::component
 	}
 
 	template<isGridLocatorNode TNode, isGridLocatorEdge<TNode> TEdge>
-	graph<TNode, TEdge> delaunayAlgorithm<TNode, TEdge>::run(const simpleList<TNode>& vertices)
+	graph<TNode, TEdge>* delaunayAlgorithm<TNode, TEdge>::run(const simpleList<TNode>& vertices)
 	{
 		if (vertices.count() < 3)
 			return this->createDefaultGraph(vertices);
@@ -55,7 +55,7 @@ namespace brogueHd::component
 	}
 
 	template<isGridLocatorNode TNode, isGridLocatorEdge<TNode> TEdge>
-	graph<TNode, TEdge> delaunayAlgorithm<TNode, TEdge>::bowyerWatson(const simpleList<TNode>& vertices)
+	graph<TNode, TEdge>* delaunayAlgorithm<TNode, TEdge>::bowyerWatson(const simpleList<TNode>& vertices)
 	{
 		if (vertices.count() < 3)
 		{
@@ -277,6 +277,6 @@ namespace brogueHd::component
 		});
 
 		// Return a new graph with Delaunay edges
-		return graph<TNode, TEdge>(vertices.toArray(), delaunayEdges.toArray());
+		return new graph<TNode, TEdge>(vertices.toArray(), delaunayEdges.toArray());
 	}
 }

@@ -20,13 +20,12 @@ namespace brogueHd::component
 	class gridRegionConstructor
 	{
 	public:
-
 		/// <summary>
 		/// Grid Region Constructor:  Flood fill mode ensures that a SINGLE region of connected cells is produced. This is
 		/// the suggested usage. Otherwise, the location data is filled in during construction; and a potentially invalid
 		/// region is created.
 		/// </summary>
-		gridRegionConstructor(gridRect parentBoundary, gridPredicate<T> inclusionPredicate);
+		gridRegionConstructor(gridRect parentBoundary, gridPredicate<T> inclusionPredicate, bool unsafeMode);
 		~gridRegionConstructor();
 
 		/// <summary>
@@ -40,31 +39,14 @@ namespace brogueHd::component
 		void add(short column, short row, T item);
 
 		/// <summary>
-		/// Sets new cells in the grid using the parameterless constructor
-		/// </summary>
-		void add(const grid<T>& grid);
-
-		/// <summary>
-		/// Sets new cells in the grid using the parameterless constructor
-		/// </summary>
-		void add(T* itemArray);
-
-		/// <summary>
 		/// Checks to see whether or not the region constructor contains the specified item
 		/// </summary>
-		bool contains(T item);
+		bool contains(T item) const;
 
 		/// <summary>
 		/// Checks to see whether the constructor is defined at the specified coordinates
 		/// </summary>
-		bool isDefined(short column, short row);
-
-		///// <summary>
-		///// Translates a gridRegion using the specified offset - creating a new gridRegion instance
-		///// </summary>
-		///// <param name="region"></param>
-		///// <returns></returns>
-		//static gridRegion<T>* translate(const gridRegion<T>& region, gridLocator translation);
+		bool isDefined(short column, short row) const;
 
 	private:
 
@@ -74,7 +56,7 @@ namespace brogueHd::component
 		void addBoundary(short column, short row, T item);
 		void validate();
 		void validateRegionCollection(const char* name, simpleHash<T, T>* collection);
-		gridRect calculateLargestRectangle();
+		gridRect calculateLargestRectangle() const;
 
 	private:
 
@@ -101,12 +83,13 @@ namespace brogueHd::component
 		short _bottom;
 
 		bool _completed;
+		bool _unsafeMode;
 
 		gridPredicate<T>* _predicate;
 	};
 
 	template<isGridLocator T>
-	gridRegionConstructor<T>::gridRegionConstructor(gridRect parentBoundary, gridPredicate<T> inclusionPredicate)
+	gridRegionConstructor<T>::gridRegionConstructor(gridRect parentBoundary, gridPredicate<T> inclusionPredicate, bool unsafeMode)
 	{
 		// This component is pretty much free-standing
 		// _regionCentroidCalculator = IocContainer.Get<IRegionCentroidCalculator>();
@@ -135,6 +118,7 @@ namespace brogueHd::component
 		_bottom = std::numeric_limits<short>::min();
 
 		_completed = false;
+		_unsafeMode = unsafeMode;
 		_calculatedBoundary = nullptr;
 	}
 
@@ -142,6 +126,19 @@ namespace brogueHd::component
 	gridRegionConstructor<T>::~gridRegionConstructor()
 	{
 		delete _grid;
+
+		delete _locations;
+		delete _edgeLocations;
+
+		delete _northEdges;
+		delete _southEdges;
+		delete _eastEdges;
+		delete _westEdges;
+
+		delete _nwCorners;
+		delete _neCorners;
+		delete _seCorners;
+		delete _swCorners;
 	}
 
 	template<isGridLocator T>
@@ -150,23 +147,31 @@ namespace brogueHd::component
 		completeImpl();
 		validate();
 
-		//var centroids = _regionCentroidCalculator.CalculateCentroidLocations(regionInfo);
-
 		gridRect largestSubRegionRect = calculateLargestRectangle();
 
-		return new gridRegion<T>(_locations->getKeys().toArray(),
-								_edgeLocations->getKeys().toArray(),
-								_westEdges->getKeys().toArray(),
-								_northEdges->getKeys().toArray(),
-								_eastEdges->getKeys().toArray(),
-								_southEdges->getKeys().toArray(),
-								_nwCorners->getKeys().toArray(),
-								_neCorners->getKeys().toArray(),
-								_seCorners->getKeys().toArray(),
-								_swCorners->getKeys().toArray(),
-								_grid->getParentBoundary(),
-								*_calculatedBoundary,
-								largestSubRegionRect);
+		simpleArray<T> locations = _locations->getKeys().toArray();
+		simpleArray<T> edgeLocations = _edgeLocations->getKeys().toArray();
+
+		simpleArray<T> edgesN = _northEdges->getKeys().toArray();
+		simpleArray<T> edgesS = _southEdges->getKeys().toArray();
+		simpleArray<T> edgesE = _eastEdges->getKeys().toArray();
+		simpleArray<T> edgesW = _westEdges->getKeys().toArray();
+
+		simpleArray<T> cornersNE = _neCorners->getKeys().toArray();
+		simpleArray<T> cornersNW = _nwCorners->getKeys().toArray();
+		simpleArray<T> cornersSE = _seCorners->getKeys().toArray();
+		simpleArray<T> cornersSW = _swCorners->getKeys().toArray();
+
+		gridRect parentBoundary = _grid->getParentBoundary();
+		gridRect boundary = *_calculatedBoundary;
+
+		// (MEMORY!)
+		gridRegion<T>* result = new gridRegion<T>(locations, edgeLocations,
+												 edgesN, edgesS, edgesE, edgesW,
+												 cornersNE, cornersNW, cornersSE, cornersSW,
+												 parentBoundary, boundary, largestSubRegionRect);
+
+		return result;
 	}
 
 	template<isGridLocator T>
@@ -180,8 +185,12 @@ namespace brogueHd::component
 
 		else
 		{
-			if (_locations->count() > 0 && !isConnected(column, row, location))
-				throw simpleException("Trying to add un-connected cell to the region:  gridRegionConstructor.add (try unsafe non-flood fill mode?)");
+			// Unsafe Mode:  Doesn't check adjacency while adding locations
+			if (!_unsafeMode)
+			{
+				if (_locations->count() > 0 && !isConnected(column, row, location))
+					throw simpleException("Trying to add un-connected cell to the region:  gridRegionConstructor.add (try unsafe non-flood fill mode?)");
+			}
 
 			// Keep locations up to date
 			_grid->set(column, row, location);
@@ -189,29 +198,6 @@ namespace brogueHd::component
 
 			// Expand the boundary
 			addBoundary(column, row, location);
-		}
-	}
-
-	template<isGridLocator T>
-	void gridRegionConstructor<T>::add(const grid<T>& grid)
-	{
-		gridRegionConstructor<T>* that = this;
-
-		grid.iterate([&that] (short column, short row, T item)
-		{
-			if (item != NULL)
-				that->add(column, row, item);
-
-			return iterationCallback::iterate;
-		});
-	}
-
-	template<isGridLocator T>
-	void gridRegionConstructor<T>::add(T* locators)
-	{
-		for (int index = 0; index < sizeof(locators); index++)
-		{
-			this->add(locators[index].column, locators[index].row, locators[index]);
 		}
 	}
 
@@ -238,13 +224,13 @@ namespace brogueHd::component
 	}
 
 	template<isGridLocator T>
-	bool gridRegionConstructor<T>::isDefined(short column, short row)
+	bool gridRegionConstructor<T>::isDefined(short column, short row) const
 	{
 		return _grid->isDefined(column, row);
 	}
 
 	template<isGridLocator T>
-	bool gridRegionConstructor<T>::contains(T item)
+	bool gridRegionConstructor<T>::contains(T item) const
 	{
 		return _grid->isDefined(item.column, item.row) && (_grid->get(item.column, item.row) == item);
 	}
@@ -256,10 +242,10 @@ namespace brogueHd::component
 			return false;
 
 		// ONE of the adjacent elements MUST be in the grid - using the predicate to verify
-		T north = _grid->getAdjacent(column, row, brogueCompass::N);
-		T south = _grid->getAdjacent(column, row, brogueCompass::S);
-		T east = _grid->getAdjacent(column, row, brogueCompass::E);
-		T west = _grid->getAdjacent(column, row, brogueCompass::W);
+		T north = _grid->getAdjacentUnsafe(column, row, brogueCompass::N);
+		T south = _grid->getAdjacentUnsafe(column, row, brogueCompass::S);
+		T east = _grid->getAdjacentUnsafe(column, row, brogueCompass::E);
+		T west = _grid->getAdjacentUnsafe(column, row, brogueCompass::W);
 
 		if (north != default_value::value<T>() && (*_predicate)(column, row - 1, north))
 			return true;
@@ -344,7 +330,7 @@ namespace brogueHd::component
 		_locations->forEach([&grid] (T key, T value)
 		{
 			if (grid->get(key.column, key.row) != key)
-				simpleException::show("RegionConstructor grid was not valid:  Column={} Row={}", key.column, key.row);
+				throw simpleException("RegionConstructor grid was not valid:  Column={} Row={}", key.column, key.row);
 
 			return iterationCallback::iterate;
 		});
@@ -366,11 +352,11 @@ namespace brogueHd::component
 	void gridRegionConstructor<T>::validateRegionCollection(const char* name, simpleHash<T, T>* collection)
 	{
 		if (collection->count() <= 0)
-			simpleException::showCstr("Collection for building regions is not valid:  gridRegionConstructor.validate");
+			throw simpleException("Collection for building regions is not valid:  gridRegionConstructor.validate");
 	}
 
 	template<isGridLocator T>
-	gridRect gridRegionConstructor<T>::calculateLargestRectangle()
+	gridRect gridRegionConstructor<T>::calculateLargestRectangle() const
 	{
 		if (!_completed)
 			throw simpleException("Trying to run largest rectangle calculation before calling complete:  gridRegionConstructor.h");
@@ -454,7 +440,7 @@ namespace brogueHd::component
 
 		// Validation: Check boundaries; check that grid is defined
 		//
-		gridRegionConstructor<T>* that = this;
+		const gridRegionConstructor<T>* that = this;
 		gridRect result(bestStartColumn, bestStartRow, (bestEndColumn - bestStartColumn) + 1, (bestEndRow - bestStartRow) + 1);
 
 		if (!_calculatedBoundary->contains(result))
@@ -470,33 +456,5 @@ namespace brogueHd::component
 
 		return result;
 	}
-
-	//template<isGridLocator T>
-	//gridRegion<T>* gridRegionConstructor<T>::translate(const gridRegion<T>& region, gridLocator translation)
-	//{
-	//	gridRegionConstructor<T> constructor(region.getParentBoundary(), [] (short column, short row, T item)
-	//	{
-	//		return true;
-	//	});
-
-	//	// MODIFIES GRID LOCATORS!
-	//	region.iterateLocations([&constructor, &translation] (short column, short row, T item)
-	//	{
-	//		short newColumn = item.column + translation.column;
-	//		short newRow = item.row + translation.row;
-
-	//		gridLocator locator = (gridLocator)(item);
-
-	//		locator.column = newColumn;
-	//		locator.row = newRow;
-
-	//		constructor.add(newColumn, newRow, locator);
-
-	//		return iterationCallback::iterate;
-	//	});
-
-	//	// Commit the translated region to memory - calculating the rest of the data
-	//	return constructor.complete();
-	//}
 }
 

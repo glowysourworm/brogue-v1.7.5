@@ -1,8 +1,10 @@
 #pragma once
 
 #include "brogueCell.h"
+#include "gridDefinitions.h"
 #include "gridLocator.h"
 #include "gridRegion.h"
+#include "gridRegionExtension.h"
 #include "simple.h"
 
 using namespace brogueHd::component;
@@ -13,20 +15,43 @@ namespace brogueHd::backend::model
 	{
 	public:
 
-		brogueRoom(gridRegion<brogueCell> region,
-					gridLocator connectionPointN,
-					gridLocator connectionPointS,
-					gridLocator connectionPointE,
-					gridLocator connectionPointW)
+		template<isGridLocator T>
+		brogueRoom(gridRegion<T>* region,
+				   const gridLocator& connectionPointN,
+				   const gridLocator& connectionPointS,
+				   const gridLocator& connectionPointE,
+				   const gridLocator& connectionPointW)
 		{
-			_region = region;
-			_connectionPointN = connectionPointN;
-			_connectionPointS = connectionPointS;
-			_connectionPointE = connectionPointE;
-			_connectionPointW = connectionPointW;
+			//// (MEMORY!)
+			//_region = gridRegionExtension::map(region, [] (const T& locator)
+			//{
+			//	return new brogueCell(locator.column, locator.row);
+			//});
+
+			_connectionPointN = new gridLocator(connectionPointN);
+			_connectionPointS = new gridLocator(connectionPointS);
+			_connectionPointE = new gridLocator(connectionPointE);
+			_connectionPointW = new gridLocator(connectionPointW);
 		}
 
-		~brogueRoom() {};
+		~brogueRoom() 
+		{
+			//_region->iterateLocations([] (short column, short row, brogueCell* item)
+			//{
+			//	delete item;
+
+			//	return iterationCallback::iterate;
+			//});
+
+			// (MEMORY!)
+			delete _region;
+
+			// local memory
+			delete _connectionPointN;
+			delete _connectionPointS;
+			delete _connectionPointE;
+			delete _connectionPointW;
+		};
 
 	public:
 
@@ -37,12 +62,12 @@ namespace brogueHd::backend::model
 
 	private:
 
-		gridRegion<brogueCell> _region;
+		gridRegion<brogueCell>* _region;
 
 		// Connection points are inside the region:  THEY ARE NOT DOORS!
-		gridLocator _connectionPointN;
-		gridLocator _connectionPointS;
-		gridLocator _connectionPointE;
-		gridLocator _connectionPointW;
+		gridLocator* _connectionPointN;
+		gridLocator* _connectionPointS;
+		gridLocator* _connectionPointE;
+		gridLocator* _connectionPointW;
 	};
 }

@@ -28,7 +28,7 @@ namespace brogueHd::backend::model
 			//brogueAssert(SIZEOF(amessage) <= COLS * 2);
 
 			if (sizeof(amessage) > COLS * 2)
-				simpleException::showCstr("Message is outside the bounds of the display:  messageData.h");
+				throw simpleException("Message is outside the bounds of the display:  messageData.h");
 
 			message = colorString(amessage, textColor);
 			confirmed = aconfirmed;

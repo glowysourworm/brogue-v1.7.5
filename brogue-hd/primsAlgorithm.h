@@ -134,7 +134,7 @@ namespace brogueHd::component
 			}
 
 			if (nextEdge == NULL)
-				simpleException::show("No connection found between regions Minimum Spanning Tree:  primsAlgorithm.cpp");
+				throw simpleException("No connection found between regions Minimum Spanning Tree:  primsAlgorithm.cpp");
 
 			unusedVertices.remove(nextVertex);
 			usedVertices.add(nextVertex);

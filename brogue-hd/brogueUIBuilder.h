@@ -59,16 +59,18 @@ namespace brogueHd::frontend
 
 		// Brogue v1.7.5
 		static const color HeaderForegroundColor() { return colors::yellow(); }
-		static const color FooterForegroundColor() { return color(0.464, 0.396, 0.894, 1.0); }
+		static const color FooterForegroundColor() { return color(0.464f, 0.396f, 0.894f, 1.0f); }
 		static const color FontDefaultColor() { return colors::white(); }
+		static const color FontFlavorTextColor() { return color(0.464f, 0.396f, 0.894f, 1.0f); }
+		static const color FontHighScoresColor() { return color(0.596f, 0.494f, 0.996f, 1); }
 		static const color FontDefaultHotkeyColor() { return colors::yellow(); }
 		static const color FontDefaultBackgroundColor() { return color(0, 0, 0, 0); }
-
+		
 		static const color FlatMenuButtonColor() { return color(0, 0, 0, 0.85f); }
-		static const color FlatMenuButtonActiveColor1() { return color(0.3, 0.3, 0.3, 0.85f); }
-		static const color FlatMenuButtonActiveColor2() { return color(0.1, 0.1, 0.1, 0.85f); }
-		static const color FlatMenuButtonPressedColor1() { return color(0.4, 0.4, 0.4, 0.85f); }
-		static const color FlatMenuButtonPressedColor2() { return color(0.1, 0.1, 0.1, 0.85f); }
+		static const color FlatMenuButtonActiveColor1() { return color(0.3f, 0.3f, 0.3f, 0.85f); }
+		static const color FlatMenuButtonActiveColor2() { return color(0.1f, 0.1f, 0.1f, 0.85f); }
+		static const color FlatMenuButtonPressedColor1() { return color(0.4f, 0.4f, 0.4f, 0.85f); }
+		static const color FlatMenuButtonPressedColor2() { return color(0.1f, 0.1f, 0.1f, 0.85f); }
 
 		static const color GameFontSubduedColor() { return colors::getGray(0.5); }
 
@@ -82,16 +84,16 @@ namespace brogueHd::frontend
 		static const color GameMenuButtonPressedColor1() { return MenuButtonPressedColor1() * 0.75f; }
 		static const color GameMenuButtonPressedColor2() { return MenuButtonPressedColor2() * 0.75f; }
 
-		static const color MenuBackgroundColor1() { return color(0.156, 0.137, 0.329, 1); }
-		static const color MenuBackgroundColor2() { return color(0.078, 0.058, 0.156, 1); }
-		static const color MenuDefaultBackground() { return color(0, 0, 0, 0.85); }
+		static const color MenuBackgroundColor1() { return color(0.156f, 0.137f, 0.329f, 1.0f); }
+		static const color MenuBackgroundColor2() { return color(0.078f, 0.058f, 0.156f, 1.0f); }
+		static const color MenuDefaultBackground() { return color(0, 0, 0, 0.85f); }
 
-		static const color MenuButtonColor1() { return color(0.156, 0.137, 0.329, 1); }
-		static const color MenuButtonColor2() { return color(0.078, 0.058, 0.156, 1); }
-		static const color MenuButtonActiveColor1() { return color(0.312, 0.274, 0.658, 1); }
-		static const color MenuButtonActiveColor2() { return color(0.078, 0.058, 0.156, 1); }
-		static const color MenuButtonPressedColor1() { return color(0.234, 0.205, 0.493, 1); }
-		static const color MenuButtonPressedColor2() { return color(0.078, 0.058, 0.156, 1); }
+		static const color MenuButtonColor1() { return color(0.156f, 0.137f, 0.329f, 1.0f); }
+		static const color MenuButtonColor2() { return color(0.078f, 0.058f, 0.156f, 1.0f); }
+		static const color MenuButtonActiveColor1() { return color(0.312f, 0.274f, 0.658f, 1.0f); }
+		static const color MenuButtonActiveColor2() { return color(0.078f, 0.058f, 0.156f, 1.0f); }
+		static const color MenuButtonPressedColor1() { return color(0.234f, 0.205f, 0.493f, 1.0f); }
+		static const color MenuButtonPressedColor2() { return color(0.078f, 0.058f, 0.156f, 1.0f); }
 
 	private:
 
@@ -536,9 +538,8 @@ namespace brogueHd::frontend
 		brogueUIProgram program = brogueUIProgram::FlavorTextPanelProgram;
 
 		// Brogue v1.7.5
-		color foreground(0.464, 0.396, 0.894, 1.0);
 		gridRect boundary = getBrogueStaticBoundary(brogueUIProgramPartId(program, brogueUIProgramPart::Background, 0));
-		brogueTextView* flavorText = createTextViewSingleLine(program, boundary, "You see a large Troll...", foreground, colors::black(), colors::black(), brogueTextAlignment::Left);
+		brogueTextView* flavorText = createTextViewSingleLine(program, boundary, "You see a large Troll...", FontFlavorTextColor(), colors::black(), colors::black(), brogueTextAlignment::Left);
 		brogueViewContainer* result = new brogueViewContainer(program, _zoomLevel, false, false, boundary);
 
 		result->addView(flavorText);
@@ -574,8 +575,6 @@ namespace brogueHd::frontend
 
 	brogueViewContainer* brogueUIBuilder::createGameLog()
 	{
-		color menuColor(0, 0, 0, 0.85);
-
 		brogueUIProgram program = brogueUIProgram::GameLogProgram;
 
 		gridRect sceneBounds = getBrogueSceneBoundary();
@@ -584,7 +583,7 @@ namespace brogueHd::frontend
 		brogueGameLogContainer* result = new brogueGameLogContainer(program, _zoomLevel, false, false, boundary);
 
 		brogueUIProgramPartId partId(program, brogueUIProgramPart::Text, 0);
-		brogueUIData uiData(_zoomLevel, menuColor);
+		brogueUIData uiData(_zoomLevel, MenuDefaultBackground());
 		brogueTextView* view = new brogueTextView(_eventController, partId, uiData, sceneBounds, boundary);
 
 		view->setUIAction(brogueUITagAction(brogueUIAction::GameCommand_ToggleLog, ""));
@@ -744,9 +743,6 @@ namespace brogueHd::frontend
 
 	brogueViewContainer* brogueUIBuilder::createHighScoresView()
 	{
-		// Pulled from Brogue v1.7.5
-		color menuColor(0, 0, 0, 0.85);
-		color footerColor(0.596f, 0.494f, 0.996f, 1);
 		int menuPadding = 2;
 
 		gridRect sceneBounds = getBrogueSceneBoundary();
@@ -754,14 +750,14 @@ namespace brogueHd::frontend
 		brogueViewContainer* result = new brogueViewContainer(brogueUIProgram::HighScoresProgram, _zoomLevel, false, false, sceneBounds);
 
 		brogueUIProgramPartId partId(brogueUIProgram::HighScoresProgram, brogueUIProgramPart::Text, 0);
-		brogueUIData uiData(_zoomLevel, menuColor);
+		brogueUIData uiData(_zoomLevel, MenuDefaultBackground());
 		brogueTextView* textView = new brogueTextView(_eventController, partId, uiData, sceneBounds, sceneBounds);
 
 		textView->setUIAction(brogueUITagAction(brogueUIState::MainMenu));
 
 		// Header and Footer
 		textView->setLine(0, "-- High Scores --", colors::yellow(), brogueTextAlignment::Center);
-		textView->setLine(sceneBounds.height - 1, "Press space to continue", footerColor, brogueTextAlignment::Center);
+		textView->setLine(sceneBounds.height - 1, "Press space to continue", FontHighScoresColor(), brogueTextAlignment::Center);
 
 		for (int index = 0; index < _resourceController->getHighScoreCount(); index++)
 		{
@@ -796,10 +792,6 @@ namespace brogueHd::frontend
 
 	brogueViewContainer* brogueUIBuilder::createHeaderedBackground(brogueUIProgram programName, const colorString& headerText)
 	{
-		// Pulled from Brogue v1.7.5
-		color menuColor1(0.067, 0.059, 0.149, 0.8f);
-		color menuColor2(0.067, 0.059, 0.149, 0.8f);
-
 		brogueUIProgramPartId menuId(programName, brogueUIProgramPart::MenuBackground, 0);
 
 		gridRect sceneBounds = getBrogueSceneBoundary();
@@ -811,7 +803,7 @@ namespace brogueHd::frontend
 		brogueUIProgramPartId partId(programName, brogueUIProgramPart::Text, 0);
 
 		// Menu Background
-		brogueUIData uiData(_zoomLevel, menuColor1, menuColor2, brogueGradientType::Circular);
+		brogueUIData uiData(_zoomLevel, MenuBackgroundColor1(), MenuBackgroundColor2(), brogueGradientType::Circular);
 
 		// Handles lines of text / a paragraph
 		brogueTextView* textView = new brogueTextView(_eventController, partId, uiData, sceneBounds, boundary);
@@ -827,7 +819,7 @@ namespace brogueHd::frontend
 	brogueViewContainer* brogueUIBuilder::createPlaceholder(brogueUIProgram programName, const gridRect& boundary)
 	{
 		brogueUIProgramPartId partId(programName, brogueUIProgramPart::Background, 0);
-		brogueUIData uiData(_zoomLevel, _randomGenerator->nextColor(colors::getGray(0.2), colors::getGray(0.5)));
+		brogueUIData uiData(_zoomLevel, _randomGenerator->nextColor(colors::getGray(0.2f), colors::getGray(0.5f)));
 		brogueBackground* background = new brogueBackground(_eventController, partId, uiData, getBrogueSceneBoundary(), boundary);
 		brogueViewContainer* container = new brogueViewContainer(programName, _zoomLevel, false, false, boundary);
 
@@ -991,15 +983,11 @@ namespace brogueHd::frontend
 
 	brogueBackground* brogueUIBuilder::createMenuBackground(brogueUIProgram programName, const gridRect& boundary)
 	{
-		// Pulled from Brogue v1.7.5
-		color menuColor1(0, 0, 0, 1.0f);
-		color menuColor2(0, 0, 0, 0.5f);
-
 		gridRect sceneBounds = getBrogueSceneBoundary();
 
 		brogueUIProgramPartId menuId(programName, brogueUIProgramPart::MenuBackground, _menuBackgroundCounter++);
 
-		brogueUIData menuData(_zoomLevel, menuColor1, menuColor2, brogueGradientType::Circular);
+		brogueUIData menuData(_zoomLevel, MenuBackgroundColor1(), MenuBackgroundColor2(), brogueGradientType::Circular);
 
 		return new brogueBackground(_eventController, menuId, menuData, sceneBounds, boundary);
 	}

@@ -105,7 +105,7 @@ namespace brogueHd::simple
 	uint8_t simpleBuffer::decode8(int offset, bufferByte byteNumber)
 	{
 		if (_checkWordAlignment && offset % this->WordSize != 0)
-			simpleException::show("Word alignment incorrect:  simpleBuffer.h");
+			throw simpleException("Word alignment incorrect:  simpleBuffer.h");
 
 		return (getWord(offset) & getMask(byteNumber)) >> ((byteNumber - 1) * 8);
 	}
@@ -113,7 +113,7 @@ namespace brogueHd::simple
 	{
 		if (_checkWordAlignment &&
 			(offset % this->WordSize != 0))
-			simpleException::show("Word alignment incorrect:  simpleBuffer.h");
+			throw simpleException("Word alignment incorrect:  simpleBuffer.h");
 
 		uint32_t word = getWord(offset);
 
@@ -123,7 +123,7 @@ namespace brogueHd::simple
 	{
 		if (_checkWordAlignment &&
 			(offset % this->WordSize != 0))
-			simpleException::show("Word alignment incorrect:  simpleBuffer.h");
+			throw simpleException("Word alignment incorrect:  simpleBuffer.h");
 
 		return (uint16_t)(_buffer[offset]) |
 			(uint16_t)(_buffer[offset + 1] << 8);
@@ -131,7 +131,7 @@ namespace brogueHd::simple
 	uint32_t simpleBuffer::decode32(int offset)
 	{
 		if (_checkWordAlignment && (offset % this->WordSize != 0))
-			simpleException::show("Word alignment incorrect:  simpleBuffer.h");
+			throw simpleException("Word alignment incorrect:  simpleBuffer.h");
 
 		return getWord(offset);
 	}
@@ -139,7 +139,7 @@ namespace brogueHd::simple
 	void simpleBuffer::encode8(int offset, bufferByte byteNumber, uint8_t value)
 	{
 		if (_checkWordAlignment && offset % this->WordSize != 0)
-			simpleException::show("Word alignment incorrect:  simpleBuffer.h");
+			throw simpleException("Word alignment incorrect:  simpleBuffer.h");
 
 		_buffer[offset + byteNumber - 1] = value;
 	}
@@ -147,7 +147,7 @@ namespace brogueHd::simple
 	{
 		if (_checkWordAlignment &&
 			(offset % this->WordSize != 0))
-			simpleException::show("Word alignment incorrect:  simpleBuffer.h");
+			throw simpleException("Word alignment incorrect:  simpleBuffer.h");
 
 		uint32_t output = maskAndShift(value, byteNumber);
 
@@ -157,7 +157,7 @@ namespace brogueHd::simple
 	void simpleBuffer::encode32(int offset, uint32_t value)
 	{
 		if (_checkWordAlignment && offset % this->WordSize != 0)
-			simpleException::show("Word alignment incorrect:  simpleBuffer.h");
+			throw simpleException("Word alignment incorrect:  simpleBuffer.h");
 
 		for (int index = 0; index < 4; index++)
 		{
@@ -185,7 +185,7 @@ namespace brogueHd::simple
 			case bufferByte::byte4:
 				return this->Int32_Byte4;
 			default:
-				simpleException::show("Unhandled bufferByte type:  simpleBuffer::getMask");
+				throw simpleException("Unhandled bufferByte type:  simpleBuffer::getMask");
 		}
 	}
 	uint32_t simpleBuffer::maskAndShift(uint8_t value, bufferByte byteNumber)
@@ -201,7 +201,7 @@ namespace brogueHd::simple
 			case bufferByte::byte4:
 				return ((uint32_t)value) << 24;
 			default:
-				simpleException::show("Unhandled bufferByte type:  simpleBuffer::getMask");
+				throw simpleException("Unhandled bufferByte type:  simpleBuffer::getMask");
 		}
 	}
 	uint32_t simpleBuffer::maskAndShift(uint16_t value, bufferByte byteNumber)
@@ -214,10 +214,10 @@ namespace brogueHd::simple
 				return ((uint32_t)value) << 8;
 			case bufferByte::byte1:
 			case bufferByte::byte4:
-				simpleException::show("Alignment Exception:  simpleBuffer.h");
+				throw simpleException("Alignment Exception:  simpleBuffer.h");
 				throw;
 			default:
-				simpleException::show("Unhandled bufferByte type:  simpleBuffer::getMask");
+				throw simpleException("Unhandled bufferByte type:  simpleBuffer::getMask");
 				throw;
 		}
 	}
@@ -237,7 +237,7 @@ namespace brogueHd::simple
 			case bufferByte::byte4:
 				return result >> 24;
 			default:
-				simpleException::show("Unhandled bufferByte type:  simpleBuffer::getMask");
+				throw simpleException("Unhandled bufferByte type:  simpleBuffer::getMask");
 		}
 	}
 }

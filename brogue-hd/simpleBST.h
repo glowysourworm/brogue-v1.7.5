@@ -159,7 +159,7 @@ namespace brogueHd::simple
 	T simpleBST<K, T>::remove(K key)
 	{
 		if (!_nodeMap->contains(key))
-			simpleException::showCstr("Trying to remove non-existing key from binary search tree");
+			throw simpleException("Trying to remove non-existing key from binary search tree");
 
 		// Remove the specified key -> Rebalance the tree
 		_root = this->removalImpl(_root, key);
@@ -202,7 +202,7 @@ namespace brogueHd::simple
 			return _nodeMap->get(key)->value;
 
 		else
-			simpleException::showCstr("Trying to retrieve hash-backed node from BST without checking");
+			throw simpleException("Trying to retrieve hash-backed node from BST without checking");
 	}
 
 	template<isHashable K, typename T>
@@ -256,7 +256,7 @@ namespace brogueHd::simple
 		simpleBSTNode<K, T>* minNode = this->minImpl(_root);
 
 		if (minNode == NULL)
-			simpleException::showCstr("Trying to resolve min key from an empty Binary Search Tree");
+			throw simpleException("Trying to resolve min key from an empty Binary Search Tree");
 
 		else
 			return minNode->key;
@@ -280,7 +280,7 @@ namespace brogueHd::simple
 		simpleBSTNode<K, T>* maxNode = this->maxImpl(_root);
 
 		if (maxNode == NULL)
-			simpleException::showCstr("Trying to resolve max key from an empty Binary Search Tree");
+			throw simpleException("Trying to resolve max key from an empty Binary Search Tree");
 
 		else
 			return maxNode->key;
@@ -303,7 +303,7 @@ namespace brogueHd::simple
 			node->right = this->insertImpl(node->right, key, value);
 
 		else
-			simpleException::showCstr("Duplicate key insertion BinarySearchTree");
+			throw simpleException("Duplicate key insertion BinarySearchTree");
 
 		// Set the height
 		node->height = simpleMath::maxOf((node->left != NULL) ? node->left->height : -1,

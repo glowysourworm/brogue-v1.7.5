@@ -29,35 +29,43 @@ namespace brogueHd::component
 	concept isGridLocator = std::convertible_to<T, gridLocator>;
 
 	/// <summary>
+	/// Delegate for mapping different types of grid locators.
+	/// </summary>
+	/// <typeparam name="TResult">Result type</typeparam>
+	/// <typeparam name="T">Source type</typeparam>
+	template<isGridLocator TResult, isGridLocator T>
+	using gridLocatorMapper = std::function<TResult(const T& item)>;
+
+	/// <summary>
 	/// Simple iteration callback. Set the return value to either continue / break.
 	/// </summary>
 	template<typename T>
-	using gridSimpleCallback = std::function<iterationCallback(T)>;
+	using gridSimpleCallback = std::function<iterationCallback(const T& item)>;
 
 	/// <summary>
 	/// Iteration callback that includes the indices. Set the return value to either continue / break.
 	/// </summary>
 	template<typename T>
-	using gridCallback = std::function<iterationCallback(short, short, T)>;
+	using gridCallback = std::function<iterationCallback(short column, short row, const T& current)>;
 
 	/// <summary>
 	/// Iteration callback that includes the indices. Set the return value to either continue / break. Adds the
 	/// compass for adjacent cells.
 	/// </summary>
 	template<typename T>
-	using gridCallbackAdjacent = std::function<iterationCallback(short, short, brogueCompass, T)>;
+	using gridCallbackAdjacent = std::function<iterationCallback(short column, short row, brogueCompass direction, const T& current)>;
 
 	/// <summary>
 	/// Simple predicate decision making function that includes the item coordinates
 	/// </summary>
 	template<typename T>
-	using gridPredicate = std::function<bool(short, short, T)>;
+	using gridPredicate = std::function<bool(short column, short row, const T& current)>;
 
 	/// <summary>
 	/// Simple predicate decision making function
 	/// </summary>
 	template<typename T>
-	using gridSimplePredicate = std::function<bool(T)>;
+	using gridSimplePredicate = std::function<bool(const T& current)>;
 
 	/// <summary>
 	/// Searches grid for requested value based on comparison. Each truthy aggregateComparator result will store
@@ -65,30 +73,24 @@ namespace brogueHd::component
 	/// The second argument will be the current grid value.
 	/// </summary>
 	template<typename T>
-	using gridAggregateComparer = std::function<bool(T, T)>;
+	using gridAggregateComparer = std::function<bool(T& seed, const T& currentItem)>;
 
 	/// <summary>
 	/// Defines a constructor (or getter) method for grid cells
 	/// </summary>
 	template<typename T>
-	using gridElementConstructor = std::function<T(short, short)>;
+	using gridElementConstructor = std::function<T(short column, short row)>;
 
 
 	/// <summary>
 	/// Selector of a value from the current item that includes the grid coordinates
 	/// </summary>
 	template<typename T, typename TResult>
-	using gridSelector = std::function<TResult(short, short, T)>;
+	using gridSelector = std::function<TResult(short column, short row, const T& current)>;
 
 	/// <summary>
 	/// Definition of function to select a value from the grid type.
 	/// </summary>
 	template<typename T, typename TResult>
-	using gridSimpleSelectlr = std::function<TResult(T)>;
-
-	/// <summary>
-	/// Simple iteration callback. Set the return value to either continue / break.
-	/// </summary>
-	template<typename T>
-	using gridIterator = std::function<iterationCallback(short, short)>;
+	using gridSimpleSelector = std::function<TResult(const T& current)>;
 }

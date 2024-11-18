@@ -111,11 +111,10 @@ namespace brogueHd::backend
 					default:
 						break;
 				}
-				break;
 
 				designCavern(designGrid, minSize, maxSize);
 			}
-				break;
+			break;
 			case roomTypes::Cavern:
 			{
 				minSize.width = CAVE_MIN_WIDTH;
@@ -222,7 +221,7 @@ namespace brogueHd::backend
 		designGrid.iterate([&designGrid, &maxRegion] (short column, short row, const gridLocator& item)
 		{
 			if (!maxRegion->isDefined(column, row))
-				designGrid.set(column, row, default_value::value<gridLocator>());
+				designGrid.set(column, row, default_value::value<gridLocator>(), true);
 
 			// Just force it to be defined (but should already be set from the CA algorithm)
 			else

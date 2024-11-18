@@ -12,21 +12,21 @@ namespace brogueHd::simple
 
 		simplePoint()
 		{
-			x = -1;
-			y = -1;
+			x = default_value::value<T>();
+			y = default_value::value<T>();
 		}
 		simplePoint(const simplePoint<T>& copy)
 		{
 			x = copy.x;
 			y = copy.y;
 		}
-		simplePoint(T ax, T ay)
+		simplePoint(const T& ax, const T& ay)
 		{
 			x = ax;
 			y = ay;
 		}
 
-		void operator =(const simplePoint<T>& copy)
+		void operator=(const simplePoint<T>& copy)
 		{
 			x = copy.x;
 			y = copy.y;

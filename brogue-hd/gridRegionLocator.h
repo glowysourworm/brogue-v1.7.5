@@ -96,7 +96,7 @@ namespace brogueHd::component
 				// Recurse to fill out the grid
 				gridRegionConstructor<T>* constructor = that->runFloodFill(grid, column, row, inclusionPredicate);
 
-				// Validate / Complete the region
+				// (MEMORY!) Validate / Complete the region
 				gridRegion<T>* region = constructor->complete();
 
 				delete constructor;
@@ -132,10 +132,10 @@ namespace brogueHd::component
 	gridRegionConstructor<T>* gridRegionLocator<T>::runFloodFill(const grid<T>& grid, short column, short row, gridPredicate<T> inclusionPredicate)
 	{
 		if (!grid.isDefined(column, row) || !inclusionPredicate(column, row, grid.get(column, row)))
-			simpleException::show("Trying to start FloodFill in non-region location");
+			throw simpleException("Trying to start FloodFill in non-region location");
 
 		// (MEMORY!) Collect the region data in a constructor
-		gridRegionConstructor<T>* regionConstructor = new gridRegionConstructor(grid.getParentBoundary(), inclusionPredicate);
+		gridRegionConstructor<T>* regionConstructor = new gridRegionConstructor(grid.getParentBoundary(), inclusionPredicate, false);
 
 		// Use queue to know what locations have been verified. Starting with test location - continue 
 		// until all connected cells have been added to the resulting region using the predicate.
@@ -153,16 +153,16 @@ namespace brogueHd::component
 			T regionLocation = resultQueue.removeAt(0);
 
 			//if (regionConstructor.contains(regionLocation))
-			//	simpleException::showCstr("Trying to add location duplicate:  gridRegionLocator.runFloodFill");
+			//	throw simpleException("Trying to add location duplicate:  gridRegionLocator.runFloodFill");
 
 			// Add to region constructor (also prevents requeueing)
 			//regionConstructor.add(regionLocation.column, regionLocation.row, regionLocation);
 
 			// Search cardinally adjacent cells (N,S,E,W)
-			T north = grid.get(regionLocation.column, regionLocation.row - 1);
-			T south = grid.get(regionLocation.column, regionLocation.row + 1);
-			T east = grid.get(regionLocation.column + 1, regionLocation.row);
-			T west = grid.get(regionLocation.column - 1, regionLocation.row);
+			T north = grid.isInBounds(regionLocation.column, regionLocation.row - 1) ? grid.get(regionLocation.column, regionLocation.row - 1) : default_value::value<T>();
+			T south = grid.isInBounds(regionLocation.column, regionLocation.row + 1) ? grid.get(regionLocation.column, regionLocation.row + 1) : default_value::value<T>();
+			T east = grid.isInBounds(regionLocation.column + 1, regionLocation.row) ? grid.get(regionLocation.column + 1, regionLocation.row) : default_value::value<T>();
+			T west = grid.isInBounds(regionLocation.column - 1, regionLocation.row) ? grid.get(regionLocation.column - 1, regionLocation.row) : default_value::value<T>();
 
 			// Procedure: DON'T SET RESULT ARRAYS HERE
 			//

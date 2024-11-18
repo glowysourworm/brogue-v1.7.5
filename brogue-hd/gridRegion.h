@@ -22,21 +22,20 @@ namespace brogueHd::component
 	class gridRegion : public hashableObject
 	{
 	public:
-		gridRegion() {}
-		gridRegion(const gridRegion<T>& copy);
+		gridRegion() {};
 		gridRegion(const simpleArray<T>& locations,
 					const simpleArray<T>& edgeLocations,
-					const simpleArray<T>& westExposedLocations,
 					const simpleArray<T>& northExposedLocations,
-					const simpleArray<T>& eastExposedLocations,
 					const simpleArray<T>& southExposedLocations,
-					const simpleArray<T>& northWestCornerLocations,
+					const simpleArray<T>& eastExposedLocations,
+					const simpleArray<T>& westExposedLocations,
 					const simpleArray<T>& northEastCornerLocations,
+					const simpleArray<T>& northWestCornerLocations,
 					const simpleArray<T>& southEastCornerLocations,
 					const simpleArray<T>& southWestCornerLocations,
-					gridRect parentBoundary,
-					gridRect relativeBoundary,
-					gridRect largestRectangularSubRegion);
+					const gridRect& parentBoundary,
+					const gridRect& relativeBoundary,
+					const gridRect& largestRectangularSubRegion);
 
 
 		~gridRegion();
@@ -62,7 +61,7 @@ namespace brogueHd::component
 		/// <summary>
 		/// Checks for location overlap
 		/// </summary>
-		bool overlaps(const gridRegion<T>& region) const;
+		bool overlaps(gridRegion<T>* region) const;
 
 	public:
 
@@ -126,18 +125,18 @@ namespace brogueHd::component
 
 		// Needed a mutator for the translate() function
 		void initialize(const simpleArray<T>& locations,
-			const simpleArray<T>& edgeLocations,
-			const simpleArray<T>& westExposedLocations,
-			const simpleArray<T>& northExposedLocations,
-			const simpleArray<T>& eastExposedLocations,
-			const simpleArray<T>& southExposedLocations,
-			const simpleArray<T>& northWestCornerLocations,
-			const simpleArray<T>& northEastCornerLocations,
-			const simpleArray<T>& southEastCornerLocations,
-			const simpleArray<T>& southWestCornerLocations,
-			gridRect parentBoundary,
-			gridRect relativeBoundary,
-			gridRect largestRectangularSubRegion);
+						const simpleArray<T>& edgeLocations,
+						const simpleArray<T>& northExposedLocations,
+						const simpleArray<T>& southExposedLocations,
+						const simpleArray<T>& eastExposedLocations,
+						const simpleArray<T>& westExposedLocations,
+						const simpleArray<T>& northEastCornerLocations,
+						const simpleArray<T>& northWestCornerLocations,
+						const simpleArray<T>& southEastCornerLocations,
+						const simpleArray<T>& southWestCornerLocations,
+						const gridRect& parentBoundary,
+						const gridRect& relativeBoundary,
+						const gridRect& largestRectangularSubRegion);
 
 	private:
 
@@ -164,77 +163,77 @@ namespace brogueHd::component
 
 	template<isGridLocator T>
 	gridRegion<T>::gridRegion(const simpleArray<T>& locations,
-		const simpleArray<T>& edgeLocations,
-		const simpleArray<T>& westExposedLocations,
-		const simpleArray<T>& northExposedLocations,
-		const simpleArray<T>& eastExposedLocations,
-		const simpleArray<T>& southExposedLocations,
-		const simpleArray<T>& northWestCornerLocations,
-		const simpleArray<T>& northEastCornerLocations,
-		const simpleArray<T>& southEastCornerLocations,
-		const simpleArray<T>& southWestCornerLocations,
-		gridRect parentBoundary,
-		gridRect relativeBoundary,
-		gridRect largestRectangularSubRegion)
+								const simpleArray<T>& edgeLocations,
+								const simpleArray<T>& northExposedLocations,
+								const simpleArray<T>& southExposedLocations,
+								const simpleArray<T>& eastExposedLocations,
+								const simpleArray<T>& westExposedLocations,
+								const simpleArray<T>& northEastCornerLocations,
+								const simpleArray<T>& northWestCornerLocations,
+								const simpleArray<T>& southEastCornerLocations,
+								const simpleArray<T>& southWestCornerLocations,
+								const gridRect& parentBoundary,
+								const gridRect& relativeBoundary,
+								const gridRect& largestRectangularSubRegion)
 	{
 		this->initialize(locations, edgeLocations,
-			northExposedLocations,
-			southExposedLocations,
-			eastExposedLocations,
-			westExposedLocations,
-			northEastCornerLocations,
-			northWestCornerLocations,
-			southEastCornerLocations,
-			southWestCornerLocations,
-			parentBoundary,
-			relativeBoundary,
-			largestRectangularSubRegion);
-	}
-	template<isGridLocator T>
-	gridRegion<T>::gridRegion(const gridRegion<T>& copy)
-	{
-		this->initialize(copy.getLocations(),
-						 copy.getEdgeLocations(),
-						 copy.getEdges(brogueCompass::N),
-						 copy.getEdges(brogueCompass::S),
-						 copy.getEdges(brogueCompass::E),
-						 copy.getEdges(brogueCompass::W),
-						 copy.getCorners(brogueCompass::NE),
-						 copy.getCorners(brogueCompass::NW),
-						 copy.getCorners(brogueCompass::SE),
-						 copy.getCorners(brogueCompass::SW),
-						 copy.getParentBoundary(),
-						 copy.getBoundary(),
-						 copy.getLargestSubRectangle());
+							northExposedLocations,
+							southExposedLocations,
+							eastExposedLocations,
+							westExposedLocations,
+							northEastCornerLocations,
+							northWestCornerLocations,
+							southEastCornerLocations,
+							southWestCornerLocations,
+							parentBoundary,
+							relativeBoundary,
+							largestRectangularSubRegion);
 	}
 
 	template<isGridLocator T>
 	void gridRegion<T>::initialize(const simpleArray<T>& locations,
 									const simpleArray<T>& edgeLocations,
-									const simpleArray<T>& westExposedLocations,
 									const simpleArray<T>& northExposedLocations,
-									const simpleArray<T>& eastExposedLocations,
 									const simpleArray<T>& southExposedLocations,
-									const simpleArray<T>& northWestCornerLocations,
+									const simpleArray<T>& eastExposedLocations,
+									const simpleArray<T>& westExposedLocations,
 									const simpleArray<T>& northEastCornerLocations,
+									const simpleArray<T>& northWestCornerLocations,
 									const simpleArray<T>& southEastCornerLocations,
 									const simpleArray<T>& southWestCornerLocations,
-									gridRect parentBoundary,
-									gridRect relativeBoundary,
-									gridRect largestRectangularSubRegion)
+									const gridRect& parentBoundary,
+									const gridRect& relativeBoundary,
+									const gridRect& largestRectangularSubRegion)
 	{
-		if (_grid != nullptr) delete _grid;
-		if (_edgeGrid != nullptr) delete _edgeGrid;
+		if (_grid != nullptr)
+			delete _grid;
 
-		if (_northExposedLocations != nullptr) delete _northExposedLocations;
-		if (_southExposedLocations != nullptr) delete _southExposedLocations;
-		if (_eastExposedLocations != nullptr) delete _eastExposedLocations;
-		if (_westExposedLocations != nullptr) delete _westExposedLocations;
+		if (_edgeGrid != nullptr)
+			delete _edgeGrid;
 
-		if (_northEastCornerLocations != nullptr) delete _northEastCornerLocations;
-		if (_northWestCornerLocations != nullptr) delete _northWestCornerLocations;
-		if (_southEastCornerLocations != nullptr) delete _southEastCornerLocations;
-		if (_southWestCornerLocations != nullptr) delete _southWestCornerLocations;
+		if (_northExposedLocations != nullptr)
+			delete _northExposedLocations;
+
+		if (_southExposedLocations != nullptr)
+			delete _southExposedLocations;
+
+		if (_eastExposedLocations != nullptr)
+			delete _eastExposedLocations;
+
+		if (_westExposedLocations != nullptr)
+			delete _westExposedLocations;
+
+		if (_northEastCornerLocations != nullptr)
+			delete _northEastCornerLocations;
+
+		if (_northWestCornerLocations != nullptr)
+			delete _northWestCornerLocations;
+
+		if (_southEastCornerLocations != nullptr)
+			delete _southEastCornerLocations;
+
+		if (_southWestCornerLocations != nullptr)
+			delete _southWestCornerLocations;
 
 		_grid = new grid<T>(parentBoundary, relativeBoundary);
 		_edgeGrid = new grid<T>(parentBoundary, relativeBoundary);
@@ -255,15 +254,31 @@ namespace brogueHd::component
 		_southWestCornerLocations = new simpleArray<T>(southWestCornerLocations);
 
 		grid<T>* grid = _grid;
+		//grid<T>* edgeGrid = _edgeGrid;
 
-		// Initialize Grid
-		_locations->iterate([&grid] (T item)
+		// Initialize Grids
+		_locations->iterate([&grid] (const T& item)
 		{
 			// Validates that each cell is at a unique location
 			grid->set(item.column, item.row, item);
 
 			return iterationCallback::iterate;
 		});
+
+		// WORKAROUND: NOT COMPILING W/ A SIMPLE CAST
+		for (int index = 0; index < edgeLocations.count(); index++)
+		{
+			T location = edgeLocations.get(index);
+
+			_edgeGrid->set(location.column, location.row, location);
+		}
+
+		//_edgeLocations->iterate([&edgeGrid] (const T& item)
+		//{
+		//	edgeGrid->set(item.column, item.row, item);
+
+		//	return iterationCallback::iterate;
+		//});
 	}
 
 	template<isGridLocator T>
@@ -541,7 +556,7 @@ namespace brogueHd::component
 			case brogueCompass::SW:
 				return *_southWestCornerLocations;
 			default:
-				simpleException::showCstr("Must use non cardinal direction for gridRegion<>::getCorners");
+				throw simpleException("Must use non cardinal direction for gridRegion<>::getCorners");
 		}
 	}
 
@@ -582,13 +597,13 @@ namespace brogueHd::component
 	}
 
 	template<isGridLocator T>
-	bool gridRegion<T>::overlaps(const gridRegion<T>& region) const
+	bool gridRegion<T>::overlaps(gridRegion<T>* region) const
 	{
 		bool overlap = false;
 
 		this->iterateLocations([&region, &overlap] (short column, short row, T item)
 		{
-			if (region.isDefined(column, row))
+			if (region->isDefined(column, row))
 				return iterationCallback::breakAndReturn;
 
 			return iterationCallback::iterate;

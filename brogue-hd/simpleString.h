@@ -126,7 +126,7 @@ namespace brogueHd::simple
 	simpleString::simpleString(int count)
 	{
 		if (count >= this->MAX_LENGTH)
-			simpleException::showCstr("Trying to declare simpleString greater than 1MB");
+			throw simpleException("Trying to declare simpleString greater than 1MB");
 
 		_array = new simpleArray<char>(count);
 	}
@@ -254,7 +254,7 @@ namespace brogueHd::simple
 	bool simpleString::endsWith(const char* chars) const
 	{
 		if (chars == nullptr)
-			simpleException::show("Trying to compare a string with a nullptr:  simpleString::endsWith");
+			throw simpleException("Trying to compare a string with a nullptr:  simpleString::endsWith");
 
 		simpleString charsStr(chars);
 
@@ -367,7 +367,7 @@ namespace brogueHd::simple
 	int simpleString::searchImpl(int startIndex, const simpleString& search) const
 	{
 		if (search.count() == 0)
-			simpleException::showCstr("Trying to search for zero-count string simpleString::search");
+			throw simpleException("Trying to search for zero-count string simpleString::search");
 
 		int firstIndex = -1;
 
@@ -408,10 +408,10 @@ namespace brogueHd::simple
 	void simpleString::copyImpl(const simpleString& copy)
 	{
 		if (copy == nullptr)
-			simpleException::showCstr("Trying to declare simpleString from nullptr:  simpleString.h");
+			throw simpleException("Trying to declare simpleString from nullptr:  simpleString.h");
 
 		if (copy.count() >= this->MAX_LENGTH)
-			simpleException::showCstr("Trying to declare simpleString greater than 1MB");
+			throw simpleException("Trying to declare simpleString greater than 1MB");
 
 		delete _array;
 
@@ -424,12 +424,12 @@ namespace brogueHd::simple
 	void simpleString::copyImpl(const char* copy)
 	{
 		if (copy == nullptr)
-			simpleException::showCstr("Trying to declare simpleString from nullptr:  simpleString.h");
+			throw simpleException("Trying to declare simpleString from nullptr:  simpleString.h");
 
 		size_t length = strnlen_s(copy, this->MAX_LENGTH);
 
 		if (length >= this->MAX_LENGTH)
-			simpleException::showCstr("Trying to declare simpleString greater than 1MB");
+			throw simpleException("Trying to declare simpleString greater than 1MB");
 
 		delete _array;
 
@@ -443,7 +443,7 @@ namespace brogueHd::simple
 	void simpleString::insert(int index, const simpleString& replacement)
 	{
 		if (index >= _array->count())
-			simpleException::showCstr("Index for insert was outside the bounds of the array:  simpleString.cpp");
+			throw simpleException("Index for insert was outside the bounds of the array:  simpleString.cpp");
 
 		simpleArray<char>* newArray = new simpleArray<char>(_array->count() + replacement.count());
 
@@ -470,7 +470,7 @@ namespace brogueHd::simple
 	void simpleString::remove(int index, int count)
 	{
 		if (index + count > _array->count())
-			simpleException::showCstr("Index for remove was outside the bounds of the array:  simpleString.cpp");
+			throw simpleException("Index for remove was outside the bounds of the array:  simpleString.cpp");
 
 		simpleArray<char>* newArray = new simpleArray<char>(_array->count() - count);
 
@@ -573,7 +573,7 @@ namespace brogueHd::simple
 	simpleString simpleString::subString(int index, int count) const
 	{
 		if (index + count > _array->count())
-			simpleException::showCstr("Index outside the bounds of the array: simpleArray::subString");
+			throw simpleException("Index outside the bounds of the array: simpleArray::subString");
 
 		simpleString result(count);
 
@@ -624,7 +624,7 @@ namespace brogueHd::simple
 		size_t length = strnlen_s(tokens, this->MAX_SPLIT_TOKENS);
 
 		if (length > this->MAX_SPLIT_TOKENS)
-			simpleException::showCstr("Cannot have simpleString::split const char* tokens length greater than 30");
+			throw simpleException("Cannot have simpleString::split const char* tokens length greater than 30");
 
 		simpleList<simpleString> result;
 		simpleList<simpleString> list;

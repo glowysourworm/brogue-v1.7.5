@@ -14,8 +14,19 @@ namespace brogueHd::simple
 		simplePoint<T> point2;
 		simplePoint<T> point3;
 
-		simpleTriangle() {}
-		simpleTriangle(simplePoint<T> apoint1, simplePoint<T> apoint2, simplePoint<T> apoint3)
+		simpleTriangle() 
+		{
+			point1 = default_value::value<simplePoint<T>>();
+			point2 = default_value::value<simplePoint<T>>();
+			point3 = default_value::value<simplePoint<T>>();
+		}
+		simpleTriangle(const simpleTriangle& copy) 
+		{
+			point1 = copy.point1;
+			point2 = copy.point2;
+			point3 = copy.point3;
+		}
+		simpleTriangle(const simplePoint<T>& apoint1, const simplePoint<T>& apoint2, const simplePoint<T>& apoint3)
 		{
 			point1 = apoint1;
 			point2 = apoint2;
@@ -113,7 +124,7 @@ namespace brogueHd::simple
 				p3 = point2;
 			}
 			else
-				simpleException::showCstr("Improper use of circum-circle algorithm");
+				throw simpleException("Improper use of circum-circle algorithm");
 
 			// 3) Solve the circum-circle interior determinant
 			//

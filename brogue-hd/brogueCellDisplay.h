@@ -41,7 +41,7 @@ namespace brogueHd::backend::model
 				case 12: return 18.0;
 				case 13: return 19.0;
 				default:
-					simpleException::show("Invalid zoom level:  brogueCellDisplay::CellWidth");
+					throw simpleException("Invalid zoom level:  brogueCellDisplay::CellWidth");
 			}
 		}
 
@@ -73,7 +73,7 @@ namespace brogueHd::backend::model
 				case 12: return 31.0;
 				case 13: return 31.0;
 				default:
-					simpleException::show("Invalid zoom level:  brogueCellDisplay::CellHeight");
+					throw simpleException("Invalid zoom level:  brogueCellDisplay::CellHeight");
 			}
 		}
 

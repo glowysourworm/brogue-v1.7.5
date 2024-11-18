@@ -66,7 +66,7 @@ namespace brogueHd::simple
 				case simplePixel::colorChannel::A:
 					return alpha.resolve() / (float)maxValue;
 				default:
-					simpleException::show("Unhandled simplePixel color channel type:  simplePixel.h");
+					throw simpleException("Unhandled simplePixel color channel type:  simplePixel.h");
 			}
 
 			return 0;
@@ -85,7 +85,7 @@ namespace brogueHd::simple
 				case simplePixel::colorChannel::A:
 					return alpha;
 				default:
-					simpleException::show("Unhandled simplePixel color channel type:  simplePixel.h");
+					throw simpleException("Unhandled simplePixel color channel type:  simplePixel.h");
 			}
 
 			return default_value::value<simpleMaskedInt32>();

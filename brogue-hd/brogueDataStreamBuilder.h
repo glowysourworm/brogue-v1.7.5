@@ -259,7 +259,7 @@ namespace brogueHd::frontend
 					colorQuads.add(coordinateConverter.createBrogueColorQuadScene(*cell, column, row));
 					break;
 				default:
-					simpleException::show("Unhandled openglDataStreamType:  brogueProgramBuilder.h");
+					throw simpleException("Unhandled openglDataStreamType:  brogueProgramBuilder.h");
 			}
 
 			return iterationCallback::iterate;
@@ -313,7 +313,7 @@ namespace brogueHd::frontend
 			}
 			break;
 			default:
-				simpleException::show("Unhandled openglDataStreamType:  brogueProgramBuilder.h");
+				throw simpleException("Unhandled openglDataStreamType:  brogueProgramBuilder.h");
 				break;
 		}
 	}
@@ -354,7 +354,7 @@ namespace brogueHd::frontend
 			case openglDataStreamType::brogueFlameQuad:
 			case openglDataStreamType::brogueCellQuad:
 			default:
-				simpleException::show("Unhandled openglDataStreamType:  brogueProgramBuilder.h");
+				throw simpleException("Unhandled openglDataStreamType:  brogueProgramBuilder.h");
 		}
 	}
 

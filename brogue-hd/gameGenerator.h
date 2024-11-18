@@ -5,6 +5,7 @@
 #include "brogueLayout.h"
 #include "brogueLevel.h"
 #include "brogueLevelTemplate.h"
+#include "brogueUIBuilder.h"
 #include "contentGenerator.h"
 #include "gridRect.h"
 #include "layoutGenerator.h"
@@ -19,8 +20,9 @@ namespace brogueHd::backend
 	{
 	public:
 
-		gameGenerator(randomGenerator* randomMain, noiseGenerator* noiseGenerator, const gridRect& gameBoundary)
+		gameGenerator(brogueUIBuilder* uiBuilder, randomGenerator* randomMain, noiseGenerator* noiseGenerator, const gridRect& gameBoundary)
 		{
+			_uiBuilder = uiBuilder;
 			_randomGenerator = randomMain;
 			_noiseGenerator = noiseGenerator;
 			_gameBoundary = new gridRect(gameBoundary);
@@ -34,6 +36,7 @@ namespace brogueHd::backend
 
 	private:
 
+		brogueUIBuilder* _uiBuilder;
 		randomGenerator* _randomGenerator;
 		noiseGenerator* _noiseGenerator;
 		gridRect* _gameBoundary;
@@ -49,7 +52,7 @@ namespace brogueHd::backend
 		{
 			brogueLevelTemplate* levelTemplate = gameTemplate->getLevel(index + 1);
 
-			layoutGenerator layoutGen(_randomGenerator, _noiseGenerator);
+			layoutGenerator layoutGen(_uiBuilder, _randomGenerator, _noiseGenerator);
 			terrainGenerator terrainGen(_randomGenerator);
 			contentGenerator contentGen(*_gameBoundary);
 

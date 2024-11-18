@@ -240,7 +240,7 @@ namespace brogueHd::component
 	void dijkstra<T>::run()
 	{
 		if (!_initialized)
-			simpleException::showCstr("Must call initialize() before run() dijkstra.h");
+			throw simpleException("Must call initialize() before run() dijkstra.h");
 
 		if (_finished)
 			return;
@@ -405,7 +405,7 @@ namespace brogueHd::component
 			return !value;
 		}))
 		{
-			simpleException::showCstr("Dijkstra's Map was unable to find the current goal location");
+			throw simpleException("Dijkstra's Map was unable to find the current goal location");
 		}
 
 		// GENERATE PATHS
@@ -423,7 +423,7 @@ namespace brogueHd::component
 	simpleArray<T> dijkstra<T>::getResultPath(T targetLocation)
 	{
 		if (!_finished)
-			simpleException::showCstr("Must first call dijkstra.run() before calling getResultPath(..)");
+			throw simpleException("Must first call dijkstra.run() before calling getResultPath(..)");
 
 		return _completedPaths->get(targetLocation);
 	}
@@ -432,7 +432,7 @@ namespace brogueHd::component
 	simpleArray<T> dijkstra<T>::generatePath(T targetLocation)
 	{
 		if (!_targetLocations->contains(targetLocation))
-			simpleException::showCstr("Requested target location not specified by the constructor dijkstra.h");
+			throw simpleException("Requested target location not specified by the constructor dijkstra.h");
 
 		// Reverse ordered - starting with target
 		simpleList<T> result;
@@ -443,7 +443,7 @@ namespace brogueHd::component
 		bool valid = _mapPredicate(targetLocation.column, targetLocation.row);
 
 		if (!valid)
-			simpleException::showCstr("Invalid target location:  dijkstra<T>::generatePath(...)");
+			throw simpleException("Invalid target location:  dijkstra<T>::generatePath(...)");
 
 		T currentLocation = targetLocation;
 		T goalLocation = _sourceLocation;
@@ -512,7 +512,7 @@ namespace brogueHd::component
 
 			if (lowestWeight == std::numeric_limits<short>::max())
 			{
-				simpleException::showCstr("Mishandled Dijkstra Map dijkstra.generatePath()");
+				throw simpleException("Mishandled Dijkstra Map dijkstra.generatePath()");
 			}
 
 			currentLocation = lowestWeightLocation;
@@ -529,12 +529,12 @@ namespace brogueHd::component
 				valid &= _mapPredicate(lowestWeightLocation.column, lowestWeightLocation.row);
 
 				if (!valid)
-					simpleException::showCstr("Invalid path found:  dijkstra.generatePath");
+					throw simpleException("Invalid path found:  dijkstra.generatePath");
 			}
 
 			else
 			{
-				simpleException::showCstr("Loop in Dijkstra Map path finding");
+				throw simpleException("Loop in Dijkstra Map path finding");
 			}
 		}
 

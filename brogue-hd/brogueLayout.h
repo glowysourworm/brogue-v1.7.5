@@ -7,7 +7,6 @@
 #include "simpleList.h"
 
 #include "brogueCell.h"
-#include "brogueGlobal.h"
 #include "gridDefinitions.h"
 #include "gridRect.h"
 #include "gridRegion.h"
@@ -51,10 +50,10 @@ namespace brogueHd::backend::model
 		void iterate(gridCallback<brogueCell*> callback) const;
 
 		/// <summary>
-		/// Ensures that the layout has cells in the specified region
+		/// Ensures that the layout has cells in the specified locations.
 		/// </summary>
 		template<isGridLocator T>
-		void createCells(const gridRegion<T>& region);
+		void createCells(gridRegion<T>* region);
 
 		/// <summary>
 		/// Ensures that cell is created for specified location
@@ -136,11 +135,12 @@ namespace brogueHd::backend::model
 	}
 
 	template<isGridLocator T>
-	void brogueLayout::createCells(const gridRegion<T>& region)
+	void brogueLayout::createCells(gridRegion<T>* region)
 	{
 		grid<brogueCell*>* mainGrid = _mainGrid;
 
-		region.iterateLocations([&mainGrid] (short column, short row, const T& locator)
+		// Check cells
+		region->iterateLocations([&mainGrid] (short column, short row, const T& locator)
 		{
 			if (!mainGrid->isDefined(locator.column, locator.row))
 				mainGrid->set(locator.column, locator.row, new brogueCell(locator.column, locator.row), true);

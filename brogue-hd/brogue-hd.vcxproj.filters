@@ -707,6 +707,9 @@
     <ClInclude Include="cppstopwatch.h">
       <Filter>Header Files\vendor</Filter>
     </ClInclude>
+    <ClInclude Include="gridRegionExtension.h">
+      <Filter>Header Files\component</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\resources\model\armor.csv">

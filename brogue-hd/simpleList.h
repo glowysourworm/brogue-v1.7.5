@@ -185,7 +185,7 @@ namespace brogueHd::simple
 	T simpleList<T>::get(int index) const
 	{
 		if (index >= _count)
-			simpleException::showCstr("Index is outside the bounds of the list:  simpleList.h");
+			throw simpleException("Index is outside the bounds of the list:  simpleList.h");
 
 		return _array->get(index);
 	}
@@ -262,7 +262,7 @@ namespace brogueHd::simple
 	void simpleList<T>::reAllocate()
 	{
 		if (_count != _array->count())
-			simpleException::showCstr("Trying to re-allocate memory for simple list before capacity is reached");
+			throw simpleException("Trying to re-allocate memory for simple list before capacity is reached");
 
 		// Use doubling method: Always multiply size by 2 until {MaxElementIncrement} is reached
 		//
@@ -307,7 +307,7 @@ namespace brogueHd::simple
 	T simpleList<T>::removeAt(int index)
 	{
 		if (index >= _count)
-			simpleException::showCstr("Index is outside the bounds of the array");
+			throw simpleException("Index is outside the bounds of the array");
 
 		T item = this->get(index);
 
@@ -339,7 +339,7 @@ namespace brogueHd::simple
 			this->removeAt(itemIndex);
 
 		else
-			simpleException::showCstr("Item not found in simpleList::remove");
+			throw simpleException("Item not found in simpleList::remove");
 	}
 
 	template<isHashable T>
@@ -460,7 +460,7 @@ namespace brogueHd::simple
 	T simpleList<T>::first() const
 	{
 		if (this->count() == 0)
-			simpleException::showCstr("Trying to get element from an empty list:  simpleList::first()");
+			throw simpleException("Trying to get element from an empty list:  simpleList::first()");
 
 		return this->get(0);
 	}

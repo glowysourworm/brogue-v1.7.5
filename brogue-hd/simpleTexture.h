@@ -180,7 +180,7 @@ namespace brogueHd::frontend
 	void simpleTexture::glCreate(GLuint programHandle)
 	{
 		if (this->isCreated())
-			simpleException::show("simpleTexture already created in the backend");
+			throw simpleException("simpleTexture already created in the backend");
 
 		// Procedure
 		//
@@ -227,7 +227,7 @@ namespace brogueHd::frontend
 		glGenerateTextureMipmap(this->handle);
 
 		if (!this->isCreated())
-			simpleException::show("simpleTexture problem creating on the backend");
+			throw simpleException("simpleTexture problem creating on the backend");
 	}
 
 	void simpleTexture::clearColor(const color& color)

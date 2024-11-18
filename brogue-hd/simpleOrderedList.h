@@ -158,7 +158,7 @@ namespace brogueHd::simple
 	T simpleOrderedList<T>::removeAt(int index)
 	{
 		if (index >= _list->count())
-			simpleException::showCstr("Index is outside the bounds of the array");
+			throw simpleException("Index is outside the bounds of the array");
 
 		return _list->removeAt(index);
 	}

@@ -54,7 +54,7 @@ namespace brogueHd::backend
 			fileStream.open(filePath);
 
 			if (!fileStream.good())
-				simpleException::show("Error opening file:  {}", filePath);
+				throw simpleException("Error opening file:  {}", filePath);
 
 			// Store the path of the playback file
 			_playbackData->filePath = filePath;
@@ -66,7 +66,7 @@ namespace brogueHd::backend
 		}
 		catch (std::exception& ex)
 		{
-			simpleException::show("Error opening playback file: ", ex.what());
+			throw simpleException("Error opening playback file: ", ex.what());
 		}
 	}
 }

@@ -94,7 +94,7 @@ namespace brogueHd::frontend
 	void simpleVertexArray<T>::glCreate(GLuint programHandle)
 	{
 		if (this->isCreated())
-			simpleException::show("simpleVertexArray already created in the backend");
+			throw simpleException("simpleVertexArray already created in the backend");
 
 		// Procedure:  Create / Draw / Teardown several vertex buffers
 		//
@@ -129,10 +129,10 @@ namespace brogueHd::frontend
 	void simpleVertexArray<T>::reBuffer(GLuint programHandle)
 	{
 		if (!this->isCreated())
-			simpleException::show("simpleVertexArray already deleted from the backend");
+			throw simpleException("simpleVertexArray already deleted from the backend");
 
 		if (!this->isBound())
-			simpleException::show("simpleVertexArray must be bound before calling rebuffer()");
+			throw simpleException("simpleVertexArray must be bound before calling rebuffer()");
 
 		_vertexBuffer->reBuffer(programHandle);
 	}
@@ -141,7 +141,7 @@ namespace brogueHd::frontend
 	simpleDataStream* simpleVertexArray<T>::getStream() const
 	{
 		if (!this->isCreated())
-			simpleException::show("simpleVertexArray already deleted from the backend");
+			throw simpleException("simpleVertexArray already deleted from the backend");
 
 		return _vertexBuffer->getStream();
 	}
@@ -169,10 +169,10 @@ namespace brogueHd::frontend
 	void simpleVertexArray<T>::draw()
 	{
 		if (!this->isCreated())
-			simpleException::show("simpleVertexArray already deleted from the backend");
+			throw simpleException("simpleVertexArray already deleted from the backend");
 
 		if (!this->isBound())
-			simpleException::show("simpleVertexArray must be bound before calling draw()");
+			throw simpleException("simpleVertexArray must be bound before calling draw()");
 
 		// Draw Buffer
 		glDrawArrays(_primitiveType, 0, _vertexBuffer->getBufferLength());
@@ -182,7 +182,7 @@ namespace brogueHd::frontend
 	void simpleVertexArray<T>::bind()
 	{
 		if (!this->isCreated())
-			simpleException::show("simpleVertexArray already deleted from the backend");
+			throw simpleException("simpleVertexArray already deleted from the backend");
 
 		// Bind VAO before using
 		glBindVertexArray(this->handle);

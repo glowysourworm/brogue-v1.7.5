@@ -14,7 +14,7 @@ namespace brogueHd::simple
 	{
 	public:
 
-		static constexpr float Pi = std::numbers::pi;
+		static constexpr double Pi = std::numbers::pi;
 
 	public:
 
@@ -83,7 +83,7 @@ namespace brogueHd::simple
 				return sqrt(x);
 
 			else
-				simpleException::showCstr("Unknown sqrt type simpleMath.h");
+				throw simpleException("Unknown sqrt type simpleMath.h");
 		}
 
 		template<isNumber TMath>
@@ -96,7 +96,7 @@ namespace brogueHd::simple
 				return log(x);
 
 			else
-				simpleException::showCstr("Unknown sqrt type simpleMath.h");
+				throw simpleException("Unknown sqrt type simpleMath.h");
 		}
 
 		template<isNumber TMath>
@@ -109,7 +109,7 @@ namespace brogueHd::simple
 				return sin(x);
 
 			else
-				simpleException::showCstr("Unknown sqrt type simpleMath.h");
+				throw simpleException("Unknown sqrt type simpleMath.h");
 		}
 
 		template<isNumber TMath>
@@ -122,7 +122,7 @@ namespace brogueHd::simple
 				return exp(x);
 
 			else
-				simpleException::showCstr("Unknown sqrt type simpleMath.h");
+				throw simpleException("Unknown sqrt type simpleMath.h");
 		}
 
 		template<isNumber TMath>
@@ -135,7 +135,7 @@ namespace brogueHd::simple
 				return floor(x);
 
 			else
-				simpleException::showCstr("Unknown sqrt type simpleMath.h");
+				throw simpleException("Unknown sqrt type simpleMath.h");
 		}
 
 		template<isNumber TMath>

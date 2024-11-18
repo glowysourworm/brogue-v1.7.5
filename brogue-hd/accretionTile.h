@@ -19,7 +19,7 @@ namespace brogueHd::backend::model
 
 		accretionTile()
 		{
-			region = new gridRegion<gridLocator>();
+			region = nullptr;
 
 			hasNorthConnection = false;
 			hasSouthConnection = false;
@@ -33,17 +33,6 @@ namespace brogueHd::backend::model
 		}
 		~accretionTile()
 		{
-			delete region;
-		}
-		accretionTile(const accretionTile& copy)
-		{
-			region = nullptr;
-
-			copyImpl(copy);
-		}
-		void operator=(const accretionTile& copy)
-		{
-			copyImpl(copy);
 		}
 
 		// Tile has been connected to another tile
@@ -63,26 +52,6 @@ namespace brogueHd::backend::model
 		size_t getHash() const override
 		{
 			return hashGenerator::generateHash(region);
-		}
-
-	private:
-
-		void copyImpl(const accretionTile& copy)
-		{
-			if (region != nullptr)
-				delete region;
-
-			region = new gridRegion(*copy.region);
-
-			hasNorthConnection = copy.hasNorthConnection;
-			hasSouthConnection = copy.hasSouthConnection;
-			hasEastConnection = copy.hasEastConnection;
-			hasWestConnection = copy.hasWestConnection;
-
-			connectionPointN = copy.connectionPointN;
-			connectionPointS = copy.connectionPointS;
-			connectionPointE = copy.connectionPointE;
-			connectionPointW = copy.connectionPointW;
 		}
 	};
 }

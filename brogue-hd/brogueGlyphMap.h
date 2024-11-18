@@ -232,7 +232,7 @@ namespace brogueHd::frontend
 	gridLocator brogueGlyphMap::getGlyphLocation(int character)
 	{
 		if (!_glyphLocations->contains(character))
-			simpleException::show("Glyph not found:  brogueGlyph::getGlyphLocation");
+			throw simpleException("Glyph not found:  brogueGlyph::getGlyphLocation");
 
 		// Forgot the offset while setting these up
 		gridLocator location = _glyphLocations->get(character);

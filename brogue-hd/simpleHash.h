@@ -1,10 +1,12 @@
 #pragma once
 
+#include "json.hpp"
 #include "simple.h"
 #include "simpleArray.h"
 #include "simpleException.h"
 #include "simpleList.h"
 #include "simpleMath.h"
+#include <functional>
 
 namespace brogueHd::simple
 {
@@ -18,7 +20,7 @@ namespace brogueHd::simple
 	/// Definition of simple predicate for any key-value map
 	/// </summary>
 	template<isHashable K, isHashable V>
-	using simpleHashCallback = std::function<iterationCallback(const K &key, const V& value)>;
+	using simpleHashCallback = std::function<iterationCallback(const K& key, const V& value)>;
 
 	/// <summary>
 	/// Definition of selector for the value type
@@ -103,7 +105,7 @@ namespace brogueHd::simple
 		simpleList<V> getValues() const;
 
 	public:
-		
+
 		size_t getHash() const override;
 
 	private:
@@ -172,7 +174,7 @@ namespace brogueHd::simple
 				return _table->get(bucketIndex)->get(index)->value;
 		}
 
-		simpleException::showCstr("Key not found in hash table:  simpleHash.cpp");
+		throw simpleException("Key not found in hash table:  simpleHash.cpp");
 	}
 
 	template<isHashable K, isHashable V>
@@ -191,7 +193,7 @@ namespace brogueHd::simple
 	void simpleHash<K, V>::add(const K& key, const V& value)
 	{
 		if (this->contains(key))
-			simpleException::showCstr("Trying to add duplicate value to simpleHash table. Use set(...)");
+			throw simpleException("Trying to add duplicate value to simpleHash table. Use set(...)");
 
 		// First rehash will give 100 buckets
 		if (_table->count() == 0)
@@ -228,7 +230,7 @@ namespace brogueHd::simple
 	void simpleHash<K, V>::set(const K& key, const V& value)
 	{
 		if (!this->contains(key))
-			simpleException::showCstr("Trying to set value for a key-value pair that doesn't exist. Use add(...)");
+			throw simpleException("Trying to set value for a key-value pair that doesn't exist. Use add(...)");
 
 		V oldValue = this->get(key);
 
@@ -390,13 +392,15 @@ namespace brogueHd::simple
 	{
 		bool result = false;
 
-		this->iterate([&result, &predicate](K key, V value)
+		this->iterate([&result, &predicate] (K key, V value)
 		{
 			if (predicate(key, value))
 			{
 				result = true;
 				return iterationCallback::breakAndReturn;
 			}
+
+			return iterationCallback::iterate;
 		});
 
 		return result;
@@ -435,7 +439,7 @@ namespace brogueHd::simple
 	{
 		K result = default_value::value<K>();
 
-		this->iterate([&result, &predicate](K key, V value)
+		this->iterate([&result, &predicate] (K key, V value)
 		{
 			if (predicate(key, value))
 			{
@@ -473,7 +477,7 @@ namespace brogueHd::simple
 	template<isHashable K, isHashable V>
 	void simpleHash<K, V>::forEach(const simpleHashCallback<K, V>& callback)
 	{
-		this->iterate([&callback](K key, V value)
+		this->iterate([&callback] (K key, V value)
 		{
 			return callback(key, value);
 		});
@@ -484,13 +488,15 @@ namespace brogueHd::simple
 	{
 		K result = default_value::value<K>();
 
-		this->iterate([&result, &predicate](K key, V value)
+		this->iterate([&result, &predicate] (K key, V value)
 		{
 			if (predicate(key, value))
 			{
 				result = key;
 				return iterationCallback::breakAndReturn;
 			}
+
+			return iterationCallback::iterate;
 		});
 
 		return result;
@@ -502,7 +508,7 @@ namespace brogueHd::simple
 	{
 		simpleList<VResult> result;
 
-		this->iterate([&result, &selector](K key, V value)
+		this->iterate([&result, &selector] (K key, V value)
 		{
 			result.add(selector(value));
 			return iterationCallback::iterate;
@@ -516,7 +522,7 @@ namespace brogueHd::simple
 	{
 		simpleList<K> result;
 
-		this->iterate([&result](K key, V value)
+		this->iterate([&result] (K key, V value)
 		{
 			result.add(key);
 
@@ -531,7 +537,7 @@ namespace brogueHd::simple
 	{
 		simpleList<V> result;
 
-		this->iterate([&result](K key, V value)
+		this->iterate([&result] (K key, V value)
 		{
 			result.add(value);
 
@@ -545,7 +551,7 @@ namespace brogueHd::simple
 	size_t simpleHash<K, V>::getHash() const
 	{
 		size_t hash = 0;
-		
+
 		// Generate hash from just the key hash values
 		//
 		this->iterate([&hash] (K key, V value)
@@ -555,7 +561,7 @@ namespace brogueHd::simple
 
 			else
 				hash = hashGenerator::combineHash(hash, key);
-				
+
 			return iterationCallback::iterate;
 		});
 

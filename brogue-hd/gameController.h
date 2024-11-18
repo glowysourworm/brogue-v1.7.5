@@ -7,7 +7,6 @@
 #include "brogueMouseState.h"
 #include "brogueUIBuilder.h"
 #include "eventController.h"
-#include "gameData.h"
 #include "gameGenerator.h"
 #include "gridRect.h"
 #include "keyProcessor.h"
@@ -183,7 +182,7 @@ namespace brogueHd::backend
 		brogueGameTemplate* gameTemplate = _resourceController->getBrogueDesign_v1_7_5();
 		brogueUIBuilder uiBuilder(_eventController, _resourceController, _randomMain, 0);
 		gridRect boundary = uiBuilder.getBrogueSceneBoundary();
-		gameGenerator generator(_randomMain, _noiseGenerator, boundary);
+		gameGenerator generator(&uiBuilder, _randomMain, _noiseGenerator, boundary);
 
 		_game = generator.createGame(seed, gameTemplate);
 	}
@@ -205,7 +204,7 @@ namespace brogueHd::backend
 			throw simpleException("Trying to initialize playback while a current one is loaded:  call closeGame() first");
 
 		if (recordingPath == NULL)
-			simpleException::showCstr("Recording path not specified");
+			throw simpleException("Recording path not specified");
 
 		try
 		{

@@ -111,7 +111,7 @@ namespace brogueHd::simple
 				_fileNameWithoutExtension->count() == 0 ||
 				_writeTimeLong->count() == 0 ||
 				_writeTimeShort->count() == 0)
-				simpleException::show("Invalid file information:  simpleFileEntry.h");
+				throw simpleException("Invalid file information:  simpleFileEntry.h");
 
 			return true;
 		}

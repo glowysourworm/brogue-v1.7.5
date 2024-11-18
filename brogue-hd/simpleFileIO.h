@@ -63,7 +63,7 @@ namespace brogueHd::simple
 			}
 			catch (std::exception& ex)
 			{
-				simpleException::show("Error trying to check if file exists:  {}:  {}", filename.c_str(), ex.what());
+				throw simpleException("Error trying to check if file exists:  {}:  {}", filename.c_str(), ex.what());
 			}
 
 			return result;
@@ -88,7 +88,7 @@ namespace brogueHd::simple
 			}
 			catch (std::exception& ex)
 			{
-				simpleException::show("Error trying to read file:  {}:  {}", filename, ex.what());
+				throw simpleException("Error trying to read file:  {}:  {}", filename, ex.what());
 			}
 
 			return nullptr;
@@ -116,7 +116,7 @@ namespace brogueHd::simple
 			}
 			catch (std::exception& ex)
 			{
-				simpleException::show("Error trying to read file:  {}:  {}", filename.c_str(), ex.what());
+				throw simpleException("Error trying to read file:  {}:  {}", filename.c_str(), ex.what());
 			}
 
 			return simpleString("");
@@ -133,7 +133,7 @@ namespace brogueHd::simple
 			}
 			catch (std::exception& ex)
 			{
-				simpleException::show("Error trying to write file:  {}:  {}", filename.c_str(), ex.what());
+				throw simpleException("Error trying to write file:  {}:  {}", filename.c_str(), ex.what());
 			}
 		}
 		static simpleDirectoryEntry readDirectory(const char* path)
@@ -180,7 +180,7 @@ namespace brogueHd::simple
 			}
 			catch (std::exception& ex)
 			{
-				simpleException::show("Error trying to read directory:  {}", path);
+				throw simpleException("Error trying to read directory:  {}", path);
 			}
 
 			return result;

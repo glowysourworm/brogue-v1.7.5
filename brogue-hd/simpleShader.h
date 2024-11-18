@@ -96,7 +96,7 @@ namespace brogueHd::frontend
 			});
 
 			else
-				simpleException::show("Unhandled uniform type simpleShader.h");
+				throw simpleException("Unhandled uniform type simpleShader.h");
 
 			return false;
 		}
@@ -162,7 +162,7 @@ namespace brogueHd::frontend
 				return getUniform4(index);
 
 			else
-				simpleException::show("Unhandled uniform type:  simpleShader.h");
+				throw simpleException("Unhandled uniform type:  simpleShader.h");
 		}
 
 	public:

@@ -68,7 +68,7 @@ namespace brogueHd::backend::model
 	brogueLevelProfile::brogueLevelProfile(short depth, levelTypes type)
 	{
 		if (depth == 1 && type != levelTypes::DP_BASIC_FIRST_ROOM)
-			simpleException::show("Invalid first level type:  brogueLevelProfile.cpp");
+			throw simpleException("Invalid first level type:  brogueLevelProfile.cpp");
 
 		_roomInfo = new simpleHash<roomTypes, brogueRoomInfo>();
 		_roomFrequencyMap = new simpleHash<levelTypes, simpleHash<roomTypes, short>*>();
