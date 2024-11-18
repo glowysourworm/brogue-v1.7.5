@@ -6,6 +6,7 @@
 #include "simple.h"
 #include "simpleArray.h"
 #include "simpleException.h"
+#include "simpleOrderedList.h"
 
 using namespace brogueHd::simple;
 
@@ -112,9 +113,9 @@ namespace brogueHd::component
 		simpleArray<T> getEdges(brogueCompass direction) const;
 
 		/// <summary>
-		/// Gets the locations that are also along the bounding rectangle
+		/// Gets the locations ordered by their distance to the boundary (closest first)
 		/// </summary>
-		simpleArray<T> getBoundaryEdges(brogueCompass direction) const;
+		simpleOrderedList<T> getBestEdges(brogueCompass direction) const;
 
 		/// <summary>
 		/// Gets locations with exposed corner
@@ -471,32 +472,56 @@ namespace brogueHd::component
 	}
 
 	template<isGridLocator T>
-	simpleArray<T> gridRegion<T>::getBoundaryEdges(brogueCompass direction) const
+	simpleOrderedList<T> gridRegion<T>::getBestEdges(brogueCompass direction) const
 	{
 		gridRect boundary = this->getBoundary();
 
 		switch (direction)
 		{
 			case brogueCompass::N:
-				return _northExposedLocations->whereArray([&boundary] (T item)
+			{
+				simpleOrderedList<T> result([&boundary] (const T& item1, const T& item2)
 				{
-					return item.row == boundary.top();
+					return (item1.row - boundary.top()) - (item2.row - boundary.top());
 				});
+
+				result.addRange(*_northExposedLocations);
+
+				return result;
+			}
 			case brogueCompass::S:
-				return _southExposedLocations->whereArray([&boundary] (T item)
+			{
+				simpleOrderedList<T> result([&boundary] (const T& item1, const T& item2)
 				{
-					return item.row == boundary.bottom();
+					return (boundary.bottom() - item1.row) - (boundary.top() - item2.row);
 				});
+
+				result.addRange(*_southExposedLocations);
+
+				return result;
+			}
 			case brogueCompass::E:
-				return _eastExposedLocations->whereArray([&boundary] (T item)
+			{
+				simpleOrderedList<T> result([&boundary] (const T& item1, const T& item2)
 				{
-					return item.column == boundary.right();
+					return (boundary.right() - item1.column) - (boundary.right() - item2.column);
 				});
+
+				result.addRange(*_eastExposedLocations);
+
+				return result;
+			}
 			case brogueCompass::W:
-				return _westExposedLocations->whereArray([&boundary] (T item)
+			{
+				simpleOrderedList<T> result([&boundary] (const T& item1, const T& item2)
 				{
-					return item.column == boundary.left();
+					return (item1.column - boundary.left()) - (item2.column - boundary.left());
 				});
+
+				result.addRange(*_westExposedLocations);
+
+				return result;
+			}
 			default:
 				throw simpleException("Must use cardinal direction for gridRegion<>::getEdges");
 		}

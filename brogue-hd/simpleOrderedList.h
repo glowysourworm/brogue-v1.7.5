@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "simple.h"
+#include "simpleArray.h"
 #include "simpleException.h"
 #include "simpleList.h"
 #include "simpleMath.h"
@@ -30,6 +31,7 @@ namespace brogueHd::simple
 
 		bool contains(const T& item) const;
 		void forEach(const simpleListCallback<T>& callback) const;
+		void addRange(const simpleArray<T>& collection);
 
 	protected:
 
@@ -123,6 +125,15 @@ namespace brogueHd::simple
 
 		else
 			_list->add(item);
+	}
+
+	template<isHashable T>
+	void simpleOrderedList<T>::addRange(const simpleArray<T>& collection)
+	{
+		for (int index = 0; index < collection.count(); index++)
+		{
+			this->add(collection.get(index));
+		}
 	}
 
 	template<isHashable T>

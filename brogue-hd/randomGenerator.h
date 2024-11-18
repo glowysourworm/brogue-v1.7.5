@@ -61,6 +61,15 @@ namespace brogueHd::backend
 		int randomIndex(int lower, int upper);
 
 		/// <summary>
+		/// Returns a random index from an exponential draw (TODO: CREATE RANDOM VARIABLE ENUM)
+		/// </summary>
+		/// <param name="lower">inclusive lower bound</param>
+		/// <param name="upper">exclusive upper bound</param>
+		/// <param name="lambda">lambda parameter where:  mean = 1 / lambda</param>
+		/// <returns></returns>
+		int randomIndex_exp(int lower, int upper, float lambda);
+
+		/// <summary>
 		/// Returns a random inteber between the two bounds, including both.
 		/// </summary>
 		int randomRange(int lowerBound, int upperBound);
@@ -97,13 +106,15 @@ namespace brogueHd::backend
 		/// Calls next random number [0, RAND_MAX] and scales it to the 
 		/// provided range.
 		/// </summary>
-		int range(int upperBound);
+		//int range(int upperBound);
 
 	private:
 
 		int _id;
 		unsigned long _seed;
 		unsigned long _numbersGenerated;
+
+		//std::mt19937* _engine;				// Mersenne Twister Engine
 	};
 
 	randomGenerator::randomGenerator(int id)
@@ -113,6 +124,7 @@ namespace brogueHd::backend
 		_id = id;
 		_seed = 0;
 		_numbersGenerated = 0;
+		//_engine = new std::mt19937(_seed);
 	}
 
 	randomGenerator::randomGenerator(int id, unsigned long seed)
@@ -126,11 +138,13 @@ namespace brogueHd::backend
 
 	randomGenerator::~randomGenerator()
 	{
-
+		//delete _engine;
 	}
 
 	double randomGenerator::next()
 	{
+		//std::uniform_real_distribution<double> uniform;
+		
 		// Uniform [0,1]
 		double nextRand = rand() / (double)RAND_MAX;
 
@@ -142,6 +156,8 @@ namespace brogueHd::backend
 
 	double randomGenerator::next(double low, double high)
 	{
+		//std::uniform_real_distribution<double> uniform;
+
 		// Uniform [0,1]
 		double nextRand = rand() / (double)RAND_MAX;
 
@@ -206,6 +222,7 @@ namespace brogueHd::backend
 
 		// Seed the generator for later use with rand()
 		srand(seed);
+		//_engine->seed(seed);
 	}
 
 	int randomGenerator::randomIndex(int lowerBound, int upperBound)
@@ -214,6 +231,16 @@ namespace brogueHd::backend
 
 		// Small chance of hitting the upper bound
 		return simpleMath::clamp(result, lowerBound, upperBound);
+	}
+
+	int randomGenerator::randomIndex_exp(int lower, int upper, float lambda)
+	{
+		// TODO: CREATE OUR OWN DETERMISTIC REPEATED RAND. Just unit test these if std is going to be
+		//		 the base library.
+		//
+		float value = -1 * simpleMath::naturalLog(this->next()) / lambda;
+
+		return lower + (int)(value * (upper - lower));
 	}
 
 	int randomGenerator::randomRange(int lowerBound, int upperBound)

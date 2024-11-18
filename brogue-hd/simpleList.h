@@ -142,12 +142,14 @@ namespace brogueHd::simple
 		_array = new simpleArray<T>(anArray, arrayLength);
 		_count = 0;
 	}
+
 	template<isHashable T>
 	simpleList<T>::simpleList(const simpleArray<T>& anArray)
 	{
 		_array = new simpleArray<T>(anArray);
 		_count = _array->count();
 	}
+
 	template<isHashable T>
 	simpleList<T>::simpleList(const simpleList<T>& copy)
 	{

@@ -11,6 +11,7 @@
 #include "gameGenerator.h"
 #include "gridRect.h"
 #include "keyProcessor.h"
+#include "noiseGenerator.h"
 #include "playbackProcessor.h"
 #include "randomGenerator.h"
 #include "renderingController.h"
@@ -100,6 +101,7 @@ namespace brogueHd::backend
 
 		randomGenerator* _randomMain;
 		randomGenerator* _randomCosmetic;
+		noiseGenerator* _noiseGenerator;
 		keyProcessor* _keyProcessor;
 		playbackProcessor* _playbackProcessor;
 
@@ -118,6 +120,7 @@ namespace brogueHd::backend
 		_playbackProcessor = new playbackProcessor();
 		_randomMain = new randomGenerator(RANDOM_GENERATOR_MAIN);
 		_randomCosmetic = new randomGenerator(RANDOM_GENERATOR_COSMETIC);
+		_noiseGenerator = new noiseGenerator(_randomMain);
 		_eventController = new eventController();
 		_resourceController = resourceController;
 		_renderingController = new renderingController(_eventController, resourceController, _randomCosmetic);
@@ -180,7 +183,7 @@ namespace brogueHd::backend
 		brogueGameTemplate* gameTemplate = _resourceController->getBrogueDesign_v1_7_5();
 		brogueUIBuilder uiBuilder(_eventController, _resourceController, _randomMain, 0);
 		gridRect boundary = uiBuilder.getBrogueSceneBoundary();
-		gameGenerator generator(_randomMain, boundary);
+		gameGenerator generator(_randomMain, _noiseGenerator, boundary);
 
 		_game = generator.createGame(seed, gameTemplate);
 	}

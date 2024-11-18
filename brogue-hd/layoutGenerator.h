@@ -18,10 +18,12 @@
 #include "gridRect.h"
 #include "gridRegion.h"
 #include "gridRegionConstructor.h"
+#include "noiseGenerator.h"
 #include "simple.h"
 #include "simpleArray.h"
 #include "simpleException.h"
 #include "simpleList.h"
+#include "simpleOrderedList.h"
 
 using namespace brogueHd::component;
 using namespace brogueHd::backend::model;
@@ -36,7 +38,7 @@ namespace brogueHd::backend
 		/// Creates the base layout, terrain, and machine terrain for the leve
 		/// </summary>
 		/// <param name="profile">The dungeon profile:  must contain all parameters</param>
-		layoutGenerator(randomGenerator* randomGenerator);
+		layoutGenerator(randomGenerator* randomGenerator, noiseGenerator* noiseGenerator);
 		~layoutGenerator();
 
 		brogueLayout* generateLayout(brogueLevelProfile* profile);
@@ -66,13 +68,15 @@ namespace brogueHd::backend
 	};
 
 
-	layoutGenerator::layoutGenerator(randomGenerator* randomGenerator)
+	layoutGenerator::layoutGenerator(randomGenerator* randomGenerator, noiseGenerator* noiseGenerator)
 	{
 		_randomGenerator = randomGenerator;
+		_roomGenerator = new roomGenerator(noiseGenerator, randomGenerator);
 	}
 
 	layoutGenerator::~layoutGenerator()
 	{
+		delete _roomGenerator;
 	}
 
 	gridRect layoutGenerator::getPaddedBoundary(short padding) const
@@ -165,15 +169,18 @@ namespace brogueHd::backend
 			gridRegion<gridLocator>* nextRegion = _roomGenerator->designRoom(configuration, layout->getParentBoundary(), layout->getBoundary());
 
 			// Connection Points					
-			simpleArray<gridLocator> northEdge = nextRegion->getBoundaryEdges(brogueCompass::N);
-			simpleArray<gridLocator> southEdge = nextRegion->getBoundaryEdges(brogueCompass::S);
-			simpleArray<gridLocator> eastEdge = nextRegion->getBoundaryEdges(brogueCompass::E);
-			simpleArray<gridLocator> westEdge = nextRegion->getBoundaryEdges(brogueCompass::W);
+			simpleOrderedList<gridLocator> northEdge = nextRegion->getBestEdges(brogueCompass::N);
+			simpleOrderedList<gridLocator> southEdge = nextRegion->getBestEdges(brogueCompass::S);
+			simpleOrderedList<gridLocator> eastEdge = nextRegion->getBestEdges(brogueCompass::E);
+			simpleOrderedList<gridLocator> westEdge = nextRegion->getBestEdges(brogueCompass::W);
 
-			int randN = _randomGenerator->randomRange(0, northEdge.count());
-			int randS = _randomGenerator->randomRange(0, southEdge.count());
-			int randE = _randomGenerator->randomRange(0, eastEdge.count());
-			int randW = _randomGenerator->randomRange(0, westEdge.count());
+			// TODO: Situate these better. This will create an exponential draw that falls off quickly. 
+			//		 So, the majority of attempts will be on the outer walls, closer to the boundary.
+			//
+			int randN = _randomGenerator->randomIndex_exp(0, northEdge.count(), 10);
+			int randS = _randomGenerator->randomIndex_exp(0, southEdge.count(), 10);
+			int randE = _randomGenerator->randomIndex_exp(0, eastEdge.count(), 10);
+			int randW = _randomGenerator->randomIndex_exp(0, westEdge.count(), 10);
 
 			accretionTile nextRoom;
 
