@@ -20,7 +20,7 @@ namespace brogueHd::backend
 		noiseGenerator(randomGenerator* randomGenerator);
 		~noiseGenerator();
 
-		void cellularAutomata(const cellularAutomataParameters& parameters, gridCallback<bool> callback);
+		void cellularAutomata(const gridRect& parentBoundary, const gridRect& relativeBoundary, const cellularAutomataParameters& parameters, gridCallback<bool> callback);
 
 	private:
 
@@ -41,7 +41,7 @@ namespace brogueHd::backend
 
 	}
 
-	void noiseGenerator::cellularAutomata(const cellularAutomataParameters& parameters, gridCallback<bool> callback)
+	void noiseGenerator::cellularAutomata(const gridRect& parentBoundary, const gridRect& relativeBoundary, const cellularAutomataParameters& parameters, gridCallback<bool> callback)
 	{
 		// Procedure
 		//
@@ -51,17 +51,14 @@ namespace brogueHd::backend
 		// 3) Run the callback
 		//        
 
-		// Parent boundary with 1 padding
-		gridRect parentBoundary = gridRect(1, 1, DCOLS - 1, DROWS - 1);
-
 		// Array for generating the result
-		grid<bool> resultGrid(parentBoundary, parameters.boundary);
+		grid<bool> resultGrid(parentBoundary, relativeBoundary);
 
 		randomGenerator* rand = _randomGenerator;
 
 		// Generate white noise inside the chosen rectangle
 		//
-		parameters.boundary.iterate([&rand, &parameters, &resultGrid] (short x, short y)
+		relativeBoundary.iterate([&rand, &parameters, &resultGrid] (short x, short y)
 		{
 			if (rand->next() <= parameters.fillRatio)
 				resultGrid.set(x, y, true);
@@ -77,7 +74,7 @@ namespace brogueHd::backend
 		}
 
 		// Callback
-		parameters.boundary.iterate([&rand, &parameters, &resultGrid, &callback] (short x, short y)
+		relativeBoundary.iterate([&rand, &parameters, &resultGrid, &callback] (short x, short y)
 		{
 			return callback(x, y, resultGrid.get(x, y));
 		});

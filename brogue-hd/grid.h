@@ -16,7 +16,6 @@ namespace brogueHd::component
 	{
 	public:
 
-		grid() {};
 		grid(const gridRect& parentBoundary, const gridRect& relativeBoundary);
 		~grid();
 
@@ -173,7 +172,7 @@ namespace brogueHd::component
 	grid<T>::~grid()
 	{
 		// Added grid cells from this class
-		for (int index = 0; index < _relativeBoundary->height; index++)
+		for (int index = 0; index < _relativeBoundary->width; index++)
 			delete[] _grid[index];
 
 		delete[] _grid;

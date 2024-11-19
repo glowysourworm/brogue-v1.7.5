@@ -8,6 +8,7 @@
 #include "gridLocator.h"
 #include "gridRect.h"
 #include "gridRegion.h"
+#include "gridRegionConstructor.h"
 #include "gridRegionLocator.h"
 #include "noiseGenerator.h"
 #include "randomGenerator.h"
@@ -54,9 +55,6 @@ namespace brogueHd::backend
 		_randomGenerator = randomGenerator;
 		_noiseGenerator = noiseGenerator;
 
-		// This gets changed during generation
-		gridRect paddedBoundary = gridRect(1, 1, DCOLS - 1, DROWS - 1);
-
 		// Brogue v1.7.5
 		float fillRatio = 0.55f;
 		short birthCount = 6;
@@ -64,7 +62,7 @@ namespace brogueHd::backend
 		short smoothingIterations = 5;	// This was a change:  Probably can get away with fewer iterations (was >= 10)
 
 		// CA Algorithm Parameters:  These are for the cavern room (Brogue v1.7.5)
-		_cavernParameters = new cellularAutomataParameters(paddedBoundary, fillRatio, birthCount, survivalCount, smoothingIterations);
+		_cavernParameters = new cellularAutomataParameters(fillRatio, birthCount, survivalCount, smoothingIterations);
 	}
 
 	roomGenerator::~roomGenerator()
@@ -99,13 +97,13 @@ namespace brogueHd::backend
 						minSize.width = 3;
 						minSize.height = 15;
 						maxSize.width = 12;
-						maxSize.height = DROWS - 2;
+						maxSize.height = relativeBoundary.height - 2;
 						break;
 					case 2:
 						// Large east-west cave room.
 						minSize.width = 20;
 						minSize.height = 4;
-						maxSize.width = DROWS - 2;
+						maxSize.width = relativeBoundary.height - 2;
 						maxSize.height = 8;
 						break;
 					default:
@@ -117,10 +115,10 @@ namespace brogueHd::backend
 			break;
 			case roomTypes::Cavern:
 			{
-				minSize.width = CAVE_MIN_WIDTH;
-				minSize.height = CAVE_MIN_HEIGHT;
-				maxSize.width = DCOLS - 2;
-				maxSize.height = DROWS - 2;
+				minSize.width = simpleMath::minOf(CAVE_MIN_WIDTH, relativeBoundary.width);
+				minSize.height = simpleMath::minOf(CAVE_MIN_HEIGHT, relativeBoundary.height);
+				maxSize.width = relativeBoundary.width;
+				maxSize.height = relativeBoundary.height;
 
 				designCavern(designGrid, minSize, maxSize);
 			}
@@ -153,10 +151,14 @@ namespace brogueHd::backend
 		// (MEMORY!)
 		simpleList<gridRegion<gridLocator>*> regions = regionLocator.locateRegions(designGrid);
 
-		if (regions.count() != 1)
+		if (regions.count() == 0)
 			throw simpleException("Invalid room created by roomGenerator:  Must have at least one valid region");
 
-		gridRegion<gridLocator>* region = regions.get(0);
+		// Take region with max location count
+		gridRegion<gridLocator>* region = regions.withMax<int>([] (gridRegion<gridLocator>* region)
+		{
+			return region->getLocationCount();
+		});
 
 		if (minSize != default_value::value<gridRect>() &&
 			maxSize != default_value::value<gridRect>())
@@ -175,7 +177,10 @@ namespace brogueHd::backend
 		gridRegionLocator<gridLocator> regionLocator;
 
 		// Create cellular automata using cavern parameters
-		_noiseGenerator->cellularAutomata(*_cavernParameters, [&designGrid] (short column, short row, bool result)
+		_noiseGenerator->cellularAutomata(designGrid.getParentBoundary(), 
+										  designGrid.getRelativeBoundary(), 
+										  *_cavernParameters, 
+		[&designGrid] (short column, short row, bool result)
 		{
 			if (result)
 				designGrid.set(column, row, gridLocator(column, row));
@@ -199,18 +204,40 @@ namespace brogueHd::backend
 				region->getBoundary().height <= maxSize.height;
 		});
 
-		// Select largest area region from valid regions
-		maxRegion = validRegions.withMax<short>([] (gridRegion<gridLocator>* region)
+		// Valid CA result
+		if (validRegions.count() > 0)
 		{
-			return region->getBoundary().area();
-		});
+			// Select largest area region from valid regions
+			maxRegion = validRegions.withMax<short>([] (gridRegion<gridLocator>* region)
+			{
+				return region->getBoundary().area();
+			});
+		}
+		else
+		{
+			gridRegionConstructor<gridLocator> constructor(designGrid.getParentBoundary(), true);
+			gridRect defaultRect(((designGrid.getRelativeBoundary().width - minSize.width) / 2) + designGrid.getRelativeBoundary().column,
+								 ((designGrid.getRelativeBoundary().height - minSize.height) / 2) + designGrid.getRelativeBoundary().row,
+								 minSize.width,
+								 minSize.height);
+			
+			defaultRect.iterate([&constructor] (short column, short row) 
+			{
+				constructor.add(column, row, gridLocator(column, row));
+
+				return iterationCallback::iterate;
+			});
+
+			// (MEMORY!) This will be the default region
+			maxRegion = constructor.complete();
+		}
 
 		// Position the new cave in the middle of the grid...
 		gridRect blobBoundary = maxRegion->getBoundary();
-		gridRect caveBoundary = gridRect(maxSize.width - blobBoundary.width / 2,
-										maxSize.height - blobBoundary.height / 2,
-										blobBoundary.width,
-										blobBoundary.height);
+		gridRect caveBoundary = gridRect(((designGrid.getRelativeBoundary().width - blobBoundary.width) / 2) + designGrid.getRelativeBoundary().column,
+										 ((designGrid.getRelativeBoundary().height - blobBoundary.height) / 2) + designGrid.getRelativeBoundary().row,
+										  blobBoundary.width,
+										  blobBoundary.height);
 
 		gridLocator translation(caveBoundary.column - blobBoundary.column, caveBoundary.row - blobBoundary.row);
 
@@ -231,12 +258,13 @@ namespace brogueHd::backend
 		});
 
 		// (MEMORY) Clean up heap memory
-		regions.forEach([] (gridRegion<gridLocator>* region)
+		for (int index = 0; index < regions.count(); index++)
 		{
-			delete region;
+			if (maxRegion != regions.get(index))
+				delete regions.get(index);
+		}
 
-			return iterationCallback::iterate;
-		});
+		delete maxRegion;
 	}
 
 	void roomGenerator::designEntranceRoom(grid<gridLocator>& designGrid)
@@ -375,11 +403,11 @@ namespace brogueHd::backend
 			radius = _randomGenerator->randomRange(2, 4);
 		}
 
-		//drawCircleOnGrid(grid, DCOLS / 2, DROWS / 2, radius, 1);
+		gridRect minRect(designGrid.getRelativeBoundary().column,
+						 designGrid.getRelativeBoundary().row,
+						 radius, radius);
 
-		gridRect setRect = gridRect::fromCircle(DCOLS / 2, DROWS / 2, radius, radius);
-
-		setRect.iterateInCircle([&designGrid] (short column, short row)
+		minRect.iterateInCircle([&designGrid] (short column, short row)
 		{
 			designGrid.set(column, row, gridLocator(column, row), true);
 
@@ -391,65 +419,43 @@ namespace brogueHd::backend
 		//    drawCircleOnGrid(grid, DCOLS / 2, DROWS / 2, rand_range(3, radius - 3), 0);
 		//}
 
-		// 50%
-		if (radius > 6 && _randomGenerator->next() >= 0.5)
-		{
-			// TODO:  FIGURE OUT ZERO VALUE! (last parameter from above. probably chasm)
+		//// 50%
+		//if (radius > 6 && _randomGenerator->next() >= 0.5)
+		//{
+		//	// TODO:  FIGURE OUT ZERO VALUE! (last parameter from above. probably chasm)
 
-			short removeRadius = _randomGenerator->randomRange(3, radius - 3);
-			gridRect removeRect = gridRect::fromCircle(DCOLS / 2 - removeRadius, DCOLS / 2 - removeRadius, removeRadius, removeRadius);
+		//	short removeRadius = _randomGenerator->randomRange(3, radius - 3);
+		//	gridRect removeRect = gridRect::fromCircle((DCOLS / 2) + removeRadius, (DCOLS / 2) + removeRadius, removeRadius, removeRadius);
 
-			setRect.iterateInCircle([&designGrid] (short column, short row)
-			{
-				designGrid.set(column, row, default_value::value<gridLocator>(), true);
+		//	setRect.iterateInCircle([&designGrid] (short column, short row)
+		//	{
+		//		designGrid.set(column, row, default_value::value<gridLocator>(), true);
 
-				return iterationCallback::iterate;
-			});
-		}
+		//		return iterationCallback::iterate;
+		//	});
+		//}
 	}
 
 	void roomGenerator::designChunkyRoom(grid<gridLocator>& designGrid)
 	{
-		short x, y;
-		short minX, maxX, minY, maxY;
+		gridRect minRect(designGrid.getRelativeBoundary().column,
+						 designGrid.getRelativeBoundary().row,
+						 2, 2);
+
 		short chunkCount = _randomGenerator->randomRange(2, 8);
-
-		// Set small room
-		gridRect(0, 0, 2, 2).iterateInCircle([&designGrid] (short column, short row)
-		{
-			designGrid.set(column, row, gridLocator(column, row));
-			return iterationCallback::iterate;
-		});
-
-		minX = DCOLS / 2 - 3;
-		maxX = DCOLS / 2 + 3;
-		minY = DROWS / 2 - 3;
-		maxY = DROWS / 2 + 3;
 
 		for (short i = 0; i < chunkCount; i++)
 		{
-			x = _randomGenerator->randomRange(minX, maxX);
-			y = _randomGenerator->randomRange(minY, maxY);
+			int offsetX = _randomGenerator->randomRange(0, 5);
+			int offsetY = _randomGenerator->randomRange(0, 5);
 
-			if (designGrid.isDefined(x, y))
+			gridRect rect = minRect + gridLocator(offsetX, offsetY);
+
+			rect.iterateInCircle([&designGrid] (short column, short row)
 			{
-				//            colorOverDungeon(&darkGray);
-				//            hiliteGrid(grid, &white, 100);
-
-				gridRect(x, y, 2, 2).iterateInCircle([&designGrid] (short column, short row)
-				{
-					designGrid.set(column, row, gridLocator(column, row), true);
-					return iterationCallback::iterate;
-				});
-
-				minX = simpleMath::maxOf(1, simpleMath::minOf(x - 3, minX));
-				maxX = simpleMath::minOf(DCOLS - 2, simpleMath::maxOf(x + 3, maxX));
-				minY = simpleMath::maxOf(1, simpleMath::minOf(y - 3, minY));
-				maxY = simpleMath::minOf(DROWS - 2, simpleMath::maxOf(y + 3, maxY));
-
-				//            hiliteGrid(grid, &green, 50);
-				//            temporaryMessage("Added a chunk:", true);
-			}
+				designGrid.set(column, row, gridLocator(column, row), true);
+				return iterationCallback::iterate;
+			});
 		}
 	}
 }

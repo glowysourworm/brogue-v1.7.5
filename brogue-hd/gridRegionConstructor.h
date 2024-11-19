@@ -26,6 +26,7 @@ namespace brogueHd::component
 		/// region is created.
 		/// </summary>
 		gridRegionConstructor(gridRect parentBoundary, gridPredicate<T> inclusionPredicate, bool unsafeMode);
+		gridRegionConstructor(gridRect parentBoundary, bool unsafeMode);
 		~gridRegionConstructor();
 
 		/// <summary>
@@ -89,6 +90,16 @@ namespace brogueHd::component
 	};
 
 	template<isGridLocator T>
+	gridRegionConstructor<T>::gridRegionConstructor(gridRect parentBoundary, bool unsafeMode) :
+		gridRegionConstructor(parentBoundary, [] (short column, short row, const T& item)
+	{
+		return true;	// Default inclusion predicate
+	}, unsafeMode)
+	{
+
+	}
+
+	template<isGridLocator T>
 	gridRegionConstructor<T>::gridRegionConstructor(gridRect parentBoundary, gridPredicate<T> inclusionPredicate, bool unsafeMode)
 	{
 		// This component is pretty much free-standing
@@ -126,6 +137,7 @@ namespace brogueHd::component
 	gridRegionConstructor<T>::~gridRegionConstructor()
 	{
 		delete _grid;
+		delete _predicate;
 
 		delete _locations;
 		delete _edgeLocations;
