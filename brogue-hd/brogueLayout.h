@@ -50,6 +50,11 @@ namespace brogueHd::backend::model
 		void iterate(gridCallback<brogueCell*> callback) const;
 
 		/// <summary>
+		/// Iterates cells where there is layout defined
+		/// </summary>
+		void iterateWhereDefined(gridCallback<brogueCell*> callback) const;
+
+		/// <summary>
 		/// Ensures that the layout has cells in the specified locations.
 		/// </summary>
 		template<isGridLocator T>
@@ -159,6 +164,17 @@ namespace brogueHd::backend::model
 	void brogueLayout::iterate(gridCallback<brogueCell*> callback) const
 	{
 		_mainGrid->iterate(callback);
+	}
+
+	void brogueLayout::iterateWhereDefined(gridCallback<brogueCell*> callback) const
+	{
+		_mainGrid->iterate([&callback] (short column, short row, brogueCell* cell)
+		{
+			if (cell != nullptr)
+				callback(column, row, cell);
+
+			return iterationCallback::iterate;
+		});
 	}
 
 	brogueCell* brogueLayout::firstAdjacent(short column, short row, gridPredicate<brogueCell*> predicate)

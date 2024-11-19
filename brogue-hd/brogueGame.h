@@ -26,6 +26,7 @@ namespace brogueHd::backend::model
 
 		void outputMessage(char* msg, color theColor, bool requireAcknowledgment);
 
+		brogueLevel* getLevel(int depth) const;
 		brogueLevel* getCurrentLevel() const;
 
 	private:
@@ -130,7 +131,10 @@ namespace brogueHd::backend::model
 	{
 		return _noMenu;
 	}
-
+	brogueLevel* brogueGame::getLevel(int depth) const
+	{
+		return _levels->get(depth - 1);
+	}
 	brogueLevel* brogueGame::getCurrentLevel() const
 	{
 		return _levels->get(currentDepth - 1);

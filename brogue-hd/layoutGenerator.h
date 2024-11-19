@@ -77,7 +77,7 @@ namespace brogueHd::backend
 	{
 		_uiBuilder = uiBuilder;
 		_randomGenerator = randomGenerator;
-		_roomGenerator = new roomGenerator(noiseGenerator, randomGenerator);
+		_roomGenerator = new roomGenerator(uiBuilder, noiseGenerator, randomGenerator);
 
 		// Layout Data
 		_layout = nullptr;
@@ -88,28 +88,30 @@ namespace brogueHd::backend
 
 	layoutGenerator::~layoutGenerator()
 	{
-		if (_layout != nullptr)
-			delete _layout;
+		// Accretion tiles can now be deleted from the previous run
+		for (int index = 0; index < _roomTiles->count(); index++)
+		{
+			// gridRegion instances handled separately
+			delete _roomTiles->get(index);
+		}
 
-		if (_roomTiles != nullptr)
-			delete _roomTiles;
-
-		if (_delaunayGraph != nullptr)
-			delete _delaunayGraph;
+		delete _roomTiles;
 
 		delete _roomGenerator;
 	}
 
 	void layoutGenerator::initialize(brogueLevelProfile* profile)
 	{
-		if (_layout != nullptr)
-			delete _layout;
-
+		// Accretion tiles can now be deleted from the previous run
 		if (_roomTiles != nullptr)
+		{
+			for (int index = 0; index < _roomTiles->count(); index++)
+			{
+				// gridRegion instances handled separately
+				delete _roomTiles->get(index);
+			}
 			delete _roomTiles;
-
-		if (_delaunayGraph != nullptr)
-			delete _delaunayGraph;
+		}
 
 		gridRect levelBoundary = _uiBuilder->getBrogueGameBoundary();
 		gridRect levelPaddedBoundary = _uiBuilder->getPaddedBoundary(levelBoundary, 1);
@@ -170,12 +172,12 @@ namespace brogueHd::backend
 		// Machine Rooms
 
 		// Triangulate Rooms:  Creates Delaunay Triangulation of the connection point vertices (new _delaunayGraph)
-		triangulateRooms();
+		//triangulateRooms();
 
 		// Connect Rooms:  Create cells in the grid for the delaunay triangulation of the 
 		//                 connection points of the room tiles. Runs dijkstra's algorithm to
 		//				   create corridor cells inside the brogueLayout*
-		connectRooms();
+		//connectRooms();
 
 		return _layout;
 	}
@@ -196,10 +198,10 @@ namespace brogueHd::backend
 			// Room configuration from the template
 			brogueRoomInfo configuration = index == 0 ? _profile->getEntranceRoom(_randomGenerator) : _profile->getRandomRoomInfo(_randomGenerator);
 
-			// (MEMORY!)
+			// (MEMORY!) (These regions are given an extra cell of padding for connection points)
 			gridRegion<gridLocator>* nextRegion = _roomGenerator->designRoom(configuration, _layout->getParentBoundary(), _layout->getBoundary());
 
-			// Connection Points					
+			// Connection Points (These are the edges, not the connection points)
 			simpleOrderedList<gridLocator> northEdge = nextRegion->getBestEdges(brogueCompass::N);
 			simpleOrderedList<gridLocator> southEdge = nextRegion->getBestEdges(brogueCompass::S);
 			simpleOrderedList<gridLocator> eastEdge = nextRegion->getBestEdges(brogueCompass::E);
@@ -218,10 +220,29 @@ namespace brogueHd::backend
 
 			// (Pointer to allocated region memory)
 			nextRoom->region = nextRegion;
-			nextRoom->connectionPointN = northEdge.get(randN);
-			nextRoom->connectionPointS = southEdge.get(randS);
-			nextRoom->connectionPointE = eastEdge.get(randE);
-			nextRoom->connectionPointW = westEdge.get(randW);
+
+			gridLocator connectionN = northEdge.get(randN).add(0, -1);
+			gridLocator connectionS = southEdge.get(randS).add(0, 1);
+			gridLocator connectionE = eastEdge.get(randE).add(1, 0);
+			gridLocator connectionW = westEdge.get(randW).add(-1, 0);
+
+			// Make sure connection points lie OUTSIDE the region
+			if (nextRegion->isDefined(connectionN) ||
+				nextRegion->isDefined(connectionS) ||
+				nextRegion->isDefined(connectionE) ||
+				nextRegion->isDefined(connectionW))
+			{
+				delete nextRoom->region;
+				delete nextRoom;
+
+				continue;
+			}
+
+
+			nextRoom->connectionPointN = connectionN;		// Connection points lie in the padded area of the desisgn grid
+			nextRoom->connectionPointS = connectionS;		// or on the interior. They are not part of the region itself; and			
+			nextRoom->connectionPointE = connectionE;		// will become separate corridor cells, and regions, afterwards.
+			nextRoom->connectionPointW = connectionW;
 
 			attemptRegions.add(nextRoom);
 		}
@@ -245,13 +266,31 @@ namespace brogueHd::backend
 			}
 
 			// Accrete rooms - translating the attempt room into place (modifies attempt region)
-			else if (attemptConnection(attemptRegion, _layout->getParentBoundary(), interRoomPadding))
+			else if (attemptConnection(attemptRegion, _layout->getBoundary(), interRoomPadding))
 			{
 				_roomTiles->add(attemptRegion);
 
 				// Set final room location (creates new brogueCell* instances, so delete our local one afterwards)
 				_layout->createCells(attemptRegion->region);
 			}
+		}
+
+		// Add corridor cells for the connection points
+		for (int index = 0; index < _roomTiles->count(); index++)
+		{
+			accretionTile* tile = _roomTiles->get(index);
+
+			if (tile->hasNorthConnection)
+				_layout->createCells(tile->connectionPointN);
+
+			if (tile->hasSouthConnection)
+				_layout->createCells(tile->connectionPointS);
+
+			if (tile->hasEastConnection)
+				_layout->createCells(tile->connectionPointE);
+
+			if (tile->hasWestConnection)
+				_layout->createCells(tile->connectionPointW);
 		}
 
 		// Cleanup Memory:  Delete unused room tiles
@@ -297,7 +336,7 @@ namespace brogueHd::backend
 					translation = tile->connectionPointW.subtract(roomTile->connectionPointE);
 
 					// Adjust the connection point by one cell + padding
-					translation.column -= (1 + interRoomPadding);
+					//translation.column -= (1 + interRoomPadding);
 
 					westAttempt = true;
 				}
@@ -307,7 +346,7 @@ namespace brogueHd::backend
 					translation = tile->connectionPointN.subtract(roomTile->connectionPointS);
 
 					// Adjust the connection point by one cell + padding
-					translation.row -= (1 + interRoomPadding);
+					//translation.row -= (1 + interRoomPadding);
 
 					northAttempt = true;
 				}
@@ -317,7 +356,7 @@ namespace brogueHd::backend
 					translation = tile->connectionPointE.subtract(roomTile->connectionPointW);
 
 					// Adjust the connection point by one cell + padding
-					translation.column += (1 + interRoomPadding);
+					//translation.column += (1 + interRoomPadding);
 
 					eastAttempt = true;
 				}
@@ -327,15 +366,16 @@ namespace brogueHd::backend
 					translation = tile->connectionPointS.subtract(roomTile->connectionPointN);
 
 					// Adjust the connection point by one cell + padding
-					translation.row += (1 + interRoomPadding);
+					//translation.row += (1 + interRoomPadding);
 
 					southAttempt = true;
 				}
 				else
 					break;
 
-				// Translate the region into position (HEAP ALLOCATED! ALSO CHANGES LOCATOR INSTANCES)
-				roomTile->region->translate_StackLike(translation.column, translation.row);
+				// Translate the region tile into position (this affects all grid locators, and connection points)
+				if (!roomTile->attemptTranslastion(translation))
+					continue;
 
 				// Check the boundary:  1) outer gridRect first to reduce iteration, and 2) the grid overlap per cell
 				if (attemptRect.contains(roomTile->region->getBoundary()))

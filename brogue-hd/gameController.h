@@ -269,11 +269,11 @@ namespace brogueHd::backend
 
 		if (newGame)
 		{
-			initNewGame(1234);
+			initNewGame(12334);
 		}
 		else if (openGame)
 		{
-			initNewGame(1234); // TODO
+			initNewGame(12334); // TODO
 		}
 
 		// Game Mode Change
@@ -281,6 +281,7 @@ namespace brogueHd::backend
 		{
 			// Might need to check on environment first (for now, just keep this here to manage the rendering thread)
 			setMode(requestedMode);
+			return true;			// Allow a cycle to initialize mode
 		}
 
 		// RUN THE GAME:	Apply keyboard / mouse to the game backend processors
@@ -290,7 +291,16 @@ namespace brogueHd::backend
 		{
 			case BrogueGameMode::Game:
 			{
-				_renderingController->updateGameData(_game->getCurrentLevel());
+				// Check for game updates
+				if (_game->getLevel(1)->needsUpdate())
+				{
+					// Update rendering thread
+					_renderingController->updateGameData(_game->getLevel(1));
+
+					// Clear update flags
+					_game->getLevel(1)->clearUpdate();
+				}
+				
 				return true;
 			}
 			case BrogueGameMode::Playback:

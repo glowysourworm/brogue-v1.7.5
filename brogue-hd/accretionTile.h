@@ -35,13 +35,40 @@ namespace brogueHd::backend::model
 		{
 		}
 
+		/// <summary>
+		/// Attempts to translate the region, and connection points, using the specified 
+		/// amount. 
+		/// </summary>
+		bool attemptTranslastion(const gridLocator& translation)
+		{
+			gridRect parentBoundary = region->getParentBoundary();
+
+			// Must be in bounds in order to translate
+			if (!parentBoundary.contains(region->getBoundary() + translation) ||
+				!parentBoundary.contains(connectionPointN.add(translation)) ||
+				!parentBoundary.contains(connectionPointS.add(translation)) ||
+				!parentBoundary.contains(connectionPointE.add(translation)) ||
+				!parentBoundary.contains(connectionPointW.add(translation)))
+				return false;
+
+			region->translate_StackLike(translation.column, translation.row);
+
+			connectionPointN.translate(translation.column, translation.row);
+			connectionPointS.translate(translation.column, translation.row);
+			connectionPointE.translate(translation.column, translation.row);
+			connectionPointW.translate(translation.column, translation.row);
+
+			return true;
+		}
+
 		// Tile has been connected to another tile
 		bool hasNorthConnection;
 		bool hasSouthConnection;
 		bool hasEastConnection;
 		bool hasWestConnection;
 
-		// Connection points - not necessarily on the border
+		// Connection points - these lie just outside the region; and are
+		// shared with the connecting tile.
 		gridLocator connectionPointN;
 		gridLocator connectionPointS;
 		gridLocator connectionPointE;

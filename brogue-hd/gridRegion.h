@@ -2,6 +2,7 @@
 
 #include "grid.h"
 #include "gridDefinitions.h"
+#include "gridLocator.h"
 #include "gridRect.h"
 #include "simple.h"
 #include "simpleArray.h"
@@ -91,6 +92,11 @@ namespace brogueHd::component
 		/// Returns true if a cell is defined for the region
 		/// </summary>
 		bool isDefined(short column, short row) const;
+
+		/// <summary>
+		/// Returns true if a cell is defined for the region
+		/// </summary>
+		bool isDefined(const gridLocator& locator) const;
 
 		/// <summary>
 		/// Returns true if an edge cell is defined
@@ -247,6 +253,12 @@ namespace brogueHd::component
 			return false;
 
 		return _grid->isDefined(column, row);
+	}
+
+	template<isGridLocator T>
+	bool gridRegion<T>::isDefined(const gridLocator& locator) const
+	{
+		return isDefined(locator.column, locator.row);
 	}
 
 	template<isGridLocator T>

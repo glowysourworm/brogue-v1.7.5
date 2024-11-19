@@ -19,12 +19,17 @@ namespace brogueHd::backend::model
 
 		short getDepth() const;
 
-		void iterate(gridCallback<brogueCell*> callback) const;
+		void iterateWhereDefined(gridCallback<brogueCell*> callback) const;
+		void clearUpdate();
+		bool needsUpdate();
 
 	private:
 
 		brogueLayout* _layout;
 		brogueContentGrid* _contentGrid;
+
+		// Primary invalid flag for the level
+		bool _invalid;
 
 		// (old variable name)
 		// pcell mapStorage[DCOLS][DROWS];
@@ -45,6 +50,8 @@ namespace brogueHd::backend::model
 		_depth = depth;
 		_layout = layout;
 		_contentGrid = content;
+
+		_invalid = true;
 	}
 	brogueLevel::~brogueLevel()
 	{
@@ -53,9 +60,17 @@ namespace brogueHd::backend::model
 	{
 		return _depth;
 	}
-	void brogueLevel::iterate(gridCallback<brogueCell*> callback) const
+	void brogueLevel::iterateWhereDefined(gridCallback<brogueCell*> callback) const
 	{
-		_layout->iterate(callback);
+		_layout->iterateWhereDefined(callback);
+	}
+	bool brogueLevel::needsUpdate()
+	{
+		return _invalid;
+	}
+	void brogueLevel::clearUpdate()
+	{
+		_invalid = false;
 	}
 }
 

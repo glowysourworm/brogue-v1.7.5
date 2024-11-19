@@ -460,7 +460,7 @@ namespace brogueHd::frontend
 
 		brogueProgramContainer* program = _program;
 
-		level->iterate([&program] (short column, short row, brogueCell* cell)
+		level->iterateWhereDefined([&program] (short column, short row, brogueCell* cell)
 		{
 			// Stack copy of brogueCellDisplay
 			program->setGameUpdate(column, row, cell->getDisplay());

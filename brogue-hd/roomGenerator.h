@@ -1,6 +1,7 @@
 #pragma once
 
 #include "brogueGlobal.h"
+#include "brogueUIBuilder.h"
 #include "cellularAutomataParameters.h"
 #include "dungeon.h"
 #include "dungeonConstants.h"
@@ -26,7 +27,7 @@ namespace brogueHd::backend
 	{
 	public:
 
-		roomGenerator(noiseGenerator* noiseGenerator, randomGenerator* randomGenerator);
+		roomGenerator(brogueUIBuilder* uiBuilder, noiseGenerator* noiseGenerator, randomGenerator* randomGenerator);
 		~roomGenerator();
 
 		gridRegion<gridLocator>* designRoom(const brogueRoomInfo& configuration,
@@ -46,12 +47,14 @@ namespace brogueHd::backend
 
 		noiseGenerator* _noiseGenerator;
 		randomGenerator* _randomGenerator;
+		brogueUIBuilder* _uiBuilder;
 
 		cellularAutomataParameters* _cavernParameters;
 	};
 
-	roomGenerator::roomGenerator(noiseGenerator* noiseGenerator, randomGenerator* randomGenerator)
+	roomGenerator::roomGenerator(brogueUIBuilder* uiBuilder, noiseGenerator* noiseGenerator, randomGenerator* randomGenerator)
 	{
+		_uiBuilder = uiBuilder;
 		_randomGenerator = randomGenerator;
 		_noiseGenerator = noiseGenerator;
 
@@ -74,7 +77,13 @@ namespace brogueHd::backend
 														const gridRect& parentBoundary,
 														const gridRect& relativeBoundary)
 	{
-		grid<gridLocator> designGrid(parentBoundary, relativeBoundary);
+		// Need a padded boundary for connection points
+		gridRect paddedBoundary = _uiBuilder->getPaddedBoundary(relativeBoundary, 1);
+
+		if (paddedBoundary.area() < 4)
+			throw simpleException("Trying to design a room with less than the minimum required space of 4 tiles");
+
+		grid<gridLocator> designGrid(parentBoundary, paddedBoundary);
 
 		gridRect minSize = default_value::value<gridRect>();
 		gridRect maxSize = default_value::value<gridRect>();
@@ -97,13 +106,13 @@ namespace brogueHd::backend
 						minSize.width = 3;
 						minSize.height = 15;
 						maxSize.width = 12;
-						maxSize.height = relativeBoundary.height - 2;
+						maxSize.height = paddedBoundary.height - 2;
 						break;
 					case 2:
 						// Large east-west cave room.
 						minSize.width = 20;
 						minSize.height = 4;
-						maxSize.width = relativeBoundary.height - 2;
+						maxSize.width = paddedBoundary.height - 2;
 						maxSize.height = 8;
 						break;
 					default:
@@ -115,10 +124,10 @@ namespace brogueHd::backend
 			break;
 			case roomTypes::Cavern:
 			{
-				minSize.width = simpleMath::minOf(CAVE_MIN_WIDTH, relativeBoundary.width);
-				minSize.height = simpleMath::minOf(CAVE_MIN_HEIGHT, relativeBoundary.height);
-				maxSize.width = relativeBoundary.width;
-				maxSize.height = relativeBoundary.height;
+				minSize.width = simpleMath::minOf(CAVE_MIN_WIDTH, paddedBoundary.width);
+				minSize.height = simpleMath::minOf(CAVE_MIN_HEIGHT, paddedBoundary.height);
+				maxSize.width = paddedBoundary.width;
+				maxSize.height = paddedBoundary.height;
 
 				designCavern(designGrid, minSize, maxSize);
 			}
@@ -302,18 +311,20 @@ namespace brogueHd::backend
 
 	void roomGenerator::designCrossRoom(grid<gridLocator>& designGrid)
 	{
+		gridRect boundary = designGrid.getRelativeBoundary();
+
 		short roomWidth, roomHeight, roomWidth2, roomHeight2, roomX, roomY, roomX2, roomY2;
 
 		roomWidth = _randomGenerator->randomRange(3, 12);
-		roomX = _randomGenerator->randomRange(simpleMath::maxOf(0, DCOLS / 2 - (roomWidth - 1)), simpleMath::minOf(DCOLS, DCOLS / 2));
+		roomX = _randomGenerator->randomRange(simpleMath::maxOf(0, boundary.centerX() - roomWidth - 1), boundary.centerX());
 		roomWidth2 = _randomGenerator->randomRange(4, 20);
 		roomX2 = (roomX + (roomWidth / 2) + _randomGenerator->randomRange(0, 2) + _randomGenerator->randomRange(0, 2) - 3) - (roomWidth2 / 2);
 
 		roomHeight = _randomGenerator->randomRange(3, 7);
-		roomY = (DROWS / 2 - roomHeight);
+		roomY = (boundary.centerY() - roomHeight);
 
 		roomHeight2 = _randomGenerator->randomRange(2, 5);
-		roomY2 = (DROWS / 2 - roomHeight2 - (_randomGenerator->randomRange(0, 2) + _randomGenerator->randomRange(0, 1)));
+		roomY2 = (boundary.centerY() - roomHeight2 - (_randomGenerator->randomRange(0, 2) + _randomGenerator->randomRange(0, 1)));
 
 		gridRect room1(roomX - 5, roomY + 5, roomWidth, roomHeight);
 		gridRect room2(roomX2 - 5, roomY2 + 5, roomWidth2, roomHeight2);

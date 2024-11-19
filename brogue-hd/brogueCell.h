@@ -1,6 +1,7 @@
 #pragma once
 
 #include "brogueCellDisplay.h"
+#include "color.h"
 #include "gridLocator.h"
 
 using namespace brogueHd::component;
@@ -27,12 +28,20 @@ namespace brogueHd::backend::model
 		// Sets default values (isEmpty() == true)
 		brogueCell()
 		{
+			_display = new brogueCellDisplay(-1, -1);
+			_display->backColor = colors::getGray(0.5);
+			_display->foreColor = colors::blue();
 		}
 		brogueCell(short column, short row)
 		{
-			// Base struct
+			_display = new brogueCellDisplay(column, row);
+			_display->backColor = colors::getGray(0.5);
+			_display->foreColor = colors::blue();
 		}
-		~brogueCell() {};
+		~brogueCell() 
+		{
+			delete _display;
+		};
 
 		brogueCellDisplay getDisplay() const
 		{
@@ -43,11 +52,11 @@ namespace brogueHd::backend::model
 
 		brogueCellDisplay* _display;
 
-		short terrainRandomValues[8];					// TODO: Figure this out!
-		bool isWayPoint;
+		//short terrainRandomValues[8];					// TODO: Figure this out!
+		//bool isWayPoint;
 
-		char machine;
-		bool disposableHere;
+		//char machine;
+		//bool disposableHere;
 	};
 }
 

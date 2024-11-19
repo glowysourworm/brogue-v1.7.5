@@ -1,5 +1,6 @@
 #pragma once
 
+#include "brogueCellDisplay.h"
 #include "brogueUIConstants.h"
 #include "brogueUIData.h"
 #include "brogueUIProgramPartId.h"
@@ -50,18 +51,7 @@ namespace brogueHd::frontend
 
 	void brogueGameView::update(int millisecondsLapsed, bool forceUpdate)
 	{
-		gridRect bounds = this->getBoundary();
-		brogueGameView* that = this;
-
-		// Iterate THIS boundary:  Apply mouse data from the render boundary
-		this->getBoundary().iterate([&that, &bounds] (short column, short row)
-		{
-			//that->get(column, row)->foreColor = uiText->getForeground(column, row);
-			that->get(column, row)->backColor = that->getBackgroundColor(column, row);
-			//that->get(column, row)->character = glyphMap.isGlyphDefined(uiText->getCharacter(column, row)) ? uiText->getCharacter(column, row) : glyphMap.Empty;
-
-			return iterationCallback::iterate;
-		});
+		// Nothing to do
 	}
 
 	bool brogueGameView::needsUpdate() const
