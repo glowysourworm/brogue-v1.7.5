@@ -300,7 +300,7 @@ namespace brogueHd::frontend
 					case brogueUIProgram::FlavorTextPanelProgram:
 						return gridRect(COLS - DCOLS, ROWS - 2, DCOLS, 1);
 					case brogueUIProgram::GameProgram:
-						return gridRect(COLS - DCOLS, ROWS - DROWS, DCOLS, DROWS - 2);
+						return gridRect(COLS - DCOLS, ROWS - DROWS, DCOLS, DROWS - 1);
 					case brogueUIProgram::GameHelpProgram:
 					case brogueUIProgram::GameDiscoveredItems:
 						return gridRect(COLS - DCOLS, 0, DCOLS, ROWS);

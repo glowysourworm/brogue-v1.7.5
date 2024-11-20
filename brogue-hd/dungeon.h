@@ -36,17 +36,17 @@ namespace brogueHd::backend::model
 	{
 	public:
 
-		roomTypes type;
+		brogueRoomType type;
 		short frequency;
 		short corridorChance;
 
 		brogueRoomInfo()
 		{
-			type = roomTypes::MainEntranceRoom;
+			type = brogueRoomType::MainEntranceRoom;
 			frequency = 0;
 			corridorChance = 0;
 		}
-		brogueRoomInfo(roomTypes atype, short afrequency, short acorridorChance)
+		brogueRoomInfo(brogueRoomType atype, short afrequency, short acorridorChance)
 		{
 			type = atype;
 			frequency = afrequency;

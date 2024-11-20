@@ -1,8 +1,11 @@
 #pragma once
 
+#include "simple.h"
+#include "simpleMath.h"
+
 namespace brogueHd::simple
 {
-    template<typename T>
+    template<isNumber T>
     struct simpleVector
     {
         T x;
@@ -18,16 +21,47 @@ namespace brogueHd::simple
             x = ax;
             y = ay;
         }
+        simpleVector(const simpleVector<T>& copy)
+        {
+            x = copy.x;
+            y = copy.y;
+        }
+        void operator=(const simpleVector<T>& copy)
+        {
+            x = copy.x;
+            y = copy.y;
+        }
 
-        T dot(simpleVector<T> vector)
+        friend simpleVector<T> operator+(const simpleVector<T>& vector1, const simpleVector<T>& vector2)
+        {
+            return simpleVector<T>(vector1.x + vector2.x, vector1.y + vector2.y);
+        }
+
+        T magnitude()
+        {
+            return sqrt(x * x + y * y);
+        }
+
+        T dot(const simpleVector<T>& vector)
         {
             return (x * vector.x) + (y * vector.y);
+        }
+
+        T slope() const
+        {
+            return y / x;
+        }
+
+        void add(T ax, T ay)
+        {
+            x += ax;
+            y += ay;
         }
 
         /// <summary>
         /// Returns the value of the cross product (casted in 3 dimensions)
         /// </summary>
-        T cross(simpleVector<T> vector)
+        T cross(const simpleVector<T>& vector)
         {
             return (x * vector.y) - (vector.x * y);
         }

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "gridDefinitions.h"
 #include "gridLocator.h"
 #include "simple.h"
 #include <functional>
@@ -10,6 +11,12 @@ namespace brogueHd::component
 	/// Iterator delegate for providing feedback to/from gridRect iterator functions.
 	/// </summary>
 	using gridRectIterator = std::function<iterationCallback(short column, short row)>;
+
+	/// <summary>
+	/// Iterator delegate for providing feedback to/from gridRect iterator functions. The direction 
+	/// is specific to the "adjacent side" along which iteration was happening.
+	/// </summary>
+	using gridRectDirectionalIterator = std::function<iterationCallback(short column, short row, brogueCompass direction)>;
 
 	struct gridRect : hashable
 	{
@@ -133,6 +140,10 @@ namespace brogueHd::component
 		{
 			return gridLocator(right(), bottom());
 		}
+		gridLocator center() const
+		{
+			return gridLocator(centerX(), centerY());
+		}
 
 		bool contains(short acolumn, short arow) const
 		{
@@ -171,6 +182,43 @@ namespace brogueHd::component
 				return false;
 
 			return true;
+		}
+
+		bool overlaps(const gridRect& rect) const
+		{
+			return !(right() < rect.left() ||
+					 left() > rect.right() ||
+					 top() > rect.bottom() ||
+					 bottom() < rect.top());
+		}
+
+		/// <summary>
+		/// Checks adjacency with the other gridRect. The condition is that it must share
+		/// an edge; and that corners don't count.
+		/// </summary>
+		bool isAdjacent(const gridRect& rect) const
+		{
+			int adjacentEdges = 0;
+
+			if (left() == rect.right() + 1)
+				adjacentEdges++;
+
+			if (right() == rect.left() - 1)
+				adjacentEdges++;
+
+			if (top() == rect.bottom() + 1)
+				adjacentEdges++;
+
+			if (bottom() == rect.top() - 1)
+				adjacentEdges++;
+
+			bool indicesOverlapX = (rect.left() >= left() && rect.left() <= right()) ||
+								   (rect.right() <= right() && rect.right() >= left());
+
+			bool indicesOverlapY = (rect.top() >= top() && rect.top() <= bottom()) ||
+								   (rect.bottom() <= bottom() && rect.bottom() >= top());
+
+			return !overlaps(rect) && adjacentEdges > 0 && (indicesOverlapX || indicesOverlapY);
 		}
 
 		void expand(const gridRect& rect)
@@ -299,6 +347,66 @@ namespace brogueHd::component
 						userBreak = callback(i, j);
 					}
 				}
+			}
+		}
+
+		/// <summary>
+		/// Iterates outside of the rectangle; but within the bounds of the second rectangle. Iteration
+		/// will continue for the specified distance.
+		/// </summary>
+		void iterateOutsideAdjacent(int distance, const gridRect& constraint, gridRectDirectionalIterator callback) const
+		{
+			// Start adjacent to the outer boundary
+			//
+			int count = 1;
+
+			while (count <= distance) 
+			{
+				// Top
+				for (int column = left() - count; column <= right() + count && constraint.contains(column, top() - count); column++)
+				{
+					// Repeat (from bottom iterator)
+					if (column == left() - count)
+						continue;
+
+					if (callback(column, top() - count, brogueCompass::N) == iterationCallback::breakAndReturn)
+						return;
+				}
+
+				// Right
+				for (int row = top() - count; row <= bottom() + count && constraint.contains(right() + count, row); row++)
+				{
+					// Repeat
+					if (row == top() - count)
+						continue;
+
+					if (callback(right() + count, row, brogueCompass::E) == iterationCallback::breakAndReturn)
+						return;
+				}
+
+				// Bottom
+				for (int column = right() + count; column >= left() - count && constraint.contains(column, bottom() + count); column--)
+				{
+					// Repeat
+					if (column == right() + count)
+						continue;
+
+					if (callback(column, bottom() + count, brogueCompass::S) == iterationCallback::breakAndReturn)
+						return;
+				}
+
+				// Left
+				for (int row = bottom() + count; row >= top() - count && constraint.contains(left() - count, row); row--)
+				{
+					// Repeat
+					if (row == bottom() + count)
+						continue;
+
+					if (callback(left() - count, row, brogueCompass::W) == iterationCallback::breakAndReturn)
+						return;
+				}
+
+				count++;
 			}
 		}
 	};

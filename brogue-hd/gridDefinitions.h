@@ -10,7 +10,7 @@ namespace brogueHd::component
 	/// <summary>
 	/// Defines directions for character movement
 	/// </summary>
-	enum brogueCompass
+	enum class brogueCompass
 	{
 		None = 0,
 		N = 1,

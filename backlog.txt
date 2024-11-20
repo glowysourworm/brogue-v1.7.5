@@ -69,3 +69,47 @@ Brogue UI Animation Sequence: (brogueUIStateChanger)
 		// State Specific (these will be animation data)
 		- int gameLogScrollOffset
 		
+Brogue Layout Generator:
+
+	Brogue v1.7.5:  Used 35 room attempts with connection point accretion (bolt-on) placement 
+					of each attempt to try and piece together his layout. 
+					
+	We're going to use his room designs (each has a type and some layout code) with a simpler
+	"accretion" method.
+	
+	Tililng: A similar method is to tile the space with allocated room rectangles. The original
+			 rogue game (1981 DOS) has a grid of rooms. A less-rectangular design might allow
+			 rooms to still "bolt-on"; but not with such a box-like layout. 
+			 
+	Procedure:
+	
+		1) Select an entrance space on the grid. This will be for the first room.
+		2) Choose a layout from the Brogue v1.7.5 type list. (we're trying to be faithful to his
+		   layout routines until we've mastered his methods)
+		3) Create a gridRegion inside of this space. The result will be outlined by a gridRect 
+		   that touches the boundaries of the gridRegion - which is amorphous.
+		4) Run the routine from our centroid locator - and locate the largest rectangle left in
+		   the layout space (other than the one(s) we've just laid).
+		5) Repeat in this new space; but take the result and put it as close (in its layout gridRect
+		   to the first tile's center as you can. This will be essentially the layout heuristic; and
+		   will help to tightly pack the tiling together.
+		   
+	Caveat:	The problem of padding the regions will want to produce the single spacing of the
+			original - except in places where you don't want a shared wall.
+			
+	Solution: The attachment of hallways will be predefined - if desired. One Brogue v1.7.5 example
+			  is the hallway with three connection points allocated at its end. This can be handled
+			  by specifying Dijkstra map costs during the padding prodecure. These will be laid out
+			  into the design grid cells. (brogueDesignCell* TBD)
+			  
+	Connecting it all up:  The use of a triangulator for this new version will make it much simpler
+						   to design without the needed caution for placement constraints. So, a simple
+						   pass to the triangulator, followed by a dijkstra run, will give the hallways
+						   for the most direct, nearest neighbor approach (with prim's algorithm giving
+						   the minimum spanning tree MST), to solving the problem very simply.
+						   
+	After all the space has been exhausted, the layout routine will exit. Providing a configuration
+	for this layout process will be part of making this very simple to use. So, most of the 
+	parameterization will be put there; and set to mimic Brogue v1.7.5.
+		 
+		

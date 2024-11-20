@@ -205,7 +205,7 @@ namespace brogueHd::backend
 		} while (R >= 1.0f || R == 0.0f);
 
 		// Use inverse CDF methods to calculate the gaussian
-		double normalValue = v1 * simpleMath::sqrt((-2.0 * simpleMath::naturalLog(R)) / R);
+		double normalValue = v1 * simpleMath::squareRoot((-2.0 * simpleMath::naturalLog(R)) / R);
 
 		// The resulting gaussian draw
 		double result = (mean + (normalValue * stdDev));

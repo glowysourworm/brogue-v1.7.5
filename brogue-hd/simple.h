@@ -215,4 +215,26 @@ namespace brogueHd::simple
 		iterate = 0,
 		breakAndReturn = 1
 	};
+
+	/// <summary>
+	/// Global operator for enum bitwise OR operation
+	/// </summary>
+	template<class T, std::enable_if_t<std::is_enum_v<T>, int> = 0>
+	constexpr T operator|(T lhs, T rhs)
+	{
+		return static_cast<T>(
+			static_cast<std::underlying_type<T>::type>(lhs) |
+			static_cast<std::underlying_type<T>::type>(rhs));
+	}
+
+	/// <summary>
+	/// Global operator for enum bitwise AND operation
+	/// </summary>
+	template<class T, std::enable_if_t<std::is_enum_v<T>, int> = 0>
+	constexpr T operator&(T lhs, T rhs)
+	{
+		return static_cast<T>(
+			static_cast<std::underlying_type<T>::type>(lhs) &
+			static_cast<std::underlying_type<T>::type>(rhs));
+	}
 }

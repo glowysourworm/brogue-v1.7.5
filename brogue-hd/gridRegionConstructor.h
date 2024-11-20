@@ -57,7 +57,6 @@ namespace brogueHd::component
 		void addBoundary(short column, short row, T item);
 		void validate();
 		void validateRegionCollection(const char* name, simpleHash<T, T>* collection);
-		gridRect calculateLargestRectangle() const;
 
 	private:
 
@@ -159,7 +158,7 @@ namespace brogueHd::component
 		completeImpl();
 		validate();
 
-		gridRect largestSubRegionRect = calculateLargestRectangle();
+		gridRect largestSubRegionRect = _grid->calculateLargestRectangle();
 
 		simpleArray<T> locations = _locations->getKeys().toArray();
 		simpleArray<T> edgeLocations = _edgeLocations->getKeys().toArray();
@@ -365,108 +364,6 @@ namespace brogueHd::component
 	{
 		if (collection->count() <= 0)
 			throw simpleException("Collection for building regions is not valid:  gridRegionConstructor.validate");
-	}
-
-	template<isGridLocator T>
-	gridRect gridRegionConstructor<T>::calculateLargestRectangle() const
-	{
-		if (!_completed)
-			throw simpleException("Trying to run largest rectangle calculation before calling complete:  gridRegionConstructor.h");
-
-		// Procedure
-		// 
-		// 1) For each row:  - Count across and add to row counters foreach non-null cell
-		//                   - For each NULL cell -> reset the counters
-		//                   - Then, take contiguous sums of counters with the Max(Min(counter value))
-		//                     This represents a rectangle from the previous rows. Update this best fit.
-		// 
-		//
-		// TODO: Use a stack-based approach to cut down on iterating
-
-		gridRect regionBoundary = *_calculatedBoundary;
-		short rowCountersLength = regionBoundary.width;
-		simpleArray<short> rowCounters(rowCountersLength);
-		short bestStartColumn = -1;
-		short bestEndColumn = -1;
-		short bestStartRow = -1;
-		short bestEndRow = -1;
-		short bestArea = 0;
-
-		for (short row = regionBoundary.top(); row <= regionBoundary.bottom(); row++)
-		{
-			for (short column = regionBoundary.left(); column <= regionBoundary.right(); column++)
-			{
-				short index = column - regionBoundary.left();
-
-				// FIRST, CHECK ROW INDEX TRACKING
-				if (_grid->isDefined(column, row))
-					rowCounters.set(index, rowCounters.get(index) + 1);
-				else
-					rowCounters.set(index, 0);
-			}
-
-			for (short index1 = 0; index1 < rowCountersLength; index1++)
-			{
-				// Initialize min-height for the next sweep
-				short minHeight = rowCounters.get(index1);
-
-				for (short index2 = index1; index2 < rowCountersLength && minHeight > 0; index2++)
-				{
-					minHeight = simpleMath::minOf(minHeight, rowCounters.get(index1), rowCounters.get(index2));
-
-					// Current column against previous
-					if (rowCounters.get(index1) > bestArea)
-					{
-						bestStartColumn = index1 + regionBoundary.left();
-						bestEndColumn = index1 + regionBoundary.left();
-						bestStartRow = row - rowCounters.get(index1) + 1;
-						bestEndRow = row;
-
-						bestArea = rowCounters.get(index1);
-					}
-
-					// Current column check
-					if (rowCounters.get(index2) > bestArea)
-					{
-						bestStartColumn = index2 + regionBoundary.left();
-						bestEndColumn = index2 + regionBoundary.left();
-						bestStartRow = row - rowCounters.get(index2) + 1;
-						bestEndRow = row;
-
-						bestArea = rowCounters.get(index2);
-					}
-
-					// Current min-block check
-					if (minHeight * ((index2 - index1) + 1) > bestArea)
-					{
-						bestStartColumn = index1 + regionBoundary.left();
-						bestEndColumn = index2 + regionBoundary.left();
-						bestStartRow = row - minHeight + 1;
-						bestEndRow = row;
-
-						bestArea = minHeight * ((index2 - index1) + 1);
-					}
-				}
-			}
-		}
-
-		// Validation: Check boundaries; check that grid is defined
-		//
-		const gridRegionConstructor<T>* that = this;
-		gridRect result(bestStartColumn, bestStartRow, (bestEndColumn - bestStartColumn) + 1, (bestEndRow - bestStartRow) + 1);
-
-		if (!_calculatedBoundary->contains(result))
-			throw simpleException("Invalid sub-region rectangle calculation:  gridRegionConstructor::calculateLargestRectangle");
-
-		result.iterate([&that] (short column, short row)
-		{
-			if (!that->isDefined(column, row))
-				throw simpleException("Invalid sub-region rectangle calculation:  gridRegionConstructor::calculateLargestRectangle");
-
-			return iterationCallback::iterate;
-		});
-
-		return result;
 	}
 }
 

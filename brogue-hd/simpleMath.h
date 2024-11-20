@@ -27,6 +27,15 @@ namespace brogueHd::simple
 			return x;
 		}
 
+		template<isNumber TMath>
+		static TMath sign(TMath x)
+		{
+			if (x < 0)
+				return -1;
+
+			return 1;
+		}
+		
 		template<isNumber TMath, isNumber...Args>
 		static TMath minOf(const TMath x, const Args...args)
 		{
@@ -74,7 +83,7 @@ namespace brogueHd::simple
 		}
 
 		template<isNumber TMath>
-		static TMath sqrt(TMath x)
+		static TMath squareRoot(TMath x)
 		{
 			if (isFloatLike<TMath>)
 				return sqrtf(static_cast<float>(x));
@@ -100,7 +109,7 @@ namespace brogueHd::simple
 		}
 
 		template<isNumber TMath>
-		static TMath sin(TMath x)
+		static TMath sine(TMath x)
 		{
 			if (isFloatLike<TMath>)
 				return sinf(static_cast<float>(x));

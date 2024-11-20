@@ -27,14 +27,14 @@ namespace brogueHd::backend::model
 
 	private:
 
-		brogueRoomInfo createRoomInfo(roomTypes roomType);
+		brogueRoomInfo createRoomInfo(brogueRoomType roomType);
 
 	private:
 
-		simpleHash<roomTypes, brogueRoomInfo>* _roomInfo;
+		simpleHash<brogueRoomType, brogueRoomInfo>* _roomInfo;
 
 		// Room Frequency static data
-		simpleHash<levelTypes, simpleHash<roomTypes, short>*>* _roomFrequencyMap;
+		simpleHash<levelTypes, simpleHash<brogueRoomType, short>*>* _roomFrequencyMap;
 
 		// Corridor static data
 		simpleHash<levelTypes, short>* _corridorFrequencyMap;
@@ -70,53 +70,61 @@ namespace brogueHd::backend::model
 		if (depth == 1 && type != levelTypes::DP_BASIC_FIRST_ROOM)
 			throw simpleException("Invalid first level type:  brogueLevelProfile.cpp");
 
-		_roomInfo = new simpleHash<roomTypes, brogueRoomInfo>();
-		_roomFrequencyMap = new simpleHash<levelTypes, simpleHash<roomTypes, short>*>();
+		_roomInfo = new simpleHash<brogueRoomType, brogueRoomInfo>();
+		_roomFrequencyMap = new simpleHash<levelTypes, simpleHash<brogueRoomType, short>*>();
 		_corridorFrequencyMap = new simpleHash< levelTypes, short>();
 		_levelType = type;
 		_depth = depth;
 
-		simpleHash<roomTypes, short>* basicMap = new simpleHash<roomTypes, short>();
-		simpleHash<roomTypes, short>* basicFirstRoomMap = new simpleHash<roomTypes, short>();
-		simpleHash<roomTypes, short>* goblinWarrenMap = new simpleHash<roomTypes, short>();
-		simpleHash<roomTypes, short>* sentinelSanctuariesMap = new simpleHash<roomTypes, short>();
+		simpleHash<brogueRoomType, short>* basicMap = new simpleHash<brogueRoomType, short>();
+		simpleHash<brogueRoomType, short>* basicFirstRoomMap = new simpleHash<brogueRoomType, short>();
+		simpleHash<brogueRoomType, short>* goblinWarrenMap = new simpleHash<brogueRoomType, short>();
+		simpleHash<brogueRoomType, short>* sentinelSanctuariesMap = new simpleHash<brogueRoomType, short>();
 
 		// BROGUE v1.7.5
-		basicMap->add(roomTypes::CrossRoom, 2);
-		basicMap->add(roomTypes::SmallSymmetricalCrossRoom, 1);
-		basicMap->add(roomTypes::SmallRoom, 1);
-		basicMap->add(roomTypes::CircularRoom, 1);
-		basicMap->add(roomTypes::ChunkyRoom, 7);
-		basicMap->add(roomTypes::Cave, 1);
-		basicMap->add(roomTypes::Cavern, 0);
-		basicMap->add(roomTypes::MainEntranceRoom, 0);
+		basicMap->add(brogueRoomType::CrossRoom, 2);
+		basicMap->add(brogueRoomType::SmallSymmetricalCrossRoom, 1);
+		basicMap->add(brogueRoomType::SmallRoom, 1);
+		basicMap->add(brogueRoomType::CircularRoom, 1);
+		basicMap->add(brogueRoomType::ChunkyRoom, 7);
+		basicMap->add(brogueRoomType::CaveCompact, 1);
+		basicMap->add(brogueRoomType::CaveLargeEW, 1);
+		basicMap->add(brogueRoomType::CaveLargeNS, 1);
+		basicMap->add(brogueRoomType::Cavern, 0);
+		basicMap->add(brogueRoomType::MainEntranceRoom, 0);
 
-		basicFirstRoomMap->add(roomTypes::CrossRoom, 10);
-		basicFirstRoomMap->add(roomTypes::SmallSymmetricalCrossRoom, 0);
-		basicFirstRoomMap->add(roomTypes::SmallRoom, 0);
-		basicFirstRoomMap->add(roomTypes::CircularRoom, 3);
-		basicFirstRoomMap->add(roomTypes::ChunkyRoom, 7);
-		basicFirstRoomMap->add(roomTypes::Cave, 10);
-		basicFirstRoomMap->add(roomTypes::Cavern, 10);
-		basicFirstRoomMap->add(roomTypes::MainEntranceRoom, 0);
+		basicFirstRoomMap->add(brogueRoomType::CrossRoom, 10);
+		basicFirstRoomMap->add(brogueRoomType::SmallSymmetricalCrossRoom, 0);
+		basicFirstRoomMap->add(brogueRoomType::SmallRoom, 0);
+		basicFirstRoomMap->add(brogueRoomType::CircularRoom, 3);
+		basicFirstRoomMap->add(brogueRoomType::ChunkyRoom, 7);
+		basicFirstRoomMap->add(brogueRoomType::CaveCompact, 10);
+		basicFirstRoomMap->add(brogueRoomType::CaveLargeEW, 10);
+		basicFirstRoomMap->add(brogueRoomType::CaveLargeNS, 10);
+		basicFirstRoomMap->add(brogueRoomType::Cavern, 10);
+		basicFirstRoomMap->add(brogueRoomType::MainEntranceRoom, 0);
 
-		goblinWarrenMap->add(roomTypes::CrossRoom, 0);
-		goblinWarrenMap->add(roomTypes::SmallSymmetricalCrossRoom, 0);
-		goblinWarrenMap->add(roomTypes::SmallRoom, 1);
-		goblinWarrenMap->add(roomTypes::CircularRoom, 0);
-		goblinWarrenMap->add(roomTypes::ChunkyRoom, 0);
-		goblinWarrenMap->add(roomTypes::Cave, 0);
-		goblinWarrenMap->add(roomTypes::Cavern, 0);
-		goblinWarrenMap->add(roomTypes::MainEntranceRoom, 0);
+		goblinWarrenMap->add(brogueRoomType::CrossRoom, 0);
+		goblinWarrenMap->add(brogueRoomType::SmallSymmetricalCrossRoom, 0);
+		goblinWarrenMap->add(brogueRoomType::SmallRoom, 1);
+		goblinWarrenMap->add(brogueRoomType::CircularRoom, 0);
+		goblinWarrenMap->add(brogueRoomType::ChunkyRoom, 0);
+		goblinWarrenMap->add(brogueRoomType::CaveCompact, 0);
+		goblinWarrenMap->add(brogueRoomType::CaveLargeEW, 0);
+		goblinWarrenMap->add(brogueRoomType::CaveLargeNS, 0);
+		goblinWarrenMap->add(brogueRoomType::Cavern, 0);
+		goblinWarrenMap->add(brogueRoomType::MainEntranceRoom, 0);
 
-		sentinelSanctuariesMap->add(roomTypes::CrossRoom, 0);
-		sentinelSanctuariesMap->add(roomTypes::SmallSymmetricalCrossRoom, 5);
-		sentinelSanctuariesMap->add(roomTypes::SmallRoom, 0);
-		sentinelSanctuariesMap->add(roomTypes::CircularRoom, 1);
-		sentinelSanctuariesMap->add(roomTypes::ChunkyRoom, 0);
-		sentinelSanctuariesMap->add(roomTypes::Cave, 0);
-		sentinelSanctuariesMap->add(roomTypes::Cavern, 0);
-		sentinelSanctuariesMap->add(roomTypes::MainEntranceRoom, 0);
+		sentinelSanctuariesMap->add(brogueRoomType::CrossRoom, 0);
+		sentinelSanctuariesMap->add(brogueRoomType::SmallSymmetricalCrossRoom, 5);
+		sentinelSanctuariesMap->add(brogueRoomType::SmallRoom, 0);
+		sentinelSanctuariesMap->add(brogueRoomType::CircularRoom, 1);
+		sentinelSanctuariesMap->add(brogueRoomType::ChunkyRoom, 0);
+		sentinelSanctuariesMap->add(brogueRoomType::CaveCompact, 0);
+		sentinelSanctuariesMap->add(brogueRoomType::CaveLargeEW, 0);
+		sentinelSanctuariesMap->add(brogueRoomType::CaveLargeNS, 0);
+		sentinelSanctuariesMap->add(brogueRoomType::Cavern, 0);
+		sentinelSanctuariesMap->add(brogueRoomType::MainEntranceRoom, 0);
 
 		_roomFrequencyMap->add(levelTypes::DP_BASIC, basicMap);
 		_roomFrequencyMap->add(levelTypes::DP_BASIC_FIRST_ROOM, basicFirstRoomMap);
@@ -129,20 +137,22 @@ namespace brogueHd::backend::model
 		_corridorFrequencyMap->add(levelTypes::DP_SENTINEL_SANCTUARY, 0);
 
 		// Set up room info's
-		_roomInfo->add(roomTypes::CrossRoom, createRoomInfo(roomTypes::CrossRoom));
-		_roomInfo->add(roomTypes::SmallSymmetricalCrossRoom, createRoomInfo(roomTypes::SmallSymmetricalCrossRoom));
-		_roomInfo->add(roomTypes::SmallRoom, createRoomInfo(roomTypes::SmallRoom));
-		_roomInfo->add(roomTypes::CircularRoom, createRoomInfo(roomTypes::CircularRoom));
-		_roomInfo->add(roomTypes::ChunkyRoom, createRoomInfo(roomTypes::ChunkyRoom));
-		_roomInfo->add(roomTypes::Cave, createRoomInfo(roomTypes::Cave));
-		_roomInfo->add(roomTypes::Cavern, createRoomInfo(roomTypes::Cavern));
-		_roomInfo->add(roomTypes::MainEntranceRoom, createRoomInfo(roomTypes::MainEntranceRoom));
+		_roomInfo->add(brogueRoomType::CrossRoom, createRoomInfo(brogueRoomType::CrossRoom));
+		_roomInfo->add(brogueRoomType::SmallSymmetricalCrossRoom, createRoomInfo(brogueRoomType::SmallSymmetricalCrossRoom));
+		_roomInfo->add(brogueRoomType::SmallRoom, createRoomInfo(brogueRoomType::SmallRoom));
+		_roomInfo->add(brogueRoomType::CircularRoom, createRoomInfo(brogueRoomType::CircularRoom));
+		_roomInfo->add(brogueRoomType::ChunkyRoom, createRoomInfo(brogueRoomType::ChunkyRoom));
+		_roomInfo->add(brogueRoomType::CaveCompact, createRoomInfo(brogueRoomType::CaveCompact));
+		_roomInfo->add(brogueRoomType::CaveLargeEW, createRoomInfo(brogueRoomType::CaveLargeEW));
+		_roomInfo->add(brogueRoomType::CaveLargeNS, createRoomInfo(brogueRoomType::CaveLargeNS));
+		_roomInfo->add(brogueRoomType::Cavern, createRoomInfo(brogueRoomType::Cavern));
+		_roomInfo->add(brogueRoomType::MainEntranceRoom, createRoomInfo(brogueRoomType::MainEntranceRoom));
 
 	}
 
 	brogueLevelProfile::~brogueLevelProfile()
 	{
-		_roomFrequencyMap->iterate([] (levelTypes type, simpleHash<roomTypes, short>* map)
+		_roomFrequencyMap->iterate([] (levelTypes type, simpleHash<brogueRoomType, short>* map)
 		{
 			delete map;
 
@@ -154,11 +164,11 @@ namespace brogueHd::backend::model
 		delete _corridorFrequencyMap;
 	}
 
-	brogueRoomInfo brogueLevelProfile::createRoomInfo(roomTypes roomType)
+	brogueRoomInfo brogueLevelProfile::createRoomInfo(brogueRoomType roomType)
 	{
 		if (_depth == 1)
 		{
-			if (roomType == roomTypes::MainEntranceRoom)
+			if (roomType == brogueRoomType::MainEntranceRoom)
 				return brogueRoomInfo(roomType, 1, _corridorFrequencyMap->get(levelTypes::DP_BASIC_FIRST_ROOM));
 		}
 
@@ -172,26 +182,28 @@ namespace brogueHd::backend::model
 		// Additional adjustment for first room
 		switch (roomType)
 		{
-			case roomTypes::CrossRoom:
+			case brogueRoomType::CrossRoom:
 				roomFrequency += 20 * (100 - descentPercent) / 100;
 				break;
-			case roomTypes::SmallSymmetricalCrossRoom:
+			case brogueRoomType::SmallSymmetricalCrossRoom:
 				roomFrequency += 10 * (100 - descentPercent) / 100;
 				break;
-			case roomTypes::SmallRoom:
+			case brogueRoomType::SmallRoom:
 				break;
-			case roomTypes::CircularRoom:
+			case brogueRoomType::CircularRoom:
 				roomFrequency += 7 * (100 - descentPercent) / 100;
 				break;
-			case roomTypes::ChunkyRoom:
+			case brogueRoomType::ChunkyRoom:
 				break;
-			case roomTypes::Cave:
+			case brogueRoomType::CaveCompact:
+			case brogueRoomType::CaveLargeNS:
+			case brogueRoomType::CaveLargeEW:
 				roomFrequency += 10 * (100 - descentPercent) / 100;
 				break;
-			case roomTypes::Cavern:
+			case brogueRoomType::Cavern:
 				roomFrequency += 50 * descentPercent / 100;
 				break;
-			case roomTypes::MainEntranceRoom:
+			case brogueRoomType::MainEntranceRoom:
 				break;
 			default:
 				break;
@@ -204,7 +216,7 @@ namespace brogueHd::backend::model
 
 	brogueRoomInfo brogueLevelProfile::getEntranceRoom(randomGenerator* randomMaim)
 	{
-		return _roomInfo->get(roomTypes::MainEntranceRoom);
+		return _roomInfo->get(brogueRoomType::MainEntranceRoom);
 	}
 
 	brogueRoomInfo brogueLevelProfile::getRandomRoomInfo(randomGenerator* randomMaim)

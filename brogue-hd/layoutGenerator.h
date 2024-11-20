@@ -11,6 +11,7 @@
 #include "dijkstra.h"
 #include "dungeon.h"
 #include "graph.h"
+#include "grid.h"
 #include "gridDefinitions.h"
 #include "gridLocator.h"
 #include "gridLocatorEdge.h"
@@ -19,9 +20,14 @@
 #include "noiseGenerator.h"
 #include "simple.h"
 #include "simpleArray.h"
+#include "simpleHash.h"
 #include "simpleList.h"
+#include "simpleMath.h"
 #include "simpleOrderedList.h"
+#include "simplePoint.h"
+#include "simpleVector.h"
 
+using namespace brogueHd::simple;
 using namespace brogueHd::component;
 using namespace brogueHd::backend::model;
 
@@ -186,119 +192,316 @@ namespace brogueHd::backend
 	{
 		// Brogue v1.7.5 Creates up to 35 rooms using accretion (bolt-on) to fill up the space
 		//
-
-		short maxAttempts = 35;
-		short interRoomPadding = 1;
-		simpleList<accretionTile*> attemptRegions;
-
-		// 1) Create 35 room (up front), 2) Attempt bolt-on until there are no more fits
 		//
-		for (short index = 0; index < maxAttempts; index++)
+		// Update:  (see backlog.txt) This will now be done using a tiling method.
+		//
+
+		grid<gridLocator> tilingGrid(_layout->getParentBoundary(), _layout->getBoundary());
+
+		simpleHash<brogueRoomInfo, gridRect> tiling;
+
+		gridRect entranceBoundary;
+		bool finished = false;
+		int maxIterations = 35;
+		int iteration = 0;
+
+		while (!finished && iteration < maxIterations)
 		{
-			// Room configuration from the template
-			brogueRoomInfo configuration = index == 0 ? _profile->getEntranceRoom(_randomGenerator) : _profile->getRandomRoomInfo(_randomGenerator);
+			brogueRoomInfo configuration;
+			gridRect boundary;
 
-			// (MEMORY!) (These regions are given an extra cell of padding for connection points)
-			gridRegion<gridLocator>* nextRegion = _roomGenerator->designRoom(configuration, _layout->getParentBoundary(), _layout->getBoundary());
-
-			// Connection Points (These are the edges, not the connection points)
-			simpleOrderedList<gridLocator> northEdge = nextRegion->getBestEdges(brogueCompass::N);
-			simpleOrderedList<gridLocator> southEdge = nextRegion->getBestEdges(brogueCompass::S);
-			simpleOrderedList<gridLocator> eastEdge = nextRegion->getBestEdges(brogueCompass::E);
-			simpleOrderedList<gridLocator> westEdge = nextRegion->getBestEdges(brogueCompass::W);
-
-			// TODO: Situate these better. This will create an exponential draw that falls off quickly. 
-			//		 So, the majority of attempts will be on the outer walls, closer to the boundary.
-			//
-			int randN = _randomGenerator->randomIndex_exp(0, northEdge.count(), 10);
-			int randS = _randomGenerator->randomIndex_exp(0, southEdge.count(), 10);
-			int randE = _randomGenerator->randomIndex_exp(0, eastEdge.count(), 10);
-			int randW = _randomGenerator->randomIndex_exp(0, westEdge.count(), 10);
-
-			// (MEMORY!) (Must delete region explicitly - see below)
-			accretionTile* nextRoom = new accretionTile();
-
-			// (Pointer to allocated region memory)
-			nextRoom->region = nextRegion;
-
-			gridLocator connectionN = northEdge.get(randN).add(0, -1);
-			gridLocator connectionS = southEdge.get(randS).add(0, 1);
-			gridLocator connectionE = eastEdge.get(randE).add(1, 0);
-			gridLocator connectionW = westEdge.get(randW).add(-1, 0);
-
-			// Make sure connection points lie OUTSIDE the region
-			if (nextRegion->isDefined(connectionN) ||
-				nextRegion->isDefined(connectionS) ||
-				nextRegion->isDefined(connectionE) ||
-				nextRegion->isDefined(connectionW))
+			// Tile the entrance room
+			if (iteration == 0)
 			{
-				delete nextRoom->region;
-				delete nextRoom;
+				configuration = _profile->getEntranceRoom(_randomGenerator);
+				boundary = _roomGenerator->getRoomDesiredSize(configuration, _layout->getBoundary());
+				gridLocator topLeft = gridLocator(_layout->getBoundary().centerX() - (boundary.width / 2),
+												  _layout->getBoundary().bottom() - boundary.height);
+				boundary.translate(topLeft);
 
-				continue;
+				// Mark the entrance tile
+				entranceBoundary = boundary;
 			}
 
-
-			nextRoom->connectionPointN = connectionN;		// Connection points lie in the padded area of the desisgn grid
-			nextRoom->connectionPointS = connectionS;		// or on the interior. They are not part of the region itself; and			
-			nextRoom->connectionPointE = connectionE;		// will become separate corridor cells, and regions, afterwards.
-			nextRoom->connectionPointW = connectionW;
-
-			attemptRegions.add(nextRoom);
-		}
-
-		// Bolt-on
-		for (int index = 0; index < attemptRegions.count(); index++)
-		{
-			accretionTile* attemptRegion = attemptRegions.get(index);
-
-			// First Room
-			if (index == 0)
+			// Tile against any previous tile; but we're going to apply some random logic to the positining;
+			// and, also, brute force movement once our random positioning doesn't get a much better heuristic.
+			else
 			{
-				// NOTE:  Rooms are generated in their supposed 1st-attempt location. This may
-				//        have been by design (Brogue v1.7.5); but probably only matters for
-				//        the first level.
+				gridRect nextLargestBoundary = tilingGrid.calculateLargestRectangle();
+				configuration = _profile->getRandomRoomInfo(_randomGenerator);
+				boundary = _roomGenerator->getRoomDesiredSize(configuration, nextLargestBoundary);
+
+				// No more space
+				if (boundary == default_value::value<gridRect>())
+					break;
+
+				// Procedure:  Pseudo-Rectangular Packing Problem (w/ random positioning and distance heuristic)
+				// 
+				// 0) Check adjacent locations to the tile to see if it's well nestled into a decent spot
+				//		-> True: Goto #3
+				// 1) Calculate the distance vector between the new tile center and the first tile center
+				// 2) Try random locations to minimize this vector - limit to a small number (we'll try 10)
+				// 3) Check against the vector for edge adjacency to another tile. 
+				//		-> True: Slide laterally (in the opposite dimension) to see if it minimizes the 
+				//				 heuristic.
+				//		-> False: Move against the vector (in both dimensions) using the slope to determine
+				//				  the amount in each dimension until there is adjacency established. 
+				// 4) Set the result and break the loop
 				//
-				_roomTiles->add(attemptRegion);
 
-				// Set final room location (creates new brogueCell* instances, so delete our local one afterwards)
-				_layout->createCells(attemptRegion->region);
+				int edgesFound = 0;
+
+				// Condition:  2 / 4 edges are adjacent to another rectangle
+				tiling.iterate([&boundary, &edgesFound] (brogueRoomInfo config, const gridRect& tile)
+				{
+					if (tile.isAdjacent(boundary))
+						edgesFound++;
+
+					if (edgesFound >= 2)
+						return iterationCallback::breakAndReturn;
+
+					return iterationCallback::iterate;
+				});
+
+				simpleVector<float> heuristic(boundary.centerX() - entranceBoundary.centerX(), boundary.centerY() - entranceBoundary.centerY());
+				int counter = 0;
+
+				// Try randomly a few times to minimize iteration work in the following loops
+				while (edgesFound == 0 && counter++ < 10)
+				{
+					gridRect randomBoundary(_randomGenerator->randomIndex(nextLargestBoundary.left(), nextLargestBoundary.right() - boundary.width + 1),
+											_randomGenerator->randomIndex(nextLargestBoundary.top(), nextLargestBoundary.bottom() - boundary.height + 1),
+											boundary.width, boundary.height);
+
+					simpleVector<float> nextHeuristic(randomBoundary.centerX() - entranceBoundary.centerX(),
+													  randomBoundary.centerY() - entranceBoundary.centerY());
+
+					if (nextHeuristic.magnitude() < heuristic.magnitude())
+					{
+						boundary = randomBoundary;
+						heuristic = nextHeuristic;
+					}
+				}
+
+				bool movement = true;
+
+				// Slide into position
+				while (movement)
+				{
+					int yMoves = simpleMath::floor(1 / heuristic.slope());
+					int xMoves = simpleMath::floor(yMoves / heuristic.slope());
+
+					// First, check overlapping tiles (before iterating positions independently)
+					boundary.translate(xMoves, yMoves);
+
+					bool validMove = true;
+
+					tiling.iterate([&boundary, &validMove] (brogueRoomInfo config, const gridRect& tile)
+					{
+						if (boundary.overlaps(tile))
+						{
+							validMove = false;
+							return iterationCallback::breakAndReturn;
+						}
+						return iterationCallback::iterate;
+					});
+
+					// Invalid:  Backout and try single dimension(s)
+					if (!validMove)
+					{
+						boundary.translate(-1 * xMoves, -1 * yMoves);
+					}
+					else
+						continue;
+
+					// Move one-dimension, one-cell at a time; and check using the tile grid this time.
+					//
+					for (int index = 0; index < simpleMath::abs(xMoves) + simpleMath::abs(yMoves); index++)
+					{
+						bool yMove = (index >= simpleMath::abs(xMoves));
+
+						if (!yMove)
+							boundary.translate(simpleMath::sign(xMoves), 0);
+						else
+							boundary.translate(0, simpleMath::sign(yMoves));
+
+						validMove = true;
+
+						// Iterate just the tiles to save processing time (checking for invalid movement)
+						tiling.iterate([&boundary, &validMove] (brogueRoomInfo config, const gridRect& tile)
+						{
+							if (boundary.overlaps(tile))
+							{
+								validMove = false;
+								return iterationCallback::breakAndReturn;
+							}
+							return iterationCallback::iterate;
+						});
+
+						// Invalid:  Back out the translation and move onto the y-dimension
+						if (!validMove)
+						{
+							// X-Dimension:  Can still check the y-dimension
+							if (!yMove)
+							{
+								boundary.translate(-1 * simpleMath::sign(xMoves), 0);
+
+								// Skip to the y-dimension
+								index += (simpleMath::abs(xMoves) - index);
+							}
+
+							// Y-Dimension:  Must break the loop
+							else
+							{
+								boundary.translate(0, -1 * simpleMath::sign(yMoves));
+								movement = false;
+								break;
+							}
+						}
+					}
+				}
 			}
 
-			// Accrete rooms - translating the attempt room into place (modifies attempt region)
-			else if (attemptConnection(attemptRegion, _layout->getBoundary(), interRoomPadding))
+			// Fill in the tile on the grid (will be needed to calculate the largest sub-rectangle)
+			//
+			boundary.iterate([&tilingGrid] (short column, short row)
 			{
-				_roomTiles->add(attemptRegion);
+				tilingGrid.set(column, row, gridLocator(column, row));
+				return iterationCallback::iterate;
+			});
 
-				// Set final room location (creates new brogueCell* instances, so delete our local one afterwards)
-				_layout->createCells(attemptRegion->region);
-			}
+			tiling.add(configuration, boundary);
+
+			iteration++;
 		}
 
-		// Add corridor cells for the connection points
-		for (int index = 0; index < _roomTiles->count(); index++)
+		// Tiling is complete! Next, just iterate the tiles and fill in room cells
+		//
+		for (int index = 0; index < tiling.count(); index++)
 		{
-			accretionTile* tile = _roomTiles->get(index);
+			brogueRoomInfo configuration = tiling.getAt(index)->key;
+			gridRect boundary = tiling.getAt(index)->value;
+			int padding = index == 0 ? 0 : 1;
 
-			if (tile->hasNorthConnection)
-				_layout->createCells(tile->connectionPointN);
+			// (MEMORY!) These must be deleted; and the stack-like gridLocator instances will be copied into the brogueLayout* grid.
+			gridRegion<gridLocator>* region = _roomGenerator->designRoom(configuration, _layout->getParentBoundary(), boundary, 0);
 
-			if (tile->hasSouthConnection)
-				_layout->createCells(tile->connectionPointS);
+			_layout->createCells(region);
 
-			if (tile->hasEastConnection)
-				_layout->createCells(tile->connectionPointE);
-
-			if (tile->hasWestConnection)
-				_layout->createCells(tile->connectionPointW);
+			delete region;
 		}
 
-		// Cleanup Memory:  Delete unused room tiles
-		for (int index = 0; index < attemptRegions.count(); index++)
-		{
-			if (!_roomTiles->contains(attemptRegions.get(index)))
-				delete attemptRegions.get(index);
-		}
+
+
+
+		//// 1) Create 35 room (up front), 2) Attempt bolt-on until there are no more fits
+		////
+		//for (short index = 0; index < maxAttempts; index++)
+		//{
+		//	// Room configuration from the template
+		//	brogueRoomInfo configuration = index == 0 ? _profile->getEntranceRoom(_randomGenerator) : _profile->getRandomRoomInfo(_randomGenerator);
+
+		//	// (MEMORY!) (These regions are given an extra cell of padding for connection points)
+		//	gridRegion<gridLocator>* nextRegion = _roomGenerator->designRoom(configuration, _layout->getParentBoundary(), _layout->getBoundary());
+
+		//	// Connection Points (These are the edges, not the connection points)
+		//	simpleOrderedList<gridLocator> northEdge = nextRegion->getBestEdges(brogueCompass::N);
+		//	simpleOrderedList<gridLocator> southEdge = nextRegion->getBestEdges(brogueCompass::S);
+		//	simpleOrderedList<gridLocator> eastEdge = nextRegion->getBestEdges(brogueCompass::E);
+		//	simpleOrderedList<gridLocator> westEdge = nextRegion->getBestEdges(brogueCompass::W);
+
+		//	// TODO: Situate these better. This will create an exponential draw that falls off quickly. 
+		//	//		 So, the majority of attempts will be on the outer walls, closer to the boundary.
+		//	//
+		//	int randN = _randomGenerator->randomIndex_exp(0, northEdge.count(), 10);
+		//	int randS = _randomGenerator->randomIndex_exp(0, southEdge.count(), 10);
+		//	int randE = _randomGenerator->randomIndex_exp(0, eastEdge.count(), 10);
+		//	int randW = _randomGenerator->randomIndex_exp(0, westEdge.count(), 10);
+
+		//	// (MEMORY!) (Must delete region explicitly - see below)
+		//	accretionTile* nextRoom = new accretionTile();
+
+		//	// (Pointer to allocated region memory)
+		//	nextRoom->region = nextRegion;
+
+		//	gridLocator connectionN = northEdge.get(randN).add(0, -1);
+		//	gridLocator connectionS = southEdge.get(randS).add(0, 1);
+		//	gridLocator connectionE = eastEdge.get(randE).add(1, 0);
+		//	gridLocator connectionW = westEdge.get(randW).add(-1, 0);
+
+		//	// Make sure connection points lie OUTSIDE the region
+		//	if (nextRegion->isDefined(connectionN) ||
+		//		nextRegion->isDefined(connectionS) ||
+		//		nextRegion->isDefined(connectionE) ||
+		//		nextRegion->isDefined(connectionW))
+		//	{
+		//		delete nextRoom->region;
+		//		delete nextRoom;
+
+		//		continue;
+		//	}
+
+
+		//	nextRoom->connectionPointN = connectionN;		// Connection points lie in the padded area of the desisgn grid
+		//	nextRoom->connectionPointS = connectionS;		// or on the interior. They are not part of the region itself; and			
+		//	nextRoom->connectionPointE = connectionE;		// will become separate corridor cells, and regions, afterwards.
+		//	nextRoom->connectionPointW = connectionW;
+
+		//	attemptRegions.add(nextRoom);
+		//}
+
+		//// Bolt-on
+		//for (int index = 0; index < attemptRegions.count(); index++)
+		//{
+		//	accretionTile* attemptRegion = attemptRegions.get(index);
+
+		//	// First Room
+		//	if (index == 0)
+		//	{
+		//		// NOTE:  Rooms are generated in their supposed 1st-attempt location. This may
+		//		//        have been by design (Brogue v1.7.5); but probably only matters for
+		//		//        the first level.
+		//		//
+		//		_roomTiles->add(attemptRegion);
+
+		//		// Set final room location (creates new brogueCell* instances, so delete our local one afterwards)
+		//		_layout->createCells(attemptRegion->region);
+		//	}
+
+		//	// Accrete rooms - translating the attempt room into place (modifies attempt region)
+		//	else if (attemptConnection(attemptRegion, _layout->getBoundary(), interRoomPadding))
+		//	{
+		//		_roomTiles->add(attemptRegion);
+
+		//		// Set final room location (creates new brogueCell* instances, so delete our local one afterwards)
+		//		_layout->createCells(attemptRegion->region);
+		//	}
+		//}
+
+		//// Add corridor cells for the connection points
+		//for (int index = 0; index < _roomTiles->count(); index++)
+		//{
+		//	accretionTile* tile = _roomTiles->get(index);
+
+		//	if (tile->hasNorthConnection)
+		//		_layout->createCells(tile->connectionPointN);
+
+		//	if (tile->hasSouthConnection)
+		//		_layout->createCells(tile->connectionPointS);
+
+		//	if (tile->hasEastConnection)
+		//		_layout->createCells(tile->connectionPointE);
+
+		//	if (tile->hasWestConnection)
+		//		_layout->createCells(tile->connectionPointW);
+		//}
+
+		//// Cleanup Memory:  Delete unused room tiles
+		//for (int index = 0; index < attemptRegions.count(); index++)
+		//{
+		//	if (!_roomTiles->contains(attemptRegions.get(index)))
+		//		delete attemptRegions.get(index);
+		//}
 	}
 
 	bool layoutGenerator::attemptConnection(accretionTile* roomTile, const gridRect& attemptRect, short interRoomPadding) const

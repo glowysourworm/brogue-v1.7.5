@@ -65,7 +65,7 @@ namespace brogueHd::component
 			double dx = location.column - column;
 			double dy = location.row - row;
 
-			return simpleMath::sqrt((dx * dx) + (dy * dy));
+			return simpleMath::squareRoot((dx * dx) + (dy * dy));
 		}
 
 		bool isEmpty()

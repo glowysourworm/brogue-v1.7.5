@@ -4,6 +4,7 @@
 #include "gridLocator.h"
 #include "gridRect.h"
 #include "simple.h"
+#include "simpleArray.h"
 #include "simpleException.h"
 #include "simpleMath.h"
 
@@ -148,6 +149,12 @@ namespace brogueHd::component
 		/// Iterates outward from center location to specified distance
 		/// </summary>
 		void iterateOutward(short centerColumn, short centerRow, short distance, gridCallback<T> callback) const;
+
+		/// <summary>
+		/// Calculates the largest sub-rectangle in the grid. This will use the grid::isDefined as its decision
+		/// maker.
+		/// </summary>
+		gridRect calculateLargestRectangle() const;
 
 	private:
 
@@ -755,6 +762,105 @@ namespace brogueHd::component
 
 		else if (!withinBounds)
 			response = callback(column - 1, row, west);
+	}
+
+	template<typename T>
+	gridRect grid<T>::calculateLargestRectangle() const
+	{
+		// Procedure
+		// 
+		// 1) For each row:  - Count across and add to row counters foreach non-null cell
+		//                   - For each NULL cell -> reset the counters
+		//                   - Then, take contiguous sums of counters with the Max(Min(counter value))
+		//                     This represents a rectangle from the previous rows. Update this best fit.
+		// 
+		//
+		// TODO: Use a stack-based approach to cut down on iterating
+
+		gridRect boundary = this->getRelativeBoundary();
+		short rowCountersLength = boundary.width;
+		simpleArray<short> rowCounters(rowCountersLength);
+		short bestStartColumn = -1;
+		short bestEndColumn = -1;
+		short bestStartRow = -1;
+		short bestEndRow = -1;
+		short bestArea = 0;
+
+		for (short row = boundary.top(); row <= boundary.bottom(); row++)
+		{
+			for (short column = boundary.left(); column <= boundary.right(); column++)
+			{
+				short index = column - boundary.left();
+
+				// FIRST, CHECK ROW INDEX TRACKING
+				if (this->isDefined(column, row))
+					rowCounters.set(index, rowCounters.get(index) + 1);
+				else
+					rowCounters.set(index, 0);
+			}
+
+			for (short index1 = 0; index1 < rowCountersLength; index1++)
+			{
+				// Initialize min-height for the next sweep
+				short minHeight = rowCounters.get(index1);
+
+				for (short index2 = index1; index2 < rowCountersLength && minHeight > 0; index2++)
+				{
+					minHeight = simpleMath::minOf(minHeight, rowCounters.get(index1), rowCounters.get(index2));
+
+					// Current column against previous
+					if (rowCounters.get(index1) > bestArea)
+					{
+						bestStartColumn = index1 + boundary.left();
+						bestEndColumn = index1 + boundary.left();
+						bestStartRow = row - rowCounters.get(index1) + 1;
+						bestEndRow = row;
+
+						bestArea = rowCounters.get(index1);
+					}
+
+					// Current column check
+					if (rowCounters.get(index2) > bestArea)
+					{
+						bestStartColumn = index2 + boundary.left();
+						bestEndColumn = index2 + boundary.left();
+						bestStartRow = row - rowCounters.get(index2) + 1;
+						bestEndRow = row;
+
+						bestArea = rowCounters.get(index2);
+					}
+
+					// Current min-block check
+					if (minHeight * ((index2 - index1) + 1) > bestArea)
+					{
+						bestStartColumn = index1 + boundary.left();
+						bestEndColumn = index2 + boundary.left();
+						bestStartRow = row - minHeight + 1;
+						bestEndRow = row;
+
+						bestArea = minHeight * ((index2 - index1) + 1);
+					}
+				}
+			}
+		}
+
+		// Validation: Check boundaries; check that grid is defined
+		//
+		const grid<T>* that = this;
+		gridRect result(bestStartColumn, bestStartRow, (bestEndColumn - bestStartColumn) + 1, (bestEndRow - bestStartRow) + 1);
+
+		if (!boundary.contains(result))
+			throw simpleException("Invalid sub-region rectangle calculation:  gridRegionConstructor::calculateLargestRectangle");
+
+		result.iterate([&that] (short column, short row)
+		{
+			if (!that->isDefined(column, row))
+				throw simpleException("Invalid sub-region rectangle calculation:  gridRegionConstructor::calculateLargestRectangle");
+
+			return iterationCallback::iterate;
+		});
+
+		return result;
 	}
 
 	///// <summary>

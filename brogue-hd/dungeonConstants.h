@@ -13,14 +13,16 @@ namespace brogueHd::backend::model
 		DP_SENTINEL_SANCTUARY
 	};
 
-	enum roomTypes : int
+	enum class brogueRoomType : int
 	{
 		CrossRoom = 0,
 		SmallSymmetricalCrossRoom,
 		SmallRoom,
 		CircularRoom,
 		ChunkyRoom,
-		Cave,
+		CaveCompact,
+		CaveLargeNS,
+		CaveLargeEW,
 
 		// The kind that fills a level
 		Cavern,
