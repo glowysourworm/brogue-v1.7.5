@@ -263,6 +263,8 @@ namespace brogueHd::simple
 		size_t hashCode = this->calculateHashCode(key);
 		size_t bucketIndex = this->calculateBucketIndex(hashCode);
 
+		simplePair<K, V>* item = nullptr;
+
 		// TODO: Use Ordered List
 		for (int index = 0; index < _table->get(bucketIndex)->count(); index++)
 		{
@@ -272,14 +274,11 @@ namespace brogueHd::simple
 				if (_table->get(bucketIndex)->count() == _maxBucketSize)
 					_maxBucketSize--;
 
-				simplePair<K, V>* pair = _table->get(bucketIndex)->get(index);
+				// Save item pointer
+				item = _table->get(bucketIndex)->get(index);
 
-				// (MEMORY!)
-				delete pair;
-
+				// Remove from the array
 				_table->get(bucketIndex)->removeAt(index);
-
-				return true;
 			}
 		}
 
@@ -288,14 +287,16 @@ namespace brogueHd::simple
 		{
 			if (_list->get(index)->key == key)
 			{
-				simplePair<K, V>* pair = _list->get(index);
-
-				// (MEMORY!)
-				delete pair;
-
+				// Remove from the parallel list
 				_list->removeAt(index);
 				break;
 			}
+		}
+
+		if (item != nullptr)
+		{
+			delete item;
+			return true;
 		}
 
 		return false;

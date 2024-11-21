@@ -713,6 +713,12 @@
     <ClInclude Include="rectanglePackingAlgorithm.h">
       <Filter>Header Files\component</Filter>
     </ClInclude>
+    <ClInclude Include="brogueScrollView.h">
+      <Filter>Header Files\frontend\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueUIColorText.h">
+      <Filter>Header Files\frontend\ui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\resources\model\armor.csv">

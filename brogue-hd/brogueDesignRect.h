@@ -23,19 +23,17 @@ namespace brogueHd::backend::model
 		{
 			_configuration = default_value::value<brogueRoomInfo>();
 			_boundary = default_value::value <gridRect>();
+			_minSize = default_value::value<gridRect>();
 			_paddedBoundary = default_value::value <gridRect>();
 			_actualBoundary = default_value::value <gridRect>();
 			_complete = false;
 		};
-		brogueDesignRect(const brogueRoomInfo& configuration, const gridRect& boundary, int padding)
+		brogueDesignRect(const brogueRoomInfo& configuration, const gridRect& boundary, const gridRect& paddedBoundary, const gridRect& minSize)
 		{
 			_configuration = configuration;
 			_boundary = boundary;
-			_paddedBoundary = gridRect(boundary.column + padding,
-									   boundary.row + padding,
-									   boundary.width - (2 * padding),
-									   boundary.height - (2 * padding));
-
+			_minSize = minSize;
+			_paddedBoundary = paddedBoundary;
 			_actualBoundary = default_value::value<gridRect>();
 			_complete = false;
 		}
@@ -62,6 +60,9 @@ namespace brogueHd::backend::model
 
 		void complete(const gridRect& actualBoundary)
 		{
+			if (_complete)
+				throw simpleException("Already called complete() on brogueDesignRect");
+
 			if (!_paddedBoundary.contains(actualBoundary))
 				throw simpleException("Actual boundary outside the padded boundary of the brogueDesignRect.");
 
@@ -100,6 +101,10 @@ namespace brogueHd::backend::model
 		{
 			return _boundary;
 		}
+		gridRect getMinSize() const
+		{
+			return _minSize;
+		}
 		gridRect getPaddedBoundary() const
 		{
 			return _paddedBoundary;
@@ -119,6 +124,7 @@ namespace brogueHd::backend::model
 		{
 			return _configuration == other.getConfiguration() &&
 				_boundary == other.getBoundary() &&
+				_minSize == other.getMinSize() &&
 				_paddedBoundary == other.getPaddedBoundary() &&
 				_actualBoundary == other.getActualBoundary() &&
 				_complete == other.getIsComplete();
@@ -127,6 +133,7 @@ namespace brogueHd::backend::model
 		{
 			_configuration = copy.getConfiguration();
 			_boundary = copy.getBoundary();
+			_minSize = copy.getMinSize();
 			_paddedBoundary = copy.getPaddedBoundary();
 			_actualBoundary = copy.getActualBoundary();
 			_complete = copy.getIsComplete();
@@ -137,6 +144,7 @@ namespace brogueHd::backend::model
 		// Room / Region configuration
 		brogueRoomInfo _configuration;
 		gridRect _boundary;
+		gridRect _minSize;
 		gridRect _paddedBoundary;
 
 		// Design actuals

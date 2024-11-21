@@ -28,10 +28,25 @@ namespace brogueHd::component
 
 		void initialize(const gridRect& firstRect);
 
+		/// <summary>
+		/// Adds a rectangle to the tiling - moving it into position
+		/// </summary>
 		bool addRectangle(gridRect& rect);
 
+		/// <summary>
+		/// Removes rectangle from the tiling by index; and repacks the replacement. Must
+		/// not be the first rectangle.
+		/// </summary>
+		gridRect repackRectangle(int index, const gridRect& replacement);
+
+		/// <summary>
+		/// Returns the largest unused space in the constraint boundary
+		/// </summary>
 		gridRect getLargestUnusedRectangle() const;
 
+		/// <summary>
+		/// Returns current list of result rectangles
+		/// </summary>
 		simpleList<gridRect> getResult() const;
 
 	private:
@@ -88,6 +103,37 @@ namespace brogueHd::component
 	simpleList<gridRect> rectanglePackingAlgorithm::getResult() const
 	{
 		return _rectangles->getKeys();
+	}
+
+	gridRect rectanglePackingAlgorithm::repackRectangle(int index, const gridRect& rect)
+	{
+		if (index == 0)
+			throw simpleException("Cannot repack the first rectangle in the tiling:  rectanglePackingAlgorithm.h");
+
+		gridRect tileKey = _rectangles->getAt(index)->key;
+		grid<gridLocator>* tilingGrid = _tilingGrid;
+
+		if (!tileKey.contains(rect))
+			throw simpleException("Trying to replace rectangle with another that is not contianed by the existing one");
+
+		// Un-set the tiling grid
+		tileKey.iterate([&tilingGrid] (short column, short row)
+		{
+			tilingGrid->set(column, row, default_value::value<gridLocator>(), true);
+
+			return iterationCallback::iterate;
+		});
+
+		// Replace the tile
+		_rectangles->remove(tileKey);
+
+		// Re-pack
+		gridRect nextRect(rect);
+
+		if (!this->addRectangle(nextRect))
+			throw simpleException("Repacking a smaller rectangle failed:  rectanglePackingAlgorithm.h");
+
+		return nextRect;
 	}
 
 	bool rectanglePackingAlgorithm::addRectangle(gridRect& rect)
@@ -377,10 +423,10 @@ namespace brogueHd::component
 			}
 		}
 
-		// Success!  Keep Rectangle and Tiling Grid up to date
-		_rectangles->add(rect, rect);
-		
+		// Success!  Keep Rectangle and Tiling Grid up to date		
 		grid<gridLocator>* tilingGrid = _tilingGrid;
+
+		_rectangles->add(rect, rect);
 
 		rect.iterate([&tilingGrid] (short column, short row)
 		{

@@ -173,6 +173,9 @@ namespace brogueHd::component
 	template<typename T>
 	grid<T>::grid(const gridRect& parentBoundary, const gridRect& relativeBoundary)
 	{
+		if (!parentBoundary.contains(relativeBoundary))
+			throw simpleException("Parent boundary does not contain relative boundary: grid.h");
+
 		_grid = new T * [relativeBoundary.width];
 		_parentBoundary = new gridRect(parentBoundary);
 		_relativeBoundary = new gridRect(relativeBoundary);

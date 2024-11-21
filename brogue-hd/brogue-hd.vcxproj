@@ -176,6 +176,7 @@
     <ClCompile Include="gl.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="brogueUIColorText.h" />
     <ClInclude Include="brogueDesignRect.h" />
     <ClInclude Include="bitmap.h" />
     <ClInclude Include="boltConstants.h" />
@@ -194,6 +195,7 @@
     <ClInclude Include="brogueProgramBuilder.h" />
     <ClInclude Include="brogueProgramContainer.h" />
     <ClInclude Include="brogueGameTemplate.h" />
+    <ClInclude Include="brogueScrollView.h" />
     <ClInclude Include="brogueTitleGrid.h" />
     <ClInclude Include="brogueUIData.h" />
     <ClInclude Include="brogueUIStateChanger.h" />

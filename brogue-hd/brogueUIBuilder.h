@@ -30,6 +30,8 @@
 #include "simpleList.h"
 #include "simpleOrderedList.h"
 #include "simpleString.h"
+#include "brogueScrollView.h"
+#include "brogueUIColorText.h"
 
 using namespace brogueHd::simple;
 using namespace brogueHd::component;
@@ -127,6 +129,7 @@ namespace brogueHd::frontend
 		brogueTextView* createTextView(brogueUIProgram programName, const gridRect& boundary, const simpleString& text, const color& foreground);
 		brogueBackground* createMenuBackground(brogueUIProgram programName, const gridRect& boundary);
 		brogueBackground* createBackground(brogueUIProgram programName, const gridRect& boundary);
+		brogueScrollView* createScrollView(brogueUIProgram programName, const gridRect& boundary);
 
 		brogueButton* createFlatMenuButton(brogueUIProgram programName, const gridRect& boundary, const simpleString& text, int hotkeyIndex, brogueUIAction action);
 		brogueButton* createFlatMenuButton(brogueUIProgram programName, const gridRect& boundary, const simpleString& text, int hotkeyIndex, const brogueUITagAction& action);
@@ -438,9 +441,8 @@ namespace brogueHd::frontend
 
 		gridRect sceneBounds = getBrogueSceneBoundary();
 		gridRect menuBounds = getBrogueStaticBoundary(backgroundId);
-		gridRect itemBounds(menuBounds);
 
-		simpleList<brogueButton*> buttons;
+		simpleList<brogueUIColorText*> items;
 		simpleOrderedList<simpleFileEntry*> filesSorted = files.sort();
 
 		for (int index = 0; index < filesSorted.count(); index++)
@@ -469,12 +471,11 @@ namespace brogueHd::frontend
 			result.appendPadding(' ', space);
 			result.append(*(filesSorted.get(index)->getWriteTimeShort()));
 
-			// Expand total item container boundary for the background
-			itemBounds.expand(boundary);
-
 			brogueUITagAction tagAction(brogueUIAction::OpenGame, *(filesSorted.get(index)->getFileFullPath()));
+			colorString colorText(result.c_str(), colors::white());
 
-			buttons.add(createFlatMenuButton(programName, boundary, result, -1, tagAction));
+			// (MEMORY!)
+			items.add(new brogueUIColorText(colorText, tagAction));
 		}
 
 		// Finally, create the views. The view container will handle the scroll and clipping behavior.
@@ -483,13 +484,11 @@ namespace brogueHd::frontend
 
 		// This background will take the color of the menu while the scroll is applied; and carries the item dimensions.
 		//
-		result->addView(createBackground(programName, itemBounds));
+		brogueScrollView* scrollView = createScrollView(programName, menuBounds);
 
-		// Buttons
-		for (int index = 0; index < buttons.count(); index++)
-		{
-			result->addView(buttons.get(index));
-		}
+		scrollView->addRange(items);
+
+		result->addView(scrollView);
 
 		return result;
 	}
@@ -968,17 +967,24 @@ namespace brogueHd::frontend
 
 	brogueBackground* brogueUIBuilder::createBackground(brogueUIProgram programName, const gridRect& boundary)
 	{
-		// Pulled from Brogue v1.7.5
-		color menuColor1(0, 0, 0, 1.0f);
-		color menuColor2(0, 0, 0, 0.5f);
-
 		gridRect sceneBounds = getBrogueSceneBoundary();
 
 		brogueUIProgramPartId menuId(programName, brogueUIProgramPart::Background, _menuBackgroundCounter++);
 
-		brogueUIData menuData(_zoomLevel, menuColor1);
+		brogueUIData menuData(_zoomLevel, MenuBackgroundColor1());
 
 		return new brogueBackground(_eventController, menuId, menuData, sceneBounds, boundary);
+	}
+
+	brogueScrollView* brogueUIBuilder::createScrollView(brogueUIProgram programName, const gridRect& boundary)
+	{
+		gridRect sceneBounds = getBrogueSceneBoundary();
+
+		brogueUIProgramPartId scrollId(programName, brogueUIProgramPart::MenuBackground, 0);
+
+		brogueUIData scrollData(_zoomLevel, MenuBackgroundColor1(), MenuBackgroundColor2(), brogueGradientType::Circular);
+
+		return new brogueScrollView(_eventController, scrollId, scrollData, sceneBounds, boundary);
 	}
 
 	brogueBackground* brogueUIBuilder::createMenuBackground(brogueUIProgram programName, const gridRect& boundary)

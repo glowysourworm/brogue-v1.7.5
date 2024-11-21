@@ -3,6 +3,7 @@
 #include "gridDefinitions.h"
 #include "gridLocator.h"
 #include "simple.h"
+#include "simpleException.h"
 #include <functional>
 
 namespace brogueHd::component
@@ -144,6 +145,20 @@ namespace brogueHd::component
 		{
 			return gridLocator(centerX(), centerY());
 		}
+		
+		/// <summary>
+		/// Creates a new gridRect, expanded in all directions, by the specified amount.
+		/// </summary>
+		gridRect createExpanded(int amount)
+		{
+			gridRect paddedRect = gridRect(column - amount, row - amount, width + (2 * amount), height + (2 * amount));
+
+			if (paddedRect.width <= 0 ||
+				paddedRect.height <= 0)
+				throw simpleException("Trying to create padded gridRect created invalid rectangle");
+
+			return paddedRect;
+		}
 
 		bool contains(short acolumn, short arow) const
 		{
@@ -258,6 +273,11 @@ namespace brogueHd::component
 		void translate(const gridLocator& translation)
 		{
 			translate(translation.column, translation.row);
+		}
+
+		gridLocator getTranslation(const gridRect& rect)
+		{
+			return gridLocator(rect.column - column, rect.row - row);
 		}
 
 
