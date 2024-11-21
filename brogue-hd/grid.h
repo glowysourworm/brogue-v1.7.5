@@ -151,6 +151,12 @@ namespace brogueHd::component
 		void iterateOutward(short centerColumn, short centerRow, short distance, gridCallback<T> callback) const;
 
 		/// <summary>
+		/// Calculates the largest sub-rectangle in the grid.  The predicate is used to determine what to include 
+		/// in the search. The getUnsafe method is used - which has a potential to return nullptr's or default data.
+		/// </summary>
+		gridRect calculateLargestRectangle(gridPredicate<T> predicate) const;
+
+		/// <summary>
 		/// Calculates the largest sub-rectangle in the grid. This will use the grid::isDefined as its decision
 		/// maker.
 		/// </summary>
@@ -767,6 +773,17 @@ namespace brogueHd::component
 	template<typename T>
 	gridRect grid<T>::calculateLargestRectangle() const
 	{
+		const grid<T>* that = this;
+
+		return calculateLargestRectangle([&that] (short column, short row, const T& item)
+		{
+			return that->isDefined(column, row);
+		});
+	}
+
+	template<typename T>
+	gridRect grid<T>::calculateLargestRectangle(gridPredicate<T> predicate) const
+	{
 		// Procedure
 		// 
 		// 1) For each row:  - Count across and add to row counters foreach non-null cell
@@ -793,7 +810,7 @@ namespace brogueHd::component
 				short index = column - boundary.left();
 
 				// FIRST, CHECK ROW INDEX TRACKING
-				if (this->isDefined(column, row))
+				if (predicate(column, row, this->getUnsafe(column, row)))
 					rowCounters.set(index, rowCounters.get(index) + 1);
 				else
 					rowCounters.set(index, 0);
@@ -844,7 +861,7 @@ namespace brogueHd::component
 			}
 		}
 
-		// Validation: Check boundaries; check that grid is defined
+		// Validation: Check boundaries; check that the predicate passes
 		//
 		const grid<T>* that = this;
 		gridRect result(bestStartColumn, bestStartRow, (bestEndColumn - bestStartColumn) + 1, (bestEndRow - bestStartRow) + 1);
@@ -852,9 +869,9 @@ namespace brogueHd::component
 		if (!boundary.contains(result))
 			throw simpleException("Invalid sub-region rectangle calculation:  gridRegionConstructor::calculateLargestRectangle");
 
-		result.iterate([&that] (short column, short row)
+		result.iterate([&that, &predicate] (short column, short row)
 		{
-			if (!that->isDefined(column, row))
+			if (!predicate(column, row, that->getUnsafe(column, row)))
 				throw simpleException("Invalid sub-region rectangle calculation:  gridRegionConstructor::calculateLargestRectangle");
 
 			return iterationCallback::iterate;

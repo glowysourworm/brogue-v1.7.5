@@ -32,6 +32,17 @@ namespace brogueHd::simple
             y = copy.y;
         }
 
+        void set(T ax, T ay)
+        {
+            x = ax;
+            y = ay;
+        }
+        void set(const simpleVector<T>& copy)
+        {
+            x = copy.x;
+            y = copy.y;
+        }
+
         friend simpleVector<T> operator+(const simpleVector<T>& vector1, const simpleVector<T>& vector2)
         {
             return simpleVector<T>(vector1.x + vector2.x, vector1.y + vector2.y);

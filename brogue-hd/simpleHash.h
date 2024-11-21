@@ -98,6 +98,12 @@ namespace brogueHd::simple
 		template<typename VResult>
 		simpleList<VResult> selectFromValues(const simpleHashSelector<K, V, VResult>& selector);
 
+		/// <summary>
+		/// Returns a stack-copyable simpleHash table for key-value pairs except for those
+		/// indicated by a truthy predicate.
+		/// </summary>
+		simpleHash<K, V> except(const simpleHashPredicate<K, V>& predicate) const;
+
 		//K getKeyAt(int index);
 		//V getValueAt(const std::map<K, V>& map, int index);
 
@@ -511,6 +517,22 @@ namespace brogueHd::simple
 		this->iterate([&result, &selector] (K key, V value)
 		{
 			result.add(selector(value));
+			return iterationCallback::iterate;
+		});
+
+		return result;
+	}
+
+	template<isHashable K, isHashable V>
+	simpleHash<K, V> simpleHash<K, V>::except(const simpleHashPredicate<K, V>& predicate) const
+	{
+		simpleHash<K, V> result;
+
+		this->iterate([&result, &predicate] (const K& key, const V& value)
+		{
+			if (!predicate(key, value))
+				 result.add(key, value);
+
 			return iterationCallback::iterate;
 		});
 

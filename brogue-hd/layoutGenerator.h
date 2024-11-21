@@ -1,30 +1,22 @@
 #pragma once
 
-#include "accretionTile.h"
+#include "brogueDesignRect.h"
 #include "brogueLayout.h"
 #include "brogueLevelProfile.h"
 #include "randomGenerator.h"
 #include "roomGenerator.h"
 
 #include "brogueUIBuilder.h"
-#include "delaunayAlgorithm.h"
-#include "dijkstra.h"
 #include "dungeon.h"
 #include "graph.h"
-#include "grid.h"
-#include "gridDefinitions.h"
 #include "gridLocator.h"
 #include "gridLocatorEdge.h"
 #include "gridRect.h"
 #include "gridRegion.h"
 #include "noiseGenerator.h"
-#include "simple.h"
-#include "simpleArray.h"
+#include "rectanglePackingAlgorithm.h"
 #include "simpleHash.h"
 #include "simpleList.h"
-#include "simpleMath.h"
-#include "simpleOrderedList.h"
-#include "simplePoint.h"
 #include "simpleVector.h"
 
 using namespace brogueHd::simple;
@@ -35,6 +27,7 @@ namespace brogueHd::backend
 {
 	class layoutGenerator
 	{
+
 	public:
 
 		/// <summary>
@@ -56,7 +49,7 @@ namespace brogueHd::backend
 
 		void createRooms();
 
-		bool attemptConnection(accretionTile* roomTile, const gridRect& attemptRect, short interRoomPadding) const;
+		//bool attemptConnection(brogueDesignRect* roomTile, const gridRect& attemptRect, short interRoomPadding) const;
 
 		//void designateMachineRooms();
 
@@ -74,7 +67,7 @@ namespace brogueHd::backend
 		//
 		brogueLayout* _layout;
 		brogueLevelProfile* _profile;
-		simpleList<accretionTile*>* _roomTiles;
+		simpleList<brogueDesignRect*>* _roomTiles;
 		graph<gridLocator, gridLocatorEdge>* _delaunayGraph;
 	};
 
@@ -124,7 +117,7 @@ namespace brogueHd::backend
 
 		_layout = new brogueLayout(levelBoundary, levelPaddedBoundary);
 		_profile = profile;
-		_roomTiles = new simpleList<accretionTile*>();
+		_roomTiles = new simpleList<brogueDesignRect*>();
 		_delaunayGraph = nullptr;
 	}
 
@@ -196,21 +189,23 @@ namespace brogueHd::backend
 		// Update:  (see backlog.txt) This will now be done using a tiling method.
 		//
 
-		grid<gridLocator> tilingGrid(_layout->getParentBoundary(), _layout->getBoundary());
+		rectanglePackingAlgorithm algorithm(_randomGenerator, _layout->getBoundary());
 
-		simpleHash<brogueRoomInfo, gridRect> tiling;
+		simpleHash<brogueDesignRect, gridRect> tiling;
 
-		gridRect entranceBoundary;
-		bool finished = false;
 		int maxIterations = 35;
 		int iteration = 0;
 
-		while (!finished && iteration < maxIterations)
+		while (iteration < maxIterations)
 		{
 			brogueRoomInfo configuration;
 			gridRect boundary;
 
-			// Tile the entrance room
+			simpleVector<float> heuristic;
+			simpleVector<float> nextHeuristic;
+
+			// Entrance Room Selection
+			//
 			if (iteration == 0)
 			{
 				configuration = _profile->getEntranceRoom(_randomGenerator);
@@ -219,158 +214,39 @@ namespace brogueHd::backend
 												  _layout->getBoundary().bottom() - boundary.height);
 				boundary.translate(topLeft);
 
-				// Mark the entrance tile
-				entranceBoundary = boundary;
+				// Initialize Rectangle Packing Algorithm
+				//
+				algorithm.initialize(boundary);
+				tiling.add(brogueDesignRect(configuration, boundary, 0), boundary);
 			}
 
-			// Tile against any previous tile; but we're going to apply some random logic to the positining;
-			// and, also, brute force movement once our random positioning doesn't get a much better heuristic.
+			// Add rectangles to the space using the algorithm
+			//
 			else
 			{
-				gridRect nextLargestBoundary = tilingGrid.calculateLargestRectangle();
 				configuration = _profile->getRandomRoomInfo(_randomGenerator);
-				boundary = _roomGenerator->getRoomDesiredSize(configuration, nextLargestBoundary);
+				boundary = _roomGenerator->getRoomDesiredSize(configuration, _layout->getBoundary());
 
-				// No more space
-				if (boundary == default_value::value<gridRect>())
-					break;
+				// Be sure there is enough space to continue
+				gridRect largestSubRect = algorithm.getLargestUnusedRectangle();
 
-				// Procedure:  Pseudo-Rectangular Packing Problem (w/ random positioning and distance heuristic)
-				// 
-				// 0) Check adjacent locations to the tile to see if it's well nestled into a decent spot
-				//		-> True: Goto #3
-				// 1) Calculate the distance vector between the new tile center and the first tile center
-				// 2) Try random locations to minimize this vector - limit to a small number (we'll try 10)
-				// 3) Check against the vector for edge adjacency to another tile. 
-				//		-> True: Slide laterally (in the opposite dimension) to see if it minimizes the 
-				//				 heuristic.
-				//		-> False: Move against the vector (in both dimensions) using the slope to determine
-				//				  the amount in each dimension until there is adjacency established. 
-				// 4) Set the result and break the loop
-				//
-
-				int edgesFound = 0;
-
-				// Condition:  2 / 4 edges are adjacent to another rectangle
-				tiling.iterate([&boundary, &edgesFound] (brogueRoomInfo config, const gridRect& tile)
+				if (largestSubRect.width < boundary.width ||
+					largestSubRect.height < boundary.height)
 				{
-					if (tile.isAdjacent(boundary))
-						edgesFound++;
-
-					if (edgesFound >= 2)
-						return iterationCallback::breakAndReturn;
-
-					return iterationCallback::iterate;
-				});
-
-				simpleVector<float> heuristic(boundary.centerX() - entranceBoundary.centerX(), boundary.centerY() - entranceBoundary.centerY());
-				int counter = 0;
-
-				// Try randomly a few times to minimize iteration work in the following loops
-				while (edgesFound == 0 && counter++ < 10)
-				{
-					gridRect randomBoundary(_randomGenerator->randomIndex(nextLargestBoundary.left(), nextLargestBoundary.right() - boundary.width + 1),
-											_randomGenerator->randomIndex(nextLargestBoundary.top(), nextLargestBoundary.bottom() - boundary.height + 1),
-											boundary.width, boundary.height);
-
-					simpleVector<float> nextHeuristic(randomBoundary.centerX() - entranceBoundary.centerX(),
-													  randomBoundary.centerY() - entranceBoundary.centerY());
-
-					if (nextHeuristic.magnitude() < heuristic.magnitude())
-					{
-						boundary = randomBoundary;
-						heuristic = nextHeuristic;
-					}
+					iteration++;
+					continue;
 				}
 
-				bool movement = true;
+				// Set next room in the upper left corner of the unused space
+				boundary.column = largestSubRect.column;
+				boundary.row = largestSubRect.row;
 
-				// Slide into position
-				while (movement)
+				// Success
+				if (algorithm.addRectangle(boundary))
 				{
-					int yMoves = simpleMath::floor(1 / heuristic.slope());
-					int xMoves = simpleMath::floor(yMoves / heuristic.slope());
-
-					// First, check overlapping tiles (before iterating positions independently)
-					boundary.translate(xMoves, yMoves);
-
-					bool validMove = true;
-
-					tiling.iterate([&boundary, &validMove] (brogueRoomInfo config, const gridRect& tile)
-					{
-						if (boundary.overlaps(tile))
-						{
-							validMove = false;
-							return iterationCallback::breakAndReturn;
-						}
-						return iterationCallback::iterate;
-					});
-
-					// Invalid:  Backout and try single dimension(s)
-					if (!validMove)
-					{
-						boundary.translate(-1 * xMoves, -1 * yMoves);
-					}
-					else
-						continue;
-
-					// Move one-dimension, one-cell at a time; and check using the tile grid this time.
-					//
-					for (int index = 0; index < simpleMath::abs(xMoves) + simpleMath::abs(yMoves); index++)
-					{
-						bool yMove = (index >= simpleMath::abs(xMoves));
-
-						if (!yMove)
-							boundary.translate(simpleMath::sign(xMoves), 0);
-						else
-							boundary.translate(0, simpleMath::sign(yMoves));
-
-						validMove = true;
-
-						// Iterate just the tiles to save processing time (checking for invalid movement)
-						tiling.iterate([&boundary, &validMove] (brogueRoomInfo config, const gridRect& tile)
-						{
-							if (boundary.overlaps(tile))
-							{
-								validMove = false;
-								return iterationCallback::breakAndReturn;
-							}
-							return iterationCallback::iterate;
-						});
-
-						// Invalid:  Back out the translation and move onto the y-dimension
-						if (!validMove)
-						{
-							// X-Dimension:  Can still check the y-dimension
-							if (!yMove)
-							{
-								boundary.translate(-1 * simpleMath::sign(xMoves), 0);
-
-								// Skip to the y-dimension
-								index += (simpleMath::abs(xMoves) - index);
-							}
-
-							// Y-Dimension:  Must break the loop
-							else
-							{
-								boundary.translate(0, -1 * simpleMath::sign(yMoves));
-								movement = false;
-								break;
-							}
-						}
-					}
+					tiling.add(brogueDesignRect(configuration, boundary, 1), boundary);
 				}
 			}
-
-			// Fill in the tile on the grid (will be needed to calculate the largest sub-rectangle)
-			//
-			boundary.iterate([&tilingGrid] (short column, short row)
-			{
-				tilingGrid.set(column, row, gridLocator(column, row));
-				return iterationCallback::iterate;
-			});
-
-			tiling.add(configuration, boundary);
 
 			iteration++;
 		}
@@ -379,7 +255,7 @@ namespace brogueHd::backend
 		//
 		for (int index = 0; index < tiling.count(); index++)
 		{
-			brogueRoomInfo configuration = tiling.getAt(index)->key;
+			brogueRoomInfo configuration = tiling.getAt(index)->key.getConfiguration();
 			gridRect boundary = tiling.getAt(index)->value;
 			int padding = index == 0 ? 0 : 1;
 
@@ -504,287 +380,287 @@ namespace brogueHd::backend
 		//}
 	}
 
-	bool layoutGenerator::attemptConnection(accretionTile* roomTile, const gridRect& attemptRect, short interRoomPadding) const
-	{
-		// Procedure
-		//
-		// 1) Combinatorically attempt connection points
-		//      -> Start at beginning of room tile vector
-		//      -> Test each possibility
-		//          1) fits inside attemptRect
-		//          2) no overlapping region locations
-		// 
-		// Success: Update room tile; Update attemptRect
-		// 
-		// Fail:    (TODO) Try positioning the tile using
-		//                 padding.
-		//
+	//bool layoutGenerator::attemptConnection(brogueDesignRect* roomTile, const gridRect& attemptRect, short interRoomPadding) const
+	//{
+	//	// Procedure
+	//	//
+	//	// 1) Combinatorically attempt connection points
+	//	//      -> Start at beginning of room tile vector
+	//	//      -> Test each possibility
+	//	//          1) fits inside attemptRect
+	//	//          2) no overlapping region locations
+	//	// 
+	//	// Success: Update room tile; Update attemptRect
+	//	// 
+	//	// Fail:    (TODO) Try positioning the tile using
+	//	//                 padding.
+	//	//
 
-		for (int index = 0; index < _roomTiles->count(); index++)
-		{
-			accretionTile* tile = _roomTiles->get(index);
+	//	for (int index = 0; index < _roomTiles->count(); index++)
+	//	{
+	//		brogueDesignRect* tile = _roomTiles->get(index);
 
-			bool northAttempt = false;
-			bool southAttempt = false;
-			bool eastAttempt = false;
-			bool westAttempt = false;
+	//		bool northAttempt = false;
+	//		bool southAttempt = false;
+	//		bool eastAttempt = false;
+	//		bool westAttempt = false;
 
-			for (int tileAttempts = 1; tileAttempts <= 4; tileAttempts++)
-			{
-				gridLocator translation = gridLocator::getEmpty();
+	//		for (int tileAttempts = 1; tileAttempts <= 4; tileAttempts++)
+	//		{
+	//			gridLocator translation = gridLocator::getEmpty();
 
-				// Left, Top, Right, Bottom
-				if (!roomTile->hasEastConnection && !tile->hasWestConnection && !westAttempt)
-				{
-					translation = tile->connectionPointW.subtract(roomTile->connectionPointE);
+	//			// Left, Top, Right, Bottom
+	//			if (!roomTile->hasEastConnection && !tile->hasWestConnection && !westAttempt)
+	//			{
+	//				translation = tile->connectionPointW.subtract(roomTile->connectionPointE);
 
-					// Adjust the connection point by one cell + padding
-					//translation.column -= (1 + interRoomPadding);
+	//				// Adjust the connection point by one cell + padding
+	//				//translation.column -= (1 + interRoomPadding);
 
-					westAttempt = true;
-				}
+	//				westAttempt = true;
+	//			}
 
-				else if (!roomTile->hasNorthConnection && !tile->hasSouthConnection && !northAttempt)
-				{
-					translation = tile->connectionPointN.subtract(roomTile->connectionPointS);
+	//			else if (!roomTile->hasNorthConnection && !tile->hasSouthConnection && !northAttempt)
+	//			{
+	//				translation = tile->connectionPointN.subtract(roomTile->connectionPointS);
 
-					// Adjust the connection point by one cell + padding
-					//translation.row -= (1 + interRoomPadding);
+	//				// Adjust the connection point by one cell + padding
+	//				//translation.row -= (1 + interRoomPadding);
 
-					northAttempt = true;
-				}
+	//				northAttempt = true;
+	//			}
 
-				else if (!roomTile->hasEastConnection && !tile->hasWestConnection && !eastAttempt)
-				{
-					translation = tile->connectionPointE.subtract(roomTile->connectionPointW);
+	//			else if (!roomTile->hasEastConnection && !tile->hasWestConnection && !eastAttempt)
+	//			{
+	//				translation = tile->connectionPointE.subtract(roomTile->connectionPointW);
 
-					// Adjust the connection point by one cell + padding
-					//translation.column += (1 + interRoomPadding);
+	//				// Adjust the connection point by one cell + padding
+	//				//translation.column += (1 + interRoomPadding);
 
-					eastAttempt = true;
-				}
+	//				eastAttempt = true;
+	//			}
 
-				else if (!roomTile->hasSouthConnection && !tile->hasNorthConnection && !southAttempt)
-				{
-					translation = tile->connectionPointS.subtract(roomTile->connectionPointN);
+	//			else if (!roomTile->hasSouthConnection && !tile->hasNorthConnection && !southAttempt)
+	//			{
+	//				translation = tile->connectionPointS.subtract(roomTile->connectionPointN);
 
-					// Adjust the connection point by one cell + padding
-					//translation.row += (1 + interRoomPadding);
+	//				// Adjust the connection point by one cell + padding
+	//				//translation.row += (1 + interRoomPadding);
 
-					southAttempt = true;
-				}
-				else
-					break;
+	//				southAttempt = true;
+	//			}
+	//			else
+	//				break;
 
-				// Translate the region tile into position (this affects all grid locators, and connection points)
-				if (!roomTile->attemptTranslastion(translation))
-					continue;
+	//			// Translate the region tile into position (this affects all grid locators, and connection points)
+	//			if (!roomTile->attemptTranslastion(translation))
+	//				continue;
 
-				// Check the boundary:  1) outer gridRect first to reduce iteration, and 2) the grid overlap per cell
-				if (attemptRect.contains(roomTile->region->getBoundary()))
-				{
-					if (tile->region->overlaps(roomTile->region))
-					{
-						//delete roomTile->region;
-						continue;
-					}
+	//			// Check the boundary:  1) outer gridRect first to reduce iteration, and 2) the grid overlap per cell
+	//			if (attemptRect.contains(roomTile->region->getBoundary()))
+	//			{
+	//				if (tile->region->overlaps(roomTile->region))
+	//				{
+	//					//delete roomTile->region;
+	//					continue;
+	//				}
 
-					bool gridOverlaps = false;
-					brogueLayout* layout = _layout;
+	//				bool gridOverlaps = false;
+	//				brogueLayout* layout = _layout;
 
-					// Double check the already-set rooms
-					roomTile->region->iterateLocations([&layout, &gridOverlaps] (short column, short row, gridLocator item)
-					{
-						if (layout->isDefined(item.column, item.row))
-						{
-							gridOverlaps = true;
-							return iterationCallback::breakAndReturn;
-						}
+	//				// Double check the already-set rooms
+	//				roomTile->region->iterateLocations([&layout, &gridOverlaps] (short column, short row, gridLocator item)
+	//				{
+	//					if (layout->isDefined(item.column, item.row))
+	//					{
+	//						gridOverlaps = true;
+	//						return iterationCallback::breakAndReturn;
+	//					}
 
-						return iterationCallback::iterate;
-					});
+	//					return iterationCallback::iterate;
+	//				});
 
-					if (gridOverlaps)
-					{
-						//delete roomTile->region;
-						continue;
-					}
+	//				if (gridOverlaps)
+	//				{
+	//					//delete roomTile->region;
+	//					continue;
+	//				}
 
-					// Set connection point data (should be using a direction iterator) [1, 4] -> [W,N,E,S]
-					if (index == 1)
-					{
-						roomTile->connectionPointE = tile->connectionPointW;
-						roomTile->hasEastConnection = true;
-					}
-					else if (index == 2)
-					{
-						roomTile->connectionPointS = tile->connectionPointN;
-						roomTile->hasSouthConnection = true;
-					}
-					else if (index == 3)
-					{
-						roomTile->connectionPointW = tile->connectionPointE;
-						roomTile->hasWestConnection = true;
-					}
-					else
-					{
-						roomTile->connectionPointN = tile->connectionPointS;
-						roomTile->hasNorthConnection = true;
-					}
+	//				// Set connection point data (should be using a direction iterator) [1, 4] -> [W,N,E,S]
+	//				if (index == 1)
+	//				{
+	//					roomTile->connectionPointE = tile->connectionPointW;
+	//					roomTile->hasEastConnection = true;
+	//				}
+	//				else if (index == 2)
+	//				{
+	//					roomTile->connectionPointS = tile->connectionPointN;
+	//					roomTile->hasSouthConnection = true;
+	//				}
+	//				else if (index == 3)
+	//				{
+	//					roomTile->connectionPointW = tile->connectionPointE;
+	//					roomTile->hasWestConnection = true;
+	//				}
+	//				else
+	//				{
+	//					roomTile->connectionPointN = tile->connectionPointS;
+	//					roomTile->hasNorthConnection = true;
+	//				}
 
-					return true;
-				}
-			}
-		}
+	//				return true;
+	//			}
+	//		}
+	//	}
 
-		return false;
-	}
+	//	return false;
+	//}
 
 	void layoutGenerator::triangulateRooms()
 	{
-		// Create delaunay triangulator with graph edge constructor
-		delaunayAlgorithm<gridLocator, gridLocatorEdge> triangulator([] (gridLocator node1, gridLocator node2)
-		{
-			gridLocatorEdge edge(node1, node2);
+		//// Create delaunay triangulator with graph edge constructor
+		//delaunayAlgorithm<gridLocator, gridLocatorEdge> triangulator([] (gridLocator node1, gridLocator node2)
+		//{
+		//	gridLocatorEdge edge(node1, node2);
 
-			return edge;
-		});
+		//	return edge;
+		//});
 
-		// Create connection point vertices
-		simpleList<gridLocator> connectionNodes;
+		//// Create connection point vertices
+		//simpleList<gridLocator> connectionNodes;
 
-		_roomTiles->forEach([&connectionNodes] (accretionTile* item)
-		{
-			if (item->hasEastConnection)
-				connectionNodes.add(gridLocator(item->connectionPointE));
+		//_roomTiles->forEach([&connectionNodes] (brogueDesignRect* item)
+		//{
+		//	if (item->hasEastConnection)
+		//		connectionNodes.add(gridLocator(item->connectionPointE));
 
-			if (item->hasNorthConnection)
-				connectionNodes.add(gridLocator(item->connectionPointN));
+		//	if (item->hasNorthConnection)
+		//		connectionNodes.add(gridLocator(item->connectionPointN));
 
-			if (item->hasSouthConnection)
-				connectionNodes.add(gridLocator(item->connectionPointS));
+		//	if (item->hasSouthConnection)
+		//		connectionNodes.add(gridLocator(item->connectionPointS));
 
-			if (item->hasWestConnection)
-				connectionNodes.add(gridLocator(item->connectionPointW));
+		//	if (item->hasWestConnection)
+		//		connectionNodes.add(gridLocator(item->connectionPointW));
 
-			return iterationCallback::iterate;
-		});
+		//	return iterationCallback::iterate;
+		//});
 
-		_delaunayGraph = triangulator.run(connectionNodes);
+		//_delaunayGraph = triangulator.run(connectionNodes);
 	}
 
 	void layoutGenerator::connectRooms()
 	{
-		// Procedure
-		//
-		// 1) Iterate Edges: DELAUNAY GRAPH
-		//      -> Find edges that are not self-referential (use room tiles)
-		//      -> Collect these edges to pass to dijkstra
-		//
-		// 2) Run Dijkstra to set cells in the primary grid
-		//
+		//// Procedure
+		////
+		//// 1) Iterate Edges: DELAUNAY GRAPH
+		////      -> Find edges that are not self-referential (use room tiles)
+		////      -> Collect these edges to pass to dijkstra
+		////
+		//// 2) Run Dijkstra to set cells in the primary grid
+		////
 
-		simpleList<gridLocatorEdge> corridorEdges;
-		simpleList<accretionTile*>* roomTiles = _roomTiles;
-		brogueLayout* layout = _layout;
+		//simpleList<gridLocatorEdge> corridorEdges;
+		//simpleList<brogueDesignRect*>* roomTiles = _roomTiles;
+		//brogueLayout* layout = _layout;
 
-		_delaunayGraph->iterateEdges([&roomTiles, &corridorEdges] (const gridLocatorEdge& edge)
-		{
-			bool isCorridorEdge = false;
+		//_delaunayGraph->iterateEdges([&roomTiles, &corridorEdges] (const gridLocatorEdge& edge)
+		//{
+		//	bool isCorridorEdge = false;
 
-			roomTiles->forEach([&edge, &isCorridorEdge] (accretionTile* tile)
-			{
-				int connectionCount = 0;
+		//	roomTiles->forEach([&edge, &isCorridorEdge] (brogueDesignRect* tile)
+		//	{
+		//		int connectionCount = 0;
 
-				// North
-				if (tile->hasNorthConnection &&
-					(tile->connectionPointN == edge.node1 ||
-					tile->connectionPointN == edge.node2))
-					connectionCount++;
+		//		// North
+		//		if (tile->hasNorthConnection &&
+		//			(tile->connectionPointN == edge.node1 ||
+		//			tile->connectionPointN == edge.node2))
+		//			connectionCount++;
 
-				// South
-				if (tile->hasSouthConnection &&
-					(tile->connectionPointS == edge.node1 ||
-					tile->connectionPointS == edge.node2))
-					connectionCount++;
+		//		// South
+		//		if (tile->hasSouthConnection &&
+		//			(tile->connectionPointS == edge.node1 ||
+		//			tile->connectionPointS == edge.node2))
+		//			connectionCount++;
 
-				// East
-				if (tile->hasEastConnection &&
-					(tile->connectionPointE == edge.node1 ||
-					tile->connectionPointE == edge.node2))
-					connectionCount++;
+		//		// East
+		//		if (tile->hasEastConnection &&
+		//			(tile->connectionPointE == edge.node1 ||
+		//			tile->connectionPointE == edge.node2))
+		//			connectionCount++;
 
-				// West
-				if (tile->hasWestConnection &&
-					(tile->connectionPointW == edge.node1 ||
-					tile->connectionPointW == edge.node2))
-					connectionCount++;
+		//		// West
+		//		if (tile->hasWestConnection &&
+		//			(tile->connectionPointW == edge.node1 ||
+		//			tile->connectionPointW == edge.node2))
+		//			connectionCount++;
 
-				if (connectionCount == 1)
-				{
-					isCorridorEdge = true;
-					return iterationCallback::breakAndReturn;
-				}
+		//		if (connectionCount == 1)
+		//		{
+		//			isCorridorEdge = true;
+		//			return iterationCallback::breakAndReturn;
+		//		}
 
-				return iterationCallback::iterate;
-			});
+		//		return iterationCallback::iterate;
+		//	});
 
-			if (isCorridorEdge)
-				corridorEdges.add(edge);
+		//	if (isCorridorEdge)
+		//		corridorEdges.add(edge);
 
-			return iterationCallback::iterate;
-		});
+		//	return iterationCallback::iterate;
+		//});
 
-		// (MEMORY!) Use the corridor edges to call dijkstra (on stack usgae has predicate copying)
-		dijkstra<gridLocator>* algorithm = new dijkstra<gridLocator>(
-			_layout->getParentBoundary(),
-			_layout->getBoundary(),
-			true,                           // Cardinal Movement (for laying corridors)
+		//// (MEMORY!) Use the corridor edges to call dijkstra (on stack usgae has predicate copying)
+		//dijkstra<gridLocator>* algorithm = new dijkstra<gridLocator>(
+		//	_layout->getParentBoundary(),
+		//	_layout->getBoundary(),
+		//	true,                           // Cardinal Movement (for laying corridors)
 
-		// Primary Inclusion Predicate (is it in the grid?)
-		[&layout](short column, short row)
-		{
-			return layout->isDefined(column, row);
-		},
+		//// Primary Inclusion Predicate (is it in the grid?)
+		//[&layout](short column, short row)
+		//{
+		//	return layout->isDefined(column, row);
+		//},
 
-		// Then, the map cost is queried (what is the movement cost?)
-		[&layout](short column, short row)
-		{
-			return 1;
-		},
+		//// Then, the map cost is queried (what is the movement cost?)
+		//[&layout](short column, short row)
+		//{
+		//	return 1;
+		//},
 
-		// Then, it will need the locators from the grid to keep its internal data temporarily
-		[&layout](short column, short row)
-		{
-			// May need design change for this problem (needed to copy grid locators back for dijkstra)
-			return gridLocator(column, row);
-		});
+		//// Then, it will need the locators from the grid to keep its internal data temporarily
+		//[&layout](short column, short row)
+		//{
+		//	// May need design change for this problem (needed to copy grid locators back for dijkstra)
+		//	return gridLocator(column, row);
+		//});
 
-		// Iterate each corridor edge and run dijkstra to finalize the connection
-		corridorEdges.forEach([&algorithm, &layout] (const gridLocatorEdge& edge)
-		{
-			gridLocator source = edge.node1;
-			gridLocator targets[1] = { edge.node2 };
+		//// Iterate each corridor edge and run dijkstra to finalize the connection
+		//corridorEdges.forEach([&algorithm, &layout] (const gridLocatorEdge& edge)
+		//{
+		//	gridLocator source = edge.node1;
+		//	gridLocator targets[1] = { edge.node2 };
 
-			// Run Dijkstra
-			algorithm->initialize(source, simpleArray<gridLocator>(targets, 1));
-			algorithm->run();
+		//	// Run Dijkstra
+		//	algorithm->initialize(source, simpleArray<gridLocator>(targets, 1));
+		//	algorithm->run();
 
-			simpleArray<gridLocator> resultPath = algorithm->getResultPath(targets[0]);
+		//	simpleArray<gridLocator> resultPath = algorithm->getResultPath(targets[0]);
 
-			// Set corridors
-			resultPath.forEach([&layout] (gridLocator locator)
-			{
-				layout->createCells(locator);
+		//	// Set corridors
+		//	resultPath.forEach([&layout] (gridLocator locator)
+		//	{
+		//		layout->createCells(locator);
 
-				return iterationCallback::iterate;
-			});
+		//		return iterationCallback::iterate;
+		//	});
 
-			return iterationCallback::iterate;
-		});
+		//	return iterationCallback::iterate;
+		//});
 
-		// Clean up memory
-		delete algorithm;
+		//// Clean up memory
+		//delete algorithm;
 	}
 }
 

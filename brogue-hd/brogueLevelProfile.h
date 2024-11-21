@@ -221,7 +221,11 @@ namespace brogueHd::backend::model
 
 	brogueRoomInfo brogueLevelProfile::getRandomRoomInfo(randomGenerator* randomMaim)
 	{
-		simpleList<short> weights = _roomInfo->selectFromValues<short>([] (brogueRoomInfo info)
+		simpleList<short> weights = _roomInfo->except([] (brogueRoomType type, const brogueRoomInfo& info)
+		{
+			return type == brogueRoomType::MainEntranceRoom;
+
+		}).selectFromValues<short>([] (brogueRoomInfo info)
 		{
 			return info.frequency;
 		});

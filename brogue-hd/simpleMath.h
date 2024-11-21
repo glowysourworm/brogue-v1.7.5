@@ -144,7 +144,20 @@ namespace brogueHd::simple
 				return floor(x);
 
 			else
-				throw simpleException("Unknown sqrt type simpleMath.h");
+				throw simpleException("Unknown floor type simpleMath.h");
+		}
+
+		template<isNumber TMath>
+		static TMath ceiling(TMath x)
+		{
+			if (isFloatLike<TMath>)
+				return ceilf(static_cast<float>(x));
+
+			else if (isIntLike<TMath>)
+				return ceil(x);
+
+			else
+				throw simpleException("Unknown ceiling type simpleMath.h");
 		}
 
 		template<isNumber TMath>

@@ -257,7 +257,7 @@
     <ClInclude Include="brogueLevelProfile.h">
       <Filter>Header Files\backend\model</Filter>
     </ClInclude>
-    <ClInclude Include="accretionTile.h">
+    <ClInclude Include="brogueDesignRect.h">
       <Filter>Header Files\backend\model\layout</Filter>
     </ClInclude>
     <ClInclude Include="noiseGenerator.h">
@@ -708,6 +708,9 @@
       <Filter>Header Files\vendor</Filter>
     </ClInclude>
     <ClInclude Include="gridRegionExtension.h">
+      <Filter>Header Files\component</Filter>
+    </ClInclude>
+    <ClInclude Include="rectanglePackingAlgorithm.h">
       <Filter>Header Files\component</Filter>
     </ClInclude>
   </ItemGroup>

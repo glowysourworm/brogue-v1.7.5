@@ -176,7 +176,7 @@
     <ClCompile Include="gl.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="accretionTile.h" />
+    <ClInclude Include="brogueDesignRect.h" />
     <ClInclude Include="bitmap.h" />
     <ClInclude Include="boltConstants.h" />
     <ClInclude Include="boudingBox2D.h" />
@@ -232,6 +232,7 @@
     <ClInclude Include="openglHelper.h" />
     <ClInclude Include="brogueUIConstants.h" />
     <ClInclude Include="randomRange.h" />
+    <ClInclude Include="rectanglePackingAlgorithm.h" />
     <ClInclude Include="simpleBoundingBox.h" />
     <ClInclude Include="simpleBuffer.h" />
     <ClInclude Include="simpleDirectoryEntry.h" />
