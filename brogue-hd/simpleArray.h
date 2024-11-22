@@ -2,8 +2,10 @@
 
 #include "simple.h"
 #include "simpleException.h"
+#include "simpleRange.h"
 #include <functional>
 #include <iosfwd>
+#include <limits>
 
 namespace brogueHd::simple
 {
@@ -40,6 +42,12 @@ namespace brogueHd::simple
 	template<isHashable T, typename TResult>
 	using simpleArraySelector = std::function<TResult(const T& item)>;
 
+	/// <summary>
+	/// Assigns a number value to any item of the array
+	/// </summary>
+	template<isHashable T, isNumber TResult>
+	using simpleArrayValueIndicator = std::function<TResult(const T& item)>;
+
 	template<isHashable T>
 	class simpleArray : public hashableObject
 	{
@@ -55,6 +63,7 @@ namespace brogueHd::simple
 
 		T get(int index) const;
 		void set(int index, const T& value);
+		void setAll(const T& value);
 
 		void operator=(const simpleArray<T>& other);
 
@@ -82,7 +91,16 @@ namespace brogueHd::simple
 		template<isHashable TResult>
 		simpleArray<TResult> select(simpleArraySelector<T, TResult> selector);
 
+		template<typename TResult>
+		TResult maxOf(simpleArraySelector<T, TResult> selector) const;
+
+		template<typename TResult>
+		int maxIndexOf(simpleArraySelector<T, TResult> selector) const;
+
 		simpleArray<T> whereArray(simpleArrayPredicate<T> predicate);
+
+		template<isNumber TResult>
+		TResult kadanesAlgorithm(simpleRange<int>& result, simpleArrayValueIndicator<T, TResult> valueIndicator);
 
 	private:
 
@@ -253,6 +271,13 @@ namespace brogueHd::simple
 			throw simpleException("Index is outside the bounds of the array: simpleArray.h");
 
 		_array[index] = value;
+	}
+
+	template<isHashable T>
+	void simpleArray<T>::setAll(const T& value)
+	{
+		for (int index = 0; index < _count; index++)
+			_array[index] = value;
 	}
 
 	template<isHashable T>
@@ -444,5 +469,122 @@ namespace brogueHd::simple
 		}
 
 		return result;
+	}
+
+	template<isHashable T>
+	template<typename TResult>
+	TResult simpleArray<T>::maxOf(simpleArraySelector<T, TResult> selector) const
+	{
+		TResult max = default_value::value<T>();
+		int maxIndex = -1;
+
+		for (int index = 0; index < _count; index++)
+		{
+			TResult current = selector(this->get(index));
+
+			if (max == default_value::value<T>())
+			{
+				max = current;
+				maxIndex = index;
+			}
+
+			else if (max < current)
+			{
+				max = current;
+				maxIndex = index;
+			}
+		}
+
+		return max;
+	}
+
+	template<isHashable T>
+	template<typename TResult>
+	int simpleArray<T>::maxIndexOf(simpleArraySelector<T, TResult> selector) const
+	{
+		TResult max = default_value::value<T>();
+		int maxIndex = -1;
+
+		for (int index = 0; index < _count; index++)
+		{
+			TResult current = selector(this->get(index));
+
+			if (max == default_value::value<T>())
+			{
+				max = current;
+				maxIndex = index;
+			}
+
+			else if (max < current)
+			{
+				max = current;
+				maxIndex = index;
+			}
+		}
+
+		return maxIndex;
+	}
+
+	template<isHashable T>
+	template<isNumber TResult>
+	TResult simpleArray<T>::kadanesAlgorithm(simpleRange<int>& result, simpleArrayValueIndicator<T, TResult> valueIndicator)
+	{
+		TResult maxSum = std::numeric_limits<TResult>::min();
+		TResult currentSum = 0;
+
+		simpleRange<int> current(-1, -1, -1, this->count() - 1);
+
+		for (int index = 0; index < this->count(); index++)
+		{
+			TResult currentValue = valueIndicator(this->get(index));
+
+			if (currentSum + currentValue > currentSum)
+			{
+				currentSum += currentValue;
+
+				if (current.getLow() == -1)
+				{
+					current.set(index, index);
+				}
+				else
+				{
+					current.setHigh(index);
+				}
+			}
+			else
+			{
+				// Current block
+				if (current.getLow() > -1)
+					current.setHigh(index);
+
+				// Check maximum value
+				if (maxSum < currentSum)
+				{
+					result.set(current.getLow(), current.getHigh());
+					maxSum = currentSum;
+				}
+
+				// Reset (current block only)
+				if (current.getLow() > -1)
+				{
+					current.set(-1, -1);
+					currentSum = 0;
+				}
+			}
+		}
+
+		// Result
+		if (currentSum > 0)
+		{
+			// Check maximum value
+			if (maxSum < currentSum)
+			{
+				result.set(current.getLow(), current.getHigh());
+				maxSum = currentSum;
+			}
+		}
+
+		// Default
+		return maxSum;
 	}
 }

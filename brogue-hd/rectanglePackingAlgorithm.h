@@ -180,8 +180,8 @@ namespace brogueHd::component
 		// Try randomly a few times to minimize iteration work in the following loops
 		while (counter++ < 10)
 		{
-			gridRect randomBoundary(_randomGenerator->randomIndex(constraint.left(), constraint.right() - rect.width + 1),
-									_randomGenerator->randomIndex(constraint.top(), constraint.bottom() - rect.height + 1),
+			gridRect randomBoundary(_randomGenerator->randomRangeInclusive(constraint.left(), constraint.right() - rect.width + 1),
+									_randomGenerator->randomRangeInclusive(constraint.top(), constraint.bottom() - rect.height + 1),
 									rect.width, rect.height);
 
 			bool overlaps = false;

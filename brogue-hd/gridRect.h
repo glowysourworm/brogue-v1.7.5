@@ -4,6 +4,7 @@
 #include "gridLocator.h"
 #include "simple.h"
 #include "simpleException.h"
+#include "simpleMath.h"
 #include <functional>
 
 namespace brogueHd::component
@@ -78,6 +79,28 @@ namespace brogueHd::component
 				width != rect.width ||
 				height != rect.height;
 		}
+
+		/// <summary>
+		/// Returns true if the grid rect represents a valid rectangle in UI coordinates
+		/// </summary>
+		/// <returns></returns>
+		bool validateUI() const
+		{
+			if (column < 0)
+				return false;
+
+			if (row < 0)
+				return false;
+
+			if (width <= 0)
+				return false;
+
+			if (height <= 0)
+				return false;
+
+			return true;
+		}
+
 		virtual size_t getHash() const override
 		{
 			return hashGenerator::generateHash(column, row, width, height);
@@ -114,11 +137,11 @@ namespace brogueHd::component
 		}
 		short centerX() const
 		{
-			return column + (width / 2);
+			return column + simpleMath::floor(width / 2.0f);
 		}
 		short centerY() const
 		{
-			return row + (height / 2);
+			return row + simpleMath::floor(height / 2.0f);
 		}
 		long area() const
 		{
@@ -149,9 +172,23 @@ namespace brogueHd::component
 		/// <summary>
 		/// Creates a new gridRect, expanded in all directions, by the specified amount.
 		/// </summary>
-		gridRect createExpanded(int amount)
+		gridRect createExpanded(int amount) const
 		{
-			gridRect paddedRect = gridRect(column - amount, row - amount, width + (2 * amount), height + (2 * amount));
+			gridRect expandedRect = gridRect(column - amount, row - amount, width + (2 * amount), height + (2 * amount));
+
+			if (expandedRect.width <= 0 ||
+				expandedRect.height <= 0)
+				throw simpleException("Trying to create expanded gridRect created invalid rectangle");
+
+			return expandedRect;
+		}
+
+		/// <summary>
+		/// Creates a new gridRect, shrunk in all directions, by the specified amount.
+		/// </summary>
+		gridRect createPadded(int padding) const
+		{
+			gridRect paddedRect = gridRect(column + padding, row + padding, width - (2 * padding), height - (2 * padding));
 
 			if (paddedRect.width <= 0 ||
 				paddedRect.height <= 0)

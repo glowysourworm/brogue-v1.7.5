@@ -1,16 +1,28 @@
 #pragma once
 
 #include "color.h"
-#include "randomRange.h"
+#include "simple.h"
 #include "simpleArray.h"
+#include "simpleException.h"
 #include "simpleMath.h"
-#include <cstdlib>
+#include <random>
 
 using namespace brogueHd::simple;
 using namespace brogueHd::backend::model;
 
 namespace brogueHd::backend
 {
+	enum class randomVariable
+	{
+		Uniform = 0,
+		Exponential,
+		Gaussian
+	};
+
+	/// <summary>
+	/// Generates random draws from several distributions (see randomVariable enum class). These are determined
+	/// using normalized mean and standard deviation - which are scaled to whatever the function requires.
+	/// </summary>
 	class randomGenerator
 	{
 	public:
@@ -30,83 +42,51 @@ namespace brogueHd::backend
 		void reset(unsigned long seed);
 
 		/// <summary>
+		/// Get a random int between lowerBound and upperBound, inclusive
+		/// </summary>
+		int randomRangeInclusive(short lowerBound, short upperBound, randomVariable type = randomVariable::Uniform, float mean = 0.5f, float stdDev = 0.6);
+
+		/// <summary>
+		/// Gets a random integer between lower and upper bounds, exclusive upper bound, with
+		/// specified probability distribution.
+		/// </summary>
+		int randomRangeExclusive(short lowerBound, short upperBound, randomVariable type = randomVariable::Uniform, float mean = 0.5f, float stdDev = 0.6);
+
+		/// <summary>
 		/// Returns random index from array based on its weights
 		/// </summary>
-		short randWeighted(const simpleArray<short>& weights);
+		template<isNumber T>
+		int randomIndex(const simpleArray<T>& weights, randomVariable type = randomVariable::Uniform, float mean = 0.5f, float stdDev = 0.6);
 
 		/// <summary>
-		/// Returns random from the provided range, using the clumping factor
+		/// Randomizes the input array using Uniform random draws
 		/// </summary>
-		short randClump(const randomRange& theRange);
+		template<typename T>
+		simpleArray<T> shuffle(const simpleArray<T>& array);
 
 		/// <summary>
-		/// Get a random int between lowerBound and upperBound, inclusive, with probability distribution
-		/// affected by clumpFactor.
+		/// Generates next double with the specified parameters
 		/// </summary>
-		short randClumpedRange(short lowerBound, short upperBound, short clumpFactor);
+		float next(randomVariable type = randomVariable::Uniform, float mean = 0.5f, float stdDev = 0.6);
 
 		/// <summary>
-		/// Randomizes the input array
+		/// Creates a random color with random color channels.
 		/// </summary>
-		void shuffleList(short* list, short listLength);
+		color nextColor(randomVariable type = randomVariable::Uniform, float mean = 0.5f, float stdDev = 0.6);
 
 		/// <summary>
-		/// Creates list of numbers in order (non-random)
-		/// </summary>
-		void fillSequentialList(short* list, short listLength);
-
-		/// <summary>
-		/// Returns random integer between bounds, excluding the upper bound
-		/// </summary>
-		int randomIndex(int lower, int upper);
-
-		/// <summary>
-		/// Returns a random index from an exponential draw (TODO: CREATE RANDOM VARIABLE ENUM)
-		/// </summary>
-		/// <param name="lower">inclusive lower bound</param>
-		/// <param name="upper">exclusive upper bound</param>
-		/// <param name="lambda">lambda parameter where:  mean = 1 / lambda</param>
-		/// <returns></returns>
-		int randomIndex_exp(int lower, int upper, float lambda);
-
-		/// <summary>
-		/// Returns a random inteber between the two bounds, including both.
-		/// </summary>
-		int randomRange(int lowerBound, int upperBound);
-
-		/// <summary>
-		/// Generates next double Uniform[0,1] and keeps private members updated
-		/// </summary>
-		double next();
-
-		/// <summary>
-		/// Scales the next draw from Uniform[0, 1] and keeps private members updated
-		/// </summary>
-		double next(double low, double high);
-
-		/// <summary>
-		/// Generates a gaussian random number with the specified parameters
-		/// </summary>
-		double gaussian(double mean, double stdDev, double lowLimit, double highLimit);
-
-		/// <summary>
-		/// Creates a random color with random color channels between the two provided. Makes U[0,1] draws
+		/// Creates a random color with random color channels between the two provided. Makes draws
 		/// scaled by the two colors' channels.
 		/// </summary>
-		color nextColor(color low, color high);
-
-		/// <summary>
-		/// Creates a  random color using color channels near the mean - based on gaussian draws.
-		/// </summary>
-		color nextColorNear(color mean, float stdDev);
+		color nextColor(color low, color high, randomVariable type = randomVariable::Uniform, float mean = 0.5f, float stdDev = 0.6);
 
 	private:
 
-		/// <summary>
-		/// Calls next random number [0, RAND_MAX] and scales it to the 
-		/// provided range.
-		/// </summary>
-		//int range(int upperBound);
+		int nextInt(int lowerBound, int upperBound, bool exclusiveUpperBound, randomVariable type, float mean, float stdDev);
+		float nextFloat(float lowerBound, float upperBound, randomVariable type, float mean, float stdDev);
+		float drawUniform(float low, float high);
+		float drawExponential(float low, float high, float mean);
+		float drawGaussian(float low, float high, float mean, float stdDev);
 
 	private:
 
@@ -114,141 +94,119 @@ namespace brogueHd::backend
 		unsigned long _seed;
 		unsigned long _numbersGenerated;
 
-		//std::mt19937* _engine;				// Mersenne Twister Engine
+		std::mt19937* _engine;				// Mersenne Twister Engine
 	};
 
 	randomGenerator::randomGenerator(int id)
 	{
-		//brogueAssert(id == RANDOM_GENERATOR_MAIN || id == RANDOM_GENERATOR_COSMETIC)
-
 		_id = id;
 		_seed = 0;
 		_numbersGenerated = 0;
-		//_engine = new std::mt19937(_seed);
+		_engine = new std::mt19937(_seed);
 	}
 
 	randomGenerator::randomGenerator(int id, unsigned long seed)
 	{
-		//brogueAssert(id == RANDOM_GENERATOR_MAIN || id == RANDOM_GENERATOR_COSMETIC)
-
 		_id = id;
+		_engine = new std::mt19937(_seed);
 
 		this->reset(seed);
 	}
 
 	randomGenerator::~randomGenerator()
 	{
-		//delete _engine;
+		delete _engine;
 	}
 
-	double randomGenerator::next()
-	{
-		//std::uniform_real_distribution<double> uniform;
-		
-		// Uniform [0,1]
-		double nextRand = rand() / (double)RAND_MAX;
-
-		// Goes with rand()
-		_numbersGenerated++;
-
-		return nextRand;
-	}
-
-	double randomGenerator::next(double low, double high)
-	{
-		//std::uniform_real_distribution<double> uniform;
-
-		// Uniform [0,1]
-		double nextRand = rand() / (double)RAND_MAX;
-
-		// Goes with rand()
-		_numbersGenerated++;
-
-		return (nextRand * (high - low)) + low;
-	}
-	color randomGenerator::nextColor(color low, color high)
-	{
-		float red = next(low.red, high.red);
-		float green = next(low.green, high.green);
-		float blue = next(low.blue, high.blue);
-		float alpha = next(low.alpha, high.alpha);
-
-		return color(red, green, blue, alpha);
-	}
-	color randomGenerator::nextColorNear(color mean, float stdDev)
-	{
-		float red = gaussian(mean.red, stdDev, 0, 1);
-		float green = gaussian(mean.green, stdDev, 0, 1);
-		float blue = gaussian(mean.blue, stdDev, 0, 1);
-		float alpha = gaussian(mean.alpha, stdDev, 0, 1);
-
-		return color(red, green, blue, alpha);
-	}
-	double randomGenerator::gaussian(double mean, double stdDev, double lowLimit, double highLimit)
-	{
-		// Normal Distribution
-		// 
-		// https://www.alanzucconi.com/2015/09/16/how-to-sample-from-a-gaussian-distribution/
-
-		double v1, v2, R;
-
-		do
-		{
-			// Generate U[-1, 1] Variables: 2 draws
-			v1 = (2.0 * next()) - 1.0;
-			v2 = (2.0 * next()) - 1.0;
-
-			// Calculate R^2
-			R = v1 * v1 + v2 * v2;
-
-			// Reject points outside the unit circle (RARE)
-		} while (R >= 1.0f || R == 0.0f);
-
-		// Use inverse CDF methods to calculate the gaussian
-		double normalValue = v1 * simpleMath::squareRoot((-2.0 * simpleMath::naturalLog(R)) / R);
-
-		// The resulting gaussian draw
-		double result = (mean + (normalValue * stdDev));
-
-		// Clip off very rare events
-		float resultClipped = simpleMath::clamp<float>(result, lowLimit, highLimit);
-
-		return resultClipped;
-	}
 	void randomGenerator::reset(unsigned long seed)
 	{
 		_seed = seed;
 		_numbersGenerated = 0;
 
-		// Seed the generator for later use with rand()
-		srand(seed);
-		//_engine->seed(seed);
+		_engine->seed(seed);
 	}
 
-	int randomGenerator::randomIndex(int lowerBound, int upperBound)
+	float randomGenerator::drawUniform(float low, float high)
 	{
-		int result = lowerBound + (int)(next() * (upperBound - lowerBound));
+		std::uniform_real_distribution<float> distribution(low, high);
 
-		// Small chance of hitting the upper bound
-		return simpleMath::clamp(result, lowerBound, upperBound);
+		_numbersGenerated++;
+
+		return distribution(*_engine);
 	}
-
-	int randomGenerator::randomIndex_exp(int lower, int upper, float lambda)
+	float randomGenerator::drawExponential(float low, float high, float mean)
 	{
-		// TODO: CREATE OUR OWN DETERMISTIC REPEATED RAND. Just unit test these if std is going to be
-		//		 the base library.
-		//
-		float value = -1 * simpleMath::naturalLog(this->next()) / lambda;
+		std::exponential_distribution<float> distribution(mean);
 
-		return lower + (int)(value * (upper - lower));
+		_numbersGenerated++;
+
+		return simpleMath::clamp(distribution(*_engine), low, high);
 	}
-
-	int randomGenerator::randomRange(int lowerBound, int upperBound)
+	float randomGenerator::drawGaussian(float low, float high, float mean, float stdDev)
 	{
-		return lowerBound + (int)(next() * (upperBound - lowerBound));
+		std::normal_distribution<float> distribution(mean, stdDev);
+
+		_numbersGenerated++;
+
+		return simpleMath::clamp(distribution(*_engine), low, high);
 	}
 
-	short randomGenerator::randWeighted(const simpleArray<short>& weights)
+	int randomGenerator::nextInt(int lowerBound, int upperBound, bool exclusiveUpperBound, randomVariable type, float mean, float stdDev)
+	{
+		float draw = 0.0f;
+
+		switch (type)
+		{
+			case randomVariable::Exponential:
+				draw = drawExponential(0, 1, mean);
+				break;
+			case randomVariable::Gaussian:
+				draw = drawGaussian(0, 1, mean, stdDev);
+				break;
+			case randomVariable::Uniform:
+				draw = drawUniform(0, 1);
+				break;
+		}
+
+		if (exclusiveUpperBound)
+			return lowerBound + simpleMath::floor(draw * (upperBound - lowerBound));
+
+		else
+			return lowerBound + simpleMath::ceiling(draw * (upperBound - lowerBound));
+	}
+
+	float randomGenerator::nextFloat(float lowerBound, float upperBound, randomVariable type, float mean, float stdDev)
+	{
+		float draw = 0.0f;
+
+		switch (type)
+		{
+			case randomVariable::Exponential:
+				draw = drawExponential(0, 1, mean);
+				break;
+			case randomVariable::Gaussian:
+				draw = drawGaussian(0, 1, mean, stdDev);
+				break;
+			case randomVariable::Uniform:
+				draw = drawUniform(0, 1);
+				break;
+		}
+
+		return lowerBound + (draw * (upperBound - lowerBound));
+	}
+
+	int randomGenerator::randomRangeInclusive(short lowerBound, short upperBound, randomVariable type, float mean, float stdDev)
+	{
+		return nextInt(lowerBound, upperBound, true, type, mean, stdDev);
+	}
+
+	int randomGenerator::randomRangeExclusive(short lowerBound, short upperBound, randomVariable type, float mean, float stdDev)
+	{
+		return nextInt(lowerBound, upperBound, false, type, mean, stdDev);
+	}
+
+	template<isNumber T>
+	int randomGenerator::randomIndex(const simpleArray<T>& weights, randomVariable type, float mean, float stdDev)
 	{
 		short sum = 0;
 
@@ -257,7 +215,7 @@ namespace brogueHd::backend
 			sum += weights.get(index);
 		}
 
-		double nextDouble = next() * sum;
+		float nextRandom = nextFloat(0, sum, type, mean, stdDev);
 
 		sum = 0;
 
@@ -265,65 +223,55 @@ namespace brogueHd::backend
 		{
 			sum += weights.get(index);
 
-			if (sum >= nextDouble)
+			if (sum >= nextRandom)
 				return index;
 		}
 
 		return weights.count() - 1;
 	}
 
-	//short randomGenerator::randClump(const randomRange& theRange)
-	//{
-	//	return randClumpedRange(theRange.lowerBound, theRange.upperBound, theRange.clumpFactor);
-	//}
-
-	// Get a random int between lowerBound and upperBound, inclusive, with probability distribution
-	// affected by clumpFactor.
-	short randomGenerator::randClumpedRange(short lowerBound, short upperBound, short clumpFactor)
+	/// <summary>
+	/// Randomizes the input array using Uniform random draws
+	/// </summary>
+	template<typename T>
+	simpleArray<T> randomGenerator::shuffle(const simpleArray<T>& array)
 	{
-		if (upperBound <= lowerBound)
-		{
-			return lowerBound;
-		}
-		if (clumpFactor <= 1)
-		{
-			return randomRange(lowerBound, upperBound);
-		}
-
-		short i, total = 0, numSides = (upperBound - lowerBound) / clumpFactor;
-
-		for (i = 0; i < (upperBound - lowerBound) % clumpFactor; i++) {
-			total += randomRange(0, numSides + 1);
-		}
-
-		for (; i < clumpFactor; i++) {
-			total += randomRange(0, numSides);
-		}
-
-		return (total + lowerBound);
+		throw simpleException("Not Implemented:  randomGenerator::shuffle");
 	}
 
-	void randomGenerator::shuffleList(short* list, short listLength)
+	/// <summary>
+	/// Generates next double with the specified parameters
+	/// </summary>
+	float randomGenerator::next(randomVariable type, float mean, float stdDev)
 	{
-		short i, r, buf;
-		for (i = 0; i < listLength; i++)
-		{
-			r = randomRange(0, listLength - 1);
-			if (i != r) {
-				buf = list[r];
-				list[r] = list[i];
-				list[i] = buf;
-			}
-		}
+		return nextFloat(0, 1, type, mean, stdDev);
 	}
 
-	void randomGenerator::fillSequentialList(short* list, short listLength)
+	/// <summary>
+	/// Creates a random color with random color channels.
+	/// </summary>
+	color randomGenerator::nextColor(randomVariable type, float mean, float stdDev)
 	{
-		short i;
-		for (i = 0; i < listLength; i++)
-		{
-			list[i] = i;
-		}
+		color result(next(type, mean, stdDev),
+					 next(type, mean, stdDev),
+					 next(type, mean, stdDev),
+					 next(type, mean, stdDev));
+
+		return result;
+	}
+
+	/// <summary>
+	/// Creates a random color with random color channels between the two provided. Makes draws
+	/// scaled by the two colors' channels.
+	/// </summary>
+	color randomGenerator::nextColor(color low, color high, randomVariable type, float mean, float stdDev)
+	{
+		color result(nextFloat(low.red, high.red, type, mean, stdDev),
+					 nextFloat(low.green, high.green, type, mean, stdDev),
+					 nextFloat(low.blue, high.blue, type, mean, stdDev),
+					 nextFloat(low.alpha, high.alpha, type, mean, stdDev));
+
+		return result;
 	}
 }
 

@@ -176,6 +176,7 @@
     <ClCompile Include="gl.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="brogueRoomTemplate.h" />
     <ClInclude Include="brogueUIColorText.h" />
     <ClInclude Include="brogueDesignRect.h" />
     <ClInclude Include="bitmap.h" />
@@ -311,7 +312,6 @@
     <ClInclude Include="contentGenerator.h" />
     <ClInclude Include="creature.h" />
     <ClInclude Include="dungeonConstants.h" />
-    <ClInclude Include="dungeon.h" />
     <ClInclude Include="feat.h" />
     <ClInclude Include="fileio.h" />
     <ClInclude Include="flare.h" />
@@ -338,6 +338,8 @@
     <ClInclude Include="simplePixelFilter.h" />
     <ClInclude Include="simplePoint.h" />
     <ClInclude Include="simpleQueue.h" />
+    <ClInclude Include="simpleRange.h" />
+    <ClInclude Include="simpleStack.h" />
     <ClInclude Include="simpleTimer.h" />
     <ClInclude Include="simpleUniform.h" />
     <ClInclude Include="simpleVector.h" />

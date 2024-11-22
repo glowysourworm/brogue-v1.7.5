@@ -83,6 +83,7 @@ namespace brogueHd::simple
 		size_t calculateHashCode(const K& key) const;
 		size_t calculateBucketIndex(int hashCode) const;
 		void rehash(size_t newSize);
+		void checkHash() const;
 
 	public:	// Extension Methods:  mostly queries
 
@@ -196,10 +197,19 @@ namespace brogueHd::simple
 	}
 
 	template<isHashable K, isHashable V>
+	void simpleHash<K, V>::checkHash() const
+	{
+		// TODO:  Check hash code integrity
+	}
+
+	template<isHashable K, isHashable V>
 	void simpleHash<K, V>::add(const K& key, const V& value)
 	{
 		if (this->contains(key))
 			throw simpleException("Trying to add duplicate value to simpleHash table. Use set(...)");
+
+		// Check hash integrity
+		checkHash();
 
 		// First rehash will give 100 buckets
 		if (_table->count() == 0)

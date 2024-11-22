@@ -6,7 +6,12 @@
 #include "simple.h"
 #include "simpleArray.h"
 #include "simpleException.h"
+#include "simpleList.h"
 #include "simpleMath.h"
+#include "simpleOrderedList.h"
+#include "simpleRange.h"
+#include "simpleStack.h"
+#include <limits>
 
 using namespace brogueHd::simple;
 
@@ -787,6 +792,117 @@ namespace brogueHd::component
 	template<typename T>
 	gridRect grid<T>::calculateLargestRectangle(gridPredicate<T> predicate) const
 	{
+		const grid<T>* that = this;
+		gridRect boundary = this->getRelativeBoundary();
+
+		int maxSum = std::numeric_limits<int>::min();
+
+		simpleArray<int> counters(boundary.height);
+		simpleRange<int> contiguousRange(-1, -1, -1, counters.count());
+		int sum = -1;
+		bool found = false;
+
+		// Keep an ordered list of best rectangle
+		simpleOrderedList<gridRect*> subRectangles([] (gridRect* rect1, gridRect* rect2)
+		{
+			return rect1->area() - rect2->area();
+		});
+
+		// Set the counters to carry the row index
+		for (int index = 0; index < counters.count(); index++)
+		{
+			counters.set(index, index + boundary.top());
+		}
+
+		for (int column = boundary.left(); column <= boundary.right(); column++)
+		{
+			//for (int right = left; right <= boundary.right(); right++)
+			//{
+				//for (int row = boundary.top(); row <= boundary.bottom(); row++)
+				//{
+				//	if (predicate(right, row, this->get(right, row)))
+				//	{
+				//		counters.set(row - boundary.top(), counters.get(row - boundary.top()) + 1);
+				//	}
+				//}
+
+				// Reset range
+				contiguousRange.set(-1, -1);
+
+				// Get best sub-array
+				sum = counters.kadanesAlgorithm<int>(contiguousRange, [&column, &predicate, &that] (int rowIndex)
+				{ 
+					return predicate(column, rowIndex, that->get(column, rowIndex)) ? 1 : 0; // Return positive if the cell predicate passes
+				});
+
+				found = false;
+
+				// Add this to the list unless there is currently one of the same size (in rows). Otherwise,
+				// update any rect instances that overlap this rect.
+				//
+				gridRect newRect(column, contiguousRange.getLow() + boundary.top(), 1, contiguousRange.size());
+
+				// Update rectangles
+				subRectangles.forEach([&found, &column, &newRect, &boundary] (gridRect* rect)
+				{
+					// Equals
+					if (rect->top() == newRect.top() && rect->bottom() == newRect.bottom())
+					{
+						rect->width++;
+						found = true;
+					}
+
+					// Overlaps (The rect could be LARGER in area if you add this overlap)
+					else if ((rect->top() >= newRect.top() && rect->top() <= newRect.bottom()) ||
+							 (rect->bottom() >= newRect.top() && rect->bottom() <= newRect.bottom()))
+					{
+						int top = simpleMath::maxOf(rect->top(), newRect.top());
+						int bottom = simpleMath::minOf(rect->bottom(), newRect.bottom());
+
+						gridRect testRect(rect->column, top, rect->width + 1, bottom - top + 1);
+
+						// Better fit: Take new dimensions
+						if (testRect.area() > rect->area())
+						{
+							rect->row = top;
+							rect->height = bottom - top + 1;
+							rect->width++;
+
+							// DON'T set found = true. The next rectangle from now on could end up
+							// being greater than this one.
+						}
+					}
+
+					return iterationCallback::iterate;
+				});
+
+				// Start a new rectangle for this iteration
+				if (!found && sum > 0)
+				{
+					subRectangles.add(new gridRect(column, contiguousRange.getLow() + boundary.top(), 1, contiguousRange.getHigh() - contiguousRange.getLow() + 1));
+				}
+			//}
+		}
+
+		// Get result data
+		gridRect result = *(subRectangles.get(subRectangles.count() - 1));
+
+		// Clean up memory
+		for (int index = 0; index < subRectangles.count(); index++)
+		{
+			delete subRectangles.get(index);
+		}
+
+		if (subRectangles.count() == 0)
+			return default_value::value<gridRect>();
+
+		else
+			return result;
+	}
+}
+
+
+		/*
 		// Procedure
 		// 
 		// 1) For each row:  - Count across and add to row counters foreach non-null cell
@@ -800,6 +916,7 @@ namespace brogueHd::component
 		gridRect boundary = this->getRelativeBoundary();
 		short rowCountersLength = boundary.width;
 		simpleArray<short> rowCounters(rowCountersLength);
+
 		short bestStartColumn = -1;
 		short bestEndColumn = -1;
 		short bestStartRow = -1;
@@ -812,18 +929,20 @@ namespace brogueHd::component
 			{
 				short index = column - boundary.left();
 
-				// FIRST, CHECK ROW INDEX TRACKING
+				// FIRST, INCREMENT ROW COUNTERS
 				if (predicate(column, row, this->getUnsafe(column, row)))
 					rowCounters.set(index, rowCounters.get(index) + 1);
 				else
 					rowCounters.set(index, 0);
 			}
 
+			// From the Left
 			for (short index1 = 0; index1 < rowCountersLength; index1++)
 			{
-				// Initialize min-height for the next sweep
+				// Initialize min-height for the next sweep (from the left)
 				short minHeight = rowCounters.get(index1);
 
+				// From the left
 				for (short index2 = index1; index2 < rowCountersLength && minHeight > 0; index2++)
 				{
 					minHeight = simpleMath::minOf(minHeight, rowCounters.get(index1), rowCounters.get(index2));
@@ -862,7 +981,57 @@ namespace brogueHd::component
 					}
 				}
 			}
+
+			// From the Right
+			for (short index1 = rowCountersLength - 1; index1 >= 0; index1--)
+			{
+				// Initialize min-height for the next sweep (from the right)
+				short minHeight = rowCounters.get(index1);
+
+				// From the right
+				for (short index2 = index1; index2 >= 0 && minHeight > 0; index2--)
+				{
+					minHeight = simpleMath::minOf(minHeight, rowCounters.get(index1), rowCounters.get(index2));
+
+					// Current column against previous
+					if (rowCounters.get(index1) > bestArea)
+					{
+						bestStartColumn = index1 + boundary.left();
+						bestEndColumn = index1 + boundary.left();
+						bestStartRow = row - rowCounters.get(index1) + 1;
+						bestEndRow = row;
+
+						bestArea = rowCounters.get(index1);
+					}
+
+					// Current column check
+					if (rowCounters.get(index2) > bestArea)
+					{
+						bestStartColumn = index2 + boundary.left();
+						bestEndColumn = index2 + boundary.left();
+						bestStartRow = row - rowCounters.get(index2) + 1;
+						bestEndRow = row;
+
+						bestArea = rowCounters.get(index2);
+					}
+
+					// Current min-block check
+					if (minHeight * ((index1 - index2) + 1) > bestArea)
+					{
+						// Columns are reversed
+						bestStartColumn = index2 + boundary.left();
+						bestEndColumn = index1 + boundary.left();
+						bestStartRow = row - minHeight + 1;
+						bestEndRow = row;
+
+						bestArea = minHeight * ((index1 - index2) + 1);
+					}
+				}
+			}
 		}
+
+		if (bestArea == 0)
+			return default_value::value<gridRect>();
 
 		// Validation: Check boundaries; check that the predicate passes
 		//
@@ -881,7 +1050,8 @@ namespace brogueHd::component
 		});
 
 		return result;
-	}
+		*/
+	//}
 
 	///// <summary>
 	///// Checks for grid adjacency using an AND mask with the provided compass constrained direction.
@@ -1156,5 +1326,4 @@ namespace brogueHd::component
 	//        }
 	//    });
 	//}
-}
 

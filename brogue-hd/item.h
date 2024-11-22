@@ -3,9 +3,7 @@
 #include "color.h"
 #include "creatureConstants.h"
 #include "itemConstants.h"
-
 #include "randomRange.h"
-
 #include "brogueGlobal.h"
 #include "simpleString.h"
 

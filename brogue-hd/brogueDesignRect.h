@@ -1,10 +1,11 @@
 #pragma once
 
-#include "dungeon.h"
+#include "brogueRoomTemplate.h"
 #include "gridLocator.h"
 #include "gridRect.h"
 #include "simple.h"
 #include "simpleException.h"
+#include "simpleMath.h"
 
 using namespace brogueHd::simple;
 using namespace brogueHd::component;
@@ -21,21 +22,26 @@ namespace brogueHd::backend::model
 
 		brogueDesignRect() 
 		{
-			_configuration = default_value::value<brogueRoomInfo>();
+			_configuration = default_value::value<brogueRoomTemplate>();
 			_boundary = default_value::value <gridRect>();
 			_minSize = default_value::value<gridRect>();
-			_paddedBoundary = default_value::value <gridRect>();
+			_padding = 0;
 			_actualBoundary = default_value::value <gridRect>();
 			_complete = false;
 		};
-		brogueDesignRect(const brogueRoomInfo& configuration, const gridRect& boundary, const gridRect& paddedBoundary, const gridRect& minSize)
+
+		/// <summary>
+		/// Creates a design rectangle with EXTRA padding: which will be honored until the constraint
+		/// boundary isn't large enough. 
+		/// </summary>
+		brogueDesignRect(const brogueRoomTemplate& configuration, const gridRect& constraint, int padding)
 		{
 			_configuration = configuration;
-			_boundary = boundary;
-			_minSize = minSize;
-			_paddedBoundary = paddedBoundary;
+			_padding = padding;
 			_actualBoundary = default_value::value<gridRect>();
 			_complete = false;
+
+			applyConstraintImpl(constraint, true);
 		}
 		brogueDesignRect(const brogueDesignRect& copy)
 		{
@@ -63,11 +69,21 @@ namespace brogueHd::backend::model
 			if (_complete)
 				throw simpleException("Already called complete() on brogueDesignRect");
 
-			if (!_paddedBoundary.contains(actualBoundary))
+			if (!_boundary.contains(actualBoundary))
 				throw simpleException("Actual boundary outside the padded boundary of the brogueDesignRect.");
 
 			_actualBoundary = actualBoundary;
 			_complete = true;
+		}
+
+		void applyConstraint(const gridRect& constraint)
+		{
+			applyConstraintImpl(constraint, false);
+		}
+
+		void setOffset(const gridLocator& location)
+		{
+			translate(location.column - _boundary.column, location.row - _boundary.row);
 		}
 
 		void translate(const gridLocator& locator)
@@ -78,7 +94,6 @@ namespace brogueHd::backend::model
 		void translate(short columnOffset, short rowOffset)
 		{
 			_boundary.translate(columnOffset, rowOffset);
-			_paddedBoundary.translate(columnOffset, rowOffset);
 
 			if (_complete)
 				_actualBoundary.translate(columnOffset, rowOffset);
@@ -88,12 +103,12 @@ namespace brogueHd::backend::model
 		{
 			// Just hashing declarative data (configuration, and pre-design values)
 			//
-			return hashGenerator::combineHash(_configuration.getHash(), _boundary, _paddedBoundary);
+			return hashGenerator::combineHash(_configuration.getHash(), _boundary, _padding);
 		}
 
 	public:
 
-		brogueRoomInfo getConfiguration() const
+		brogueRoomTemplate getConfiguration() const
 		{
 			return _configuration;
 		}
@@ -105,10 +120,6 @@ namespace brogueHd::backend::model
 		{
 			return _minSize;
 		}
-		gridRect getPaddedBoundary() const
-		{
-			return _paddedBoundary;
-		}
 		gridRect getActualBoundary() const
 		{
 			return _actualBoundary;
@@ -117,15 +128,39 @@ namespace brogueHd::backend::model
 		{
 			return _complete;
 		}
+		int getPadding() const
+		{
+			return _padding;
+		}
 
 	private:
+
+		void applyConstraintImpl(const gridRect& constraint, bool forceUpdate)
+		{
+			if (_complete)
+				throw simpleException("Trying to apply constraint to a completed brogueDesignRect");
+
+			if (!constraint.contains(_boundary) || forceUpdate)
+			{
+				_minSize = _configuration.getMinSize(constraint);
+
+				// Max Size + Padding (if allowed)
+				_boundary = _configuration.getMaxSize(constraint).createExpanded(_padding);
+
+				_boundary.column = constraint.column;
+				_boundary.row = constraint.row;
+
+				_boundary.width = simpleMath::clamp(_boundary.width, _minSize.width, constraint.width);
+				_boundary.height = simpleMath::clamp(_boundary.height, _minSize.height, constraint.height);
+			}
+		}
 
 		bool compare(const brogueDesignRect& other)
 		{
 			return _configuration == other.getConfiguration() &&
 				_boundary == other.getBoundary() &&
 				_minSize == other.getMinSize() &&
-				_paddedBoundary == other.getPaddedBoundary() &&
+				_padding == other.getPadding() &&
 				_actualBoundary == other.getActualBoundary() &&
 				_complete == other.getIsComplete();
 		}
@@ -134,7 +169,7 @@ namespace brogueHd::backend::model
 			_configuration = copy.getConfiguration();
 			_boundary = copy.getBoundary();
 			_minSize = copy.getMinSize();
-			_paddedBoundary = copy.getPaddedBoundary();
+			_padding = copy.getPadding();
 			_actualBoundary = copy.getActualBoundary();
 			_complete = copy.getIsComplete();
 		}
@@ -142,10 +177,10 @@ namespace brogueHd::backend::model
 	private:
 
 		// Room / Region configuration
-		brogueRoomInfo _configuration;
+		brogueRoomTemplate _configuration;
 		gridRect _boundary;
 		gridRect _minSize;
-		gridRect _paddedBoundary;
+		int _padding;
 
 		// Design actuals
 		gridRect _actualBoundary;

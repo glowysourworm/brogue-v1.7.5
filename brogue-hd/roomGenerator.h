@@ -1,10 +1,9 @@
 #pragma once
 
 #include "brogueDesignRect.h"
-#include "brogueGlobal.h"
+#include "brogueRoomTemplate.h"
 #include "brogueUIBuilder.h"
 #include "cellularAutomataParameters.h"
-#include "dungeon.h"
 #include "dungeonConstants.h"
 #include "grid.h"
 #include "gridLocator.h"
@@ -33,18 +32,16 @@ namespace brogueHd::backend
 
 		gridRegion<gridLocator>* designRoom(const brogueDesignRect& designRect, const gridRect& parentBoundary);
 
-		gridRect getRoomDesiredSize(const brogueRoomInfo& configuration, const gridRect& constraint);
-		gridRect getRoomMinSize(const brogueRoomInfo& configuration, const gridRect& constraint);
-
 	private:
 
-		void designCavern(grid<gridLocator>& designGrid, const brogueDesignRect& designRect);
-		void designEntranceRoom(grid<gridLocator>& designGrid, const brogueDesignRect& designRect);
-		void designCrossRoom(grid<gridLocator>& designGrid, const brogueDesignRect& designRect);
-		void designSymmetricalCrossRoom(grid<gridLocator>& designGrid, const brogueDesignRect& designRect);
-		void designSmallRoom(grid<gridLocator>& designGrid, const brogueDesignRect& designRect);
-		void designCircularRoom(grid<gridLocator>& designGrid, const brogueDesignRect& designRect);
-		void designChunkyRoom(grid<gridLocator>& designGrid, const brogueDesignRect& designRect);
+		void designDefault(grid<gridLocator>& designGrid);
+		void designCavern(grid<gridLocator>& designGrid, const gridRect& minSize);
+		void designEntranceRoom(grid<gridLocator>& designGrid);
+		void designCrossRoom(grid<gridLocator>& designGrid, const gridRect& minSize);
+		void designSymmetricalCrossRoom(grid<gridLocator>& designGrid);
+		void designSmallRoom(grid<gridLocator>& designGrid, const gridRect& minSize);
+		void designCircularRoom(grid<gridLocator>& designGrid, const gridRect& minSize);
+		void designChunkyRoom(grid<gridLocator>& designGrid);
 
 	private:
 
@@ -76,136 +73,45 @@ namespace brogueHd::backend
 		delete _cavernParameters;
 	}
 
-	gridRect roomGenerator::getRoomDesiredSize(const brogueRoomInfo& configuration, const gridRect& constraint)
-	{
-		gridRect result = default_value::value<gridRect>();
-
-		switch (configuration.type)
-		{
-			case brogueRoomType::CaveCompact:
-				result = gridRect(0, 0, 12, 8); break;
-
-			case brogueRoomType::CaveLargeNS:
-				result = gridRect(0, 0, 12, constraint.height); break;
-
-			case brogueRoomType::CaveLargeEW:
-				result = gridRect(0, 0, constraint.width, 8); break;
-
-			case brogueRoomType::Cavern:
-				result = constraint; break;
-
-			case brogueRoomType::ChunkyRoom:
-				result = gridRect(0, 0, 7, 7); break;
-
-			case brogueRoomType::CircularRoom:
-				result = gridRect(0, 0, 20, 20); break;
-
-			case brogueRoomType::CrossRoom:
-				result = gridRect(0, 0, 20, 7); break;
-
-			case brogueRoomType::MainEntranceRoom:
-				result = gridRect(0, 0, 20, 10); break;
-
-			case brogueRoomType::SmallRoom:
-				result = gridRect(0, 0, 6, 4); break;
-
-			case brogueRoomType::SmallSymmetricalCrossRoom:
-				result = gridRect(0, 0, 8, 5); break;
-				//result = gridRect(0, 0, 9, 6); break;
-
-			default:
-				throw simpleException("Unhandled room type:  roomGenerator::designRoom");
-		}
-
-		if (result.width > constraint.width ||
-			result.height > constraint.height)
-			return default_value::value<gridRect>();
-
-		return result;
-	}
-
-	gridRect roomGenerator::getRoomMinSize(const brogueRoomInfo& configuration, const gridRect& constraint)
-	{
-		gridRect result = default_value::value<gridRect>();
-
-		switch (configuration.type)
-		{
-			case brogueRoomType::CaveCompact:
-				result = gridRect(0, 0, 3, 4); break;
-
-			case brogueRoomType::CaveLargeNS:
-				result = gridRect(0, 0, 3, 15); break;
-
-			case brogueRoomType::CaveLargeEW:
-				result = gridRect(0, 0, 20, 4); break;
-
-			case brogueRoomType::Cavern:
-				result = gridRect(0, 0, CAVE_MIN_WIDTH, CAVE_MIN_HEIGHT); break;
-
-			case brogueRoomType::ChunkyRoom:
-				result = gridRect(0, 0, 2, 2); break;
-
-			case brogueRoomType::CircularRoom:
-				result = gridRect(0, 0, 4, 4); break;
-
-			case brogueRoomType::CrossRoom:
-				result = gridRect(0, 0, 4, 3); break;
-
-			case brogueRoomType::MainEntranceRoom:
-				result = gridRect(0, 0, 20, 10); break;
-
-			case brogueRoomType::SmallRoom:
-				result = gridRect(0, 0, 3, 2); break;
-
-			case brogueRoomType::SmallSymmetricalCrossRoom:
-				result = gridRect(0, 0, 4, 4); break;
-
-			default:
-				throw simpleException("Unhandled room type:  roomGenerator::designRoom");
-		}
-
-		if (result.width > constraint.width ||
-			result.height > constraint.height)
-			return default_value::value<gridRect>();
-
-		return result;
-	}
-
 	gridRegion<gridLocator>* roomGenerator::designRoom(const brogueDesignRect& designRect, const gridRect& parentBoundary)
 	{
-		grid<gridLocator> designGrid(parentBoundary, designRect.getPaddedBoundary());
+		grid<gridLocator> designGrid(parentBoundary, designRect.getBoundary().createPadded(designRect.getPadding()));
 
-		switch (designRect.getConfiguration().type)
+		switch (designRect.getConfiguration().getRoomType())
 		{
+			case brogueRoomType::Default:
+				designDefault(designGrid);
+				break;
+
 			case brogueRoomType::CaveCompact:
 			case brogueRoomType::CaveLargeNS:
 			case brogueRoomType::CaveLargeEW:
 			case brogueRoomType::Cavern:
-				designCavern(designGrid, designRect);
+				designCavern(designGrid, designRect.getMinSize());
 				break;
 
 			case brogueRoomType::ChunkyRoom:
-				designChunkyRoom(designGrid, designRect);
+				designChunkyRoom(designGrid);
 				break;
 
 			case brogueRoomType::CircularRoom:
-				designCircularRoom(designGrid, designRect);
+				designCircularRoom(designGrid, designRect.getMinSize());
 				break;
 
 			case brogueRoomType::CrossRoom:
-				designCrossRoom(designGrid, designRect);
+				designCrossRoom(designGrid, designRect.getMinSize());
 				break;
 
 			case brogueRoomType::MainEntranceRoom:
-				designEntranceRoom(designGrid, designRect);
+				designEntranceRoom(designGrid);
 				break;
 
 			case brogueRoomType::SmallRoom:
-				designSmallRoom(designGrid, designRect);
+				designSmallRoom(designGrid, designRect.getMinSize());
 				break;
 
 			case brogueRoomType::SmallSymmetricalCrossRoom:
-				designSymmetricalCrossRoom(designGrid, designRect);
+				designSymmetricalCrossRoom(designGrid);
 				break;
 
 			default:
@@ -228,20 +134,29 @@ namespace brogueHd::backend
 		});
 
 		// TODO: Formalize this validation (add constraints to the entire configuration)
-		if (region->getBoundary().area() < 4)
-			throw simpleException("Invalid room created by roomGenerator:  Must fall within size constraints");
+		//if (region->getBoundary().area() < 4)
+		//	throw simpleException("Invalid room created by roomGenerator:  Must fall within size constraints");
 
 		return region;
 	}
 
+	void roomGenerator::designDefault(grid<gridLocator>& designGrid)
+	{
+		designGrid.iterate([&designGrid] (short column, short row, const gridLocator& locator)
+		{
+			designGrid.set(column, row, gridLocator(column, row));
 
-	void roomGenerator::designCavern(grid<gridLocator>& designGrid, const brogueDesignRect& designRect)
+			return iterationCallback::iterate;
+		});
+	}
+
+	void roomGenerator::designCavern(grid<gridLocator>& designGrid, const gridRect& minSize)
 	{
 		gridRegionLocator<gridLocator> regionLocator;
 
 		// Create cellular automata using cavern parameters
 		_noiseGenerator->cellularAutomata(designGrid.getParentBoundary(),
-										  designRect.getPaddedBoundary(),
+										  designGrid.getRelativeBoundary(),
 										  *_cavernParameters,
 		[&designGrid] (short column, short row, bool result)
 		{
@@ -259,12 +174,10 @@ namespace brogueHd::backend
 		simpleList<gridRegion<gridLocator>*> regions = regionLocator.locateRegions(designGrid);
 
 		// Filter regions to comply to size constraints
-		validRegions = regions.where([&designRect] (gridRegion<gridLocator>* region)
+		validRegions = regions.where([&minSize] (gridRegion<gridLocator>* region)
 		{
-			return region->getBoundary().width >= designRect.getMinSize().width &&
-					region->getBoundary().width <= designRect.getPaddedBoundary().width &&
-					region->getBoundary().height >= designRect.getMinSize().height &&
-					region->getBoundary().height <= designRect.getPaddedBoundary().height;
+			return region->getBoundary().width >= minSize.width &&
+				region->getBoundary().height >= minSize.height;
 		});
 
 		// Valid CA result
@@ -279,10 +192,10 @@ namespace brogueHd::backend
 		else
 		{
 			gridRegionConstructor<gridLocator> constructor(designGrid.getParentBoundary(), true);
-			gridRect defaultRect(((designGrid.getRelativeBoundary().width - designRect.getMinSize().width) / 2) + designGrid.getRelativeBoundary().column,
-								 ((designGrid.getRelativeBoundary().height - designRect.getMinSize().height) / 2) + designGrid.getRelativeBoundary().row,
-								 designRect.getMinSize().width,
-								 designRect.getMinSize().height);
+			gridRect defaultRect(((designGrid.getRelativeBoundary().width - minSize.width) / 2) + designGrid.getRelativeBoundary().column,
+								 ((designGrid.getRelativeBoundary().height - minSize.height) / 2) + designGrid.getRelativeBoundary().row,
+								 minSize.width,
+								 minSize.height);
 
 			defaultRect.iterate([&constructor] (short column, short row)
 			{
@@ -309,11 +222,10 @@ namespace brogueHd::backend
 
 		// ...and copy it to the master grid.
 		designGrid.iterate([&designGrid, &maxRegion] (short column, short row, const gridLocator& item)
-		{
+		{			
+			// Overwrite = true. (just set the main grid to the max region)
 			if (!maxRegion->isDefined(column, row))
 				designGrid.set(column, row, default_value::value<gridLocator>(), true);
-
-			// Just force it to be defined (but should already be set from the CA algorithm)
 			else
 				designGrid.set(column, row, gridLocator(column, row), true);
 
@@ -323,15 +235,13 @@ namespace brogueHd::backend
 		// (MEMORY) Clean up heap memory
 		for (int index = 0; index < regions.count(); index++)
 		{
-			if (maxRegion != regions.get(index))
-				delete regions.get(index);
+			delete regions.get(index);
 		}
-
-		delete maxRegion;
 	}
 
-	void roomGenerator::designEntranceRoom(grid<gridLocator>& designGrid, const brogueDesignRect& designRect)
+	void roomGenerator::designEntranceRoom(grid<gridLocator>& designGrid)
 	{
+		gridRect boundary = designGrid.getRelativeBoundary();
 		short roomWidth, roomHeight, roomWidth2, roomHeight2, roomX, roomY, roomX2, roomY2;
 
 		roomWidth = 8;
@@ -346,10 +256,10 @@ namespace brogueHd::backend
 		//gridRect room1(roomX, roomY, roomWidth, roomHeight);
 		//gridRect room2(roomX2, roomY2, roomWidth2, roomHeight2);
 
-		int offsetX1 = designRect.getPaddedBoundary().column + ((designRect.getPaddedBoundary().width - roomWidth) / 2);
-		int offsetY1 = designRect.getPaddedBoundary().row;
-		int offsetX2 = designRect.getPaddedBoundary().column + ((designRect.getPaddedBoundary().width - roomWidth2) / 2);
-		int offsetY2 = (designRect.getPaddedBoundary().bottom() - roomHeight2) + 1;
+		int offsetX1 = boundary.column + ((boundary.width - roomWidth) / 2);
+		int offsetY1 = boundary.row;
+		int offsetX2 = boundary.column + ((boundary.width - roomWidth2) / 2);
+		int offsetY2 = boundary.bottom() - roomHeight2 + 1;
 
 		gridRect room1(offsetX1, offsetY1, roomWidth, roomHeight);
 		gridRect room2(offsetX2, offsetY2, roomWidth2, roomHeight2);
@@ -363,31 +273,36 @@ namespace brogueHd::backend
 		});
 
 		// Add Room 2
-		room2.iterate([&designGrid] (short column, short row)
+		room2.iterate([&designGrid, &room1] (short column, short row)
 		{
-			designGrid.set(column, row, gridLocator(column, row), true);
+			if (!room1.contains(column, row))
+				designGrid.set(column, row, gridLocator(column, row));
 
 			return iterationCallback::iterate;
 		});
 	}
 
-	void roomGenerator::designCrossRoom(grid<gridLocator>& designGrid, const brogueDesignRect& designRect)
+	void roomGenerator::designCrossRoom(grid<gridLocator>& designGrid, const gridRect& minSize)
 	{
-		short roomWidth, roomHeight, roomWidth2, roomHeight2, roomX, roomY, roomX2, roomY2;
+		gridRect boundary = designGrid.getRelativeBoundary();
 
-		roomWidth = _randomGenerator->randomRange(3, 12);
-		roomX = _randomGenerator->randomRange(simpleMath::maxOf(0, designRect.getPaddedBoundary().centerX() - roomWidth - 1), designRect.getPaddedBoundary().centerX());
-		roomWidth2 = _randomGenerator->randomRange(4, 20);
-		roomX2 = (roomX + (roomWidth / 2) + _randomGenerator->randomRange(0, 2) + _randomGenerator->randomRange(0, 2) - 3) - (roomWidth2 / 2);
+		// Room 1:  75% of the total size (randomly)
+		short roomWidth = _randomGenerator->randomRangeInclusive(minSize.width, 0.75f * boundary.width);
+		short roomX = _randomGenerator->randomRangeInclusive(0, boundary.width - roomWidth, randomVariable::Gaussian);
 
-		roomHeight = _randomGenerator->randomRange(3, 7);
-		roomY = (designRect.getPaddedBoundary().centerY() - roomHeight);
+		short roomHeight = _randomGenerator->randomRangeInclusive(minSize.height, 0.75f * boundary.height);
+		short roomY = _randomGenerator->randomRangeInclusive(0, boundary.height - roomHeight, randomVariable::Gaussian);
 
-		roomHeight2 = _randomGenerator->randomRange(2, 5);
-		roomY2 = (designRect.getPaddedBoundary().centerY() - roomHeight2 - (_randomGenerator->randomRange(0, 2) + _randomGenerator->randomRange(0, 1)));
+		// Room 2:  100% of the total size (randomly)
+		short roomWidth2 = _randomGenerator->randomRangeInclusive(minSize.width, boundary.width);
+		short roomX2 = _randomGenerator->randomRangeInclusive(0, boundary.width - roomWidth2, randomVariable::Gaussian);
 
-		gridRect room1(roomX - 5, roomY + 5, roomWidth, roomHeight);
-		gridRect room2(roomX2 - 5, roomY2 + 5, roomWidth2, roomHeight2);
+		short roomHeight2 = _randomGenerator->randomRangeInclusive(minSize.height, boundary.height);
+		short roomY2 = _randomGenerator->randomRangeInclusive(0, boundary.height - roomHeight2, randomVariable::Gaussian);
+
+
+		gridRect room1(boundary.column + roomX, boundary.row + roomY, roomWidth, roomHeight);
+		gridRect room2(boundary.column + roomX2, boundary.row + roomY2, roomWidth2, roomHeight2);
 
 		// Add Room 1
 		room1.iterate([&designGrid] (short column, short row)
@@ -398,28 +313,29 @@ namespace brogueHd::backend
 		});
 
 		// Add Room 2
-		room2.iterate([&designGrid] (short column, short row)
+		room2.iterate([&designGrid, &room1] (short column, short row)
 		{
-			designGrid.set(column, row, gridLocator(column, row), true);
+			if (!room1.contains(column, row))
+				designGrid.set(column, row, gridLocator(column, row));
 
 			return iterationCallback::iterate;
 		});
 	}
 
-	void roomGenerator::designSymmetricalCrossRoom(grid<gridLocator>& designGrid, const brogueDesignRect& designRect)
+	void roomGenerator::designSymmetricalCrossRoom(grid<gridLocator>& designGrid)
 	{
 		short majorWidth, majorHeight, minorWidth, minorHeight;
 
-		gridRect boundary = designRect.getPaddedBoundary();
+		gridRect boundary = designGrid.getRelativeBoundary();
 
-		majorWidth = _randomGenerator->randomRange(boundary.width / 2, boundary.width);
-		majorHeight = _randomGenerator->randomRange(boundary.height / 2, boundary.height);
+		majorWidth = _randomGenerator->randomRangeInclusive(boundary.width / 2.0f, boundary.width);
+		majorHeight = _randomGenerator->randomRangeInclusive(boundary.height / 2.0f, boundary.height);
 
-		minorWidth = _randomGenerator->randomRange(2, majorWidth);
-		minorHeight = _randomGenerator->randomRange(2, majorHeight);
+		minorWidth = _randomGenerator->randomRangeInclusive(2, majorWidth);
+		minorHeight = _randomGenerator->randomRangeInclusive(2, majorHeight);
 
-		gridRect roomNS(boundary.center().column - (minorWidth / 2), boundary.center().row - (majorHeight / 2), minorWidth, majorHeight);
-		gridRect roomEW(boundary.center().column - (majorWidth / 2), boundary.center().row - (minorHeight / 2), majorWidth, minorHeight);
+		gridRect roomNS(boundary.center().column - simpleMath::floor(minorWidth / 2.0f), boundary.center().row - simpleMath::floor(majorHeight / 2.0f), minorWidth, majorHeight);
+		gridRect roomEW(boundary.center().column - simpleMath::floor(majorWidth / 2.0f), boundary.center().row - simpleMath::floor(minorHeight / 2.0f), majorWidth, minorHeight);
 
 		// Add Room 1
 		roomNS.iterate([&designGrid] (short column, short row)
@@ -430,22 +346,23 @@ namespace brogueHd::backend
 		});
 
 		// Add Room 2
-		roomEW.iterate([&designGrid] (short column, short row)
+		roomEW.iterate([&designGrid, &roomNS] (short column, short row)
 		{
-			designGrid.set(column, row, gridLocator(column, row), true);
+			if (!roomNS.contains(column, row))
+				designGrid.set(column, row, gridLocator(column, row));
 
 			return iterationCallback::iterate;
 		});
 	}
 
-	void roomGenerator::designSmallRoom(grid<gridLocator>& designGrid, const brogueDesignRect& designRect)
+	void roomGenerator::designSmallRoom(grid<gridLocator>& designGrid, const gridRect& minSize)
 	{
-		short width, height;
+		gridRect boundary = designGrid.getRelativeBoundary();
 
-		width = _randomGenerator->randomRange(3, designRect.getPaddedBoundary().width);
-		height = _randomGenerator->randomRange(2, designRect.getPaddedBoundary().height);
+		short width = _randomGenerator->randomRangeInclusive(minSize.width, boundary.width);
+		short height = _randomGenerator->randomRangeInclusive(minSize.height, boundary.height);
 
-		gridRect room(designRect.getPaddedBoundary().column, designRect.getPaddedBoundary().row, width, height);
+		gridRect room(boundary.column, boundary.row, width, height);
 
 		// Add Room
 		room.iterate([&designGrid] (short column, short row)
@@ -456,33 +373,30 @@ namespace brogueHd::backend
 		});
 	}
 
-	void roomGenerator::designCircularRoom(grid<gridLocator>& designGrid, const brogueDesignRect& designRect)
+	void roomGenerator::designCircularRoom(grid<gridLocator>& designGrid, const gridRect& minSize)
 	{
-		gridRect boundary = designRect.getPaddedBoundary();
-		gridRect minSize = designRect.getMinSize();
+		gridRect boundary = designGrid.getRelativeBoundary();
 
-		short radiusX, radiusY;
+		short diameterX, diameterY;
 
 		// 5% Chance (Full Sized)
 		if (_randomGenerator->next() >= 0.05)
 		{
-			radiusX = _randomGenerator->randomRange(minSize.width, boundary.width);
-			radiusY = _randomGenerator->randomRange(minSize.height, boundary.height);
+			diameterX = _randomGenerator->randomRangeInclusive(minSize.width, boundary.width);
+			diameterY = _randomGenerator->randomRangeInclusive(minSize.height, boundary.height);
 		}
 		// 95% Chance (Less-Than-Min Size / Meets bare-minimum size)
 		else
 		{
-			radiusX = _randomGenerator->randomRange(2, minSize.width);
-			radiusY = _randomGenerator->randomRange(2, minSize.height);
+			diameterX = _randomGenerator->randomRangeInclusive(2, minSize.width);
+			diameterY = _randomGenerator->randomRangeInclusive(2, minSize.height);
 		}
 
-		gridRect minRect(designGrid.getRelativeBoundary().column,
-						 designGrid.getRelativeBoundary().row,
-						 radiusX, radiusY);
+		gridRect minRect(boundary.column, boundary.row, diameterX, diameterY);
 
 		minRect.iterateInCircle([&designGrid] (short column, short row)
 		{
-			designGrid.set(column, row, gridLocator(column, row), true);
+			designGrid.set(column, row, gridLocator(column, row));
 
 			return iterationCallback::iterate;
 		});
@@ -509,19 +423,18 @@ namespace brogueHd::backend
 		//}
 	}
 
-	void roomGenerator::designChunkyRoom(grid<gridLocator>& designGrid, const brogueDesignRect& designRect)
+	void roomGenerator::designChunkyRoom(grid<gridLocator>& designGrid)
 	{
-		gridRect minRect(designRect.getPaddedBoundary().column,
-						 designRect.getPaddedBoundary().row,
-						 2, 2);
+		gridRect boundary = designGrid.getRelativeBoundary();
+		gridRect minRect(boundary.column, boundary.row, 2, 2);
 
-		short chunkCount = _randomGenerator->randomRange(2, 8);
+		short chunkCount = _randomGenerator->randomRangeInclusive(2, 8);
 
 		for (short i = 0; i < chunkCount; i++)
 		{
 			// Brogue v1.7.5 Design:  Create chunks with 2x2 size within the layout range
-			int offsetX = _randomGenerator->randomRange(0, designRect.getPaddedBoundary().width - 3);
-			int offsetY = _randomGenerator->randomRange(0, designRect.getPaddedBoundary().height - 3);
+			int offsetX = _randomGenerator->randomRangeExclusive(0, boundary.width - 2);
+			int offsetY = _randomGenerator->randomRangeExclusive(0, boundary.height - 2);
 
 			gridRect rect = minRect + gridLocator(offsetX, offsetY);
 

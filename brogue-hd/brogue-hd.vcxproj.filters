@@ -218,9 +218,6 @@
     <ClInclude Include="colorString.h">
       <Filter>Header Files\backend\model\game</Filter>
     </ClInclude>
-    <ClInclude Include="dungeon.h">
-      <Filter>Header Files\backend\model\game</Filter>
-    </ClInclude>
     <ClInclude Include="feat.h">
       <Filter>Header Files\backend\model\game</Filter>
     </ClInclude>
@@ -485,9 +482,6 @@
     <ClInclude Include="simpleQueue.h">
       <Filter>Header Files\simple</Filter>
     </ClInclude>
-    <ClInclude Include="randomRange.h">
-      <Filter>Header Files\backend\model\game</Filter>
-    </ClInclude>
     <ClInclude Include="openglHelper.h">
       <Filter>Header Files\frontend\opengl</Filter>
     </ClInclude>
@@ -718,6 +712,18 @@
     </ClInclude>
     <ClInclude Include="brogueUIColorText.h">
       <Filter>Header Files\frontend\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueRoomTemplate.h">
+      <Filter>Header Files\backend\model\gameTemplate</Filter>
+    </ClInclude>
+    <ClInclude Include="randomRange.h">
+      <Filter>Header Files\backend\model\game</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleStack.h">
+      <Filter>Header Files\simple</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleRange.h">
+      <Filter>Header Files\simple</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -66,6 +66,11 @@ namespace brogueHd::backend::model
 		template<isGridLocator T>
 		void createCells(const T& locator);
 
+		/// <summary>
+		/// Gets sub-rectangle from the layout - the largest possible
+		/// </summary>
+		gridRect getLargestUnusedRectangle();
+
 	private:
 
 		simpleList<brogueRoom*>* _rooms;
@@ -132,11 +137,21 @@ namespace brogueHd::backend::model
 		return _mainGrid->get(column, row);
 	}
 
+	gridRect brogueLayout::getLargestUnusedRectangle()
+	{
+		grid<brogueCell*>* mainGrid = _mainGrid;
+
+		return _mainGrid->calculateLargestRectangle([&mainGrid] (short column, short row, brogueCell* cell)
+		{
+			return !mainGrid->isDefined(column, row);
+		});
+	}
+
 	template<isGridLocator T>
 	void brogueLayout::createCells(const T& locator)
 	{
-		if (!_mainGrid->isDefined(locator.column, locator.row))
-			_mainGrid->set(locator.column, locator.row, new brogueCell(locator.column, locator.row), true);
+		//if (!_mainGrid->isDefined(locator.column, locator.row))
+			_mainGrid->set(locator.column, locator.row, new brogueCell(locator.column, locator.row));
 	}
 
 	template<isGridLocator T>

@@ -13,9 +13,18 @@ namespace brogueHd::backend::model
 		DP_SENTINEL_SANCTUARY
 	};
 
-	enum class brogueRoomType : int
+	enum class brogueStartLocation
 	{
-		CrossRoom = 0,
+		MainEntrance = 0
+	};
+
+	enum class brogueRoomType
+	{
+		/// <summary>
+		/// Default room is the full size of the room constraint boundary
+		/// </summary>
+		Default = 0,
+		CrossRoom,
 		SmallSymmetricalCrossRoom,
 		SmallRoom,
 		CircularRoom,
