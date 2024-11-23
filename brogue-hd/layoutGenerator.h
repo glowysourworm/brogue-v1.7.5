@@ -190,20 +190,20 @@ namespace brogueHd::backend
 
 		//rectanglePackingAlgorithm algorithm(_randomGenerator, _layout->getBoundary());
 
-		simpleList<brogueDesignRect*> tiling;
-
-		int maxIterations = 600;
+		int maxIterations = 35;
 		int iteration = 0;
 
 		while (iteration < maxIterations)
 		{
-			brogueRoomTemplate configuration = (iteration == 0) ? _profile->getEntranceRoom(_randomGenerator) : _profile->getDefaultRoom();
+			brogueRoomTemplate configuration = (iteration == 0) ? _profile->getEntranceRoom(_randomGenerator) : _profile->getRandomRoomInfo(_randomGenerator);
+			brogueDesignRect* designRect = nullptr;
 
 			// Entrance Room Selection
 			//
 			if (iteration == 0)
 			{
-				brogueDesignRect* designRect = new brogueDesignRect(configuration, _layout->getBoundary(), 0);
+				designRect = new brogueDesignRect(configuration, _layout->getBoundary(), 0);
+
 				gridLocator topLeft = gridLocator(_layout->getBoundary().centerX() - (designRect->getBoundary().width / 2),
 												  _layout->getBoundary().bottom() - designRect->getBoundary().height);
 				designRect->setOffset(topLeft);
@@ -211,7 +211,7 @@ namespace brogueHd::backend
 				// Initialize Rectangle Packing Algorithm
 				//
 				//algorithm.initialize(designRect->getBoundary());
-				tiling.add(designRect);
+				//tiling.add(designRect);
 			}
 
 			// Add rectangles to the space using the algorithm (Padding = 1)
@@ -220,8 +220,7 @@ namespace brogueHd::backend
 			{
 				// Get next space in which to create a room
 				//gridRect largestSubRect = algorithm.getLargestUnusedRectangle();
-				gridRect minRect(0, 0, 8, 9);
-				gridRect largestSubRect = _layout->getLargestUnusedRectangle(minRect);
+				gridRect largestSubRect = _layout->getLargestUnusedRectangle(configuration.getMinSize().createExpanded(1));
 
 				if (largestSubRect == default_value::value<gridRect>())
 				{
@@ -229,7 +228,7 @@ namespace brogueHd::backend
 					continue;
 				}
 
-				brogueDesignRect* designRect = new brogueDesignRect(configuration, largestSubRect, 0);
+				designRect = new brogueDesignRect(configuration, largestSubRect, 1);
 				gridRect minSize = designRect->getMinSize();
 
 				if (largestSubRect.width < minSize.width ||
@@ -241,6 +240,13 @@ namespace brogueHd::backend
 					continue;
 				}
 
+				// Offset randomly inside the available space
+				gridLocator translation(_randomGenerator->randomRangeInclusive(0, largestSubRect.width - designRect->getBoundary().width),
+										_randomGenerator->randomRangeInclusive(0, largestSubRect.height - designRect->getBoundary().height));
+
+
+				designRect->translate(translation);
+
 				// Give the algorithm a rectangle to tile
 				//gridRect nextRect = designRect->getBoundary();
 
@@ -248,9 +254,9 @@ namespace brogueHd::backend
 				//if (algorithm.addRectangle(nextRect))
 				//{
 					// Use the rectangle to translate the design rect
-				//	designRect->setOffset(nextRect.topLeft());
+					//designRect->setOffset(nextRect.topLeft());
 
-					tiling.add(designRect);
+					//tiling.add(designRect);
 				//}
 			}
 
@@ -262,13 +268,11 @@ namespace brogueHd::backend
 			// 4) Remove / Replace the rectangle in the algorithm with the final one
 			//
 
-			brogueDesignRect* designRect = tiling.get(tiling.count() - 1);
-
 			// (MEMORY!) These must be deleted; and the stack-like gridLocator instances will be copied into the brogueLayout* grid.
-			//gridRegion<gridLocator>* region = _roomGenerator->designRoom(*designRect, _layout->getBoundary());
+			gridRegion<gridLocator>* region = _roomGenerator->designRoom(*designRect, _layout->getBoundary());
 
 			// Set the actual region boundary
-			//designRect->complete(region->getBoundary());
+			designRect->complete(region->getBoundary());
 
 			// Repack the rectangle if it is not the entrance
 			if (iteration != 0)
@@ -297,14 +301,10 @@ namespace brogueHd::backend
 
 			brogueLayout* layout = _layout;
 
-			designRect->getBoundary().iterate([&layout] (short column, short row)
-			{
-				layout->createCells(gridLocator(column, row));
-				return iterationCallback::iterate;
-			});
+			_layout->createCells(region);
 
 			// (MEMORY!) Clean up heap memory
-			//delete region;
+			delete region;
 
 			iteration++;
 		}

@@ -399,7 +399,7 @@ namespace brogueHd::component
 					short dx = centerX() - i;
 					short dy = centerY() - j;
 
-					if (((dx * dx) + (dy * dy) <= (width * width)))
+					if (((dx * dx) + (dy * dy) <= (width * width * 0.25f)))
 					{
 						userBreak = callback(i, j);
 					}

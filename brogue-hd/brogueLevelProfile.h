@@ -216,7 +216,7 @@ namespace brogueHd::backend::model
 
 		corridorFrequency += 80 * (100 - descentPercent) / 100;
 
-		return brogueRoomTemplate(levelBoundary, roomType, roomFrequency);
+		return brogueRoomTemplate(levelBoundary, roomType, roomFrequency / 100.0f);
 	}
 
 	brogueRoomTemplate brogueLevelProfile::getEntranceRoom(randomGenerator* randomMaim)

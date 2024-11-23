@@ -155,9 +155,7 @@ namespace brogueHd::backend
 
 	void gameController::setMode(BrogueGameMode gameMode)
 	{
-		_gameMode = gameMode;
 
-		_renderingController->setGameMode(gameMode);
 	}
 
 	void gameController::closeGame()
@@ -280,8 +278,12 @@ namespace brogueHd::backend
 		if (requestedMode != _gameMode)
 		{
 			// Might need to check on environment first (for now, just keep this here to manage the rendering thread)
-			setMode(requestedMode);
-			return true;			// Allow a cycle to initialize mode
+			_gameMode = requestedMode;
+
+			// Send message to say mode change was processed. This will need time to set up rendering.
+			_renderingController->setGameModeAsync(requestedMode);
+
+			return true;
 		}
 
 		// RUN THE GAME:	Apply keyboard / mouse to the game backend processors
@@ -291,8 +293,11 @@ namespace brogueHd::backend
 		{
 			case BrogueGameMode::Game:
 			{
-				// Check for game updates
-				if (_game->getLevel(1)->needsUpdate())
+				// Get the actual processing game mode for the render thread
+				BrogueGameMode renderMode = _renderingController->getRenderingGameMode();
+
+				// Check for game updates (may still need time to process a mode change)
+				if (_game->getLevel(1)->needsUpdate() && renderMode == BrogueGameMode::Game)
 				{
 					// Update rendering thread
 					_renderingController->updateGameData(_game->getLevel(1));

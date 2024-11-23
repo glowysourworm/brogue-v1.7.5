@@ -162,8 +162,8 @@ namespace brogueHd::backend::model
 		// Check cells
 		region->iterateLocations([&mainGrid] (short column, short row, const T& locator)
 		{
-			if (!mainGrid->isDefined(locator.column, locator.row))
-				mainGrid->set(locator.column, locator.row, new brogueCell(locator.column, locator.row), true);
+			//if (!mainGrid->isDefined(locator.column, locator.row))
+				mainGrid->set(locator.column, locator.row, new brogueCell(locator.column, locator.row));
 
 			return iterationCallback::iterate;
 		});

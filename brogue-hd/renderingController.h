@@ -31,7 +31,7 @@ namespace brogueHd::backend
 		/// <summary>
 		/// Sets the video output to the specific view
 		/// </summary>
-		void setGameMode(BrogueGameMode mode);
+		void setGameModeAsync(BrogueGameMode mode);
 
 		/// <summary>
 		/// Creates program containers with active UI components
@@ -41,6 +41,7 @@ namespace brogueHd::backend
 		brogueKeyboardState getKeyboardState() const;
 		brogueMouseState getMouseState() const;
 		BrogueGameMode getGameModeRequest(bool& newGame, bool& openGame, simpleString& fileName) const;
+		BrogueGameMode getRenderingGameMode() const;
 		
 		/// <summary>
 		/// Primary rendering data hand-over to the rendering thread
@@ -146,7 +147,12 @@ namespace brogueHd::backend
 		_openglRenderer->setGameData(level);
 	}
 
-	void renderingController::setGameMode(BrogueGameMode mode)
+	BrogueGameMode renderingController::getRenderingGameMode() const
+	{
+		return _openglRenderer->getRenderingMode();
+	}
+
+	void renderingController::setGameModeAsync(BrogueGameMode mode)
 	{
 		switch (mode)
 		{

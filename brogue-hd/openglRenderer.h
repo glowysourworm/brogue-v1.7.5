@@ -83,6 +83,7 @@ namespace brogueHd::frontend
 
 		// Shared resources
 		BrogueGameMode getRequestedMode(bool& newGame, bool& openGame, simpleString& fileName);
+		BrogueGameMode getRenderingMode() const;
 		brogueKeyboardState getKeyboardState() const;
 		brogueMouseState getMouseState() const;
 
@@ -526,6 +527,18 @@ namespace brogueHd::frontend
 		_openGameOut = false;
 		_newGameOut = false;
 		_fileNameOut->clear();
+
+		_threadLock->unlock();
+
+		return mode;
+	}
+	BrogueGameMode openglRenderer::getRenderingMode() const
+	{
+		BrogueGameMode mode;
+
+		_threadLock->lock();
+
+		mode = _gameMode;
 
 		_threadLock->unlock();
 

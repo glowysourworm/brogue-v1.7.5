@@ -142,10 +142,10 @@ namespace brogueHd::backend::model
 
 			if (!constraint.contains(_boundary) || forceUpdate)
 			{
-				_minSize = _configuration.getMinSize(constraint);
+				_minSize = _configuration.getMinSize();
 
 				// Max Size + Padding (if allowed)
-				_boundary = _configuration.getMaxSize(constraint).createExpanded(_padding);
+				_boundary = _configuration.getMaxSize().createExpanded(_padding);
 
 				_boundary.column = constraint.column;
 				_boundary.row = constraint.row;

@@ -837,7 +837,7 @@ namespace brogueHd::component
 			gridRect newRect(column, contiguousRange.getLow() + boundary.top(), 1, contiguousRange.size());
 
 			// Update rectangles
-			subRectangles.forEach([&found, &column, &newRect, &boundary, &predicate, &that] (gridRect* rect)
+			subRectangles.forEach([&found, &column, &newRect, &boundary] (gridRect* rect)
 			{
 				// Equals
 				if (rect->top() == newRect.top() && 
@@ -896,7 +896,7 @@ namespace brogueHd::component
 
 			});
 
-			gridRect result = *(finalRects.get(finalRects.count() - 1));
+			gridRect result = finalRects.count() == 0 ? default_value::value<gridRect>() : *(finalRects.get(finalRects.count() - 1));
 
 			// Clean up memory
 			for (int index = 0; index < subRectangles.count(); index++)
