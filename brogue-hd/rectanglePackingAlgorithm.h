@@ -42,7 +42,7 @@ namespace brogueHd::component
 		/// <summary>
 		/// Returns the largest unused space in the constraint boundary
 		/// </summary>
-		gridRect getLargestUnusedRectangle() const;
+		gridRect getLargestUnusedRectangle(const gridRect& minSize) const;
 
 		/// <summary>
 		/// Returns current list of result rectangles
@@ -91,9 +91,9 @@ namespace brogueHd::component
 		});
 	}
 
-	gridRect rectanglePackingAlgorithm::getLargestUnusedRectangle() const
+	gridRect rectanglePackingAlgorithm::getLargestUnusedRectangle(const gridRect& minSize) const
 	{
-		return _tilingGrid->calculateLargestRectangle([] (short column, short row, const gridLocator& item)
+		return _tilingGrid->calculateLargestRectangle(minSize, [] (short column, short row, const gridLocator& item)
 		{
 			// Use the predicate to look for negative space
 			return item == default_value::value<gridLocator>();
@@ -223,7 +223,7 @@ namespace brogueHd::component
 		{
 			// Look for largest sub-rectangle in the constraint area
 			//
-			gridRect nextLargestBoundary = _tilingGrid->calculateLargestRectangle([] (short column, short row, const gridLocator& item)
+			gridRect nextLargestBoundary = _tilingGrid->calculateLargestRectangle(rect, [] (short column, short row, const gridLocator& item)
 			{
 				// Use the predicate to look for negative space
 				return item == default_value::value<gridLocator>();

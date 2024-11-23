@@ -31,6 +31,7 @@ namespace brogueHd::simple
 
 		bool contains(const T& item) const;
 		void forEach(const simpleListCallback<T>& callback) const;
+		simpleList<T> where(const simpleListPredicate<T>& predicate) const;
 		void addRange(const simpleArray<T>& collection);
 
 	protected:
@@ -187,6 +188,20 @@ namespace brogueHd::simple
 	void simpleOrderedList<T>::forEach(const simpleListCallback<T>& callback) const
 	{
 		_list->forEach(callback);
+	}
+
+	template<isHashable T>
+	simpleList<T> simpleOrderedList<T>::where(const simpleListPredicate<T>& predicate) const
+	{
+		simpleList<T> result;
+
+		for (int index = 0; index < _list->count(); index++)
+		{
+			if (predicate(_list->get(index)))
+				result.add(_list->get(index));
+		}
+
+		return result;
 	}
 
 	template<isHashable T>

@@ -529,7 +529,7 @@ namespace brogueHd::simple
 	template<isNumber TResult>
 	TResult simpleArray<T>::kadanesAlgorithm(simpleRange<int>& result, simpleArrayValueIndicator<T, TResult> valueIndicator)
 	{
-		TResult maxSum = std::numeric_limits<TResult>::min();
+		TResult maxSum = 0;
 		TResult currentSum = 0;
 
 		simpleRange<int> current(-1, -1, -1, this->count() - 1);
@@ -538,7 +538,7 @@ namespace brogueHd::simple
 		{
 			TResult currentValue = valueIndicator(this->get(index));
 
-			if (currentSum + currentValue > currentSum)
+			if (currentValue > 0)
 			{
 				currentSum += currentValue;
 
@@ -553,31 +553,24 @@ namespace brogueHd::simple
 			}
 			else
 			{
-				// Current block
-				if (current.getLow() > -1)
-					current.setHigh(index);
-
 				// Check maximum value
-				if (maxSum < currentSum)
+				if (maxSum < currentSum && current.getLow() >= 0 && current.getHigh() >= 0)
 				{
 					result.set(current.getLow(), current.getHigh());
 					maxSum = currentSum;
 				}
 
 				// Reset (current block only)
-				if (current.getLow() > -1)
-				{
-					current.set(-1, -1);
-					currentSum = 0;
-				}
+				current.set(-1, -1);
+				currentSum = 0;
 			}
 		}
 
-		// Result
+		// Result (trailing value was set, so the maxSum and result weren't updated)
 		if (currentSum > 0)
 		{
 			// Check maximum value
-			if (maxSum < currentSum)
+			if (maxSum < currentSum && current.getLow() >= 0 && current.getHigh() >= 0)
 			{
 				result.set(current.getLow(), current.getHigh());
 				maxSum = currentSum;

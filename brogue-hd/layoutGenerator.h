@@ -220,7 +220,8 @@ namespace brogueHd::backend
 			{
 				// Get next space in which to create a room
 				//gridRect largestSubRect = algorithm.getLargestUnusedRectangle();
-				gridRect largestSubRect = _layout->getLargestUnusedRectangle();
+				gridRect minRect(0, 0, 8, 9);
+				gridRect largestSubRect = _layout->getLargestUnusedRectangle(minRect);
 
 				if (largestSubRect == default_value::value<gridRect>())
 				{

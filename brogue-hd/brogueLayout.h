@@ -69,7 +69,7 @@ namespace brogueHd::backend::model
 		/// <summary>
 		/// Gets sub-rectangle from the layout - the largest possible
 		/// </summary>
-		gridRect getLargestUnusedRectangle();
+		gridRect getLargestUnusedRectangle(const gridRect& minSize);
 
 	private:
 
@@ -137,11 +137,11 @@ namespace brogueHd::backend::model
 		return _mainGrid->get(column, row);
 	}
 
-	gridRect brogueLayout::getLargestUnusedRectangle()
+	gridRect brogueLayout::getLargestUnusedRectangle(const gridRect& minSize)
 	{
 		grid<brogueCell*>* mainGrid = _mainGrid;
 
-		return _mainGrid->calculateLargestRectangle([&mainGrid] (short column, short row, brogueCell* cell)
+		return _mainGrid->calculateLargestRectangle(minSize, [&mainGrid] (short column, short row, brogueCell* cell)
 		{
 			return !mainGrid->isDefined(column, row);
 		});

@@ -159,13 +159,13 @@ namespace brogueHd::component
 		/// Calculates the largest sub-rectangle in the grid.  The predicate is used to determine what to include 
 		/// in the search. The getUnsafe method is used - which has a potential to return nullptr's or default data.
 		/// </summary>
-		gridRect calculateLargestRectangle(gridPredicate<T> predicate) const;
+		gridRect calculateLargestRectangle(const gridRect& minSize, gridPredicate<T> predicate) const;
 
 		/// <summary>
 		/// Calculates the largest sub-rectangle in the grid. This will use the grid::isDefined as its decision
 		/// maker.
 		/// </summary>
-		gridRect calculateLargestRectangle() const;
+		gridRect calculateLargestRectangle(const gridRect& minSize) const;
 
 	private:
 
@@ -779,18 +779,18 @@ namespace brogueHd::component
 	}
 
 	template<typename T>
-	gridRect grid<T>::calculateLargestRectangle() const
+	gridRect grid<T>::calculateLargestRectangle(const gridRect& minSize) const
 	{
 		const grid<T>* that = this;
 
-		return calculateLargestRectangle([&that] (short column, short row, const T& item)
+		return calculateLargestRectangle(minSize, [&that] (short column, short row, const T& item)
 		{
 			return that->isDefined(column, row);
 		});
 	}
 
 	template<typename T>
-	gridRect grid<T>::calculateLargestRectangle(gridPredicate<T> predicate) const
+	gridRect grid<T>::calculateLargestRectangle(const gridRect& minSize, gridPredicate<T> predicate) const
 	{
 		const grid<T>* that = this;
 		gridRect boundary = this->getRelativeBoundary();
@@ -816,88 +816,96 @@ namespace brogueHd::component
 
 		for (int column = boundary.left(); column <= boundary.right(); column++)
 		{
-			//for (int right = left; right <= boundary.right(); right++)
-			//{
-				//for (int row = boundary.top(); row <= boundary.bottom(); row++)
-				//{
-				//	if (predicate(right, row, this->get(right, row)))
-				//	{
-				//		counters.set(row - boundary.top(), counters.get(row - boundary.top()) + 1);
-				//	}
-				//}
+			// Reset range
+			contiguousRange.set(-1, -1);
 
-				// Reset range
-				contiguousRange.set(-1, -1);
+			// Get best sub-array
+			sum = counters.kadanesAlgorithm<int>(contiguousRange, [&column, &predicate, &that] (int rowIndex)
+			{
+				return predicate(column, rowIndex, that->get(column, rowIndex)) ? 1 : 0; // Return positive if the cell predicate passes
+			});
 
-				// Get best sub-array
-				sum = counters.kadanesAlgorithm<int>(contiguousRange, [&column, &predicate, &that] (int rowIndex)
-				{ 
-					return predicate(column, rowIndex, that->get(column, rowIndex)) ? 1 : 0; // Return positive if the cell predicate passes
-				});
+			found = false;
 
-				found = false;
+			if (contiguousRange.getLow() < 0 ||
+				contiguousRange.getHigh() < 0)
+				continue;
 
-				// Add this to the list unless there is currently one of the same size (in rows). Otherwise,
-				// update any rect instances that overlap this rect.
-				//
-				gridRect newRect(column, contiguousRange.getLow() + boundary.top(), 1, contiguousRange.size());
+			// Add this to the list unless there is currently one of the same size (in rows). Otherwise,
+			// update any rect instances that overlap this rect.
+			//
+			gridRect newRect(column, contiguousRange.getLow() + boundary.top(), 1, contiguousRange.size());
 
-				// Update rectangles
-				subRectangles.forEach([&found, &column, &newRect, &boundary] (gridRect* rect)
+			// Update rectangles
+			subRectangles.forEach([&found, &column, &newRect, &boundary, &predicate, &that] (gridRect* rect)
+			{
+				// Equals
+				if (rect->top() == newRect.top() && 
+					rect->bottom() == newRect.bottom() &&
+					rect->right() == column - 1)
 				{
-					// Equals
-					if (rect->top() == newRect.top() && rect->bottom() == newRect.bottom())
-					{
-						rect->width++;
-						found = true;
-					}
-
-					// Overlaps (The rect could be LARGER in area if you add this overlap)
-					else if ((rect->top() >= newRect.top() && rect->top() <= newRect.bottom()) ||
-							 (rect->bottom() >= newRect.top() && rect->bottom() <= newRect.bottom()))
-					{
-						int top = simpleMath::maxOf(rect->top(), newRect.top());
-						int bottom = simpleMath::minOf(rect->bottom(), newRect.bottom());
-
-						gridRect testRect(rect->column, top, rect->width + 1, bottom - top + 1);
-
-						// Better fit: Take new dimensions
-						if (testRect.area() > rect->area())
-						{
-							rect->row = top;
-							rect->height = bottom - top + 1;
-							rect->width++;
-
-							// DON'T set found = true. The next rectangle from now on could end up
-							// being greater than this one.
-						}
-					}
-
-					return iterationCallback::iterate;
-				});
-
-				// Start a new rectangle for this iteration
-				if (!found && sum > 0)
-				{
-					subRectangles.add(new gridRect(column, contiguousRange.getLow() + boundary.top(), 1, contiguousRange.getHigh() - contiguousRange.getLow() + 1));
+					rect->width = rect->width + 1;
+					found = true;
 				}
-			//}
-		}
 
-		// Get result data
-		gridRect result = *(subRectangles.get(subRectangles.count() - 1));
+				// Overlaps (The rect could be LARGER in area if you add this overlap)
+				else if (((rect->top() >= newRect.top() && rect->top() <= newRect.bottom()) ||
+						  (rect->bottom() >= newRect.top() && rect->bottom() <= newRect.bottom())) &&
+						  (rect->right() == column - 1))
+				{
+					int top = simpleMath::maxOf(rect->top(), newRect.top());
+					int bottom = simpleMath::minOf(rect->bottom(), newRect.bottom());
 
-		// Clean up memory
-		for (int index = 0; index < subRectangles.count(); index++)
-		{
-			delete subRectangles.get(index);
+					gridRect testRect(rect->column, top, rect->width + 1, bottom - top + 1);
+
+					// Better fit: Take new dimensions
+					if (testRect.area() > rect->area())
+					{
+						rect->row = testRect.row;
+						rect->column = testRect.column;
+						rect->width = testRect.width;
+						rect->height = testRect.height;
+
+						// DON'T set found = true. The next rectangle from now on could end up
+						// being greater than this one.
+					}
+				}
+
+				return iterationCallback::iterate;
+			});
+
+			// Start a new rectangle for this iteration (check constraint)
+			if (!found && (sum > 0) && (contiguousRange.size() >= minSize.height))
+			{
+				gridRect nextRect(column, contiguousRange.getLow() + boundary.top(), 1, contiguousRange.size());
+
+				subRectangles.add(new gridRect(nextRect));
+			}
 		}
 
 		if (subRectangles.count() == 0)
 			return default_value::value<gridRect>();
 
 		else
+		{
+			// Get result data (checked the height, now we must check the width)
+			simpleList<gridRect*> finalRects = subRectangles.where([&minSize] (gridRect* rect)
+			{
+				return rect->width >= minSize.width &&
+					   rect->height >= minSize.height;
+
+			});
+
+			gridRect result = *(finalRects.get(finalRects.count() - 1));
+
+			// Clean up memory
+			for (int index = 0; index < subRectangles.count(); index++)
+			{
+				delete subRectangles.get(index);
+			}
+
 			return result;
+		}
 	}
 }
 

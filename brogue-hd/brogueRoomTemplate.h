@@ -133,13 +133,11 @@ namespace brogueHd::backend::model
 
 		void getSize(brogueRoomType type, gridRect& aminSize, gridRect& amaxSize, const gridRect& constraint) const
 		{
-			int defaultSize = 2;
-
 			switch (type)
 			{
 				case brogueRoomType::Default:
-					aminSize = gridRect(0, 0, defaultSize, defaultSize);
-					amaxSize = gridRect(0, 0, defaultSize, defaultSize);
+					aminSize = gridRect(0, 0, constraint.width, constraint.height);
+					amaxSize = gridRect(0, 0, constraint.width, constraint.height);
 					break;
 
 				case brogueRoomType::CaveCompact:

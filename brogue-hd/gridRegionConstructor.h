@@ -158,7 +158,7 @@ namespace brogueHd::component
 		completeImpl();
 		validate();
 
-		gridRect largestSubRegionRect = _grid->calculateLargestRectangle();
+		gridRect largestSubRegionRect = _grid->calculateLargestRectangle(gridRect(0, 0, 1, 1));
 
 		simpleArray<T> locations = _locations->getKeys().toArray();
 		simpleArray<T> edgeLocations = _edgeLocations->getKeys().toArray();

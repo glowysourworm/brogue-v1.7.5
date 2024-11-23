@@ -140,7 +140,7 @@ namespace brogueHd::simple
 	template<isNumber T>
 	int simpleRange<T>::size() const
 	{
-		return _high - _low;
+		return _high - _low + 1;
 	}
 
 	template<isNumber T>
