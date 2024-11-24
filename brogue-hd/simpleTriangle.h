@@ -20,7 +20,7 @@ namespace brogueHd::simple
 			point2 = default_value::value<simplePoint<T>>();
 			point3 = default_value::value<simplePoint<T>>();
 		}
-		simpleTriangle(const simpleTriangle& copy) 
+		simpleTriangle(const simpleTriangle<T>& copy) 
 		{
 			point1 = copy.point1;
 			point2 = copy.point2;
@@ -31,6 +31,13 @@ namespace brogueHd::simple
 			point1 = apoint1;
 			point2 = apoint2;
 			point3 = apoint3;
+		}
+
+		void operator=(const simpleTriangle<T>& copy)
+		{
+			point1 = copy.point1;
+			point2 = copy.point2;
+			point3 = copy.point3;
 		}
 
 		bool operator==(const simpleTriangle<T>& triangle) const
@@ -52,7 +59,7 @@ namespace brogueHd::simple
 			return hashGenerator::generateHash(point1, point2, point3);
 		}
 
-		bool containsEqualEdge(simplePoint<T> vertex1, simplePoint<T> vertex2)
+		bool containsEqualEdge(const simplePoint<T>& vertex1, const simplePoint<T>& vertex2) const
 		{
 			int pointsShared = 0;
 
@@ -65,14 +72,14 @@ namespace brogueHd::simple
 			return pointsShared > 1;
 		}
 
-		bool containsEqualPoint(simplePoint<T> point)
+		bool containsEqualPoint(const simplePoint<T>& point) const
 		{
 			return (point == point1) ||
-				(point == point2) ||
-				(point == point3);
+					(point == point2) ||
+					(point == point3);
 		}
 
-		bool circumCircleContains(simplePoint<T> point)
+		bool circumCircleContains(const simplePoint<T>& point) const
 		{
 			// Procedure
 			//
@@ -131,17 +138,17 @@ namespace brogueHd::simple
 
 			T m00 = p1.x - point.x;
 			T m10 = p1.y - point.y;
-			T m20 = pow(m00, 2) + pow(m10, 2);
+			T m20 = simpleMath::power<int>(m00, 2) + simpleMath::power<int>(m10, 2);
 			T m01 = p2.x - point.x;
 			T m11 = p2.y - point.y;
-			T m21 = pow(m01, 2) + pow(m11, 2);
+			T m21 = simpleMath::power<int>(m01, 2) + simpleMath::power<int>(m11, 2);
 			T m02 = p3.x - point.x;
 			T m12 = p3.y - point.y;
-			T m22 = pow(m02, 2) + pow(m12, 2);
+			T m22 = simpleMath::power<int>(m02, 2) + simpleMath::power<int>(m12, 2);
 
 			T d = (m00 * ((m11 * m22) - (m21 * m12))) -
-				(m10 * ((m01 * m22) - (m21 * m02))) +
-				(m20 * ((m01 * m12) - (m11 * m02)));
+				  (m10 * ((m01 * m22) - (m21 * m02))) +
+				  (m20 * ((m01 * m12) - (m11 * m02)));
 
 			// Theorem:  Point lies in the circum-circle iff d > 0 (When 1 -> 2 -> 3 are sorted counter-clockwise)
 			//

@@ -60,7 +60,7 @@ namespace brogueHd::component
 		{
 			return gridLocator(column - acolumn, row - arow);
 		}
-		double distance(const gridLocator& location)
+		double distance(const gridLocator& location) const
 		{
 			double dx = location.column - column;
 			double dy = location.row - row;

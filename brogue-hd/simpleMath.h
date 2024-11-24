@@ -184,7 +184,7 @@ namespace brogueHd::simple
 		}
 
 		template<isNumber TMath>
-		static simpleVector<TMath> subtract(simplePoint<TMath> point2, simplePoint<TMath> point1)
+		static simpleVector<TMath> subtract(const simplePoint<TMath>& point2, const simplePoint<TMath>& point1)
 		{
 			return simpleVector<TMath>(point2.x - point1.x, point2.y - point1.y);
 		}
@@ -195,7 +195,7 @@ namespace brogueHd::simple
 		/// returned shows the orientation of the ordering (clockwise, counter-clockwise, or collinear)
 		/// </summary>
 		template<isNumber TMath>
-		static TMath orientation(simplePoint<TMath> point1, simplePoint<TMath> point2, simplePoint<TMath> point3)
+		static TMath orientation(const simplePoint<TMath>& point1, const simplePoint<TMath>& point2, const simplePoint<TMath>& point3)
 		{
 			// 1 -> 2 -> 3 (Results from crossing the vectors 12 X 23 - where subtracting the points gives you the vector)
 			simpleVector<TMath> vector12 = simpleMath::subtract(point2, point1);

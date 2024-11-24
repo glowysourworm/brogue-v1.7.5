@@ -55,18 +55,18 @@ namespace brogueHd::component
 		/// <summary>
 		/// Returns the graph weight (distance) for this edge
 		/// </summary>
-		short weight()
+		short weight() const
 		{
 			return (short)node1.distance(node2);
 		}
 
 		template<typename T>
-		bool isEquivalent(simplePoint<T> point1, simplePoint<T> point2)
+		bool isEquivalent(simplePoint<T> point1, simplePoint<T> point2) const
 		{
 			return (node1.column == point1.x &&
-				node1.row == point1.y &&
-				node2.column == point2.x &&
-				node2.row == point2.y) ||
+					node1.row == point1.y &&
+					node2.column == point2.x &&
+					node2.row == point2.y) ||
 				(node1.column == point2.x &&
 					node1.row == point2.y &&
 					node2.column == point1.x &&
