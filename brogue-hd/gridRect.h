@@ -236,6 +236,21 @@ namespace brogueHd::component
 			return true;
 		}
 
+		void clamp(const gridRect& constraint)
+		{
+			if (!constraint.validateUI())
+				throw simpleException("Invalid constraint rect:  gridRect::clamp");
+
+			column = simpleMath::clamp(column, constraint.left(), constraint.right());
+			row = simpleMath::clamp(row, constraint.top(), constraint.bottom());
+
+			if (right() > constraint.right())
+				width -= right() - constraint.right();
+
+			if (bottom() > constraint.bottom())
+				height -= bottom() - constraint.bottom();
+		}
+
 		bool overlaps(const gridRect& rect) const
 		{
 			return !(right() < rect.left() ||
@@ -392,16 +407,19 @@ namespace brogueHd::component
 		{
 			bool userBreak = false;
 
+			float heightRadius = height / 2.0f;
+			float widthRadius = width / 2.0f;
+
 			for (short i = left(); i <= right() && !userBreak; i++)
 			{
 				for (short j = top(); j <= bottom() && !userBreak; j++)
 				{
-					short dx = centerX() - i;
-					short dy = centerY() - j;
+					float dx = (column + (width / 2.0f)) - i;
+					float dy = (row + (height / 2.0f)) - j;
 
 					// From equation for an ellipse
-					float yLimit = simpleMath::squareRoot(height * height - ((height / (float)width) * (height / (float)width) * dx * dx));
-					float xLimit = simpleMath::squareRoot(width * width - ((width / (float)height) * (width / (float)height) * dy * dy));
+					float yLimit = simpleMath::squareRoot(heightRadius * heightRadius - ((heightRadius / (float)widthRadius) * (heightRadius / (float)widthRadius) * dx * dx));
+					float xLimit = simpleMath::squareRoot(widthRadius * widthRadius - ((widthRadius / (float)heightRadius) * (widthRadius / (float)heightRadius) * dy * dy));
 
 					if (simpleMath::abs(dy) <= yLimit &&
 						simpleMath::abs(dx) <= xLimit)

@@ -25,6 +25,11 @@ namespace brogueHd::backend
 	/// </summary>
 	class randomGenerator
 	{
+	private:
+
+		// Try playing with the std normal distribution.. not sure what the sigma parameter is doing.
+		static constexpr float GAUSS_STD_DEV = 0.1f;
+
 	public:
 
 		randomGenerator(int id);
@@ -44,19 +49,19 @@ namespace brogueHd::backend
 		/// <summary>
 		/// Get a random int between lowerBound and upperBound, inclusive
 		/// </summary>
-		int randomRangeInclusive(short lowerBound, short upperBound, randomVariable type = randomVariable::Uniform, float mean = 0.5f, float stdDev = 0.6);
+		int randomRangeInclusive(short lowerBound, short upperBound, randomVariable type = randomVariable::Uniform, float mean = 0.5f, float stdDev = GAUSS_STD_DEV);
 
 		/// <summary>
 		/// Gets a random integer between lower and upper bounds, exclusive upper bound, with
 		/// specified probability distribution.
 		/// </summary>
-		int randomRangeExclusive(short lowerBound, short upperBound, randomVariable type = randomVariable::Uniform, float mean = 0.5f, float stdDev = 0.6);
+		int randomRangeExclusive(short lowerBound, short upperBound, randomVariable type = randomVariable::Uniform, float mean = 0.5f, float stdDev = GAUSS_STD_DEV);
 
 		/// <summary>
 		/// Returns random index from array based on its weights
 		/// </summary>
 		template<isNumber T>
-		int randomIndex(const simpleArray<T>& weights, randomVariable type = randomVariable::Uniform, float mean = 0.5f, float stdDev = 0.6);
+		int randomIndex(const simpleArray<T>& weights, randomVariable type = randomVariable::Uniform, float mean = 0.5f, float stdDev = GAUSS_STD_DEV);
 
 		/// <summary>
 		/// Randomizes the input array using Uniform random draws
@@ -67,18 +72,18 @@ namespace brogueHd::backend
 		/// <summary>
 		/// Generates next double with the specified parameters
 		/// </summary>
-		float next(randomVariable type = randomVariable::Uniform, float mean = 0.5f, float stdDev = 0.6);
+		float next(randomVariable type = randomVariable::Uniform, float mean = 0.5f, float stdDev = GAUSS_STD_DEV);
 
 		/// <summary>
 		/// Creates a random color with random color channels.
 		/// </summary>
-		color nextColor(randomVariable type = randomVariable::Uniform, float mean = 0.5f, float stdDev = 0.6);
+		color nextColor(randomVariable type = randomVariable::Uniform, float mean = 0.5f, float stdDev = GAUSS_STD_DEV);
 
 		/// <summary>
 		/// Creates a random color with random color channels between the two provided. Makes draws
 		/// scaled by the two colors' channels.
 		/// </summary>
-		color nextColor(color low, color high, randomVariable type = randomVariable::Uniform, float mean = 0.5f, float stdDev = 0.6);
+		color nextColor(color low, color high, randomVariable type = randomVariable::Uniform, float mean = 0.5f, float stdDev = GAUSS_STD_DEV);
 
 	private:
 
@@ -148,7 +153,9 @@ namespace brogueHd::backend
 
 		_numbersGenerated++;
 
-		return simpleMath::clamp(distribution(*_engine), low, high);
+		float result = distribution(*_engine);  
+
+		return simpleMath::clamp(result,low, high);
 	}
 
 	int randomGenerator::nextInt(int lowerBound, int upperBound, bool exclusiveUpperBound, randomVariable type, float mean, float stdDev)

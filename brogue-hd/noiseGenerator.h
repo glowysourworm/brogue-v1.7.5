@@ -6,6 +6,7 @@
 #include "gridRect.h"
 #include "randomGenerator.h"
 #include "simple.h"
+#include "simpleList.h"
 
 using namespace brogueHd::component;
 using namespace brogueHd::backend::model;
@@ -23,7 +24,7 @@ namespace brogueHd::backend
 
 	private:
 
-		void cellularAutomataIteration(grid<bool>& resultGrid, const cellularAutomataRule& rule);
+		void cellularAutomataIteration(grid<bool>& resultGrid, const simpleList<cellularAutomataRule>* rules, bool resultPolarity);
 
 	private:
 
@@ -60,7 +61,7 @@ namespace brogueHd::backend
 		relativeBoundary.iterate([&rand, &parameters, &resultGrid] (short x, short y)
 		{
 			if (rand->next() <= parameters.getFillRatio())
-				resultGrid.set(x, y, true);
+				resultGrid.set(x, y, parameters.getResultPolarity());
 
 			return iterationCallback::iterate;
 		});
@@ -69,10 +70,7 @@ namespace brogueHd::backend
 		//
 		for (int index = 0; index < parameters.getIterations(); index++)
 		{
-			for (int ruleIndex = 0; ruleIndex < parameters.getRules()->count(); ruleIndex++)
-			{
-				this->cellularAutomataIteration(resultGrid, parameters.getRules()->get(ruleIndex));
-			}
+			this->cellularAutomataIteration(resultGrid, parameters.getRules(), parameters.getResultPolarity());
 		}
 
 		// Callback
@@ -82,49 +80,57 @@ namespace brogueHd::backend
 		});
 	}
 
-	void noiseGenerator::cellularAutomataIteration(grid<bool>& resultGrid, const cellularAutomataRule& rule)
+	void noiseGenerator::cellularAutomataIteration(grid<bool>& resultGrid, const simpleList<cellularAutomataRule>* rules, bool resultPolarity)
 	{
-		short count = 0;
+		short positiveCount = 0;
+		short negativeCount = 0;
 
-		resultGrid.iterate([&resultGrid, &rule, &count] (short columnRect, short rowRect, bool item)
+		resultGrid.iterate([&resultGrid, &rules, &positiveCount, &negativeCount, &resultPolarity] (short columnRect, short rowRect, bool item)
 		{
-			count = 0;
+			positiveCount = 0;
+			negativeCount = 0;
 
-			resultGrid.iterateAdjacent(columnRect, rowRect, false, [&resultGrid, &count, &rule] (short i, short j, brogueCompass direction, bool item)
+			resultGrid.iterateAdjacent(columnRect, rowRect, false, [&resultGrid, &positiveCount, &negativeCount] (short i, short j, brogueCompass direction, bool item)
 			{
 				// Use out-of-bounds as negative polarity
 				if (!resultGrid.isInBounds(i, j))
 				{
-					if (!rule.countPolarity)
-						count++;
+					negativeCount++;
 				}
 				else
 				{
-					// Count number of cells that match the count polarity
-					//
-					if (rule.countPolarity && resultGrid.isDefined(i, j))
-						count++;
+					if (resultGrid.isDefined(i, j))
+						positiveCount++;
 
-					else if (!rule.countPolarity && !resultGrid.isDefined(i, j))
-						count++;
+					else
+						negativeCount++;
 				}
 
 				return iterationCallback::iterate;
 			});
 
-			// Apply the rule
-			if (rule.polarity)
+			bool result = false;
+
+			for (int index = 0; index < rules->count(); index++)
 			{
+				cellularAutomataRule rule = rules->get(index);
+
+				// Must match the polarity of the rule
+				if (rule.polarity != resultGrid.isDefined(columnRect, rowRect))
+					continue;
+
 				// Positive polarity
-				if (resultGrid.isDefined(columnRect, rowRect) && count >= rule.count)
-					resultGrid.set(columnRect, rowRect, rule.resultPolarity, true);
-			}
-			else
-			{
+				if (rule.countPolarity && positiveCount >= rule.count)
+					result |= true;
+
 				// Negative polarity
-				if (!resultGrid.isDefined(columnRect, rowRect) && count >= rule.count)
-					resultGrid.set(columnRect, rowRect, rule.resultPolarity, true);
+				if (!rule.countPolarity && negativeCount >= rule.count)
+					result |= true;
 			}
+
+			// Apply the rule(s)
+			if (result)
+				resultGrid.set(columnRect, rowRect, resultPolarity, true);
 
 			return iterationCallback::iterate;
 		});

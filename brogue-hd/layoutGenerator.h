@@ -378,7 +378,7 @@ namespace brogueHd::backend
 			{
 				color backColor(0.3, 0.3, 0.3, 0.5);
 
-				if (designRect->getConfiguration().getRoomType() == brogueRoomType::CaveLargeNS)
+				if (designRect->getConfiguration().getRoomType() == brogueRoomType::ChunkyRoom)
 				{
 					backColor.red = 1;
 				}

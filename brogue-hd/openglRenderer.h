@@ -321,6 +321,13 @@ namespace brogueHd::frontend
 			glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
 			glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
 			glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
+			
+			// Set the window position based on the scene boundary
+			int offsetX = (mode->width - sceneBoundaryUI.width) / 2.0f;
+			int offsetY = (mode->height - sceneBoundaryUI.height) / 2.0f;
+			
+			glfwWindowHint(GLFW_POSITION_X, offsetX);
+			glfwWindowHint(GLFW_POSITION_Y, offsetY);
 
 			simpleLogger::logColor(brogueConsoleColor::Yellow, glfwGetVersionString());
 
@@ -334,6 +341,8 @@ namespace brogueHd::frontend
 
 		// Windowed Mode
 		_window = glfwCreateWindow(sceneBoundaryUI.width, sceneBoundaryUI.height, "Brogue v1.7.5", NULL, NULL);
+
+		
 
 		// Open GL Context
 		glfwMakeContextCurrent(_window);
