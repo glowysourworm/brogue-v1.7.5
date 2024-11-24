@@ -1,6 +1,5 @@
 #pragma once
 
-#include "brogueGlobal.h"
 #include "cellularAutomataParameters.h"
 #include "grid.h"
 #include "gridDefinitions.h"
@@ -24,7 +23,7 @@ namespace brogueHd::backend
 
 	private:
 
-		void cellularAutomataIteration(grid<bool>& resultGrid, const cellularAutomataParameters& parameters);
+		void cellularAutomataIteration(grid<bool>& resultGrid, const cellularAutomataRule& rule);
 
 	private:
 
@@ -60,17 +59,20 @@ namespace brogueHd::backend
 		//
 		relativeBoundary.iterate([&rand, &parameters, &resultGrid] (short x, short y)
 		{
-			if (rand->next() <= parameters.fillRatio)
+			if (rand->next() <= parameters.getFillRatio())
 				resultGrid.set(x, y, true);
 
 			return iterationCallback::iterate;
 		});
 
-		// Run smoothing iterations
+		// Run iterations
 		//
-		for (int index = 0; index < parameters.smoothingIterations; index++)
+		for (int index = 0; index < parameters.getIterations(); index++)
 		{
-			this->cellularAutomataIteration(resultGrid, parameters);
+			for (int ruleIndex = 0; ruleIndex < parameters.getRules()->count(); ruleIndex++)
+			{
+				this->cellularAutomataIteration(resultGrid, parameters.getRules()->get(ruleIndex));
+			}
 		}
 
 		// Callback
@@ -80,40 +82,48 @@ namespace brogueHd::backend
 		});
 	}
 
-	void noiseGenerator::cellularAutomataIteration(grid<bool>& resultGrid, const cellularAutomataParameters& parameters)
+	void noiseGenerator::cellularAutomataIteration(grid<bool>& resultGrid, const cellularAutomataRule& rule)
 	{
 		short count = 0;
 
-		resultGrid.iterate([&resultGrid, &parameters, &count] (short columnRect, short rowRect, bool item)
+		resultGrid.iterate([&resultGrid, &rule, &count] (short columnRect, short rowRect, bool item)
 		{
 			count = 0;
 
-			resultGrid.iterateAdjacent(columnRect, rowRect, true, [&resultGrid, &count] (short i, short j, brogueCompass direction, bool item)
+			resultGrid.iterateAdjacent(columnRect, rowRect, false, [&resultGrid, &count, &rule] (short i, short j, brogueCompass direction, bool item)
 			{
-				// Count number of alive cells
-				//
-				if (resultGrid.isDefined(i, j))
-					count++;
+				// Use out-of-bounds as negative polarity
+				if (!resultGrid.isInBounds(i, j))
+				{
+					if (!rule.countPolarity)
+						count++;
+				}
+				else
+				{
+					// Count number of cells that match the count polarity
+					//
+					if (rule.countPolarity && resultGrid.isDefined(i, j))
+						count++;
+
+					else if (!rule.countPolarity && !resultGrid.isDefined(i, j))
+						count++;
+				}
 
 				return iterationCallback::iterate;
 			});
 
-			// Birth
-			if (!resultGrid.isDefined(columnRect, rowRect) && count >= parameters.birthCount)
+			// Apply the rule
+			if (rule.polarity)
 			{
-				resultGrid.set(columnRect, rowRect, true, true);
+				// Positive polarity
+				if (resultGrid.isDefined(columnRect, rowRect) && count >= rule.count)
+					resultGrid.set(columnRect, rowRect, rule.resultPolarity, true);
 			}
-
-			// Survival
-			else if (resultGrid.isDefined(columnRect, rowRect) && count >= parameters.survivalCount)
-			{
-				// keep alive
-			}
-
-			// Death
 			else
 			{
-				resultGrid.set(columnRect, rowRect, false, true);
+				// Negative polarity
+				if (!resultGrid.isDefined(columnRect, rowRect) && count >= rule.count)
+					resultGrid.set(columnRect, rowRect, rule.resultPolarity, true);
 			}
 
 			return iterationCallback::iterate;

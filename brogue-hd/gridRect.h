@@ -399,7 +399,12 @@ namespace brogueHd::component
 					short dx = centerX() - i;
 					short dy = centerY() - j;
 
-					if (((dx * dx) + (dy * dy) <= (width * width * 0.25f)))
+					// From equation for an ellipse
+					float yLimit = simpleMath::squareRoot(height * height - ((height / (float)width) * (height / (float)width) * dx * dx));
+					float xLimit = simpleMath::squareRoot(width * width - ((width / (float)height) * (width / (float)height) * dy * dy));
+
+					if (simpleMath::abs(dy) <= yLimit &&
+						simpleMath::abs(dx) <= xLimit)
 					{
 						userBreak = callback(i, j);
 					}

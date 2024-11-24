@@ -38,6 +38,13 @@ namespace brogueHd::backend::model
 			_display->backColor = colors::getGray(0.5);
 			_display->foreColor = colors::blue();
 		}
+		brogueCell(short column, short row, const color& backColor, const color& foreColor, char symbol)
+		{
+			_display = new brogueCellDisplay(column, row);
+			_display->backColor = backColor;
+			_display->foreColor = foreColor;
+			_display->character = symbol;
+		}
 		~brogueCell() 
 		{
 			delete _display;

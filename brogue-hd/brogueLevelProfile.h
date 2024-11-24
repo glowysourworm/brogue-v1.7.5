@@ -8,7 +8,6 @@
 #include "simple.h"
 #include "simpleException.h"
 #include "simpleHash.h"
-#include "simpleList.h"
 #include "simpleMath.h"
 
 using namespace brogueHd::simple;
@@ -221,23 +220,17 @@ namespace brogueHd::backend::model
 
 	brogueRoomTemplate brogueLevelProfile::getEntranceRoom(randomGenerator* randomMaim)
 	{
-		return _roomInfo->get(brogueRoomType::MainEntranceRoom);
+		// TODO: GET RID OF STATIC LAYOUT
+		gridRect levelBoundary(COLS - DCOLS, ROWS - DROWS, DCOLS, DROWS);
+
+		return brogueRoomTemplate(levelBoundary, brogueRoomType::MainEntranceRoom, 1.0);
 	}
 
 	brogueRoomTemplate brogueLevelProfile::getRandomRoomInfo(randomGenerator* randomMaim)
 	{
-		simpleList<float> weights = _roomInfo->except([] (brogueRoomType type, const brogueRoomTemplate& info)
-		{
-			return type == brogueRoomType::MainEntranceRoom;
+		int index = randomMaim->randomRangeInclusive(1, 10);
 
-		}).selectFromValues<float>([] (brogueRoomTemplate info)
-		{
-			return info.getFrequency();
-		});
-
-		short randomIndex = randomMaim->randomIndex(weights.toArray());
-
-		return _roomInfo->getAt(randomIndex)->value;
+		return _roomInfo->get((brogueRoomType)index);
 	}
 
 	brogueRoomTemplate brogueLevelProfile::getDefaultRoom()

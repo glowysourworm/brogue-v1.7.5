@@ -44,7 +44,7 @@ namespace brogueHd::backend::model
 		{
 			init(brogueRoomType::MainEntranceRoom, 0.0);
 		}
-		brogueRoomTemplate(const gridRect& levelBoundary, brogueRoomType type, short afrequency)
+		brogueRoomTemplate(const gridRect& levelBoundary, brogueRoomType type, float frequency)
 		{
 			init(type, frequency);
 		}
@@ -85,7 +85,7 @@ namespace brogueHd::backend::model
 			return roomType;
 		}
 
-		short getFrequency() const
+		float getFrequency() const
 		{
 			return frequency;
 		}
@@ -96,7 +96,7 @@ namespace brogueHd::backend::model
 		brogueRoomType roomType;
 		gridRect minSize;
 		gridRect maxSize;
-		short frequency;
+		float frequency;
 
 	private:
 

@@ -23,10 +23,11 @@ namespace brogueHd::component
 	{
 	public:
 
-		rectanglePackingAlgorithm(randomGenerator* randomGenerator, const gridRect& boundary);
+		rectanglePackingAlgorithm(randomGenerator* randomGenerator, const gridRect& parentBoundary, const gridRect& relativeBoundary);
 		~rectanglePackingAlgorithm();
 
-		void initialize(const gridRect& firstRect);
+		void initialize(const gridRect& firstRect, const gridLocator& focalPoint);
+		void initialize(const simpleList<gridRect>& rects, const gridLocator& focalPoint);
 
 		/// <summary>
 		/// Adds a rectangle to the tiling - moving it into position
@@ -34,15 +35,14 @@ namespace brogueHd::component
 		bool addRectangle(gridRect& rect);
 
 		/// <summary>
-		/// Removes rectangle from the tiling by index; and repacks the replacement. Must
-		/// not be the first rectangle.
+		/// Clears out all rectangles from the packing
 		/// </summary>
-		gridRect repackRectangle(int index, const gridRect& replacement);
+		void clearRectangles();
 
 		/// <summary>
-		/// Returns the largest unused space in the constraint boundary
+		/// Gets the largest unused space with respect to this packing
 		/// </summary>
-		gridRect getLargestUnusedRectangle(const gridRect& minSize) const;
+		gridRect getLargestUnusedRectangle(const gridRect& minSize);
 
 		/// <summary>
 		/// Returns current list of result rectangles
@@ -53,27 +53,32 @@ namespace brogueHd::component
 
 		randomGenerator* _randomGenerator;
 
+		gridLocator* _focalPoint;
+
 		grid<gridLocator>* _tilingGrid;
 
 		simpleHash<gridRect, gridRect>* _rectangles;
-
-		bool _initialized;
 	};
 
-	rectanglePackingAlgorithm::rectanglePackingAlgorithm(randomGenerator* randomGenerator, const gridRect& boundary)
+	rectanglePackingAlgorithm::rectanglePackingAlgorithm(randomGenerator* randomGenerator, const gridRect& parentBoundary, const gridRect& relativeBoundary)
 	{
 		_randomGenerator = randomGenerator;
 		_rectangles = new simpleHash<gridRect, gridRect>();
-		_tilingGrid = new grid<gridLocator>(boundary, boundary);
+		_tilingGrid = new grid<gridLocator>(parentBoundary, relativeBoundary);
+		_focalPoint = new gridLocator(0, 0);
 	}
 	rectanglePackingAlgorithm::~rectanglePackingAlgorithm()
 	{
 		delete _rectangles;
 		delete _tilingGrid;
+		delete _focalPoint;
 	}
 
-	void rectanglePackingAlgorithm::initialize(const gridRect& firstRect)
+	void rectanglePackingAlgorithm::initialize(const gridRect& firstRect, const gridLocator& focalPoint)
 	{
+		_focalPoint->column = focalPoint.column;
+		_focalPoint->row = focalPoint.row;
+
 		_rectangles->clear();
 		_rectangles->add(firstRect, firstRect);
 
@@ -90,13 +95,46 @@ namespace brogueHd::component
 			return iterationCallback::iterate;
 		});
 	}
-
-	gridRect rectanglePackingAlgorithm::getLargestUnusedRectangle(const gridRect& minSize) const
+	void rectanglePackingAlgorithm::initialize(const simpleList<gridRect>& rects, const gridLocator& focalPoint)
 	{
-		return _tilingGrid->calculateLargestRectangle(minSize, [] (short column, short row, const gridLocator& item)
+		_focalPoint->column = focalPoint.column;
+		_focalPoint->row = focalPoint.row;
+
+		_rectangles->clear();
+
+		for (int index = 0; index < rects.count(); index++)
 		{
-			// Use the predicate to look for negative space
-			return item == default_value::value<gridLocator>();
+			gridRect rect = rects.get(index);
+
+			_rectangles->add(rect, rect);
+
+			grid<gridLocator>* grid = _tilingGrid;
+
+			_tilingGrid->iterate([&grid, &rect] (short column, short row, const gridLocator& item)
+			{
+				if (rect.contains(column, row))
+					grid->set(column, row, gridLocator(column, row), true);
+
+				else
+					grid->set(column, row, default_value::value<gridLocator>(), true);
+
+				return iterationCallback::iterate;
+			});
+
+		}
+	}
+
+	void rectanglePackingAlgorithm::clearRectangles()
+	{
+		_rectangles->clear();
+
+		grid<gridLocator>* grid = _tilingGrid;
+
+		_tilingGrid->iterate([&grid] (short column, short row, const gridLocator& item)
+		{
+			grid->set(column, row, default_value::value<gridLocator>(), true);
+
+			return iterationCallback::iterate;
 		});
 	}
 
@@ -104,38 +142,15 @@ namespace brogueHd::component
 	{
 		return _rectangles->getKeys();
 	}
-
-	gridRect rectanglePackingAlgorithm::repackRectangle(int index, const gridRect& rect)
+	gridRect rectanglePackingAlgorithm::getLargestUnusedRectangle(const gridRect& minSize)
 	{
-		if (index == 0)
-			throw simpleException("Cannot repack the first rectangle in the tiling:  rectanglePackingAlgorithm.h");
+		grid<gridLocator>* grid = _tilingGrid;
 
-		gridRect tileKey = _rectangles->getAt(index)->key;
-		grid<gridLocator>* tilingGrid = _tilingGrid;
-
-		if (!tileKey.contains(rect))
-			throw simpleException("Trying to replace rectangle with another that is not contianed by the existing one");
-
-		// Un-set the tiling grid
-		tileKey.iterate([&tilingGrid] (short column, short row)
+		return _tilingGrid->calculateLargestRectangle(minSize, [&grid] (short column, short row, const gridLocator& location)
 		{
-			tilingGrid->set(column, row, default_value::value<gridLocator>(), true);
-
-			return iterationCallback::iterate;
+			return !grid->isDefined(column, row);
 		});
-
-		// Replace the tile
-		_rectangles->remove(tileKey);
-
-		// Re-pack
-		gridRect nextRect(rect);
-
-		if (!this->addRectangle(nextRect))
-			throw simpleException("Repacking a smaller rectangle failed:  rectanglePackingAlgorithm.h");
-
-		return nextRect;
 	}
-
 	bool rectanglePackingAlgorithm::addRectangle(gridRect& rect)
 	{
 		if (_rectangles->count() == 0)
@@ -166,12 +181,11 @@ namespace brogueHd::component
 		//
 
 		gridRect constraint = _tilingGrid->getRelativeBoundary();
-		gridRect firstRect = _rectangles->getAt(0)->key;
 		simpleVector<float> heuristic;
 		simpleVector<float> nextHeuristic;
 
 		// Mark the distance
-		heuristic.set(firstRect.centerX() - rect.centerX(), firstRect.centerY() - rect.centerY());
+		heuristic.set(_focalPoint->column - rect.centerX(), _focalPoint->row - rect.centerY());
 		nextHeuristic.set(heuristic);
 
 		bool randomPlacementSuccessful = false;
@@ -205,8 +219,8 @@ namespace brogueHd::component
 			if (overlaps)
 				continue;
 
-			nextHeuristic.set(firstRect.centerX() - randomBoundary.centerX(),
-							  firstRect.centerY() - randomBoundary.centerY());
+			nextHeuristic.set(_focalPoint->column - randomBoundary.centerX(),
+							  _focalPoint->row - randomBoundary.centerY());
 
 			// Valid location found - update boundary and heuristic
 			if (nextHeuristic.magnitude() < heuristic.magnitude())
@@ -260,8 +274,8 @@ namespace brogueHd::component
 			//
 
 			// Mark Distance Heuristic (check against this one during iteration)
-			heuristic.set(firstRect.centerX() - rect.centerX(),
-						  firstRect.centerY() - rect.centerY());
+			heuristic.set(_focalPoint->column - rect.centerX(),
+						  _focalPoint->row - rect.centerY());
 
 			int yMoves = 0;
 			int xMoves = 0;
@@ -288,8 +302,8 @@ namespace brogueHd::component
 			// First, check overlapping tiles (before iterating positions independently)
 			rect.translate(xMoves, yMoves);
 
-			nextHeuristic.set(firstRect.centerX() - rect.centerX(),
-							  firstRect.centerY() - rect.centerY());
+			nextHeuristic.set(_focalPoint->column - rect.centerX(),
+							  _focalPoint->row - rect.centerY());
 
 			// Step 1:  Invalid
 			if (nextHeuristic.magnitude() >= heuristic.magnitude())
@@ -351,8 +365,8 @@ namespace brogueHd::component
 						rect.translate(0, simpleMath::sign(yMoves));
 
 					// Check Heuristic
-					nextHeuristic.set(firstRect.centerX() - rect.centerX(),
-									  firstRect.centerY() - rect.centerY());
+					nextHeuristic.set(_focalPoint->column - rect.centerX(),
+									  _focalPoint->row - rect.centerY());
 
 					// Step 3: Invalid
 					if (nextHeuristic.magnitude() >= heuristic.magnitude())

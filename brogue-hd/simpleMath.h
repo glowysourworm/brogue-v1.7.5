@@ -62,6 +62,17 @@ namespace brogueHd::simple
 			return x;
 		}
 
+		template<isNumber TMath>
+		static int nearestEvenFloor(const TMath x)
+		{
+			int result = simpleMath::floor(x);
+
+			if (result % 2 == 0)
+				return result;
+
+			return result - 1;
+		}
+
 		// Cheat sheet:  https://easings.net/
 
 		template<isNumber TMath>
@@ -141,7 +152,7 @@ namespace brogueHd::simple
 				return floorf(static_cast<float>(x));
 
 			else if (isIntLike<TMath>)
-				return floor(x);
+				return std::floor(x);
 
 			else
 				throw simpleException("Unknown floor type simpleMath.h");

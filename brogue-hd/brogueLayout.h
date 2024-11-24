@@ -7,6 +7,7 @@
 #include "simpleList.h"
 
 #include "brogueCell.h"
+#include "brogueCellDisplay.h"
 #include "gridDefinitions.h"
 #include "gridRect.h"
 #include "gridRegion.h"
@@ -58,13 +59,13 @@ namespace brogueHd::backend::model
 		/// Ensures that the layout has cells in the specified locations.
 		/// </summary>
 		template<isGridLocator T>
-		void createCells(gridRegion<T>* region);
+		void createCells(gridRegion<T>* region, const brogueCell& prototype, bool overwrite = false);
 
 		/// <summary>
 		/// Ensures that cell is created for specified location
 		/// </summary>
 		template<isGridLocator T>
-		void createCells(const T& locator);
+		void createCells(const T& locator, const brogueCell& prototype, bool overwrite = false);
 
 		/// <summary>
 		/// Gets sub-rectangle from the layout - the largest possible
@@ -148,22 +149,29 @@ namespace brogueHd::backend::model
 	}
 
 	template<isGridLocator T>
-	void brogueLayout::createCells(const T& locator)
+	void brogueLayout::createCells(const T& locator, const brogueCell& prototype, bool overwrite)
 	{
-		//if (!_mainGrid->isDefined(locator.column, locator.row))
-			_mainGrid->set(locator.column, locator.row, new brogueCell(locator.column, locator.row));
+		brogueCellDisplay display = prototype.getDisplay();
+
+		_mainGrid->set(locator.column, 
+					   locator.row, 
+					   new brogueCell(locator.column, locator.row, display.backColor, display.foreColor, display.character), 
+					   overwrite);
 	}
 
 	template<isGridLocator T>
-	void brogueLayout::createCells(gridRegion<T>* region)
+	void brogueLayout::createCells(gridRegion<T>* region, const brogueCell& prototype, bool overwrite)
 	{
 		grid<brogueCell*>* mainGrid = _mainGrid;
+		brogueCellDisplay display = prototype.getDisplay();
 
 		// Check cells
-		region->iterateLocations([&mainGrid] (short column, short row, const T& locator)
+		region->iterateLocations([&mainGrid, &display, &overwrite] (short column, short row, const T& locator)
 		{
-			//if (!mainGrid->isDefined(locator.column, locator.row))
-				mainGrid->set(locator.column, locator.row, new brogueCell(locator.column, locator.row));
+			mainGrid->set(locator.column, 
+						  locator.row, 
+						  new brogueCell(locator.column, locator.row, display.backColor, display.foreColor, display.character),
+						  overwrite);
 
 			return iterationCallback::iterate;
 		});

@@ -6,8 +6,13 @@
 #include "randomGenerator.h"
 #include "roomGenerator.h"
 
+#include "brogueCell.h"
+#include "brogueCell.h"
+#include "brogueGlyphMap.h"
 #include "brogueRoomTemplate.h"
 #include "brogueUIBuilder.h"
+#include "color.h"
+#include "dungeonConstants.h"
 #include "graph.h"
 #include "gridLocator.h"
 #include "gridLocatorEdge.h"
@@ -16,6 +21,7 @@
 #include "noiseGenerator.h"
 #include "rectanglePackingAlgorithm.h"
 #include "simple.h"
+#include "simpleHash.h"
 #include "simpleList.h"
 
 using namespace brogueHd::simple;
@@ -188,8 +194,14 @@ namespace brogueHd::backend
 		// Update:  (see backlog.txt) This will now be done using a tiling method.
 		//
 
-		//rectanglePackingAlgorithm algorithm(_randomGenerator, _layout->getBoundary());
+		rectanglePackingAlgorithm algorithm(_randomGenerator, _layout->getParentBoundary(), _layout->getBoundary());
 
+		// Keep track of the actual tiles in the layout. The algorithm must have a copy with which to
+		// work; and will not see the fidgeting with our copy of the gridRect on the stack.
+		//
+		simpleHash<brogueDesignRect*, gridRect> tiling;
+
+		gridLocator rectPackingFocus;
 		int maxIterations = 35;
 		int iteration = 0;
 
@@ -197,21 +209,25 @@ namespace brogueHd::backend
 		{
 			brogueRoomTemplate configuration = (iteration == 0) ? _profile->getEntranceRoom(_randomGenerator) : _profile->getRandomRoomInfo(_randomGenerator);
 			brogueDesignRect* designRect = nullptr;
+			int roomPadding = iteration == 0 ? 0 : 1;
 
 			// Entrance Room Selection
 			//
 			if (iteration == 0)
 			{
-				designRect = new brogueDesignRect(configuration, _layout->getBoundary(), 0);
+				designRect = new brogueDesignRect(configuration, _layout->getBoundary(), roomPadding);
 
 				gridLocator topLeft = gridLocator(_layout->getBoundary().centerX() - (designRect->getBoundary().width / 2),
 												  _layout->getBoundary().bottom() - designRect->getBoundary().height);
 				designRect->setOffset(topLeft);
 
-				// Initialize Rectangle Packing Algorithm
+				rectPackingFocus.column = designRect->getBoundary().centerX();
+				rectPackingFocus.row = designRect->getBoundary().bottom();
+
+				// Keep track of our tiling
 				//
-				//algorithm.initialize(designRect->getBoundary());
-				//tiling.add(designRect);
+				algorithm.initialize(designRect->getBoundary(), rectPackingFocus);
+				tiling.add(designRect, designRect->getBoundary());
 			}
 
 			// Add rectangles to the space using the algorithm (Padding = 1)
@@ -219,8 +235,7 @@ namespace brogueHd::backend
 			else
 			{
 				// Get next space in which to create a room
-				//gridRect largestSubRect = algorithm.getLargestUnusedRectangle();
-				gridRect largestSubRect = _layout->getLargestUnusedRectangle(configuration.getMinSize().createExpanded(1));
+				gridRect largestSubRect = algorithm.getLargestUnusedRectangle(configuration.getMinSize().createExpanded(roomPadding));
 
 				if (largestSubRect == default_value::value<gridRect>())
 				{
@@ -228,11 +243,9 @@ namespace brogueHd::backend
 					continue;
 				}
 
-				designRect = new brogueDesignRect(configuration, largestSubRect, 1);
-				gridRect minSize = designRect->getMinSize();
+				brogueDesignRect designRectPreLayout(configuration, largestSubRect, roomPadding);
 
-				if (largestSubRect.width < minSize.width ||
-					largestSubRect.height < minSize.height)
+				if (!largestSubRect.contains(designRectPreLayout.getBoundary()))	// Check room space constraints
 				{
 					iteration++;
 
@@ -240,12 +253,23 @@ namespace brogueHd::backend
 					continue;
 				}
 
+				// Use packing algorithm to place a room rectangle inside the constrained area; and 
+				// put it as close to the focal point as possible.
+				gridRect paddedBoundary = designRectPreLayout.getBoundary();
+				algorithm.addRectangle(paddedBoundary);
+
+				// Store the result as the constrained boundary (removing the padding)
+				designRect = new brogueDesignRect(configuration, paddedBoundary, 0);
+
+				// Update the tiling
+				tiling.add(designRect, paddedBoundary);
+
 				// Offset randomly inside the available space
-				gridLocator translation(_randomGenerator->randomRangeInclusive(0, largestSubRect.width - designRect->getBoundary().width),
-										_randomGenerator->randomRangeInclusive(0, largestSubRect.height - designRect->getBoundary().height));
+				//gridLocator translation(_randomGenerator->randomRangeInclusive(0, largestSubRect.width - designRect->getBoundary().width),
+				//						_randomGenerator->randomRangeInclusive(0, largestSubRect.height - designRect->getBoundary().height));
 
 
-				designRect->translate(translation);
+				//designRect->translate(translation);
 
 				// Give the algorithm a rectangle to tile
 				//gridRect nextRect = designRect->getBoundary();
@@ -269,46 +293,105 @@ namespace brogueHd::backend
 			//
 
 			// (MEMORY!) These must be deleted; and the stack-like gridLocator instances will be copied into the brogueLayout* grid.
-			gridRegion<gridLocator>* region = _roomGenerator->designRoom(*designRect, _layout->getBoundary());
+			gridRegion<gridLocator>* region = _roomGenerator->designRoom(designRect->getConfiguration().getRoomType(),
+																		 designRect->getBoundary().createPadded(roomPadding),
+																		 designRect->getMinSize(),
+																		 _layout->getBoundary());
 
 			// Set the actual region boundary
-			designRect->complete(region->getBoundary());
+			designRect->complete(region);
 
 			// Repack the rectangle if it is not the entrance
 			if (iteration != 0)
 			{
 				// Since the design rect was built with a padded boundary (for the room generator), the
 				// tile in the packing should still have room for the padded boundary of the actual rect.
+				// 
+				// This "actual rect" will be the exact smallest boundary for the region. To fit this 
+				// properly into the layout we have to expand by the size of the padding; and move it
+				// inside the design rect's boundary.
 				//
-				//gridRect actualRect = designRect->getActualBoundary();
-				////gridRect actualPaddedRect = actualRect.createExpanded(designRect->getPadding());				// Padded region must be within the bounds
-				//gridRect actualPaddedRect = actualRect;
-				//gridRect repackedRect = algorithm.repackRectangle(tiling.count() - 1, actualPaddedRect);
-				//gridLocator translation = actualPaddedRect.getTranslation(repackedRect);						// Difference from the original boundary
+				gridRect actualRect = designRect->getActualBoundary();
+				gridRect boundary = designRect->getBoundary();
 
-				//// Translate the design rect
-				//designRect->translate(translation);
+				// Add the padding back to the actual rect
+				gridRect actualRectPadded = actualRect.createExpanded(roomPadding);
+				gridLocator translation(0, 0);
 
-				//// Translate the region
-				//region->translate_StackLike(translation.column, translation.row);
+				// Check the boundary to see where it falls outside the prescribed bounds.
+				if (actualRectPadded.left() < boundary.left())
+					translation.column = boundary.left() - actualRectPadded.left();
 
-				// (TODO: Heap the tile list) (Have to re-create tiling list entry due to stack memory copying)
-				//tiling.removeAt(tiling.count() - 1);
-				//tiling.add(designRect);
+				if (actualRectPadded.right() > boundary.right())
+					translation.column = boundary.right() - actualRectPadded.right();
+
+				if (actualRectPadded.top() < boundary.top())
+					translation.row = boundary.top() - actualRectPadded.top();
+
+				if (actualRectPadded.bottom() > boundary.bottom())
+					translation.row = boundary.bottom() - actualRectPadded.bottom();
+
+				// Modify the region using a translation
+				designRect->translate(translation, true);
 			}
-
-			// Transfer data over to the brogueLayout*
-
-			brogueLayout* layout = _layout;
-
-			_layout->createCells(region);
-
-			// (MEMORY!) Clean up heap memory
-			delete region;
 
 			iteration++;
 		}
 
+		// Place Region Data
+		brogueLayout* layout = _layout;
+
+		tiling.forEach([&layout] (brogueDesignRect* designRect, const gridRect& boundary)
+		{
+			// Design Tile
+			boundary.iterate([&layout] (short column, short row)
+			{
+				brogueCell prototype(column, row, color(0, 0, 0.3, 0.2), colors::white(), brogueGlyphMap::Empty);
+
+				layout->createCells(gridLocator(column, row), prototype);
+
+				return iterationCallback::iterate;
+			});
+
+			// Design Boundary
+			designRect->getBoundary().iterate([&layout] (short column, short row)
+			{
+				brogueCell prototype(column, row, color(0.3, 0.0, 0.3, 0.2), colors::white(), brogueGlyphMap::Empty);
+
+				layout->createCells(gridLocator(column, row), prototype, true);
+
+				return iterationCallback::iterate;
+			});
+
+			// Actual Boundary
+			designRect->getActualBoundary().iterate([&layout] (short column, short row)
+			{
+				brogueCell prototype(column, row, color(0, 0.5, 1, 0.2), colors::white(), brogueGlyphMap::Empty);
+
+				layout->createCells(gridLocator(column, row), prototype, true);
+
+				return iterationCallback::iterate;
+			});
+
+			// Room Floor
+			designRect->getRegion()->iterateLocations([&layout, &designRect] (short column, short row, const gridLocator& location)
+			{
+				color backColor(0.3, 0.3, 0.3, 0.5);
+
+				if (designRect->getConfiguration().getRoomType() == brogueRoomType::CaveLargeNS)
+				{
+					backColor.red = 1;
+				}
+
+				brogueCell prototype(column, row, backColor, colors::white(), '.');
+
+				layout->createCells(gridLocator(column, row), prototype, true);
+
+				return iterationCallback::iterate;
+			});
+
+			return iterationCallback::iterate;
+		});
 
 
 		//// 1) Create 35 room (up front), 2) Attempt bolt-on until there are no more fits
