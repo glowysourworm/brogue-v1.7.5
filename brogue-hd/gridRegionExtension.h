@@ -21,7 +21,7 @@ namespace brogueHd::component
 		{
 			gridRegionConstructor<TResult> constructor(this->getParentBoundary(), this->getBoundary(), true);
 
-			region->iterateLocations([&constructor, &mapper] (short column, short row, const T& item)
+			region->iterateLocations([&constructor, &mapper] (int column, int row, const T& item)
 			{
 				TResult mappedItem = mapper(item);
 

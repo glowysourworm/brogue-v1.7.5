@@ -32,6 +32,10 @@
 #include "brogueLevel.h"
 #include "brogueCell.h"
 #include "cppstopwatch.h"
+#include "gridLocator.h"
+#include "gridLocatorEdge.h"
+#include "brogueUIProgramPartId.h"
+#include "brogueGraphView.h"
 
 using namespace brogueHd::simple;
 using namespace brogueHd::component;
@@ -470,13 +474,29 @@ namespace brogueHd::frontend
 
 		brogueProgramContainer* program = _program;
 
-		level->iterateWhereDefined([&program] (short column, short row, brogueCell* cell)
+		// Level Rendering
+		level->iterateWhereDefined([&program] (int column, int row, brogueCell* cell)
 		{
 			// Stack copy of brogueCellDisplay
 			program->setGameUpdate(column, row, cell->getDisplay());
 
 			return iterationCallback::iterate;
 		});
+
+		// Debug Texture (Overlay)
+		// 1) GPU / Frame-Rate data panel
+		// 2) Room Graph (or current issue data)
+		//
+		// 
+		// Using mock view to do the UI translation (TODO: This needs to go into the program API stack)
+		//brogueGraphView graphView(_eventController, brogueUIProgramPartId(brogueUIProgram::DebugOverlay, brogueUIProgramPart::Polygon, 0), brogueUIData(10, colors::white()), );
+
+		//level->iterateRoomGraph([&graphView] (const gridLocator& roomCenter, const gridLocatorEdge& roomConnection)
+		//{
+		//	graphView.addEdge(roomConnection);
+
+		//	return iterationCallback::iterate;
+		//});
 
 
 		_threadLock->unlock();

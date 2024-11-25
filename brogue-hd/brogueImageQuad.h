@@ -4,19 +4,22 @@
 #include "simpleDataStream.h"
 #include "simpleException.h"
 #include "simpleGlData.h"
+#include "brogueQuad.h"
 
 namespace brogueHd::frontend
 {
-	struct brogueImageQuad : simpleGlData
+	struct brogueImageQuad : public brogueQuad
 	{
 		brogueImageQuad() {}
 		brogueImageQuad(const brogueImageQuad& copy)
 		{
+			location = copy.location;
 			vertexXY = copy.vertexXY;
 			textureUV = copy.textureUV;
 		}
-		brogueImageQuad(const simpleQuad& avertexXY, const simpleQuad& atextureUV)
+		brogueImageQuad(const gridLocator& locator, const simpleQuad& avertexXY, const simpleQuad& atextureUV)
 		{
+			location = locator;
 			vertexXY = avertexXY;
 			textureUV = atextureUV;
 		}

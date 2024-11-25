@@ -12,21 +12,21 @@ namespace brogueHd::component
 	/// <summary>
 	/// Iterator delegate for providing feedback to/from gridRect iterator functions.
 	/// </summary>
-	using gridRectIterator = std::function<iterationCallback(short column, short row)>;
+	using gridRectIterator = std::function<iterationCallback(int column, int row)>;
 
 	/// <summary>
 	/// Iterator delegate for providing feedback to/from gridRect iterator functions. The direction 
 	/// is specific to the "adjacent side" along which iteration was happening.
 	/// </summary>
-	using gridRectDirectionalIterator = std::function<iterationCallback(short column, short row, brogueCompass direction)>;
+	using gridRectDirectionalIterator = std::function<iterationCallback(int column, int row, brogueCompass direction)>;
 
 	struct gridRect : hashable
 	{
 	public:
-		short column;
-		short row;
-		short width;
-		short height;
+		int column;
+		int row;
+		int width;
+		int height;
 
 		gridRect()
 		{
@@ -44,7 +44,7 @@ namespace brogueHd::component
 			height = copy.height;
 		}
 
-		gridRect(short acolumn, short arow, short awidth, short aheight)
+		gridRect(int acolumn, int arow, int awidth, int aheight)
 		{
 			column = acolumn;
 			row = arow;
@@ -52,6 +52,14 @@ namespace brogueHd::component
 			height = aheight;
 		}
 		void operator=(const gridRect& copy)
+		{
+			column = copy.column;
+			row = copy.row;
+			width = copy.width;
+			height = copy.height;
+		}
+
+		void set(const gridRect& copy)
 		{
 			column = copy.column;
 			row = copy.row;
@@ -106,7 +114,7 @@ namespace brogueHd::component
 			return hashGenerator::generateHash(column, row, width, height);
 		}
 
-		static gridRect fromCircle(short centerColumn, short centerRow, short radiusX, short radiusY)
+		static gridRect fromCircle(int centerColumn, int centerRow, int radiusX, int radiusY)
 		{
 			gridRect result;
 
@@ -118,28 +126,28 @@ namespace brogueHd::component
 			return result;
 		}
 
-		short left() const
+		int left() const
 
 		{
 			return column;
 		}
-		short right() const
+		int right() const
 		{
 			return column + width - 1;
 		}
-		short top() const
+		int top() const
 		{
 			return row;
 		}
-		short bottom() const
+		int bottom() const
 		{
 			return row + height - 1;
 		}
-		short centerX() const
+		int centerX() const
 		{
 			return column + simpleMath::floor(width / 2.0f);
 		}
-		short centerY() const
+		int centerY() const
 		{
 			return row + simpleMath::floor(height / 2.0f);
 		}
@@ -197,7 +205,7 @@ namespace brogueHd::component
 			return paddedRect;
 		}
 
-		bool contains(short acolumn, short arow) const
+		bool contains(int acolumn, int arow) const
 		{
 			if (acolumn < left())
 				return false;
@@ -288,13 +296,19 @@ namespace brogueHd::component
 			return !overlaps(rect) && adjacentEdges > 0 && (indicesOverlapX || indicesOverlapY);
 		}
 
+		void expand(int amount)
+		{
+			expand(column - 1, row - 1);
+			expand(right() + 1, bottom() + 1);
+		}
+
 		void expand(const gridRect& rect)
 		{
 			expand(rect.left(), rect.top());
 			expand(rect.right(), rect.bottom());
 		}
 
-		void expand(short acolumn, short arow)
+		void expand(int acolumn, int arow)
 		{
 			if (acolumn < left())
 			{
@@ -316,7 +330,7 @@ namespace brogueHd::component
 			}
 		}
 
-		void translate(short columnOffset, short rowOffset)
+		void translate(int columnOffset, int rowOffset)
 		{
 			column += columnOffset;
 			row += rowOffset;
@@ -337,9 +351,9 @@ namespace brogueHd::component
 		{
 			bool userBreak = false;
 
-			for (short i = left(); i <= right() && !userBreak; i++)
+			for (int i = left(); i <= right() && !userBreak; i++)
 			{
-				for (short j = top(); j <= bottom() && !userBreak; j++)
+				for (int j = top(); j <= bottom() && !userBreak; j++)
 				{
 					if (callback(i, j) == iterationCallback::breakAndReturn)
 						userBreak = true;
@@ -351,19 +365,19 @@ namespace brogueHd::component
 		{
 			bool userBreak = false;
 
-			for (short i = left(); i <= right() && !userBreak; i++)
+			for (int i = left(); i <= right() && !userBreak; i++)
 			{
 				if (callback(i, top()) == iterationCallback::breakAndReturn)
 					userBreak = true;
 			}
 
-			for (short i = left(); i <= right() && !userBreak; i++)
+			for (int i = left(); i <= right() && !userBreak; i++)
 			{
 				if (callback(i, bottom()) == iterationCallback::breakAndReturn)
 					userBreak = true;
 			}
 
-			for (short j = top() + 1; j <= bottom() - 1 && !userBreak; j++)
+			for (int j = top() + 1; j <= bottom() - 1 && !userBreak; j++)
 			{
 				if (callback(left(), j) == iterationCallback::breakAndReturn)
 					userBreak = true;
@@ -376,7 +390,7 @@ namespace brogueHd::component
 			}
 		}
 
-		void iterateAdjacent(short column, short row, gridRectIterator callback) const
+		void iterateAdjacent(int column, int row, gridRectIterator callback) const
 		{
 			for (int columnIndex = column - 1; columnIndex != column + 1; columnIndex++)
 			{
@@ -394,9 +408,9 @@ namespace brogueHd::component
 		{
 			bool userBreak = false;
 
-			for (short j = bottom(); j >= top() && !userBreak; j--)
+			for (int j = bottom(); j >= top() && !userBreak; j--)
 			{
-				for (short i = left(); i <= right() && !userBreak; i++)
+				for (int i = left(); i <= right() && !userBreak; i++)
 				{
 					if (callback(i, j) == iterationCallback::breakAndReturn)
 						userBreak = true;
@@ -410,9 +424,9 @@ namespace brogueHd::component
 			float heightRadius = height / 2.0f;
 			float widthRadius = width / 2.0f;
 
-			for (short i = left(); i <= right() && !userBreak; i++)
+			for (int i = left(); i <= right() && !userBreak; i++)
 			{
-				for (short j = top(); j <= bottom() && !userBreak; j++)
+				for (int j = top(); j <= bottom() && !userBreak; j++)
 				{
 					float dx = (column + (width / 2.0f)) - i;
 					float dy = (row + (height / 2.0f)) - j;

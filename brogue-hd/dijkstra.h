@@ -18,8 +18,8 @@ using namespace brogueHd::simple;
 namespace brogueHd::component
 {
 	//struct pdsLink {
-	//	short distance;
-	//	short cost;
+	//	int distance;
+	//	int cost;
 	//	pdsLink* left, * right;
 	//};
 
@@ -33,18 +33,18 @@ namespace brogueHd::component
 	/// <summary>
 	/// Decision making predicate for dijkstra's algorithm
 	/// </summary>
-	using dijkstraPredicate = std::function<bool(short column, short row)>;
+	using dijkstraPredicate = std::function<bool(int column, int row)>;
 
 	/// <summary>
 	/// Cost predicate:  calls user code to provide a movement cost to the map
 	/// </summary>
-	using dijkstraCostCallback = std::function<short(short column, short row)>;
+	using dijkstraCostCallback = std::function<int(int column, int row)>;
 
 	/// <summary>
 	/// Locator Callback:  Provides locator instances to the algorithm
 	/// </summary>
 	template<typename T>
-	using dijkstraLocatorCallback = std::function<T(short column, short row)>;
+	using dijkstraLocatorCallback = std::function<T(int column, int row)>;
 
 	template<isGridLocator T>
 	class dijkstra
@@ -80,31 +80,31 @@ namespace brogueHd::component
 
 		//void pdsUpdate(pdsMap* map);
 
-		//void pdsClear(pdsMap* map, short maxDistance, boolean eightWays);
+		//void pdsClear(pdsMap* map, int maxDistance, boolean eightWays);
 
-		//short pdsGetDistance(pdsMap* map, short x, short y);
+		//int pdsGetDistance(pdsMap* map, int x, int y);
 
-		//void pdsSetDistance(pdsMap* map, short x, short y, short distance);
+		//void pdsSetDistance(pdsMap* map, int x, int y, int distance);
 
-		//void pdsSetCosts(pdsMap* map, short** costMap);
+		//void pdsSetCosts(pdsMap* map, int** costMap);
 
-		//void pdsBatchInput(pdsMap* map, short** distanceMap, short** costMap, short maxDistance, boolean eightWays);
+		//void pdsBatchInput(pdsMap* map, int** distanceMap, int** costMap, int maxDistance, boolean eightWays);
 
-		//void pdsBatchOutput(pdsMap* map, short** distanceMap);
+		//void pdsBatchOutput(pdsMap* map, int** distanceMap);
 
-		//void pdsInvalidate(pdsMap* map, short maxDistance);
+		//void pdsInvalidate(pdsMap* map, int maxDistance);
 
-		//void dijkstraScan(short** distanceMap, short** costMap, boolean useDiagonals);
+		//void dijkstraScan(int** distanceMap, int** costMap, boolean useDiagonals);
 
-		//void calculateDistances(short** distanceMap,
-		//						short destinationX, 
-		//						short destinationY,
+		//void calculateDistances(int** distanceMap,
+		//						int destinationX, 
+		//						int destinationY,
 		//						unsigned long blockingTerrainFlags,
 		//						creature* traveler,
 		//						boolean canUseSecretDoors,
 		//						boolean eightWays);
 
-		//short pathingDistance(short x1, short y1, short x2, short y2, unsigned long blockingTerrainFlags);
+		//int pathingDistance(int x1, int y1, int x2, int y2, unsigned long blockingTerrainFlags);
 
 	private:
 
@@ -133,7 +133,7 @@ namespace brogueHd::component
 		T _sourceLocation;
 		simpleArray<T>* _targetLocations;
 
-		grid<short>* _outputMap;
+		grid<int>* _outputMap;
 
 		grid<bool>* _visitedMap;                        // Visited locations on the map
 		grid<bool>* _locationMap;                       // Locations that have been added to the frontier
@@ -166,7 +166,7 @@ namespace brogueHd::component
 		_locatorCallback = locatorCallback;
 
 		// Set these to be the full size of the parent
-		_outputMap = new grid<short>(parentBoundary, relativeBoundary);
+		_outputMap = new grid<int>(parentBoundary, relativeBoundary);
 		_visitedMap = new grid<bool>(parentBoundary, relativeBoundary);
 		_locationMap = new grid<bool>(parentBoundary, relativeBoundary);
 
@@ -220,7 +220,7 @@ namespace brogueHd::component
 				bool passesPredicate = _mapPredicate(column, row);
 
 				// Initialize output map (set to infinity for initialization
-				short outputValue = ((column == _sourceLocation.column) && (row == _sourceLocation.row) && passesPredicate) ? 0 : std::numeric_limits<short>::max();
+				int outputValue = ((column == _sourceLocation.column) && (row == _sourceLocation.row) && passesPredicate) ? 0 : std::numeric_limits<int>::max();
 
 				_outputMap->set(column, row, outputValue);
 
@@ -253,8 +253,8 @@ namespace brogueHd::component
 			goalDict.add(_targetLocations->get(index), false);
 
 		// Process the first element
-		short column = _sourceLocation.column;
-		short row = _sourceLocation.row;
+		int column = _sourceLocation.column;
+		int row = _sourceLocation.row;
 
 		T lastLocator = default_value::value<T>();
 
@@ -451,15 +451,15 @@ namespace brogueHd::component
 		// Find the "easiest" route to the goal (also, see operators for gridCell)
 		while (currentLocation != goalLocation)
 		{
-			short column = currentLocation.column;
-			short row = currentLocation.row;
+			int column = currentLocation.column;
+			int row = currentLocation.row;
 
-			short north = row - 1 >= _relativeBoundary.top();
-			short south = row + 1 <= _relativeBoundary.bottom();
-			short east = column + 1 <= _relativeBoundary.right();
-			short west = column - 1 >= _relativeBoundary.left();
+			int north = row - 1 >= _relativeBoundary.top();
+			int south = row + 1 <= _relativeBoundary.bottom();
+			int east = column + 1 <= _relativeBoundary.right();
+			int west = column - 1 >= _relativeBoundary.left();
 
-			short lowestWeight = std::numeric_limits<short>::max();
+			int lowestWeight = std::numeric_limits<int>::max();
 			T lowestWeightLocation = currentLocation;
 
 			if (north && (_outputMap->get(column, row - 1) < lowestWeight))
@@ -510,7 +510,7 @@ namespace brogueHd::component
 				lowestWeight = _outputMap->get(column - 1, row + 1);
 			}
 
-			if (lowestWeight == std::numeric_limits<short>::max())
+			if (lowestWeight == std::numeric_limits<int>::max())
 			{
 				throw simpleException("Mishandled Dijkstra Map dijkstra.generatePath()");
 			}
@@ -570,16 +570,16 @@ namespace brogueHd::component
 		//
 
 		// Pre-fetch the cost list for this frontier location
-		short oldWeight = _outputMap->get(destColumn, destRow);
+		int oldWeight = _outputMap->get(destColumn, destRow);
 
 		// Callback for next step weight
-		short cost = _mapCostPredicate(destColumn, destRow);
+		int cost = _mapCostPredicate(destColumn, destRow);
 
 		// Update the output map
 		_outputMap->set(destColumn, destRow, simpleMath::minOf(_outputMap->get(destColumn, destRow), currentWeight + cost));
 
 		// Update the frontier
-		short newWeight = _outputMap->get(destColumn, destRow);
+		int newWeight = _outputMap->get(destColumn, destRow);
 
 		// Check for a new location in the frontier
 		if (!_locationMap->get(destColumn, destRow))
@@ -693,7 +693,7 @@ namespace brogueHd::component
 
 	//void dijkstra::pdsUpdate(pdsMap* map) 
 	//{
-	//	short dir, dirs;
+	//	int dir, dirs;
 	//	pdsLink* left = NULL, * right = NULL, * link = NULL;
 
 	//	dirs = map->eightWays ? 8 : 4;
@@ -753,9 +753,9 @@ namespace brogueHd::component
 	//	}
 	//}
 
-	//void dijkstra::pdsClear(pdsMap* map, short maxDistance, boolean eightWays) 
+	//void dijkstra::pdsClear(pdsMap* map, int maxDistance, boolean eightWays) 
 	//{
-	//	short i;
+	//	int i;
 
 	//	map->eightWays = eightWays;
 
@@ -767,13 +767,13 @@ namespace brogueHd::component
 	//	}
 	//}
 
-	//short dijkstra::pdsGetDistance(pdsMap* map, short x, short y) 
+	//int dijkstra::pdsGetDistance(pdsMap* map, int x, int y) 
 	//{
 	//	pdsUpdate(map);
 	//	return PDS_CELL(map, x, y)->distance;
 	//}
 
-	//void dijkstra::pdsSetDistance(pdsMap* map, short x, short y, short distance)
+	//void dijkstra::pdsSetDistance(pdsMap* map, int x, int y, int distance)
 	//{
 	//	pdsLink* left, * right, * link;
 
@@ -805,9 +805,9 @@ namespace brogueHd::component
 	//	}
 	//}
 
-	//void dijkstra::pdsSetCosts(pdsMap* map, short** costMap)
+	//void dijkstra::pdsSetCosts(pdsMap* map, int** costMap)
 	//{
-	//	short i, j;
+	//	int i, j;
 
 	//	for (i = 0; i < DCOLS; i++) {
 	//		for (j = 0; j < DROWS; j++) {
@@ -821,9 +821,9 @@ namespace brogueHd::component
 	//	}
 	//}
 
-	//void dijkstra::pdsBatchInput(pdsMap* map, short** distanceMap, short** costMap, short maxDistance, boolean eightWays) 
+	//void dijkstra::pdsBatchInput(pdsMap* map, int** distanceMap, int** costMap, int maxDistance, boolean eightWays) 
 	//{
-	//	short i, j;
+	//	int i, j;
 	//	pdsLink* left, * right;
 
 	//	map->eightWays = eightWays;
@@ -913,9 +913,9 @@ namespace brogueHd::component
 	//	}
 	//}
 
-	//void dijkstra::pdsBatchOutput(pdsMap* map, short** distanceMap) 
+	//void dijkstra::pdsBatchOutput(pdsMap* map, int** distanceMap) 
 	//{
-	//	short i, j;
+	//	int i, j;
 
 	//	pdsUpdate(map);
 	//	// transfer results to the distanceMap
@@ -926,12 +926,12 @@ namespace brogueHd::component
 	//	}
 	//}
 
-	//void dijkstra::pdsInvalidate(pdsMap* map, short maxDistance)
+	//void dijkstra::pdsInvalidate(pdsMap* map, int maxDistance)
 	//{
 	//	pdsBatchInput(map, NULL, NULL, maxDistance, map->eightWays);
 	//}
 
-	//void dijkstra::dijkstraScan(short** distanceMap, short** costMap, boolean useDiagonals) 
+	//void dijkstra::dijkstraScan(int** distanceMap, int** costMap, boolean useDiagonals) 
 	//{
 	//	static pdsMap map;
 
@@ -939,9 +939,9 @@ namespace brogueHd::component
 	//	pdsBatchOutput(&map, distanceMap);
 	//}
 
-	//void dijkstra::calculateDistances(short** distanceMap,
-	//								  short destinationX, 
-	//								  short destinationY,
+	//void dijkstra::calculateDistances(int** distanceMap,
+	//								  int destinationX, 
+	//								  int destinationY,
 	//								  unsigned long blockingTerrainFlags,
 	//								  creature* traveler,
 	//								  boolean canUseSecretDoors,
@@ -950,7 +950,7 @@ namespace brogueHd::component
 	//	creature* monst;
 	//	static pdsMap map;
 
-	//	short i, j;
+	//	int i, j;
 
 	//	for (i = 0; i < DCOLS; i++) 
 	//	{
@@ -994,9 +994,9 @@ namespace brogueHd::component
 	//	pdsBatchOutput(&map, distanceMap);
 	//}
 
-	//short dijkstra::pathingDistance(short x1, short y1, short x2, short y2, unsigned long blockingTerrainFlags) 
+	//int dijkstra::pathingDistance(int x1, int y1, int x2, int y2, unsigned long blockingTerrainFlags) 
 	//{
-	//	short retval, ** distanceMap = allocGrid();
+	//	int retval, ** distanceMap = allocGrid();
 	//	calculateDistances(distanceMap, x2, y2, blockingTerrainFlags, NULL, true, true);
 	//	retval = distanceMap[x1][y1];
 	//	freeGrid(distanceMap);

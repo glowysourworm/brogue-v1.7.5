@@ -12,7 +12,7 @@ namespace brogueHd::backend::model
 		{
 			_profile = nullptr;
 		}
-		brogueLevelTemplate(short depth, levelTypes types) 
+		brogueLevelTemplate(int depth, levelTypes types) 
 		{
 			_profile = new brogueLevelProfile(depth, types);
 		};

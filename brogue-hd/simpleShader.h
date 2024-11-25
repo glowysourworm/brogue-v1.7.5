@@ -7,9 +7,11 @@
 #include "simpleException.h"
 #include "simpleGlData.h"
 #include "simpleGlObject.h"
+#include "simpleList.h"
 #include "simpleLogger.h"
 #include "simpleString.h"
 #include "simpleUniform.h"
+#include "simpleVertexAttribute.h"
 #include <concepts>
 
 using namespace brogueHd::simple;
@@ -187,6 +189,10 @@ namespace brogueHd::frontend
 		{
 			return *_uniforms4;
 		}
+		simpleArray<simpleVertexAttribute> getVertexAttributes() const
+		{
+			return *_vertexAttributes;
+		}
 
 	private:
 
@@ -202,6 +208,8 @@ namespace brogueHd::frontend
 		simpleArray<simpleUniform<vec2>>* _uniforms2;
 		simpleArray<simpleUniform<ivec2>>* _uniforms2i;
 		simpleArray<simpleUniform<vec4>>* _uniforms4;
+
+		simpleArray<simpleVertexAttribute>* _vertexAttributes;
 	};
 
 	simpleShader::simpleShader()
@@ -211,6 +219,7 @@ namespace brogueHd::frontend
 		_uniforms2 = new simpleArray<simpleUniform<vec2>>();
 		_uniforms2i = new simpleArray<simpleUniform<ivec2>>();
 		_uniforms4 = new simpleArray<simpleUniform<vec4>>();
+		_vertexAttributes = new simpleArray<simpleVertexAttribute>();
 
 		_shaderType = NULL;
 	}
@@ -221,6 +230,7 @@ namespace brogueHd::frontend
 		delete _uniforms2;
 		delete _uniforms2i;
 		delete _uniforms4;
+		delete _vertexAttributes;
 	}
 	simpleShader::simpleShader(const simpleShader& copy)
 	{
@@ -235,6 +245,15 @@ namespace brogueHd::frontend
 		_uniforms2 = new simpleArray<simpleUniform<vec2>>(data->uniforms2.toArray());
 		_uniforms2i = new simpleArray<simpleUniform<ivec2>>(data->uniforms2i.toArray());
 		_uniforms4 = new simpleArray<simpleUniform<vec4>>(data->uniforms4.toArray());
+
+		_vertexAttributes = new simpleArray<simpleVertexAttribute>(data->attributes.count());
+
+		for (int index = 0; index < data->attributes.count(); index++)
+		{
+			vertexAttributeData vaData = data->attributes.get(index);
+
+			_vertexAttributes->set(index, simpleVertexAttribute(vaData.index, vaData.name, vaData.type));
+		}
 
 		_source = data->source;
 		_shaderType = data->type;
@@ -252,6 +271,7 @@ namespace brogueHd::frontend
 		_uniforms2 = new simpleArray<simpleUniform<vec2>>(copy.getUniforms2());
 		_uniforms2i = new simpleArray<simpleUniform<ivec2>>(copy.getUniforms2i());
 		_uniforms4 = new simpleArray<simpleUniform<vec4>>(copy.getUniforms4());
+		_vertexAttributes = new simpleArray<simpleVertexAttribute>(copy.getVertexAttributes());
 	}
 
 	void simpleShader::operator=(const simpleShader& copy)

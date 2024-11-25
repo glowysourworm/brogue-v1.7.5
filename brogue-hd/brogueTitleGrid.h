@@ -32,7 +32,7 @@ namespace brogueHd::frontend
 			return gridRect(0, 0, COLS, ROWS);
 		}
 
-		bool isTheText(short column, short row)
+		bool isTheText(int column, int row)
 		{
 			gridRect theTextBounds = this->textBounds();
 

@@ -2,7 +2,9 @@
 
 #include "brogueCellDisplay.h"
 #include "brogueUIConstants.h"
+#include "brogueQuad.h"
 #include "gl.h"
+#include "gridLocator.h"
 #include "simple.h"
 #include "simpleDataStream.h"
 #include "simpleException.h"
@@ -12,10 +14,11 @@ using namespace brogueHd::backend::model;
 
 namespace brogueHd::frontend
 {
-	struct brogueCellQuad : simpleGlData
+	struct brogueCellQuad : public brogueQuad
 	{
 		brogueCellQuad()
 		{
+			location = default_value::value<gridLocator>();
 			vertexXY = default_value::value<simpleQuad>();
 			textureUV = default_value::value<simpleQuad>();
 			glyphUV = default_value::value<simpleQuad>();
@@ -27,11 +30,15 @@ namespace brogueHd::frontend
 			copyImpl(copy);
 		}
 		brogueCellQuad(const brogueCellDisplay& cell,
-			const simpleQuad& averticesXY,
-			const simpleQuad& atextureUV,
-			const simpleQuad& aglyphUV,
-			openglBrogueCellOutputSelector aoutputSelector)
+						const simpleQuad& averticesXY,
+						const simpleQuad& atextureUV,
+						const simpleQuad& aglyphUV,
+						openglBrogueCellOutputSelector aoutputSelector)
 		{
+			// Cache the location data
+			location.column = cell.column;
+			location.row = cell.row;
+
 			// Consider translating these perhaps INTO the cell display - the view bounds.
 			//
 			backgroundColor = vec4(cell.backColor.red, cell.backColor.green, cell.backColor.blue, cell.backColor.alpha);
@@ -160,6 +167,8 @@ namespace brogueHd::frontend
 
 		void copyImpl(const brogueCellQuad& copy)
 		{
+			location = copy.location;
+
 			backgroundColor = copy.backgroundColor;
 			foregroundColor = copy.foregroundColor;
 			glyphUV = copy.glyphUV;

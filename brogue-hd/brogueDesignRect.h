@@ -86,7 +86,7 @@ namespace brogueHd::backend::model
 			translate(locator.column, locator.row, actualOnly);
 		}
 
-		void translate(short columnOffset, short rowOffset, bool actualOnly = false)
+		void translate(int columnOffset, int rowOffset, bool actualOnly = false)
 		{
 			if (actualOnly && _complete)
 			{

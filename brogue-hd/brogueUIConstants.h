@@ -107,7 +107,12 @@ namespace brogueHd::frontend
 		/// <summary>
 		/// Program to show the discovered items display
 		/// </summary>
-		GameDiscoveredItems = 21
+		GameDiscoveredItems = 21,
+
+		/// <summary>
+		/// Overlay for debugging various pieces of the game
+		/// </summary>
+		DebugOverlay = 22
 	};
 
 	enum class brogueUIProgramPart : int
@@ -142,7 +147,12 @@ namespace brogueHd::frontend
 		/// <summary>
 		/// A color mask cell-type data stream with reduced data output; and non-mouse interacting handling.
 		/// </summary>
-		ColorMask = 5
+		ColorMask = 5,
+
+		/// <summary>
+		/// A polygon (view) data stream with optional mouse interaction
+		/// </summary>
+		Polygon = 6
 	};
 
 	enum class brogueProgramExitCondition : int
@@ -216,7 +226,7 @@ namespace brogueHd::frontend
 		brogueImageQuad = 0,
 		brogueCellQuad = 1,
 		brogueColorQuad = 2,
-		brogueFlameQuad = 3
+		broguePolygon = 3
 	};
 
 	enum class openglBrogueCellOutputSelector

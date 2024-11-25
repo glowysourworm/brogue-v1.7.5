@@ -27,13 +27,13 @@ namespace brogueHd::backend::model
 		/// Advances message queue to the count specified or until the last message has
 		/// been processed. Confirms all intermediate messages
 		/// </summary>
-		bool confirmAndAdvance(short count);
+		bool confirmAndAdvance(int count);
 
 		void updateFlavorText(char* message, color foreColor);
 
 	private:
 
-		short _currentMessageIndex;
+		int _currentMessageIndex;
 
 		simpleList<messageData>* _messages;
 
@@ -41,14 +41,14 @@ namespace brogueHd::backend::model
 
 		//messageData messageArchive[MESSAGE_ARCHIVE_LINES];
 
-		//short messageArchivePosition;
+		//int messageArchivePosition;
 
 		//std::string currentFilePath;
 
 		// char displayDetail[DCOLS][DROWS];		// used to make certain per-cell data accessible to external code (e.g. terminal adaptations)
 
 		//unsigned char inputRecordBuffer[INPUT_RECORD_BUFFER + 100];
-		//unsigned short locationInRecordingBuffer;
+		//unsigned int locationInRecordingBuffer;
 		//unsigned long randomNumbersGenerated;
 		//unsigned long positionInPlaybackFile;
 		//unsigned long lengthOfPlaybackFile;
@@ -100,7 +100,7 @@ namespace brogueHd::backend::model
 		else
 		{
 			// Check queue from the back and stop where confirmation hasn't been received
-			for (short index = _messages->count(); index >= 0; index--)
+			for (int index = _messages->count(); index >= 0; index--)
 			{
 				// Update current index
 				if (!_messages->get(index).confirmed)
@@ -112,9 +112,9 @@ namespace brogueHd::backend::model
 		}
 	}
 
-	bool brogueMessageQueue::confirmAndAdvance(short count)
+	bool brogueMessageQueue::confirmAndAdvance(int count)
 	{
-		short index = _currentMessageIndex;
+		int index = _currentMessageIndex;
 
 		for (index = _currentMessageIndex; index >= (_currentMessageIndex - count) && index >= 0; index--)
 		{

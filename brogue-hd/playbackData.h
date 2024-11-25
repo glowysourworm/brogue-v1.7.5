@@ -16,9 +16,9 @@ namespace brogueHd::backend::model
 		bool playbackMode;					// whether we're viewing a recording instead of playing
 		unsigned long currentTurnNumber;	// how many turns have elapsed
 		unsigned long howManyTurns;			// how many turns are in this recording
-		short howManyDepthChanges;			// how many times the player changes depths
-		short playbackDelayPerTurn;			// base playback speed; modified per turn by events
-		short playbackDelayThisTurn;		// playback speed as modified
+		int howManyDepthChanges;			// how many times the player changes depths
+		int playbackDelayPerTurn;			// base playback speed; modified per turn by events
+		int playbackDelayThisTurn;		// playback speed as modified
 		bool playbackPaused;
 		bool playbackFastForward;			// for loading saved games and such -- disables drawing and prevents pauses
 		bool playbackOOS;					// playback out of sync -- no unpausing allowed

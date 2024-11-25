@@ -6,11 +6,11 @@
 namespace brogueHd::backend::model
 {
 	typedef struct blueprint {
-		short depthRange[2];				// machine must be built between these dungeon depths
-		short roomSize[2];					// machine must be generated in a room of this size
-		short frequency;					// frequency (number of tickets this blueprint enters in the blueprint selection raffle)
-		short featureCount;					// how many different types of features follow (max of 20)
-		short dungeonProfileType;           // if BP_REDESIGN_INTERIOR is set, which dungeon profile do we use?
+		int depthRange[2];				// machine must be built between these dungeon depths
+		int roomSize[2];					// machine must be generated in a room of this size
+		int frequency;					// frequency (number of tickets this blueprint enters in the blueprint selection raffle)
+		int featureCount;					// how many different types of features follow (max of 20)
+		int dungeonProfileType;           // if BP_REDESIGN_INTERIOR is set, which dungeon profile do we use?
 		unsigned long flags;				// blueprint flags
 		machineFeature feature[20];			// the features themselves
 	} blueprint;

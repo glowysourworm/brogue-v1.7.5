@@ -27,16 +27,16 @@ namespace brogueHd::backend::model
 		creatureTypes leaderType;
 
 		// membership information
-		short numberOfMemberTypes;
+		int numberOfMemberTypes;
 		creatureTypes memberType[5];
 		randomRange memberCount[5];
 
 		// spawning information
-		short minLevel;
-		short maxLevel;
-		short frequency;
+		int minLevel;
+		int maxLevel;
+		int frequency;
 		tileType spawnsIn;
-		short machine;
+		int machine;
 
 		hordeFlags flags;
 	};
@@ -45,12 +45,12 @@ namespace brogueHd::backend::model
 	{
 		char title[100];
 		const color* textColor;
-		short healthFactor;
-		short moveSpeedFactor;
-		short attackSpeedFactor;
-		short defenseFactor;
-		short damageFactor;
-		short DFChance;
+		int healthFactor;
+		int moveSpeedFactor;
+		int attackSpeedFactor;
+		int defenseFactor;
+		int damageFactor;
+		int DFChance;
 		permanentDungeonLayers DFType;
 		lightType light;
 		unsigned long monsterFlags;
@@ -63,8 +63,8 @@ namespace brogueHd::backend::model
 	struct creatureClass
 	{
 		char name[30];
-		short frequency;
-		short maxDepth;
+		int frequency;
+		int maxDepth;
 		creatureTypes memberList[15];
 	};
 
@@ -75,13 +75,13 @@ namespace brogueHd::backend::model
 		char name[COLS];
 		char symbol;
 
-		short maxHP;
-		short defense;
-		short accuracy;
+		int maxHP;
+		int defense;
+		int accuracy;
 		randomRange damage;
 		long turnsBetweenRegen;		// turns to wait before regaining 1 HP
-		short movementSpeed;
-		short attackSpeed;
+		int movementSpeed;
+		int attackSpeed;
 
 		dungeonFeatureBodilyFluids bloodType;
 		lightType intrinsicLightType;
@@ -91,7 +91,7 @@ namespace brogueHd::backend::model
 		//		   will be some sort of "special effect" class, or "dungeon alteration", which
 		//		   will be shared among brogueObject instances.
 
-		short DFChance;						// percent chance to spawn the dungeon feature per awake turn
+		int DFChance;						// percent chance to spawn the dungeon feature per awake turn
 		permanentDungeonLayers DFType;	// kind of dungeon feature
 		//boltType bolts[20];
 		unsigned long flags;

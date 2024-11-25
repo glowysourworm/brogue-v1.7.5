@@ -58,7 +58,7 @@ namespace brogueHd::backend
 
 		// Generate white noise inside the chosen rectangle
 		//
-		relativeBoundary.iterate([&rand, &parameters, &resultGrid] (short x, short y)
+		relativeBoundary.iterate([&rand, &parameters, &resultGrid] (int x, int y)
 		{
 			if (rand->next() <= parameters.getFillRatio())
 				resultGrid.set(x, y, parameters.getResultPolarity());
@@ -74,7 +74,7 @@ namespace brogueHd::backend
 		}
 
 		// Callback
-		relativeBoundary.iterate([&rand, &parameters, &resultGrid, &callback] (short x, short y)
+		relativeBoundary.iterate([&rand, &parameters, &resultGrid, &callback] (int x, int y)
 		{
 			return callback(x, y, resultGrid.get(x, y));
 		});
@@ -82,15 +82,15 @@ namespace brogueHd::backend
 
 	void noiseGenerator::cellularAutomataIteration(grid<bool>& resultGrid, const simpleList<cellularAutomataRule>* rules, bool resultPolarity)
 	{
-		short positiveCount = 0;
-		short negativeCount = 0;
+		int positiveCount = 0;
+		int negativeCount = 0;
 
-		resultGrid.iterate([&resultGrid, &rules, &positiveCount, &negativeCount, &resultPolarity] (short columnRect, short rowRect, bool item)
+		resultGrid.iterate([&resultGrid, &rules, &positiveCount, &negativeCount, &resultPolarity] (int columnRect, int rowRect, bool item)
 		{
 			positiveCount = 0;
 			negativeCount = 0;
 
-			resultGrid.iterateAdjacent(columnRect, rowRect, false, [&resultGrid, &positiveCount, &negativeCount] (short i, short j, brogueCompass direction, bool item)
+			resultGrid.iterateAdjacent(columnRect, rowRect, false, [&resultGrid, &positiveCount, &negativeCount] (int i, int j, brogueCompass direction, bool item)
 			{
 				// Use out-of-bounds as negative polarity
 				if (!resultGrid.isInBounds(i, j))

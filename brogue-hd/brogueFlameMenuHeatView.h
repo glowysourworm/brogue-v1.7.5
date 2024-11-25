@@ -1,17 +1,18 @@
 #pragma once
 #include "brogueCellDisplay.h"
+#include "brogueColorQuad.h"
+#include "brogueCoordinateConverter.h"
 #include "brogueKeyboardState.h"
 #include "brogueMouseState.h"
 #include "brogueTitleGrid.h"
-#include "brogueUIConstants.h"
 #include "brogueUIData.h"
 #include "brogueUIProgramPartId.h"
-#include "brogueViewBase.h"
+#include "brogueViewGridCore.h"
 #include "color.h"
 #include "eventController.h"
-#include "gridDefinitions.h"
 #include "gridRect.h"
 #include "randomGenerator.h"
+#include "resourceController.h"
 #include "simple.h"
 #include "simplePeriodCounter.h"
 
@@ -26,15 +27,16 @@ namespace brogueHd::frontend
 	/// elements will provide the constant colors below. This view will keep track of a random sequence to provide
 	/// also as uniforms to the GPU shaders to add variability.
 	/// </summary>
-	class brogueFlameMenuHeatView : public brogueViewBase
+	class brogueFlameMenuHeatView : public brogueViewGridCore<brogueColorQuad>
 	{
 	public:
-		brogueFlameMenuHeatView(eventController* eventController,
+		brogueFlameMenuHeatView(brogueCoordinateConverter* coordinateConverter,
+								resourceController* resourceController,
+								eventController* eventController,
 								randomGenerator* randomGenerator,
-								int fadePeriodMilliseconds,
+								const brogueUIProgramPartId& partId,
 								const brogueUIData& data,
-								const gridRect& sceneBoundary,
-								const gridRect& viewBoundary);
+								int fadePeriodMilliseconds);
 		~brogueFlameMenuHeatView();
 
 		void update(int millisecondsLapsed,
@@ -45,7 +47,6 @@ namespace brogueHd::frontend
 						 int millisecondsLapsed) override;
 
 		void clearUpdate() override;
-		void clearEvents() override;
 
 		bool needsUpdate() const override;
 
@@ -75,23 +76,9 @@ namespace brogueHd::frontend
 
 	public:
 
-		bool isTheText(short column, short row) const
+		bool isTheText(int column, int row) const
 		{
 			return _titleGrid->isTheText(column, row);
-		}
-
-		void iterate(gridCallback<brogueCellDisplay*> callback) const override
-		{
-			brogueTitleGrid* titleGrid = _titleGrid;
-			gridRect sceneBounds = _titleGrid->sceneBounds();
-
-			brogueViewBase::iterate([&callback, &titleGrid, &sceneBounds] (short column, short row, brogueCellDisplay* cell)
-			{
-				//if (titleGrid->isTheText(column, row) || row == sceneBounds.bottom())
-				callback(column, row, cell);
-
-				return iterationCallback::iterate;
-			});
 		}
 
 	public:
@@ -116,17 +103,14 @@ namespace brogueHd::frontend
 		int _fadePeriodRandom2;
 	};
 
-	brogueFlameMenuHeatView::brogueFlameMenuHeatView(eventController* eventController,
+	brogueFlameMenuHeatView::brogueFlameMenuHeatView(brogueCoordinateConverter* coordinateConverter,
+													 resourceController* resourceController,
+													 eventController* eventController,
 													 randomGenerator* randomGenerator,
-													 int fadePeriodMilliseconds,
+													 const brogueUIProgramPartId& partId,
 													 const brogueUIData& data,
-													 const gridRect& sceneBoundary,
-													 const gridRect& viewBoundary)
-		: brogueViewBase(eventController,
-						 brogueUIProgramPartId(brogueUIProgram::FlameMenuProgram, brogueUIProgramPart::FlameDisplay, 0),
-						 data,
-						 sceneBoundary,
-						 viewBoundary)
+													 int fadePeriodMilliseconds)
+		: brogueViewGridCore(coordinateConverter, resourceController, eventController, partId, data)
 	{
 		_randomGenerator = randomGenerator;
 		_fadePeriodRandom1 = randomGenerator->next() * 10000;
@@ -134,6 +118,11 @@ namespace brogueHd::frontend
 		_periodCounter = new simplePeriodCounter(5);
 		_fadePeriodCounter = new simplePeriodCounter(fadePeriodMilliseconds);
 		_titleGrid = new brogueTitleGrid();
+
+		update(0, true);
+
+		// Call initializeCore() -> sets up stream for  GL backend
+		brogueViewGridCore::initializeCore();
 	}
 	brogueFlameMenuHeatView::~brogueFlameMenuHeatView()
 	{
@@ -158,7 +147,7 @@ namespace brogueHd::frontend
 		}
 
 		// Mouse Interaction
-		brogueViewBase::checkUpdate(keyboardState, mouseState, millisecondsLapsed);
+		brogueViewGridCore::checkUpdate(keyboardState, mouseState, millisecondsLapsed);
 	}
 	bool brogueFlameMenuHeatView::needsUpdate() const
 	{
@@ -176,14 +165,32 @@ namespace brogueHd::frontend
 	{
 		_periodCounter->reset();
 
-
-		brogueViewBase::clearUpdate();
-	}
-	void brogueFlameMenuHeatView::clearEvents()
-	{
-		brogueViewBase::clearEvents();
+		brogueViewGridCore::clearUpdate();
 	}
 	void brogueFlameMenuHeatView::update(int millisecondsLapsed, bool forceUpdate)
 	{
+		brogueFlameMenuHeatView* that = this;
+		brogueTitleGrid* titleGrid = _titleGrid;
+		gridRect sceneBounds = _titleGrid->sceneBounds();
+
+		sceneBounds.iterate([&that, &titleGrid, &sceneBounds] (int column, int row)
+		{
+			brogueCellDisplay cell(column, row);
+
+			if (titleGrid->isTheText(column, row))
+			{
+				cell.backColor = colors::blue();
+
+				that->set(cell);
+			}
+			else if (row == sceneBounds.bottom())
+			{
+				cell.backColor = colors::red();
+
+				that->set(cell);
+			}
+
+			return iterationCallback::iterate;
+		});
 	}
 }

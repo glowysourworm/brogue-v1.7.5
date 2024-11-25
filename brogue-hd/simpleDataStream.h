@@ -41,6 +41,24 @@ namespace brogueHd::frontend
 			_cursor = 0;
 		}
 
+
+		/// <summary>
+		/// Deletes / Re-creates a data stream with storage for N number of elements
+		/// </summary>
+		/// <param name="numberShaderCallsPerElement">Total number of shader calls (vertices) per element</param>
+		/// <param name="elementByteSize">Total size of a single element in bytes</param>
+		/// <param name="elementCount">Total count in terms of elements</param>
+		void reCreate(int elementCount, int numberShaderCallsPerElement, int elementByteSize)
+		{
+			if (_array != nullptr)
+				delete _array;
+
+			_streamNumberElements = elementCount;
+			_numberVerticesPerElement = numberShaderCallsPerElement;
+			_array = new simpleArray<char>(elementCount * elementByteSize);
+			_cursor = 0;
+		}
+
 		void resetCursor()
 		{
 			_cursor = 0;

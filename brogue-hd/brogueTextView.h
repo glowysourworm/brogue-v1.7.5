@@ -1,15 +1,19 @@
 #pragma once
 
+#include "brogueCellDisplay.h"
+#include "brogueCellQuad.h"
+#include "brogueCoordinateConverter.h"
 #include "brogueGlyphMap.h"
 #include "brogueUIConstants.h"
 #include "brogueUIData.h"
 #include "brogueUIProgramPartId.h"
 #include "brogueUIText.h"
-#include "brogueViewBase.h"
+#include "brogueViewGridCore.h"
 #include "color.h"
 #include "colorString.h"
 #include "eventController.h"
 #include "gridRect.h"
+#include "resourceController.h"
 #include "simple.h"
 #include "simpleString.h"
 
@@ -17,18 +21,19 @@ using namespace brogueHd::component;
 
 namespace brogueHd::frontend
 {
-	class brogueTextView : public brogueViewBase
+	class brogueTextView : public brogueViewGridCore<brogueCellQuad>
 	{
 	public:
 
-		brogueTextView(eventController* eventController, const brogueUIProgramPartId& partId, const brogueUIData& data, const gridRect& sceneBoundary, const gridRect& viewBoundary);
+		brogueTextView(brogueCoordinateConverter* coordinateConverter,
+					   resourceController* resourceController,
+					   eventController* eventController,
+					   const brogueUIProgramPartId& partId,
+					   const brogueUIData& data);
 		~brogueTextView();
 
 		virtual void update(int millisecondsLapsed,
 							bool forceUpdate) override;
-
-		virtual bool needsUpdate() const override;
-		virtual void clearUpdate() override;
 
 		void setLine(int row, const colorString& text, brogueTextAlignment alignment);
 		void setLine(int row, const simpleString& text, brogueTextAlignment alignment);
@@ -39,48 +44,41 @@ namespace brogueHd::frontend
 	private:
 
 		brogueUIText* _uiText;
-		bool _invalid;
 	};
 
-	brogueTextView::brogueTextView(eventController* eventController, const brogueUIProgramPartId& partId, const brogueUIData& data, const gridRect& sceneBoundary, const gridRect& viewBoundary)
-		: brogueViewBase(eventController, partId, data, sceneBoundary, viewBoundary)
+	brogueTextView::brogueTextView(brogueCoordinateConverter* coordinateConverter,
+								   resourceController* resourceController,
+								   eventController* eventController,
+								   const brogueUIProgramPartId& partId,
+								   const brogueUIData& data)
+		: brogueViewGridCore(coordinateConverter, resourceController, eventController, partId, data)
 	{
-		_uiText = new brogueUIText(sceneBoundary, viewBoundary, simpleString(""));
+		_uiText = new brogueUIText(data.getParentBoundary(), data.getBoundary(), simpleString(""));
 
 		update(0, true);
 
 		// Force initial update
-		_invalid = true;
+		brogueViewGridCore::initializeCore();
 	}
 	brogueTextView::~brogueTextView()
 	{
 		delete _uiText;
 	}
-	bool brogueTextView::needsUpdate() const
-	{
-		// Adding the mouse enter / leave events
-		//
-		return brogueViewBase::needsUpdate() || _invalid;
-	}
-	void brogueTextView::clearUpdate()
-	{
-		_invalid = false;
-
-		brogueViewBase::clearUpdate();
-	}
 	void brogueTextView::update(int millisecondsLapsed, bool forceUpdate)
 	{
-		gridRect bounds = this->getBoundary();
+		brogueUIData* uiData = this->getUIData();
 		brogueTextView* that = this;
 		brogueUIText* uiText = _uiText;
 		brogueGlyphMap glyphMap;
 
 		// Iterate THIS Boundary:  apply just the background
-		this->getBoundary().iterate([&that, &bounds, &uiText, &glyphMap] (short column, short row)
+		uiData->getBoundary().iterate([&that, &uiData, &uiText, &glyphMap] (int column, int row)
 		{
-			that->get(column, row)->foreColor = uiText->getForeground(column, row);
-			that->get(column, row)->backColor = that->getBackgroundColor(column, row);
-			that->get(column, row)->character = glyphMap.isGlyphDefined(uiText->getCharacter(column, row)) ? uiText->getCharacter(column, row) : glyphMap.Empty;
+			brogueCellDisplay cell(column, row);
+
+			cell.foreColor = uiText->getForeground(column, row);
+			cell.backColor = uiData->calculateGradient(column, row, false, false, false);
+			cell.character = glyphMap.isGlyphDefined(uiText->getCharacter(column, row)) ? uiText->getCharacter(column, row) : glyphMap.Empty;
 
 			return iterationCallback::iterate;
 		});
@@ -89,13 +87,13 @@ namespace brogueHd::frontend
 	{
 		_uiText->setLine(row, text, alignment);
 
-		_invalid = true;
+		brogueViewGridCore::invalidate();
 	}
 	void brogueTextView::setLine(int row, const simpleString& text, brogueTextAlignment alignment)
 	{
 		_uiText->setLine(row, text, alignment);
 
-		_invalid = true;
+		brogueViewGridCore::invalidate();
 	}
 	void brogueTextView::setLine(int row, const simpleString& text, const color& foreground, brogueTextAlignment alignment)
 	{
@@ -105,12 +103,12 @@ namespace brogueHd::frontend
 	{
 		_uiText->setText(text);
 
-		_invalid = true;
+		brogueViewGridCore::invalidate();
 	}
 	void brogueTextView::setText(const simpleString& text)
 	{
 		_uiText->setText(text);
 
-		_invalid = true;
+		brogueViewGridCore::invalidate();
 	}
 }

@@ -14,18 +14,28 @@ namespace brogueHd::component
 	{
 	public:
 
-		short column;
-		short row;
+		int column;
+		int row;
 
 		gridLocator()
 		{
 			column = -1;
 			row = -1;
 		}
-		gridLocator(short acol, short arow)
+		gridLocator(int acol, int arow)
 		{
 			column = acol;
 			row = arow;
+		}
+		gridLocator(const gridLocator& copy)
+		{
+			column = copy.column;
+			row = copy.row;
+		}
+		void operator=(const gridLocator& copy)
+		{
+			column = copy.column;
+			row = copy.row;
 		}
 
 		bool operator==(const gridLocator& cell) const
@@ -39,7 +49,7 @@ namespace brogueHd::component
 			return column != cell.column ||
 				   row != cell.row;
 		}
-		void translate(short columnOffset, short rowOffset)
+		void translate(int columnOffset, int rowOffset)
 		{
 			column += columnOffset;
 			row += rowOffset;
@@ -48,7 +58,7 @@ namespace brogueHd::component
 		{
 			return gridLocator(cell.column + column, cell.row + row);
 		}
-		gridLocator add(short acolumn, short arow)
+		gridLocator add(int acolumn, int arow)
 		{
 			return gridLocator(acolumn + column, arow + row);
 		}
@@ -56,7 +66,7 @@ namespace brogueHd::component
 		{
 			return gridLocator(column - cell.column, row - cell.row);
 		}
-		gridLocator subtract(short acolumn, short arow)
+		gridLocator subtract(int acolumn, int arow)
 		{
 			return gridLocator(column - acolumn, row - arow);
 		}

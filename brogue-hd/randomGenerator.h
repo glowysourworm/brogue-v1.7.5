@@ -49,13 +49,13 @@ namespace brogueHd::backend
 		/// <summary>
 		/// Get a random int between lowerBound and upperBound, inclusive
 		/// </summary>
-		int randomRangeInclusive(short lowerBound, short upperBound, randomVariable type = randomVariable::Uniform, float mean = 0.5f, float stdDev = GAUSS_STD_DEV);
+		int randomRangeInclusive(int lowerBound, int upperBound, randomVariable type = randomVariable::Uniform, float mean = 0.5f, float stdDev = GAUSS_STD_DEV);
 
 		/// <summary>
 		/// Gets a random integer between lower and upper bounds, exclusive upper bound, with
 		/// specified probability distribution.
 		/// </summary>
-		int randomRangeExclusive(short lowerBound, short upperBound, randomVariable type = randomVariable::Uniform, float mean = 0.5f, float stdDev = GAUSS_STD_DEV);
+		int randomRangeExclusive(int lowerBound, int upperBound, randomVariable type = randomVariable::Uniform, float mean = 0.5f, float stdDev = GAUSS_STD_DEV);
 
 		/// <summary>
 		/// Returns random index from array based on its weights
@@ -202,12 +202,12 @@ namespace brogueHd::backend
 		return lowerBound + (draw * (upperBound - lowerBound));
 	}
 
-	int randomGenerator::randomRangeInclusive(short lowerBound, short upperBound, randomVariable type, float mean, float stdDev)
+	int randomGenerator::randomRangeInclusive(int lowerBound, int upperBound, randomVariable type, float mean, float stdDev)
 	{
 		return nextInt(lowerBound, upperBound, true, type, mean, stdDev);
 	}
 
-	int randomGenerator::randomRangeExclusive(short lowerBound, short upperBound, randomVariable type, float mean, float stdDev)
+	int randomGenerator::randomRangeExclusive(int lowerBound, int upperBound, randomVariable type, float mean, float stdDev)
 	{
 		return nextInt(lowerBound, upperBound, false, type, mean, stdDev);
 	}
@@ -215,7 +215,7 @@ namespace brogueHd::backend
 	template<isNumber T>
 	int randomGenerator::randomIndex(const simpleArray<T>& weights, randomVariable type, float mean, float stdDev)
 	{
-		short sum = 0;
+		int sum = 0;
 
 		for (int index = 0; index < weights.count(); index++)
 		{

@@ -81,7 +81,7 @@ namespace brogueHd::frontend
 		/// must invalidate all views that require a cell from the game display. The brogueViewBase must
 		/// enter an invalid state after this update - so that its data can be re-buffered.
 		/// </summary>
-		void setGameUpdate(short column, short row, const brogueCellDisplay& data);
+		void setGameUpdate(int column, int row, const brogueCellDisplay& data);
 
 		gridRect getSceneBoundaryUI() const;
 
@@ -177,7 +177,7 @@ namespace brogueHd::frontend
 	{
 		_mainProgram->setMode(gameMode);
 	}
-	void brogueProgramContainer::setGameUpdate(short column, short row, const brogueCellDisplay& data)
+	void brogueProgramContainer::setGameUpdate(int column, int row, const brogueCellDisplay& data)
 	{
 		_mainProgram->setGameUpdate(column, row, data);
 	}

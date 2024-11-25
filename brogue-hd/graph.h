@@ -2,18 +2,27 @@
 
 #include "graphDefinitions.h"
 #include "graphEdgeCollection.h"
+#include "simple.h"
 #include "simpleArray.h"
 #include "simpleList.h"
+#include <functional>
 
 namespace brogueHd::component
 {
+	template<graphNodeType TNode, graphEdgeType<TNode> TEdge>
+	using graphSimpleNodeIterator = std::function<iterationCallback(TNode node)>;
+
+	template<graphNodeType TNode, graphEdgeType<TNode> TEdge>
+	using graphSimpleEdgeIterator = std::function<iterationCallback(TEdge edge)>;
+
+	template<graphNodeType TNode, graphEdgeType<TNode> TEdge>
+	using graphIterator = std::function<iterationCallback(TNode node, const simpleList<TEdge>& adjacentEdges)>;
+
 	/// <summary>
 	/// Defines a graph with type constraints for graphNode, and graphEdge
 	/// </summary>
 	/// <typeparam name="TValue">Type for the node value</typeparam>
 	/// <typeparam name="TWeight">Type for the node weight</typeparam>
-	//template<GraphTemplate>
-
 	template<graphNodeType TNode, graphEdgeType<TNode> TEdge>
 	class graph
 	{
@@ -32,8 +41,9 @@ namespace brogueHd::component
 		simpleList<TEdge> getAdjacentEdges(TNode node) const;
 		TEdge findEdge(TNode node1, TNode node2) const;
 
-		void iterateNodes(simpleListCallback<TNode> callback) const;
-		void iterateEdges(simpleListCallback<TEdge> callback) const;
+		void iterate(graphIterator<TNode, TEdge> callback) const;
+		void iterateNodes(graphSimpleNodeIterator<TNode, TEdge> callback) const;
+		void iterateEdges(graphSimpleEdgeIterator<TNode, TEdge> callback) const;
 
 	private:
 
@@ -138,13 +148,28 @@ namespace brogueHd::component
 	}
 
 	template<graphNodeType TNode, graphEdgeType<TNode> TEdge>
-	void graph<TNode, TEdge>::iterateNodes(simpleListCallback<TNode> callback) const
+	void graph<TNode, TEdge>::iterate(graphIterator<TNode, TEdge> callback) const
+	{
+		bool userBreak = false;
+
+		for (int index = 0; index < _nodes->count() && !userBreak; index++)
+		{
+			TNode node = _nodes->get(index);
+
+			simpleList<TEdge> adjacentEdges = this->getAdjacentEdges(node);
+
+			userBreak |= (callback(node, adjacentEdges) == iterationCallback::breakAndReturn);
+		}
+	}
+
+	template<graphNodeType TNode, graphEdgeType<TNode> TEdge>
+	void graph<TNode, TEdge>::iterateNodes(graphSimpleNodeIterator<TNode, TEdge> callback) const
 	{
 		_nodes->forEach(callback);
 	}
 
 	template<graphNodeType TNode, graphEdgeType<TNode> TEdge>
-	void graph<TNode, TEdge>::iterateEdges(simpleListCallback<TEdge> callback) const
+	void graph<TNode, TEdge>::iterateEdges(graphSimpleEdgeIterator<TEdge, TEdge> callback) const
 	{
 		_edgeCollection->getEdges().forEach(callback);
 	}

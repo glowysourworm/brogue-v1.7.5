@@ -192,7 +192,7 @@ namespace brogueHd
 //#define BROGUE_FILENAME_MAX		(min(1024*4, FILENAME_MAX))
 
 // Allows unicode characters:
-//#define uchar					unsigned short
+//#define uchar					unsigned int
 
 #define MESSAGE_LINES			3
 #define MESSAGE_ARCHIVE_LINES	ROWS
@@ -539,7 +539,7 @@ namespace brogueHd
 	//										| tileCatalog[pmap[x][y].layers[GAS]].mechFlags)
 
 	//#ifdef BROGUE_ASSERTS
-	//boolean cellHasTerrainFlag(short x, short y, unsigned long flagMask);
+	//boolean cellHasTerrainFlag(int x, int y, unsigned long flagMask);
 	//#else
 	//#define cellHasTerrainFlag(x, y, flagMask)	((flagMask) & terrainFlags((x), (y)) ? true : false)
 	//#endif
@@ -572,7 +572,7 @@ namespace brogueHd
 
 	//#define CYCLE_MONSTERS_AND_PLAYERS(x)		for ((x) = &player; (x) != NULL; (x) = ((x) == &player ? monsters->nextCreature : (x)->nextCreature))
 
-	//#define assureCosmeticRNG					short oldRNG = rogue.RNG; rogue.RNG = RNG_COSMETIC;
+	//#define assureCosmeticRNG					int oldRNG = rogue.RNG; rogue.RNG = RNG_COSMETIC;
 	//#define restoreRNG							rogue.RNG = oldRNG;
 
 	//#define MIN_COLOR_DIFF			600

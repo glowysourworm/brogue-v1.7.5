@@ -7,6 +7,7 @@
 #include "graph.h"
 #include "graphAlgorithm.h"
 #include "graphDefinitions.h"
+#include "gridRect.h"
 #include "simple.h"
 #include "simpleHash.h"
 #include <limits>
@@ -128,10 +129,15 @@ namespace brogueHd::component
 			return iterationCallback::iterate;
 		});
 
-		// NOTE*** NULL VERTEX REFERENCE USED TO IDENTIFY SUPER TRIANGLE
-		simplePoint<int> point1(0, 0);
-		simplePoint<int> point2((int)((right * 2) + 1), 0);
-		simplePoint<int> point3(0, (int)((bottom * 2) + 1));
+		gridRect pointRect(left, top, right - left + 1, bottom - top + 1);
+
+		// Encompass all points
+		pointRect.expand(1);
+
+		// Create super triangle to encompass all points
+		simplePoint<int> point1(pointRect.left(), pointRect.top());
+		simplePoint<int> point2(((pointRect.right() * 4) + 1), pointRect.top());
+		simplePoint<int> point3(pointRect.left(), ((pointRect.bottom() * 4) + 1));
 
 		// Initialize the mesh (the "super-triangle" is removed as part of the algorithm)
 		//
@@ -227,7 +233,7 @@ namespace brogueHd::component
 					TNode node1 = nodeLookup[triangle.point1];
 					TNode node2 = nodeLookup[triangle.point2];
 
-					delaunayEdges.add(that->edgeConstructor(node1, node2));
+					delaunayEdges.add((*(that->edgeConstructor))(node1, node2));
 				}
 			}
 
@@ -248,7 +254,7 @@ namespace brogueHd::component
 					TNode node2 = nodeLookup[triangle.point2];
 					TNode node3 = nodeLookup[triangle.point3];
 
-					delaunayEdges.add(that->edgeConstructor(node2, node3));
+					delaunayEdges.add((*(that->edgeConstructor))(node2, node3));
 				}
 			}
 
@@ -269,7 +275,7 @@ namespace brogueHd::component
 					TNode node3 = nodeLookup[triangle.point3];
 					TNode node1 = nodeLookup[triangle.point1];
 
-					delaunayEdges.add(that->edgeConstructor(node3, node1));
+					delaunayEdges.add((*(that->edgeConstructor))(node3, node1));
 				}
 			}
 

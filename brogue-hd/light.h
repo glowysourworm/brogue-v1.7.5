@@ -10,12 +10,12 @@ namespace brogueHd::backend::model
 	struct light 
 	{
 
-		short red;
-		short green;
-		short blue;
+		int red;
+		int green;
+		int blue;
 
 		light() {}
-		light(short ared, short agreen, short ablue)
+		light(int ared, int agreen, int ablue)
 		{
 			red = ared;
 			green = agreen;
@@ -32,7 +32,7 @@ namespace brogueHd::backend::model
 	{
 		color lightColor;
 		randomRange lightRadius;
-		short radialFadeToPercent;
+		int radialFadeToPercent;
 		bool passThroughCreatures;			// generally no, but miner light does
 	};
 }

@@ -15,7 +15,7 @@ namespace brogueHd::backend::model
 			polarity = true;
 			countPolarity = true;
 		}
-		cellularAutomataRule(short acount, bool apolarity, bool acountPolarity)
+		cellularAutomataRule(int acount, bool apolarity, bool acountPolarity)
 		{
 			count = acount;
 			polarity = apolarity;
@@ -37,7 +37,7 @@ namespace brogueHd::backend::model
 		/// <summary>
 		/// Count at which to apply the rule
 		/// </summary>
-		short count;
+		int count;
 
 		/// <summary>
 		/// Polarity of the cell to check (false for wall). This is the polarity for which
@@ -64,7 +64,7 @@ namespace brogueHd::backend::model
 		}
 
 		cellularAutomataParameters(float fillRatio, 
-								   short smoothingIterations, 
+								   int smoothingIterations, 
 								   bool resultPolarity,
 								   const cellularAutomataRule& rule1, 
 								   const cellularAutomataRule& rule2)
@@ -101,7 +101,7 @@ namespace brogueHd::backend::model
 			return _fillRatio;
 		}
 
-		short getIterations() const
+		int getIterations() const
 		{
 			return _iterations;
 		}
@@ -119,7 +119,7 @@ namespace brogueHd::backend::model
 	private:
 
 		float _fillRatio;
-		short _iterations;
+		int _iterations;
 		bool _resultPolarity;
 		simpleList<cellularAutomataRule>* _rules;
 	};

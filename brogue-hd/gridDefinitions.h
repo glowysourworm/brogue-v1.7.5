@@ -46,20 +46,20 @@ namespace brogueHd::component
 	/// Iteration callback that includes the indices. Set the return value to either continue / break.
 	/// </summary>
 	template<typename T>
-	using gridCallback = std::function<iterationCallback(short column, short row, const T& current)>;
+	using gridCallback = std::function<iterationCallback(int column, int row, const T& current)>;
 
 	/// <summary>
 	/// Iteration callback that includes the indices. Set the return value to either continue / break. Adds the
 	/// compass for adjacent cells.
 	/// </summary>
 	template<typename T>
-	using gridCallbackAdjacent = std::function<iterationCallback(short column, short row, brogueCompass direction, const T& current)>;
+	using gridCallbackAdjacent = std::function<iterationCallback(int column, int row, brogueCompass direction, const T& current)>;
 
 	/// <summary>
 	/// Simple predicate decision making function that includes the item coordinates
 	/// </summary>
 	template<typename T>
-	using gridPredicate = std::function<bool(short column, short row, const T& current)>;
+	using gridPredicate = std::function<bool(int column, int row, const T& current)>;
 
 	/// <summary>
 	/// Simple predicate decision making function
@@ -79,14 +79,14 @@ namespace brogueHd::component
 	/// Defines a constructor (or getter) method for grid cells
 	/// </summary>
 	template<typename T>
-	using gridElementConstructor = std::function<T(short column, short row)>;
+	using gridElementConstructor = std::function<T(int column, int row)>;
 
 
 	/// <summary>
 	/// Selector of a value from the current item that includes the grid coordinates
 	/// </summary>
 	template<typename T, typename TResult>
-	using gridSelector = std::function<TResult(short column, short row, const T& current)>;
+	using gridSelector = std::function<TResult(int column, int row, const T& current)>;
 
 	/// <summary>
 	/// Definition of function to select a value from the grid type.

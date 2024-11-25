@@ -1,33 +1,34 @@
 #pragma once
 
 #include "brogueCellDisplay.h"
+#include "brogueColorQuad.h"
+#include "brogueCoordinateConverter.h"
 #include "brogueKeyboardState.h"
 #include "brogueMouseState.h"
 #include "brogueTitleGrid.h"
-#include "brogueUIConstants.h"
 #include "brogueUIData.h"
 #include "brogueUIProgramPartId.h"
-#include "brogueViewBase.h"
+#include "brogueViewGridCore.h"
 #include "color.h"
 #include "eventController.h"
-#include "gridDefinitions.h"
 #include "gridRect.h"
+#include "resourceController.h"
 #include "simple.h"
 
 using namespace brogueHd::backend;
 
 namespace brogueHd::frontend
 {
-	class brogueFlameMenuTitleMask : public brogueViewBase
+	class brogueFlameMenuTitleMask : public brogueViewGridCore<brogueColorQuad>
 	{
 	public:
 
-		brogueFlameMenuTitleMask(eventController* eventController, const brogueUIData& data, const gridRect& sceneBoundary, const gridRect& viewBoundary)
-			: brogueViewBase(eventController, 
-							 brogueUIProgramPartId(brogueUIProgram::FlameMenuTitleMaskProgram, brogueUIProgramPart::ColorMask, 0),
-							 data, 
-							 sceneBoundary, 
-							 viewBoundary)
+		brogueFlameMenuTitleMask(brogueCoordinateConverter* coordinateConverter,
+								 resourceController* resourceController,
+								 eventController* eventController,
+								 const brogueUIProgramPartId& partId,
+								 const brogueUIData& data)
+			: brogueViewGridCore(coordinateConverter, resourceController, eventController, partId, data)
 		{
 			_titleGrid = new brogueTitleGrid();
 			_maskCell = new brogueCellDisplay();
@@ -38,6 +39,9 @@ namespace brogueHd::frontend
 
 			_defaultCell->backColor = colors::transparent();
 			_defaultCell->noDisplay = true;
+
+			// Call initializeCore() -> sets up stream for  GL backend
+			brogueViewGridCore::initializeCore();
 		}
 		~brogueFlameMenuTitleMask()
 		{
@@ -53,40 +57,28 @@ namespace brogueHd::frontend
 			// Prevent updating
 		}
 
-		void update(int millisecondsLapsed,
-					bool forceUpdate) override
+		void update(int millisecondsLapsed, bool forceUpdate) override
 		{
-			// Prevent updating
+			brogueFlameMenuTitleMask* that = this;
+			brogueTitleGrid* titleGrid = _titleGrid;
+			brogueCellDisplay* maskCell = _maskCell;
+
+			_titleGrid->sceneBounds().iterate([&that, &titleGrid, &maskCell] (int column, int row)
+			{
+				if (titleGrid->isTheText(column, row))
+					that->set(*maskCell);
+
+				return iterationCallback::iterate;
+			});
 		}
 
 		bool needsUpdate() const override
 		{
 			return false;
 		}
-		gridRect getBoundary() const override
-		{
-			return _titleGrid->sceneBounds();
-		}
-		gridRect getSceneBoundary() const override
-		{
-			return _titleGrid->sceneBounds();
-		}
-		bool isTheText(short column, short row)
+		bool isTheText(int column, int row)
 		{
 			return _titleGrid->isTheText(column, row);
-		}
-		void iterate(gridCallback<brogueCellDisplay*> callback) const override
-		{
-			brogueTitleGrid* titleGrid = _titleGrid;
-			brogueCellDisplay* maskCell = _maskCell;
-
-			_titleGrid->sceneBounds().iterate([&callback, &titleGrid, &maskCell] (short column, short row)
-			{
-				if (titleGrid->isTheText(column, row))
-					callback(column, row, maskCell);
-
-				return iterationCallback::iterate;
-			});
 		}
 
 	private:

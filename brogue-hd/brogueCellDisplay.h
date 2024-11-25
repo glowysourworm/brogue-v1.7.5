@@ -93,17 +93,17 @@ namespace brogueHd::backend::model
 
 		//enum dungeonLayers layerFlags;					// Designate which of the layers the cell inhabits
 		//unsigned long flags;							// non-terrain cell flags
-		//unsigned short volume;							// quantity of gas in cell
+		//unsigned int volume;							// quantity of gas in cell
 
 		//// REFACTORED VOLUME:  Separates gases
-		//unsigned short poisonGasVolume;
-		//unsigned short swampGasVolume;
+		//unsigned int poisonGasVolume;
+		//unsigned int swampGasVolume;
 
 		//unsigned char machineNumber;
 		////brogueCellDisplay rememberedAppearance;			// how the player remembers the cell to look
 		////enum itemCategory rememberedItemCategory;		// what category of item the player remembers lying there
-		////short rememberedItemKind;                       // what kind of item the player remembers lying there
-		////short rememberedItemQuantity;                   // how many of the item the player remembers lying there
+		////int rememberedItemKind;                       // what kind of item the player remembers lying there
+		////int rememberedItemQuantity;                   // how many of the item the player remembers lying there
 		////enum tileType rememberedTerrain;				// what the player remembers as the terrain (i.e. highest priority terrain upon last seeing)
 		////unsigned long rememberedCellFlags;              // map cell flags the player remembers from that spot
 		////unsigned long rememberedTerrainFlags;           // terrain flags the player remembers from that spot
@@ -126,7 +126,7 @@ namespace brogueHd::backend::model
 			needsUpdate = false;
 			noDisplay = false;
 		}
-		brogueCellDisplay(short column, short row)
+		brogueCellDisplay(int column, int row)
 		{
 			column = column;
 			row = row;

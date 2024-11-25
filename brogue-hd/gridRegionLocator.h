@@ -34,11 +34,11 @@ namespace brogueHd::component
 		/// <summary>
 		/// Creates region at the specified point (or NULL)
 		/// </summary>
-		gridRegion<T>* identifyRegion(const grid<T>& grid, short column, short row, gridPredicate<T> inclusionPredicate);
+		gridRegion<T>* identifyRegion(const grid<T>& grid, int column, int row, gridPredicate<T> inclusionPredicate);
 
 	private:
 
-		gridRegionConstructor<T>* runFloodFill(const grid<T>& grid, short column, short row, gridPredicate<T> inclusionPredicate);
+		gridRegionConstructor<T>* runFloodFill(const grid<T>& grid, int column, int row, gridPredicate<T> inclusionPredicate);
 	};
 
 	template<isGridLocator T>
@@ -55,7 +55,7 @@ namespace brogueHd::component
 	template<isGridLocator T>
 	simpleList<gridRegion<T>*> gridRegionLocator<T>::locateRegions(const grid<T>& grid)
 	{
-		return locateRegions(grid, [] (short column, short row, T value)
+		return locateRegions(grid, [] (int column, int row, T value)
 		{
 			return value != default_value::value<T>();
 		});
@@ -75,7 +75,7 @@ namespace brogueHd::component
 
 		gridRegionLocator<T>* that = this;
 
-		grid.iterate([&inclusionPredicate, &result, &grid, &that] (short column, short row, T item)
+		grid.iterate([&inclusionPredicate, &result, &grid, &that] (int column, int row, T item)
 		{
 			// Check history (to see if we're still inside the previous region)
 			for (int index = 0; index < result.count(); index++)
@@ -112,7 +112,7 @@ namespace brogueHd::component
 	}
 
 	template<isGridLocator T>
-	gridRegion<T>* gridRegionLocator<T>::identifyRegion(const grid<T>& grid, short column, short row, gridPredicate<T> inclusionPredicate)
+	gridRegion<T>* gridRegionLocator<T>::identifyRegion(const grid<T>& grid, int column, int row, gridPredicate<T> inclusionPredicate)
 	{
 		if (!grid.isDefined(column, row))
 			return NULL;
@@ -129,7 +129,7 @@ namespace brogueHd::component
 	}
 
 	template<isGridLocator T>
-	gridRegionConstructor<T>* gridRegionLocator<T>::runFloodFill(const grid<T>& grid, short column, short row, gridPredicate<T> inclusionPredicate)
+	gridRegionConstructor<T>* gridRegionLocator<T>::runFloodFill(const grid<T>& grid, int column, int row, gridPredicate<T> inclusionPredicate)
 	{
 		if (!grid.isDefined(column, row) || !inclusionPredicate(column, row, grid.get(column, row)))
 			throw simpleException("Trying to start FloodFill in non-region location");

@@ -55,9 +55,9 @@ namespace brogueHd::component
 		/// <summary>
 		/// Returns the graph weight (distance) for this edge
 		/// </summary>
-		short weight() const
+		int weight() const
 		{
-			return (short)node1.distance(node2);
+			return (int)node1.distance(node2);
 		}
 
 		template<typename T>

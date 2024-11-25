@@ -19,10 +19,9 @@ namespace brogueHd::component
 		graphAlgorithm(graphEdgeConstructor<TNode, TEdge> graphEdgeConstructor);
 		~graphAlgorithm();
 
-		virtual graph<TNode, TEdge>* run(const simpleList<TNode>& vertices)
-		{
-			return nullptr;
-		}
+		virtual graph<TNode, TEdge>* run(const simpleList<TNode>& vertices);
+
+		graph<TNode, TEdge>* createFullGraph(const simpleList<TNode>& vertices);
 
 	protected:
 
@@ -39,24 +38,31 @@ namespace brogueHd::component
 		/// <summary>
 		/// Delegate that constructs the proper edge type
 		/// </summary>
-		graphEdgeConstructor<TNode, TEdge> edgeConstructor;
+		graphEdgeConstructor<TNode, TEdge>* edgeConstructor;
 	};
 
 	template<isGridLocatorNode TNode, isGridLocatorEdge<TNode> TEdge>
 	graphAlgorithm<TNode, TEdge>::graphAlgorithm(graphEdgeConstructor<TNode, TEdge> edgeConstructor)
 	{
-		this->edgeConstructor = edgeConstructor;
+		this->edgeConstructor = new graphEdgeConstructor<TNode, TEdge>(edgeConstructor);
 	}
 
 	template<isGridLocatorNode TNode, isGridLocatorEdge<TNode> TEdge>
 	graphAlgorithm<TNode, TEdge>::~graphAlgorithm()
 	{
+		delete this->edgeConstructor;
 	}
 
 	template<isGridLocatorNode TNode, isGridLocatorEdge<TNode> TEdge>
-	graph<TNode, TEdge>* run(const simpleList<TNode>& vertices)
+	graph<TNode, TEdge>* graphAlgorithm<TNode, TEdge>::run(const simpleList<TNode>& vertices)
 	{
-		// Overridden in child class
+		throw simpleException("Must override the run function in a child class:  graphAlgorithm.h");
+	}
+
+	template<isGridLocatorNode TNode, isGridLocatorEdge<TNode> TEdge>
+	graph<TNode, TEdge>* graphAlgorithm<TNode, TEdge>::createFullGraph(const simpleList<TNode>& vertices)
+	{
+		return createDefaultGraph(vertices);
 	}
 
 	template<isGridLocatorNode TNode, isGridLocatorEdge<TNode> TEdge>
@@ -77,7 +83,7 @@ namespace brogueHd::component
 
 			simpleListExtension<TNode>::distinctPairs(vertices, vertices, [&edges, &that] (TNode node1, TNode node2)
 			{
-				edges.add(that->edgeConstructor(node1, node2));
+				edges.add((*(that->edgeConstructor))(node1, node2));
 			});
 
 			return new graph<TNode, TEdge>(vertices.toArray(), edges.toArray());

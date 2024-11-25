@@ -3,16 +3,18 @@
 #include "brogueCellDisplay.h"
 #include "color.h"
 #include "gl.h"
+#include "gridLocator.h"
 #include "simple.h"
 #include "simpleDataStream.h"
 #include "simpleException.h"
 #include "simpleGlData.h"
+#include "brogueQuad.h"
 
 using namespace brogueHd::backend::model;
 
 namespace brogueHd::frontend
 {
-	struct brogueColorQuad : simpleGlData
+	struct brogueColorQuad : public brogueQuad
 	{
 		brogueColorQuad()
 		{
@@ -24,17 +26,24 @@ namespace brogueHd::frontend
 			copyImpl(copy);
 		}
 		brogueColorQuad(const brogueCellDisplay& cell,
-			const simpleQuad& vertices)
+						const simpleQuad& vertices)
 		{
+			location.column = cell.column;
+			location.row = cell.row;
+
 			// Consider translating these perhaps INTO the cell display - the view bounds.
 			//
 			backgroundColor = vec4(cell.backColor.red, cell.backColor.green, cell.backColor.blue, cell.backColor.alpha);
 
 			vertexCoordinates = vertices;
 		}
-		brogueColorQuad(const color& theColor,
-			const simpleQuad& vertices)
+		brogueColorQuad(const gridLocator& locator,
+						const color& theColor,
+						const simpleQuad& vertices)
 		{
+			location.column = locator.column;
+			location.row = locator.row;
+
 			// Consider translating these perhaps INTO the cell display - the view bounds.
 			//
 			backgroundColor = vec4(theColor.red, theColor.green, theColor.blue, theColor.alpha);
@@ -134,6 +143,7 @@ namespace brogueHd::frontend
 
 		void copyImpl(const brogueColorQuad& copy)
 		{
+			location = copy.location;
 			backgroundColor = copy.backgroundColor;
 			vertexCoordinates = copy.vertexCoordinates;
 		}

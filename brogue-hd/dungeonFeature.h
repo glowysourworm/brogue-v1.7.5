@@ -15,13 +15,13 @@ namespace brogueHd::backend::model
 		temporaryDungeonLayers temporaryLayer;
 
 		// spawning pattern:
-		short startProbability;
-		short probabilityDecrement;
+		int startProbability;
+		int probabilityDecrement;
 		unsigned long flags;
 		char description[DCOLS];
 		lightType lightFlare;
 		const color* flashColor;
-		short effectRadius;
+		int effectRadius;
 		tileType propagationTerrain;
 		//dungeonFeatureTypes subsequentDF;
 		permanentDungeonLayers subsequentDF_P;

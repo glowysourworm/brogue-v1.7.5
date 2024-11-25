@@ -52,13 +52,13 @@ namespace brogueHd::component
 		/// MODIFIES LAYOUT! Translates the grid region data by the provided amount without
 		/// re-allocating memory. (Assumes copied data)
 		/// </summary>
-		void translate_StackLike(short column, short row);
+		void translate_StackLike(int column, int row);
 
 		/// <summary>
 		/// MODIFIES LAYOUT! Translates the grid region data by the provided amount without
 		/// re-allocating memory. (Assumes pointers)
 		/// </summary>
-		void translate_HeapLike(short column, short row);
+		void translate_HeapLike(int column, int row);
 
 		/// <summary>
 		/// Checks for location overlap
@@ -86,12 +86,12 @@ namespace brogueHd::component
 		/// <summary>
 		/// Returns value from the underlying grid. This is the index space of the parent grid.
 		/// </summary>
-		T get(short column, short row) const;
+		T get(int column, int row) const;
 
 		/// <summary>
 		/// Returns true if a cell is defined for the region
 		/// </summary>
-		bool isDefined(short column, short row) const;
+		bool isDefined(int column, int row) const;
 
 		/// <summary>
 		/// Returns true if a cell is defined for the region
@@ -101,7 +101,7 @@ namespace brogueHd::component
 		/// <summary>
 		/// Returns true if an edge cell is defined
 		/// </summary>
-		bool isEdge(short column, short row) const;
+		bool isEdge(int column, int row) const;
 
 		/// <summary>
 		/// Iterates the locations of the region and calls the user method
@@ -231,7 +231,7 @@ namespace brogueHd::component
 	}
 
 	template<isGridLocator T>
-	T gridRegion<T>::get(short column, short row) const
+	T gridRegion<T>::get(int column, int row) const
 	{
 		return _grid->get(column, row);
 	}
@@ -243,7 +243,7 @@ namespace brogueHd::component
 	}
 
 	template<isGridLocator T>
-	bool gridRegion<T>::isDefined(short column, short row) const
+	bool gridRegion<T>::isDefined(int column, int row) const
 	{
 		// Checking "bounds" for a region isn't really an appropriate meaning for
 		// an amorphous region. The grid needs to be protected from out of bounds
@@ -262,13 +262,13 @@ namespace brogueHd::component
 	}
 
 	template<isGridLocator T>
-	bool gridRegion<T>::isEdge(short column, short row) const
+	bool gridRegion<T>::isEdge(int column, int row) const
 	{
 		return _edgeGrid->isDefined(column, row);
 	}
 
 	template<isGridLocator T>
-	void gridRegion<T>::translate_HeapLike(short column, short row)
+	void gridRegion<T>::translate_HeapLike(int column, int row)
 	{
 		// NOT SURE HOW THIS METHOD MIGHT WORK:  The template must understand
 		// that T is a pointer; but that will take some more understanding of
@@ -278,7 +278,7 @@ namespace brogueHd::component
 		// Translates the coordinate boundary (relative boundary)
 		_grid->translate(column, row);
 
-		_grid->iterate([] (short column, short row, T item)
+		_grid->iterate([] (int column, int row, T item)
 		{
 			item.translate(column, row);
 
@@ -287,20 +287,20 @@ namespace brogueHd::component
 	}
 
 	template<isGridLocator T>
-	void gridRegion<T>::translate_StackLike(short column, short row)
+	void gridRegion<T>::translate_StackLike(int column, int row)
 	{
 		// Translates the coordinate boundary (relative boundary)
 		_grid->translate(column, row);
 
 		// Data must all be copied over (each collection)
-		_grid->iterate([] (short column, short row, T item)
+		_grid->iterate([] (int column, int row, T item)
 		{
 			item.translate(column, row);
 
 			return iterationCallback::iterate;
 		});
 
-		_edgeGrid->iterate([] (short column, short row, T item)
+		_edgeGrid->iterate([] (int column, int row, T item)
 		{
 			item.translate(column, row);
 
@@ -533,7 +533,7 @@ namespace brogueHd::component
 	{
 		bool overlap = false;
 
-		this->iterateLocations([&region, &overlap] (short column, short row, T item)
+		this->iterateLocations([&region, &overlap] (int column, int row, T item)
 		{
 			if (region->isDefined(column, row))
 				return iterationCallback::breakAndReturn;

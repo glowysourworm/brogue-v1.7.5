@@ -34,16 +34,16 @@ namespace brogueHd::backend::model
 		//tileType terrain;					// generate this terrain tile at the feature location (0 for none)
 		//temporaryDungeonLayers layer;		// generate the terrain tile in this layer
 
-		short instanceCountRange[2];		// generate this range of instances of this feature
-		short minimumInstanceCount;			// abort if fewer than this
+		int instanceCountRange[2];		// generate this range of instances of this feature
+		int minimumInstanceCount;			// abort if fewer than this
 
 		// items: these will be ignored if the feature is adopting an item
-		short itemCategory;					// generate this category of item (or -1 for random)
-		short itemKind;						// generate this kind of item (or -1 for random)
+		int itemCategory;					// generate this category of item (or -1 for random)
+		int itemKind;						// generate this kind of item (or -1 for random)
 
-		short monsterID;					// generate a monster of this kind if MF_GENERATE_MONSTER is set
+		int monsterID;					// generate a monster of this kind if MF_GENERATE_MONSTER is set
 
-		short personalSpace;				// subsequent features must be generated more than this many tiles away from this feature
+		int personalSpace;				// subsequent features must be generated more than this many tiles away from this feature
 		unsigned long hordeFlags;			// choose a monster horde based on this
 		unsigned long itemFlags;			// assign these flags to the item
 		unsigned long flags;				// feature flags
@@ -52,8 +52,8 @@ namespace brogueHd::backend::model
 	struct creatureMachineTemplate : machineBase
 	{
 		creatureBookkeepingFlags bookkeepingFlags;
-		//short spawnDepth;					// keep track of the depth of the machine to which they relate (for activation monsters)
-		short machineHome;                  // monsters that spawn in a machine keep track of the machine number here (for activation monsters)
+		//int spawnDepth;					// keep track of the depth of the machine to which they relate (for activation monsters)
+		int machineHome;                  // monsters that spawn in a machine keep track of the machine number here (for activation monsters)
 	};
 
 

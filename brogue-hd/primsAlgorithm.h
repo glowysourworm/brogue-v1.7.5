@@ -88,7 +88,7 @@ namespace brogueHd::component
 				unusedVertices.remove(firstVertex);
 				usedVertices.add(firstVertex);
 
-				nextVertex = unusedVertices.withMin<short>([&firstVertex] (TNode vertex)
+				nextVertex = unusedVertices.withMin<int>([&firstVertex] (TNode vertex)
 				{
 					return firstVertex.calculateDistance(vertex);
 				});
@@ -102,12 +102,12 @@ namespace brogueHd::component
 				unusedVertices.forEach([&treeEdges, &that] (TNode vertex)
 				{
 					// Edges in the current tree
-					short potentialEdgeWeight = std::numeric_limits<short>::max();
+					int potentialEdgeWeight = std::numeric_limits<int>::max();
 					TNode potentialNode = NULL;
 
 					treeEdges.forEach([&vertex, &potentialEdgeWeight, &that] (TEdge edge)
 					{
-						short distance = edge.node1.calculateDistance(vertex);
+						int distance = edge.node1.calculateDistance(vertex);
 
 						if (distance < potentialEdgeWeight)
 						{

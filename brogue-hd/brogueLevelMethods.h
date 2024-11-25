@@ -42,7 +42,7 @@ namespace brogueHd::backend
 
 
 		//#define cellHasTerrainFlag(x, y, flagMask)	((flagMask) & terrainFlags((x), (y)) ? true : false)
-	static bool isTerrain(brogueLevel* level, short column, short row, terrainFlagCatalog terrainFlag)
+	static bool isTerrain(brogueLevel* level, int column, int row, terrainFlagCatalog terrainFlag)
 	{
 		//brogueCell* cell = level->levelGrid->getCell(column, row);
 
@@ -70,7 +70,7 @@ namespace brogueHd::backend
 		return false;
 	}
 
-	static bool isPathingBlocker(brogueLevel* level, short column, short row)
+	static bool isPathingBlocker(brogueLevel* level, int column, int row)
 	{
 		//brogueCell* cell = level->levelGrid->getCell(column, row);
 
@@ -85,7 +85,7 @@ namespace brogueHd::backend
 		return false;
 	}
 
-	static bool isAutoDescent(brogueLevel* level, short column, short row)
+	static bool isAutoDescent(brogueLevel* level, int column, int row)
 	{
 		//brogueCell* cell = level->levelGrid->getCell(column, row);
 
@@ -111,7 +111,7 @@ namespace brogueHd::backend
 		return false;
 	}
 
-	static brogueCell* findAdjacentWalkableLocation(brogueLevel* level, short column, short row)
+	static brogueCell* findAdjacentWalkableLocation(brogueLevel* level, int column, int row)
 	{
 		//return level->levelGrid->checkAdjacentCells(column, row, [](brogueCell* cell)
 		//{
@@ -124,7 +124,7 @@ namespace brogueHd::backend
 
 	static brogueCell* findValidStairLocation(brogueLevel* level)
 	{
-		//short newX, newY, dir, neighborWallCount;
+		//int newX, newY, dir, neighborWallCount;
 
 		// TODO: Fix this using walkable layer
 

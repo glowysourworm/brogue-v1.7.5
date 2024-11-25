@@ -39,7 +39,7 @@ namespace brogueHd::backend::model
 		//static void getAvailableFilePath(char* returnPath, const char* defaultPath, const char* suffix)
 		//{
 		//	char fullPath[BROGUE_FILENAME_MAX];
-		//	short fileNameIterator = 2;
+		//	int fileNameIterator = 2;
 
 		//	strcpy(returnPath, defaultPath);
 		//	sprintf(fullPath, "%s%s", returnPath, suffix);

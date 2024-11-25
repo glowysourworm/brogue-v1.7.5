@@ -9,13 +9,13 @@ namespace brogueHd::backend::model
 	struct characterStatusEffect
 	{
 		statusEffects status;
-		short maxStatus;								// used to set the max point on the status bars
+		int maxStatus;								// used to set the max point on the status bars
 	};
 
 	// TODO
 	struct characterEffect
 	{
-		short flashStrength;							// monster will flash soon; this indicates the percent strength of flash
+		int flashStrength;							// monster will flash soon; this indicates the percent strength of flash
 		color flashColor;								// the color that the monster will flash
 	};
 }

@@ -106,7 +106,7 @@ namespace brogueHd::frontend
 		void invalidate(const simpleKeyboardState& keyboardState,
 						const simpleMouseState& mouseState);
 
-		void setGameUpdate(short column, short row, const brogueCellDisplay& data);
+		void setGameUpdate(int column, int row, const brogueCellDisplay& data);
 
 		void run(int millisecondsElapsed);
 		void outputStatus() const;
@@ -337,7 +337,7 @@ namespace brogueHd::frontend
 
 		_viewContainer->invalidate(keyboardUI, mouseUI);
 	}
-	void brogueViewProgram::setGameUpdate(short column, short row, const brogueCellDisplay& data)
+	void brogueViewProgram::setGameUpdate(int column, int row, const brogueCellDisplay& data)
 	{
 		if (!_active)
 			throw simpleException("Brogue View Program not active:  brogueViewProgram::setGameUpdate");

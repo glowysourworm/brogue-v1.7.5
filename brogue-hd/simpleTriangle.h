@@ -56,7 +56,7 @@ namespace brogueHd::simple
 
 		size_t getHash() const override
 		{
-			return hashGenerator::generateHash(point1, point2, point3);
+			return hashGenerator::generateHash(point1.getHash(), point2.getHash(), point3.getHash());
 		}
 
 		bool containsEqualEdge(const simplePoint<T>& vertex1, const simplePoint<T>& vertex2) const

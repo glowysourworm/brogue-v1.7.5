@@ -99,24 +99,24 @@ namespace brogueHd::backend::model
 
 			return result.subString(startIndex, length);
 		}
-		char getChar(short index) const
+		char getChar(int index) const
 		{
 			return _characters->get(index);
 		}
-		color getColor(short index) const
+		color getColor(int index) const
 		{
 			return _colors->get(index);
 		}
-		void set(short index, char character, const color& color)
+		void set(int index, char character, const color& color)
 		{
 			_characters->set(index, character);
 			_colors->set(index, color);
 		}
-		void setColor(short index, const color& color)
+		void setColor(int index, const color& color)
 		{
 			_colors->set(index, color);
 		}
-		void setColorRange(short index, short count, const color& color)
+		void setColorRange(int index, int count, const color& color)
 		{
 			for (int i = index; i < index + count; i++)
 			{

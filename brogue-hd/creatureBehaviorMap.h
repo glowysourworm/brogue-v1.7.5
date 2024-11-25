@@ -45,9 +45,9 @@ namespace brogueHd::backend::model
 
 		grid<bool>* _visibilityMap;
 		grid<bool>* _visibilityMapLastTurn;	// Map from last turn
-		grid<short>* _goalMap;					// This map varies depending on the creature (also, friendly or enemy, "mapToMe")
-		grid<short>* _fleeMap;
-		grid<short>* _scentMap;
+		grid<int>* _goalMap;					// This map varies depending on the creature (also, friendly or enemy, "mapToMe")
+		grid<int>* _fleeMap;
+		grid<int>* _scentMap;
 
 		// Collections of cells left over from updating the visibility. These will indicate cells that
 		// have changed.
@@ -55,25 +55,25 @@ namespace brogueHd::backend::model
 		simpleList<gridLocator>* _visibleCellsDiff;			// Difference between last turn and this turn
 
 		// UNSURE:  These should be sent in during calculation
-		short _numberOfWaypoints;
+		int _numberOfWaypoints;
 		gridLocator* _waypoints;
 
 		// ???
-		//grid<short>* _mapToStairs;
-		//grid<short>* _mapToPit;
+		//grid<int>* _mapToStairs;
+		//grid<int>* _mapToPit;
 		// ???
 
 
-		//grid<short>* _safetyMap;
-		//grid<short>* _allySafetyMap;
-		//grid<short>* _chokePointMap;
+		//grid<int>* _safetyMap;
+		//grid<int>* _allySafetyMap;
+		//grid<int>* _chokePointMap;
 
 		//// Waypoints:
-		//short targetWaypointIndex;          // the index number of the waypoint we're pathing toward
+		//int targetWaypointIndex;          // the index number of the waypoint we're pathing toward
 		//boolean waypointAlreadyVisited[MAX_WAYPOINT_COUNT]; // checklist of waypoints
-		//short lastSeenPlayerAt[2];          // last location at which the monster hunted the player
+		//int lastSeenPlayerAt[2];          // last location at which the monster hunted the player
 
-		//short** mapToMe;					// if a pack leader, this is a periodically updated pathing map to get to the leader
-		//short** safetyMap;					// fleeing monsters store their own safety map when out of player FOV to avoid omniscience
+		//int** mapToMe;					// if a pack leader, this is a periodically updated pathing map to get to the leader
+		//int** safetyMap;					// fleeing monsters store their own safety map when out of player FOV to avoid omniscience
 	};
 }

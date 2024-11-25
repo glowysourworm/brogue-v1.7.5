@@ -55,7 +55,7 @@ namespace brogueHd::backend
 
 		void createRooms();
 
-		//bool attemptConnection(brogueDesignRect* roomTile, const gridRect& attemptRect, short interRoomPadding) const;
+		//bool attemptConnection(brogueDesignRect* roomTile, const gridRect& attemptRect, int interRoomPadding) const;
 
 		//void designateMachineRooms();
 
@@ -345,7 +345,7 @@ namespace brogueHd::backend
 		tiling.forEach([&layout, &roomTiles] (brogueDesignRect* designRect, const gridRect& boundary)
 		{
 			// Design Tile
-			boundary.iterate([&layout] (short column, short row)
+			boundary.iterate([&layout] (int column, int row)
 			{
 				brogueCell prototype(column, row, color(0, 0, 0.3, 0.2), colors::white(), brogueGlyphMap::Empty);
 
@@ -355,7 +355,7 @@ namespace brogueHd::backend
 			});
 
 			// Design Boundary
-			designRect->getBoundary().iterate([&layout] (short column, short row)
+			designRect->getBoundary().iterate([&layout] (int column, int row)
 			{
 				brogueCell prototype(column, row, color(0.3, 0.0, 0.3, 0.2), colors::white(), brogueGlyphMap::Empty);
 
@@ -365,7 +365,7 @@ namespace brogueHd::backend
 			});
 
 			// Actual Boundary
-			designRect->getActualBoundary().iterate([&layout] (short column, short row)
+			designRect->getActualBoundary().iterate([&layout] (int column, int row)
 			{
 				brogueCell prototype(column, row, color(0, 0.5, 1, 0.2), colors::white(), brogueGlyphMap::Empty);
 
@@ -375,7 +375,7 @@ namespace brogueHd::backend
 			});
 
 			// Room Floor
-			designRect->getRegion()->iterateLocations([&layout, &designRect] (short column, short row, const gridLocator& location)
+			designRect->getRegion()->iterateLocations([&layout, &designRect] (int column, int row, const gridLocator& location)
 			{
 				color backColor(0.3, 0.3, 0.3, 0.5);
 
@@ -416,7 +416,9 @@ namespace brogueHd::backend
 			return designRect->getRegion()->getLargestSubRectangle().center();
 		});
 
-		_delaunayGraph = triangulator.run(connectionNodes);
+		_delaunayGraph = triangulator.createFullGraph(connectionNodes);
+
+		_layout->setRoomGraph(_delaunayGraph);
 	}
 
 	void layoutGenerator::connectRooms()
@@ -488,19 +490,19 @@ namespace brogueHd::backend
 		//	true,                           // Cardinal Movement (for laying corridors)
 
 		//// Primary Inclusion Predicate (is it in the grid?)
-		//[&layout](short column, short row)
+		//[&layout](int column, int row)
 		//{
 		//	return layout->isDefined(column, row);
 		//},
 
 		//// Then, the map cost is queried (what is the movement cost?)
-		//[&layout](short column, short row)
+		//[&layout](int column, int row)
 		//{
 		//	return 1;
 		//},
 
 		//// Then, it will need the locators from the grid to keep its internal data temporarily
-		//[&layout](short column, short row)
+		//[&layout](int column, int row)
 		//{
 		//	// May need design change for this problem (needed to copy grid locators back for dijkstra)
 		//	return gridLocator(column, row);

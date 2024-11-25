@@ -36,7 +36,7 @@ namespace brogueHd::backend::model
 
 		~brogueRoom() 
 		{
-			//_region->iterateLocations([] (short column, short row, brogueCell* item)
+			//_region->iterateLocations([] (int column, int row, brogueCell* item)
 			//{
 			//	delete item;
 

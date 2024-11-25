@@ -8,10 +8,14 @@
 
 #include "brogueCell.h"
 #include "brogueCellDisplay.h"
+#include "graph.h"
 #include "gridDefinitions.h"
+#include "gridLocator.h"
+#include "gridLocatorEdge.h"
 #include "gridRect.h"
 #include "gridRegion.h"
 #include "simple.h"
+#include "simpleException.h"
 #include <functional>
 
 using namespace brogueHd::simple;
@@ -27,9 +31,9 @@ namespace brogueHd::backend::model
 		brogueLayout(const gridRect& levelParentBoundary, const gridRect& levelBoundary);
 		~brogueLayout();
 
-		bool isDefined(short column, short row) const;
+		bool isDefined(int column, int row) const;
 
-		brogueCell* get(short column, short row) const;
+		brogueCell* get(int column, int row) const;
 
 		gridRect getBoundary() const;
 		gridRect getParentBoundary() const;
@@ -38,12 +42,12 @@ namespace brogueHd::backend::model
 		/// Iterates adjacent cells to satisfy the user predicate. Returns the result cell, (or null), and 
 		/// will have updated the column and row, (or -1's).
 		/// </summary>
-		brogueCell* firstAdjacent(short column, short row, gridPredicate<brogueCell*> predicate);
+		brogueCell* firstAdjacent(int column, int row, gridPredicate<brogueCell*> predicate);
 
 		/// <summary>
 		/// Iterates adjacent cells and calls the user callback
 		/// </summary>
-		void iterateAdjacentCells(short column, short row, gridCallback<brogueCell*> callback);
+		void iterateAdjacentCells(int column, int row, gridCallback<brogueCell*> callback);
 
 		/// <summary>
 		/// Iterates cells and calls the user callback
@@ -72,6 +76,16 @@ namespace brogueHd::backend::model
 		/// </summary>
 		gridRect getLargestUnusedRectangle(const gridRect& minSize);
 
+		/// <summary>
+		/// Sets graph of rooms for the layout
+		/// </summary>
+		void setRoomGraph(graph<gridLocator, gridLocatorEdge>* roomGraph);
+
+		/// <summary>
+		/// Iterates the graph and presents the current node, and adjacent edges during a callback
+		/// </summary>
+		void iterateRoomGraph(graphIterator<gridLocator, gridLocatorEdge> callback);
+
 	private:
 
 		simpleList<brogueRoom*>* _rooms;
@@ -88,29 +102,32 @@ namespace brogueHd::backend::model
 		// Grid containing flag-enum for categories of features:  TODO
 		grid<dungeonFeatureCategories>* _featureCategoriesGrid;
 
-		//short cost;
+		graph<gridLocator, gridLocatorEdge>* _roomGraph;
+
+		//int cost;
 
 		//enum dungeonLayers layerFlags;					// Designate which of the layers the cell inhabits
 		//unsigned long flags;							// non-terrain cell flags
-		//unsigned short volume;							// quantity of gas in cell
+		//unsigned int volume;							// quantity of gas in cell
 
 		//unsigned char machineNumber;
 
 
 		// REFACTORED VOLUME:  Separates gases
-		//unsigned short poisonGasVolume;
-		//unsigned short swampGasVolume;
+		//unsigned int poisonGasVolume;
+		//unsigned int swampGasVolume;
 
 	};
 
 	brogueLayout::brogueLayout(const gridRect& levelParentBoundary, const gridRect& levelBoundary)
 	{
 		_mainGrid = new grid<brogueCell*>(levelParentBoundary, levelBoundary);
+		_roomGraph = nullptr;
 	}
 
 	brogueLayout::~brogueLayout()
 	{
-		_mainGrid->iterate([] (short column, short row, brogueCell* cell)
+		_mainGrid->iterate([] (int column, int row, brogueCell* cell)
 		{
 			delete cell;
 
@@ -128,12 +145,12 @@ namespace brogueHd::backend::model
 	{
 		return _mainGrid->getParentBoundary();
 	}
-	bool brogueLayout::isDefined(short column, short row) const
+	bool brogueLayout::isDefined(int column, int row) const
 	{
 		return _mainGrid->isDefined(column, row);
 	}
 
-	brogueCell* brogueLayout::get(short column, short row) const
+	brogueCell* brogueLayout::get(int column, int row) const
 	{
 		return _mainGrid->get(column, row);
 	}
@@ -142,7 +159,7 @@ namespace brogueHd::backend::model
 	{
 		grid<brogueCell*>* mainGrid = _mainGrid;
 
-		return _mainGrid->calculateLargestRectangle(minSize, [&mainGrid] (short column, short row, brogueCell* cell)
+		return _mainGrid->calculateLargestRectangle(minSize, [&mainGrid] (int column, int row, brogueCell* cell)
 		{
 			return !mainGrid->isDefined(column, row);
 		});
@@ -153,9 +170,9 @@ namespace brogueHd::backend::model
 	{
 		brogueCellDisplay display = prototype.getDisplay();
 
-		_mainGrid->set(locator.column, 
-					   locator.row, 
-					   new brogueCell(locator.column, locator.row, display.backColor, display.foreColor, display.character), 
+		_mainGrid->set(locator.column,
+					   locator.row,
+					   new brogueCell(locator.column, locator.row, display.backColor, display.foreColor, display.character),
 					   overwrite);
 	}
 
@@ -166,10 +183,10 @@ namespace brogueHd::backend::model
 		brogueCellDisplay display = prototype.getDisplay();
 
 		// Check cells
-		region->iterateLocations([&mainGrid, &display, &overwrite] (short column, short row, const T& locator)
+		region->iterateLocations([&mainGrid, &display, &overwrite] (int column, int row, const T& locator)
 		{
-			mainGrid->set(locator.column, 
-						  locator.row, 
+			mainGrid->set(locator.column,
+						  locator.row,
 						  new brogueCell(locator.column, locator.row, display.backColor, display.foreColor, display.character),
 						  overwrite);
 
@@ -177,9 +194,22 @@ namespace brogueHd::backend::model
 		});
 	}
 
-	void brogueLayout::iterateAdjacentCells(short column, short row, gridCallback<brogueCell*> callback)
+	void brogueLayout::setRoomGraph(graph<gridLocator, gridLocatorEdge>* roomGraph)
 	{
-		_mainGrid->iterateAdjacent(column, row, true, [&callback] (short column, short row, brogueCompass direction, brogueCell* item)
+		_roomGraph = roomGraph;
+	}
+
+	void brogueLayout::iterateRoomGraph(graphIterator<gridLocator, gridLocatorEdge> callback)
+	{
+		if (_roomGraph == nullptr)
+			throw simpleException("Trying to iterate room graph before setting it");
+
+		_roomGraph->iterate(callback);
+	}
+
+	void brogueLayout::iterateAdjacentCells(int column, int row, gridCallback<brogueCell*> callback)
+	{
+		_mainGrid->iterateAdjacent(column, row, true, [&callback] (int column, int row, brogueCompass direction, brogueCell* item)
 		{
 			return callback(column, row, item);
 		});
@@ -191,7 +221,7 @@ namespace brogueHd::backend::model
 
 	void brogueLayout::iterateWhereDefined(gridCallback<brogueCell*> callback) const
 	{
-		_mainGrid->iterate([&callback] (short column, short row, brogueCell* cell)
+		_mainGrid->iterate([&callback] (int column, int row, brogueCell* cell)
 		{
 			if (cell != nullptr)
 				callback(column, row, cell);
@@ -200,11 +230,11 @@ namespace brogueHd::backend::model
 		});
 	}
 
-	brogueCell* brogueLayout::firstAdjacent(short column, short row, gridPredicate<brogueCell*> predicate)
+	brogueCell* brogueLayout::firstAdjacent(int column, int row, gridPredicate<brogueCell*> predicate)
 	{
 		brogueCell* result;
 
-		_mainGrid->iterateAdjacent(column, row, true, [&predicate, &result] (short acolumn, short arow, brogueCompass direction, brogueCell* cell)
+		_mainGrid->iterateAdjacent(column, row, true, [&predicate, &result] (int acolumn, int arow, brogueCompass direction, brogueCell* cell)
 		{
 			if (predicate(acolumn, arow, cell))
 			{

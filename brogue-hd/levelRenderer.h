@@ -31,9 +31,9 @@ namespace brogueHd::frontend
 		brogueView* getMessageView() const;
 		brogueView* getFlavorMessageView() const;
 
-		//void plotCharWithColor(uchar inputChar, short xLoc, short yLoc, const color* cellForeColor, const color* cellBackColor);
+		//void plotCharWithColor(uchar inputChar, int xLoc, int yLoc, const color* cellForeColor, const color* cellBackColor);
 
-		//void hiliteGrid(color* hiliteColor, short hiliteStrength);
+		//void hiliteGrid(color* hiliteColor, int hiliteStrength);
 
 		//void bakeColor(color* theColor);
 
@@ -123,11 +123,11 @@ namespace brogueHd::frontend
 
 	}
 
-	//void levelRenderer::plotCharWithColor(uchar inputChar, short xLoc, short yLoc, const color* cellForeColor, const color* cellBackColor) 
+	//void levelRenderer::plotCharWithColor(uchar inputChar, int xLoc, int yLoc, const color* cellForeColor, const color* cellBackColor) 
 	//{
-	//	short oldRNG;
+	//	int oldRNG;
 
-	//	short foreRed = cellForeColor->red,
+	//	int foreRed = cellForeColor->red,
 	//		  foreGreen = cellForeColor->green,
 	//		  foreBlue = cellForeColor->blue,
 
@@ -194,9 +194,9 @@ namespace brogueHd::frontend
 	//}
 
 	//// Highlight the portion indicated by hiliteCharGrid with the hiliteColor at the hiliteStrength -- both latter arguments are optional.
-	//void levelRenderer::hiliteGrid(color* hiliteColor, short hiliteStrength)
+	//void levelRenderer::hiliteGrid(color* hiliteColor, int hiliteStrength)
 	//{
-	//	short x, y;
+	//	int x, y;
 	//	color hCol;
 
 	//	if (hiliteColor) {
@@ -214,7 +214,7 @@ namespace brogueHd::frontend
 
 	//	brogueGrid* grid = _level->levelGrid;
 
-	//	iterate(_level->levelGrid->getBoundary(), [grid, &x, &y, &hCol, &hiliteStrength](short i, short j)
+	//	iterate(_level->levelGrid->getBoundary(), [grid, &x, &y, &hCol, &hiliteStrength](int i, int j)
 	//	{
 	//		if (grid->isDefined(i, j))
 	//		{
@@ -236,7 +236,7 @@ namespace brogueHd::frontend
 
 	//void levelRenderer::bakeColor(color* theColor) 
 	//{
-	//	short rand;
+	//	int rand;
 	//	rand = _randomGenerator->rand_range(0, theColor->rand);
 	//	theColor->red += _randomGenerator->rand_range(0, theColor->redRand) + rand;
 	//	theColor->green += _randomGenerator->rand_range(0, theColor->greenRand) + rand;
@@ -246,7 +246,7 @@ namespace brogueHd::frontend
 
 	//void levelRenderer::displayMessageArchive()
 	//{
-		//short i, j, k, reverse, fadePercent, totalMessageCount, currentMessageCount;
+		//int i, j, k, reverse, fadePercent, totalMessageCount, currentMessageCount;
 		//boolean fastForward;
 
 		////brogueCellDisplay dbuf[COLS][ROWS], rbuf[COLS][ROWS];
@@ -315,7 +315,7 @@ namespace brogueHd::frontend
 	void temporaryMessage(char* msg, bool requireAcknowledgment)
 	{
 		//char message[COLS];
-		//short i, j;
+		//int i, j;
 
 		//assureCosmeticRNG;
 		//strcpy(message, msg);
@@ -341,7 +341,7 @@ namespace brogueHd::frontend
 
 	//void flavorMessage(char* msg) 
 	//{
-	//	short i;
+	//	int i;
 	//	char text[COLS * 20];
 
 	//	for (i = 0; i < COLS * 2 && msg[i] != '\0'; i++) {
@@ -360,7 +360,7 @@ namespace brogueHd::frontend
 
 	//void messageWithoutCaps(char* msg, boolean requireAcknowledgment) 
 	//{
-	//	short i;
+	//	int i;
 	//	if (!msg[0]) {
 	//		return;
 	//	}
@@ -403,7 +403,7 @@ namespace brogueHd::frontend
 	//void message(const char* msg, boolean requireAcknowledgment) 
 	//{
 	//	char text[COLS * 20], * msgPtr;
-	//	short i, lines;
+	//	int i, lines;
 
 	//	assureCosmeticRNG;
 
@@ -458,7 +458,7 @@ namespace brogueHd::frontend
 	//}
 
 	//void displayMoreSign() {
-	//	short i;
+	//	int i;
 
 	//	if (rogue.autoPlayingLevel) {
 	//		return;
@@ -481,7 +481,7 @@ namespace brogueHd::frontend
 	//// Inserts a four-character color escape sequence into a string at the insertion point.
 	//// Does NOT check string lengths, so it could theoretically write over the null terminator.
 	//// Returns the new insertion point.
-	//short levelRenderer::encodeMessageColor(char* msg, short i, const color* theColor)
+	//int levelRenderer::encodeMessageColor(char* msg, int i, const color* theColor)
 	//{
 	//	//boolean needTerminator = false;
 	//	//color col(*theColor);
@@ -510,7 +510,7 @@ namespace brogueHd::frontend
 
 	//// Call this when the i'th character of msg is COLOR_ESCAPE.
 	//// It will return the encoded color, and will advance i past the color escape sequence.
-	//short decodeMessageColor(const char* msg, short i, color* returnColor) {
+	//int decodeMessageColor(const char* msg, int i, color* returnColor) {
 
 	//	if (msg[i] != COLOR_ESCAPE) {
 	//		printf("\nAsked to decode a color escape that didn't exist!");
@@ -519,9 +519,9 @@ namespace brogueHd::frontend
 	//	else {
 	//		i++;
 	//		*returnColor = black;
-	//		returnColor->red = (short)(msg[i++] - COLOR_VALUE_INTERCEPT);
-	//		returnColor->green = (short)(msg[i++] - COLOR_VALUE_INTERCEPT);
-	//		returnColor->blue = (short)(msg[i++] - COLOR_VALUE_INTERCEPT);
+	//		returnColor->red = (int)(msg[i++] - COLOR_VALUE_INTERCEPT);
+	//		returnColor->green = (int)(msg[i++] - COLOR_VALUE_INTERCEPT);
+	//		returnColor->blue = (int)(msg[i++] - COLOR_VALUE_INTERCEPT);
 
 	//		returnColor->red = clamp(returnColor->red, 0, 100);
 	//		returnColor->green = clamp(returnColor->green, 0, 100);
@@ -531,7 +531,7 @@ namespace brogueHd::frontend
 	//}
 
 	//void updateMessageDisplay() {
-	//	short i, j, m;
+	//	int i, j, m;
 	//	color messageColor;
 
 	//	for (i = 0; i < MESSAGE_LINES; i++) {
@@ -566,7 +566,7 @@ namespace brogueHd::frontend
 
 	//// Does NOT clear the message archive.
 	//void deleteMessages() {
-	//	short i;
+	//	int i;
 	//	for (i = 0; i < MESSAGE_LINES; i++) {
 	//		displayedMessage[i][0] = '\0';
 	//	}
@@ -574,7 +574,7 @@ namespace brogueHd::frontend
 	//}
 
 	//void confirmMessages() {
-	//	short i;
+	//	int i;
 	//	for (i = 0; i < MESSAGE_LINES; i++) {
 	//		messageConfirmed[i] = true;
 	//	}

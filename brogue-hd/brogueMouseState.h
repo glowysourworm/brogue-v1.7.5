@@ -18,7 +18,7 @@ namespace brogueHd::frontend
 			_scrollNegativeY = false;
 			_mouseLeft = false;
 		}
-		brogueMouseState(short column, short row, bool scrollPendingX, bool scrollPendingY, bool negativeX, bool negativeY, bool mouseLeft)
+		brogueMouseState(int column, int row, bool scrollPendingX, bool scrollPendingY, bool negativeX, bool negativeY, bool mouseLeft)
 		{
 			_location = gridLocator(column, row);
 			_scrollPendingX = scrollPendingX;

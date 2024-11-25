@@ -187,7 +187,7 @@ namespace brogueHd::frontend
 		gridRect boundary = source->getBoundary();
 		bool result = true;
 
-		source->iterateFrom(start, end, [&configuration, &source, &dest, &result, &copyView] (short column, short row, brogueCellDisplay* cell)
+		source->iterateFrom(start, end, [&configuration, &source, &dest, &result, &copyView] (int column, int row, brogueCellDisplay* cell)
 		{
 			if (cell == nullptr || dest->get(column, row) == nullptr)
 			{

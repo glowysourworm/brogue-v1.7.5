@@ -3,8 +3,10 @@
 #include "brogueCell.h"
 #include "brogueContentGrid.h"
 #include "brogueLayout.h"
+#include "graph.h"
 #include "gridDefinitions.h"
 #include "gridLocator.h"
+#include "gridLocatorEdge.h"
 
 using namespace brogueHd::component;
 
@@ -14,12 +16,13 @@ namespace brogueHd::backend::model
 	{
 	public:
 
-		brogueLevel(short depth, brogueLayout* layout, brogueContentGrid* content);
+		brogueLevel(int depth, brogueLayout* layout, brogueContentGrid* content);
 		~brogueLevel();
 
-		short getDepth() const;
+		int getDepth() const;
 
 		void iterateWhereDefined(gridCallback<brogueCell*> callback) const;
+		void iterateRoomGraph(graphIterator<gridLocator, gridLocatorEdge> callback);
 		void clearUpdate();
 		bool needsUpdate();
 
@@ -33,10 +36,10 @@ namespace brogueHd::backend::model
 
 		// (old variable name)
 		// pcell mapStorage[DCOLS][DROWS];
-		// short** scentMap;
+		// int** scentMap;
 
 		bool _visited;
-		short _depth;
+		int _depth;
 		unsigned long _levelSeed;
 		//unsigned long _awaySince;		// Parameter to "burn in" level. Simulate it for N turns so that swamp gas accumulates, swamps percolate, etc...
 
@@ -45,7 +48,7 @@ namespace brogueHd::backend::model
 		gridLocator* _playerExitedVia;
 	};
 
-	brogueLevel::brogueLevel(short depth, brogueLayout* layout, brogueContentGrid* content)
+	brogueLevel::brogueLevel(int depth, brogueLayout* layout, brogueContentGrid* content)
 	{
 		_depth = depth;
 		_layout = layout;
@@ -56,13 +59,17 @@ namespace brogueHd::backend::model
 	brogueLevel::~brogueLevel()
 	{
 	}
-	short brogueLevel::getDepth() const
+	int brogueLevel::getDepth() const
 	{
 		return _depth;
 	}
 	void brogueLevel::iterateWhereDefined(gridCallback<brogueCell*> callback) const
 	{
 		_layout->iterateWhereDefined(callback);
+	}
+	void brogueLevel::iterateRoomGraph(graphIterator<gridLocator, gridLocatorEdge> callback)
+	{
+		_layout->iterateRoomGraph(callback);
 	}
 	bool brogueLevel::needsUpdate()
 	{

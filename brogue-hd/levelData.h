@@ -13,11 +13,11 @@ namespace brogueHd::backend::model
 		itemBase* items;
 		creatureInfo* monsters;
 		creatureInfo* dormantMonsters;
-		short** scentMap;
+		int** scentMap;
 		unsigned long levelSeed;
-		short upStairsLoc[2];
-		short downStairsLoc[2];
-		short playerExitedVia[2];
+		int upStairsLoc[2];
+		int downStairsLoc[2];
+		int playerExitedVia[2];
 		unsigned long awaySince;
 	};
 }

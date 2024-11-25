@@ -176,13 +176,15 @@
     <ClCompile Include="gl.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="brogueGraphView.h" />
+    <ClInclude Include="brogueLine.h" />
+    <ClInclude Include="brogueQuad.h" />
     <ClInclude Include="brogueRoomTemplate.h" />
     <ClInclude Include="brogueUIColorText.h" />
     <ClInclude Include="brogueDesignRect.h" />
     <ClInclude Include="bitmap.h" />
     <ClInclude Include="boltConstants.h" />
     <ClInclude Include="boudingBox2D.h" />
-    <ClInclude Include="brogueFlameQuad.h" />
     <ClInclude Include="brogueButton.h" />
     <ClInclude Include="brogueEvent.h" />
     <ClInclude Include="brogueFlameMenuHeatView.h" />
@@ -209,7 +211,9 @@
     <ClInclude Include="brogueUIBuilder.h" />
     <ClInclude Include="brogueUIMouseData.h" />
     <ClInclude Include="brogueUIText.h" />
-    <ClInclude Include="brogueViewBase.h" />
+    <ClInclude Include="brogueViewCore.h" />
+    <ClInclude Include="brogueViewGridCore.h" />
+    <ClInclude Include="brogueViewPolygonCore.h" />
     <ClInclude Include="brogueViewProgram.h" />
     <ClInclude Include="brogueColorMap.h" />
     <ClInclude Include="brogueColorQuad.h" />
@@ -242,6 +246,7 @@
     <ClInclude Include="simpleExt.h" />
     <ClInclude Include="simpleFileEntry.h" />
     <ClInclude Include="simpleKeyboardState.h" />
+    <ClInclude Include="simpleLine.h" />
     <ClInclude Include="simpleLogger.h" />
     <ClInclude Include="brogueMachine.h" />
     <ClInclude Include="simpleMaskedInt32.h" />
@@ -249,7 +254,6 @@
     <ClInclude Include="brogueObject.h" />
     <ClInclude Include="broguePlayer.h" />
     <ClInclude Include="brogueRoom.h" />
-    <ClInclude Include="brogueDataStreamBuilder.h" />
     <ClInclude Include="brogueTestPackage.h" />
     <ClInclude Include="cellularAutomataParameters.h" />
     <ClInclude Include="brogueCoordinateConverter.h" />
@@ -332,6 +336,7 @@
     <ClInclude Include="machineConstants.h" />
     <ClInclude Include="simpleBitmap.h" />
     <ClInclude Include="simpleMouseState.h" />
+    <ClInclude Include="simpleOpenGL.h" />
     <ClInclude Include="simpleOrderedList.h" />
     <ClInclude Include="simplePeriodCounter.h" />
     <ClInclude Include="simplePixel.h" />

@@ -9,8 +9,8 @@ using namespace brogueHd::component;
 namespace brogueHd::backend::model
 {
 	//struct pdsLink {
-	//	short distance;
-	//	short cost;
+	//	int distance;
+	//	int cost;
 	//	pdsLink* left, * right;
 	//};
 
@@ -32,13 +32,13 @@ namespace brogueHd::backend::model
 			_display->backColor = colors::getGray(0.5);
 			_display->foreColor = colors::blue();
 		}
-		brogueCell(short column, short row)
+		brogueCell(int column, int row)
 		{
 			_display = new brogueCellDisplay(column, row);
 			_display->backColor = colors::getGray(0.5);
 			_display->foreColor = colors::blue();
 		}
-		brogueCell(short column, short row, const color& backColor, const color& foreColor, char symbol)
+		brogueCell(int column, int row, const color& backColor, const color& foreColor, char symbol)
 		{
 			_display = new brogueCellDisplay(column, row);
 			_display->backColor = backColor;
@@ -59,7 +59,7 @@ namespace brogueHd::backend::model
 
 		brogueCellDisplay* _display;
 
-		//short terrainRandomValues[8];					// TODO: Figure this out!
+		//int terrainRandomValues[8];					// TODO: Figure this out!
 		//bool isWayPoint;
 
 		//char machine;

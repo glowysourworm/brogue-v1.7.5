@@ -60,7 +60,7 @@ namespace brogueHd::backend
 
 		bool polarity = true;							// Make walls
 		float fillRatio = 0.55f;						// Fill 45% with walls
-		short iterations = 4;							// # iterations
+		int iterations = 4;							// # iterations
 		cellularAutomataRule rule1(4, true, true);		// Rule 1 (OR) Rule 2 (passes) -> set to [polarity = wall]
 		cellularAutomataRule rule2(5, false, true);		// Rule 2
 		
@@ -163,7 +163,7 @@ namespace brogueHd::backend
 
 	void roomGenerator::designDefault(grid<gridLocator>& designGrid, bool overwrite)
 	{
-		designGrid.iterate([&designGrid, &overwrite] (short column, short row, const gridLocator& locator)
+		designGrid.iterate([&designGrid, &overwrite] (int column, int row, const gridLocator& locator)
 		{
 			designGrid.set(column, row, gridLocator(column, row), overwrite);
 
@@ -179,7 +179,7 @@ namespace brogueHd::backend
 		_noiseGenerator->cellularAutomata(designGrid.getParentBoundary(),
 										  designGrid.getRelativeBoundary(),
 										  *_cavernParameters,
-		[&designGrid] (short column, short row, bool result)
+		[&designGrid] (int column, int row, bool result)
 		{
 			if (result)
 				designGrid.set(column, row, gridLocator(column, row));
@@ -205,7 +205,7 @@ namespace brogueHd::backend
 		if (validRegions.count() > 0)
 		{
 			// Select largest area region from valid regions
-			maxRegion = validRegions.withMax<short>([] (gridRegion<gridLocator>* region)
+			maxRegion = validRegions.withMax<int>([] (gridRegion<gridLocator>* region)
 			{
 				return region->getBoundary().area();
 			});
@@ -218,7 +218,7 @@ namespace brogueHd::backend
 								 minSize.width,
 								 minSize.height);
 
-			defaultRect.iterate([&constructor] (short column, short row)
+			defaultRect.iterate([&constructor] (int column, int row)
 			{
 				constructor.add(column, row, gridLocator(column, row));
 
@@ -242,7 +242,7 @@ namespace brogueHd::backend
 		maxRegion->translate_StackLike(translation.column, translation.row);
 
 		// ...and copy it to the master grid.
-		designGrid.iterate([&designGrid, &maxRegion] (short column, short row, const gridLocator& item)
+		designGrid.iterate([&designGrid, &maxRegion] (int column, int row, const gridLocator& item)
 		{			
 			// Overwrite = true. (just set the main grid to the max region)
 			if (!maxRegion->isDefined(column, row))
@@ -278,7 +278,7 @@ namespace brogueHd::backend
 		gridRect room2(offsetX2, offsetY2, roomWidth2, roomHeight2);
 
 		// Add Room 1
-		room1.iterate([&designGrid] (short column, short row)
+		room1.iterate([&designGrid] (int column, int row)
 		{
 			designGrid.set(column, row, gridLocator(column, row));
 
@@ -286,7 +286,7 @@ namespace brogueHd::backend
 		});
 
 		// Add Room 2
-		room2.iterate([&designGrid, &room1] (short column, short row)
+		room2.iterate([&designGrid, &room1] (int column, int row)
 		{
 			if (!room1.contains(column, row))
 				designGrid.set(column, row, gridLocator(column, row));
@@ -302,25 +302,25 @@ namespace brogueHd::backend
 		//gridRect boundary = designGrid.getRelativeBoundary();
 
 		//// Room 1:  75% of the total size (randomly)
-		//short roomWidth = simpleMath::nearestEvenFloor(_randomGenerator->randomRangeInclusive(minSize.width, 0.75f * boundary.width));
-		//short roomX = _randomGenerator->randomRangeInclusive(0, boundary.width - roomWidth, randomVariable::Gaussian);
+		//int roomWidth = simpleMath::nearestEvenFloor(_randomGenerator->randomRangeInclusive(minSize.width, 0.75f * boundary.width));
+		//int roomX = _randomGenerator->randomRangeInclusive(0, boundary.width - roomWidth, randomVariable::Gaussian);
 
-		//short roomHeight = simpleMath::nearestEvenFloor(_randomGenerator->randomRangeInclusive(minSize.height, 0.75f * boundary.height));
-		//short roomY = _randomGenerator->randomRangeInclusive(0, boundary.height - roomHeight, randomVariable::Gaussian);
+		//int roomHeight = simpleMath::nearestEvenFloor(_randomGenerator->randomRangeInclusive(minSize.height, 0.75f * boundary.height));
+		//int roomY = _randomGenerator->randomRangeInclusive(0, boundary.height - roomHeight, randomVariable::Gaussian);
 
 		//// Room 2:  100% of the total size (randomly)
-		//short roomWidth2 = simpleMath::nearestEvenFloor(_randomGenerator->randomRangeInclusive(minSize.width, boundary.width));
-		//short roomX2 = _randomGenerator->randomRangeInclusive(0, boundary.width - roomWidth2, randomVariable::Gaussian);
+		//int roomWidth2 = simpleMath::nearestEvenFloor(_randomGenerator->randomRangeInclusive(minSize.width, boundary.width));
+		//int roomX2 = _randomGenerator->randomRangeInclusive(0, boundary.width - roomWidth2, randomVariable::Gaussian);
 
-		//short roomHeight2 = simpleMath::nearestEvenFloor(_randomGenerator->randomRangeInclusive(minSize.height, boundary.height));
-		//short roomY2 = _randomGenerator->randomRangeInclusive(0, boundary.height - roomHeight2, randomVariable::Gaussian);
+		//int roomHeight2 = simpleMath::nearestEvenFloor(_randomGenerator->randomRangeInclusive(minSize.height, boundary.height));
+		//int roomY2 = _randomGenerator->randomRangeInclusive(0, boundary.height - roomHeight2, randomVariable::Gaussian);
 
 		//// Cross the sizes
 		//gridRect room1(boundary.column + roomX, boundary.row + roomY, roomWidth, roomHeight);
 		//gridRect room2(boundary.column + roomX2, boundary.row + roomY2, roomWidth2, roomHeight2);
 
 		//// Add Room 1
-		//room1.iterate([&designGrid] (short column, short row)
+		//room1.iterate([&designGrid] (int column, int row)
 		//{
 		//	designGrid.set(column, row, gridLocator(column, row));
 
@@ -328,7 +328,7 @@ namespace brogueHd::backend
 		//});
 
 		//// Add Room 2
-		//room2.iterate([&designGrid, &room1] (short column, short row)
+		//room2.iterate([&designGrid, &room1] (int column, int row)
 		//{
 		//	if (!room1.contains(column, row))
 		//		designGrid.set(column, row, gridLocator(column, row));
@@ -339,7 +339,7 @@ namespace brogueHd::backend
 
 	void roomGenerator::designSymmetricalCrossRoom(grid<gridLocator>& designGrid)
 	{
-		short majorWidth, majorHeight, minorWidth, minorHeight;
+		int majorWidth, majorHeight, minorWidth, minorHeight;
 
 		gridRect boundary = designGrid.getRelativeBoundary();
 
@@ -365,7 +365,7 @@ namespace brogueHd::backend
 		roomEW.clamp(boundary);
 
 		// Add Room 1
-		roomNS.iterate([&designGrid] (short column, short row)
+		roomNS.iterate([&designGrid] (int column, int row)
 		{
 			designGrid.set(column, row, gridLocator(column, row));
 
@@ -373,7 +373,7 @@ namespace brogueHd::backend
 		});
 
 		// Add Room 2
-		roomEW.iterate([&designGrid, &roomNS] (short column, short row)
+		roomEW.iterate([&designGrid, &roomNS] (int column, int row)
 		{
 			if (!roomNS.contains(column, row))
 				designGrid.set(column, row, gridLocator(column, row));
@@ -386,13 +386,13 @@ namespace brogueHd::backend
 	{
 		gridRect boundary = designGrid.getRelativeBoundary();
 
-		short width = _randomGenerator->randomRangeInclusive(minSize.width, boundary.width);
-		short height = _randomGenerator->randomRangeInclusive(minSize.height, boundary.height);
+		int width = _randomGenerator->randomRangeInclusive(minSize.width, boundary.width);
+		int height = _randomGenerator->randomRangeInclusive(minSize.height, boundary.height);
 
 		gridRect room(boundary.column, boundary.row, width, height);
 
 		// Add Room
-		room.iterate([&designGrid] (short column, short row)
+		room.iterate([&designGrid] (int column, int row)
 		{
 			designGrid.set(column, row, gridLocator(column, row));
 
@@ -404,7 +404,7 @@ namespace brogueHd::backend
 	{
 		gridRect boundary = designGrid.getRelativeBoundary();
 
-		boundary.iterateInCircle([&designGrid] (short column, short row)
+		boundary.iterateInCircle([&designGrid] (int column, int row)
 		{
 			designGrid.set(column, row, gridLocator(column, row));
 
@@ -421,10 +421,10 @@ namespace brogueHd::backend
 		//{
 		//	// TODO:  FIGURE OUT ZERO VALUE! (last parameter from above. probably chasm)
 
-		//	short removeRadius = _randomGenerator->randomRange(3, radius - 3);
+		//	int removeRadius = _randomGenerator->randomRange(3, radius - 3);
 		//	gridRect removeRect = gridRect::fromCircle((DCOLS / 2) + removeRadius, (DCOLS / 2) + removeRadius, removeRadius, removeRadius);
 
-		//	setRect.iterateInCircle([&designGrid] (short column, short row)
+		//	setRect.iterateInCircle([&designGrid] (int column, int row)
 		//	{
 		//		designGrid.set(column, row, default_value::value<gridLocator>(), true);
 
@@ -438,9 +438,9 @@ namespace brogueHd::backend
 		gridRect boundary = designGrid.getRelativeBoundary();
 		gridRect minRect(boundary.column, boundary.row, 2, 2);
 
-		short chunkCount = _randomGenerator->randomRangeInclusive(2, 8);
+		int chunkCount = _randomGenerator->randomRangeInclusive(2, 8);
 
-		for (short i = 0; i < chunkCount; i++)
+		for (int i = 0; i < chunkCount; i++)
 		{
 			// Brogue v1.7.5 Design:  Create chunks with 2x2 size within the layout range
 			int offsetX = _randomGenerator->randomRangeExclusive(0, boundary.width - 2);
@@ -448,7 +448,7 @@ namespace brogueHd::backend
 
 			gridRect rect = minRect + gridLocator(offsetX, offsetY);
 
-			rect.iterateInCircle([&designGrid] (short column, short row)
+			rect.iterateInCircle([&designGrid] (int column, int row)
 			{
 				designGrid.set(column, row, gridLocator(column, row), true);
 				return iterationCallback::iterate;

@@ -39,7 +39,7 @@ namespace brogueHd::backend::model
 		bool stackableInventory;
 
 		// Quantity of items that are currently stacked (quiver or quantity)		
-		unsigned short stackableQuantity;
+		unsigned int stackableQuantity;
 	};
 
 	struct itemKey : itemBase
@@ -62,8 +62,8 @@ namespace brogueHd::backend::model
 		weaponKind kind;
 		weaponEnchants enchant1;
 		weaponEnchants enchant2;
-		short timesEnchanted;
-		short strengthRequired;
+		int timesEnchanted;
+		int strengthRequired;
 	};
 
 	struct itemArmor : itemBase
@@ -71,9 +71,9 @@ namespace brogueHd::backend::model
 		armorKind kind;
 		armorEnchants enchant1;
 		armorEnchants enchant2;
-		short armor;
-		short timesEnchanted;
-		short strengthRequired;
+		int armor;
+		int timesEnchanted;
+		int strengthRequired;
 	};
 
 	struct itemWand : itemBase
@@ -81,7 +81,7 @@ namespace brogueHd::backend::model
 		wandKind kind;
 
 		boltType bolt;
-		short charges;
+		int charges;
 		creatureTypes vorpalEnemy;
 	};
 
@@ -90,22 +90,22 @@ namespace brogueHd::backend::model
 		staffKind kind;
 
 		boltType bolt;
-		short charges;
+		int charges;
 		creatureTypes vorpalEnemy;
-		short strengthRequired;
+		int strengthRequired;
 	};
 
 	struct itemRing : itemBase
 	{
 		ringKind kind;
-		short timesEnchanted;
+		int timesEnchanted;
 	};
 
 	struct itemCharm : itemBase
 	{
 		charmKind kind;
-		short charges;
-		short timesEnchanted;
+		int charges;
+		int timesEnchanted;
 	};
 
 	struct itemScroll : itemBase
@@ -119,9 +119,9 @@ namespace brogueHd::backend::model
 		simpleString name;
 		simpleString flavor;
 		simpleString callTitle;
-		short frequency;
-		short marketValue;
-		short strengthRequired;
+		int frequency;
+		int marketValue;
+		int strengthRequired;
 		randomRange range;
 		bool identified;
 		bool called;

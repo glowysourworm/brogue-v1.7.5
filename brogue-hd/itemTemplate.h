@@ -7,6 +7,6 @@ namespace brogueHd::backend::model
 	struct itemTemplate
 	{
 		keyLocation location;
-		short originDepth;
+		int originDepth;
 	};
 }

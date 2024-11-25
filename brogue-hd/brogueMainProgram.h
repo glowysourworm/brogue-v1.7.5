@@ -85,7 +85,7 @@ namespace brogueHd::frontend
 		/// <summary>
 		/// Primary game data update (see program container)
 		/// </summary>
-		void setGameUpdate(short column, short row, const brogueCellDisplay& data);
+		void setGameUpdate(int column, int row, const brogueCellDisplay& data);
 		
 	private:
 
@@ -282,7 +282,7 @@ namespace brogueHd::frontend
 			return iterationCallback::iterate;
 		});
 	}
-	void brogueMainProgram::setGameUpdate(short column, short row, const brogueCellDisplay& data)
+	void brogueMainProgram::setGameUpdate(int column, int row, const brogueCellDisplay& data)
 	{
 		_uiPrograms->get(brogueUIProgram::GameProgram)->setGameUpdate(column, row, data);
 	}

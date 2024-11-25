@@ -15,10 +15,10 @@ namespace brogueHd::backend::model
 		char theChar;
 		color foreColor;
 		color backColor;
-		short boltEffect;
-		short magnitude;
-		short pathDF;
-		short targetDF;
+		int boltEffect;
+		int magnitude;
+		int pathDF;
+		int targetDF;
 		unsigned long forbiddenMonsterFlags;
 		unsigned long flags;
 	};

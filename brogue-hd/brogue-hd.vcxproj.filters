@@ -521,9 +521,6 @@
     <ClInclude Include="brogueViewContainer.h">
       <Filter>Header Files\frontend\ui</Filter>
     </ClInclude>
-    <ClInclude Include="brogueDataStreamBuilder.h">
-      <Filter>Header Files\frontend\opengl\program</Filter>
-    </ClInclude>
     <ClInclude Include="simpleShaderProgram.h">
       <Filter>Header Files\frontend\opengl\program</Filter>
     </ClInclude>
@@ -623,9 +620,6 @@
     <ClInclude Include="openglQuadConverter.h">
       <Filter>Header Files\frontend\opengl\program\openglData</Filter>
     </ClInclude>
-    <ClInclude Include="brogueViewBase.h">
-      <Filter>Header Files\frontend\ui</Filter>
-    </ClInclude>
     <ClInclude Include="eventController.h">
       <Filter>Header Files\backend\controller</Filter>
     </ClInclude>
@@ -658,9 +652,6 @@
     </ClInclude>
     <ClInclude Include="simpleOrderedList.h">
       <Filter>Header Files\simple</Filter>
-    </ClInclude>
-    <ClInclude Include="brogueFlameQuad.h">
-      <Filter>Header Files\frontend\opengl\streamObjects</Filter>
     </ClInclude>
     <ClInclude Include="brogueUIStateChanger.h">
       <Filter>Header Files\frontend\ui</Filter>
@@ -724,6 +715,30 @@
     </ClInclude>
     <ClInclude Include="simpleRange.h">
       <Filter>Header Files\simple</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueGraphView.h">
+      <Filter>Header Files\frontend\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleLine.h">
+      <Filter>Header Files\simple</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueViewGridCore.h">
+      <Filter>Header Files\frontend\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueViewCore.h">
+      <Filter>Header Files\frontend\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueViewPolygonCore.h">
+      <Filter>Header Files\frontend\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleOpenGL.h">
+      <Filter>Header Files\frontend\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueQuad.h">
+      <Filter>Header Files\frontend\opengl\streamObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueLine.h">
+      <Filter>Header Files\frontend\opengl\streamObjects</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

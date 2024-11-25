@@ -9,8 +9,8 @@ namespace brogueHd::backend::model
 	{
 	public:
 
-		//short depthLevel;					// which dungeon level are we on
-		//short deepestLevel;
+		//int depthLevel;					// which dungeon level are we on
+		//int deepestLevel;
 		//boolean disturbed;					// player should stop auto-acting
 		//boolean gameHasEnded;				// stop everything and go to death screen
 		//boolean highScoreSaved;				// so that it saves the high score only once
@@ -36,11 +36,11 @@ namespace brogueHd::backend::model
 		bool displayAggroRangeMode;      // whether your stealth range is displayed
 		bool quit;						// to skip the typical end-game theatrics when the player quits
 		unsigned long seed;					// the master seed for generating the entire dungeon
-		short RNG;							// which RNG are we currently using?
+		int RNG;							// which RNG are we currently using?
 		unsigned long gold;					// how much gold we have
 		unsigned long goldGenerated;		// how much gold has been generated on the levels, not counting gold held by monsters
-		short strength;
-		unsigned short monsterSpawnFuse;	// how much longer till a random monster spawns
+		int strength;
+		unsigned int monsterSpawnFuse;	// how much longer till a random monster spawns
 
 		//item* weapon;
 		//item* armor;
@@ -48,43 +48,43 @@ namespace brogueHd::backend::model
 		//item* ringRight;
 
 		//flare** flares;
-		short flareCount;
-		short flareCapacity;
+		int flareCount;
+		int flareCapacity;
 
 		//creature* yendorWarden;
 
 		//lightSource minersLight;
 		int64_t minersLightRadius;
-		short ticksTillUpdateEnvironment;	// so that some periodic things happen in objective time
-		unsigned short scentTurnNumber;		// helps make scent-casting work
+		int ticksTillUpdateEnvironment;	// so that some periodic things happen in objective time
+		unsigned int scentTurnNumber;		// helps make scent-casting work
 		unsigned long playerTurnNumber;     // number of input turns in recording. Does not increment during paralysis.
 		unsigned long absoluteTurnNumber;   // number of turns since the beginning of time. Always increments.
 		signed long milliseconds;			// milliseconds since launch, to decide whether to engage cautious mode
-		short xpxpThisTurn;					// how many squares the player explored this turn
-		short aggroRange;                   // distance from which monsters will notice you
+		int xpxpThisTurn;					// how many squares the player explored this turn
+		int aggroRange;                   // distance from which monsters will notice you
 
-		short previousPoisonPercent;        // and your poison proportion, to display percentage alerts for each.
+		int previousPoisonPercent;        // and your poison proportion, to display percentage alerts for each.
 
-		short upLoc[2];						// upstairs location this level
-		short downLoc[2];					// downstairs location this level
+		int upLoc[2];						// upstairs location this level
+		int downLoc[2];					// downstairs location this level
 
-		short cursorLoc[2];					// used for the return key functionality
+		int cursorLoc[2];					// used for the return key functionality
 		//creature* lastTarget;				// to keep track of the last monster the player has thrown at or zapped
-		short rewardRoomsGenerated;			// to meter the number of reward machines
-		short machineNumber;				// so each machine on a level gets a unique number
-		short sidebarLocationList[ROWS * 2][2];	// to keep track of which location each line of the sidebar references
+		int rewardRoomsGenerated;			// to meter the number of reward machines
+		int machineNumber;				// so each machine on a level gets a unique number
+		int sidebarLocationList[ROWS * 2][2];	// to keep track of which location each line of the sidebar references
 
 		// maps
-		short** mapToShore;					// how many steps to get back to shore
-		short** mapToSafeTerrain;			// so monsters can get to safety
+		int** mapToShore;					// how many steps to get back to shore
+		int** mapToSafeTerrain;			// so monsters can get to safety
 
 		//// recording info
 		//boolean playbackMode;				// whether we're viewing a recording instead of playing
 		//unsigned long currentTurnNumber;	// how many turns have elapsed
 		//unsigned long howManyTurns;			// how many turns are in this recording
-		//short howManyDepthChanges;			// how many times the player changes depths
-		//short playbackDelayPerTurn;			// base playback speed; modified per turn by events
-		//short playbackDelayThisTurn;		// playback speed as modified
+		//int howManyDepthChanges;			// how many times the player changes depths
+		//int playbackDelayPerTurn;			// base playback speed; modified per turn by events
+		//int playbackDelayThisTurn;		// playback speed as modified
 		//boolean playbackPaused;
 		//boolean playbackFastForward;		// for loading saved games and such -- disables drawing and prevents pauses
 		//boolean playbackOOS;				// playback out of sync -- no unpausing allowed
@@ -96,32 +96,32 @@ namespace brogueHd::backend::model
 
 		// metered items
 		int64_t foodSpawned;					// amount of nutrition units spawned so far this game
-		short lifePotionFrequency;
-		short lifePotionsSpawned;
-		short strengthPotionFrequency;
-		short enchantScrollFrequency;
+		int lifePotionFrequency;
+		int lifePotionsSpawned;
+		int strengthPotionFrequency;
+		int enchantScrollFrequency;
 
 		// ring bonuses:
-		short clairvoyance;
-		short stealthBonus;
-		short regenerationBonus;
-		short lightMultiplier;
-		short awarenessBonus;
-		short transference;
-		short wisdomBonus;
-		short reaping;
+		int clairvoyance;
+		int stealthBonus;
+		int regenerationBonus;
+		int lightMultiplier;
+		int awarenessBonus;
+		int transference;
+		int wisdomBonus;
+		int reaping;
 
 		// feats:
 		//boolean featRecord[FEAT_COUNT];
 
 		// waypoints:
-		//short** wpDistance[MAX_WAYPOINT_COUNT];
-		//short wpCount;
-		//short wpCoordinates[MAX_WAYPOINT_COUNT][2];
-		//short wpRefreshTicker;
+		//int** wpDistance[MAX_WAYPOINT_COUNT];
+		//int wpCount;
+		//int wpCoordinates[MAX_WAYPOINT_COUNT][2];
+		//int wpRefreshTicker;
 
 		// cursor trail:
-		short cursorPathIntensity;
+		int cursorPathIntensity;
 		bool cursorMode;
 	};
 }

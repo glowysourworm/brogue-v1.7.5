@@ -17,7 +17,7 @@ namespace brogueHd::backend::model
 		gridCell()
 		{
 		}
-		gridCell(short column, short row, T cellValue)
+		gridCell(int column, int row, T cellValue)
 		{
 			locator.column = column;
 			locator.row = row;

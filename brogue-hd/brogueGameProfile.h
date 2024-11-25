@@ -13,9 +13,9 @@ namespace brogueHd::backend::model
 	// brogueCell
 	//typedef struct keyLocationProfile 
 	//{
-	//	short x;
-	//	short y;
-	//	short machine;
+	//	int x;
+	//	int y;
+	//	int machine;
 	//	bool disposableHere;
 
 	//} keyLocationProfile;

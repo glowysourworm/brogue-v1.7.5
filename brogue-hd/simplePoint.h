@@ -1,11 +1,14 @@
 #pragma once
 
+#include "graphNode.h"
 #include "simple.h"
+
+using namespace brogueHd::component;
 
 namespace brogueHd::simple
 {
 	template<isHashable T>
-	struct simplePoint : hashable
+	struct simplePoint : graphNode
 	{
 		T x;
 		T y;

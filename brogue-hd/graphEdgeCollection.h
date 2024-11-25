@@ -23,8 +23,8 @@ namespace brogueHd::component
 		graphEdgeCollection(const graphEdgeCollection& copy);
 		~graphEdgeCollection();
 
-		short edgeCount() const;
-		short nodeCount() const;
+		int edgeCount() const;
+		int nodeCount() const;
 
 		void addEdge(const TEdge& edge);
 		void addNode(const TNode& node);
@@ -122,13 +122,13 @@ namespace brogueHd::component
 	}
 
 	template<graphNodeType TNode, graphEdgeType<TNode> TEdge>
-	short graphEdgeCollection<TNode, TEdge>::edgeCount() const
+	int graphEdgeCollection<TNode, TEdge>::edgeCount() const
 	{
 		return _edges->count();
 	}
 
 	template<graphNodeType TNode, graphEdgeType<TNode> TEdge>
-	short graphEdgeCollection<TNode, TEdge>::nodeCount() const
+	int graphEdgeCollection<TNode, TEdge>::nodeCount() const
 	{
 		return _nodes->count();
 	}
@@ -236,7 +236,7 @@ namespace brogueHd::component
 	template<graphNodeType TNode, graphEdgeType<TNode> TEdge>
 	TEdge graphEdgeCollection<TNode, TEdge>::findEdge(const TNode& node1, const TNode& node2)
 	{
-		return _edges->firstKey([&node1, &node2] (TEdge key, TEdge value)
+		return _edges->firstOrDefaultKey([&node1, &node2] (TEdge key, TEdge value)
 		{
 			if (key.node1 == node1 && key.node2 == node2)
 			{

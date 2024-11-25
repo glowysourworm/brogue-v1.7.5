@@ -4,11 +4,11 @@ namespace brogueHd::backend::model
 {
 	struct linearGenerationParameters
 	{
-		short minDepth;
-		short maxDepth;
-		short frequency;
-		short minNumberIntercept; // actually intercept * 100
-		short minNumberSlope;	  // actually slope * 100
-		short maxNumber;
+		int minDepth;
+		int maxDepth;
+		int frequency;
+		int minNumberIntercept; // actually intercept * 100
+		int minNumberSlope;	  // actually slope * 100
+		int maxNumber;
 	};
 }

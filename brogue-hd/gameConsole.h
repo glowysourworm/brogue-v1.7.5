@@ -71,7 +71,7 @@ namespace brogueHd::console
 	}
 	void gameConsole::printScores(std::ostream& stream)
 	{
-		//short mostRecent = 0;
+		//int mostRecent = 0;
 
 		//brogueScoresFile* scoreFile = _resourceController->getHighScores(mostRecent);
 
@@ -112,7 +112,7 @@ namespace brogueHd::console
 				//
 				run = _gameController->run();
 
-				// Allow a short thread sleep for the rendering thread
+				// Allow a int thread sleep for the rendering thread
 				//
 				std::this_thread::sleep_for(std::chrono::milliseconds(intervalMilliseconds));
 			}

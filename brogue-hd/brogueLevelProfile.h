@@ -19,7 +19,7 @@ namespace brogueHd::backend::model
 	{
 	public:
 
-		brogueLevelProfile(short depth, levelTypes type);
+		brogueLevelProfile(int depth, levelTypes type);
 		~brogueLevelProfile();
 
 		brogueRoomTemplate getRandomRoomInfo(randomGenerator* randomMain);
@@ -35,12 +35,12 @@ namespace brogueHd::backend::model
 		simpleHash<brogueRoomType, brogueRoomTemplate>* _roomInfo;
 
 		// Room Frequency static data
-		simpleHash<levelTypes, simpleHash<brogueRoomType, short>*>* _roomFrequencyMap;
+		simpleHash<levelTypes, simpleHash<brogueRoomType, int>*>* _roomFrequencyMap;
 
 		// Corridor static data
-		simpleHash<levelTypes, short>* _corridorFrequencyMap;
+		simpleHash<levelTypes, int>* _corridorFrequencyMap;
 
-		short _depth;
+		int _depth;
 		levelTypes _levelType;
 	};
 
@@ -66,21 +66,21 @@ namespace brogueHd::backend::model
 
 	*/
 
-	brogueLevelProfile::brogueLevelProfile(short depth, levelTypes type)
+	brogueLevelProfile::brogueLevelProfile(int depth, levelTypes type)
 	{
 		if (depth == 1 && type != levelTypes::DP_BASIC_FIRST_ROOM)
 			throw simpleException("Invalid first level type:  brogueLevelProfile.cpp");
 
 		_roomInfo = new simpleHash<brogueRoomType, brogueRoomTemplate>();
-		_roomFrequencyMap = new simpleHash<levelTypes, simpleHash<brogueRoomType, short>*>();
-		_corridorFrequencyMap = new simpleHash< levelTypes, short>();
+		_roomFrequencyMap = new simpleHash<levelTypes, simpleHash<brogueRoomType, int>*>();
+		_corridorFrequencyMap = new simpleHash< levelTypes, int>();
 		_levelType = type;
 		_depth = depth;
 
-		simpleHash<brogueRoomType, short>* basicMap = new simpleHash<brogueRoomType, short>();
-		simpleHash<brogueRoomType, short>* basicFirstRoomMap = new simpleHash<brogueRoomType, short>();
-		simpleHash<brogueRoomType, short>* goblinWarrenMap = new simpleHash<brogueRoomType, short>();
-		simpleHash<brogueRoomType, short>* sentinelSanctuariesMap = new simpleHash<brogueRoomType, short>();
+		simpleHash<brogueRoomType, int>* basicMap = new simpleHash<brogueRoomType, int>();
+		simpleHash<brogueRoomType, int>* basicFirstRoomMap = new simpleHash<brogueRoomType, int>();
+		simpleHash<brogueRoomType, int>* goblinWarrenMap = new simpleHash<brogueRoomType, int>();
+		simpleHash<brogueRoomType, int>* sentinelSanctuariesMap = new simpleHash<brogueRoomType, int>();
 
 		// BROGUE v1.7.5
 		basicMap->add(brogueRoomType::CrossRoom, 2);
@@ -153,7 +153,7 @@ namespace brogueHd::backend::model
 
 	brogueLevelProfile::~brogueLevelProfile()
 	{
-		_roomFrequencyMap->iterate([] (levelTypes type, simpleHash<brogueRoomType, short>* map)
+		_roomFrequencyMap->iterate([] (levelTypes type, simpleHash<brogueRoomType, int>* map)
 		{
 			delete map;
 
@@ -177,11 +177,11 @@ namespace brogueHd::backend::model
 		}
 
 		// ADJUST FOR DEPTH (Brogue v1.7.5)
-		const short descentPercent = simpleMath::clamp(100 * (_depth - 1) / (AMULET_LEVEL - 1), 0, 100);
+		const int descentPercent = simpleMath::clamp(100 * (_depth - 1) / (AMULET_LEVEL - 1), 0, 100);
 
 		// Get static data to adjust
-		short roomFrequency = _roomFrequencyMap->get(_levelType)->get(roomType);
-		short corridorFrequency = _corridorFrequencyMap->get(_levelType);
+		int roomFrequency = _roomFrequencyMap->get(_levelType)->get(roomType);
+		int corridorFrequency = _corridorFrequencyMap->get(_levelType);
 
 		// Additional adjustment for first room
 		switch (roomType)

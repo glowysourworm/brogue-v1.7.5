@@ -41,14 +41,14 @@ namespace brogueHd::backend
 
 	brogueContentGrid* contentGenerator::generateLevelContents(brogueLayout* layout)
 	{
-		short i, j, dir;
-		short upLoc[2], downLoc[2], ** mapToStairs, ** mapToPit;
+		int i, j, dir;
+		int upLoc[2], downLoc[2], ** mapToStairs, ** mapToPit;
 		creatureInfo* monst;
 		itemBase* theItem;
 		char grid[DCOLS][DROWS];
 
 		return nullptr;
-		//short n = rogue.depthLevel - 1;
+		//int n = rogue.depthLevel - 1;
 
 		// Procedure:
 		//
@@ -185,14 +185,14 @@ namespace brogueHd::backend
 
 	void contentGenerator::placeStairs()
 	{
-		//short newX, newY, dir;
+		//int newX, newY, dir;
 
 		brogueCell* stairsLocation;
 		brogueCell* torchLocation1;
 		brogueCell* torchLocation2;
 
 		// Number of cells to clear around stairs
-		short stairsClearance = 5;
+		int stairsClearance = 5;
 
 		// Procedure
 		// 
@@ -229,7 +229,7 @@ namespace brogueHd::backend
 
 		//_level->levelGrid->iterateAdjacentCells(stairsLocation->xLocation, 
 		//										stairsLocation->yLocation, 
-		//										[](short column, short row, brogueCell* cell)
+		//										[](int column, int row, brogueCell* cell)
 		//{
 		//	if (cell->display.layers[DUNGEON] == GRANITE)
 		//		cell->display.layers[DUNGEON] = WALL;
@@ -254,7 +254,7 @@ namespace brogueHd::backend
 		//			   stairsLocation->xLocation, 
 		//			   stairsLocation->yLocation, 
 		//			   stairsClearance, 
-		//			   [](short column, short row)
+		//			   [](int column, int row)
 		//{
 		//	_validLocations[column, row] = false;
 

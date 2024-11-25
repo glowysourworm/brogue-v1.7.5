@@ -37,7 +37,7 @@ namespace brogueHd::component
 		/// <summary>
 		/// Adds new cell to the region, and updates collections.
 		/// </summary>
-		void add(short column, short row, T item);
+		void add(int column, int row, T item);
 
 		/// <summary>
 		/// Checks to see whether or not the region constructor contains the specified item
@@ -47,14 +47,14 @@ namespace brogueHd::component
 		/// <summary>
 		/// Checks to see whether the constructor is defined at the specified coordinates
 		/// </summary>
-		bool isDefined(short column, short row) const;
+		bool isDefined(int column, int row) const;
 
 	private:
 
 		void completeImpl();
-		bool isConnected(short column, short row, T item);
-		void addEdges(short column, short row, T item);
-		void addBoundary(short column, short row, T item);
+		bool isConnected(int column, int row, T item);
+		void addEdges(int column, int row, T item);
+		void addBoundary(int column, int row, T item);
 		void validate();
 		void validateRegionCollection(const char* name, simpleHash<T, T>* collection);
 
@@ -77,10 +77,10 @@ namespace brogueHd::component
 
 		gridRect* _calculatedBoundary;
 
-		short _top;
-		short _left;
-		short _right;
-		short _bottom;
+		int _top;
+		int _left;
+		int _right;
+		int _bottom;
 
 		bool _completed;
 		bool _unsafeMode;
@@ -90,7 +90,7 @@ namespace brogueHd::component
 
 	template<isGridLocator T>
 	gridRegionConstructor<T>::gridRegionConstructor(gridRect parentBoundary, bool unsafeMode) :
-		gridRegionConstructor(parentBoundary, [] (short column, short row, const T& item)
+		gridRegionConstructor(parentBoundary, [] (int column, int row, const T& item)
 	{
 		return true;	// Default inclusion predicate
 	}, unsafeMode)
@@ -122,10 +122,10 @@ namespace brogueHd::component
 		_seCorners = new simpleHash<T, T>();
 		_swCorners = new simpleHash<T, T>();
 
-		_top = std::numeric_limits<short>::max();
-		_left = std::numeric_limits<short>::max();
-		_right = std::numeric_limits<short>::min();
-		_bottom = std::numeric_limits<short>::min();
+		_top = std::numeric_limits<int>::max();
+		_left = std::numeric_limits<int>::max();
+		_right = std::numeric_limits<int>::min();
+		_bottom = std::numeric_limits<int>::min();
 
 		_completed = false;
 		_unsafeMode = unsafeMode;
@@ -186,7 +186,7 @@ namespace brogueHd::component
 	}
 
 	template<isGridLocator T>
-	void gridRegionConstructor<T>::add(short column, short row, T location)
+	void gridRegionConstructor<T>::add(int column, int row, T location)
 	{
 		if (_completed)
 			throw simpleException("Trying to add location to a completed region constructor:  gridRegionConstructor.add");
@@ -235,7 +235,7 @@ namespace brogueHd::component
 	}
 
 	template<isGridLocator T>
-	bool gridRegionConstructor<T>::isDefined(short column, short row) const
+	bool gridRegionConstructor<T>::isDefined(int column, int row) const
 	{
 		return _grid->isDefined(column, row);
 	}
@@ -247,7 +247,7 @@ namespace brogueHd::component
 	}
 
 	template<isGridLocator T>
-	bool gridRegionConstructor<T>::isConnected(short column, short row, T item)
+	bool gridRegionConstructor<T>::isConnected(int column, int row, T item)
 	{
 		if (!(*_predicate)(item.column, item.row, item))
 			return false;
@@ -274,7 +274,7 @@ namespace brogueHd::component
 	}
 
 	template<isGridLocator T>
-	void gridRegionConstructor<T>::addEdges(short column, short row, T location)
+	void gridRegionConstructor<T>::addEdges(int column, int row, T location)
 	{
 		// Edges and Corners
 		if (_grid->isEdge(column, row) && (*_predicate)(column, row, location))
@@ -318,7 +318,7 @@ namespace brogueHd::component
 	}
 
 	template<isGridLocator T>
-	void gridRegionConstructor<T>::addBoundary(short column, short row, T location)
+	void gridRegionConstructor<T>::addBoundary(int column, int row, T location)
 	{
 		if (column < _left)
 			_left = location.column;

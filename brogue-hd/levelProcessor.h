@@ -39,13 +39,13 @@ namespace brogueHd::backend
 	{
 		unsigned long oldSeed;
 		itemBase* theItem;
-		short loc[2], i, j, x, y, px, py, flying, dir;
+		int loc[2], i, j, x, y, px, py, flying, dir;
 		bool placedPlayer;
 		//creature* monst;
 		//dungeonLayers layer;
 		unsigned long timeAway;
-		short** mapToStairs;
-		short** mapToPit;
+		int** mapToStairs;
+		int** mapToPit;
 		bool connectingStairsDiscovered;
 
 		//if (oldLevelNumber == DEEPEST_LEVEL && stairDirection != -1) {
@@ -344,7 +344,7 @@ namespace brogueHd::backend
 		//px = player.xLoc;
 		//py = player.yLoc;
 		//player.xLoc = player.yLoc = 0;
-		//for (i = 0; i < 100 && i < (short)timeAway; i++) {
+		//for (i = 0; i < 100 && i < (int)timeAway; i++) {
 		//	updateEnvironment();
 		//}
 		//player.xLoc = px;

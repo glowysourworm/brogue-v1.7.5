@@ -52,8 +52,8 @@ namespace brogueHd::backend::model
 		brogueItem* packItems;
 		brogueItem* monsterItemsHopper;
 
-		short currentDepth;					// which dungeon level are we on
-		//short deepesteLevel;
+		int currentDepth;					// which dungeon level are we on
+		//int deepesteLevel;
 		bool disturbed;					// player should stop auto-acting
 		bool gameHasEnded;				// stop everything and go to death screen
 		bool highScoreSaved;				// so that it saves the high score only once
@@ -63,15 +63,15 @@ namespace brogueHd::backend::model
 
 		//tcell tmap[DCOLS][DROWS];						// grids with info about the map
 		//pcell pmap[DCOLS][DROWS];
-		//short** scentMap;
+		//int** scentMap;
 		//cellDisplayBuffer displayBuffer[COLS][ROWS];	// used to optimize plotCharWithColor
-		//short terrainRandomValues[DCOLS][DROWS][8];
-		//short** safetyMap;								// used to help monsters flee
-		//short** allySafetyMap;							// used to help allies flee
-		//short** chokeMap;								// used to assess the importance of the map's various chokepoints
-		//const short nbDirs[8][2] = { {0,-1}, {0,1}, {-1,0}, {1,0}, {-1,-1}, {-1,1}, {1,-1}, {1,1} };
-		//const short cDirs[8][2] = { {0, 1}, {1, 1}, {1, 0}, {1, -1}, {0, -1}, {-1, -1}, {-1, 0}, {-1, 1} };
-		//short numberOfWaypoints;
+		//int terrainRandomValues[DCOLS][DROWS][8];
+		//int** safetyMap;								// used to help monsters flee
+		//int** allySafetyMap;							// used to help allies flee
+		//int** chokeMap;								// used to assess the importance of the map's various chokepoints
+		//const int nbDirs[8][2] = { {0,-1}, {0,1}, {-1,0}, {1,0}, {-1,-1}, {-1,1}, {1,-1}, {1,1} };
+		//const int cDirs[8][2] = { {0, 1}, {1, 1}, {1, 0}, {1, -1}, {0, -1}, {-1, -1}, {-1, 0}, {-1, 1} };
+		//int numberOfWaypoints;
 
 
 
@@ -80,7 +80,7 @@ namespace brogueHd::backend::model
 		//		char displayedMessage[MESSAGE_LINES][COLS * 2];
 		//		boolean messageConfirmed[MESSAGE_LINES];
 		//		char combatText[COLS * 2];
-		//		short messageArchivePosition;
+		//		int messageArchivePosition;
 		//		char messageArchive[MESSAGE_ARCHIVE_LINES][COLS * 2];
 		//
 		//		char currentFilePath[BROGUE_FILENAME_MAX];
@@ -92,7 +92,7 @@ namespace brogueHd::backend::model
 		//#endif
 
 				//unsigned char inputRecordBuffer[INPUT_RECORD_BUFFER + 100];
-				//unsigned short locationInRecordingBuffer;
+				//unsigned int locationInRecordingBuffer;
 				//unsigned long randomNumbersGenerated;
 				//unsigned long positionInPlaybackFile;
 				//unsigned long lengthOfPlaybackFile;

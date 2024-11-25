@@ -84,7 +84,7 @@ namespace brogueHd::component
 
 		grid<gridLocator>* grid = _tilingGrid;
 
-		_tilingGrid->iterate([&grid, &firstRect] (short column, short row, const gridLocator& item)
+		_tilingGrid->iterate([&grid, &firstRect] (int column, int row, const gridLocator& item)
 		{
 			if (firstRect.contains(column, row))
 				grid->set(column, row, gridLocator(column, row), true);
@@ -110,7 +110,7 @@ namespace brogueHd::component
 
 			grid<gridLocator>* grid = _tilingGrid;
 
-			_tilingGrid->iterate([&grid, &rect] (short column, short row, const gridLocator& item)
+			_tilingGrid->iterate([&grid, &rect] (int column, int row, const gridLocator& item)
 			{
 				if (rect.contains(column, row))
 					grid->set(column, row, gridLocator(column, row), true);
@@ -130,7 +130,7 @@ namespace brogueHd::component
 
 		grid<gridLocator>* grid = _tilingGrid;
 
-		_tilingGrid->iterate([&grid] (short column, short row, const gridLocator& item)
+		_tilingGrid->iterate([&grid] (int column, int row, const gridLocator& item)
 		{
 			grid->set(column, row, default_value::value<gridLocator>(), true);
 
@@ -146,7 +146,7 @@ namespace brogueHd::component
 	{
 		grid<gridLocator>* grid = _tilingGrid;
 
-		return _tilingGrid->calculateLargestRectangle(minSize, [&grid] (short column, short row, const gridLocator& location)
+		return _tilingGrid->calculateLargestRectangle(minSize, [&grid] (int column, int row, const gridLocator& location)
 		{
 			return !grid->isDefined(column, row);
 		});
@@ -237,7 +237,7 @@ namespace brogueHd::component
 		{
 			// Look for largest sub-rectangle in the constraint area
 			//
-			gridRect nextLargestBoundary = _tilingGrid->calculateLargestRectangle(rect, [] (short column, short row, const gridLocator& item)
+			gridRect nextLargestBoundary = _tilingGrid->calculateLargestRectangle(rect, [] (int column, int row, const gridLocator& item)
 			{
 				// Use the predicate to look for negative space
 				return item == default_value::value<gridLocator>();
@@ -442,7 +442,7 @@ namespace brogueHd::component
 
 		_rectangles->add(rect, rect);
 
-		rect.iterate([&tilingGrid] (short column, short row)
+		rect.iterate([&tilingGrid] (int column, int row)
 		{
 			tilingGrid->set(column, row, gridLocator(column, row));
 

@@ -25,8 +25,8 @@ namespace brogueHd::frontend
 		brogueUIText(const brogueUIText& copy);
 
 		gridRect getBoundary() const;
-		color getForeground(short column, short row) const;
-		char getCharacter(short column, short row) const;
+		color getForeground(int column, int row) const;
+		char getCharacter(int column, int row) const;
 
 		void setLine(int row, const colorString& text, brogueTextAlignment alignment);
 		void setLine(int row, const simpleString& text, brogueTextAlignment alignment);
@@ -72,7 +72,7 @@ namespace brogueHd::frontend
 		_foregroundGrid = new grid<color>(copy.getBoundary(), copy.getBoundary());
 		_characterGrid = new grid<char>(copy.getBoundary(), copy.getBoundary());
 
-		copy.getBoundary().iterate([&that, &copy] (short column, short row)
+		copy.getBoundary().iterate([&that, &copy] (int column, int row)
 		{
 			that->set(column, row, copy.getForeground(column, row), copy.getCharacter(column, row));
 
@@ -105,11 +105,11 @@ namespace brogueHd::frontend
 	{
 		return _characterGrid->getRelativeBoundary();
 	}
-	color brogueUIText::getForeground(short column, short row) const
+	color brogueUIText::getForeground(int column, int row) const
 	{
 		return _foregroundGrid->get(column, row);
 	}
-	char brogueUIText::getCharacter(short column, short row) const
+	char brogueUIText::getCharacter(int column, int row) const
 	{
 		return _characterGrid->get(column, row);
 	}

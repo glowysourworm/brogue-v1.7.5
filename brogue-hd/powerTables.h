@@ -28,7 +28,7 @@ using namespace brogueHd::backend::model;
 //                                  However! One may always test this axi-umm.. with some programming "code". 
 //                                  e.g. UNIT TESTS! ("you hear thunder clap near your window")
 //
-//                                  Also:   short x = (short)pow( {the power of brogue v1.7.5} ) does provide a short value. Now that's pretty tall!
+//                                  Also:   int x = (int)pow( {the power of brogue v1.7.5} ) does provide a int value. Now that's pretty tall!
 //
 //                                  Ok, that's all for now. Let's try saving your "enchanted" idea of bitwise-shifting the enchant.. and see
 //                                  what we come up with.
@@ -38,7 +38,7 @@ namespace brogueHd::backend::model
 {
 	//class brogueCalculations
 	//{
-	//    static short wandDominate(const creatureInfo& monst) 
+	//    static int wandDominate(const creatureInfo& monst) 
 	//    {
 	//        return (monst.currentHP * 5 < monst.info.maxHP) ? 100 : max(0, 100 * ((monst)->info.maxHP - (monst)->currentHP) / (monst)->info.maxHP);
 	//    }
@@ -47,15 +47,15 @@ namespace brogueHd::backend::model
 
 
 	//// All "enchant" parameters must already be multiplied by FP_FACTOR:
-	//short fp_staffDamageLow(int64_t enchant) { return ((int)(3 * (2 + (enchant)) / 4 >> FP_BASE)); }
-	//short fp_staffDamageHigh(int64_t enchant) { return ((int)(4 + (5 * (enchant) / 2) >> FP_BASE)); }
-	//short fp_staffDamage(int64_t enchant) { return ((int)randClumpedRange(fp_staffDamageLow(enchant), fp_staffDamageHigh(enchant), 1 + (enchant) / 3)); }
-	//short fp_staffBlinkDistance(int64_t enchant) { return ((int)(((enchant) * 2 >> FP_BASE) + 2)); }
-	//short fp_staffHasteDuration(int64_t enchant) { return ((int)(2 + (enchant) * 4 >> FP_BASE)); }
-	//short fp_staffBladeCount(int64_t enchant) { return ((int)((enchant) * 3 / 2 >> FP_BASE)); }
-	//short fp_staffDiscordDuration(int64_t enchant) { return ((int)((enchant) * 4 >> FP_BASE)); }
-	//short fp_staffEntrancementDuration(int64_t enchant) { return ((int)((enchant) * 3 >> FP_BASE)); }
-	//short fp_staffProtection(int64_t enchant) {
+	//int fp_staffDamageLow(int64_t enchant) { return ((int)(3 * (2 + (enchant)) / 4 >> FP_BASE)); }
+	//int fp_staffDamageHigh(int64_t enchant) { return ((int)(4 + (5 * (enchant) / 2) >> FP_BASE)); }
+	//int fp_staffDamage(int64_t enchant) { return ((int)randClumpedRange(fp_staffDamageLow(enchant), fp_staffDamageHigh(enchant), 1 + (enchant) / 3)); }
+	//int fp_staffBlinkDistance(int64_t enchant) { return ((int)(((enchant) * 2 >> FP_BASE) + 2)); }
+	//int fp_staffHasteDuration(int64_t enchant) { return ((int)(2 + (enchant) * 4 >> FP_BASE)); }
+	//int fp_staffBladeCount(int64_t enchant) { return ((int)((enchant) * 3 / 2 >> FP_BASE)); }
+	//int fp_staffDiscordDuration(int64_t enchant) { return ((int)((enchant) * 4 >> FP_BASE)); }
+	//int fp_staffEntrancementDuration(int64_t enchant) { return ((int)((enchant) * 3 >> FP_BASE)); }
+	//int fp_staffProtection(int64_t enchant) {
 	//    const int64_t POW_STAFF_PROTECTION[] = {
 	//        // 1.53^x << FP_BASE, with x from 0 to 50 in increments of 1:
 	//        65536, 100270, 153413, 234722, 359125, 549461, 840675, 1286233, 1967937, 3010944, 4606745, 7048320, 10783931, 16499414, 25244104, 38623479, 59093923,
@@ -64,7 +64,7 @@ namespace brogueHd::backend::model
 	//        2448096844694, 3745588172382, 5730749903744, 8768047352729, 13415112449676, 20525122048004, 31403436733446, 48047258202173, 73512305049325, 112473826725468 };
 	//    return 50 * POW_STAFF_PROTECTION[(enchant >> FP_BASE) - 2] >> FP_BASE;
 	//}
-	//short fp_staffPoison(int64_t enchant) {
+	//int fp_staffPoison(int64_t enchant) {
 	//    const int64_t POW_POISON[] = {
 	//        // 1.3^x << FP_BASE, with x from 0 to 50 in increments of 1:
 	//        65536, 85196, 110755, 143982, 187177, 243330, 316329, 411228, 534597, 694976, 903469, 1174510, 1526863, 1984922, 2580398, 3354518, 4360874, 5669136, 7369877,
@@ -75,7 +75,7 @@ namespace brogueHd::backend::model
 	//    return 5 * POW_POISON[enchant] >> FP_BASE;
 	//}
 
-	//short fp_ringWisdomMultiplier(int64_t enchant) {
+	//int fp_ringWisdomMultiplier(int64_t enchant) {
 	//    const int64_t POW_WISDOM[] = {
 	//        // 1.3^x << FP_BASE, with x from -10 to 30 in increments of 1:
 	//        4753, 6180, 8034, 10444, 13577, 17650, 22945, 29829, 38778, 50412, 65536, 85196, 110755, 143982, 187177, 243330, 316329, 411228, 534597, 694976, 903469,
@@ -86,11 +86,11 @@ namespace brogueHd::backend::model
 	//    return 10 * POW_WISDOM[enchant] >> FP_BASE;
 	//}
 
-	//short fp_charmHealing(int64_t enchant) { return ((int)clamp(20 * (enchant) >> FP_BASE, 0, 100)); }
-	//short fp_charmShattering(int64_t enchant) { return ((int)(4 + (enchant) >> FP_BASE)); }
-	//short fp_charmGuardianLifespan(int64_t enchant) { return ((int)(4 + 2 * (enchant) >> FP_BASE)); }
-	//short fp_charmNegationRadius(int64_t enchant) { return ((int)(1 + 3 * (enchant) >> FP_BASE)); }
-	//short fp_charmProtection(int64_t enchant) {
+	//int fp_charmHealing(int64_t enchant) { return ((int)clamp(20 * (enchant) >> FP_BASE, 0, 100)); }
+	//int fp_charmShattering(int64_t enchant) { return ((int)(4 + (enchant) >> FP_BASE)); }
+	//int fp_charmGuardianLifespan(int64_t enchant) { return ((int)(4 + 2 * (enchant) >> FP_BASE)); }
+	//int fp_charmNegationRadius(int64_t enchant) { return ((int)(1 + 3 * (enchant) >> FP_BASE)); }
+	//int fp_charmProtection(int64_t enchant) {
 	//    const int64_t POW_CHARM_PROTECTION[] = {
 	//        // 1.35^x << FP_BASE, with x from 0 to 50 in increments of 1:
 	//        65536, 88473, 119439, 161243, 217678, 293865, 396718, 535570, 723019, 976076, 1317703, 1778899, 2401514, 3242044, 4376759, 5908625, 7976644, 10768469,
@@ -102,17 +102,17 @@ namespace brogueHd::backend::model
 	//    return 150 * POW_CHARM_PROTECTION[enchant] >> FP_BASE;
 	//}
 
-	//short fp_weaponParalysisDuration(int64_t enchant) { return (max(2, (int)(2 + ((enchant) / 2 >> FP_BASE)))); }
-	//short fp_weaponConfusionDuration(int64_t enchant) { return (max(3, (int)((enchant) * 3 / 2 >> FP_BASE))); }
-	//short fp_weaponForceDistance(int64_t enchant) { return (max(4, (int)(((enchant) * 2 >> FP_BASE) + 2))); } // Depends on definition of staffBlinkDistance() above.
-	//short fp_weaponSlowDuration(int64_t enchant) { return (max(3, (int)((((enchant) >> FP_BASE) + 2) * ((enchant)+(2 << FP_BASE))) / 3 >> FP_BASE)); }
-	//short fp_weaponImageCount(int64_t enchant) { return (clamp((int)((enchant) / 3 >> FP_BASE), 1, 7)); }
-	//short fp_weaponImageDuration(int64_t enchant) { return 3; }
+	//int fp_weaponParalysisDuration(int64_t enchant) { return (max(2, (int)(2 + ((enchant) / 2 >> FP_BASE)))); }
+	//int fp_weaponConfusionDuration(int64_t enchant) { return (max(3, (int)((enchant) * 3 / 2 >> FP_BASE))); }
+	//int fp_weaponForceDistance(int64_t enchant) { return (max(4, (int)(((enchant) * 2 >> FP_BASE) + 2))); } // Depends on definition of staffBlinkDistance() above.
+	//int fp_weaponSlowDuration(int64_t enchant) { return (max(3, (int)((((enchant) >> FP_BASE) + 2) * ((enchant)+(2 << FP_BASE))) / 3 >> FP_BASE)); }
+	//int fp_weaponImageCount(int64_t enchant) { return (clamp((int)((enchant) / 3 >> FP_BASE), 1, 7)); }
+	//int fp_weaponImageDuration(int64_t enchant) { return 3; }
 
-	//short fp_armorReprisalPercent(int64_t enchant) { return (max(5, (int)((enchant) * 5 >> FP_BASE))); }
-	//short fp_armorAbsorptionMax(int64_t enchant) { return (max(1, (int)((enchant) >> FP_BASE))); }
-	//short fp_armorImageCount(int64_t enchant) { return (clamp((int)((enchant) / 3 >> FP_BASE), 1, 5)); }
-	//short fp_reflectionChance(int64_t enchant) {
+	//int fp_armorReprisalPercent(int64_t enchant) { return (max(5, (int)((enchant) * 5 >> FP_BASE))); }
+	//int fp_armorAbsorptionMax(int64_t enchant) { return (max(1, (int)((enchant) >> FP_BASE))); }
+	//int fp_armorImageCount(int64_t enchant) { return (clamp((int)((enchant) / 3 >> FP_BASE), 1, 5)); }
+	//int fp_reflectionChance(int64_t enchant) {
 	//    const int64_t POW_REFLECT[] = {
 	//        // 0.85^x << FP_BASE, with x from 1 to 50 in increments of 0.25:
 	//        62926, 60421, 58015, 55705, 53487, 51358, 49313, 47349, 45464, 43654, 41916, 40247, 38644, 37106, 35628, 34210, 32848, 31540, 30284, 29078, 27920,
@@ -188,7 +188,7 @@ namespace brogueHd::backend::model
 	//}
 
 	//int64_t fp_defenseFraction(int64_t netDefense) {
-	//    short tableIndex;
+	//    int tableIndex;
 	//    const int64_t POW_DEFENSE_FRACTION[] = {
 	//        // 0.9678^x << FP_BASE, with x representing a change in 0.25 armor points (as displayed), ranging from -20 to 50.
 	//        897530, 868644, 840688, 813632, 787446, 762103, 737575, 713837, 690863, 668629, 647110, 626283, 606127, 586619, 567740, 549468,
@@ -212,7 +212,7 @@ namespace brogueHd::backend::model
 	//    return POW_DEFENSE_FRACTION[tableIndex];
 	//}
 
-	//short charmEffectDuration(short charmKind, short enchant) {
+	//int charmEffectDuration(int charmKind, int enchant) {
 	//    const int64_t POW_0_CHARM_INCREMENT[50] = { 0 };
 	//    const int64_t POW_120_CHARM_INCREMENT[] = { // 1.20^x << FP_BASE, with x from 1 to 50 in increments of 1:
 	//        78643, 94371, 113246, 135895, 163074, 195689, 234827, 281792, 338151, 405781, 486937, 584325, 701190, 841428, 1009714, 1211657,
@@ -224,7 +224,7 @@ namespace brogueHd::backend::model
 	//        2910383, 3637978, 4547473, 5684341, 7105427, 8881784, 11102230, 13877787, 17347234, 21684043, 27105054, 33881317, 42351647, 52939559,
 	//        66174449, 82718061, 103397576, 129246970, 161558713, 201948391, 252435489, 315544362, 394430452, 493038065, 616297582, 770371977,
 	//        962964972, 1203706215, 1504632769, 1880790961, 2350988701, 2938735877, 3673419846, 4591774807, 5739718509 };
-	//    const short duration[NUMBER_CHARM_KINDS] = {
+	//    const int duration[NUMBER_CHARM_KINDS] = {
 	//        3,  // Health
 	//        20, // Protection
 	//        7,  // Haste
@@ -256,7 +256,7 @@ namespace brogueHd::backend::model
 	//    return duration[charmKind] * increment[charmKind][enchant] >> FP_BASE;
 	//}
 
-	//short charmRechargeDelay(short charmKind, short enchant) {
+	//int charmRechargeDelay(int charmKind, int enchant) {
 	//    const int64_t POW_30_CHARM_DECREMENT[] = { // 0.7^x << FP_BASE, with x from 1 to 50 in increments of 1:
 	//        45875, 32112, 22478, 15735, 11014, 7710, 5397, 3778, 2644, 1851, 1295, 907, 634, 444, 311, 217, 152, 106, 74, 52, 36, 25,
 	//        17, 12, 8, 6, 4, 3, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -269,7 +269,7 @@ namespace brogueHd::backend::model
 	//    const int64_t POW_45_CHARM_DECREMENT[] = { // 0.55^x << FP_BASE, with x from 1 to 50 in increments of 1:
 	//        36044, 19824, 10903, 5996, 3298, 1814, 997, 548, 301, 165, 91, 50, 27, 15, 8, 4, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	//        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-	//    const short duration[NUMBER_CHARM_KINDS] = {
+	//    const int duration[NUMBER_CHARM_KINDS] = {
 	//        2500,   // Health
 	//        1000,   // Protection
 	//        800,    // Haste
@@ -298,12 +298,12 @@ namespace brogueHd::backend::model
 	//        POW_40_CHARM_DECREMENT, // Negation
 	//    };
 	//    enchant = clamp(enchant, 1, 50) - 1;
-	//    short delay = charmEffectDuration(charmKind, enchant)
+	//    int delay = charmEffectDuration(charmKind, enchant)
 	//        + (duration[charmKind] * increment[charmKind][enchant] >> FP_BASE);
 	//    return max(1, delay);
 	//}
 
-	//short runicWeaponChance(item* theItem, boolean customEnchantLevel, int64_t enchantLevel) {
+	//int runicWeaponChance(item* theItem, boolean customEnchantLevel, int64_t enchantLevel) {
 	//    const int64_t POW_16_RUNIC_DECREMENT[] = { // (1-0.16)^x << FP_BASE, with x from 0 to 50 in increments of 0.25:
 	//        65536, 62740, 60064, 57502, 55050, 52702, 50454, 48302, 46242, 44269, 42381, 40574, 38843, 37186, 35600, 34082, 32628, 31236, 29904,
 	//        28629, 27407, 26238, 25119, 24048, 23022, 22040, 21100, 20200, 19339, 18514, 17724, 16968, 16244, 15551, 14888, 14253, 13645, 13063,
@@ -379,8 +379,8 @@ namespace brogueHd::backend::model
 	//        0,		// W_MERCY
 	//        0 };		// W_PLENTY
 	//    int64_t modifier;
-	//    short runicType = theItem->enchant2;
-	//    short chance, adjustedBaseDamage, tableIndex;
+	//    int runicType = theItem->enchant2;
+	//    int chance, adjustedBaseDamage, tableIndex;
 
 	//    if (runicType == W_SLAYING) {
 	//        return 0;
@@ -412,7 +412,7 @@ namespace brogueHd::backend::model
 	//    else {
 	//        tableIndex = enchantLevel * modifier * 4 >> FP_BASE >> FP_BASE;
 	//        tableIndex = clamp(tableIndex, 0, 50 * 4);
-	//        chance = 100 - (short)(100LL * effectChances[runicType][tableIndex] >> FP_BASE); // good runic
+	//        chance = 100 - (int)(100LL * effectChances[runicType][tableIndex] >> FP_BASE); // good runic
 	//    }
 
 	//    // Slow weapons get an adjusted chance of 1 - (1-p)^2 to reflect two bites at the apple instead of one.
@@ -426,7 +426,7 @@ namespace brogueHd::backend::model
 
 	//    // The lowest percent change that a weapon will ever have is its enchantment level (if greater than 0).
 	//    // That is so that even really heavy weapons will improve at least 1% per enchantment.
-	//    chance = clamp(chance, max(1, (short)(enchantLevel >> FP_BASE)), 100);
+	//    chance = clamp(chance, max(1, (int)(enchantLevel >> FP_BASE)), 100);
 
 	//    return chance;
 	//}

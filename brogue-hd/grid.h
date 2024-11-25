@@ -28,32 +28,32 @@ namespace brogueHd::component
 		/// <summary>
 		/// Returns value from the grid - throws exception for out of bounds indices
 		/// </summary>
-		T get(short column, short row) const;
+		T get(int column, int row) const;
 
 		/// <summary>
 		/// Returns value from the grid - or default value if out of bounds.
 		/// </summary>
-		T getUnsafe(short column, short row) const;
+		T getUnsafe(int column, int row) const;
 
 		/// <summary>
 		/// Gets adjacent element from the grid
 		/// </summary>
-		T getAdjacent(short column, short row, brogueCompass direction) const;
+		T getAdjacent(int column, int row, brogueCompass direction) const;
 
 		/// <summary>
 		/// Gets adjacent element from the grid (OR default_value::value)
 		/// </summary>
-		T getAdjacentUnsafe(short column, short row, brogueCompass direction) const;
+		T getAdjacentUnsafe(int column, int row, brogueCompass direction) const;
 
 		/// <summary>
 		/// Gets adjacent as cell's locator - throws exception when out of bounds
 		/// </summary>
-		gridLocator getAdjacentLocator(short column, short row, brogueCompass direction) const;
+		gridLocator getAdjacentLocator(int column, int row, brogueCompass direction) const;
 
 		/// <summary>
 		/// Gets adjacent as cell's locator (or default_value::value if out of bounds)
 		/// </summary>
-		gridLocator getAdjacentLocatorUnsafe(short column, short row, brogueCompass direction) const;
+		gridLocator getAdjacentLocatorUnsafe(int column, int row, brogueCompass direction) const;
 
 		/// <summary>
 		/// Returns true if grid cell locations are adjacent
@@ -73,17 +73,17 @@ namespace brogueHd::component
 		/// <summary>
 		/// Returns true if the (column, row) correspond to the grid's zero value
 		/// </summary>
-		bool isDefined(short column, short row) const;
+		bool isDefined(int column, int row) const;
 
 		/// <summary>
 		/// Returns true if the (column, row) are in bounds
 		/// </summary>
-		bool isInBounds(short column, short row) const;
+		bool isInBounds(int column, int row) const;
 
 		/// <summary>
 		/// Sets the value to the grid, clipping it to the max and min values, and handling exceptions
 		/// </summary>
-		void set(short column, short row, T setValue, bool overwrite = false);
+		void set(int column, int row, T setValue, bool overwrite = false);
 
 		/// <summary>
 		/// Searches grid for requested value based on comparison. Each truthy aggregateComparator result will store
@@ -96,13 +96,13 @@ namespace brogueHd::component
 		/// <summary>
 		/// Returns true if the location is at the edge of the grid (using default_value::value comparison).
 		/// </summary>
-		bool isEdge(short column, short row) const;
+		bool isEdge(int column, int row) const;
 
 		/// <summary>
 		/// Returns true if the location is at the edge of the grid (using default_value::value comparison), or 
 		/// the provided predicate.
 		/// </summary>
-		bool isEdgeWhere(short column, short row, gridPredicate<T> predicate) const;
+		bool isEdgeWhere(int column, int row, gridPredicate<T> predicate) const;
 
 		/// <summary>
 		/// Returns true if the adjacent element is positive with respect to the provided predicate OR is
@@ -130,6 +130,11 @@ namespace brogueHd::component
 		void iterate(gridCallback<T> callback) const;
 
 		/// <summary>
+		/// Iterates only where there are cells defined.
+		/// </summary>
+		void iterateWhereDefined(gridCallback<T> callback) const;
+
+		/// <summary>
 		/// Iterates the grid in the same manner as "iterate", column first, then row. So, the start and end
 		/// locations will be honored as such.
 		/// </summary>
@@ -138,12 +143,12 @@ namespace brogueHd::component
 		/// <summary>
 		/// Iterates around a specific point by one-cell in the 4 cardinal directions
 		/// </summary>
-		void iterateAroundCardinal(short column, short row, bool withinBounds, gridCallback<T> callback) const;
+		void iterateAroundCardinal(int column, int row, bool withinBounds, gridCallback<T> callback) const;
 
 		/// <summary>
 		/// Iterates around a specific point by one-cell in all 8 directions
 		/// </summary>
-		void iterateAdjacent(short column, short row, bool withinBounds, gridCallbackAdjacent<T> callback) const;
+		void iterateAdjacent(int column, int row, bool withinBounds, gridCallbackAdjacent<T> callback) const;
 
 		/// <summary>
 		/// Iterates grid within specific boundary constraint
@@ -153,7 +158,7 @@ namespace brogueHd::component
 		/// <summary>
 		/// Iterates outward from center location to specified distance
 		/// </summary>
-		void iterateOutward(short centerColumn, short centerRow, short distance, gridCallback<T> callback) const;
+		void iterateOutward(int centerColumn, int centerRow, int distance, gridCallback<T> callback) const;
 
 		/// <summary>
 		/// Calculates the largest sub-rectangle in the grid.  The predicate is used to determine what to include 
@@ -203,7 +208,7 @@ namespace brogueHd::component
 	}
 
 	template<typename T>
-	T grid<T>::get(short column, short row) const
+	T grid<T>::get(int column, int row) const
 	{
 		if (column < _relativeBoundary->column ||
 			row < _relativeBoundary->row ||
@@ -216,7 +221,7 @@ namespace brogueHd::component
 	}
 
 	template<typename T>
-	T grid<T>::getUnsafe(short column, short row) const
+	T grid<T>::getUnsafe(int column, int row) const
 	{
 		if (column < _relativeBoundary->column ||
 			row < _relativeBoundary->row ||
@@ -229,7 +234,7 @@ namespace brogueHd::component
 	}
 
 	template<typename T>
-	T grid<T>::getAdjacentUnsafe(short column, short row, brogueCompass direction) const
+	T grid<T>::getAdjacentUnsafe(int column, int row, brogueCompass direction) const
 	{
 		switch (direction)
 		{
@@ -262,7 +267,7 @@ namespace brogueHd::component
 	}
 
 	template<typename T>
-	T grid<T>::getAdjacent(short column, short row, brogueCompass direction) const
+	T grid<T>::getAdjacent(int column, int row, brogueCompass direction) const
 	{
 		switch (direction)
 		{
@@ -315,7 +320,7 @@ namespace brogueHd::component
 	}
 
 	template<typename T>
-	gridLocator grid<T>::getAdjacentLocator(short column, short row, brogueCompass direction) const
+	gridLocator grid<T>::getAdjacentLocator(int column, int row, brogueCompass direction) const
 	{
 		switch (direction)
 		{
@@ -375,7 +380,7 @@ namespace brogueHd::component
 	}
 
 	template<typename T>
-	gridLocator grid<T>::getAdjacentLocatorUnsafe(short column, short row, brogueCompass direction) const
+	gridLocator grid<T>::getAdjacentLocatorUnsafe(int column, int row, brogueCompass direction) const
 	{
 		switch (direction)
 		{
@@ -447,19 +452,19 @@ namespace brogueHd::component
 	}
 
 	template<typename T>
-	bool grid<T>::isDefined(short column, short row) const
+	bool grid<T>::isDefined(int column, int row) const
 	{
 		return  this->get(column, row) != default_value::value<T>();
 	}
 
 	template<typename T>
-	bool grid<T>::isInBounds(short column, short row) const
+	bool grid<T>::isInBounds(int column, int row) const
 	{
 		return _relativeBoundary->contains(column, row);
 	}
 
 	template<typename T>
-	void grid<T>::set(short column, short row, T value, bool overwrite)
+	void grid<T>::set(int column, int row, T value, bool overwrite)
 	{
 		if (!this->isInBounds(column, row))
 			throw simpleException("Grid out of bounds:  grid.cpp");
@@ -478,7 +483,7 @@ namespace brogueHd::component
 
 		grid<T>* grid = this;
 
-		iterate(this, [&grid] (short column, short row)
+		iterate(this, [&grid] (int column, int row)
 		{
 			if (aggregateComparator(searchValue, grid->get(column, row)))
 				searchValue = grid->get(column, row);
@@ -488,16 +493,16 @@ namespace brogueHd::component
 	}
 
 	template<typename T>
-	bool grid<T>::isEdge(short column, short row) const
+	bool grid<T>::isEdge(int column, int row) const
 	{
-		return this->isEdgeWhere(column, row, [] (short acolumn, short arow, T item)
+		return this->isEdgeWhere(column, row, [] (int acolumn, int arow, T item)
 		{
 			return item != default_value::value<T>();
 		});
 	}
 
 	template<typename T>
-	bool grid<T>::isEdgeWhere(short column, short row, gridPredicate<T> predicate) const
+	bool grid<T>::isEdgeWhere(int column, int row, gridPredicate<T> predicate) const
 	{
 		T north = this->getUnsafe(column, row - 1);
 		T south = this->getUnsafe(column, row + 1);
@@ -601,10 +606,31 @@ namespace brogueHd::component
 
 		gridRect boundary = this->getRelativeBoundary();
 
-		for (short i = boundary.left(); i <= boundary.right() && !userBreak; i++)
+		for (int i = boundary.left(); i <= boundary.right() && !userBreak; i++)
 		{
-			for (short j = boundary.top(); j <= boundary.bottom() && !userBreak; j++)
+			for (int j = boundary.top(); j <= boundary.bottom() && !userBreak; j++)
 			{
+				if (callback(i, j, this->get(i, j)) == iterationCallback::breakAndReturn)
+					userBreak = true;
+			}
+		}
+	}
+
+	template<typename T>
+	void grid<T>::iterateWhereDefined(gridCallback<T> callback) const
+	{
+		bool userBreak = false;
+
+		gridRect boundary = this->getRelativeBoundary();
+
+		for (int i = boundary.left(); i <= boundary.right() && !userBreak; i++)
+		{
+			for (int j = boundary.top(); j <= boundary.bottom() && !userBreak; j++)
+			{
+				// Block non-defined location callbacks
+				if (!this->isDefined(i, j))
+					continue;
+
 				if (callback(i, j, this->get(i, j)) == iterationCallback::breakAndReturn)
 					userBreak = true;
 			}
@@ -645,23 +671,23 @@ namespace brogueHd::component
 	}
 
 	template<typename T>
-	void grid<T>::iterateOutward(short centerColumn,
-		short centerRow,
-		short distance,
+	void grid<T>::iterateOutward(int centerColumn,
+		int centerRow,
+		int distance,
 		gridCallback<T> callback) const
 	{
 		bool userBreak = false;
 
 		gridRect boundary = this->getRelativeBoundary();
 
-		short left = simpleMath::clamp(centerColumn - distance, boundary.left(), boundary.right());
-		short right = simpleMath::clamp(centerColumn + distance, boundary.left(), boundary.right());
-		short top = simpleMath::clamp(centerRow - distance, boundary.top(), boundary.bottom());
-		short bottom = simpleMath::clamp(centerColumn + distance, boundary.top(), boundary.bottom());
+		int left = simpleMath::clamp(centerColumn - distance, boundary.left(), boundary.right());
+		int right = simpleMath::clamp(centerColumn + distance, boundary.left(), boundary.right());
+		int top = simpleMath::clamp(centerRow - distance, boundary.top(), boundary.bottom());
+		int bottom = simpleMath::clamp(centerColumn + distance, boundary.top(), boundary.bottom());
 
-		for (short i = left; i <= right && !userBreak; i++)
+		for (int i = left; i <= right && !userBreak; i++)
 		{
-			for (short j = top; j <= bottom && !userBreak; j++)
+			for (int j = top; j <= bottom && !userBreak; j++)
 			{
 				if (callback(i, j, this->get(i, j)) == iterationCallback::breakAndReturn)
 					userBreak = true;
@@ -676,12 +702,12 @@ namespace brogueHd::component
 
 		gridRect gridBoundary = this->getRelativeBoundary();
 
-		short safeRight = simpleMath::clamp(boundary.right(), gridBoundary.left(), gridBoundary.right());
-		short safeBottom = simpleMath::clamp(boundary.bottom(), gridBoundary.top(), gridBoundary.bottom());
+		int safeRight = simpleMath::clamp(boundary.right(), gridBoundary.left(), gridBoundary.right());
+		int safeBottom = simpleMath::clamp(boundary.bottom(), gridBoundary.top(), gridBoundary.bottom());
 
-		for (short i = boundary.left(); i <= safeRight && !userBreak; i++)
+		for (int i = boundary.left(); i <= safeRight && !userBreak; i++)
 		{
-			for (short j = boundary.top(); j <= safeBottom && !userBreak; j++)
+			for (int j = boundary.top(); j <= safeBottom && !userBreak; j++)
 			{
 				if (callback(i, j, this->get(i, j)) == iterationCallback::breakAndReturn)
 					userBreak = true;
@@ -690,7 +716,7 @@ namespace brogueHd::component
 	}
 
 	template<typename T>
-	void grid<T>::iterateAdjacent(short column, short row, bool withinBounds, gridCallbackAdjacent<T> callback) const
+	void grid<T>::iterateAdjacent(int column, int row, bool withinBounds, gridCallbackAdjacent<T> callback) const
 	{
 		bool userBreak = false;
 
@@ -728,7 +754,7 @@ namespace brogueHd::component
 	}
 
 	template<typename T>
-	void grid<T>::iterateAroundCardinal(short column, short row, bool withinBounds, gridCallback<T> callback) const
+	void grid<T>::iterateAroundCardinal(int column, int row, bool withinBounds, gridCallback<T> callback) const
 	{
 		iterationCallback response = iterationCallback::iterate;
 
@@ -783,7 +809,7 @@ namespace brogueHd::component
 	{
 		const grid<T>* that = this;
 
-		return calculateLargestRectangle(minSize, [&that] (short column, short row, const T& item)
+		return calculateLargestRectangle(minSize, [&that] (int column, int row, const T& item)
 		{
 			return that->isDefined(column, row);
 		});
@@ -922,20 +948,20 @@ namespace brogueHd::component
 		// TODO: Use a stack-based approach to cut down on iterating
 
 		gridRect boundary = this->getRelativeBoundary();
-		short rowCountersLength = boundary.width;
-		simpleArray<short> rowCounters(rowCountersLength);
+		int rowCountersLength = boundary.width;
+		simpleArray<int> rowCounters(rowCountersLength);
 
-		short bestStartColumn = -1;
-		short bestEndColumn = -1;
-		short bestStartRow = -1;
-		short bestEndRow = -1;
-		short bestArea = 0;
+		int bestStartColumn = -1;
+		int bestEndColumn = -1;
+		int bestStartRow = -1;
+		int bestEndRow = -1;
+		int bestArea = 0;
 
-		for (short row = boundary.top(); row <= boundary.bottom(); row++)
+		for (int row = boundary.top(); row <= boundary.bottom(); row++)
 		{
-			for (short column = boundary.left(); column <= boundary.right(); column++)
+			for (int column = boundary.left(); column <= boundary.right(); column++)
 			{
-				short index = column - boundary.left();
+				int index = column - boundary.left();
 
 				// FIRST, INCREMENT ROW COUNTERS
 				if (predicate(column, row, this->getUnsafe(column, row)))
@@ -945,13 +971,13 @@ namespace brogueHd::component
 			}
 
 			// From the Left
-			for (short index1 = 0; index1 < rowCountersLength; index1++)
+			for (int index1 = 0; index1 < rowCountersLength; index1++)
 			{
 				// Initialize min-height for the next sweep (from the left)
-				short minHeight = rowCounters.get(index1);
+				int minHeight = rowCounters.get(index1);
 
 				// From the left
-				for (short index2 = index1; index2 < rowCountersLength && minHeight > 0; index2++)
+				for (int index2 = index1; index2 < rowCountersLength && minHeight > 0; index2++)
 				{
 					minHeight = simpleMath::minOf(minHeight, rowCounters.get(index1), rowCounters.get(index2));
 
@@ -991,13 +1017,13 @@ namespace brogueHd::component
 			}
 
 			// From the Right
-			for (short index1 = rowCountersLength - 1; index1 >= 0; index1--)
+			for (int index1 = rowCountersLength - 1; index1 >= 0; index1--)
 			{
 				// Initialize min-height for the next sweep (from the right)
-				short minHeight = rowCounters.get(index1);
+				int minHeight = rowCounters.get(index1);
 
 				// From the right
-				for (short index2 = index1; index2 >= 0 && minHeight > 0; index2--)
+				for (int index2 = index1; index2 >= 0 && minHeight > 0; index2--)
 				{
 					minHeight = simpleMath::minOf(minHeight, rowCounters.get(index1), rowCounters.get(index2));
 
@@ -1049,7 +1075,7 @@ namespace brogueHd::component
 		if (!boundary.contains(result))
 			throw simpleException("Invalid sub-region rectangle calculation:  gridRegionConstructor::calculateLargestRectangle");
 
-		result.iterate([&that, &predicate] (short column, short row)
+		result.iterate([&that, &predicate] (int column, int row)
 		{
 			if (!predicate(column, row, that->getUnsafe(column, row)))
 				throw simpleException("Invalid sub-region rectangle calculation:  gridRegionConstructor::calculateLargestRectangle");
@@ -1100,16 +1126,16 @@ namespace brogueHd::component
 	//// If there are no valid locations, returns (-1, -1).
 
 	//template<typename T>
-	//void grid<T>::randomLocationInGrid(short* x, short* y, short validValue) 
+	//void grid<T>::randomLocationInGrid(int* x, int* y, int validValue) 
 	//{
-	//    const short locationCount = validLocationCount(grid, validValue);
-	//    short i, j;
+	//    const int locationCount = validLocationCount(grid, validValue);
+	//    int i, j;
 
 	//    if (locationCount <= 0) {
 	//        *x = *y = -1;
 	//        return;
 	//    }
-	//    short index = rand_range(0, locationCount - 1);
+	//    int index = rand_range(0, locationCount - 1);
 	//    for (i = 0; i < DCOLS && index >= 0; i++) {
 	//        for (j = 0; j < DROWS && index >= 0; j++) {
 	//            if (grid[i][j] == validValue) {
@@ -1128,10 +1154,10 @@ namespace brogueHd::component
 	//// If there are no valid locations, returns (-1, -1).
 
 	//template<typename T>
-	//void grid<T>::randomLeastPositiveLocationInGrid(short** grid, short* x, short* y, boolean deterministic) {
-	//    const short targetValue = leastPositiveValueInGrid(grid);
-	//    short locationCount;
-	//    short i, j, index;
+	//void grid<T>::randomLeastPositiveLocationInGrid(int** grid, int* x, int* y, boolean deterministic) {
+	//    const int targetValue = leastPositiveValueInGrid(grid);
+	//    int locationCount;
+	//    int i, j, index;
 
 	//    if (targetValue == 0) {
 	//        *x = *y = -1;
@@ -1169,16 +1195,16 @@ namespace brogueHd::component
 	//}
 
 	//template<typename T>
-	//boolean grid<T>::getQualifyingPathLocNear(short* retValX, short* retValY,
-	//    short x, short y,
+	//boolean grid<T>::getQualifyingPathLocNear(int* retValX, int* retValY,
+	//    int x, int y,
 	//    boolean hallwaysAllowed,
 	//    unsigned long blockingTerrainFlags,
 	//    unsigned long blockingMapFlags,
 	//    unsigned long forbiddenTerrainFlags,
 	//    unsigned long forbiddenMapFlags,
 	//    boolean deterministic) {
-	//    short** grid, ** costMap;
-	//    short loc[2];
+	//    int** grid, ** costMap;
+	//    int loc[2];
 
 	//    // First check the given location to see if it works, as an optimization.
 	//    if (!cellHasTerrainFlag(x, y, blockingTerrainFlags | forbiddenTerrainFlags)
@@ -1251,9 +1277,9 @@ namespace brogueHd::component
 
 
 	//template<gridCellConstraint T>
-	//short grid<T>::fillContiguousRegion(short column, short row, T fillValue) 
+	//int grid<T>::fillContiguousRegion(int column, int row, T fillValue) 
 	//{
-	//    short numberOfCells = 1;
+	//    int numberOfCells = 1;
 
 	//    // Fill current cell value
 	//    //
@@ -1261,7 +1287,7 @@ namespace brogueHd::component
 
 	//    // Recurse through in a flood-fill fashion
 	//    //
-	//    iterateAroundCardinal(this, column, row, true, [](short x, short y)
+	//    iterateAroundCardinal(this, column, row, true, [](int x, int y)
 	//    {
 	//        // If the neighbor is an unmarked region cell
 	//        //
@@ -1279,7 +1305,7 @@ namespace brogueHd::component
 	//{
 	//    std::vector<gridRegion<T>*> result;
 
-	//    iterate(this, [](short column, short row)
+	//    iterate(this, [](int column, int row)
 	//    {
 	//        // Check history
 	//        for (int index = 0; index < result.size(); index++)
@@ -1313,11 +1339,11 @@ namespace brogueHd::component
 	//}
 
 	//template<gridCellConstraint T>
-	//void grid<T>::locateRegionRecurse(grid<T>* regionGrid, gridRect& boundary, short currentColumn, short currentRow, T fillValue, function<bool(T)> predicate)
+	//void grid<T>::locateRegionRecurse(grid<T>* regionGrid, gridRect& boundary, int currentColumn, int currentRow, T fillValue, function<bool(T)> predicate)
 	//{
 	//    // Recurse through in a flood-fill fashion
 	//    //
-	//    iterateAroundCardinal(this, currentColumn, currentRow, true, [](short x, short y)
+	//    iterateAroundCardinal(this, currentColumn, currentRow, true, [](int x, int y)
 	//    {
 	//        // Neighbor Cell:  Protect from infinite recursion by checking region grid
 	//        //
