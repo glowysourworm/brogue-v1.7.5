@@ -376,7 +376,7 @@ namespace brogueHd::frontend
 	}
 
 	template<isGLStream TStream>
-	int brogueViewContainer::getViewCount<TStream>()
+	int brogueViewContainer::getViewCount()
 	{
 		if (std::same_as<TStream, brogueCellQuad>())
 			return _cellViews->count();

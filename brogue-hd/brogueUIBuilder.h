@@ -840,7 +840,6 @@ namespace brogueHd::frontend
 	brogueViewContainer* brogueUIBuilder::createPlaceholder(brogueUIProgram programName, const gridRect& boundary)
 	{
 		brogueUIProgramPartId partId(programName, brogueUIProgramPart::Background, 0);
-		gridRect boundary = getBrogueStaticBoundary(partId);
 		gridRect sceneBounds = getBrogueSceneBoundary();
 		brogueUIData uiData(boundary, sceneBounds, _zoomLevel, _randomGenerator->nextColor(colors::getGray(0.2f), colors::getGray(0.5f)));
 		brogueBackground* background = new brogueBackground(_coordinateConverter, _resourceController, _eventController, partId, uiData);

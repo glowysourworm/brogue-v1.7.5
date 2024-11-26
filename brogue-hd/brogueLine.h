@@ -8,10 +8,8 @@
 
 namespace brogueHd::frontend
 {
-	class brogueLine : simpleGlData
+	struct brogueLine : simpleGlData
 	{
-	public:
-
 		brogueLine()
 		{
 			_point1 = default_value::value<vec2>();

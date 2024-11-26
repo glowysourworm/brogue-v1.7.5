@@ -1,11 +1,8 @@
 #pragma once
 
 #include "brogueCellDisplay.h"
-#include "brogueColorQuad.h"
 #include "brogueGlyphMap.h"
-#include "brogueImageQuad.h"
-#include "color.h"
-#include "gridLocator.h"
+#include "gridRect.h"
 #include "openglQuadConverter.h"
 #include "resourceController.h"
 #include "simpleGlData.h"
@@ -31,10 +28,8 @@ namespace brogueHd::frontend
 
 		gridRect calculateSceneBoundaryUI() const;
 
-	protected:
-
-		brogueImageQuad createBrogueImageQuadFrame();
-		brogueColorQuad createBrogueColorQuadFrame(const color& theColor);
+		simpleQuad createFrameQuadXY();
+		simpleQuad createFrameQuadUV();
 
 	public:
 
@@ -83,19 +78,12 @@ namespace brogueHd::frontend
 	{
 		return gridRect(0, 0, _viewConverter.getViewWidth(), _viewConverter.getViewHeight());
 	}
-	brogueImageQuad brogueCoordinateConverter::createBrogueImageQuadFrame()
+	simpleQuad brogueCoordinateConverter::createFrameQuadXY()
 	{
-		simpleQuad quadXY = _viewConverter.createQuadNormalizedXY(0, 0, _viewConverter.getViewWidth(), _viewConverter.getViewHeight());
-		simpleQuad quadUV = _viewConverter.createQuadNormalizedUV(0, 0, _viewConverter.getViewWidth(), _viewConverter.getViewHeight());
-
-		return brogueImageQuad(gridLocator(0, 0), quadXY, quadUV);
+		return _viewConverter.createQuadNormalizedXY(0, 0, _viewConverter.getViewWidth(), _viewConverter.getViewHeight());
 	}
-
-	brogueColorQuad brogueCoordinateConverter::createBrogueColorQuadFrame(const color& theColor)
+	simpleQuad brogueCoordinateConverter::createFrameQuadUV()
 	{
-		simpleQuad quadXY = _viewConverter.createQuadNormalizedXY(0, 0, _viewConverter.getViewWidth(), _viewConverter.getViewHeight());
-		simpleQuad quadUV = _viewConverter.createQuadNormalizedUV(0, 0, _viewConverter.getViewWidth(), _viewConverter.getViewHeight());
-
-		return brogueColorQuad(gridLocator(0, 0), theColor, quadXY);
+		return _viewConverter.createQuadNormalizedUV(0, 0, _viewConverter.getViewWidth(), _viewConverter.getViewHeight());
 	}
 }

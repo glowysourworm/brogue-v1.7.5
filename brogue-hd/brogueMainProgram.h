@@ -1,20 +1,14 @@
 #pragma once
-#include "brogueBackground.h"
 #include "brogueCellDisplay.h"
-#include "brogueCellQuad.h"
-#include "brogueFlameMenuHeatView.h"
+#include "brogueColorQuad.h"
 #include "brogueGlobal.h"
 #include "brogueGlyphMap.h"
 #include "brogueKeyboardState.h"
 #include "brogueMouseState.h"
-#include "brogueProgramBuilder.h"
 #include "brogueUIBuilder.h"
 #include "brogueUIConstants.h"
-#include "brogueUIData.h"
-#include "brogueUIProgramPartConfiguration.h"
 #include "brogueUIProgramPartId.h"
 #include "brogueViewContainer.h"
-#include "brogueViewProgram.h"
 #include "color.h"
 #include "eventController.h"
 #include "gl.h"
@@ -23,6 +17,7 @@
 #include "resourceController.h"
 #include "simple.h"
 #include "simpleBitmap.h"
+#include "simpleDataStream.h"
 #include "simpleExt.h"
 #include "simpleFrameBuffer.h"
 #include "simpleGlData.h"
@@ -30,8 +25,11 @@
 #include "simpleKeyboardState.h"
 #include "simpleList.h"
 #include "simpleMouseState.h"
+#include "simpleShader.h"
 #include "simpleShaderProgram.h"
 #include "simpleTexture.h"
+#include "simpleVertexArray.h"
+#include "simpleVertexBuffer.h"
 #include <SDL_image.h>
 #include <SDL_surface.h>
 
@@ -44,7 +42,7 @@ namespace brogueHd::frontend
 	public:
 
 		brogueMainProgram(brogueUIBuilder* uiBuilder,
-					      resourceController* resourceController,
+						  resourceController* resourceController,
 						  eventController* eventController,
 						  brogueGlyphMap* glyphMap,
 						  const gridRect& sceneBoundaryUI,
@@ -85,7 +83,7 @@ namespace brogueHd::frontend
 		/// Primary game data update (see program container)
 		/// </summary>
 		void setGameUpdate(const brogueCellDisplay& data);
-		
+
 	private:
 
 		void clearAllTextures();
@@ -140,24 +138,22 @@ namespace brogueHd::frontend
 			_uiPrograms->add(viewList.get(index)->getProgramName(), viewList.get(index));
 		}
 
-		// Grid Coordinates...
-		gridRect sceneBounds = _uiBuilder->getBrogueSceneBoundary();
+		// Create a program for the frame buffer
+		simpleShader vertexShader(resourceController->getShader(shaderResource::mixFrameTexturesVert));
+		simpleShader fragmentShader(resourceController->getShader(shaderResource::mixFrameTexturesFrag));
+		brogueCellDisplay emptyCell;
+		simpleQuad frameQuadXY = uiBuilder->getCoordinateConverter()->createFrameQuadXY();
+		brogueColorQuad element(emptyCell, frameQuadXY);
+		simpleDataStream* frameDataStream = new simpleDataStream(1, element.getElementVertexSize(GL_TRIANGLES), element.getStreamSize(GL_TRIANGLES));
 
-		brogueUIProgramPartId partId(brogueUIProgram::ContainerControlledProgram, brogueUIProgramPart::Background, 0);
-		brogueUIData backgroundData(sceneBounds, sceneBounds, zoomLevel, colors::transparent());
-		brogueProgramBuilder builder(resourceController, glyphMap);
-		brogueBackground background(uiBuilder->getCoordinateConverter(), resourceController, eventController, partId, backgroundData);
+		int vertexBufferIndex = 0;	// GL VBO index is STATIC!
 
-		brogueUIProgramPartConfiguration frameConfiguration(brogueUIProgramPart::Background,
-															shaderResource::mixFrameTexturesVert,
-															shaderResource::mixFrameTexturesFrag,
-															openglDataStreamType::brogueImageQuad,
-															openglBrogueCellOutputSelector::DisplayCurrentFrame,
-															0,
-															false,
-															true);
+		// (MEMORY!) These are managed by the simple shader program
+		simpleVertexBuffer<float>* programVBO = new simpleVertexBuffer<float>(vertexBufferIndex++, frameDataStream, vertexShader.getVertexAttributes());
+		simpleVertexArray<float>* programVAO = new simpleVertexArray<float>(GL_TRIANGLES, programVBO);
 
-		_frameProgram = builder.buildProgram(&background, frameConfiguration);
+		// (MEMORY!)
+		_frameProgram = new simpleShaderProgram(vertexShader, fragmentShader, programVAO);
 
 		// (CRITICAL!) Keep track of this, MUST MATCH:  Uniform location (layout index in the shader); shaderData->index; texture attachment GL_TEXTURE(N) index.
 		//
@@ -503,7 +499,7 @@ namespace brogueHd::frontend
 								 with the mouse, may be activated and deactivated, and will stay in memory until the
 								 end of the application.
 		*/
-		
+
 		_uiPrograms->iterate([] (const brogueUIProgram& programName, brogueViewContainer* viewProgram)
 		{
 			// Compile the UI Programs

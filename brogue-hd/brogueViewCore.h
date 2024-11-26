@@ -63,8 +63,8 @@ namespace brogueHd::frontend
 
 	protected:	// UI <---> GL Data Functions
 
-		TStream get(int elementIndex);
-		void set(const TStream& element, int elementIndex);
+		TStream getElement(int elementIndex);
+		void setElement(const TStream& element, int elementIndex);
 
 	protected:	// GL Functions
 
@@ -85,13 +85,13 @@ namespace brogueHd::frontend
 		template<isGLUniform TUniform>
 		void setUniform(const char* name, const TUniform& value);
 
-	private:
-
 		void setUniform(const char* name, const float& value);
 		void setUniform(const char* name, const int& value);
 		void setUniform(const char* name, const vec2& value);
 		void setUniform(const char* name, const ivec2& value);
 		void setUniform(const char* name, const vec4& value);
+
+	private:
 
 		simpleDataStream* createDataStream(int elementCount);
 
@@ -126,15 +126,13 @@ namespace brogueHd::frontend
 		// 4) Restream from calls to reBuffer (TODO: Invalidate / re-stream portions of the data stream)
 		//
 
-		_configuration = new brogueUIProgramPartConfiguration(resourceController->getUIPartConfig(partId.getPartName()));
+		_configuration = new brogueUIProgramPartConfiguration(*resourceController->getUIPartConfig(partId.getPartName()));
 
-		simpleShader vertexShader(resourceController->getShader(configuration->vertexShaderName));
-		simpleShader fragmentShader(resourceController->getShader(configuration->fragmentShaderName));
+		simpleShader vertexShader(resourceController->getShader(_configuration->vertexShaderName));
+		simpleShader fragmentShader(resourceController->getShader(_configuration->fragmentShaderName));
 
 		// Define the stream size (in elements)
 		_elements = new simpleArray<TStream>(0);
-
-		_coordinateConverter = coordinateConverter;
 
 		// Create a placeholder stream. This will be the shared pointer with the simpleShaderProgram.
 		_dataStream = createDataStream(0);
@@ -164,13 +162,13 @@ namespace brogueHd::frontend
 	}
 
 	template<isGLStream TStream>
-	TStream brogueViewCore<TStream>::get(int elementIndex)
+	TStream brogueViewCore<TStream>::getElement(int elementIndex)
 	{
 		return _elements->get(elementIndex);
 	}
 
 	template<isGLStream TStream>
-	void brogueViewCore<TStream>::set(const TStream& element, int elementIndex)
+	void brogueViewCore<TStream>::setElement(const TStream& element, int elementIndex)
 	{
 		_elements->set(elementIndex, element);
 	}
@@ -380,6 +378,24 @@ namespace brogueHd::frontend
 		}
 	}
 
+	// Brogue Coordinate Converter Frame-Type Code (Graveyard)
+	// 
+	//brogueImageQuad brogueCoordinateConverter::createBrogueImageQuadFrame()
+	//{
+	//	simpleQuad quadXY = _viewConverter.createQuadNormalizedXY(0, 0, _viewConverter.getViewWidth(), _viewConverter.getViewHeight());
+	//	simpleQuad quadUV = _viewConverter.createQuadNormalizedUV(0, 0, _viewConverter.getViewWidth(), _viewConverter.getViewHeight());
+
+	//	return brogueImageQuad(gridLocator(0, 0), quadXY, quadUV);
+	//}
+
+	//brogueColorQuad brogueCoordinateConverter::createBrogueColorQuadFrame(const color& theColor)
+	//{
+	//	simpleQuad quadXY = _viewConverter.createQuadNormalizedXY(0, 0, _viewConverter.getViewWidth(), _viewConverter.getViewHeight());
+	//	simpleQuad quadUV = _viewConverter.createQuadNormalizedUV(0, 0, _viewConverter.getViewWidth(), _viewConverter.getViewHeight());
+
+	//	return brogueColorQuad(gridLocator(0, 0), theColor, quadXY);
+	//}
+
 	template<isGLStream TStream>
 	void brogueViewCore<TStream>::initializeStream(int elementSize)
 	{
@@ -411,7 +427,7 @@ namespace brogueHd::frontend
 			break;
 			case openglDataStreamType::broguePolygon:
 			{
-				broguePolygon element;
+				brogueLine element;
 				_dataStream->reCreate(elementSize, element.getElementVertexSize(this->PolygonPrimitiveType), element.getStreamSize(this->PolygonPrimitiveType));
 			}
 			break;

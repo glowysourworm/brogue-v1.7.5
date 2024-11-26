@@ -119,7 +119,7 @@ namespace brogueHd::backend
 		}
 
 		gridRect levelBoundary = _uiBuilder->getBrogueGameBoundary();
-		gridRect levelPaddedBoundary = _uiBuilder->getPaddedBoundary(levelBoundary, 1);
+		gridRect levelPaddedBoundary = levelBoundary.createPadded(1);
 
 		_layout = new brogueLayout(levelBoundary, levelPaddedBoundary);
 		_profile = profile;

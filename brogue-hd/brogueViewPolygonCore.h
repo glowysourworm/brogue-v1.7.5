@@ -182,7 +182,7 @@ namespace brogueHd::frontend
 			brogueLine streamElement(point1, point2);
 
 			// Stream out elements as the iterator specifies -> ordered onto the stream.
-			brogueViewCore<brogueLine>::set(streamElement, index);
+			this->setElement(streamElement, index);
 		}
 
 		// Complete the buffer; and put it online

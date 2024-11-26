@@ -18,13 +18,13 @@ namespace brogueHd::simple
 		}
 		simpleLine(const simplePoint<T>& point1, const simplePoint<T>& point2)
 		{
-			node1 = point1;
-			node2 = point2;
+			this->node1 = point1;
+			this->node2 = point2;
 		}
 		simpleLine(const simpleLine<T>& copy)
 		{
-			node1 = copy.node1;
-			node2 = copy.node2;
+			this->node1 = copy.node1;
+			this->node2 = copy.node2;
 		}
 	};
 }
