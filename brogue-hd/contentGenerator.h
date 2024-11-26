@@ -4,8 +4,6 @@
 #include "brogueContentGrid.h"
 #include "brogueGlobal.h"
 #include "brogueLayout.h"
-#include "brogueLevel.h"
-#include "brogueUIBuilder.h"
 #include "creature.h"
 #include "grid.h"
 #include "gridRect.h"

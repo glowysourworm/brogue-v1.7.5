@@ -4,8 +4,8 @@
 #include "brogueGlyphMap.h"
 #include "brogueKeyboardState.h"
 #include "brogueLevel.h"
-#include "brogueMouseState.h"
 #include "brogueMainProgram.h"
+#include "brogueMouseState.h"
 #include "brogueUIBuilder.h"
 #include "brogueUIConstants.h"
 #include "brogueViewContainer.h"
@@ -42,7 +42,7 @@ namespace brogueHd::backend
 		brogueMouseState getMouseState() const;
 		BrogueGameMode getGameModeRequest(bool& newGame, bool& openGame, simpleString& fileName) const;
 		BrogueGameMode getRenderingGameMode() const;
-		
+
 		/// <summary>
 		/// Primary rendering data hand-over to the rendering thread
 		/// </summary>

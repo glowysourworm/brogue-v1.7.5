@@ -181,7 +181,7 @@ namespace brogueHd::backend::model
 		}
 		size_t getHash() const override
 		{
-			return hashGenerator::generateHash(column, row, character, foreColor, backColor, opacity, needsUpdate, noDisplay);
+			return hashGenerator::generateHash(column, row, character, foreColor.getHash(), backColor.getHash(), opacity, needsUpdate, noDisplay);
 		}
 
 	private:

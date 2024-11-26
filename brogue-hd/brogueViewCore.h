@@ -17,7 +17,6 @@
 #include "simpleOpenGL.h"
 #include "simpleShader.h"
 #include "simpleShaderProgram.h"
-#include "simpleString.h"
 #include "simpleVertexArray.h"
 #include "simpleVertexBuffer.h"
 

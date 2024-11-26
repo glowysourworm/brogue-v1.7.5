@@ -288,12 +288,12 @@ namespace brogueHd::backend
 	void resourceController::loadPartConfigs()
 	{
 		// Title View
-		brogueUIProgramPartConfiguration* flameDisplay = 
-			new brogueUIProgramPartConfiguration(brogueUIProgramPart::FlameDisplay, 
-												 shaderResource::diffuseColorUpwardVert, 
-												 shaderResource::diffuseColorUpwardFrag, 
-												 openglDataStreamType::brogueCellQuad, 
-												 openglBrogueCellOutputSelector::NoDisplay, 
+		brogueUIProgramPartConfiguration* flameDisplay =
+			new brogueUIProgramPartConfiguration(brogueUIProgramPart::FlameDisplay,
+												 shaderResource::diffuseColorUpwardVert,
+												 shaderResource::diffuseColorUpwardFrag,
+												 openglDataStreamType::brogueCellQuad,
+												 openglBrogueCellOutputSelector::NoDisplay,
 												 15,
 												 false,
 												 false);

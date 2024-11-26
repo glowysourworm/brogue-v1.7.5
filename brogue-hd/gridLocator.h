@@ -2,9 +2,7 @@
 
 #include "graphNode.h"
 #include "simple.h"
-#include "simpleExt.h"
 #include "simpleMath.h"
-#include <string>
 
 using namespace brogueHd::simple;
 
@@ -41,13 +39,13 @@ namespace brogueHd::component
 		bool operator==(const gridLocator& cell) const
 		{
 			return column == cell.column &&
-				   row == cell.row;
+				row == cell.row;
 		}
 
 		bool operator!=(const gridLocator& cell) const
 		{
 			return column != cell.column ||
-				   row != cell.row;
+				row != cell.row;
 		}
 		void translate(int columnOffset, int rowOffset)
 		{

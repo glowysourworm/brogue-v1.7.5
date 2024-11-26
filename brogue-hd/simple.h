@@ -27,10 +27,10 @@ namespace brogueHd::simple
 	//
 
 	template <typename T, typename = std::void_t<>>
-	struct is_std_hashable : std::false_type { };
+	struct is_std_hashable : std::false_type {};
 
 	template <typename T>
-	struct is_std_hashable<T, std::void_t<decltype(std::declval<std::hash<T>>()(std::declval<T>()))>> : std::true_type { };
+	struct is_std_hashable<T, std::void_t<decltype(std::declval<std::hash<T>>()(std::declval<T>()))>> : std::true_type {};
 
 	template <typename T>
 	constexpr bool is_std_hashable_v = is_std_hashable<T>::value;
@@ -127,9 +127,9 @@ namespace brogueHd::simple
 
 	template<typename T>
 	concept isHashable = std::convertible_to<T, hashable> ||
-							std::convertible_to<T, hashableObject> ||
-							std::same_as<T, simpleString> ||
-							isStdHashable<T>;
+		std::convertible_to<T, hashableObject> ||
+		std::same_as<T, simpleString> ||
+		isStdHashable<T>;
 
 	template<typename T>
 	concept isSimpleCompatible = isHashable<T> && isComparable<T>;

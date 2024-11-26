@@ -7,11 +7,11 @@
 #include "roomGenerator.h"
 
 #include "brogueCell.h"
-#include "brogueCell.h"
 #include "brogueGlyphMap.h"
 #include "brogueRoomTemplate.h"
 #include "brogueUIBuilder.h"
 #include "color.h"
+#include "delaunayAlgorithm.h"
 #include "dungeonConstants.h"
 #include "graph.h"
 #include "gridLocator.h"
@@ -23,7 +23,6 @@
 #include "simple.h"
 #include "simpleHash.h"
 #include "simpleList.h"
-#include "delaunayAlgorithm.h"
 
 using namespace brogueHd::simple;
 using namespace brogueHd::component;
@@ -347,7 +346,7 @@ namespace brogueHd::backend
 			// Design Tile
 			boundary.iterate([&layout] (int column, int row)
 			{
-				brogueCell prototype(column, row, color(0, 0, 0.3, 0.2), colors::white(), brogueGlyphMap::Empty);
+				brogueCell prototype(column, row, color(0.0f, 0.0f, 0.3f, 0.2f), colors::white(), brogueGlyphMap::Empty);
 
 				layout->createCells(gridLocator(column, row), prototype);
 
@@ -357,7 +356,7 @@ namespace brogueHd::backend
 			// Design Boundary
 			designRect->getBoundary().iterate([&layout] (int column, int row)
 			{
-				brogueCell prototype(column, row, color(0.3, 0.0, 0.3, 0.2), colors::white(), brogueGlyphMap::Empty);
+				brogueCell prototype(column, row, color(0.3f, 0.0f, 0.3f, 0.2f), colors::white(), brogueGlyphMap::Empty);
 
 				layout->createCells(gridLocator(column, row), prototype, true);
 
@@ -367,7 +366,7 @@ namespace brogueHd::backend
 			// Actual Boundary
 			designRect->getActualBoundary().iterate([&layout] (int column, int row)
 			{
-				brogueCell prototype(column, row, color(0, 0.5, 1, 0.2), colors::white(), brogueGlyphMap::Empty);
+				brogueCell prototype(column, row, color(0.0f, 0.5f, 1.0f, 0.2f), colors::white(), brogueGlyphMap::Empty);
 
 				layout->createCells(gridLocator(column, row), prototype, true);
 
@@ -377,7 +376,7 @@ namespace brogueHd::backend
 			// Room Floor
 			designRect->getRegion()->iterateLocations([&layout, &designRect] (int column, int row, const gridLocator& location)
 			{
-				color backColor(0.3, 0.3, 0.3, 0.5);
+				color backColor(0.3f, 0.3f, 0.3f, 0.5f);
 
 				if (designRect->getConfiguration().getRoomType() == brogueRoomType::ChunkyRoom)
 				{

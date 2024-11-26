@@ -315,7 +315,6 @@ namespace brogueHd::frontend
 			{
 				brogueImageQuad quad = that->createBrogueImageQuad(*cell, noDisplaySelector);
 				that->setElement(quad, cursor++);
-
 			}
 			else if constexpr (std::same_as<TStream, brogueCellQuad>)
 			{
@@ -633,10 +632,10 @@ namespace brogueHd::frontend
 	template<isGLStream TStream>
 	brogueCellQuad brogueViewGridCore<TStream>::createBrogueCellQuad(const brogueCellDisplay& cell, openglBrogueCellOutputSelector outputSelector)
 	{
-		gridLocator glyphLocation = _coordinateConverter->getGlyphConverter().getGlyphLocation(cell.character);
+		gridLocator glyphLocation = _coordinateConverter->getGlyphMap()->getGlyphLocation(cell.character);
 
-		simpleQuad quadXY = _coordinateConverter.getViewConverter().createQuadNormalizedXY_FromLocator(cell.column, cell.row);
-		simpleQuad quadUV = _coordinateConverter.getViewConverter().createQuadNormalizedUV_FromLocator(cell.column, cell.row);
+		simpleQuad quadXY = _coordinateConverter->getViewConverter().createQuadNormalizedXY_FromLocator(cell.column, cell.row);
+		simpleQuad quadUV = _coordinateConverter->getViewConverter().createQuadNormalizedUV_FromLocator(cell.column, cell.row);
 		simpleQuad glyphUV = _coordinateConverter->getGlyphConverter().createQuadNormalizedUV_FromLocator(glyphLocation);
 
 		return brogueCellQuad(cell, quadXY, quadUV, glyphUV, outputSelector);

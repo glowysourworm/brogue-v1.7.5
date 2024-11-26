@@ -305,7 +305,7 @@ namespace brogueHd::backend
 					// Clear update flags
 					_game->getLevel(1)->clearUpdate();
 				}
-				
+
 				return true;
 			}
 			case BrogueGameMode::Playback:

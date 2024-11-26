@@ -38,7 +38,7 @@ namespace brogueHd::frontend
 		/// methods on the view's grid data to set up the view before calling this function.
 		/// </summary>
 		void initializeCore();
-		
+
 		/// <summary>
 		/// Compiles the GL shader program and output status. This should be done after initializeCore is run.
 		/// </summary>

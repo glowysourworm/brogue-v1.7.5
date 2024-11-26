@@ -21,7 +21,7 @@ namespace brogueHd::backend::model
 	{
 	public:
 
-		brogueDesignRect() 
+		brogueDesignRect()
 		{
 			_configuration = default_value::value<brogueRoomTemplate>();
 			_boundary = default_value::value <gridRect>();

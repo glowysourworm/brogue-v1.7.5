@@ -58,15 +58,15 @@ namespace brogueHd::backend::model
 		cellularAutomataParameters()
 		{
 			_fillRatio = 0.55f;
-			_rules = new simpleList<cellularAutomataRule>();			
+			_rules = new simpleList<cellularAutomataRule>();
 			_iterations = 5;
 			_resultPolarity = true;
 		}
 
-		cellularAutomataParameters(float fillRatio, 
-								   int smoothingIterations, 
+		cellularAutomataParameters(float fillRatio,
+								   int smoothingIterations,
 								   bool resultPolarity,
-								   const cellularAutomataRule& rule1, 
+								   const cellularAutomataRule& rule1,
 								   const cellularAutomataRule& rule2)
 		{
 			_fillRatio = fillRatio;

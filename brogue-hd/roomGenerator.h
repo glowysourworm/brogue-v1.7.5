@@ -1,7 +1,5 @@
 #pragma once
 
-#include "brogueDesignRect.h"
-#include "brogueRoomTemplate.h"
 #include "brogueUIBuilder.h"
 #include "cellularAutomataParameters.h"
 #include "dungeonConstants.h"
@@ -63,7 +61,7 @@ namespace brogueHd::backend
 		int iterations = 4;							// # iterations
 		cellularAutomataRule rule1(4, true, true);		// Rule 1 (OR) Rule 2 (passes) -> set to [polarity = wall]
 		cellularAutomataRule rule2(5, false, true);		// Rule 2
-		
+
 
 		// CA Algorithm Parameters:  These are for the cavern room (Brogue v1.7.5)
 		_cavernParameters = new cellularAutomataParameters(fillRatio, iterations, polarity, rule1, rule2);
@@ -243,7 +241,7 @@ namespace brogueHd::backend
 
 		// ...and copy it to the master grid.
 		designGrid.iterate([&designGrid, &maxRegion] (int column, int row, const gridLocator& item)
-		{			
+		{
 			// Overwrite = true. (just set the main grid to the max region)
 			if (!maxRegion->isDefined(column, row))
 				designGrid.set(column, row, default_value::value<gridLocator>(), true);

@@ -153,9 +153,9 @@ namespace brogueHd::backend
 
 		_numbersGenerated++;
 
-		float result = distribution(*_engine);  
+		float result = distribution(*_engine);
 
-		return simpleMath::clamp(result,low, high);
+		return simpleMath::clamp(result, low, high);
 	}
 
 	int randomGenerator::nextInt(int lowerBound, int upperBound, bool exclusiveUpperBound, randomVariable type, float mean, float stdDev)

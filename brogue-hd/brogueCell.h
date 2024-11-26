@@ -45,7 +45,7 @@ namespace brogueHd::backend::model
 			_display->foreColor = foreColor;
 			_display->character = symbol;
 		}
-		~brogueCell() 
+		~brogueCell()
 		{
 			delete _display;
 		};
