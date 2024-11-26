@@ -114,6 +114,9 @@ namespace brogueHd::frontend
 
 	protected:
 
+		const char* UniformCellSizeUI = "cellSizeUI";
+		const char* UniformCellSizeUV = "cellSizeUV";
+
 		void setScrollOffset(int column, int row);
 		void setRenderOffsetUI(int pixelX, float pixelY);
 		brogueMouseState getAdjustedMouse(const brogueMouseState& mouseState) const;
@@ -445,6 +448,7 @@ namespace brogueHd::frontend
 	}
 
 #pragma region public get-access functions
+
 	gridRect brogueViewContainer::getSceneBoundary() const
 	{
 		return *_sceneBoundary;
@@ -513,36 +517,72 @@ namespace brogueHd::frontend
 	{
 		return _zoomLevel;
 	}
+
 #pragma endregion
 
 #pragma region GL Program control functions
+
 	bool brogueViewContainer::isActive() const
 	{
 		return _active;
 	}
 	void brogueViewContainer::compile()
 	{
-		_cellViews->forEach([] (const brogueUIProgramPartId& partId, brogueViewGridCore<brogueCellQuad>* view)
+		// Initialize Uniforms
+		ivec2 cellSizeUI(brogueCellDisplay::CellWidth(_zoomLevel), brogueCellDisplay::CellHeight(_zoomLevel));
+		vec2 cellSizeUV(this->getCellSizeUV().getWidth(), this->getCellSizeUV().getHeight());
+
+		const brogueViewContainer* that = this;
+
+		_cellViews->forEach([&that, &cellSizeUI, &cellSizeUV] (const brogueUIProgramPartId& partId, brogueViewGridCore<brogueCellQuad>* view)
 		{
 			view->compileCore();
+
+			if (view->hasUniform(that->UniformCellSizeUI))
+				view->setUniform(that->UniformCellSizeUI, cellSizeUI);
+
+			if (view->hasUniform(that->UniformCellSizeUV))
+				view->setUniform(that->UniformCellSizeUV, cellSizeUV);
+
 			return iterationCallback::iterate;
 		});
 
-		_imageViews->forEach([] (const brogueUIProgramPartId& partId, brogueViewGridCore<brogueImageQuad>* view)
+		_imageViews->forEach([&that, &cellSizeUI, &cellSizeUV] (const brogueUIProgramPartId& partId, brogueViewGridCore<brogueImageQuad>* view)
 		{
 			view->compileCore();
+
+			if (view->hasUniform(that->UniformCellSizeUI))
+				view->setUniform(that->UniformCellSizeUI, cellSizeUI);
+
+			if (view->hasUniform(that->UniformCellSizeUV))
+				view->setUniform(that->UniformCellSizeUV, cellSizeUV);
+
 			return iterationCallback::iterate;
 		});
 
-		_colorViews->forEach([] (const brogueUIProgramPartId& partId, brogueViewGridCore<brogueColorQuad>* view)
+		_colorViews->forEach([&that, &cellSizeUI, &cellSizeUV] (const brogueUIProgramPartId& partId, brogueViewGridCore<brogueColorQuad>* view)
 		{
 			view->compileCore();
+
+			if (view->hasUniform(that->UniformCellSizeUI))
+				view->setUniform(that->UniformCellSizeUI, cellSizeUI);
+
+			if (view->hasUniform(that->UniformCellSizeUV))
+				view->setUniform(that->UniformCellSizeUV, cellSizeUV);
+
 			return iterationCallback::iterate;
 		});
 
-		_lineViews->forEach([] (const brogueUIProgramPartId& partId, brogueViewPolygonCore* view)
+		_lineViews->forEach([&that, &cellSizeUI, &cellSizeUV] (const brogueUIProgramPartId& partId, brogueViewPolygonCore* view)
 		{
 			view->compileCore();
+
+			if (view->hasUniform(that->UniformCellSizeUI))
+				view->setUniform(that->UniformCellSizeUI, cellSizeUI);
+
+			if (view->hasUniform(that->UniformCellSizeUV))
+				view->setUniform(that->UniformCellSizeUV, cellSizeUV);
+
 			return iterationCallback::iterate;
 		});
 	}
@@ -997,25 +1037,33 @@ namespace brogueHd::frontend
 
 		_cellViews->forEach([] (const brogueUIProgramPartId& partId, brogueViewGridCore<brogueCellQuad>* view)
 		{
-			view->clearUpdate();
+			if (view->needsUpdate())
+				view->clearUpdate();
+
 			return iterationCallback::iterate;
 		});
 
 		_imageViews->forEach([] (const brogueUIProgramPartId& partId, brogueViewGridCore<brogueImageQuad>* view)
 		{
-			view->clearUpdate();
+			if (view->needsUpdate())
+				view->clearUpdate();
+
 			return iterationCallback::iterate;
 		});
 
 		_colorViews->forEach([] (const brogueUIProgramPartId& partId, brogueViewGridCore<brogueColorQuad>* view)
 		{
-			view->clearUpdate();
+			if (view->needsUpdate())
+				view->clearUpdate();
+
 			return iterationCallback::iterate;
 		});
 
 		_lineViews->forEach([] (const brogueUIProgramPartId& partId, brogueViewPolygonCore* view)
 		{
-			view->clearUpdate();
+			if (view->needsUpdate())
+				view->clearUpdate();
+
 			return iterationCallback::iterate;
 		});
 	}

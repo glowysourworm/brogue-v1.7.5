@@ -13,6 +13,7 @@
 #include "simpleGlData.h"
 #include "simpleLine.h"
 #include "simpleList.h"
+#include "simpleOpenGL.h"
 #include "simplePoint.h"
 
 using namespace brogueHd::simple;
@@ -67,6 +68,17 @@ namespace brogueHd::frontend
 		/// Outputs the errors for this program to std::cout
 		/// </summary>
 		void showErrors();
+
+		/// <summary>
+		/// Returns true if the shader program has the specified uniform
+		/// </summary>
+		bool hasUniform(const char* name);
+
+		/// <summary>
+		/// Sets uniform value for the brogueViewCore shader program
+		/// </summary>
+		template<isGLUniform TUniform>
+		void setUniform(const char* name, const TUniform& value);
 
 	public:
 
@@ -204,6 +216,17 @@ namespace brogueHd::frontend
 	void brogueViewPolygonCore::showErrors()
 	{
 		brogueViewCore<brogueLine>::glShowErrors();
+	}
+
+	bool brogueViewPolygonCore::hasUniform(const char* name)
+	{
+		return brogueViewCore<brogueLine>::glHasUniform(name);
+	}
+
+	template<isGLUniform TUniform>
+	void brogueViewPolygonCore::setUniform(const char* name, const TUniform& value)
+	{
+		brogueViewCore<brogueLine>::setUniform(name, value);
 	}
 
 	void brogueViewPolygonCore::run()

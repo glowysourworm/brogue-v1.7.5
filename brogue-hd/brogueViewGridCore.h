@@ -230,6 +230,7 @@ namespace brogueHd::frontend
 
 		brogueCoordinateConverter* _coordinateConverter;
 		brogueUIProgramPartConfiguration* _configuration;
+		brogueUIProgramPartId* _partId;
 		grid<brogueCellDisplay*>* _view;
 		brogueUITagAction* _tagAction;
 		brogueUIData* _uiData;
@@ -278,6 +279,7 @@ namespace brogueHd::frontend
 		delete _uiData;
 		delete _mouseData;
 		delete _tagAction;
+		delete _partId;
 		delete _configuration;
 	}
 
@@ -291,6 +293,8 @@ namespace brogueHd::frontend
 		{
 			elementSize++;
 		});
+
+		// TDOO: FRAME TYPE STREAM!
 
 		// Initialize the GL backend stream
 		brogueViewCore<TStream>::initializeStream(elementSize);

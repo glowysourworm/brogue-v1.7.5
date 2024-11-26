@@ -478,7 +478,7 @@ namespace brogueHd::frontend
 		level->iterateWhereDefined([&program] (int column, int row, brogueCell* cell)
 		{
 			// Stack copy of brogueCellDisplay
-			program->setGameUpdate(column, row, cell->getDisplay());
+			program->setGameUpdate(cell->getDisplay());
 
 			return iterationCallback::iterate;
 		});
@@ -953,7 +953,7 @@ namespace brogueHd::frontend
 			//							 update (to active programs only!)
 			//
 			if (_program->needsUpdate() || gameModeChangeThisIteration)
-				_program->update(keyboardState, mouseState, milliSecondsActual, gameModeChangeThisIteration);
+				_program->update(milliSecondsActual, gameModeChangeThisIteration);
 
 			// Run drawing program
 			_program->run(milliSecondsActual);											// Run() -> Draws the buffers

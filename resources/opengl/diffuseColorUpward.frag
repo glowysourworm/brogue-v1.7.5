@@ -7,10 +7,11 @@
 out vec4 outputColor;
 
 in vec2 currentVertex;
-in vec2 currentTexture;
-in vec4 currentBackgroundColor1;
-in vec4 currentBackgroundColor2;
-in vec4 currentBackgroundColor3;
+in vec2 currentTextureUV;
+in vec2 currentGlyphUV;
+in vec4 currentForegroundColor;
+in vec4 currentBackgroundColor;
+in float currentOutputSelector;
 
 // Try and use a 2D sampler to work with the texture. The active texture should be the 0th texture.
 uniform sampler2D flameTexture;
@@ -21,6 +22,13 @@ uniform float fadePeriodTime;   // [0,1] time ratio for the color fade
 uniform int nextColorNumber;
 uniform int fadePeriodRandom1;   // Random constant integers for the fade period
 uniform int fadePeriodRandom2;
+
+uniform vec4 flameTitleColor1;
+uniform vec4 flameTitleColor2;
+uniform vec4 flameTitleColor3;
+uniform vec4 flameBottomColor1;
+uniform vec4 flameBottomColor2;
+uniform vec4 flameBottomColor3;
 
 int pseudoRandom(int lastRandom)
 {
@@ -112,7 +120,7 @@ void main()
     //                           frame buffer. So, for the title menu, the round-off errors were apparent
     //                           which wasn't easy to fix, until other issues were eliminated.
     //
-    ivec2 locationUI = ivec2(floor(currentTexture.x / cellSizeUV.x), floor(currentTexture.y / cellSizeUV.y));
+    ivec2 locationUI = ivec2(floor(currentTextureUV.x / cellSizeUV.x), floor(currentTextureUV.y / cellSizeUV.y));
 
     // Calculate other adjacent cells in UV -> UI coordinates (careful for inverted y-coordinate)
     //
@@ -120,8 +128,10 @@ void main()
     ivec2 southEastLocationUI = ivec2(locationUI.x + 1, locationUI.y - 1);
     ivec2 southWestLocationUI = ivec2(locationUI.x - 1, locationUI.y - 1);
 
+    bool bottomRow = (currentTextureUV.y - cellSizeUV.y) < 0;
+
     // Heat Source Region
-    if (length(currentBackgroundColor1) > 0)
+    if (length(currentBackgroundColor) > 0)
     {
         /*
             Heat Source Layering:  1, 3, 5, 7 (spatial "frequencies" = numer of "candles" across the bottom)
@@ -160,6 +170,10 @@ void main()
         float bellowSpeed1 = 0.01;          // This is an amplitude bellow based on the period; and will utilize the heat floor.
         float bellowSpeed2 = 0;
         float bellowSpeed3 = 0;
+
+        vec4 currentBackgroundColor1 = bottomRow ? flameBottomColor1 : flameTitleColor1;
+        vec4 currentBackgroundColor2 = bottomRow ? flameBottomColor2 : flameTitleColor2;
+        vec4 currentBackgroundColor3 = bottomRow ? flameBottomColor3 : flameTitleColor3;
 
         vec4 lastBackground1 = nextColor(currentBackgroundColor1, fadePeriodRandom2 * locationUI.x, noiseLow);
         vec4 lastBackground2 = nextColor(currentBackgroundColor2, fadePeriodRandom2 * locationUI.x, noiseMed);

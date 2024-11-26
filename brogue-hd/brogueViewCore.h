@@ -3,6 +3,7 @@
 #include "brogueCellQuad.h"
 #include "brogueColorQuad.h"
 #include "brogueImageQuad.h"
+#include "brogueLine.h"
 #include "brogueUIConstants.h"
 #include "brogueUIProgramPartConfiguration.h"
 #include "brogueUIProgramPartId.h"
@@ -134,7 +135,6 @@ namespace brogueHd::frontend
 		_elements = new simpleArray<TStream>(0);
 
 		_coordinateConverter = coordinateConverter;
-		_dataStreamType = configuration->dataStreamType;
 
 		// Create a placeholder stream. This will be the shared pointer with the simpleShaderProgram.
 		_dataStream = createDataStream(0);
@@ -144,7 +144,7 @@ namespace brogueHd::frontend
 		int vertexBufferIndex = 0;	// GL VBO index is STATIC!
 
 		// (MEMORY!) These are managed by the simple shader program
-		simpleVertexBuffer<float>* programVBO = new simpleVertexBuffer<float>(vertexBufferIndex++, _dataStream, vertexAttributes);
+		simpleVertexBuffer<float>* programVBO = new simpleVertexBuffer<float>(vertexBufferIndex++, _dataStream, vertexShader.getVertexAttributes());
 		simpleVertexArray<float>* programVAO = new simpleVertexArray<float>(this->PrimitiveType, programVBO);
 
 		_program = new simpleShaderProgram(vertexShader, fragmentShader, programVAO);
@@ -158,7 +158,6 @@ namespace brogueHd::frontend
 	template<isGLStream TStream>
 	brogueViewCore<TStream>::~brogueViewCore()
 	{
-		delete _streamBuilder;
 		delete _elements;
 		delete _partId;
 		delete _configuration;
@@ -373,7 +372,7 @@ namespace brogueHd::frontend
 			}
 			case openglDataStreamType::broguePolygon:
 			{
-				broguePolygon element;
+				brogueLine element;
 				return new simpleDataStream(elementCount, element.getElementVertexSize(this->PolygonPrimitiveType), element.getStreamSize(this->PolygonPrimitiveType));
 			}
 			default:
@@ -390,7 +389,7 @@ namespace brogueHd::frontend
 		_elements = new simpleArray<TStream>(elementSize);
 
 		// Create the pre-allocated data stream
-		switch (_dataStreamType)
+		switch (_configuration->dataStreamType)
 		{
 			case openglDataStreamType::brogueImageQuad:
 			{

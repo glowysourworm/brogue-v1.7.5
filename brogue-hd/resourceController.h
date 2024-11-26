@@ -292,7 +292,7 @@ namespace brogueHd::backend
 			new brogueUIProgramPartConfiguration(brogueUIProgramPart::FlameDisplay, 
 												 shaderResource::diffuseColorUpwardVert, 
 												 shaderResource::diffuseColorUpwardFrag, 
-												 openglDataStreamType::brogueFlameQuad, 
+												 openglDataStreamType::brogueCellQuad, 
 												 openglBrogueCellOutputSelector::NoDisplay, 
 												 15,
 												 false,

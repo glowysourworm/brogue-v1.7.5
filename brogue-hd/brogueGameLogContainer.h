@@ -7,7 +7,9 @@
 #include "brogueViewContainer.h"
 #include "gridRect.h"
 #include "simpleException.h"
+#include "simpleKeyboardState.h"
 #include "simpleMath.h"
+#include "simpleMouseState.h"
 #include "simplePeriodCounter.h"
 
 using namespace brogueHd::simple;
@@ -18,15 +20,21 @@ namespace brogueHd::frontend
 	{
 	public:
 
-		brogueGameLogContainer(brogueUIProgram programName, int zoomLevel, bool hasScrollInteraction, bool applyClipping, const gridRect& containerBoundary);
+		brogueGameLogContainer(brogueCoordinateConverter* coordinateConverter,
+								brogueUIProgram programName,
+								int zoomLevel,
+								bool hasScrollInteraction,
+								bool applyClipping,
+								const gridRect& containerBoundary,
+								const gridRect& sceneBoundary);
 		~brogueGameLogContainer();
 
 		virtual void initiateStateChange(brogueUIState fromState, brogueUIState toState) override;
 		virtual void clearStateChange() override;
 		virtual bool checkStateChange() override;
 
-		virtual void checkUpdate(const brogueKeyboardState& keyboardState,
-								 const brogueMouseState& mouseState,
+		virtual void checkUpdate(const simpleKeyboardState& keyboardState,
+								 const simpleMouseState& mouseState,
 								 int millisecondsLapsed) override;
 
 	private:
@@ -41,8 +49,14 @@ namespace brogueHd::frontend
 
 	};
 
-	brogueGameLogContainer::brogueGameLogContainer(brogueUIProgram programName, int zoomLevel, bool hasScrollInteraction, bool applyClipping, const gridRect& containerBoundary)
-		: brogueViewContainer(programName, zoomLevel, hasScrollInteraction, applyClipping, containerBoundary)
+	brogueGameLogContainer::brogueGameLogContainer(brogueCoordinateConverter* coordinateConverter,
+													brogueUIProgram programName,
+													int zoomLevel,
+													bool hasScrollInteraction,
+													bool applyClipping,
+													const gridRect& containerBoundary,
+													const gridRect& sceneBoundary)
+		: brogueViewContainer(coordinateConverter, programName, zoomLevel, hasScrollInteraction, applyClipping, containerBoundary, sceneBoundary)
 	{
 		_animationCounter = new simplePeriodCounter(300);
 		_animating = false;
@@ -67,8 +81,8 @@ namespace brogueHd::frontend
 
 		this->setRenderOffsetUI(0, offsetUI);
 	}
-	void brogueGameLogContainer::checkUpdate(const brogueKeyboardState& keyboardState,
-											 const brogueMouseState& mouseState,
+	void brogueGameLogContainer::checkUpdate(const simpleKeyboardState& keyboardState,
+											 const simpleMouseState& mouseState,
 											 int millisecondsLapsed)
 	{
 		// Check for state animation
