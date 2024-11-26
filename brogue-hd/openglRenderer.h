@@ -16,7 +16,7 @@
 #include "simpleLogger.h"
 #include "simpleException.h"
 #include "gridRect.h"
-#include "brogueProgramContainer.h"
+#include "brogueMainProgram.h"
 #include "brogueUIConstants.h"
 #include "simpleExt.h"
 #include "eventController.h"
@@ -57,7 +57,7 @@ namespace brogueHd::frontend
 		/// <summary>
 		/// Sets the program pointer for use
 		/// </summary>
-		void setProgram(brogueProgramContainer* program, BrogueGameMode gameMode);
+		void setProgram(brogueMainProgram* program, BrogueGameMode gameMode);
 
 		/// <summary>
 		/// Game mode will handle the context switching for the program. So, there is two-way
@@ -138,7 +138,7 @@ namespace brogueHd::frontend
 		int _clickToken;
 		int _hoverToken;
 
-		brogueProgramContainer* _program;
+		brogueMainProgram* _program;
 		simplePeriodCounter* _uiEventDebouncer;
 		brogueUIStateChanger* _uiStateChanger;
 		simpleTimer* _stopwatch;
@@ -419,7 +419,7 @@ namespace brogueHd::frontend
 		// Initialize the viewport
 		glViewport(0, 0, sceneBoundaryUI.width, sceneBoundaryUI.height);
 	}
-	void openglRenderer::setProgram(brogueProgramContainer* program, BrogueGameMode gameMode)
+	void openglRenderer::setProgram(brogueMainProgram* program, BrogueGameMode gameMode)
 	{
 		// (CRITICAL!)  The program pointer is shared. So, this set function is called during 
 		//				initialization, but still before GL is initialized. The thread_start
@@ -472,7 +472,7 @@ namespace brogueHd::frontend
 
 		_threadLock->lock();
 
-		brogueProgramContainer* program = _program;
+		brogueMainProgram* program = _program;
 
 		// Level Rendering
 		level->iterateWhereDefined([&program] (int column, int row, brogueCell* cell)
@@ -583,7 +583,7 @@ namespace brogueHd::frontend
 			keyboard = default_value::value<brogueKeyboardState>();
 
 		else
-			keyboard = _program->getKeyboardState(*brogueHd::frontend::KeyState);
+			keyboard = _program->calculateKeyboardState(*brogueHd::frontend::KeyState);
 
 		_threadLock->unlock();
 
@@ -599,7 +599,7 @@ namespace brogueHd::frontend
 			mouse = default_value::value<brogueMouseState>();
 
 		else
-			mouse = _program->getMouseState(*brogueHd::frontend::MouseState);
+			mouse = _program->calculateMouseState(*brogueHd::frontend::MouseState);
 
 		_threadLock->unlock();
 

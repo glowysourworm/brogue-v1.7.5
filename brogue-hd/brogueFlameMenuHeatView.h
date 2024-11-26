@@ -146,6 +146,12 @@ namespace brogueHd::frontend
 			_fadePeriodRandom1 = _randomGenerator->next() * 10000;
 		}
 
+		// Set Uniforms (where they are defined)
+		setUniform<int>("fadePeriodTime", currentFadePeriod());
+		setUniform<int>("fadePeriodRandom1", currentFadePeriodRandom1());
+		setUniform<int>("fadePeriodRandom2", currentFadePeriodRandom2());
+		setUniform<int>("nextColorNumber", fadePeriodCount() % 3);
+
 		// Mouse Interaction
 		brogueViewGridCore::checkUpdate(keyboardState, mouseState, millisecondsLapsed);
 	}

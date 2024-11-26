@@ -59,14 +59,14 @@ namespace brogueHd::frontend
 		/// </summary>
 		simpleDataStream* getStream() const;
 
-		bool bindUniform1i(const simpleString& name, int uniformValue);
-		bool bindUniform1(const simpleString& name, float uniformValue);
-		bool bindUniform2(const simpleString& name, const vec2& uniformValue);
-		bool bindUniform2i(const simpleString& name, const ivec2& uniformValue);
-		bool bindUniform4(const simpleString& name, const vec4& uniformValue);
+		bool bindUniform1i(const char* name, int uniformValue);
+		bool bindUniform1(const char* name, float uniformValue);
+		bool bindUniform2(const char* name, const vec2& uniformValue);
+		bool bindUniform2i(const char* name, const ivec2& uniformValue);
+		bool bindUniform4(const char* name, const vec4& uniformValue);
 
 		bool bindUniforms();
-		bool hasUniform(const simpleString& name);
+		bool hasUniform(const char* name);
 
 	private:
 
@@ -189,9 +189,9 @@ namespace brogueHd::frontend
 
 		glUseProgram(NULL);
 	}
-	bool simpleShaderProgram::hasUniform(const simpleString& name)
+	bool simpleShaderProgram::hasUniform(const char* name)
 	{
-		return glGetUniformLocation(this->handle, name.c_str()) >= 0;
+		return glGetUniformLocation(this->handle, name) >= 0;
 	}
 	bool simpleShaderProgram::bindUniforms()
 	{
@@ -210,82 +210,82 @@ namespace brogueHd::frontend
 		for (int index = 0; index < _vertexShader.getUniform1iCount(); index++)
 		{
 			simpleUniform<int> uniform = _vertexShader.getUniform1i(index);
-			result &= bindUniform1i(uniform.name, uniform.value);
+			result &= bindUniform1i(uniform.name.c_str(), uniform.value);
 		}
 
 		// Uniform-1 (1f)
 		for (int index = 0; index < _vertexShader.getUniform1Count(); index++)
 		{
 			simpleUniform<float> uniform = _vertexShader.getUniform1(index);
-			result &= bindUniform1(uniform.name, uniform.value);
+			result &= bindUniform1(uniform.name.c_str(), uniform.value);
 		}
 
 		// Uniform-2 (2f)
 		for (int index = 0; index < _vertexShader.getUniform2Count(); index++)
 		{
 			simpleUniform<vec2> uniform = _vertexShader.getUniform2(index);
-			result &= bindUniform2(uniform.name, uniform.value);
+			result &= bindUniform2(uniform.name.c_str(), uniform.value);
 		}
 
 		// Uniform-2i (2i)
 		for (int index = 0; index < _vertexShader.getUniform2iCount(); index++)
 		{
 			simpleUniform<ivec2> uniform = _vertexShader.getUniform2i(index);
-			result &= bindUniform2i(uniform.name, uniform.value);
+			result &= bindUniform2i(uniform.name.c_str(), uniform.value);
 		}
 
 		// Uniform-4 (4f)
 		for (int index = 0; index < _vertexShader.getUniform4Count(); index++)
 		{
 			simpleUniform<vec4> uniform = _vertexShader.getUniform4(index);
-			result &= bindUniform4(uniform.name, uniform.value);
+			result &= bindUniform4(uniform.name.c_str(), uniform.value);
 		}
 
 		// Fragment Shaders:  Uniform 1i
 		for (int index = 0; index < _fragmentShader.getUniform1iCount(); index++)
 		{
 			simpleUniform<int> uniform = _fragmentShader.getUniform1i(index);
-			result &= bindUniform1i(uniform.name, uniform.value);
+			result &= bindUniform1i(uniform.name.c_str(), uniform.value);
 		}
 
 		// Uniform-1 (1f)
 		for (int index = 0; index < _fragmentShader.getUniform1Count(); index++)
 		{
 			simpleUniform<float> uniform = _fragmentShader.getUniform1(index);
-			result &= bindUniform1(uniform.name, uniform.value);
+			result &= bindUniform1(uniform.name.c_str(), uniform.value);
 		}
 
 		// Uniform-2 (2f)
 		for (int index = 0; index < _fragmentShader.getUniform2Count(); index++)
 		{
 			simpleUniform<vec2> uniform = _fragmentShader.getUniform2(index);
-			result &= bindUniform2(uniform.name, uniform.value);
+			result &= bindUniform2(uniform.name.c_str(), uniform.value);
 		}
 
 		// Uniform-2i (2i)
 		for (int index = 0; index < _fragmentShader.getUniform2iCount(); index++)
 		{
 			simpleUniform<ivec2> uniform = _fragmentShader.getUniform2i(index);
-			result &= bindUniform2i(uniform.name, uniform.value);
+			result &= bindUniform2i(uniform.name.c_str(), uniform.value);
 		}
 
 		// Uniform-4 (4f)
 		for (int index = 0; index < _fragmentShader.getUniform4Count(); index++)
 		{
 			simpleUniform<vec4> uniform = _fragmentShader.getUniform4(index);
-			result &= bindUniform4(uniform.name, uniform.value);
+			result &= bindUniform4(uniform.name.c_str(), uniform.value);
 		}
 
 		return result;
 	}
 
-	bool simpleShaderProgram::bindUniform1i(const simpleString& name, int uniformValue)
+	bool simpleShaderProgram::bindUniform1i(const char* name, int uniformValue)
 	{
-		GLint location = glGetUniformLocation(this->handle, name.c_str());
+		GLint location = glGetUniformLocation(this->handle, name);
 
 		if (location < 0)
 		{
-			simpleLogger::logColor(brogueConsoleColor::Blue, "Uniform not found:  Program={} Uniform={}", this->handle, name.c_str());
+			simpleLogger::logColor(brogueConsoleColor::Blue, "Uniform not found:  Program={} Uniform={}", this->handle, name);
 			return false;
 		}
 
@@ -293,14 +293,14 @@ namespace brogueHd::frontend
 
 		return true;
 	}
-	bool simpleShaderProgram::bindUniform1(const simpleString& name, float uniformValue)
+	bool simpleShaderProgram::bindUniform1(const char* name, float uniformValue)
 	{
 
-		GLint location = glGetUniformLocation(this->handle, name.c_str());
+		GLint location = glGetUniformLocation(this->handle, name);
 
 		if (location < 0)
 		{
-			simpleLogger::logColor(brogueConsoleColor::Blue, "Uniform not found:  Program={} Uniform={}", this->handle, name.c_str());
+			simpleLogger::logColor(brogueConsoleColor::Blue, "Uniform not found:  Program={} Uniform={}", this->handle, name);
 			return false;
 		}
 
@@ -308,13 +308,13 @@ namespace brogueHd::frontend
 
 		return true;
 	}
-	bool simpleShaderProgram::bindUniform2(const simpleString& name, const vec2& uniformValue)
+	bool simpleShaderProgram::bindUniform2(const char* name, const vec2& uniformValue)
 	{
-		GLint location = glGetUniformLocation(this->handle, name.c_str());
+		GLint location = glGetUniformLocation(this->handle, name);
 
 		if (location < 0)
 		{
-			simpleLogger::logColor(brogueConsoleColor::Blue, "Uniform not found:  Program={} Uniform={}", this->handle, name.c_str());
+			simpleLogger::logColor(brogueConsoleColor::Blue, "Uniform not found:  Program={} Uniform={}", this->handle, name);
 			return false;
 		}
 
@@ -322,13 +322,13 @@ namespace brogueHd::frontend
 
 		return true;
 	}
-	bool simpleShaderProgram::bindUniform2i(const simpleString& name, const ivec2& uniformValue)
+	bool simpleShaderProgram::bindUniform2i(const char* name, const ivec2& uniformValue)
 	{
-		GLint location = glGetUniformLocation(this->handle, name.c_str());
+		GLint location = glGetUniformLocation(this->handle, name);
 
 		if (location < 0)
 		{
-			simpleLogger::logColor(brogueConsoleColor::Blue, "Uniform not found:  Program={} Uniform={}", this->handle, name.c_str());
+			simpleLogger::logColor(brogueConsoleColor::Blue, "Uniform not found:  Program={} Uniform={}", this->handle, name);
 			return false;
 		}
 
@@ -336,13 +336,13 @@ namespace brogueHd::frontend
 
 		return true;
 	}
-	bool simpleShaderProgram::bindUniform4(const simpleString& name, const vec4& uniformValue)
+	bool simpleShaderProgram::bindUniform4(const char* name, const vec4& uniformValue)
 	{
-		GLint location = glGetUniformLocation(this->handle, name.c_str());
+		GLint location = glGetUniformLocation(this->handle, name);
 
 		if (location < 0)
 		{
-			simpleLogger::logColor(brogueConsoleColor::Blue, "Uniform not found:  Program={} Uniform={}", this->handle, name.c_str());
+			simpleLogger::logColor(brogueConsoleColor::Blue, "Uniform not found:  Program={} Uniform={}", this->handle, name);
 			return false;
 		}
 

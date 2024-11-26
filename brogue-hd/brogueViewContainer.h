@@ -3,6 +3,7 @@
 #include "brogueCellDisplay.h"
 #include "brogueCellQuad.h"
 #include "brogueColorQuad.h"
+#include "brogueCoordinateConverter.h"
 #include "brogueImageQuad.h"
 #include "brogueKeyboardState.h"
 #include "brogueLine.h"
@@ -16,11 +17,15 @@
 #include "brogueViewPolygonCore.h"
 #include "gridLocator.h"
 #include "gridRect.h"
+#include "openglQuadConverter.h"
 #include "simple.h"
 #include "simpleException.h"
 #include "simpleGlData.h"
 #include "simpleHash.h"
+#include "simpleKeyboardState.h"
+#include "simpleLine.h"
 #include "simpleList.h"
+#include "simpleMouseState.h"
 #include "simpleOpenGL.h"
 #include <concepts>
 #include <functional>
@@ -36,7 +41,8 @@ namespace brogueHd::frontend
 	{
 	public:
 
-		brogueViewContainer(brogueUIProgram programName,
+		brogueViewContainer(brogueCoordinateConverter* coordinateConverter,
+							brogueUIProgram programName,
 							int zoomLevel,
 							bool hasScrollInteraction,
 							bool applyClipping,
@@ -46,6 +52,71 @@ namespace brogueHd::frontend
 
 		template<isGLStream TStream>
 		void addView(brogueViewCore<TStream>* view);
+
+		template<isGLUniform TUniform>
+		void setUniform(const char* name, const TUniform& value);
+
+		// Design Problem:  Two different view data streams (polygons v.s. 2D-grid)
+		//
+		void setGridProgram(const brogueUIProgramPartId& partId, const brogueCellDisplay& cell);
+		void setPolygonProgram(const brogueUIProgramPartId& partId, const simpleLine<int>& line);
+
+	public:		// GL Program Control
+
+		virtual void initiateStateChange(brogueUIState fromState, brogueUIState toState);
+		virtual void clearStateChange();
+		virtual bool checkStateChange();
+
+		virtual void checkUpdate(const simpleKeyboardState& keyboardState,
+								 const simpleMouseState& mouseState,
+								 int millisecondsLapsed);
+
+		virtual void invalidate(const simpleKeyboardState& keyboardState,
+								 const simpleMouseState& mouseState);
+
+		bool needsUpdate() const;
+		void clearUpdate();
+		void clearEvents();
+		void update(int millisecondsLapsed, bool forceUpdate);
+
+		void compile();
+		void run();
+		void activate();
+		void deactivate();
+		bool hasErrors();
+		void showErrors();
+
+		bool isActive() const;
+
+		// UI mouse / keyboard mappings
+
+		brogueKeyboardState calculateKeyboardState(const simpleKeyboardState& keyboard);
+		brogueMouseState calculateMouseState(const simpleMouseState& mouse);
+
+	public:		// Public Access Getters
+
+		gridRect getSceneBoundary() const;
+		gridRect getContainerBoundary() const;
+		gridLocator getScrollOffset() const;
+		vec2 getRenderOffsetUI() const;
+		int getZoomLevel() const;
+		bool getClipping() const;
+		brogueUIProgram getProgramName() const;
+
+		/// <summary>
+		/// Returns an additional offset that may be used by the view container. This is not
+		/// the scroll offset or the clip; but is applied additionally to the texture sampler.
+		/// </summary>
+		vec2 getOffsetUV() const;
+		vec4 getClipXY() const;
+		simpleQuad getCellSizeUV() const;
+		vec2 getScrollUV() const;
+
+	protected:
+
+		void setScrollOffset(int column, int row);
+		void setRenderOffsetUI(int pixelX, float pixelY);
+		brogueMouseState getAdjustedMouse(const brogueMouseState& mouseState) const;
 
 	private:	// Needed way to get around template specification
 
@@ -57,58 +128,22 @@ namespace brogueHd::frontend
 		int getViewCount() const;
 
 		template<isGLStream TStream>
-		brogueViewCore<TStream> getView(int index);
-
-		template<isGLStream TStream>
 		int getViewCount();
 
 		gridRect aggregateChildBoundary() const;
-
-	public:
-
-		virtual void initiateStateChange(brogueUIState fromState, brogueUIState toState);
-		virtual void clearStateChange();
-		virtual bool checkStateChange();
-
-		virtual void checkUpdate(const brogueKeyboardState& keyboardState,
-								 const brogueMouseState& mouseState,
-								 int millisecondsLapsed);
-
-		virtual void invalidate(const brogueKeyboardState& keyboardState,
-								 const brogueMouseState& mouseState);
-
-		bool needsUpdate(const brogueUIProgramPartId& partId) const;
-		void clearUpdate(const brogueUIProgramPartId& partId);
-		void clearEvents(const brogueUIProgramPartId& partId);
-
-	public:		// brogueViewBase facade
-
-		gridRect getSceneBoundary() const;
-		gridRect getContainerBoundary() const;
-		gridLocator getScrollOffset() const;
-		vec2 getRenderOffsetUI() const;
-		int getZoomLevel() const;
-		bool getClipping() const;
-		brogueUIProgram getProgramName() const;
-
-	protected:
-
-		void setScrollOffset(int column, int row);
-		void setRenderOffsetUI(int pixelX, float pixelY);
-		brogueMouseState getAdjustedMouse(const brogueMouseState& mouseState) const;
-
-	private:
 
 		/// <summary>
 		/// Returns aggregate child boundary with scroll offset
 		/// </summary>
 		gridRect getChildOffsetBoundary() const;
 
-		void updateScroll(const brogueKeyboardState& keyboardState,
-						  const brogueMouseState& mouseState,
+		void updateScroll(const simpleKeyboardState& keyboardState,
+						  const simpleMouseState& mouseState,
 						  int millisecondsLapsed);
 
 	private:
+
+		brogueCoordinateConverter* _coordinateConverter;
 
 		brogueUIProgram _programName;
 		bool _hasScrollInteraction;
@@ -120,19 +155,23 @@ namespace brogueHd::frontend
 		gridLocator* _scrollOffset;
 		vec2* _renderOffset;											// Hard render offset for shader animation
 
+		bool _active;
+
 		simpleHash<brogueUIProgramPartId, brogueViewGridCore<brogueCellQuad>*>* _cellViews;
 		simpleHash<brogueUIProgramPartId, brogueViewGridCore<brogueColorQuad>*>* _colorViews;
 		simpleHash<brogueUIProgramPartId, brogueViewGridCore<brogueImageQuad>*>* _imageViews;
 		simpleHash<brogueUIProgramPartId, brogueViewPolygonCore*>* _lineViews;
 	};
 
-	brogueViewContainer::brogueViewContainer(brogueUIProgram programName,
+	brogueViewContainer::brogueViewContainer(brogueCoordinateConverter* coordinateConverter,
+											 brogueUIProgram programName,
 											 int zoomLevel,
 											 bool hasScrollInteraction,
 											 bool applyClipping,
 											 const gridRect& containerBoundary,
 											 const gridRect& sceneBoundary)
 	{
+		_coordinateConverter = coordinateConverter;
 		_programName = programName;
 		_zoomLevel = zoomLevel;
 		_mouseData = new brogueUIMouseData();
@@ -147,6 +186,8 @@ namespace brogueHd::frontend
 		_colorViews = new simpleHash<brogueUIProgramPartId, brogueViewGridCore<brogueColorQuad>*>();
 		_imageViews = new simpleHash<brogueUIProgramPartId, brogueViewGridCore<brogueImageQuad>*>();
 		_lineViews = new simpleHash<brogueUIProgramPartId, brogueViewPolygonCore*>();
+
+		_active = false;
 	}
 	brogueViewContainer::~brogueViewContainer()
 	{
@@ -188,6 +229,79 @@ namespace brogueHd::frontend
 		addViewImpl(view);
 	}
 
+	template<isGLUniform TUniform>
+	void brogueViewContainer::setUniform(const char* name, const TUniform& value)
+	{
+		if (!_active)
+			throw simpleException("Must activate program first before calling methods:  brogueViewContainer::setUniform");
+
+		_cellViews->forEach([&name, &value] (const brogueUIProgramPartId& partId, brogueViewGridCore<brogueCellQuad>* view)
+		{
+			if (view->hasUniform(name))
+				view->setUniform(name, value);
+
+			return iterationCallback::iterate;
+		});
+
+		_imageViews->forEach([&name, &value] (const brogueUIProgramPartId& partId, brogueViewGridCore<brogueImageQuad>* view)
+		{
+			if (view->hasUniform(name))
+				view->setUniform(name, value);
+
+			return iterationCallback::iterate;
+		});
+
+		_colorViews->forEach([&name, &value] (const brogueUIProgramPartId& partId, brogueViewGridCore<brogueColorQuad>* view)
+		{
+			if (view->hasUniform(name))
+				view->setUniform(name, value);
+
+			return iterationCallback::iterate;
+		});
+
+		_lineViews->forEach([&name, &value] (const brogueUIProgramPartId& partId, brogueViewPolygonCore* view)
+		{
+			if (view->hasUniform(name))
+				view->setUniform(name, value);
+
+			return iterationCallback::iterate;
+		});
+	}
+
+	void brogueViewContainer::setGridProgram(const brogueUIProgramPartId& partId, const brogueCellDisplay& cell)
+	{
+		if (!_active)
+			throw simpleException("Must activate program first before calling methods:  brogueViewContainer::setGridProgram");
+
+		if (this->getViewCount() == 0)
+			throw simpleException("Must first add views to the brogueViewContainer before accessing data:  brogueViewContainer::setGridProgram");
+
+		if (_cellViews->contains(partId))
+			_cellViews->get(partId)->set(cell);
+
+		else if (_imageViews->contains(partId))
+			_imageViews->get(partId)->set(cell);
+
+		else if (_colorViews->contains(partId))
+			_colorViews->get(partId)->set(cell);
+
+		else
+			throw simpleException("Program part not found:  brogueViewContainer::setGridProgram");
+	}
+	void brogueViewContainer::setPolygonProgram(const brogueUIProgramPartId& partId, const simpleLine<int>& line)
+	{
+		if (!_active)
+			throw simpleException("Must activate program first before calling methods:  brogueViewContainer::setPolygonProgram");
+
+		if (this->getViewCount() == 0)
+			throw simpleException("Must first add views to the brogueViewContainer before accessing data:  brogueViewContainer::setPolygonProgram");
+
+		if (_lineViews->contains(partId))
+			_lineViews->get(partId)->addLine(line);
+		else
+			throw simpleException("Program part not found:  brogueViewContainer::setPolygonProgram");
+	}
+
 	brogueUIProgram brogueViewContainer::getProgramName() const
 	{
 		return _programName;
@@ -211,6 +325,51 @@ namespace brogueHd::frontend
 	int brogueViewContainer::getViewCount() const
 	{
 		return _imageViews->count() + _colorViews->count() + _cellViews->count() + _lineViews->count();
+	}
+
+	simpleQuad brogueViewContainer::getCellSizeUV() const
+	{
+		openglQuadConverter viewConverter = _coordinateConverter->getViewConverter();
+		
+		return viewConverter.createQuadNormalizedUV(0, 0, brogueCellDisplay::CellWidth(_zoomLevel), brogueCellDisplay::CellHeight(_zoomLevel));
+	}
+	vec2 brogueViewContainer::getOffsetUV() const
+	{
+		vec2 offsetUI = getRenderOffsetUI();
+
+		// Points to an inverted y-coordinate
+		vec2 offsetUV = _coordinateConverter->getViewConverter().convertToNormalizedUV(offsetUI.x, offsetUI.y);
+
+		offsetUV.y = 1 - offsetUV.y;
+
+		return offsetUV;
+	}
+	vec2 brogueViewContainer::getScrollUV() const
+	{
+		openglQuadConverter viewConverter = _coordinateConverter->getViewConverter();
+
+		// Scroll Offset (Not quite a simple coordinate transfer. It's also backwards in the y-space)
+		vec2 offsetUI = vec2(_scrollOffset->column * brogueCellDisplay::CellWidth(_zoomLevel),
+							 _scrollOffset->row * brogueCellDisplay::CellHeight(_zoomLevel));
+
+		// Points to an inverted y-coordinate
+		vec2 offsetUV = viewConverter.convertToNormalizedUV(offsetUI.x, offsetUI.y);
+
+		offsetUV.y = 1 - offsetUV.y;
+
+		return offsetUV;
+	}
+	vec4 brogueViewContainer::getClipXY() const
+	{
+		openglQuadConverter viewConverter = _coordinateConverter->getViewConverter();
+
+		// Clipping Boundary
+		//
+		gridRect clip = *_containerBoundary;
+		vec2 topLeft = viewConverter.createQuadNormalizedXY_FromLocator(clip.left(), clip.top()).topLeft;
+		vec2 bottomRight = viewConverter.createQuadNormalizedXY_FromLocator(clip.right(), clip.bottom()).bottomRight;
+
+		return vec4(topLeft.x, topLeft.y, bottomRight.x - topLeft.x, topLeft.y - bottomRight.y);
 	}
 
 	template<isGLStream TStream>
@@ -265,6 +424,27 @@ namespace brogueHd::frontend
 
 		return boundary;
 	}
+	brogueKeyboardState brogueViewContainer::calculateKeyboardState(const simpleKeyboardState& keyboard)
+	{
+		// TODO: Get translator for the key system; and implement hotkeys
+		return brogueKeyboardState(-1, -1);
+	}
+	brogueMouseState brogueViewContainer::calculateMouseState(const simpleMouseState& mouse)
+	{
+		// Translate the UI space -> the brogue / program space and pass down the pipeline
+		//
+		gridRect sceneBoundaryUI = _coordinateConverter->calculateSceneBoundaryUI();
+
+		brogueMouseState mouseStateUI((mouse.getX() / sceneBoundaryUI.width) * _sceneBoundary->width,
+									  (mouse.getY() / sceneBoundaryUI.height) * _sceneBoundary->height,
+									   mouse.getScrolldXPending() != 0, mouse.getScrolldYPending() != 0,
+									   mouse.getScrolldXPending() < 0, mouse.getScrolldYPending() < 0,
+									   mouse.getLeftButton() > 0);
+
+		return mouseStateUI;
+	}
+
+#pragma region public get-access functions
 	gridRect brogueViewContainer::getSceneBoundary() const
 	{
 		return *_sceneBoundary;
@@ -299,11 +479,17 @@ namespace brogueHd::frontend
 	}
 	void brogueViewContainer::setScrollOffset(int column, int row)
 	{
+		if (!_active)
+			throw simpleException("Must activate program first before calling methods:  brogueViewContainer::initialStateChange");
+
 		_scrollOffset->column = column;
 		_scrollOffset->row = row;
 	}
 	void brogueViewContainer::setRenderOffsetUI(int pixelX, float pixelY)
 	{
+		if (!_active)
+			throw simpleException("Must activate program first before calling methods:  brogueViewContainer::initialStateChange");
+
 		_renderOffset->x = pixelX;
 		_renderOffset->y = pixelY;
 	}
@@ -327,8 +513,191 @@ namespace brogueHd::frontend
 	{
 		return _zoomLevel;
 	}
+#pragma endregion
+
+#pragma region GL Program control functions
+	bool brogueViewContainer::isActive() const
+	{
+		return _active;
+	}
+	void brogueViewContainer::compile()
+	{
+		_cellViews->forEach([] (const brogueUIProgramPartId& partId, brogueViewGridCore<brogueCellQuad>* view)
+		{
+			view->compileCore();
+			return iterationCallback::iterate;
+		});
+
+		_imageViews->forEach([] (const brogueUIProgramPartId& partId, brogueViewGridCore<brogueImageQuad>* view)
+		{
+			view->compileCore();
+			return iterationCallback::iterate;
+		});
+
+		_colorViews->forEach([] (const brogueUIProgramPartId& partId, brogueViewGridCore<brogueColorQuad>* view)
+		{
+			view->compileCore();
+			return iterationCallback::iterate;
+		});
+
+		_lineViews->forEach([] (const brogueUIProgramPartId& partId, brogueViewPolygonCore* view)
+		{
+			view->compileCore();
+			return iterationCallback::iterate;
+		});
+	}
+	void brogueViewContainer::run()
+	{
+		if (!_active)
+			throw simpleException("Must activate program first before calling methods:  brogueViewContainer::run");
+
+		_cellViews->forEach([] (const brogueUIProgramPartId& partId, brogueViewGridCore<brogueCellQuad>* view)
+		{
+			view->run();
+			return iterationCallback::iterate;
+		});
+
+		_imageViews->forEach([] (const brogueUIProgramPartId& partId, brogueViewGridCore<brogueImageQuad>* view)
+		{
+			view->run();
+			return iterationCallback::iterate;
+		});
+
+		_colorViews->forEach([] (const brogueUIProgramPartId& partId, brogueViewGridCore<brogueColorQuad>* view)
+		{
+			view->run();
+			return iterationCallback::iterate;
+		});
+
+		_lineViews->forEach([] (const brogueUIProgramPartId& partId, brogueViewPolygonCore* view)
+		{
+			view->run();
+			return iterationCallback::iterate;
+		});
+	}
+	void brogueViewContainer::activate()
+	{
+		_cellViews->forEach([] (const brogueUIProgramPartId& partId, brogueViewGridCore<brogueCellQuad>* view)
+		{
+			view->activate();
+			return iterationCallback::iterate;
+		});
+
+		_imageViews->forEach([] (const brogueUIProgramPartId& partId, brogueViewGridCore<brogueImageQuad>* view)
+		{
+			view->activate();
+			return iterationCallback::iterate;
+		});
+
+		_colorViews->forEach([] (const brogueUIProgramPartId& partId, brogueViewGridCore<brogueColorQuad>* view)
+		{
+			view->activate();
+			return iterationCallback::iterate;
+		});
+
+		_lineViews->forEach([] (const brogueUIProgramPartId& partId, brogueViewPolygonCore* view)
+		{
+			view->activate();
+			return iterationCallback::iterate;
+		});
+
+		_active = true;
+	}
+	void brogueViewContainer::deactivate()
+	{
+		_cellViews->forEach([] (const brogueUIProgramPartId& partId, brogueViewGridCore<brogueCellQuad>* view)
+		{
+			view->deactivate();
+			return iterationCallback::iterate;
+		});
+
+		_imageViews->forEach([] (const brogueUIProgramPartId& partId, brogueViewGridCore<brogueImageQuad>* view)
+		{
+			view->deactivate();
+			return iterationCallback::iterate;
+		});
+
+		_colorViews->forEach([] (const brogueUIProgramPartId& partId, brogueViewGridCore<brogueColorQuad>* view)
+		{
+			view->deactivate();
+			return iterationCallback::iterate;
+		});
+
+		_lineViews->forEach([] (const brogueUIProgramPartId& partId, brogueViewPolygonCore* view)
+		{
+			view->deactivate();
+			return iterationCallback::iterate;
+		});
+
+		_active = false;
+	}
+	bool brogueViewContainer::hasErrors()
+	{
+		if (!_active)
+			throw simpleException("Must activate program first before calling methods:  brogueViewContainer::hasErrors");
+
+		bool result = false;
+
+		_cellViews->forEach([&result] (const brogueUIProgramPartId& partId, brogueViewGridCore<brogueCellQuad>* view)
+		{
+			result |= view->hasErrors();
+			return iterationCallback::iterate;
+		});
+
+		_imageViews->forEach([&result] (const brogueUIProgramPartId& partId, brogueViewGridCore<brogueImageQuad>* view)
+		{
+			result |= view->hasErrors();
+			return iterationCallback::iterate;
+		});
+
+		_colorViews->forEach([&result] (const brogueUIProgramPartId& partId, brogueViewGridCore<brogueColorQuad>* view)
+		{
+			result |= view->hasErrors();
+			return iterationCallback::iterate;
+		});
+
+		_lineViews->forEach([&result] (const brogueUIProgramPartId& partId, brogueViewPolygonCore* view)
+		{
+			result |= view->hasErrors();
+			return iterationCallback::iterate;
+		});
+
+		return result;
+	}
+	void brogueViewContainer::showErrors()
+	{
+		if (!_active)
+			throw simpleException("Must activate program first before calling methods:  brogueViewContainer::showErrors");
+
+		_cellViews->forEach([] (const brogueUIProgramPartId& partId, brogueViewGridCore<brogueCellQuad>* view)
+		{
+			view->showErrors();
+			return iterationCallback::iterate;
+		});
+
+		_imageViews->forEach([] (const brogueUIProgramPartId& partId, brogueViewGridCore<brogueImageQuad>* view)
+		{
+			view->showErrors();
+			return iterationCallback::iterate;
+		});
+
+		_colorViews->forEach([] (const brogueUIProgramPartId& partId, brogueViewGridCore<brogueColorQuad>* view)
+		{
+			view->showErrors();
+			return iterationCallback::iterate;
+		});
+
+		_lineViews->forEach([] (const brogueUIProgramPartId& partId, brogueViewPolygonCore* view)
+		{
+			view->showErrors();
+			return iterationCallback::iterate;
+		});
+	}
 	void brogueViewContainer::initiateStateChange(brogueUIState fromState, brogueUIState toState)
 	{
+		if (!_active)
+			throw simpleException("Must activate program first before calling methods:  brogueViewContainer::initialStateChange");
+
 		_cellViews->forEach([&fromState, &toState] (const brogueUIProgramPartId& partId, brogueViewGridCore<brogueCellQuad>* view)
 		{
 			view->initiateStateChange(fromState, toState);
@@ -355,6 +724,9 @@ namespace brogueHd::frontend
 	}
 	void brogueViewContainer::clearStateChange()
 	{
+		if (!_active)
+			throw simpleException("Must activate program first before calling methods:  brogueViewContainer::initialStateChange");
+
 		_cellViews->forEach([] (const brogueUIProgramPartId& partId, brogueViewGridCore<brogueCellQuad>* view)
 		{
 			view->clearStateChange();
@@ -381,6 +753,9 @@ namespace brogueHd::frontend
 	}
 	bool brogueViewContainer::checkStateChange()
 	{
+		if (!_active)
+			throw simpleException("Must activate program first before calling methods:  brogueViewContainer::initialStateChange");
+
 		bool result = false;
 
 		result |= _cellViews->any([] (const brogueUIProgramPartId& partId, brogueViewGridCore<brogueCellQuad>* view)
@@ -405,10 +780,13 @@ namespace brogueHd::frontend
 
 		return result;
 	}
-	void brogueViewContainer::updateScroll(const brogueKeyboardState& keyboardState,
-										   const brogueMouseState& mouseState,
+	void brogueViewContainer::updateScroll(const simpleKeyboardState& keyboardState,
+										   const simpleMouseState& mouseState,
 										   int millisecondsLapsed)
 	{
+		if (!_active)
+			throw simpleException("Must activate program first before calling methods:  brogueViewContainer::initialStateChange");
+
 		if (!_hasScrollInteraction)
 			return;
 
@@ -422,6 +800,9 @@ namespace brogueHd::frontend
 							mouse position.
 		*/
 
+		brogueKeyboardState keyboardStateUI = calculateKeyboardState(keyboardState);
+		brogueMouseState mouseStateUI = calculateMouseState(mouseState);
+
 		// Aggregate child boundary
 		gridRect childBoundary = this->getChildOffsetBoundary();
 		gridRect boundary = this->getContainerBoundary();
@@ -432,9 +813,9 @@ namespace brogueHd::frontend
 		boundary.translate(_renderOffset->x / brogueCellDisplay::CellWidth(_zoomLevel), 
 						   _renderOffset->y / brogueCellDisplay::CellHeight(_zoomLevel));
 
-		bool mouseOver = this->getContainerBoundary().contains(mouseState.getLocation());
-		bool mousePressed = mouseState.getMouseLeft();
-		bool scrollEvent = mouseState.getScrollPendingX() || mouseState.getScrollPendingY();
+		bool mouseOver = this->getContainerBoundary().contains(mouseStateUI.getLocation());
+		bool mousePressed = mouseStateUI.getMouseLeft();
+		bool scrollEvent = mouseStateUI.getScrollPendingX() || mouseStateUI.getScrollPendingY();
 
 		if (!mouseOver || !scrollEvent)
 			return;
@@ -446,22 +827,22 @@ namespace brogueHd::frontend
 		// Parent View -> Mouse Over -> Scroll
 		if (_hasScrollInteraction && mouseOver && scrollEvent)
 		{
-			if (mouseState.getScrollPendingX())
+			if (mouseStateUI.getScrollPendingX())
 			{
-				if (!mouseState.getScrollNegativeX() && childBoundary.left() < _containerBoundary->left())
+				if (!mouseStateUI.getScrollNegativeX() && childBoundary.left() < _containerBoundary->left())
 					scrollX = 1;
 
-				else if (mouseState.getScrollNegativeX() && childBoundary.right() > _containerBoundary->right())
+				else if (mouseStateUI.getScrollNegativeX() && childBoundary.right() > _containerBoundary->right())
 					scrollX = -1;
 			}
-			if (mouseState.getScrollPendingY())
+			if (mouseStateUI.getScrollPendingY())
 			{
 				// Up
-				if (mouseState.getScrollNegativeY() && childBoundary.bottom() > _containerBoundary->bottom())
+				if (mouseStateUI.getScrollNegativeY() && childBoundary.bottom() > _containerBoundary->bottom())
 					scrollY = -1;
 
 				// Down
-				else if (!mouseState.getScrollNegativeY() && childBoundary.top() < _containerBoundary->top())
+				else if (!mouseStateUI.getScrollNegativeY() && childBoundary.top() < _containerBoundary->top())
 					scrollY = 1;
 			}
 		}
@@ -469,20 +850,26 @@ namespace brogueHd::frontend
 		_scrollOffset->row += scrollY;
 		_scrollOffset->column += scrollX;
 	}
-	void brogueViewContainer::checkUpdate(const brogueKeyboardState& keyboardState,
-										  const brogueMouseState& mouseState,
+	void brogueViewContainer::checkUpdate(const simpleKeyboardState& keyboardState,
+										  const simpleMouseState& mouseState,
 										  int millisecondsLapsed)
 	{
 		if (this->getViewCount() == 0)
 			throw simpleException("Must first add views to the brogueViewContainer before accessing data:  brogueViewContainer::checkUpdate");
 
+		if (!_active)
+			throw simpleException("Must activate program first before calling methods:  brogueViewContainer::initialStateChange");
+
+		brogueKeyboardState keyboardStateUI = calculateKeyboardState(keyboardState);
+		brogueMouseState mouseStateUI = calculateMouseState(mouseState);
+
 		// The view container must track mouse events for specific UI invalidation (and perhaps later,
 		// click and drag events)
 		//
-		bool containerMouseOver = this->getContainerBoundary().contains(mouseState.getLocation());
+		bool containerMouseOver = this->getContainerBoundary().contains(mouseStateUI.getLocation());
 
 		// Update View Container:  Keeps track of its own mouse events
-		_mouseData->setUpdate(mouseState.getMouseLeft(), containerMouseOver);
+		_mouseData->setUpdate(mouseStateUI.getMouseLeft(), containerMouseOver);
 
 		// The view container must apply clipping container to the part to avoid unwanted behavior.
 		//
@@ -507,52 +894,189 @@ namespace brogueHd::frontend
 
 		// Apply mouse transform to the mouse state for the child views (utilizes scrolling and render offsets)
 		//
-		brogueMouseState adjustedMouse = getAdjustedMouse(mouseState);
+		brogueMouseState adjustedMouse = getAdjustedMouse(mouseStateUI);
 
-		_views->forEach([&keyboardState, &adjustedMouse, &millisecondsLapsed] (const brogueUIProgramPartId& partId, brogueViewBase* view)
+		_cellViews->forEach([&keyboardStateUI, &adjustedMouse, &millisecondsLapsed] (const brogueUIProgramPartId& partId, brogueViewGridCore<brogueCellQuad>* view)
 		{
-			view->checkUpdate(keyboardState, adjustedMouse, millisecondsLapsed);
-
+			view->checkUpdate(keyboardStateUI, adjustedMouse, millisecondsLapsed);
 			return iterationCallback::iterate;
-		});		
-	}
-	void brogueViewContainer::invalidate(const brogueKeyboardState& keyboardState,
-										 const brogueMouseState& mouseState)
-	{
-		// Apply mouse transform to the mouse state for the child views (utilizes scrolling and render offsets)
-		//
-		brogueMouseState adjustedMouse = getAdjustedMouse(mouseState);
+		});
 
-		_views->forEach([&keyboardState, &adjustedMouse] (const brogueUIProgramPartId& partId, brogueViewBase* view)
+		_imageViews->forEach([&keyboardStateUI, &adjustedMouse, &millisecondsLapsed] (const brogueUIProgramPartId& partId, brogueViewGridCore<brogueImageQuad>* view)
 		{
-			view->invalidate(keyboardState, adjustedMouse);
+			view->checkUpdate(keyboardStateUI, adjustedMouse, millisecondsLapsed);
+			return iterationCallback::iterate;
+		});
 
+		_colorViews->forEach([&keyboardStateUI, &adjustedMouse, &millisecondsLapsed] (const brogueUIProgramPartId& partId, brogueViewGridCore<brogueColorQuad>* view)
+		{
+			view->checkUpdate(keyboardStateUI, adjustedMouse, millisecondsLapsed);
+			return iterationCallback::iterate;
+		});
+
+		_lineViews->forEach([&keyboardStateUI, &adjustedMouse, &millisecondsLapsed] (const brogueUIProgramPartId& partId, brogueViewPolygonCore* view)
+		{
+			view->checkUpdate(keyboardStateUI, adjustedMouse, millisecondsLapsed);
 			return iterationCallback::iterate;
 		});
 	}
-	bool brogueViewContainer::needsUpdate(const brogueUIProgramPartId& partId) const
+	void brogueViewContainer::invalidate(const simpleKeyboardState& keyboardState,
+										 const simpleMouseState& mouseState)
 	{
-		if (_views->count() == 0)
-			throw simpleException("Must first add views to the brogueViewContainer before accessing data:  brogueViewContainer::needsUpdate");
+		if (!_active)
+			throw simpleException("Must activate program first before calling methods:  brogueViewContainer::initialStateChange");
 
-		return _views->get(partId)->needsUpdate();
+		brogueKeyboardState keyboardStateUI = calculateKeyboardState(keyboardState);
+		brogueMouseState mouseStateUI = calculateMouseState(mouseState);
+
+		// Apply mouse transform to the mouse state for the child views (utilizes scrolling and render offsets)
+		//
+		brogueMouseState adjustedMouse = getAdjustedMouse(mouseStateUI);
+
+		_cellViews->forEach([&keyboardStateUI, &adjustedMouse] (const brogueUIProgramPartId& partId, brogueViewGridCore<brogueCellQuad>* view)
+		{
+			view->invalidate(keyboardStateUI, adjustedMouse);
+			return iterationCallback::iterate;
+		});
+
+		_imageViews->forEach([&keyboardStateUI, &adjustedMouse] (const brogueUIProgramPartId& partId, brogueViewGridCore<brogueImageQuad>* view)
+		{
+			view->invalidate(keyboardStateUI, adjustedMouse);
+			return iterationCallback::iterate;
+		});
+
+		_colorViews->forEach([&keyboardStateUI, &adjustedMouse] (const brogueUIProgramPartId& partId, brogueViewGridCore<brogueColorQuad>* view)
+		{
+			view->invalidate(keyboardStateUI, adjustedMouse);
+			return iterationCallback::iterate;
+		});
+
+		_lineViews->forEach([&keyboardStateUI, &adjustedMouse] (const brogueUIProgramPartId& partId, brogueViewPolygonCore* view)
+		{
+			view->invalidate(keyboardStateUI, adjustedMouse);
+			return iterationCallback::iterate;
+		});
 	}
-	void brogueViewContainer::clearUpdate(const brogueUIProgramPartId& partId)
+	bool brogueViewContainer::needsUpdate() const
 	{
-		if (_views->count() == 0)
-			throw simpleException("Must first add views to the brogueViewContainer before accessing data:  brogueViewContainer::clearUpdate");
+		if (!_active)
+			throw simpleException("Must activate program first before calling methods:  brogueViewContainer::needsUpdate");
 
-		_views->get(partId)->clearUpdate();
+		bool result = false;
+
+		_cellViews->forEach([&result] (const brogueUIProgramPartId& partId, brogueViewGridCore<brogueCellQuad>* view)
+		{
+			result |= view->needsUpdate();
+			return iterationCallback::iterate;
+		});
+
+		_imageViews->forEach([&result] (const brogueUIProgramPartId& partId, brogueViewGridCore<brogueImageQuad>* view)
+		{
+			result |= view->needsUpdate();
+			return iterationCallback::iterate;
+		});
+
+		_colorViews->forEach([&result] (const brogueUIProgramPartId& partId, brogueViewGridCore<brogueColorQuad>* view)
+		{
+			result |= view->needsUpdate();
+			return iterationCallback::iterate;
+		});
+
+		_lineViews->forEach([&result] (const brogueUIProgramPartId& partId, brogueViewPolygonCore* view)
+		{
+			result |= view->needsUpdate();
+			return iterationCallback::iterate;
+		});
+
+		return result;
 	}
-	void brogueViewContainer::clearEvents(const brogueUIProgramPartId& partId)
+	void brogueViewContainer::clearUpdate()
 	{
-		if (_views->count() == 0)
-			throw simpleException("Must first add views to the brogueViewContainer before accessing data:  brogueViewContainer::clearEvents");
+		if (!_active)
+			throw simpleException("Must activate program first before calling methods:  brogueViewContainer::clearUpdate");
 
-		// Container mouse data
-		_mouseData->clear();
+		_cellViews->forEach([] (const brogueUIProgramPartId& partId, brogueViewGridCore<brogueCellQuad>* view)
+		{
+			view->clearUpdate();
+			return iterationCallback::iterate;
+		});
 
-		// Child View mouse data
-		_views->get(partId)->clearEvents();
+		_imageViews->forEach([] (const brogueUIProgramPartId& partId, brogueViewGridCore<brogueImageQuad>* view)
+		{
+			view->clearUpdate();
+			return iterationCallback::iterate;
+		});
+
+		_colorViews->forEach([] (const brogueUIProgramPartId& partId, brogueViewGridCore<brogueColorQuad>* view)
+		{
+			view->clearUpdate();
+			return iterationCallback::iterate;
+		});
+
+		_lineViews->forEach([] (const brogueUIProgramPartId& partId, brogueViewPolygonCore* view)
+		{
+			view->clearUpdate();
+			return iterationCallback::iterate;
+		});
 	}
+	void brogueViewContainer::clearEvents()
+	{
+		if (!_active)
+			throw simpleException("Must activate program first before calling methods:  brogueViewContainer::clearEvents");
+
+		_cellViews->forEach([] (const brogueUIProgramPartId& partId, brogueViewGridCore<brogueCellQuad>* view)
+		{
+			view->clearEvents();
+			return iterationCallback::iterate;
+		});
+
+		_imageViews->forEach([] (const brogueUIProgramPartId& partId, brogueViewGridCore<brogueImageQuad>* view)
+		{
+			view->clearEvents();
+			return iterationCallback::iterate;
+		});
+
+		_colorViews->forEach([] (const brogueUIProgramPartId& partId, brogueViewGridCore<brogueColorQuad>* view)
+		{
+			view->clearEvents();
+			return iterationCallback::iterate;
+		});
+
+		_lineViews->forEach([] (const brogueUIProgramPartId& partId, brogueViewPolygonCore* view)
+		{
+			view->clearEvents();
+			return iterationCallback::iterate;
+		});
+	}
+	void brogueViewContainer::update(int millisecondsLapsed, bool forceUpdate)
+	{
+		if (!_active)
+			throw simpleException("Must activate program first before calling methods:  brogueViewContainer::initialStateChange");
+
+		_cellViews->forEach([&millisecondsLapsed, &forceUpdate] (const brogueUIProgramPartId& partId, brogueViewGridCore<brogueCellQuad>* view)
+		{
+			view->update(millisecondsLapsed, forceUpdate);
+			return iterationCallback::iterate;
+		});
+
+		_imageViews->forEach([&millisecondsLapsed, &forceUpdate] (const brogueUIProgramPartId& partId, brogueViewGridCore<brogueImageQuad>* view)
+		{
+			view->update(millisecondsLapsed, forceUpdate);
+			return iterationCallback::iterate;
+		});
+
+		_colorViews->forEach([&millisecondsLapsed, &forceUpdate] (const brogueUIProgramPartId& partId, brogueViewGridCore<brogueColorQuad>* view)
+		{
+			view->update(millisecondsLapsed, forceUpdate);
+			return iterationCallback::iterate;
+		});
+
+		_lineViews->forEach([&millisecondsLapsed, &forceUpdate] (const brogueUIProgramPartId& partId, brogueViewPolygonCore* view)
+		{
+			view->update(millisecondsLapsed, forceUpdate);
+			return iterationCallback::iterate;
+		});
+	}
+
+#pragma endregion
 }

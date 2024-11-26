@@ -196,7 +196,6 @@
     <ClInclude Include="brogueMainProgram.h" />
     <ClInclude Include="brogueMouseState.h" />
     <ClInclude Include="brogueProgramBuilder.h" />
-    <ClInclude Include="brogueProgramContainer.h" />
     <ClInclude Include="brogueGameTemplate.h" />
     <ClInclude Include="brogueScrollView.h" />
     <ClInclude Include="brogueTitleGrid.h" />

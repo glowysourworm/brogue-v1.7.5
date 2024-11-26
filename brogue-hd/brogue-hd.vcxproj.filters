@@ -575,9 +575,6 @@
     <ClInclude Include="brogueViewProgram.h">
       <Filter>Header Files\frontend\opengl\program</Filter>
     </ClInclude>
-    <ClInclude Include="brogueProgramContainer.h">
-      <Filter>Header Files\frontend\opengl\program</Filter>
-    </ClInclude>
     <ClInclude Include="brogueTextView.h">
       <Filter>Header Files\frontend\ui</Filter>
     </ClInclude>

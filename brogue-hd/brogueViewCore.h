@@ -71,6 +71,7 @@ namespace brogueHd::frontend
 		static constexpr GLenum PrimitiveType = GL_TRIANGLES;
 		static constexpr GLenum PolygonPrimitiveType = GL_LINES;
 
+		bool glHasUniform(const char* name) const;
 		bool glHasErrors() const;
 		void glShowErrors() const;
 		void glShowActives() const;
@@ -81,15 +82,15 @@ namespace brogueHd::frontend
 		void glDraw() const;
 
 		template<isGLUniform TUniform>
-		void setUniform(const simpleString& name, TUniform value);
+		void setUniform(const char* name, const TUniform& value);
 
 	private:
 
-		void setUniform(const simpleString& name, float value);
-		void setUniform(const simpleString& name, int value);
-		void setUniform(const simpleString& name, vec2 value);
-		void setUniform(const simpleString& name, ivec2 value);
-		void setUniform(const simpleString& name, vec4 value);
+		void setUniform(const char* name, const float& value);
+		void setUniform(const char* name, const int& value);
+		void setUniform(const char* name, const vec2& value);
+		void setUniform(const char* name, const ivec2& value);
+		void setUniform(const char* name, const vec4& value);
 
 		simpleDataStream* createDataStream(int elementCount);
 
@@ -206,6 +207,12 @@ namespace brogueHd::frontend
 	}
 
 	template<isGLStream TStream>
+	bool brogueViewCore<TStream>::glHasUniform(const char* name) const
+	{
+		return _program->hasUniform(name);
+	}
+
+	template<isGLStream TStream>
 	bool brogueViewCore<TStream>::glHasErrors() const
 	{
 		return _program->hasErrors();
@@ -244,43 +251,102 @@ namespace brogueHd::frontend
 	template<isGLStream TStream>
 	void brogueViewCore<TStream>::glDraw() const
 	{
+		// Check period counter
+		//if (!_programCounters->get(partId)->update(millisecondsElapsed))
+		//	continue;
+
+		if (_configuration->useAlphaBlending)
+		{
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		}
+
 		_program->bind();
 		_program->draw();
+
+		//if (program->hasUniform("fadePeriodTime") && partId.getName() == brogueUIProgram::FlameMenuProgram)
+		//	program->bindUniform1("fadePeriodTime", ((brogueFlameMenuHeatView*)view)->currentFadePeriod());
+
+		//if (program->hasUniform("fadePeriodRandom1") && partId.getName() == brogueUIProgram::FlameMenuProgram)
+		//	program->bindUniform1i("fadePeriodRandom1", ((brogueFlameMenuHeatView*)view)->currentFadePeriodRandom1());
+
+		//if (program->hasUniform("fadePeriodRandom2") && partId.getName() == brogueUIProgram::FlameMenuProgram)
+		//	program->bindUniform1i("fadePeriodRandom2", ((brogueFlameMenuHeatView*)view)->currentFadePeriodRandom2());
+
+		//if (program->hasUniform("nextColorNumber") && partId.getName() == brogueUIProgram::FlameMenuProgram)
+		//	program->bindUniform1i("nextColorNumber", ((brogueFlameMenuHeatView*)view)->fadePeriodCount() % 3);
+
+		if (_configuration->useAlphaBlending)
+			glDisable(GL_BLEND);
+
+		glFlush();
+		glFinish();
+
+		// Lookup NVIDIA bug:  glNamedCopyBufferSubData
+		//
+		//if (partId.getPartName() == brogueUIProgramPart::FlameDisplay)
+		//{
+			//// Buffer copy the elements back into the heat source buffer; and let the next draw pass
+			//// render them
+			////
+			//brogueUIProgramPartId diffuseId(brogueUIProgram::FlameMenuProgram, brogueUIProgramPart::FlameMenuProgram_HeatDiffuseProgram, 0);
+			//brogueViewBase* diffuseView = _viewContainer->getView(diffuseId);
+			//simpleShaderProgram* diffuseProgram = _programs->get(diffuseId);
+			//gridRect boundary = view->getBoundary();
+
+			//gridLocator fromStart(0, boundary.bottom());
+			//gridLocator fromEnd(boundary.right(), boundary.bottom());
+			//gridLocator toStart(0, boundary.bottom() - 1);
+			//gridLocator toEnd(boundary.right(), boundary.bottom() - 1);
+
+			//int fromStreamStart = 0;
+			//int fromStreamEnd = 0;
+			//int toStreamStart = 0;
+			//int toStreamEnd = 0;
+
+			//program->showActives();
+
+			//// These must match (anyway). This is a POC for the stream copy (on the GPU)
+			//_programBuilder->calculateStreamRange(view, view, *configuration, fromStart, fromEnd, false, fromStreamStart, fromStreamEnd);
+			//_programBuilder->calculateStreamRange(view, view, *configuration, toStart, toEnd, false, toStreamStart, toStreamEnd);
+			//
+			//glNamedCopyBufferSubDataEXT(program->getHandle(), program->getHandle(), fromStreamStart, toStreamStart, toStreamEnd - toStreamStart);
+		//}
 	}
 
 	template<isGLStream TStream>
 	template<isGLUniform TUniform>
-	void brogueViewCore<TStream>::setUniform(const simpleString& name, TUniform value)
+	void brogueViewCore<TStream>::setUniform(const char* name, const TUniform& value)
 	{
 		setUniform(name, value);
 	}
 
 	template<isGLStream TStream>
-	void brogueViewCore<TStream>::setUniform(const simpleString& name, float value)
+	void brogueViewCore<TStream>::setUniform(const char* name, const float& value)
 	{
 		_program->bindUniform1(name, value);
 	}
 
 	template<isGLStream TStream>
-	void brogueViewCore<TStream>::setUniform(const simpleString& name, int value)
+	void brogueViewCore<TStream>::setUniform(const char* name, const int& value)
 	{
 		_program->bindUniform1i(name, value);
 	}
 
 	template<isGLStream TStream>
-	void brogueViewCore<TStream>::setUniform(const simpleString& name, vec2 value)
+	void brogueViewCore<TStream>::setUniform(const char* name, const vec2& value)
 	{
 		_program->bindUniform2(name, value);
 	}
 
 	template<isGLStream TStream>
-	void brogueViewCore<TStream>::setUniform(const simpleString& name, ivec2 value)
+	void brogueViewCore<TStream>::setUniform(const char* name, const ivec2& value)
 	{
 		_program->bindUniform2i(name, value);
 	}
 
 	template<isGLStream TStream>
-	void brogueViewCore<TStream>::setUniform(const simpleString& name, vec4 value)
+	void brogueViewCore<TStream>::setUniform(const char* name, const vec4& value)
 	{
 		_program->bindUniform4(name, value);
 	}

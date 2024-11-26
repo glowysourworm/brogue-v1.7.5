@@ -5,7 +5,7 @@
 #include "brogueKeyboardState.h"
 #include "brogueLevel.h"
 #include "brogueMouseState.h"
-#include "brogueProgramContainer.h"
+#include "brogueMainProgram.h"
 #include "brogueUIBuilder.h"
 #include "brogueUIConstants.h"
 #include "brogueViewContainer.h"
@@ -50,7 +50,7 @@ namespace brogueHd::backend
 
 	private:
 
-		brogueProgramContainer* _programContainer;
+		brogueMainProgram* _mainProgram;
 		brogueUIBuilder* _uiBuilder;
 		randomGenerator* _randomGenerator;
 		eventController* _eventController;
@@ -112,21 +112,21 @@ namespace brogueHd::backend
 		viewList.add(flavorTextPanel);
 		viewList.add(bottomMenuBar);
 
-		gridRect sceneBoundaryUI = flameView->calculateSceneBoundaryUI();
+		gridRect sceneBoundaryUI = _uiBuilder->getBrogueSceneBoundaryUI();
 
-		_programContainer = new brogueProgramContainer(_uiBuilder, resourceController, eventController, _glyphMap, sceneBoundaryUI, zoomLevel, viewList);
+		_mainProgram = new brogueMainProgram(_uiBuilder, resourceController, eventController, _glyphMap, sceneBoundaryUI, zoomLevel, viewList);
 	}
 	renderingController::~renderingController()
 	{
 		delete _openglRenderer;
 		delete _glyphMap;
-		delete _programContainer;
+		delete _mainProgram;
 		delete _uiBuilder;
 	}
 
 	void renderingController::initialize()
 	{
-		_openglRenderer->setProgram(_programContainer, BrogueGameMode::Title);
+		_openglRenderer->setProgram(_mainProgram, BrogueGameMode::Title);
 		_openglRenderer->startProgram();
 	}
 	brogueKeyboardState renderingController::getKeyboardState() const

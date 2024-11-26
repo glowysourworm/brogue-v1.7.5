@@ -29,6 +29,8 @@ namespace brogueHd::frontend
 		}
 		~brogueCoordinateConverter();
 
+		gridRect calculateSceneBoundaryUI() const;
+
 	protected:
 
 		brogueImageQuad createBrogueImageQuadFrame();
@@ -76,6 +78,10 @@ namespace brogueHd::frontend
 	brogueCoordinateConverter::~brogueCoordinateConverter()
 	{
 		delete _glyphMap;
+	}
+	gridRect brogueCoordinateConverter::calculateSceneBoundaryUI() const
+	{
+		return gridRect(0, 0, _viewConverter.getViewWidth(), _viewConverter.getViewHeight());
 	}
 	brogueImageQuad brogueCoordinateConverter::createBrogueImageQuadFrame()
 	{

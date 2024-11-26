@@ -37,6 +37,36 @@ namespace brogueHd::frontend
 		/// methods on the view's grid data to set up the view before calling this function.
 		/// </summary>
 		void initializeCore();
+		
+		/// <summary>
+		/// Compiles the GL shader program and output status. This should be done after initializeCore is run.
+		/// </summary>
+		void compileCore();
+
+		/// <summary>
+		/// Sets the program core active (calls GL bind)
+		/// </summary>
+		void activate();
+
+		/// <summary>
+		/// Sets the program inactive (calls GL bind = 0)
+		/// </summary>
+		void deactivate();
+
+		/// <summary>
+		/// Calls the primary draw method (glDraw in brogueViewCore)
+		/// </summary>
+		void run();
+
+		/// <summary>
+		/// Returns true if the GL backend for this program has errors
+		/// </summary>
+		bool hasErrors();
+
+		/// <summary>
+		/// Outputs the errors for this program to std::cout
+		/// </summary>
+		void showErrors();
 
 	public:
 
@@ -104,7 +134,7 @@ namespace brogueHd::frontend
 												 resourceController* resourceController,
 												 const brogueUIProgramPartId& partId,
 												 const brogueUIData& uiData)
-		: brogueViewCore(resourceController, partId)
+		: brogueViewCore(resourceController, partId, uiData.getParentBoundary(), uiData.getBoundary())
 	{
 		_coordinateConverter = coordinateConverter;
 		_eventController = eventController;
@@ -145,6 +175,40 @@ namespace brogueHd::frontend
 
 		// Complete the buffer; and put it online
 		brogueViewCore<brogueLine>::createStream();
+
+		// Compile the GL program
+		brogueViewCore<brogueLine>::glInitialize();
+	}
+
+	void brogueViewPolygonCore::compileCore()
+	{
+		// Compile the GL program
+		brogueViewPolygonCore::glInitialize();
+	}
+
+	void brogueViewPolygonCore::activate()
+	{
+		brogueViewCore<brogueLine>::glActivate();
+	}
+
+	void brogueViewPolygonCore::deactivate()
+	{
+		brogueViewCore<brogueLine>::glDeactivate();
+	}
+
+	bool brogueViewPolygonCore::hasErrors()
+	{
+		return brogueViewCore<brogueLine>::glHasErrors();
+	}
+
+	void brogueViewPolygonCore::showErrors()
+	{
+		brogueViewCore<brogueLine>::glShowErrors();
+	}
+
+	void brogueViewPolygonCore::run()
+	{
+		brogueViewCore<brogueLine>::glDraw();
 	}
 
 	void brogueViewPolygonCore::addLine(const simpleLine<int>& line)

@@ -1,6 +1,8 @@
 #pragma once
 #include "brogueBackground.h"
 #include "brogueCellDisplay.h"
+#include "brogueCellQuad.h"
+#include "brogueFlameMenuHeatView.h"
 #include "brogueGlobal.h"
 #include "brogueGlyphMap.h"
 #include "brogueKeyboardState.h"
@@ -42,12 +44,12 @@ namespace brogueHd::frontend
 	public:
 
 		brogueMainProgram(brogueUIBuilder* uiBuilder,
-							resourceController* resourceController,
-							eventController* eventController,
-							brogueGlyphMap* glyphMap,
-							const gridRect& sceneBoundaryUI,
-							int zoomLevel,
-							const simpleList<brogueViewContainer*>& viewList);
+					      resourceController* resourceController,
+						  eventController* eventController,
+						  brogueGlyphMap* glyphMap,
+						  const gridRect& sceneBoundaryUI,
+						  int zoomLevel,
+						  const simpleList<brogueViewContainer*>& viewList);
 		~brogueMainProgram();
 
 		brogueKeyboardState calculateKeyboardState(const simpleKeyboardState& keyboard);
@@ -69,10 +71,7 @@ namespace brogueHd::frontend
 		bool needsUpdate();
 		void clearUpdate();
 		void clearEvents();
-		void update(const simpleKeyboardState& keyboardState,
-					const simpleMouseState& mouseState,
-					int millisecondsLapsed,
-					bool forceUpdate);
+		void update(int millisecondsLapsed, bool forceUpdate);
 
 		void initialize();
 		void run(int millisecondsElapsed);
@@ -85,7 +84,7 @@ namespace brogueHd::frontend
 		/// <summary>
 		/// Primary game data update (see program container)
 		/// </summary>
-		void setGameUpdate(int column, int row, const brogueCellDisplay& data);
+		void setGameUpdate(const brogueCellDisplay& data);
 		
 	private:
 
@@ -97,8 +96,7 @@ namespace brogueHd::frontend
 		resourceController* _resourceController;
 		brogueGlyphMap* _glyphMap;
 
-		simpleList<brogueViewContainer*>* _uiViews;
-		simpleHash<brogueUIProgram, brogueViewProgram*>* _uiPrograms;
+		simpleHash<brogueUIProgram, brogueViewContainer*>* _uiPrograms;
 
 		simpleShaderProgram* _frameProgram;
 
@@ -126,8 +124,7 @@ namespace brogueHd::frontend
 										 int zoomLevel,
 										 const simpleList<brogueViewContainer*>& viewList)
 	{
-		_uiPrograms = new simpleHash<brogueUIProgram, brogueViewProgram*>();
-		_uiViews = new simpleList<brogueViewContainer*>(viewList);
+		_uiPrograms = new simpleHash<brogueUIProgram, brogueViewContainer*>();
 		_resourceController = resourceController;
 		_glyphMap = glyphMap;
 		_gameMode = BrogueGameMode::Title;
@@ -135,13 +132,21 @@ namespace brogueHd::frontend
 		_zoomLevel = zoomLevel;
 		_uiBuilder = uiBuilder;
 
+		// Add view/programs to the program collection
+		for (int index = 0; index < viewList.count(); index++)
+		{
+			// Each view container contains collections of UI program parts - each with 
+			// their own shader program for the GPU.
+			_uiPrograms->add(viewList.get(index)->getProgramName(), viewList.get(index));
+		}
+
 		// Grid Coordinates...
 		gridRect sceneBounds = _uiBuilder->getBrogueSceneBoundary();
 
 		brogueUIProgramPartId partId(brogueUIProgram::ContainerControlledProgram, brogueUIProgramPart::Background, 0);
-		brogueUIData backgroundData(zoomLevel, colors::transparent());
+		brogueUIData backgroundData(sceneBounds, sceneBounds, zoomLevel, colors::transparent());
 		brogueProgramBuilder builder(resourceController, glyphMap);
-		brogueBackground background(eventController, partId, backgroundData, sceneBounds, sceneBounds);
+		brogueBackground background(uiBuilder->getCoordinateConverter(), resourceController, eventController, partId, backgroundData);
 
 		brogueUIProgramPartConfiguration frameConfiguration(brogueUIProgramPart::Background,
 															shaderResource::mixFrameTexturesVert,
@@ -202,8 +207,7 @@ namespace brogueHd::frontend
 		delete _fontTexture;
 		delete _frameBuffer;
 		delete _sceneBoundaryUI;
-		delete _uiViews;
-		delete _uiPrograms;
+		delete _uiPrograms;				// TODO: Need entire teardown / delete procedure for the backend.
 	}
 
 	brogueKeyboardState brogueMainProgram::calculateKeyboardState(const simpleKeyboardState& keyboard)
@@ -224,7 +228,7 @@ namespace brogueHd::frontend
 	}
 	void brogueMainProgram::deactivateUIAll()
 	{
-		_uiPrograms->iterate([] (brogueUIProgram name, brogueViewProgram* program)
+		_uiPrograms->iterate([] (brogueUIProgram name, brogueViewContainer* program)
 		{
 			program->deactivate();
 			return iterationCallback::iterate;
@@ -232,7 +236,7 @@ namespace brogueHd::frontend
 	}
 	void brogueMainProgram::initiateStateChange(brogueUIState fromState, brogueUIState toState)
 	{
-		_uiPrograms->iterate([&fromState, &toState] (brogueUIProgram programName, brogueViewProgram* program)
+		_uiPrograms->iterate([&fromState, &toState] (brogueUIProgram programName, brogueViewContainer* program)
 		{
 			if (program->isActive())
 				program->initiateStateChange(fromState, toState);
@@ -242,7 +246,7 @@ namespace brogueHd::frontend
 	}
 	void brogueMainProgram::clearStateChange()
 	{
-		_uiPrograms->iterate([] (brogueUIProgram programName, brogueViewProgram* program)
+		_uiPrograms->iterate([] (brogueUIProgram programName, brogueViewContainer* program)
 		{
 			if (program->isActive())
 				program->clearStateChange();
@@ -254,7 +258,7 @@ namespace brogueHd::frontend
 	{
 		bool result = false;
 
-		_uiPrograms->iterate([&result] (brogueUIProgram programName, brogueViewProgram* program)
+		_uiPrograms->iterate([&result] (brogueUIProgram programName, brogueViewContainer* program)
 		{
 			if (program->isActive())
 				result |= program->checkStateChange();
@@ -274,7 +278,7 @@ namespace brogueHd::frontend
 	}
 	void brogueMainProgram::invalidate(const simpleMouseState& mouse, const simpleKeyboardState& keyboard)
 	{
-		_uiPrograms->iterate([&mouse, &keyboard] (brogueUIProgram programName, brogueViewProgram* program)
+		_uiPrograms->iterate([&mouse, &keyboard] (brogueUIProgram programName, brogueViewContainer* program)
 		{
 			if (program->isActive())
 				program->invalidate(keyboard, mouse);
@@ -282,9 +286,11 @@ namespace brogueHd::frontend
 			return iterationCallback::iterate;
 		});
 	}
-	void brogueMainProgram::setGameUpdate(int column, int row, const brogueCellDisplay& data)
+	void brogueMainProgram::setGameUpdate(const brogueCellDisplay& data)
 	{
-		_uiPrograms->get(brogueUIProgram::GameProgram)->setGameUpdate(column, row, data);
+		brogueUIProgramPartId partId(brogueUIProgram::GameProgram, brogueUIProgramPart::Background, 0);
+
+		_uiPrograms->get(brogueUIProgram::GameProgram)->setGridProgram(partId, data);
 	}
 	void brogueMainProgram::run(int millisecondsElapsed)
 	{
@@ -324,13 +330,13 @@ namespace brogueHd::frontend
 
 				// Flame Texture
 				if (_uiPrograms->get(brogueUIProgram::FlameMenuProgram)->isActive())
-					_uiPrograms->get(brogueUIProgram::FlameMenuProgram)->run(millisecondsElapsed);
+					_uiPrograms->get(brogueUIProgram::FlameMenuProgram)->run();
 
 				glDrawBuffer(GL_COLOR_ATTACHMENT2);
 
 				// Title Mask
 				if (_uiPrograms->get(brogueUIProgram::FlameMenuTitleMaskProgram)->isActive())
-					_uiPrograms->get(brogueUIProgram::FlameMenuTitleMaskProgram)->run(millisecondsElapsed);
+					_uiPrograms->get(brogueUIProgram::FlameMenuTitleMaskProgram)->run();
 
 				break;
 			case BrogueGameMode::Game:
@@ -354,11 +360,11 @@ namespace brogueHd::frontend
 
 				// Main Menu
 				if (_uiPrograms->get(brogueUIProgram::MainMenuProgram)->isActive())
-					_uiPrograms->get(brogueUIProgram::MainMenuProgram)->run(millisecondsElapsed);
+					_uiPrograms->get(brogueUIProgram::MainMenuProgram)->run();
 
 				// Open Menu Header
 				if (_uiPrograms->get(brogueUIProgram::OpenMenuBackgroundProgram)->isActive())
-					_uiPrograms->get(brogueUIProgram::OpenMenuBackgroundProgram)->run(millisecondsElapsed);
+					_uiPrograms->get(brogueUIProgram::OpenMenuBackgroundProgram)->run();
 
 				// Put the open menu (scrollable area) on a separate texture to control rendering
 				glDrawBuffer(GL_COLOR_ATTACHMENT4);
@@ -367,13 +373,13 @@ namespace brogueHd::frontend
 
 				// Open Menu
 				if (_uiPrograms->get(brogueUIProgram::OpenMenuProgram)->isActive())
-					_uiPrograms->get(brogueUIProgram::OpenMenuProgram)->run(millisecondsElapsed);
+					_uiPrograms->get(brogueUIProgram::OpenMenuProgram)->run();
 
 				glDrawBuffer(GL_COLOR_ATTACHMENT3);
 
 				// Playback Menu Header
 				if (_uiPrograms->get(brogueUIProgram::PlaybackMenuBackgroundProgram)->isActive())
-					_uiPrograms->get(brogueUIProgram::PlaybackMenuBackgroundProgram)->run(millisecondsElapsed);
+					_uiPrograms->get(brogueUIProgram::PlaybackMenuBackgroundProgram)->run();
 
 				// Put the open menu (scrollable area) on a separate texture to control rendering
 				glDrawBuffer(GL_COLOR_ATTACHMENT5);
@@ -382,13 +388,13 @@ namespace brogueHd::frontend
 
 				// Playback Menu
 				if (_uiPrograms->get(brogueUIProgram::PlaybackMenuProgram)->isActive())
-					_uiPrograms->get(brogueUIProgram::PlaybackMenuProgram)->run(millisecondsElapsed);
+					_uiPrograms->get(brogueUIProgram::PlaybackMenuProgram)->run();
 
 				glDrawBuffer(GL_COLOR_ATTACHMENT3);
 
 				// High Scores
 				if (_uiPrograms->get(brogueUIProgram::HighScoresProgram)->isActive())
-					_uiPrograms->get(brogueUIProgram::HighScoresProgram)->run(millisecondsElapsed);
+					_uiPrograms->get(brogueUIProgram::HighScoresProgram)->run();
 
 				break;
 			case BrogueGameMode::Game:
@@ -396,22 +402,22 @@ namespace brogueHd::frontend
 				// Currently, all on the UI texture
 				//
 				if (_uiPrograms->get(brogueUIProgram::GameProgram)->isActive())
-					_uiPrograms->get(brogueUIProgram::GameProgram)->run(millisecondsElapsed);
+					_uiPrograms->get(brogueUIProgram::GameProgram)->run();
 
 				if (_uiPrograms->get(brogueUIProgram::GameObjectListProgram)->isActive())
-					_uiPrograms->get(brogueUIProgram::GameObjectListProgram)->run(millisecondsElapsed);
+					_uiPrograms->get(brogueUIProgram::GameObjectListProgram)->run();
 
 				if (_uiPrograms->get(brogueUIProgram::FlavorTextPanelProgram)->isActive())
-					_uiPrograms->get(brogueUIProgram::FlavorTextPanelProgram)->run(millisecondsElapsed);
+					_uiPrograms->get(brogueUIProgram::FlavorTextPanelProgram)->run();
 
 				if (_uiPrograms->get(brogueUIProgram::BottomBarMenuProgram)->isActive())
-					_uiPrograms->get(brogueUIProgram::BottomBarMenuProgram)->run(millisecondsElapsed);
+					_uiPrograms->get(brogueUIProgram::BottomBarMenuProgram)->run();
 
 				if (_uiPrograms->get(brogueUIProgram::GameMenuProgram)->isActive())
-					_uiPrograms->get(brogueUIProgram::GameMenuProgram)->run(millisecondsElapsed);
+					_uiPrograms->get(brogueUIProgram::GameMenuProgram)->run();
 
 				if (_uiPrograms->get(brogueUIProgram::GameInventoryProgram)->isActive())
-					_uiPrograms->get(brogueUIProgram::GameInventoryProgram)->run(millisecondsElapsed);
+					_uiPrograms->get(brogueUIProgram::GameInventoryProgram)->run();
 
 				// Put the game log (scrollable area) on a separate texture to control rendering
 				glDrawBuffer(GL_COLOR_ATTACHMENT6);
@@ -419,7 +425,7 @@ namespace brogueHd::frontend
 				_gameLogTexture->clearColor(colors::transparent());
 
 				if (_uiPrograms->get(brogueUIProgram::GameLogProgram)->isActive())
-					_uiPrograms->get(brogueUIProgram::GameLogProgram)->run(millisecondsElapsed);
+					_uiPrograms->get(brogueUIProgram::GameLogProgram)->run();
 
 				break;
 			case BrogueGameMode::Playback:
@@ -493,25 +499,17 @@ namespace brogueHd::frontend
 
 		/*
 			Brogue UI Programs:  This will call routines to setup all the "shader programs" that compose UI programs,
-								 one per brogueViewProgram, which are the primary UI components, have names, interact
+								 one per brogueViewContainer, which are the primary UI components, have names, interact
 								 with the mouse, may be activated and deactivated, and will stay in memory until the
 								 end of the application.
 		*/
-
-		// (MEMORY!) Create the brogueViewProgram* (see destructor)
-		for (int index = 0; index < _uiViews->count(); index++)
+		
+		_uiPrograms->iterate([] (const brogueUIProgram& programName, brogueViewContainer* viewProgram)
 		{
-			brogueViewContainer* view = _uiViews->get(index);
-			brogueViewProgram* program = new brogueViewProgram(view->getProgramName(),
-															   view,
-															   _resourceController,
-															   _glyphMap);
-			// Loads GPU (OpenGL backend)
-			program->initialize();
-
-			// Maintain UI program collection
-			_uiPrograms->add(view->getProgramName(), program);
-		}
+			// Compile the UI Programs
+			viewProgram->compile();
+			return iterationCallback::iterate;
+		});
 
 		// Initialize the textures by clearing
 		clearAllTextures();
@@ -522,7 +520,7 @@ namespace brogueHd::frontend
 										int millisecondsLapsed)
 	{
 		// Iterate UI Programs
-		_uiPrograms->iterate([&keyboardState, &mouseState, &millisecondsLapsed] (brogueUIProgram programName, brogueViewProgram* program)
+		_uiPrograms->iterate([&keyboardState, &mouseState, &millisecondsLapsed] (brogueUIProgram programName, brogueViewContainer* program)
 		{
 			if (program->isActive())
 			{
@@ -536,7 +534,7 @@ namespace brogueHd::frontend
 	{
 		bool result = false;
 
-		_uiPrograms->iterate([&result] (brogueUIProgram programName, brogueViewProgram* program)
+		_uiPrograms->iterate([&result] (brogueUIProgram programName, brogueViewContainer* program)
 		{
 			if (program->isActive())
 			{
@@ -553,7 +551,7 @@ namespace brogueHd::frontend
 	}
 	void brogueMainProgram::clearUpdate()
 	{
-		_uiPrograms->iterate([] (brogueUIProgram programName, brogueViewProgram* program)
+		_uiPrograms->iterate([] (brogueUIProgram programName, brogueViewContainer* program)
 		{
 			if (program->isActive())
 				program->clearUpdate();
@@ -563,7 +561,7 @@ namespace brogueHd::frontend
 	}
 	void brogueMainProgram::clearEvents()
 	{
-		_uiPrograms->iterate([] (brogueUIProgram programName, brogueViewProgram* program)
+		_uiPrograms->iterate([] (brogueUIProgram programName, brogueViewContainer* program)
 		{
 			if (program->isActive())
 				program->clearEvents();
@@ -571,19 +569,16 @@ namespace brogueHd::frontend
 			return iterationCallback::iterate;
 		});
 	}
-	void brogueMainProgram::update(const simpleKeyboardState& keyboardState,
-								   const simpleMouseState& mouseState,
-								   int millisecondsLapsed,
-								   bool forceUpdate)
+	void brogueMainProgram::update(int millisecondsLapsed, bool forceUpdate)
 	{
 		// Take Framebuffer Offline
 		_frameBuffer->unBind();
 
-		_uiPrograms->iterate([&keyboardState, &mouseState, &millisecondsLapsed, &forceUpdate] (brogueUIProgram programName, brogueViewProgram* program)
+		_uiPrograms->iterate([&millisecondsLapsed, &forceUpdate] (brogueUIProgram programName, brogueViewContainer* program)
 		{
 			if (program->isActive())
 			{
-				program->update(keyboardState, mouseState, millisecondsLapsed, forceUpdate);
+				program->update(millisecondsLapsed, forceUpdate);
 			}
 
 			return iterationCallback::iterate;
@@ -593,7 +588,7 @@ namespace brogueHd::frontend
 	{
 		bool hasErrors = false;
 
-		_uiPrograms->iterate([&hasErrors] (brogueUIProgram programName, brogueViewProgram* program)
+		_uiPrograms->iterate([&hasErrors] (brogueUIProgram programName, brogueViewContainer* program)
 		{
 			if (program->isActive())
 				hasErrors |= program->hasErrors();
@@ -605,10 +600,10 @@ namespace brogueHd::frontend
 	}
 	void brogueMainProgram::showErrors() const
 	{
-		_uiPrograms->iterate([] (brogueUIProgram programName, brogueViewProgram* program)
+		_uiPrograms->iterate([] (brogueUIProgram programName, brogueViewContainer* program)
 		{
 			if (program->isActive())
-				program->outputStatus();
+				program->showErrors();
 
 			return iterationCallback::iterate;
 		});

@@ -24,6 +24,7 @@
 #include "simpleException.h"
 #include "simpleGlData.h"
 #include "simpleOpenGL.h"
+#include "simpleString.h"
 
 using namespace brogueHd::backend::model;
 using namespace brogueHd::backend;
@@ -54,9 +55,50 @@ namespace brogueHd::frontend
 		void initializeCore();
 
 		/// <summary>
+		/// Compiles the GL shader program and output status. This should be done after initializeCore is run.
+		/// </summary>
+		void compileCore();
+
+		/// <summary>
 		/// Sets the invalidate flag (see other overloads for UI interaction)
 		/// </summary>
 		void invalidate();
+
+		/// <summary>
+		/// Sets the program core active (calls GL bind)
+		/// </summary>
+		void activate();
+
+		/// <summary>
+		/// Sets the program inactive (calls GL bind = 0)
+		/// </summary>
+		void deactivate();
+
+		/// <summary>
+		/// Runs the primary brogueViewCore glDraw method
+		/// </summary>
+		void run();
+
+		/// <summary>
+		/// Returns true if the shader program has the specified uniform
+		/// </summary>
+		bool hasUniform(const char* name);
+
+		/// <summary>
+		/// Sets uniform value for the brogueViewCore shader program
+		/// </summary>
+		template<isGLUniform TUniform>
+		void setUniform(const char* name, const TUniform& value);
+
+		/// <summary>
+		/// Returns true if the GL backend for this program has errors
+		/// </summary>
+		bool hasErrors();
+
+		/// <summary>
+		/// Outputs the errors for this program to std::cout
+		/// </summary>
+		void showErrors();		
 
 	private:	// GL Stream Functions
 
@@ -206,7 +248,7 @@ namespace brogueHd::frontend
 													eventController* eventController,
 													const brogueUIProgramPartId& partId,
 													const brogueUIData& data)
-		: brogueViewCore(resourceController, partId)
+		: brogueViewCore(resourceController, partId, data.getParentBoundary(), data.getBoundary())
 	{
 		_eventController = eventController;
 		_view = new grid<brogueCellDisplay*>(data.getParentBoundary(), data.getBoundary());
@@ -271,6 +313,13 @@ namespace brogueHd::frontend
 	}
 
 	template<isGLStream TStream>
+	void brogueViewGridCore<TStream>::compileCore()
+	{
+		// Compile the GL program
+		brogueViewCore<TStream>::glInitialize();
+	}
+
+	template<isGLStream TStream>
 	brogueCellDisplay brogueViewGridCore<TStream>::get(int column, int row) const
 	{
 		return *(_view->get(column, row));
@@ -294,9 +343,32 @@ namespace brogueHd::frontend
 		}
 
 		// Update the view's stream
-
-
 		_invalid = true;
+	}
+
+	template<isGLStream TStream>
+	bool brogueViewGridCore<TStream>::hasUniform(const char* name)
+	{
+		return brogueViewCore<TStream>::hasUniform(name);
+	}
+
+	template<isGLStream TStream>
+	template<isGLUniform TUniform>
+	void brogueViewGridCore<TStream>::setUniform(const char* name, const TUniform& value)
+	{
+		brogueViewCore<TStream>::setUniform(name, value);
+	}
+
+	template<isGLStream TStream>
+	bool brogueViewGridCore<TStream>::hasErrors()
+	{
+		return brogueViewCore<TStream>::glHasErrors():
+	}
+
+	template<isGLStream TStream>
+	void brogueViewGridCore<TStream>::showErrors()
+	{
+		brogueViewCore<TStream>::glShowErrors();
 	}
 
 	template<isGLStream TStream>
@@ -452,6 +524,24 @@ namespace brogueHd::frontend
 	void brogueViewGridCore<TStream>::invalidate()
 	{
 		_invalid = true;
+	}
+
+	template<isGLStream TStream>
+	void brogueViewGridCore<TStream>::run()
+	{
+		brogueViewCore<TStream>::glDraw();
+	}
+
+	template<isGLStream TStream>
+	void brogueViewGridCore<TStream>::activate()
+	{
+		brogueViewCore<TStream>::glActivate();
+	}
+
+	template<isGLStream TStream>
+	void brogueViewGridCore<TStream>::deactivate()
+	{
+		brogueViewCore<TStream>::glDeactivate();
 	}
 
 	template<isGLStream TStream>
