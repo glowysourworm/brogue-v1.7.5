@@ -24,6 +24,7 @@
 #include "simpleHash.h"
 #include "simpleKeyboardState.h"
 #include "simpleList.h"
+#include "simpleLogger.h"
 #include "simpleMouseState.h"
 #include "simpleShader.h"
 #include "simpleShaderProgram.h"
@@ -71,6 +72,7 @@ namespace brogueHd::frontend
 		void clearEvents();
 		void update(int millisecondsLapsed, bool forceUpdate);
 
+		void initializeUIPrograms();
 		void initialize();
 		void run(int millisecondsElapsed);
 		void setMode(BrogueGameMode mode);
@@ -493,9 +495,18 @@ namespace brogueHd::frontend
 
 		_frameProgram->compile();
 
+		// Sets uniforms on UI programs
+		initializeUIPrograms();
+
+		// Initialize the textures by clearing
+		clearAllTextures();
+	}
+
+	void brogueMainProgram::initializeUIPrograms()
+	{
 		/*
 			Brogue UI Programs:  This will call routines to setup all the shader programs that compose "UI programs",
-								 one (UI program) per brogueViewContainer, which are the primary UI components, have names, 
+								 one (UI program) per brogueViewContainer, which are the primary UI components, have names,
 								 interact with the mouse, may be activated and deactivated, and will stay in memory until the
 								 end of the application. These must be initialized before calling "draw"; but there are
 								 lazy compilations of the brogueViewCore that allow data to be set after the constructor.
@@ -505,11 +516,9 @@ namespace brogueHd::frontend
 		{
 			// Compile the UI Programs
 			viewProgram->initialize();
+
 			return iterationCallback::iterate;
 		});
-
-		// Initialize the textures by clearing
-		clearAllTextures();
 	}
 
 	void brogueMainProgram::checkUpdate(const simpleKeyboardState& keyboardState,

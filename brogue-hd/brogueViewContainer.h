@@ -528,11 +528,6 @@ namespace brogueHd::frontend
 	}
 	void brogueViewContainer::initialize()
 	{
-		// NOTE*** This will also force a data update of the brogueViewCore, which will
-		//		   lazy initialize all the shader programs. This must happen after data
-		//		   has been set; and before trying to set uniforms to the programs.
-		//
-
 		// Initialize Uniforms
 		ivec2 cellSizeUI(brogueCellDisplay::CellWidth(_zoomLevel), brogueCellDisplay::CellHeight(_zoomLevel));
 		vec2 cellSizeUV(this->getCellSizeUV().getWidth(), this->getCellSizeUV().getHeight());

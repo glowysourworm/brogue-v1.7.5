@@ -64,17 +64,26 @@ namespace brogueHd::frontend
 			return _vertexBuffer->getHash();
 		}
 
+	protected:
+
+		/// <summary>
+		/// Have to handle lazy initialization of the VBO for zero-data cases during compilation.
+		/// </summary>
+		void initializeVertexBuffer();
+
 	private:
 
 		// Primary VBO vertex buffer objects indexed by the OpenGL BufferIndex
 		GLenum _primitiveType;
 		simpleVertexBuffer<T>* _vertexBuffer;
+		GLuint _programHandle;
 	};
 
 	template<typename T>
 	simpleVertexArray<T>::simpleVertexArray()
 	{
 		_vertexBuffer = new simpleVertexBuffer<T>();
+		_programHandle = simpleGlObject::HandleNull;
 	}
 
 	template<typename T>
@@ -82,6 +91,7 @@ namespace brogueHd::frontend
 	{
 		_primitiveType = primitiveType;
 		_vertexBuffer = vertexBuffer;
+		_programHandle = simpleGlObject::HandleNull;
 	}
 
 	template<typename T>
@@ -109,20 +119,39 @@ namespace brogueHd::frontend
 		// BIND THIS INSTANCE TO BE THE CURRENT VERTEX ARRAY
 		glBindVertexArray(this->handle);
 
+		_programHandle = programHandle;
+
 		// NOTE: The buffer indices are assigned prior to passing into this instance. Order
-		//       has already been indicated by the calling IGLModel or IGLProgram
+		//       has already been indicated by the calling this constructor.
 		//       
-		//       Simply call IGLPrimitve.Create() to initialize the vertex buffer
-		//
-		_vertexBuffer->glCreate(programHandle);
+		if (_vertexBuffer->getBufferLength() > 0)
+			initializeVertexBuffer();
 
 		if (!this->isCreated())
 			simpleLogger::logColor(brogueConsoleColor::Yellow, "simpleVertexArray error creating the VAO");
 	}
 
 	template<typename T>
+	void simpleVertexArray<T>::initializeVertexBuffer()
+	{
+		if (!this->isCreated())
+			throw simpleException("Trying to create VBO before calling glCreate for the VAO:  simpleVertexArray.h");
+
+		if (_vertexBuffer->getBufferLength() == 0)
+			throw simpleException("Trying to create VBO with zero size:  simpleVertexArray.h");
+
+		if (_programHandle == simpleGlObject::HandleNull)
+			throw simpleException("Trying to create VBO before calling glCreate for the VAO:  simpleVertexArray.h");
+
+		_vertexBuffer->glCreate(_programHandle);
+	}
+
+	template<typename T>
 	void simpleVertexArray<T>::showActives() const
 	{
+		if (!_vertexBuffer->isCreated())
+			simpleLogger::logColor(brogueConsoleColor::Blue, "Vertex Buffer Not Yet Created:  VAO={}", this->handle);
+
 		_vertexBuffer->showActives();
 	}
 
@@ -135,7 +164,13 @@ namespace brogueHd::frontend
 		if (!this->isBound())
 			throw simpleException("simpleVertexArray must be bound before calling rebuffer()");
 
-		_vertexBuffer->reBuffer(programHandle, forceNew);
+		if (_vertexBuffer->getBufferLength() == 0)
+			throw simpleException("Trying to create VBO with zero size:  simpleVertexArray.h");
+
+		if (!_vertexBuffer->isCreated())
+			initializeVertexBuffer();
+		else
+			_vertexBuffer->reBuffer(programHandle, forceNew);
 	}
 
 	template<typename T>
@@ -158,7 +193,8 @@ namespace brogueHd::frontend
 			
 
 		// Teardown vertex buffers
-		_vertexBuffer->teardown();
+		if (_vertexBuffer->isCreated())
+			_vertexBuffer->teardown();
 
 		// Delete this vertex array
 		glDeleteVertexArrays(1, &this->handle);
@@ -174,6 +210,13 @@ namespace brogueHd::frontend
 
 		if (!this->isBound())
 			throw simpleException("simpleVertexArray must be bound before calling draw()");
+
+		// Lazy initialization of the VBO
+		if (!_vertexBuffer->isCreated())
+		{
+			if (_vertexBuffer->getBufferLength() > 0)
+				initializeVertexBuffer();
+		}
 
 		// Draw Buffer
 		glDrawArrays(_primitiveType, 0, _vertexBuffer->getBufferLength());

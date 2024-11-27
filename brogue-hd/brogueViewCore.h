@@ -498,11 +498,7 @@ namespace brogueHd::frontend
 		// Lazy compilation (must have data ready)
 		if (!_compiled || _dataInvalid)
 		{
-			if (_elements->count() > 0)
-				compileAndBuffer();
-
-			else
-				throw simpleException("Trying to utilize brogueViewCore without any data. Must set data into the backend before calling any GL functions");
+			compileAndBuffer();
 		}
 	}
 
