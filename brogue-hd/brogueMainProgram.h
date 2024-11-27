@@ -3,6 +3,7 @@
 #include "brogueColorQuad.h"
 #include "brogueGlobal.h"
 #include "brogueGlyphMap.h"
+#include "brogueImageQuad.h"
 #include "brogueKeyboardState.h"
 #include "brogueMouseState.h"
 #include "brogueUIBuilder.h"
@@ -143,10 +144,14 @@ namespace brogueHd::frontend
 		// Create a program for the frame buffer
 		simpleShader vertexShader(resourceController->getShader(shaderResource::mixFrameTexturesVert));
 		simpleShader fragmentShader(resourceController->getShader(shaderResource::mixFrameTexturesFrag));
-		brogueCellDisplay emptyCell;
+		brogueCellDisplay emptyCell(0, 0, colors::transparent());
 		simpleQuad frameQuadXY = uiBuilder->getCoordinateConverter()->createFrameQuadXY();
-		brogueColorQuad element(emptyCell, frameQuadXY);
+		simpleQuad frameQuadUV = uiBuilder->getCoordinateConverter()->createFrameQuadUV();
+		brogueImageQuad element(emptyCell, frameQuadXY, frameQuadUV);
 		simpleDataStream* frameDataStream = new simpleDataStream(1, element.getElementVertexSize(GL_TRIANGLES), element.getStreamSize(GL_TRIANGLES));
+
+		// Buffer the stream (for our one frame element)
+		element.streamBuffer(GL_TRIANGLES, frameDataStream);
 
 		int vertexBufferIndex = 0;	// GL VBO index is STATIC!
 
@@ -432,7 +437,7 @@ namespace brogueHd::frontend
 				break;
 		}
 
-		//glDrawBuffer(GL_COLOR_ATTACHMENT0);
+		glDrawBuffer(GL_COLOR_ATTACHMENT0);
 
 		// Unbind the frame buffer -> render output to normal GL output
 		_frameBuffer->unBind();
@@ -582,7 +587,7 @@ namespace brogueHd::frontend
 
 		_uiPrograms->iterate([&millisecondsLapsed, &forceUpdate] (brogueUIProgram programName, brogueViewContainer* program)
 		{
-			if (program->isActive())
+			if (program->isActive() && program->needsUpdate())
 			{
 				program->update(millisecondsLapsed, forceUpdate);
 			}

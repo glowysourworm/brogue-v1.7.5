@@ -143,6 +143,8 @@ void main()
                                    continuous; and seeded by the two fade period random integers.
         */
 
+        //outputColor = currentBackgroundColor;
+
         // Pseudo Random Color Number = function(fade period random, locationUI, static background color)
         //
         float noiseLow = 0.15;

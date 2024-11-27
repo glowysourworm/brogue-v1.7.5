@@ -1095,25 +1095,33 @@ namespace brogueHd::frontend
 
 		_cellViews->forEach([&millisecondsLapsed, &forceUpdate] (const brogueUIProgramPartId& partId, brogueViewGridCore<brogueCellQuad>* view)
 		{
-			view->update(millisecondsLapsed, forceUpdate);
+			if (view->needsUpdate())
+				view->update(millisecondsLapsed, forceUpdate);
+
 			return iterationCallback::iterate;
 		});
 
 		_imageViews->forEach([&millisecondsLapsed, &forceUpdate] (const brogueUIProgramPartId& partId, brogueViewGridCore<brogueImageQuad>* view)
 		{
-			view->update(millisecondsLapsed, forceUpdate);
+			if (view->needsUpdate())
+				view->update(millisecondsLapsed, forceUpdate);
+
 			return iterationCallback::iterate;
 		});
 
 		_colorViews->forEach([&millisecondsLapsed, &forceUpdate] (const brogueUIProgramPartId& partId, brogueViewGridCore<brogueColorQuad>* view)
 		{
-			view->update(millisecondsLapsed, forceUpdate);
+			if (view->needsUpdate())
+				view->update(millisecondsLapsed, forceUpdate);
+
 			return iterationCallback::iterate;
 		});
 
 		_lineViews->forEach([&millisecondsLapsed, &forceUpdate] (const brogueUIProgramPartId& partId, brogueViewPolygonCore* view)
 		{
-			view->update(millisecondsLapsed, forceUpdate);
+			if (view->needsUpdate())
+				view->update(millisecondsLapsed, forceUpdate);
+
 			return iterationCallback::iterate;
 		});
 	}

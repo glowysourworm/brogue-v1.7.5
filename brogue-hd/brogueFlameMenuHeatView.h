@@ -199,6 +199,12 @@ namespace brogueHd::frontend
 
 				that->set(cell);
 			}
+			else
+			{
+				// TODO: Figure out how to remove excess data w/o messing up the drawing
+				cell.backColor = colors::transparent();
+				that->set(cell);
+			}
 
 			return iterationCallback::iterate;
 		});

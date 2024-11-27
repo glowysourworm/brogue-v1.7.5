@@ -116,23 +116,20 @@ namespace brogueHd::backend::model
 		//light oldLight;									// compare with subsequent lighting to determine whether to refresh cell
 
 		brogueCellDisplay()
+			: brogueCellDisplay(-1, -1)
 		{
-			// Use empty character static value from the glyph map
-			//
-			character = brogueGlyphMap::Empty;
-			foreColor = default_value::value<color>();
-			backColor = default_value::value<color>();
-			opacity = 1.0f;
-			needsUpdate = false;
-			noDisplay = false;
 		}
-		brogueCellDisplay(int column, int row)
+		brogueCellDisplay(int column, int row) 
+			: brogueCellDisplay(column, row, colors::transparent())
+		{
+		}
+		brogueCellDisplay(int column, int row, const color& abackColor)
 		{
 			this->column = column;
 			this->row = row;
 			character = brogueGlyphMap::Empty;
 			foreColor = default_value::value<color>();
-			backColor = default_value::value<color>();
+			backColor = abackColor;
 			opacity = 1.0f;
 			needsUpdate = false;
 			noDisplay = false;
