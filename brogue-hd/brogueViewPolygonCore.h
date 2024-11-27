@@ -32,18 +32,6 @@ namespace brogueHd::frontend
 							  const brogueUIData& uiData);
 		~brogueViewPolygonCore();
 
-
-		/// <summary>
-		/// The core of the GL stream must be initialized after this view has been set up. Use get / set
-		/// methods on the view's grid data to set up the view before calling this function.
-		/// </summary>
-		void initializeCore();
-
-		/// <summary>
-		/// Compiles the GL shader program and output status. This should be done after initializeCore is run.
-		/// </summary>
-		void compileCore();
-
 		/// <summary>
 		/// Sets the program core active (calls GL bind)
 		/// </summary>
@@ -126,6 +114,13 @@ namespace brogueHd::frontend
 		/// </summary>
 		virtual bool needsUpdate() const;
 
+	private:
+
+		/// <summary>
+		/// Sets data stream elements in the core; and resets the invalid flag.
+		/// </summary>
+		void setDataStreamElements();
+
 	protected:
 
 		brogueUIData* getUIData() const;
@@ -166,12 +161,9 @@ namespace brogueHd::frontend
 		return _uiData;
 	}
 
-	void brogueViewPolygonCore::initializeCore()
+	void brogueViewPolygonCore::setDataStreamElements()
 	{
 		int elementSize = _graphUI->count();
-
-		// Initialize the GL backend stream
-		brogueViewCore<brogueLine>::initializeStream(elementSize);
 
 		// Now, we can send elements to the stream's buffer; and call createStream / reStream
 		for (int index = 0; index < _graphUI->count(); index++)
@@ -185,17 +177,7 @@ namespace brogueHd::frontend
 			this->setElement(streamElement, index);
 		}
 
-		// Complete the buffer; and put it online
-		brogueViewCore<brogueLine>::createStream();
-
-		// Compile the GL program
-		brogueViewCore<brogueLine>::glInitialize();
-	}
-
-	void brogueViewPolygonCore::compileCore()
-	{
-		// Compile the GL program
-		brogueViewPolygonCore::glInitialize();
+		_invalid = false;
 	}
 
 	void brogueViewPolygonCore::activate()
@@ -264,7 +246,10 @@ namespace brogueHd::frontend
 	void brogueViewPolygonCore::update(int millisecondsLapsed,
 										bool forceUpdate)
 	{
-		throw simpleException("brogueViewPolygonCore::update must be overridden in a child class");
+		if (_invalid)
+		{
+			setDataStreamElements();
+		}
 	}
 
 	void brogueViewPolygonCore::clearUpdate()

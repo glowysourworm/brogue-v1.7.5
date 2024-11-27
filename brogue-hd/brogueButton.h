@@ -2,13 +2,14 @@
 
 #include "brogueCellDisplay.h"
 #include "brogueCellQuad.h"
+#include "brogueColorQuad.h"
 #include "brogueCoordinateConverter.h"
 #include "brogueGlyphMap.h"
+#include "brogueViewGridCore.h"
 #include "brogueUIConstants.h"
 #include "brogueUIData.h"
 #include "brogueUIProgramPartId.h"
 #include "brogueUIText.h"
-#include "brogueViewGridCore.h"
 #include "color.h"
 #include "colorString.h"
 #include "eventController.h"
@@ -41,6 +42,10 @@ namespace brogueHd::frontend
 
 	private:
 
+		void updateImpl(int millisecondsLapsed, bool forceUpdate);
+
+	private:
+
 		brogueUIText* _uiText;
 	};
 
@@ -53,12 +58,8 @@ namespace brogueHd::frontend
 	{
 		_uiText = new brogueUIText(data.getParentBoundary(), data.getBoundary(), simpleString(""));
 
-		// Initialize the view
-		//
+		// Set data elements for the stream
 		update(0, true);
-
-		// Call initializeCore() -> sets up stream for  GL backend
-		brogueViewGridCore::initializeCore();
 	}
 	brogueButton::~brogueButton()
 	{
@@ -93,7 +94,7 @@ namespace brogueHd::frontend
 			this->getMouseEnter() ||
 			this->getMousePressedChanged();
 	}
-	void brogueButton::update(int millisecondsLapsed, bool forceUpdate)
+	void brogueButton::updateImpl(int millisecondsLapsed, bool forceUpdate)
 	{
 		brogueUIData* uiData = this->getUIData();
 		brogueButton* that = this;
@@ -114,5 +115,13 @@ namespace brogueHd::frontend
 
 			return iterationCallback::iterate;
 		});
+	}
+	void brogueButton::update(int millisecondsLapsed, bool forceUpdate)
+	{
+		// Update data elements in the view
+		updateImpl(millisecondsLapsed, forceUpdate);
+
+		// Call the base class -> restream the data
+		brogueViewGridCore<brogueCellQuad>::update(millisecondsLapsed, forceUpdate);
 	}
 }

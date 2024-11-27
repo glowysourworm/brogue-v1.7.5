@@ -40,8 +40,8 @@ namespace brogueHd::frontend
 			_defaultCell->backColor = colors::transparent();
 			_defaultCell->noDisplay = true;
 
-			// Call initializeCore() -> sets up stream for  GL backend
-			brogueViewGridCore::initializeCore();
+			// Set initial stream data
+			update(0, true);
 		}
 		~brogueFlameMenuTitleMask()
 		{
@@ -59,17 +59,11 @@ namespace brogueHd::frontend
 
 		void update(int millisecondsLapsed, bool forceUpdate) override
 		{
-			brogueFlameMenuTitleMask* that = this;
-			brogueTitleGrid* titleGrid = _titleGrid;
-			brogueCellDisplay* maskCell = _maskCell;
+			// Update data elements in the view
+			updateImpl(millisecondsLapsed, forceUpdate);
 
-			_titleGrid->sceneBounds().iterate([&that, &titleGrid, &maskCell] (int column, int row)
-			{
-				if (titleGrid->isTheText(column, row))
-					that->set(*maskCell);
-
-				return iterationCallback::iterate;
-			});
+			// Call the base class -> restream the data
+			brogueViewGridCore<brogueColorQuad>::update(millisecondsLapsed, forceUpdate);
 		}
 
 		bool needsUpdate() const override
@@ -79,6 +73,27 @@ namespace brogueHd::frontend
 		bool isTheText(int column, int row)
 		{
 			return _titleGrid->isTheText(column, row);
+		}
+
+	private:
+
+		void updateImpl(int millisecondsLapsed, int forceUpdate)
+		{
+			brogueFlameMenuTitleMask* that = this;
+			brogueTitleGrid* titleGrid = _titleGrid;
+			brogueCellDisplay* maskCell = _maskCell;
+
+			_titleGrid->sceneBounds().iterate([&that, &titleGrid, &maskCell] (int column, int row)
+			{
+				brogueCellDisplay cell(column, row);
+
+				cell.setUI(*maskCell);
+
+				if (titleGrid->isTheText(column, row))
+					that->set(cell);
+
+				return iterationCallback::iterate;
+			});
 		}
 
 	private:

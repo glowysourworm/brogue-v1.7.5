@@ -572,9 +572,6 @@
     <ClInclude Include="boudingBox2D.h">
       <Filter>Header Files\frontend\opengl\streamObjects</Filter>
     </ClInclude>
-    <ClInclude Include="brogueViewProgram.h">
-      <Filter>Header Files\frontend\opengl\program</Filter>
-    </ClInclude>
     <ClInclude Include="brogueTextView.h">
       <Filter>Header Files\frontend\ui</Filter>
     </ClInclude>
@@ -625,9 +622,6 @@
     </ClInclude>
     <ClInclude Include="brogueUIEvent.h">
       <Filter>Header Files\backend\controller\eventData</Filter>
-    </ClInclude>
-    <ClInclude Include="brogueProgramBuilder.h">
-      <Filter>Header Files\frontend\opengl\program</Filter>
     </ClInclude>
     <ClInclude Include="brogueUIProgramPartConfiguration.h">
       <Filter>Header Files\frontend\opengl\program\openglData</Filter>

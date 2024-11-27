@@ -43,6 +43,10 @@ namespace brogueHd::frontend
 
 	private:
 
+		void updateImpl(int millisecondsLapsed, bool forceUpdate);
+
+	private:
+
 		brogueUIText* _uiText;
 	};
 
@@ -56,15 +60,12 @@ namespace brogueHd::frontend
 		_uiText = new brogueUIText(data.getParentBoundary(), data.getBoundary(), simpleString(""));
 
 		update(0, true);
-
-		// Force initial update
-		brogueViewGridCore::initializeCore();
 	}
 	brogueTextView::~brogueTextView()
 	{
 		delete _uiText;
 	}
-	void brogueTextView::update(int millisecondsLapsed, bool forceUpdate)
+	void brogueTextView::updateImpl(int millisecondsLapsed, bool forceUpdate)
 	{
 		brogueUIData* uiData = this->getUIData();
 		brogueTextView* that = this;
@@ -80,8 +81,18 @@ namespace brogueHd::frontend
 			cell.backColor = uiData->calculateGradient(column, row, false, false, false);
 			cell.character = glyphMap.isGlyphDefined(uiText->getCharacter(column, row)) ? uiText->getCharacter(column, row) : glyphMap.Empty;
 
+			that->set(cell);
+
 			return iterationCallback::iterate;
 		});
+	}
+	void brogueTextView::update(int millisecondsLapsed, bool forceUpdate)
+	{
+		// Update data elements in the view
+		updateImpl(millisecondsLapsed, forceUpdate);
+
+		// Call the base class -> restream the data
+		brogueViewGridCore<brogueCellQuad>::update(millisecondsLapsed, forceUpdate);
 	}
 	void brogueTextView::setLine(int row, const colorString& text, brogueTextAlignment alignment)
 	{

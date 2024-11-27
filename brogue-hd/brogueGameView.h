@@ -39,8 +39,10 @@ namespace brogueHd::frontend
 		this->setUIAction(brogueUITagAction(brogueUIState::GameNormal));
 	}
 
+
 	void brogueGameView::update(int millisecondsLapsed, bool forceUpdate)
 	{
-		// Nothing to do
+		// Call the base class -> restream the data
+		brogueViewGridCore<brogueCellQuad>::update(millisecondsLapsed, forceUpdate);
 	}
 }

@@ -48,9 +48,10 @@ namespace brogueHd::frontend
 		void draw();
 
 		/// <summary>
-		/// Rebuffers data on the specified VBO (see simpleShaderProgram)
+		/// Rebuffers data on the specified VBO (see simpleShaderProgram). Force new will delete the
+		/// existing buffer on the GPU and re-initialize the storage.
 		/// </summary>
-		void reBuffer(GLuint programHandle);
+		void reBuffer(GLuint programHandle, bool forceNew);
 
 		/// <summary>
 		/// Returns the simpleDataStream* to the VAO's single VBO. Use this to rebuffer the stream - but
@@ -126,7 +127,7 @@ namespace brogueHd::frontend
 	}
 
 	template<typename T>
-	void simpleVertexArray<T>::reBuffer(GLuint programHandle)
+	void simpleVertexArray<T>::reBuffer(GLuint programHandle, bool forceNew)
 	{
 		if (!this->isCreated())
 			throw simpleException("simpleVertexArray already deleted from the backend");
@@ -134,7 +135,7 @@ namespace brogueHd::frontend
 		if (!this->isBound())
 			throw simpleException("simpleVertexArray must be bound before calling rebuffer()");
 
-		_vertexBuffer->reBuffer(programHandle);
+		_vertexBuffer->reBuffer(programHandle, forceNew);
 	}
 
 	template<typename T>

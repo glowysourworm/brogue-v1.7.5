@@ -67,11 +67,12 @@ namespace brogueHd::frontend
 					this->attributes.add(vertexAttributeData(5, "outputSelector", GL_FLOAT));
 					break;
 				case shaderResource::diffuseColorUpwardVert:
-					this->attributes.add(vertexAttributeData(0, "vertexCurrent", GL_FLOAT_VEC2));
-					this->attributes.add(vertexAttributeData(1, "textureCurrent", GL_FLOAT_VEC2));
-					this->attributes.add(vertexAttributeData(2, "backgroundColor1", GL_FLOAT_VEC4));
-					this->attributes.add(vertexAttributeData(3, "backgroundColor2", GL_FLOAT_VEC4));
-					this->attributes.add(vertexAttributeData(4, "backgroundColor3", GL_FLOAT_VEC4));
+					this->attributes.add(vertexAttributeData(0, "vertexXY", GL_FLOAT_VEC2));
+					this->attributes.add(vertexAttributeData(1, "textureUV", GL_FLOAT_VEC2));
+					this->attributes.add(vertexAttributeData(2, "glyphUV", GL_FLOAT_VEC2));
+					this->attributes.add(vertexAttributeData(3, "foregroundColor", GL_FLOAT_VEC4));
+					this->attributes.add(vertexAttributeData(4, "backgroundColor", GL_FLOAT_VEC4));
+					this->attributes.add(vertexAttributeData(5, "outputSelector", GL_FLOAT));
 					break;
 				case shaderResource::mixFrameTexturesVert:
 					this->attributes.add(vertexAttributeData(0, "vertexXY", GL_FLOAT_VEC2));
@@ -85,19 +86,28 @@ namespace brogueHd::frontend
 				case shaderResource::backgroundColorFrag:
 					break;
 				case shaderResource::brogueCellDisplayFrag:
-					this->uniforms1i.add(simpleUniform<int>("frameTexture", GL_SAMPLER_2D, 0));         // GLOBAL SETTING:  GL_TEXTURE0
-					this->uniforms1i.add(simpleUniform<int>("fontTexture", GL_SAMPLER_2D, 7));          // GLOBAL SETTING:  GL_TEXTURE7
+					this->uniforms1i.add(simpleUniform<int>("frameTexture", GL_SAMPLER_2D, 0));				// GLOBAL SETTING:  GL_TEXTURE0
+					this->uniforms1i.add(simpleUniform<int>("fontTexture", GL_SAMPLER_2D, 7));				// GLOBAL SETTING:  GL_TEXTURE7
 					this->uniforms1.add(simpleUniform<float>("glyphThreshold", GL_FLOAT, 0.05f));
 					break;
 				case shaderResource::diffuseColorUpwardFrag:
-					this->uniforms1i.add(simpleUniform<int>("flameTexture", GL_SAMPLER_2D, 1));         // Program Setting
+					this->uniforms1i.add(simpleUniform<int>("flameTexture", GL_SAMPLER_2D, 1));				// Program Setting
 					this->uniforms2i.add(simpleUniform<ivec2>("cellSizeUI", GL_INT_VEC2, ivec2(0, 0)));
 					this->uniforms2.add(simpleUniform<vec2>("cellSizeUV", GL_FLOAT_VEC2, vec2(0, 0)));
 					this->uniforms1.add(simpleUniform<float>("weight", GL_FLOAT, 1.0f));
-					this->uniforms1.add(simpleUniform<float>("fadePeriodTime", GL_FLOAT, 0.0f));		// [0,1] time ratio for the color fade
-					this->uniforms1i.add(simpleUniform<int>("fadePeriodRandom1", GL_INT, 1));			// Random integer 1 uniform for the fade period
-					this->uniforms1i.add(simpleUniform<int>("fadePeriodRandom2", GL_INT, 1));			// Random integer 1 uniform for the fade period
-					this->uniforms1i.add(simpleUniform<int>("nextColorNumber", GL_INT, 1));				// Counter for the color index of the title view
+					this->uniforms1.add(simpleUniform<float>("fadePeriodTime", GL_FLOAT, 0.0f));			// [0,1] time ratio for the color fade
+					this->uniforms1i.add(simpleUniform<int>("fadePeriodRandom1", GL_INT, 1));				// Random integer 1 uniform for the fade period
+					this->uniforms1i.add(simpleUniform<int>("fadePeriodRandom2", GL_INT, 1));				// Random integer 1 uniform for the fade period
+					this->uniforms1i.add(simpleUniform<int>("nextColorNumber", GL_INT, 1));					// Counter for the color index of the title view
+
+					// "Static" flame colors (could just go in the shader)
+					this->uniforms4.add(simpleUniform<vec4>("flameBottomColor1", GL_FLOAT_VEC4, vec4(1.0f, 0.0f, 0.0f, 1)));	
+					this->uniforms4.add(simpleUniform<vec4>("flameBottomColor2", GL_FLOAT_VEC4, vec4(1.0f, 1.0f, 0.6f, 1)));
+					this->uniforms4.add(simpleUniform<vec4>("flameBottomColor3", GL_FLOAT_VEC4, vec4(1.0f, 1.0f, 0.8f, 1)));
+					this->uniforms4.add(simpleUniform<vec4>("flameTitleColor1", GL_FLOAT_VEC4, vec4(0.0f, 0.0f, 1.0f, 1)));
+					this->uniforms4.add(simpleUniform<vec4>("flameTitleColor2", GL_FLOAT_VEC4, vec4(0.0f, 0.1f, 0.9f, 1)));
+					this->uniforms4.add(simpleUniform<vec4>("flameTitleColor3", GL_FLOAT_VEC4, vec4(0.0f, 0.0f, 1.0f, 1)));
+
 					break;
 				case shaderResource::mixFrameTexturesFrag: 
 					this->uniforms1i.add(simpleUniform<int>("frameTexture", GL_SAMPLER_2D, 0));						// GLOBAL SETTING:  GL_TEXTURE0

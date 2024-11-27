@@ -40,30 +40,20 @@ namespace brogueHd::frontend
 		gridRect getSceneBoundary() const;
 		gridRect getBoundary() const;
 
-	protected:
-
-		/// <summary>
-		/// Initializes the output stream and sets its (STATIC!) size. Must subsequently call get / set methods
-		/// to work with the actual data; and then call "createStream" to finish buffering on the software side.
-		/// </summary>
-		/// <param name="elementSize">Size of stream in terms of elements (# of shader passes)</param>
-		void initializeStream(int elementSize);
-
-		/// <summary>
-		/// Completes the buffer on the software side for the output data. This stream
-		/// may be modified at run time by calling "set", and subsequently, "reStream".
-		/// </summary>
-		void createStream();
-
-		/// <summary>
-		/// Re-creates the stream and forces GL backend to rebuffer using the simpleShaderProgram API.
-		/// </summary>
-		void reStream();
-
 	protected:	// UI <---> GL Data Functions
 
 		TStream getElement(int elementIndex);
 		void setElement(const TStream& element, int elementIndex);
+
+		/// <summary>
+		/// Sets the size of the element array and re-initializes the data
+		/// </summary>
+		void resizeElements(int elementSize);
+
+		/// <summary>
+		/// Returns the number of elements in the data stream
+		/// </summary>
+		int getElementCount() const;
 
 	protected:	// GL Functions
 
@@ -71,15 +61,14 @@ namespace brogueHd::frontend
 		static constexpr GLenum PrimitiveType = GL_TRIANGLES;
 		static constexpr GLenum PolygonPrimitiveType = GL_LINES;
 
-		bool glHasUniform(const char* name) const;
-		bool glHasErrors() const;
-		void glShowErrors() const;
-		void glShowActives() const;
+		bool glHasUniform(const char* name);
+		bool glHasErrors();
+		void glShowErrors();
+		void glShowActives();
 
-		void glInitialize() const;
-		void glActivate() const;
-		void glDeactivate() const;
-		void glDraw() const;
+		void glActivate();
+		void glDeactivate();
+		void glDraw();
 
 		template<isGLUniform TUniform>
 		void setUniform(const char* name, const TUniform& value);
@@ -92,6 +81,27 @@ namespace brogueHd::frontend
 
 	private:
 
+		/// <summary>
+		/// Checks and validates stream preparedness. Throws exceptions for invalid data stream usage.
+		/// </summary>
+		void validateReady();
+
+		/// <summary>
+		/// Prepares the GL backend; and handles resizing if necessary
+		/// </summary>
+		void compileAndBuffer();
+
+		/// <summary>
+		/// Initializes the output stream and sets its (STATIC!) size. Must subsequently call get / set methods
+		/// to work with the actual data; and then call "createStream" to finish buffering on the software side.
+		/// </summary>
+		/// <param name="elementSize">Size of stream in terms of elements (# of shader passes)</param>
+		void resizeDataStream(int elementSize);
+
+		/// <summary>
+		/// Completes the buffer on the software side for the output data. This stream
+		/// may be modified at run time by calling "set", and subsequently, "reStream".
+		/// </summary>
 		simpleDataStream* createDataStream(int elementCount);
 
 	private:
@@ -109,6 +119,10 @@ namespace brogueHd::frontend
 		brogueUIProgramPartId* _partId;
 		gridRect* _sceneBoundary;
 		gridRect* _viewBoundary;
+
+		bool _compiled;
+		bool _dataInvalid;
+		bool _updating;
 	};
 
 	template<isGLStream TStream>
@@ -150,6 +164,12 @@ namespace brogueHd::frontend
 		_partId = new brogueUIProgramPartId(partId);
 		_sceneBoundary = new gridRect(sceneBoundary);
 		_viewBoundary = new gridRect(viewBoundary);
+
+		// Lazy Initialization:  The shader programs will be initialized once there is data on the output
+		//						 array. So, these flags will help this class manage its own control flow.
+		//
+		_compiled = false;
+		_dataInvalid = false;
 	}
 
 	template<isGLStream TStream>
@@ -170,6 +190,7 @@ namespace brogueHd::frontend
 	void brogueViewCore<TStream>::setElement(const TStream& element, int elementIndex)
 	{
 		_elements->set(elementIndex, element);
+		_dataInvalid = true;
 	}
 
 	template<isGLStream TStream>
@@ -203,50 +224,65 @@ namespace brogueHd::frontend
 	}
 
 	template<isGLStream TStream>
-	bool brogueViewCore<TStream>::glHasUniform(const char* name) const
+	bool brogueViewCore<TStream>::glHasUniform(const char* name)
 	{
+		// Lazy compilation (must have data ready)
+		validateReady();
+
 		return _program->hasUniform(name);
 	}
 
 	template<isGLStream TStream>
-	bool brogueViewCore<TStream>::glHasErrors() const
+	bool brogueViewCore<TStream>::glHasErrors()
 	{
+		// Lazy compilation (must have data ready)
+		validateReady();
+
 		return _program->hasErrors();
 	}
 
 	template<isGLStream TStream>
-	void brogueViewCore<TStream>::glShowErrors() const
+	void brogueViewCore<TStream>::glShowErrors()
 	{
+		// Lazy compilation (must have data ready)
+		validateReady();
+
 		_program->showErrors();
 	}
 
 	template<isGLStream TStream>
-	void brogueViewCore<TStream>::glShowActives() const
+	void brogueViewCore<TStream>::glShowActives()
 	{
+		// Lazy compilation (must have data ready)
+		validateReady();
+
 		_program->showActives();
 	}
 
 	template<isGLStream TStream>
-	void brogueViewCore<TStream>::glInitialize() const
+	void brogueViewCore<TStream>::glActivate()
 	{
-		_program->compile();
-	}
+		// Lazy compilation (must have data ready)
+		validateReady();
 
-	template<isGLStream TStream>
-	void brogueViewCore<TStream>::glActivate() const
-	{
 		_program->bind();
 	}
 
 	template<isGLStream TStream>
-	void brogueViewCore<TStream>::glDeactivate() const
+	void brogueViewCore<TStream>::glDeactivate()
 	{
+		// Lazy compilation (must have data ready)
+		validateReady();
+
 		_program->unBind();
 	}
 
 	template<isGLStream TStream>
-	void brogueViewCore<TStream>::glDraw() const
+	void brogueViewCore<TStream>::glDraw()
 	{
+		// Lazy compilation (must have data ready)
+		validateReady();
+
 		// Check period counter
 		//if (!_programCounters->get(partId)->update(millisecondsElapsed))
 		//	continue;
@@ -314,36 +350,54 @@ namespace brogueHd::frontend
 	template<isGLUniform TUniform>
 	void brogueViewCore<TStream>::setUniform(const char* name, const TUniform& value)
 	{
+		// Lazy compilation (must have data ready)
+		validateReady();
+
 		setUniform(name, value);
 	}
 
 	template<isGLStream TStream>
 	void brogueViewCore<TStream>::setUniform(const char* name, const float& value)
 	{
+		// Lazy compilation (must have data ready)
+		validateReady();
+
 		_program->bindUniform1(name, value);
 	}
 
 	template<isGLStream TStream>
 	void brogueViewCore<TStream>::setUniform(const char* name, const int& value)
 	{
+		// Lazy compilation (must have data ready)
+		validateReady();
+
 		_program->bindUniform1i(name, value);
 	}
 
 	template<isGLStream TStream>
 	void brogueViewCore<TStream>::setUniform(const char* name, const vec2& value)
 	{
+		// Lazy compilation (must have data ready)
+		validateReady();
+
 		_program->bindUniform2(name, value);
 	}
 
 	template<isGLStream TStream>
 	void brogueViewCore<TStream>::setUniform(const char* name, const ivec2& value)
 	{
+		// Lazy compilation (must have data ready)
+		validateReady();
+
 		_program->bindUniform2i(name, value);
 	}
 
 	template<isGLStream TStream>
 	void brogueViewCore<TStream>::setUniform(const char* name, const vec4& value)
 	{
+		// Lazy compilation (must have data ready)
+		validateReady();
+
 		_program->bindUniform4(name, value);
 	}
 
@@ -375,34 +429,35 @@ namespace brogueHd::frontend
 			default:
 				throw simpleException("Unhandled openglDataStreamType:  brogueViewCore::createDataStream");
 		}
+
+		_dataInvalid = true;
 	}
 
-	// Brogue Coordinate Converter Frame-Type Code (Graveyard)
-	// 
-	//brogueImageQuad brogueCoordinateConverter::createBrogueImageQuadFrame()
-	//{
-	//	simpleQuad quadXY = _viewConverter.createQuadNormalizedXY(0, 0, _viewConverter.getViewWidth(), _viewConverter.getViewHeight());
-	//	simpleQuad quadUV = _viewConverter.createQuadNormalizedUV(0, 0, _viewConverter.getViewWidth(), _viewConverter.getViewHeight());
-
-	//	return brogueImageQuad(gridLocator(0, 0), quadXY, quadUV);
-	//}
-
-	//brogueColorQuad brogueCoordinateConverter::createBrogueColorQuadFrame(const color& theColor)
-	//{
-	//	simpleQuad quadXY = _viewConverter.createQuadNormalizedXY(0, 0, _viewConverter.getViewWidth(), _viewConverter.getViewHeight());
-	//	simpleQuad quadUV = _viewConverter.createQuadNormalizedUV(0, 0, _viewConverter.getViewWidth(), _viewConverter.getViewHeight());
-
-	//	return brogueColorQuad(gridLocator(0, 0), theColor, quadXY);
-	//}
+	template<isGLStream TStream>
+	int brogueViewCore<TStream>::getElementCount() const
+	{
+		return _elements->count();
+	}
 
 	template<isGLStream TStream>
-	void brogueViewCore<TStream>::initializeStream(int elementSize)
+	void brogueViewCore<TStream>::resizeElements(int elementSize)
 	{
-		// Re-allocate the software-side buffer
-		delete _elements;
+		if (elementSize == 0)
+			throw simpleException("Must not resize the brogueViewCore element stream to zero:  brogueViewCore.h");
 
-		_elements = new simpleArray<TStream>(elementSize);
+		if (elementSize != _elements->count())
+		{
+			delete _elements;
 
+			_elements = new simpleArray<TStream>(elementSize);
+
+			_dataInvalid = true;
+		}
+	}
+
+	template<isGLStream TStream>
+	void brogueViewCore<TStream>::resizeDataStream(int elementSize)
+	{
 		// Create the pre-allocated data stream
 		switch (_configuration->dataStreamType)
 		{
@@ -433,33 +488,69 @@ namespace brogueHd::frontend
 			default:
 				throw simpleException("Unknown openglDataStreamType:  brogueViewCore::initializeStream");
 		}
+
+		_dataInvalid = true;
 	}
 
 	template<isGLStream TStream>
-	void brogueViewCore<TStream>::createStream()
+	void brogueViewCore<TStream>::validateReady()
 	{
-		if (_dataStream->getStreamNumberElements() != _elements->count())
-			throw simpleException("Invalid data stream size (brogueViewCore.h):  # of elements should match what was set up on the GL backend");
-
-		// Create Scene Data Streams
-
-		// Element Size:   Total number of primitives (floats) to commit to the stream
-		// Element Length: Total number of elements as seen by OpenGL - depends on the drawing type
-		//
-
-		// RESET CURSOR:  This sends the data stream cursor back to zero; and allows overwriting the existing data.
-		_dataStream->resetCursor();
-
-		for (int index = 0; index < _elements->count(); index++)
+		// Lazy compilation (must have data ready)
+		if (!_compiled || _dataInvalid)
 		{
-			_elements->get(index).streamBuffer(this->PrimitiveType, _dataStream);
+			if (_elements->count() > 0)
+				compileAndBuffer();
+
+			else
+				throw simpleException("Trying to utilize brogueViewCore without any data. Must set data into the backend before calling any GL functions");
 		}
 	}
 
 	template<isGLStream TStream>
-	void brogueViewCore<TStream>::reStream()
+	void brogueViewCore<TStream>::compileAndBuffer()
 	{
-		_program->bind();
-		_program->reBuffer();			// Copies the contents of our shared data stream pointer to the GPU
+		bool resized = false;
+
+		// New Stream Size
+		//
+		if (_dataStream->getStreamNumberElements() != _elements->count())
+		{
+			resizeDataStream(_elements->count());
+
+			resized = true;
+		}
+
+		// Data Update
+		//
+		if (_dataInvalid)
+		{
+			// Create Scene Data Streams
+
+			// Element Size:   Total number of primitives (floats) to commit to the stream
+			// Element Length: Total number of elements as seen by OpenGL - depends on the drawing type
+			//
+
+			// RESET CURSOR:  This sends the data stream cursor back to zero; and allows overwriting the existing data.
+			_dataStream->resetCursor();
+
+			for (int index = 0; index < _elements->count(); index++)
+			{
+				_elements->get(index).streamBuffer(this->PrimitiveType, _dataStream);
+			}
+		}
+
+		// First Run:  Compile -> also streams the initial data, so there's no need to "rebuffer"
+		//
+		if (!_compiled)
+		{
+			_program->compile();
+		}
+		else
+		{
+			_program->reBuffer(resized);
+		}
+
+		_compiled = true;
+		_dataInvalid = false;
 	}
 }

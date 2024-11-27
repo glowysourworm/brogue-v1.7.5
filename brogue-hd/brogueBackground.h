@@ -30,6 +30,10 @@ namespace brogueHd::frontend
 		~brogueBackground();
 
 		virtual void update(int millisecondsLapsed, bool forceUpdate) override;
+
+	private:
+
+		void updateImpl(int millisecondsLapsed, bool forceUpdate);
 	};
 
 	brogueBackground::brogueBackground(brogueCoordinateConverter* coordinateConverter,
@@ -39,31 +43,39 @@ namespace brogueHd::frontend
 										 const brogueUIData& data)
 		: brogueViewGridCore(coordinateConverter, resourceController, eventController, partId, data)
 	{
-		brogueBackground* that = this;
-
-		// Initialize to use the background color
-		data.getBoundary().iterate([&that, &data] (int column, int row)
-		{
-			brogueCellDisplay cell(column, row);
-
-			// Calculate background (TODO: Bring in the gradient code, somewhere..)
-			cell.backColor = data.calculateGradient(column, row, false, false, false);
-
-			that->set(cell);	// -> Puts this into the data stream
-
-			return iterationCallback::iterate;
-		});
-
-		// Call initializeCore() -> sets up stream for  GL backend
-		brogueViewGridCore::initializeCore();
+		update(0, true);
 	}
 
 	brogueBackground::~brogueBackground()
 	{
 	}
+
+	void brogueBackground::updateImpl(int millisecondsLapsed, bool forceUpdate)
+	{
+		brogueBackground* that = this;
+		brogueUIData* uiData = this->getUIData();
+
+		// Initialize to use the background color
+		uiData->getBoundary().iterate([&that, &uiData] (int column, int row)
+		{
+			brogueCellDisplay cell(column, row);
+
+			// Calculate background (TODO: Bring in the gradient code, somewhere..)
+			cell.backColor = uiData->calculateGradient(column, row, false, false, false);
+
+			that->set(cell);	// -> Puts this into the data stream
+
+			return iterationCallback::iterate;
+		});
+	}
+
 	void brogueBackground::update(int millisecondsLapsed, bool forceUpdate)
 	{
-		// Nothing to do until we add mouse interaction
+		// Set the data elements
+		updateImpl(millisecondsLapsed, forceUpdate);
+
+		// Call the base class -> restream the data
+		brogueViewGridCore<brogueColorQuad>::update(millisecondsLapsed, forceUpdate);
 	}
 }
 

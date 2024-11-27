@@ -195,7 +195,6 @@
     <ClInclude Include="brogueLevelTemplate.h" />
     <ClInclude Include="brogueMainProgram.h" />
     <ClInclude Include="brogueMouseState.h" />
-    <ClInclude Include="brogueProgramBuilder.h" />
     <ClInclude Include="brogueGameTemplate.h" />
     <ClInclude Include="brogueScrollView.h" />
     <ClInclude Include="brogueTitleGrid.h" />
@@ -213,7 +212,6 @@
     <ClInclude Include="brogueViewCore.h" />
     <ClInclude Include="brogueViewGridCore.h" />
     <ClInclude Include="brogueViewPolygonCore.h" />
-    <ClInclude Include="brogueViewProgram.h" />
     <ClInclude Include="brogueColorMap.h" />
     <ClInclude Include="brogueColorQuad.h" />
     <ClInclude Include="brogueConsole.h" />

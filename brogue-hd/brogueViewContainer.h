@@ -78,7 +78,7 @@ namespace brogueHd::frontend
 		void clearEvents();
 		void update(int millisecondsLapsed, bool forceUpdate);
 
-		void compile();
+		void initialize();
 		void run();
 		void activate();
 		void deactivate();
@@ -490,8 +490,9 @@ namespace brogueHd::frontend
 	}
 	void brogueViewContainer::setRenderOffsetUI(int pixelX, float pixelY)
 	{
-		if (!_active)
-			throw simpleException("Must activate program first before calling methods:  brogueViewContainer::initialStateChange");
+		// During initialization
+		//if (!_active)
+		//	throw simpleException("Must activate program first before calling methods:  brogueViewContainer::initialStateChange");
 
 		_renderOffset->x = pixelX;
 		_renderOffset->y = pixelY;
@@ -525,8 +526,13 @@ namespace brogueHd::frontend
 	{
 		return _active;
 	}
-	void brogueViewContainer::compile()
+	void brogueViewContainer::initialize()
 	{
+		// NOTE*** This will also force a data update of the brogueViewCore, which will
+		//		   lazy initialize all the shader programs. This must happen after data
+		//		   has been set; and before trying to set uniforms to the programs.
+		//
+
 		// Initialize Uniforms
 		ivec2 cellSizeUI(brogueCellDisplay::CellWidth(_zoomLevel), brogueCellDisplay::CellHeight(_zoomLevel));
 		vec2 cellSizeUV(this->getCellSizeUV().getWidth(), this->getCellSizeUV().getHeight());
@@ -535,8 +541,6 @@ namespace brogueHd::frontend
 
 		_cellViews->forEach([&that, &cellSizeUI, &cellSizeUV] (const brogueUIProgramPartId& partId, brogueViewGridCore<brogueCellQuad>* view)
 		{
-			view->compileCore();
-
 			if (view->hasUniform(that->UniformCellSizeUI))
 				view->setUniform(that->UniformCellSizeUI, cellSizeUI);
 
@@ -548,8 +552,6 @@ namespace brogueHd::frontend
 
 		_imageViews->forEach([&that, &cellSizeUI, &cellSizeUV] (const brogueUIProgramPartId& partId, brogueViewGridCore<brogueImageQuad>* view)
 		{
-			view->compileCore();
-
 			if (view->hasUniform(that->UniformCellSizeUI))
 				view->setUniform(that->UniformCellSizeUI, cellSizeUI);
 
@@ -561,8 +563,6 @@ namespace brogueHd::frontend
 
 		_colorViews->forEach([&that, &cellSizeUI, &cellSizeUV] (const brogueUIProgramPartId& partId, brogueViewGridCore<brogueColorQuad>* view)
 		{
-			view->compileCore();
-
 			if (view->hasUniform(that->UniformCellSizeUI))
 				view->setUniform(that->UniformCellSizeUI, cellSizeUI);
 
@@ -574,8 +574,6 @@ namespace brogueHd::frontend
 
 		_lineViews->forEach([&that, &cellSizeUI, &cellSizeUV] (const brogueUIProgramPartId& partId, brogueViewPolygonCore* view)
 		{
-			view->compileCore();
-
 			if (view->hasUniform(that->UniformCellSizeUI))
 				view->setUniform(that->UniformCellSizeUI, cellSizeUI);
 

@@ -77,7 +77,5 @@ namespace brogueHd::frontend
 
 			return iterationCallback::iterate;
 		});
-
-		brogueViewPolygonCore::initializeCore();
 	}
 }

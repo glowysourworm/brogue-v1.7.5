@@ -49,9 +49,10 @@ namespace brogueHd::frontend
 		void showActives();
 
 		/// <summary>
-		/// Call to re-buffer the data glNamedBufferSubData. This will use the shared simpleDataStream* pointer.
+		/// Call to re-buffer the data glNamedBufferSubData. This will use the shared simpleDataStream* pointer. Using
+		/// "forceNew" will delete the existing buffer on the GPU; and re-initialize the storage.
 		/// </summary>
-		void reBuffer();
+		void reBuffer(bool forceNew);
 		
 		/// <summary>
 		/// Returns a pointer to the VAO's data stream (currently one-per-VAO, assigned to the VBO). Use this
@@ -156,7 +157,7 @@ namespace brogueHd::frontend
 		_programVAO->draw();
 	}
 
-	void simpleShaderProgram::reBuffer()
+	void simpleShaderProgram::reBuffer(bool forceNew)
 	{
 		if (!this->isCreated())
 			throw simpleException("Must first call compile() to run shader program:  simpleShaderProgram.h");
@@ -165,7 +166,7 @@ namespace brogueHd::frontend
 			throw simpleException("Must first call bind to set the program active");
 
 		_programVAO->bind();
-		_programVAO->reBuffer(this->handle);
+		_programVAO->reBuffer(this->handle, forceNew);
 	}
 	simpleDataStream* simpleShaderProgram::getStream() const
 	{

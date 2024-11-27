@@ -494,16 +494,17 @@ namespace brogueHd::frontend
 		_frameProgram->compile();
 
 		/*
-			Brogue UI Programs:  This will call routines to setup all the "shader programs" that compose UI programs,
-								 one per brogueViewContainer, which are the primary UI components, have names, interact
-								 with the mouse, may be activated and deactivated, and will stay in memory until the
-								 end of the application.
+			Brogue UI Programs:  This will call routines to setup all the shader programs that compose "UI programs",
+								 one (UI program) per brogueViewContainer, which are the primary UI components, have names, 
+								 interact with the mouse, may be activated and deactivated, and will stay in memory until the
+								 end of the application. These must be initialized before calling "draw"; but there are
+								 lazy compilations of the brogueViewCore that allow data to be set after the constructor.
 		*/
 
 		_uiPrograms->iterate([] (const brogueUIProgram& programName, brogueViewContainer* viewProgram)
 		{
 			// Compile the UI Programs
-			viewProgram->compile();
+			viewProgram->initialize();
 			return iterationCallback::iterate;
 		});
 

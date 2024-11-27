@@ -1,5 +1,6 @@
 #pragma once
 #include "brogueCellDisplay.h"
+#include "brogueCellQuad.h"
 #include "brogueColorQuad.h"
 #include "brogueCoordinateConverter.h"
 #include "brogueKeyboardState.h"
@@ -27,7 +28,7 @@ namespace brogueHd::frontend
 	/// elements will provide the constant colors below. This view will keep track of a random sequence to provide
 	/// also as uniforms to the GPU shaders to add variability.
 	/// </summary>
-	class brogueFlameMenuHeatView : public brogueViewGridCore<brogueColorQuad>
+	class brogueFlameMenuHeatView : public brogueViewGridCore<brogueCellQuad>
 	{
 	public:
 		brogueFlameMenuHeatView(brogueCoordinateConverter* coordinateConverter,
@@ -81,6 +82,10 @@ namespace brogueHd::frontend
 			return _titleGrid->isTheText(column, row);
 		}
 
+	private:
+
+		void updateImpl(int millisecondsLapsed, int forceUpdate);
+
 	public:
 
 		const color FlameBottomColor1 = color(1.0f, 0.0f, 0.0f, 1);
@@ -119,10 +124,8 @@ namespace brogueHd::frontend
 		_fadePeriodCounter = new simplePeriodCounter(fadePeriodMilliseconds);
 		_titleGrid = new brogueTitleGrid();
 
+		// Set initial stream data
 		update(0, true);
-
-		// Call initializeCore() -> sets up stream for  GL backend
-		brogueViewGridCore::initializeCore();
 	}
 	brogueFlameMenuHeatView::~brogueFlameMenuHeatView()
 	{
@@ -173,7 +176,8 @@ namespace brogueHd::frontend
 
 		brogueViewGridCore::clearUpdate();
 	}
-	void brogueFlameMenuHeatView::update(int millisecondsLapsed, bool forceUpdate)
+
+	void brogueFlameMenuHeatView::updateImpl(int millisecondsLapsed, int forceUpdate)
 	{
 		brogueFlameMenuHeatView* that = this;
 		brogueTitleGrid* titleGrid = _titleGrid;
@@ -198,5 +202,14 @@ namespace brogueHd::frontend
 
 			return iterationCallback::iterate;
 		});
+	}
+
+	void brogueFlameMenuHeatView::update(int millisecondsLapsed, bool forceUpdate)
+	{
+		// Update data elements in the view
+		updateImpl(millisecondsLapsed, forceUpdate);
+
+		// Call the base class -> restream the data
+		brogueViewGridCore<brogueCellQuad>::update(millisecondsLapsed, forceUpdate);
 	}
 }

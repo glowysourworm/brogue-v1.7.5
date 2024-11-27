@@ -44,8 +44,11 @@ namespace brogueHd::frontend
 		/// <summary>
 		/// Calls simpleVertexBuffer to re-sub the data from its simpleDataStream. This would be in the case
 		/// of reloading the data into the data stream; and updating the GPU memory. (shared pointer)
+		/// 
+		/// Using "forceNew" will reset the size of the VBO's data storage on the GPU. Use this if the size
+		/// of the (shared pointer) data stream has changed.
 		/// </summary>
-		void reBuffer(GLuint programHandle);
+		void reBuffer(GLuint programHandle, bool forceNew);
 
 		/// <summary>
 		/// Gets the simpleDataStream* pointer. Use this to rebuffer the stream; but must keep same size and
@@ -96,6 +99,9 @@ namespace brogueHd::frontend
 	{
 		if (this->isCreated())
 			throw simpleException("simpleVertexBuffer already created in the backend");
+
+		if (_stream->getStreamSize() == 0)
+			throw simpleException("Trying to create a VBO with zero size");
 
 		// Procedure
 		//
@@ -274,20 +280,27 @@ namespace brogueHd::frontend
 	}
 
 	template<typename T>
-	void simpleVertexBuffer<T>::reBuffer(GLuint programHandle)
+	void simpleVertexBuffer<T>::reBuffer(GLuint programHandle, bool forceNew)
 	{
 		if (!this->isCreated())
 			throw simpleException("simpleVertexBuffer not yet created on the GL backend. Call glCreate first.");
 
-		// Need to try named buffer. Active buffer should find the right buffer index; but it was having .. trouble.
-		glNamedBufferSubData(this->handle, (GLintptr)0, (GLsizeiptr)_stream->getStreamSize(), (void*)_stream->getData());
-
-		// Khronos Group:  glBufferData will delete anything that has been allocated on this particular buffer.
-		//
-		//glBufferData(GL_ARRAY_BUFFER,
-		//            (GLsizeiptr)_stream->getStreamSize(), 
-		//            _stream->getData(),
-		//            GL_DYNAMIC_DRAW);
+		// ***NOTE: The simpleDataStream* is a shared pointer! This should be used in the event that the CPU side
+		//			memory storage size has not changed. Otherwise, use glBufferData.
+		if (!forceNew)
+		{
+			// Need to try named buffer. Active buffer should find the right buffer index; but it was having .. trouble.
+			glNamedBufferSubData(this->handle, (GLintptr)0, (GLsizeiptr)_stream->getStreamSize(), (void*)_stream->getData());
+		}
+		else
+		{
+			// Khronos Group:  glBufferData will delete anything that has been allocated on this particular buffer.
+			//
+			glBufferData(GL_ARRAY_BUFFER,
+			            (GLsizeiptr)_stream->getStreamSize(), 
+			            _stream->getData(),
+			            GL_DYNAMIC_DRAW);
+		}
 	}
 
 	template<typename T>

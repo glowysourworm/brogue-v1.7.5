@@ -128,8 +128,8 @@ namespace brogueHd::backend::model
 		}
 		brogueCellDisplay(int column, int row)
 		{
-			column = column;
-			row = row;
+			this->column = column;
+			this->row = row;
 			character = brogueGlyphMap::Empty;
 			foreColor = default_value::value<color>();
 			backColor = default_value::value<color>();

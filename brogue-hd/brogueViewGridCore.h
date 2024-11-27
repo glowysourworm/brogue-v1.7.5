@@ -49,17 +49,6 @@ namespace brogueHd::frontend
 		~brogueViewGridCore();
 
 		/// <summary>
-		/// The core of the GL stream must be initialized after this view has been set up. Use get / set
-		/// methods on the view's grid data to set up the view before calling this function.
-		/// </summary>
-		void initializeCore();
-
-		/// <summary>
-		/// Compiles the GL shader program and output status. This should be done after initializeCore is run.
-		/// </summary>
-		void compileCore();
-
-		/// <summary>
 		/// Sets the invalidate flag (see other overloads for UI interaction)
 		/// </summary>
 		void invalidate();
@@ -102,26 +91,16 @@ namespace brogueHd::frontend
 
 	private:	// GL Stream Functions
 
+		/// <summary>
+		/// Function used to copy over view's data elements when it is invalid
+		/// </summary>
+		void setDataStreamElements();
+
 		brogueImageQuad createBrogueImageQuad(const brogueCellDisplay& cell, openglBrogueCellOutputSelector outputSelector);
 		brogueCellQuad createBrogueCellQuad(const brogueCellDisplay& cell, openglBrogueCellOutputSelector outputSelector);
 		brogueColorQuad createBrogueColorQuad(const brogueCellDisplay& cell, openglBrogueCellOutputSelector outputSelector);
 
 	public:		// UI Functions
-
-		///// <summary>
-		///// (TODO: MOVE THIS) Calculates the view's scene boundary is UI coordinates. This is not the same as the
-		///// GL viewport; but the coordinate space relates to it. Zoom, and offset must be
-		///// first added to the calculation.
-		///// </summary>
-		//gridRect calculateSceneBoundaryUI() const;
-
-		///// <summary>
-		///// Calculates the view's boundary in UI coordinates. This is not the same as the
-		///// GL viewport; but the coordinate space relates to it. Zoom, and offset must be
-		///// first added to the calculation.
-		///// </summary>
-		///// <returns></returns>
-		//gridRect calculateViewBoundaryUI() const;
 
 		/// <summary>
 		/// Gets the specified view cell's data
@@ -228,7 +207,6 @@ namespace brogueHd::frontend
 	private:
 
 		brogueCoordinateConverter* _coordinateConverter;
-		//brogueElementBuilder<TStream>* _elementBuilder;
 		brogueUIProgramPartConfiguration* _configuration;
 		brogueUIProgramPartId* _partId;
 		grid<brogueCellDisplay*>* _view;
@@ -237,6 +215,7 @@ namespace brogueHd::frontend
 		brogueUIMouseData* _mouseData;
 
 		bool _invalid;
+		bool _initialized;
 
 	private:
 
@@ -252,7 +231,7 @@ namespace brogueHd::frontend
 		: brogueViewCore<TStream>(resourceController, partId, data.getParentBoundary(), data.getBoundary())
 	{
 		_eventController = eventController;
-		//_elementBuilder = new brogueElementBuilder<TStream>(coordinateConverter);
+		_coordinateConverter = coordinateConverter;
 		_view = new grid<brogueCellDisplay*>(data.getParentBoundary(), data.getBoundary());
 		_configuration = new brogueUIProgramPartConfiguration(*resourceController->getUIPartConfig(partId.getPartName()));
 		_partId = new brogueUIProgramPartId(partId);
@@ -285,8 +264,12 @@ namespace brogueHd::frontend
 	}
 
 	template<isGLStream TStream>
-	void brogueViewGridCore<TStream>::initializeCore()
+	void brogueViewGridCore<TStream>::setDataStreamElements()
 	{
+		// Procedure: Check the stream's size before setting elements into their place. This requires
+		//			  an extra iteration of the stream.
+		// 
+
 		int elementSize = 0;
 
 		// Must iterate to get the size of the data stream
@@ -297,17 +280,19 @@ namespace brogueHd::frontend
 			return iterationCallback::iterate;
 		});
 
-		// TDOO: FRAME TYPE STREAM! (?) (Maybe they're not needed)
-
-		// Initialize the GL backend stream
-		brogueViewCore<TStream>::initializeStream(elementSize);
+		// Resize Data Stream
+		if (elementSize != brogueViewCore<TStream>::getElementCount())
+			brogueViewCore<TStream>::resizeElements(elementSize);
 
 		brogueViewGridCore<TStream>* that = this;
 		openglBrogueCellOutputSelector noDisplaySelector = _configuration->noDisplaySelector;
 		const brogueUIProgramPartConfiguration* configuration = _configuration;
+
+		// Marks where we are in the output stream
 		int cursor = 0;
 
-		// Now, we can send elements to the stream's buffer; and call createStream / reStream
+		// Now, we can send elements to the stream's buffer; and re-buffer the view's output stream to the GPU
+		//
 		_view->iterateWhereDefined([&that, &noDisplaySelector, &cursor, &configuration] (int column, int row, brogueCellDisplay* cell)
 		{
 			// Stream out elements as the iterator specifies -> ordered onto the stream.
@@ -332,15 +317,7 @@ namespace brogueHd::frontend
 			return iterationCallback::iterate;
 		});
 
-		// Complete the buffer; and put it online
-		brogueViewCore<TStream>::createStream();
-	}
-
-	template<isGLStream TStream>
-	void brogueViewGridCore<TStream>::compileCore()
-	{
-		// Compile the GL program
-		brogueViewCore<TStream>::glInitialize();
+		_invalid = false;
 	}
 
 	template<isGLStream TStream>
@@ -394,30 +371,6 @@ namespace brogueHd::frontend
 	{
 		brogueViewCore<TStream>::glShowErrors();
 	}
-
-	//template<isGLStream TStream>
-	//gridRect brogueViewGridCore<TStream>::calculateSceneBoundaryUI() const
-	//{
-	//	gridRect sceneBoundary = getSceneBoundary();
-	//	gridRect boundaryUI = gridRect(sceneBoundary.left() * (double)brogueCellDisplay::CellWidth(_uiData->getZoomLevel()),
-	//								   sceneBoundary.top() * (double)brogueCellDisplay::CellHeight(_uiData->getZoomLevel()),
-	//								   sceneBoundary.width * (double)brogueCellDisplay::CellWidth(_uiData->getZoomLevel()),
-	//								   sceneBoundary.height * (double)brogueCellDisplay::CellHeight(_uiData->getZoomLevel()));
-
-	//	return boundaryUI;
-	//}
-
-	//template<isGLStream TStream>
-	//gridRect brogueViewGridCore<TStream>::calculateViewBoundaryUI() const
-	//{
-	//	gridRect viewBoundary = getBoundary();
-	//	gridRect boundaryUI = gridRect(viewBoundary.left() * (double)brogueCellDisplay::CellWidth(_uiData->getZoomLevel()),
-	//								   viewBoundary.top() * (double)brogueCellDisplay::CellHeight(_uiData->getZoomLevel()),
-	//								   viewBoundary.width * (double)brogueCellDisplay::CellWidth(_uiData->getZoomLevel()),
-	//								   viewBoundary.height * (double)brogueCellDisplay::CellHeight(_uiData->getZoomLevel()));
-
-	//	return boundaryUI;
-	//}
 
 	template<isGLStream TStream>
 	brogueUIProgramPartId brogueViewGridCore<TStream>::getPartId() const
@@ -597,7 +550,13 @@ namespace brogueHd::frontend
 	void brogueViewGridCore<TStream>::update(int millisecondsLapsed,
 											 bool forceUpdate)
 	{
-		throw simpleException("brogueViewGridCore::update must be overridden in the child class");
+		// Invalid:  Re-Buffer the output stream
+		//
+		if (_invalid || forceUpdate)
+		{
+			// Set elements from the view into the element array
+			setDataStreamElements();
+		}
 	}
 
 	template<isGLStream TStream>

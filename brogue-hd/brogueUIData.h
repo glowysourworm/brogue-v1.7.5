@@ -16,19 +16,19 @@ namespace brogueHd::frontend
 
 		brogueUIData()
 		{
+			_viewBoundary = new gridRect();
+			_viewParentBoundary = new gridRect();
 			_background = new colorGradient();
 			_hoverBackground = new colorGradient();
 			_pressedBackground = new colorGradient();
-
-			_background = new colorGradient(colors::transparent(), colors::transparent(), brogueGradientType::Horizontal);
-			_hoverBackground = new colorGradient(colors::transparent(), colors::transparent(), brogueGradientType::Horizontal);
-			_pressedBackground = new colorGradient(colors::transparent(), colors::transparent(), brogueGradientType::Horizontal);
 
 			_zoomLevel = 0;
 			_zIndex = 0;
 		};
 		brogueUIData(const brogueUIData& copy)
 		{
+			_viewBoundary = new gridRect();
+			_viewParentBoundary = new gridRect();
 			_background = new colorGradient();
 			_hoverBackground = new colorGradient();
 			_pressedBackground = new colorGradient();
@@ -37,14 +37,12 @@ namespace brogueHd::frontend
 		}
 		void operator=(const brogueUIData& copy)
 		{
-			_background = new colorGradient();
-			_hoverBackground = new colorGradient();
-			_pressedBackground = new colorGradient();
-
 			copyImpl(copy);
 		}
 		~brogueUIData()
 		{
+			delete _viewBoundary;
+			delete _viewParentBoundary;
 			delete _background;
 			delete _hoverBackground;
 			delete _pressedBackground;

@@ -22,13 +22,12 @@ uniform float fadePeriodTime;   // [0,1] time ratio for the color fade
 uniform int nextColorNumber;
 uniform int fadePeriodRandom1;   // Random constant integers for the fade period
 uniform int fadePeriodRandom2;
-
-uniform vec4 flameTitleColor1;
-uniform vec4 flameTitleColor2;
-uniform vec4 flameTitleColor3;
 uniform vec4 flameBottomColor1;
 uniform vec4 flameBottomColor2;
 uniform vec4 flameBottomColor3;
+uniform vec4 flameTitleColor1;
+uniform vec4 flameTitleColor2;
+uniform vec4 flameTitleColor3;
 
 int pseudoRandom(int lastRandom)
 {

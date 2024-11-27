@@ -33,6 +33,10 @@ namespace brogueHd::frontend
 		void add(brogueUIColorText* item);
 		void addRange(const simpleList<brogueUIColorText*>& items);
 
+	private:
+
+		void updateImpl(int millisecondsLapsed, bool forceUpdate);
+
 	protected:
 
 		simpleList<brogueUIColorText*>* _list;
@@ -68,7 +72,7 @@ namespace brogueHd::frontend
 		brogueViewGridCore::invalidate();
 	}
 
-	void brogueScrollView::update(int millisecondsLapsed, bool forceUpdate)
+	void brogueScrollView::updateImpl(int millisecondsLapsed, bool forceUpdate)
 	{
 		brogueScrollView* that = this;
 		gridRect boundary = this->getUIData()->getBoundary();
@@ -84,5 +88,14 @@ namespace brogueHd::frontend
 
 			return iterationCallback::iterate;
 		});
+	}
+
+	void brogueScrollView::update(int millisecondsLapsed, bool forceUpdate)
+	{
+		// Update data elements in the view
+		updateImpl(millisecondsLapsed, forceUpdate);
+
+		// Call the base class -> restream the data
+		brogueViewGridCore<brogueCellQuad>::update(millisecondsLapsed, forceUpdate);
 	}
 }

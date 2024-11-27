@@ -1,8 +1,6 @@
 #pragma once
 #include "brogueCellDisplay.h"
-#include "brogueKeyboardState.h"
-#include "brogueMouseState.h"
-#include "brogueUIBuilder.h"
+#include "brogueCoordinateConverter.h"
 #include "brogueUIConstants.h"
 #include "brogueViewContainer.h"
 #include "gridRect.h"
