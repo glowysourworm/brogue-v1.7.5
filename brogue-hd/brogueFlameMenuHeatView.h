@@ -124,7 +124,6 @@ namespace brogueHd::frontend
 		_fadePeriodCounter = new simplePeriodCounter(fadePeriodMilliseconds);
 		_titleGrid = new brogueTitleGrid();
 
-		// Set initial stream data
 		update(0, true);
 	}
 	brogueFlameMenuHeatView::~brogueFlameMenuHeatView()

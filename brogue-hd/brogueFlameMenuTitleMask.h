@@ -92,9 +92,6 @@ namespace brogueHd::frontend
 				if (titleGrid->isTheText(column, row))
 					that->set(cell);
 
-				else
-					that->set(brogueCellDisplay(column, row, colors::transparent()));
-
 				return iterationCallback::iterate;
 			});
 		}

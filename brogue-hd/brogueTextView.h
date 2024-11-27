@@ -58,8 +58,6 @@ namespace brogueHd::frontend
 		: brogueViewGridCore(coordinateConverter, resourceController, eventController, partId, data)
 	{
 		_uiText = new brogueUIText(data.getParentBoundary(), data.getBoundary(), simpleString(""));
-
-		update(0, true);
 	}
 	brogueTextView::~brogueTextView()
 	{

@@ -50,8 +50,6 @@ namespace brogueHd::frontend
 		: brogueViewGridCore(coordinateConverter, resourceController, eventController, partId, data)
 	{
 		_list = new simpleList<brogueUIColorText*>();
-
-		update(0, true);
 	}
 
 	brogueScrollView::~brogueScrollView()

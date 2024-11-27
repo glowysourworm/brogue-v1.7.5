@@ -43,7 +43,6 @@ namespace brogueHd::frontend
 										 const brogueUIData& data)
 		: brogueViewGridCore(coordinateConverter, resourceController, eventController, partId, data)
 	{
-		update(0, true);
 	}
 
 	brogueBackground::~brogueBackground()

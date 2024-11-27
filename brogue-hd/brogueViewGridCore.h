@@ -215,7 +215,6 @@ namespace brogueHd::frontend
 		brogueUIMouseData* _mouseData;
 
 		bool _invalid;
-		bool _initialized;
 
 	private:
 

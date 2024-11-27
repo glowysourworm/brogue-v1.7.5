@@ -296,18 +296,6 @@ namespace brogueHd::frontend
 		_program->bind();
 		_program->draw();
 
-		//if (program->hasUniform("fadePeriodTime") && partId.getName() == brogueUIProgram::FlameMenuProgram)
-		//	program->bindUniform1("fadePeriodTime", ((brogueFlameMenuHeatView*)view)->currentFadePeriod());
-
-		//if (program->hasUniform("fadePeriodRandom1") && partId.getName() == brogueUIProgram::FlameMenuProgram)
-		//	program->bindUniform1i("fadePeriodRandom1", ((brogueFlameMenuHeatView*)view)->currentFadePeriodRandom1());
-
-		//if (program->hasUniform("fadePeriodRandom2") && partId.getName() == brogueUIProgram::FlameMenuProgram)
-		//	program->bindUniform1i("fadePeriodRandom2", ((brogueFlameMenuHeatView*)view)->currentFadePeriodRandom2());
-
-		//if (program->hasUniform("nextColorNumber") && partId.getName() == brogueUIProgram::FlameMenuProgram)
-		//	program->bindUniform1i("nextColorNumber", ((brogueFlameMenuHeatView*)view)->fadePeriodCount() % 3);
-
 		if (_configuration->useAlphaBlending)
 			glDisable(GL_BLEND);
 

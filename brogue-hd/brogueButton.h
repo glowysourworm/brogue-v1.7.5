@@ -57,9 +57,6 @@ namespace brogueHd::frontend
 		: brogueViewGridCore(coordinateConverter, resourceController, eventController, partId, data)
 	{
 		_uiText = new brogueUIText(data.getParentBoundary(), data.getBoundary(), simpleString(""));
-
-		// Set data elements for the stream
-		update(0, true);
 	}
 	brogueButton::~brogueButton()
 	{
