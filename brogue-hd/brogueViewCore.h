@@ -362,6 +362,7 @@ namespace brogueHd::frontend
 		// Lazy compilation (must have data ready)
 		validateReady();
 
+		_program->bind();
 		_program->bindUniform1(name, value);
 	}
 
@@ -371,6 +372,7 @@ namespace brogueHd::frontend
 		// Lazy compilation (must have data ready)
 		validateReady();
 
+		_program->bind();
 		_program->bindUniform1i(name, value);
 	}
 
@@ -380,6 +382,7 @@ namespace brogueHd::frontend
 		// Lazy compilation (must have data ready)
 		validateReady();
 
+		_program->bind();
 		_program->bindUniform2(name, value);
 	}
 
@@ -389,6 +392,7 @@ namespace brogueHd::frontend
 		// Lazy compilation (must have data ready)
 		validateReady();
 
+		_program->bind();
 		_program->bindUniform2i(name, value);
 	}
 
@@ -398,6 +402,7 @@ namespace brogueHd::frontend
 		// Lazy compilation (must have data ready)
 		validateReady();
 
+		_program->bind();
 		_program->bindUniform4(name, value);
 	}
 
@@ -533,6 +538,8 @@ namespace brogueHd::frontend
 			{
 				_elements->get(index).streamBuffer(this->PrimitiveType, _dataStream);
 			}
+
+			_dataInvalid = false;
 		}
 
 		// First Run:  Compile -> also streams the initial data, so there's no need to "rebuffer"
@@ -540,13 +547,12 @@ namespace brogueHd::frontend
 		if (!_compiled)
 		{
 			_program->compile();
+			_compiled = true;
 		}
 		else
 		{
+			_program->bind();
 			_program->reBuffer(resized);
 		}
-
-		_compiled = true;
-		_dataInvalid = false;
 	}
 }

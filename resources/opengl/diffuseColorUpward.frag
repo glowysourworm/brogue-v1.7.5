@@ -19,7 +19,7 @@ uniform vec2 cellSizeUV;
 uniform ivec2 cellSizeUI;
 uniform float weight;
 uniform float fadePeriodTime;   // [0,1] time ratio for the color fade
-uniform int nextColorNumber;
+//uniform int nextColorNumber;
 uniform int fadePeriodRandom1;   // Random constant integers for the fade period
 uniform int fadePeriodRandom2;
 uniform vec4 flameBottomColor1;

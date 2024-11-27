@@ -150,10 +150,10 @@ namespace brogueHd::frontend
 		}
 
 		// Set Uniforms (where they are defined)
-		setUniform<int>("fadePeriodTime", currentFadePeriod());
+		setUniform<float>("fadePeriodTime", currentFadePeriod());
 		setUniform<int>("fadePeriodRandom1", currentFadePeriodRandom1());
 		setUniform<int>("fadePeriodRandom2", currentFadePeriodRandom2());
-		setUniform<int>("nextColorNumber", fadePeriodCount() % 3);
+		//setUniform<int>("nextColorNumber", fadePeriodCount() % 3);
 
 		// Mouse Interaction
 		brogueViewGridCore::checkUpdate(keyboardState, mouseState, millisecondsLapsed);

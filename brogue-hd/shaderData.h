@@ -98,7 +98,7 @@ namespace brogueHd::frontend
 					this->uniforms1.add(simpleUniform<float>("fadePeriodTime", GL_FLOAT, 0.0f));			// [0,1] time ratio for the color fade
 					this->uniforms1i.add(simpleUniform<int>("fadePeriodRandom1", GL_INT, 1));				// Random integer 1 uniform for the fade period
 					this->uniforms1i.add(simpleUniform<int>("fadePeriodRandom2", GL_INT, 1));				// Random integer 1 uniform for the fade period
-					this->uniforms1i.add(simpleUniform<int>("nextColorNumber", GL_INT, 1));					// Counter for the color index of the title view
+					//this->uniforms1i.add(simpleUniform<int>("nextColorNumber", GL_INT, 1));					// Counter for the color index of the title view
 
 					// "Static" flame colors (could just go in the shader)
 					this->uniforms4.add(simpleUniform<vec4>("flameBottomColor1", GL_FLOAT_VEC4, vec4(1.0f, 0.0f, 0.0f, 1)));	
