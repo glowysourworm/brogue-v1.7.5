@@ -175,7 +175,7 @@ namespace brogueHd::backend
 		// Machine Rooms
 
 		// Triangulate Rooms:  Creates Delaunay Triangulation of the connection point vertices (new _delaunayGraph)
-		triangulateRooms();
+		//triangulateRooms();
 
 		// Connect Rooms:  Create cells in the grid for the delaunay triangulation of the 
 		//                 connection points of the room tiles. Runs dijkstra's algorithm to

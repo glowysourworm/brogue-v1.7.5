@@ -34,7 +34,7 @@ namespace brogueHd::frontend
 								   eventController* eventController,
 								   const brogueUIProgramPartId& partId,
 								   const brogueUIData& data)
-		: brogueViewGridCore(coordinateConverter, resourceController, eventController, partId, data)
+		: brogueViewGridCore(coordinateConverter, resourceController, eventController, partId, data, true)
 	{
 		this->setUIAction(brogueUITagAction(brogueUIState::GameNormal));
 	}

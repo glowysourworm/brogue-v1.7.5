@@ -285,7 +285,7 @@ namespace brogueHd::frontend
 	}
 	void brogueMainProgram::setGameUpdate(const brogueCellDisplay& data)
 	{
-		brogueUIProgramPartId partId(brogueUIProgram::GameProgram, brogueUIProgramPart::Background, 0);
+		brogueUIProgramPartId partId(brogueUIProgram::GameProgram, brogueUIProgramPart::GameSurface, 0);
 
 		_uiPrograms->get(brogueUIProgram::GameProgram)->setGridProgram(partId, data);
 	}

@@ -109,11 +109,17 @@ namespace brogueHd::backend
 
 		// Primary game data set
 		brogueGame* _game;
+
+		// TODO: MOVE THIS
+		int _zoomLevel;
 	};
 
 
 	gameController::gameController(resourceController* resourceController)
 	{
+		// TODO: MOVE THIS
+		_zoomLevel = 10;
+
 		_game = nullptr;
 		_keyProcessor = new keyProcessor();
 		_playbackProcessor = new playbackProcessor();
@@ -122,7 +128,7 @@ namespace brogueHd::backend
 		_noiseGenerator = new noiseGenerator(_randomMain);
 		_eventController = new eventController();
 		_resourceController = resourceController;
-		_renderingController = new renderingController(_eventController, resourceController, _randomCosmetic);
+		_renderingController = new renderingController(_eventController, resourceController, _randomCosmetic, _zoomLevel);
 		_gameMode = BrogueGameMode::Title;
 	}
 
@@ -178,7 +184,7 @@ namespace brogueHd::backend
 		_randomMain->reset(seed);
 
 		brogueGameTemplate* gameTemplate = _resourceController->getBrogueDesign_v1_7_5();
-		brogueUIBuilder uiBuilder(_eventController, _resourceController, _randomMain, 0);
+		brogueUIBuilder uiBuilder(_eventController, _resourceController, _randomMain, _zoomLevel);
 		gridRect boundary = uiBuilder.getBrogueSceneBoundary();
 		gameGenerator generator(&uiBuilder, _randomMain, _noiseGenerator, boundary);
 

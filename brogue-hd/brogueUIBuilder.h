@@ -287,6 +287,7 @@ namespace brogueHd::frontend
 		{
 			case brogueUIProgramPart::MenuBackground:
 			case brogueUIProgramPart::Background:
+			case brogueUIProgramPart::GameSurface:
 				switch (partId.getName())
 				{
 					case brogueUIProgram::MainMenuProgram:
@@ -380,7 +381,7 @@ namespace brogueHd::frontend
 		brogueUITagAction action(brogueUIState::MainMenu);
 
 		brogueFlameMenuHeatView* heatView = new brogueFlameMenuHeatView(_coordinateConverter, _resourceController, _eventController, _randomGenerator, heatId, heatData, this->FlamePeriodFadeMilliseconds);
-		brogueViewProgram* result = new brogueViewProgram(_coordinateConverter, brogueUIProgram::FlameMenuProgram, _zoomLevel, false, false, sceneBoundary, sceneBoundary);
+		brogueViewProgram* result = new brogueViewProgram(_coordinateConverter, brogueUIProgram::FlameMenuProgram, sceneBoundary, sceneBoundary);
 
 		// Set state change action
 		heatView->setUIAction(action);
@@ -398,7 +399,7 @@ namespace brogueHd::frontend
 		brogueUIData titleMaskData(sceneBounds, sceneBounds, _zoomLevel, colors::transparent());
 		brogueFlameMenuTitleMask* titleMask = new brogueFlameMenuTitleMask(_coordinateConverter, _resourceController, _eventController, titleId, titleMaskData);
 
-		brogueViewProgram* result = new brogueViewProgram(_coordinateConverter, brogueUIProgram::FlameMenuTitleMaskProgram, _zoomLevel, false, false, sceneBounds, sceneBounds);
+		brogueViewProgram* result = new brogueViewProgram(_coordinateConverter, brogueUIProgram::FlameMenuTitleMaskProgram, sceneBounds, sceneBounds);
 
 		result->addView(titleMask);
 		return result;
@@ -410,7 +411,7 @@ namespace brogueHd::frontend
 		gridRect menuBounds = getBrogueStaticBoundary(brogueUIProgramPartId(brogueUIProgram::MainMenuProgram, brogueUIProgramPart::MenuBackground, 0));
 		gridRect paddedBounds = menuBounds.createPadded(1);
 
-		brogueViewProgram* result = new brogueViewProgram(_coordinateConverter, brogueUIProgram::MainMenuProgram, _zoomLevel, false, false, menuBounds, sceneBounds);
+		brogueViewProgram* result = new brogueViewProgram(_coordinateConverter, brogueUIProgram::MainMenuProgram, menuBounds, sceneBounds);
 
 		int buttonPadding = 1;
 
@@ -486,7 +487,7 @@ namespace brogueHd::frontend
 			items.add(new brogueUIColorText(colorText, tagAction));
 		}
 
-		brogueViewProgram* result = new brogueViewProgram(_coordinateConverter, programName, _zoomLevel, true, true, backgroundBounds, sceneBounds);
+		brogueViewProgram* result = new brogueViewProgram(_coordinateConverter, programName, backgroundBounds, sceneBounds);
 
 		// Header will be a text view with no mouse interaction
 		//
@@ -533,7 +534,7 @@ namespace brogueHd::frontend
 
 		gridRect boundary = getBrogueStaticBoundary(brogueUIProgramPartId(brogueUIProgram::BottomBarMenuProgram, brogueUIProgramPart::Background, 0));
 
-		brogueViewProgram* result = new brogueViewProgram(_coordinateConverter, brogueUIProgram::BottomBarMenuProgram, _zoomLevel, false, false, boundary, sceneBounds);
+		brogueViewProgram* result = new brogueViewProgram(_coordinateConverter, brogueUIProgram::BottomBarMenuProgram, boundary, sceneBounds);
 
 		result->addView(depthText);
 		result->addView(exploreButton);
@@ -553,7 +554,7 @@ namespace brogueHd::frontend
 		gridRect sceneBounds = getBrogueSceneBoundary();
 		gridRect boundary = getBrogueStaticBoundary(brogueUIProgramPartId(program, brogueUIProgramPart::Background, 0));
 		brogueTextView* flavorText = createTextViewSingleLine(program, boundary, "You see a large Troll...", FontFlavorTextColor(), colors::black(), colors::black(), brogueTextAlignment::Left);
-		brogueViewProgram* result = new brogueViewProgram(_coordinateConverter, program, _zoomLevel, false, false, boundary, sceneBounds);
+		brogueViewProgram* result = new brogueViewProgram(_coordinateConverter, program, boundary, sceneBounds);
 
 		result->addView(flavorText);
 
@@ -568,7 +569,7 @@ namespace brogueHd::frontend
 		gridRect boundary = getBrogueStaticBoundary(brogueUIProgramPartId(programName, brogueUIProgramPart::Background, 0));
 		gridRect itemBounds(0, 0, COLS - DCOLS, 1);
 
-		brogueViewProgram* result = new brogueViewProgram(_coordinateConverter, programName, _zoomLevel, true, false, boundary, sceneBounds);
+		brogueViewProgram* result = new brogueViewProgram(_coordinateConverter, programName, boundary, sceneBounds);
 
 		// Background
 		result->addView(createBackground(programName, boundary));
@@ -594,7 +595,7 @@ namespace brogueHd::frontend
 		gridRect sceneBounds = getBrogueSceneBoundary();
 		gridRect boundary = getBrogueStaticBoundary(brogueUIProgramPartId(program, brogueUIProgramPart::Background, 0));
 
-		brogueGameLogContainer* result = new brogueGameLogContainer(_coordinateConverter, program, _zoomLevel, false, false, boundary, sceneBounds);
+		brogueGameLogContainer* result = new brogueGameLogContainer(_coordinateConverter, program, boundary, sceneBounds);
 
 		brogueUIProgramPartId partId(program, brogueUIProgramPart::Text, 0);
 		brogueUIData uiData(boundary, sceneBounds, _zoomLevel, MenuDefaultBackground());
@@ -652,7 +653,7 @@ namespace brogueHd::frontend
 
 		brogueButton* button9 = createGameMenuButton(program, itemBoundary, brogueUITagAction(brogueUIAction::GameCommand_Rest), "Q: Quit", brogueTextAlignment::Left, 0);
 
-		brogueViewProgram* result = new brogueViewProgram(_coordinateConverter, program, _zoomLevel, false, false, boundary, sceneBounds);
+		brogueViewProgram* result = new brogueViewProgram(_coordinateConverter, program, boundary, sceneBounds);
 
 		result->addView(button1);
 		result->addView(button2);
@@ -726,7 +727,7 @@ namespace brogueHd::frontend
 		brogueTextView* spacer3 = createTextViewSingleLine(program, itemBoundary, "   -- press (a-z) for more info --", GameFontSubduedColor(), FlatMenuButtonColor(), FlatMenuButtonColor(), brogueTextAlignment::Left);
 		itemBoundary.translate(0, 1);
 
-		brogueViewProgram* result = new brogueViewProgram(_coordinateConverter, program, _zoomLevel, false, false, boundary, sceneBounds);
+		brogueViewProgram* result = new brogueViewProgram(_coordinateConverter, program, boundary, sceneBounds);
 
 		result->addView(header);
 		result->addView(button1);
@@ -745,13 +746,13 @@ namespace brogueHd::frontend
 
 	brogueViewProgram* brogueUIBuilder::createGame()
 	{
-		brogueUIProgramPartId partId(brogueUIProgram::GameProgram, brogueUIProgramPart::Background, 0);
+		brogueUIProgramPartId partId(brogueUIProgram::GameProgram, brogueUIProgramPart::GameSurface, 0);
 		gridRect boundary = getBrogueStaticBoundary(partId);
 		gridRect sceneBounds = getBrogueSceneBoundary();
 		brogueUIData uiData(boundary, sceneBounds, _zoomLevel, colors::black());
 		brogueGameView* gameView = new brogueGameView(_coordinateConverter, _resourceController, _eventController, partId, uiData);
 
-		brogueViewProgram* container = new brogueViewProgram(_coordinateConverter, brogueUIProgram::GameProgram, _zoomLevel, false, false, boundary, sceneBounds);
+		brogueViewProgram* container = new brogueViewProgram(_coordinateConverter, brogueUIProgram::GameProgram, boundary, sceneBounds);
 
 		container->addView(gameView);
 
@@ -764,7 +765,7 @@ namespace brogueHd::frontend
 
 		gridRect sceneBounds = getBrogueSceneBoundary();
 
-		brogueViewProgram* result = new brogueViewProgram(_coordinateConverter, brogueUIProgram::HighScoresProgram, _zoomLevel, false, false, sceneBounds, sceneBounds);
+		brogueViewProgram* result = new brogueViewProgram(_coordinateConverter, brogueUIProgram::HighScoresProgram, sceneBounds, sceneBounds);
 
 		brogueUIProgramPartId partId(brogueUIProgram::HighScoresProgram, brogueUIProgramPart::Text, 0);
 		brogueUIData uiData(sceneBounds, sceneBounds, _zoomLevel, MenuDefaultBackground());
@@ -814,7 +815,7 @@ namespace brogueHd::frontend
 		gridRect sceneBounds = getBrogueSceneBoundary();
 		gridRect boundary = getBrogueStaticBoundary(menuId);
 
-		brogueViewProgram* result = new brogueViewProgram(_coordinateConverter, programName, _zoomLevel, false, false, boundary, sceneBounds);
+		brogueViewProgram* result = new brogueViewProgram(_coordinateConverter, programName, boundary, sceneBounds);
 
 		// Text View
 		brogueUIProgramPartId partId(programName, brogueUIProgramPart::Text, 0);
@@ -839,7 +840,7 @@ namespace brogueHd::frontend
 		gridRect sceneBounds = getBrogueSceneBoundary();
 		brogueUIData uiData(boundary, sceneBounds, _zoomLevel, _randomGenerator->nextColor(colors::getGray(0.2f), colors::getGray(0.5f)));
 		brogueBackground* background = new brogueBackground(_coordinateConverter, _resourceController, _eventController, partId, uiData);
-		brogueViewProgram* container = new brogueViewProgram(_coordinateConverter, programName, _zoomLevel, false, false, boundary, sceneBounds);
+		brogueViewProgram* container = new brogueViewProgram(_coordinateConverter, programName, boundary, sceneBounds);
 
 		container->addView(background);
 

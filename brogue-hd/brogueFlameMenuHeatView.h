@@ -115,7 +115,7 @@ namespace brogueHd::frontend
 													 const brogueUIProgramPartId& partId,
 													 const brogueUIData& data,
 													 int fadePeriodMilliseconds)
-		: brogueViewGridCore(coordinateConverter, resourceController, eventController, partId, data)
+		: brogueViewGridCore(coordinateConverter, resourceController, eventController, partId, data, true)
 	{
 		_randomGenerator = randomGenerator;
 		_fadePeriodRandom1 = randomGenerator->next() * 10000;

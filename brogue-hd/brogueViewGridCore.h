@@ -45,7 +45,8 @@ namespace brogueHd::frontend
 						   resourceController* resourceController,
 						   eventController* eventController,
 						   const brogueUIProgramPartId& partId,
-						   const brogueUIData& data);
+						   const brogueUIData& data,
+						   bool hasMouseInteraction);
 		~brogueViewGridCore();
 
 		/// <summary>
@@ -226,7 +227,8 @@ namespace brogueHd::frontend
 													resourceController* resourceController,
 													eventController* eventController,
 													const brogueUIProgramPartId& partId,
-													const brogueUIData& data)
+													const brogueUIData& data,
+													bool hasMouseInteraction)
 		: brogueViewCore<TStream>(resourceController, partId, data.getParentBoundary(), data.getBoundary())
 	{
 		_eventController = eventController;
@@ -237,7 +239,7 @@ namespace brogueHd::frontend
 		_uiData = new brogueUIData(data);
 		_mouseData = new brogueUIMouseData();
 		_tagAction = new brogueUITagAction();
-		_hasMouseInteraction = false;											// Set Tag Action -> (Has Mouse Interactin = true)
+		_hasMouseInteraction = hasMouseInteraction;											
 		_invalid = false;
 	}
 

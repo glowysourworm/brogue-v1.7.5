@@ -43,9 +43,6 @@ namespace brogueHd::frontend
 
 		brogueViewProgram(brogueCoordinateConverter* coordinateConverter,
 							brogueUIProgram programName,
-							int zoomLevel,
-							bool hasScrollInteraction,
-							bool applyClipping,
 							const gridRect& containerBoundary,
 							const gridRect& sceneBoundary);
 		~brogueViewProgram();
@@ -97,91 +94,41 @@ namespace brogueHd::frontend
 
 		gridRect getSceneBoundary() const;
 		gridRect getContainerBoundary() const;
-		gridLocator getScrollOffset() const;
-		vec2 getRenderOffsetUI() const;
-		int getZoomLevel() const;
-		bool getClipping() const;
 		brogueUIProgram getProgramName() const;
 
-		/// <summary>
-		/// Returns an additional offset that may be used by the view container. This is not
-		/// the scroll offset or the clip; but is applied additionally to the texture sampler.
-		/// </summary>
-		vec2 getOffsetUV() const;
-		vec4 getClipXY() const;
-		simpleQuad getCellSizeUV() const;
-		vec2 getScrollUV() const;
+		vec2 getOffsetUV() const
+		{
+			return _viewContainer->getOffsetUV();
+		}
 
 	protected:
 
 		const char* UniformCellSizeUI = "cellSizeUI";
 		const char* UniformCellSizeUV = "cellSizeUV";
 
-		void setScrollOffset(int column, int row);
 		void setRenderOffsetUI(int pixelX, float pixelY);
-		brogueMouseState getAdjustedMouse(const brogueMouseState& mouseState) const;
-
-	private:	// Needed way to get around template specification
-
-		/// <summary>
-		/// Returns aggregate child boundary with scroll offset
-		/// </summary>
-		gridRect getChildOffsetBoundary() const;
-
-		void updateScroll(const simpleKeyboardState& keyboardState,
-						  const simpleMouseState& mouseState,
-						  int millisecondsLapsed);
 
 	private:
 
 		brogueCoordinateConverter* _coordinateConverter;
-
-		brogueUIProgram _programName;
-		bool _hasScrollInteraction;
-		bool _applyClipping;
-		int _zoomLevel;
-		brogueUIMouseData* _mouseData;									// Container mouse data (need enter / leave handling)
-		gridRect* _containerBoundary;
-		gridRect* _sceneBoundary;
-		gridLocator* _scrollOffset;
-		vec2* _renderOffset;											// Hard render offset for shader animation
-
-		bool _active;
-
 		brogueViewContainer* _viewContainer;
+		brogueUIProgram _programName;
+		bool _active;
 	};
 
 	brogueViewProgram::brogueViewProgram(brogueCoordinateConverter* coordinateConverter,
-											 brogueUIProgram programName,
-											 int zoomLevel,
-											 bool hasScrollInteraction,
-											 bool applyClipping,
-											 const gridRect& containerBoundary,
-											 const gridRect& sceneBoundary)
+									     brogueUIProgram programName,
+										 const gridRect& containerBoundary,
+										 const gridRect& sceneBoundary)
 	{
 		_coordinateConverter = coordinateConverter;
 		_programName = programName;
-		_zoomLevel = zoomLevel;
-		_mouseData = new brogueUIMouseData();
-		_containerBoundary = new gridRect(containerBoundary);
-		_sceneBoundary = new gridRect(sceneBoundary);
-		_scrollOffset = new gridLocator(0, 0);
-		_renderOffset = new vec2(0, 0);
-		_hasScrollInteraction = hasScrollInteraction;
-		_applyClipping = applyClipping;
-
-		_viewContainer = new brogueViewContainer();
-
+		_viewContainer = new brogueViewContainer(coordinateConverter, containerBoundary, sceneBoundary);
 		_active = false;
 	}
 	brogueViewProgram::~brogueViewProgram()
 	{
 		delete _viewContainer;
-		delete _mouseData;
-		delete _sceneBoundary;
-		delete _containerBoundary;
-		delete _renderOffset;
-		delete _scrollOffset;
 	}
 
 	template<isGLStream TStream>
@@ -225,51 +172,6 @@ namespace brogueHd::frontend
 		return _programName;
 	}
 
-	simpleQuad brogueViewProgram::getCellSizeUV() const
-	{
-		openglQuadConverter viewConverter = _coordinateConverter->getViewConverter();
-
-		return viewConverter.createQuadNormalizedUV(0, 0, brogueCellDisplay::CellWidth(_zoomLevel), brogueCellDisplay::CellHeight(_zoomLevel));
-	}
-	vec2 brogueViewProgram::getOffsetUV() const
-	{
-		vec2 offsetUI = getRenderOffsetUI();
-
-		// Points to an inverted y-coordinate
-		vec2 offsetUV = _coordinateConverter->getViewConverter().convertToNormalizedUV(offsetUI.x, offsetUI.y);
-
-		offsetUV.y = 1 - offsetUV.y;
-
-		return offsetUV;
-	}
-	vec2 brogueViewProgram::getScrollUV() const
-	{
-		openglQuadConverter viewConverter = _coordinateConverter->getViewConverter();
-
-		// Scroll Offset (Not quite a simple coordinate transfer. It's also backwards in the y-space)
-		vec2 offsetUI = vec2(_scrollOffset->column * brogueCellDisplay::CellWidth(_zoomLevel),
-							 _scrollOffset->row * brogueCellDisplay::CellHeight(_zoomLevel));
-
-		// Points to an inverted y-coordinate
-		vec2 offsetUV = viewConverter.convertToNormalizedUV(offsetUI.x, offsetUI.y);
-
-		offsetUV.y = 1 - offsetUV.y;
-
-		return offsetUV;
-	}
-	vec4 brogueViewProgram::getClipXY() const
-	{
-		openglQuadConverter viewConverter = _coordinateConverter->getViewConverter();
-
-		// Clipping Boundary
-		//
-		gridRect clip = *_containerBoundary;
-		vec2 topLeft = viewConverter.createQuadNormalizedXY_FromLocator(clip.left(), clip.top()).topLeft;
-		vec2 bottomRight = viewConverter.createQuadNormalizedXY_FromLocator(clip.right(), clip.bottom()).bottomRight;
-
-		return vec4(topLeft.x, topLeft.y, bottomRight.x - topLeft.x, topLeft.y - bottomRight.y);
-	}
-
 	brogueKeyboardState brogueViewProgram::calculateKeyboardState(const simpleKeyboardState& keyboard)
 	{
 		// TODO: Get translator for the key system; and implement hotkeys
@@ -281,8 +183,8 @@ namespace brogueHd::frontend
 		//
 		gridRect sceneBoundaryUI = _coordinateConverter->calculateSceneBoundaryUI();
 
-		brogueMouseState mouseStateUI((mouse.getX() / sceneBoundaryUI.width) * _sceneBoundary->width,
-									  (mouse.getY() / sceneBoundaryUI.height) * _sceneBoundary->height,
+		brogueMouseState mouseStateUI((mouse.getX() / sceneBoundaryUI.width) * _viewContainer->getSceneBoundary().width,
+									  (mouse.getY() / sceneBoundaryUI.height) * _viewContainer->getSceneBoundary().height,
 									   mouse.getScrolldXPending() != 0, mouse.getScrolldYPending() != 0,
 									   mouse.getScrolldXPending() < 0, mouse.getScrolldYPending() < 0,
 									   mouse.getLeftButton() > 0);
@@ -292,75 +194,15 @@ namespace brogueHd::frontend
 
 #pragma region public get-access functions
 
-	gridRect brogueViewProgram::getSceneBoundary() const
-	{
-		return *_sceneBoundary;
-	}
-	gridRect brogueViewProgram::getChildOffsetBoundary() const
-	{
-		if (_viewContainer->getCount() == 0)
-			throw simpleException("Must first add views to the brogueViewProgram before accessing data:  brogueViewProgram::getBoundary");
-
-		gridRect boundary = _viewContainer->getAggregateBoundary();
-
-		// Apply scroll offset
-		boundary.translate(_scrollOffset->column, _scrollOffset->row);
-
-		return boundary;
-	}
-	bool brogueViewProgram::getClipping() const
-	{
-		return _applyClipping;
-	}
 	gridRect brogueViewProgram::getContainerBoundary() const
 	{
-		return *_containerBoundary;
-	}
-	gridLocator brogueViewProgram::getScrollOffset() const
-	{
-		return *_scrollOffset;
-	}
-	vec2 brogueViewProgram::getRenderOffsetUI() const
-	{
-		return *_renderOffset;
-	}
-	void brogueViewProgram::setScrollOffset(int column, int row)
-	{
-		if (!_active)
-			throw simpleException("Must activate program first before calling methods:  brogueViewProgram::initialStateChange");
-
-		_scrollOffset->column = column;
-		_scrollOffset->row = row;
+		return _viewContainer->getContainerBoundary();
 	}
 	void brogueViewProgram::setRenderOffsetUI(int pixelX, float pixelY)
 	{
-		// During initialization
-		//if (!_active)
-		//	throw simpleException("Must activate program first before calling methods:  brogueViewProgram::initialStateChange");
+		_viewContainer->setRenderOffsetUI(pixelX, pixelY);
+	}
 
-		_renderOffset->x = pixelX;
-		_renderOffset->y = pixelY;
-	}
-	brogueMouseState brogueViewProgram::getAdjustedMouse(const brogueMouseState& mouseState) const
-	{
-		// Apply mouse transform to the mouse state for the child views (utilizes scrolling).
-		//
-		brogueMouseState adjustedMouse(mouseState.getLocation()
-												 .subtract(*_scrollOffset)
-												 .subtract(_renderOffset->x / brogueCellDisplay::CellWidth(_zoomLevel),
-									   _renderOffset->y / brogueCellDisplay::CellHeight(_zoomLevel)),
-									   mouseState.getScrollPendingX(),
-									   mouseState.getScrollPendingY(),
-									   mouseState.getScrollPendingX(),
-									   mouseState.getScrollNegativeY(),
-									   mouseState.getMouseLeft());
-
-		return adjustedMouse;
-	}
-	int brogueViewProgram::getZoomLevel() const
-	{
-		return _zoomLevel;
-	}
 
 #pragma endregion
 
@@ -373,8 +215,10 @@ namespace brogueHd::frontend
 	void brogueViewProgram::initialize()
 	{
 		// Initialize Uniforms
-		ivec2 cellSizeUI(brogueCellDisplay::CellWidth(_zoomLevel), brogueCellDisplay::CellHeight(_zoomLevel));
-		vec2 cellSizeUV(this->getCellSizeUV().getWidth(), this->getCellSizeUV().getHeight());
+		int zoomLevel = _coordinateConverter->getZoomLevel();
+		simpleQuad sizeUV = _viewContainer->getCellSizeUV();
+		ivec2 cellSizeUI(brogueCellDisplay::CellWidth(zoomLevel), brogueCellDisplay::CellHeight(zoomLevel));
+		vec2 cellSizeUV(sizeUV.getWidth(), sizeUV.getHeight());
 
 		_viewContainer->setUniform(this->UniformCellSizeUI, cellSizeUI);
 		_viewContainer->setUniform(this->UniformCellSizeUV, cellSizeUV);
@@ -431,79 +275,9 @@ namespace brogueHd::frontend
 
 		return _viewContainer->checkStateChange();
 	}
-	void brogueViewProgram::updateScroll(const simpleKeyboardState& keyboardState,
-										   const simpleMouseState& mouseState,
-										   int millisecondsLapsed)
-	{
-		if (!_active)
-			throw simpleException("Must activate program first before calling methods:  brogueViewProgram::initialStateChange");
-
-		if (!_hasScrollInteraction)
-			return;
-
-		/*
-			UI Behavior:    This will add the scroll behavior. (or x-y scrolling behavior). The
-							getBoundary() method will allow for all child controls. The other
-							getContainerBoundary() method will check the clipping boundary for
-							this view container.
-
-			Render Offset:  Must add the UI offset to the container boundary to get the proper
-							mouse position.
-		*/
-
-		brogueKeyboardState keyboardStateUI = calculateKeyboardState(keyboardState);
-		brogueMouseState mouseStateUI = calculateMouseState(mouseState);
-
-		// Aggregate child boundary
-		gridRect childBoundary = this->getChildOffsetBoundary();
-		gridRect boundary = this->getContainerBoundary();
-
-		// TODO: CLEAN THIS UP
-
-		// UI Translation:  This is the ultimate position of the mouse pointer
-		boundary.translate(_renderOffset->x / brogueCellDisplay::CellWidth(_zoomLevel),
-						   _renderOffset->y / brogueCellDisplay::CellHeight(_zoomLevel));
-
-		bool mouseOver = this->getContainerBoundary().contains(mouseStateUI.getLocation());
-		bool mousePressed = mouseStateUI.getMouseLeft();
-		bool scrollEvent = mouseStateUI.getScrollPendingX() || mouseStateUI.getScrollPendingY();
-
-		if (!mouseOver || !scrollEvent)
-			return;
-
-		// Check scroll bounds
-		int scrollX = 0;
-		int scrollY = 0;
-
-		// Parent View -> Mouse Over -> Scroll
-		if (_hasScrollInteraction && mouseOver && scrollEvent)
-		{
-			if (mouseStateUI.getScrollPendingX())
-			{
-				if (!mouseStateUI.getScrollNegativeX() && childBoundary.left() < _containerBoundary->left())
-					scrollX = 1;
-
-				else if (mouseStateUI.getScrollNegativeX() && childBoundary.right() > _containerBoundary->right())
-					scrollX = -1;
-			}
-			if (mouseStateUI.getScrollPendingY())
-			{
-				// Up
-				if (mouseStateUI.getScrollNegativeY() && childBoundary.bottom() > _containerBoundary->bottom())
-					scrollY = -1;
-
-				// Down
-				else if (!mouseStateUI.getScrollNegativeY() && childBoundary.top() < _containerBoundary->top())
-					scrollY = 1;
-			}
-		}
-
-		_scrollOffset->row += scrollY;
-		_scrollOffset->column += scrollX;
-	}
 	void brogueViewProgram::checkUpdate(const simpleKeyboardState& keyboardState,
-										  const simpleMouseState& mouseState,
-										  int millisecondsLapsed)
+										const simpleMouseState& mouseState,
+										int millisecondsLapsed)
 	{
 		if (_viewContainer->getCount() == 0)
 			throw simpleException("Must first add views to the brogueViewProgram before accessing data:  brogueViewProgram::checkUpdate");
@@ -519,35 +293,12 @@ namespace brogueHd::frontend
 		//
 		bool containerMouseOver = this->getContainerBoundary().contains(mouseStateUI.getLocation());
 
-		// Update View Container:  Keeps track of its own mouse events
-		_mouseData->setUpdate(mouseStateUI.getMouseLeft(), containerMouseOver);
-
-		// The view container must apply clipping container to the part to avoid unwanted behavior.
+		// The view container must discard mouse events outside its boundary
 		//
-		if (!containerMouseOver && !_mouseData->getMouseEnter() && !_mouseData->getMouseLeave())
+		if (!containerMouseOver)
 			return;
 
-		// (TODO: SOME REDESIGN)
-		if (!containerMouseOver)
-		{
-			// Pre-maturely clearing the view container's mouse data because it's not supposed to be
-			// handled by the render loop. The view container is acting like a view.
-			_mouseData->clear();
-
-			// The child views will now process their mouse-leave event
-		}
-
-		// Scroll Behavior:  The updating of the scroll is done at the container level. So,
-		//					 this function must be run once during the normal checkUpdate path
-		//					 for this UI program.
-		//
-		updateScroll(keyboardState, mouseState, millisecondsLapsed);
-
-		// Apply mouse transform to the mouse state for the child views (utilizes scrolling and render offsets)
-		//
-		brogueMouseState adjustedMouseUI = getAdjustedMouse(mouseStateUI);
-
-		_viewContainer->checkUpdate(keyboardStateUI, adjustedMouseUI, millisecondsLapsed);
+		_viewContainer->checkUpdate(keyboardStateUI, mouseStateUI, millisecondsLapsed);
 	}
 	void brogueViewProgram::invalidate(const simpleKeyboardState& keyboardState,
 										 const simpleMouseState& mouseState)
@@ -558,11 +309,7 @@ namespace brogueHd::frontend
 		brogueKeyboardState keyboardStateUI = calculateKeyboardState(keyboardState);
 		brogueMouseState mouseStateUI = calculateMouseState(mouseState);
 
-		// Apply mouse transform to the mouse state for the child views (utilizes scrolling and render offsets)
-		//
-		brogueMouseState adjustedMouseUI = getAdjustedMouse(mouseStateUI);
-
-		_viewContainer->invalidate(keyboardStateUI, adjustedMouseUI);
+		_viewContainer->invalidate(keyboardStateUI, mouseStateUI);
 	}
 	bool brogueViewProgram::needsUpdate() const
 	{

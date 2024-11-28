@@ -54,7 +54,7 @@ namespace brogueHd::frontend
 							   eventController* eventController,
 							   const brogueUIProgramPartId& partId,
 							   const brogueUIData& data)
-		: brogueViewGridCore(coordinateConverter, resourceController, eventController, partId, data)
+		: brogueViewGridCore(coordinateConverter, resourceController, eventController, partId, data, true)
 	{
 		_uiText = new brogueUIText(data.getParentBoundary(), data.getBoundary(), simpleString(""));
 	}

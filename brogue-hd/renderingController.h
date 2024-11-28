@@ -25,7 +25,7 @@ namespace brogueHd::backend
 	{
 	public:
 
-		renderingController(eventController* eventController, resourceController* resourceController, randomGenerator* randomGenerator);
+		renderingController(eventController* eventController, resourceController* resourceController, randomGenerator* randomGenerator, int zoomLevel);
 		~renderingController();
 
 		/// <summary>
@@ -59,10 +59,8 @@ namespace brogueHd::backend
 		brogueGlyphMap* _glyphMap;
 	};
 
-	renderingController::renderingController(eventController* eventController, resourceController* resourceController, randomGenerator* randomGenerator)
+	renderingController::renderingController(eventController* eventController, resourceController* resourceController, randomGenerator* randomGenerator, int zoomLevel)
 	{
-		int zoomLevel = 10;
-
 		_glyphMap = new brogueGlyphMap();
 		_openglRenderer = new openglRenderer(eventController);
 		_resourceController = resourceController;

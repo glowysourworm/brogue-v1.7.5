@@ -28,7 +28,7 @@ namespace brogueHd::frontend
 								 eventController* eventController,
 								 const brogueUIProgramPartId& partId,
 								 const brogueUIData& data)
-			: brogueViewGridCore(coordinateConverter, resourceController, eventController, partId, data)
+			: brogueViewGridCore(coordinateConverter, resourceController, eventController, partId, data, false)
 		{
 			_titleGrid = new brogueTitleGrid();
 			_maskCell = new brogueCellDisplay();

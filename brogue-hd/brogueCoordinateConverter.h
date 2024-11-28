@@ -23,6 +23,7 @@ namespace brogueHd::frontend
 			_viewConverter = copy.getViewConverter();
 			_glyphConverter = copy.getGlyphConverter();
 			_glyphMap = copy.getGlyphMap();
+			_zoomLevel = copy.getZoomLevel();
 		}
 		~brogueCoordinateConverter();
 
@@ -45,6 +46,10 @@ namespace brogueHd::frontend
 		{
 			return _glyphMap;
 		}
+		int getZoomLevel() const
+		{
+			return _zoomLevel;
+		}
 
 	private:
 
@@ -52,6 +57,7 @@ namespace brogueHd::frontend
 		openglQuadConverter _viewConverter;
 
 		brogueGlyphMap* _glyphMap;
+		int _zoomLevel;
 	};
 
 	brogueCoordinateConverter::brogueCoordinateConverter(resourceController* resourceController, int sceneWidth, int sceneHeight, int zoomLevel)
@@ -70,6 +76,7 @@ namespace brogueHd::frontend
 
 		_glyphConverter = glyphMap;
 		_viewConverter = viewMap;
+		_zoomLevel = zoomLevel;
 		_glyphMap = new brogueGlyphMap();
 	}
 

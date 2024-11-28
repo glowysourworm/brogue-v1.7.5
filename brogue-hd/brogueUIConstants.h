@@ -142,7 +142,12 @@ namespace brogueHd::frontend
 		/// <summary>
 		/// A polygon (view) data stream with optional mouse interaction
 		/// </summary>
-		Polygon = 6
+		Polygon = 6,
+
+		/// <summary>
+		/// A cell-type program part to hold the primary game surface view
+		/// </summary>
+		GameSurface = 7
 	};
 
 	enum class brogueProgramExitCondition : int

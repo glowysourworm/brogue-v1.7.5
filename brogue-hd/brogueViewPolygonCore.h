@@ -9,7 +9,6 @@
 #include "brogueViewCore.h"
 #include "eventController.h"
 #include "resourceController.h"
-#include "simpleException.h"
 #include "simpleGlData.h"
 #include "simpleLine.h"
 #include "simpleList.h"

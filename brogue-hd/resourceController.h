@@ -309,6 +309,17 @@ namespace brogueHd::backend
 												 false,
 												 false);
 
+		// Game View
+		brogueUIProgramPartConfiguration* gameSurface =
+			new brogueUIProgramPartConfiguration(brogueUIProgramPart::GameSurface,
+												 shaderResource::brogueCellDisplayVert,
+												 shaderResource::brogueCellDisplayFrag,
+												 openglDataStreamType::brogueCellQuad,
+												 openglBrogueCellOutputSelector::DisplayCurrentFrame,
+												 0,
+												 false,
+												 false);
+
 		// Generic Parts
 		brogueUIProgramPartConfiguration* button =
 			new brogueUIProgramPartConfiguration(brogueUIProgramPart::Button,
@@ -356,6 +367,7 @@ namespace brogueHd::backend
 		_programPartConfigs->add(brogueUIProgramPart::Text, text);
 		_programPartConfigs->add(brogueUIProgramPart::Background, background);
 		_programPartConfigs->add(brogueUIProgramPart::MenuBackground, menuBackground);
+		_programPartConfigs->add(brogueUIProgramPart::GameSurface, gameSurface);
 	}
 
 	void resourceController::loadKeymap(keyProcessor& processor)

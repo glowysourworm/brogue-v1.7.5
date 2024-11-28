@@ -20,9 +20,6 @@ namespace brogueHd::frontend
 
 		brogueGameLogContainer(brogueCoordinateConverter* coordinateConverter,
 								brogueUIProgram programName,
-								int zoomLevel,
-								bool hasScrollInteraction,
-								bool applyClipping,
 								const gridRect& containerBoundary,
 								const gridRect& sceneBoundary);
 		~brogueGameLogContainer();
@@ -41,6 +38,7 @@ namespace brogueHd::frontend
 
 	private:
 
+		brogueCoordinateConverter* _coordinateConverter;
 		simplePeriodCounter* _animationCounter;
 		bool _animating;
 		bool _closing;
@@ -49,13 +47,11 @@ namespace brogueHd::frontend
 
 	brogueGameLogContainer::brogueGameLogContainer(brogueCoordinateConverter* coordinateConverter,
 													brogueUIProgram programName,
-													int zoomLevel,
-													bool hasScrollInteraction,
-													bool applyClipping,
 													const gridRect& containerBoundary,
 													const gridRect& sceneBoundary)
-		: brogueViewProgram(coordinateConverter, programName, zoomLevel, hasScrollInteraction, applyClipping, containerBoundary, sceneBoundary)
+		: brogueViewProgram(coordinateConverter, programName, containerBoundary, sceneBoundary)
 	{
+		_coordinateConverter = coordinateConverter;
 		_animationCounter = new simplePeriodCounter(300);
 		_animating = false;
 		_closing = true;
@@ -75,7 +71,7 @@ namespace brogueHd::frontend
 		float offset = -1 * periodValue * (this->getContainerBoundary().height - 3);	// Offset from the top of the screen
 
 		// Convert to UI coordinates
-		int offsetUI = offset * brogueCellDisplay::CellHeight(this->getZoomLevel());
+		int offsetUI = offset * brogueCellDisplay::CellHeight(_coordinateConverter->getZoomLevel());
 
 		this->setRenderOffsetUI(0, offsetUI);
 	}
