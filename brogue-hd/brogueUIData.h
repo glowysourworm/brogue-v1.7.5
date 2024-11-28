@@ -165,7 +165,7 @@ namespace brogueHd::frontend
 					//
 					float dx = simpleMath::abs(column - boundary.centerX()) / ((float)boundary.width / 2.0f);
 					float dy = simpleMath::abs(row - boundary.centerY()) / ((float)boundary.height / 2.0f);
-					float weight = simpleMath::squareRoot((dx * dx) + (dy * dy));
+					float weight = simpleMath::easeInCubic(simpleMath::squareRoot((dx * dx) + (dy * dy)));
 
 					return gradient.getColor(weight);
 				}

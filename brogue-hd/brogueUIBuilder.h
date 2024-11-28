@@ -91,7 +91,7 @@ namespace brogueHd::frontend
 		static const color GameMenuButtonPressedColor2() { return MenuButtonPressedColor2() * 0.75f; }
 
 		static const color MenuBackgroundColor1() { return color(0.156f, 0.137f, 0.329f, 1.0f); }
-		static const color MenuBackgroundColor2() { return color(0.078f, 0.058f, 0.156f, 1.0f); }
+		static const color MenuBackgroundColor2() { return color(0.078f, 0.058f, 0.156f, 0.0f); }
 		static const color MenuDefaultBackground() { return color(0, 0, 0, 0.85f); }
 
 		static const color MenuButtonColor1() { return color(0.156f, 0.137f, 0.329f, 1.0f); }
@@ -131,7 +131,12 @@ namespace brogueHd::frontend
 																const color& background2,
 																brogueTextAlignment alignment);
 		brogueTextView* createTextView(brogueUIProgram programName, const gridRect& boundary, const simpleString& text, const color& foreground);
-		brogueMenuBackground* createMenuBackground(brogueUIProgram programName, const gridRect& boundary);
+		brogueMenuBackground* createMainMenuBackground(brogueUIProgram programName, const gridRect& boundary);
+		brogueMenuBackground* createMenuBackground(brogueUIProgram programName,
+													const gridRect& boundary,
+													const color& background1,
+													const color& background2,
+													brogueGradientType gradient);
 		brogueBackground* createBackground(brogueUIProgram programName, const gridRect& boundary);
 		brogueScrollView* createScrollView(brogueUIProgram programName, const gridRect& boundary);
 
@@ -427,7 +432,7 @@ namespace brogueHd::frontend
 
 		int buttonPadding = 1;
 
-		result->addView(createMenuBackground(brogueUIProgram::MainMenuProgram, menuBounds));
+		result->addView(createMainMenuBackground(brogueUIProgram::MainMenuProgram, menuBounds));
 
 		for (int index = 0; index < 5; index++)
 		{
@@ -900,8 +905,8 @@ namespace brogueHd::frontend
 	{
 		return createButton(programName, boundary, text, 
 							brogueUITagAction(action),
-							MenuBackgroundColor1(),
-							MenuBackgroundColor2(),
+							MenuButtonColor1(),
+							MenuButtonColor2(),
 							MenuButtonActiveColor1(),
 							MenuButtonActiveColor2(),
 							MenuButtonPressedColor1(),
@@ -1018,13 +1023,21 @@ namespace brogueHd::frontend
 		return new brogueScrollView(_coordinateConverter, _resourceController, _eventController, scrollId, scrollData);
 	}
 
-	brogueMenuBackground* brogueUIBuilder::createMenuBackground(brogueUIProgram programName, const gridRect& boundary)
+	brogueMenuBackground* brogueUIBuilder::createMainMenuBackground(brogueUIProgram programName, const gridRect& boundary)
+	{
+		return createMenuBackground(programName, boundary, MenuDefaultBackground(), colors::transparent(), brogueGradientType::Circular);
+	}
+	brogueMenuBackground* brogueUIBuilder::createMenuBackground(brogueUIProgram programName, 
+																const gridRect& boundary, 
+																const color& background1, 
+																const color& background2, 
+																brogueGradientType gradient)
 	{
 		gridRect sceneBounds = getBrogueSceneBoundary();
 
 		brogueUIProgramPartId menuId(programName, brogueUIProgramPart::MenuBackground, _menuBackgroundCounter++);
 
-		brogueUIData menuData(boundary, sceneBounds, _zoomLevel, MenuBackgroundColor1(), MenuBackgroundColor2(), brogueGradientType::Circular);
+		brogueUIData menuData(boundary, sceneBounds, _zoomLevel, background1, background2, brogueGradientType::Circular);
 
 		return new brogueMenuBackground(_coordinateConverter, _resourceController, _eventController, menuId, menuData);
 	}

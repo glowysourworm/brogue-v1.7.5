@@ -28,11 +28,14 @@ void main()
     vec4 glyphColor = texture(fontTexture, currentGlyphUV);
     vec4 frameSample = texture(frame0Texture, currentTextureUV);
 
+    // (KEEP!) Check each color channel. Length wasn't getting the junk near the threshold floor
+    bool glyphPresent = glyphColor.x > glyphThreshold && glyphColor.y > glyphThreshold && glyphColor.z > glyphThreshold && glyphColor.w > glyphThreshold;
+
     // Dipslay Cell
     //
-    if (length(currentBackgroundColor) > 0 || length(glyphColor) > glyphThreshold)
+    if (length(currentBackgroundColor) > 0 || glyphPresent)
     {
-        if (length(glyphColor) > glyphThreshold)
+        if (glyphPresent)
             outputColor = mix(glyphColor, currentForegroundColor, 0.5);
         else
             outputColor = currentBackgroundColor;

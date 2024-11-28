@@ -88,6 +88,27 @@ namespace brogueHd::simple
 		}
 
 		template<isNumber TMath>
+		static float easeATan(const TMath x)
+		{
+			// Calculated based on asymptotic functions using the ratio of the defender to the attacker's attribute values.
+			// 
+			// The piecewise function has an output of [0, 1) (asymptotically); but scaled to dramatically yield the final 
+			// value close to 1.
+
+			float result;
+
+			// Scaled for pseudo-logarithmic dynamics from [0.001, 1]
+			if (x <= 1)
+				result = (0.637f * simpleMath::arctan(x - 1)) + 0.5f;
+
+			else
+				result = 0.318f * simpleMath::arctan(x - 1) + 0.5f;
+
+			// Clip result and return
+			return simpleMath::clamp(result, 0.0f, 1.0f);
+		}
+
+		template<isNumber TMath>
 		static TMath power(const TMath x, const TMath raisedTo)
 		{
 			return powerImpl(x, raisedTo);
@@ -127,6 +148,19 @@ namespace brogueHd::simple
 
 			else if (isIntLike<TMath>)
 				return sin(x);
+
+			else
+				throw simpleException("Unknown sqrt type simpleMath.h");
+		}
+
+		template<isNumber TMath>
+		static TMath arctan(TMath x)
+		{
+			if (isFloatLike<TMath>)
+				return atanf(static_cast<float>(x));
+
+			else if (isIntLike<TMath>)
+				return atan(x);
 
 			else
 				throw simpleException("Unknown sqrt type simpleMath.h");
