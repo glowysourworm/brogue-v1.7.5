@@ -80,6 +80,7 @@ namespace brogueHd::frontend
 					 brogueGradientType gradientType)
 		{
 			_zoomLevel = zoomLevel;
+			_zIndex = -1;									// TODO: ZIndex
 			_viewBoundary = new gridRect(viewBoundary);
 			_viewParentBoundary = new gridRect(sceneBoundary);
 			_background = new colorGradient(gradient1, gradient2, gradientType);

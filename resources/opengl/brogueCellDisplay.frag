@@ -19,17 +19,20 @@ uniform float glyphThreshold;
 
 void main()
 {
+    //outputColor = currentBackgroundColor;
+
     // Glyphs: The character for a cell is located in the glyph sheet - for every cell. So, if it
     //         is "white space" (' '), then you'll get the glyph location for the empty space. this
     //         should be a transparent color. So, we'll skip it if it's transparent.
     //
     vec4 glyphColor = texture(fontTexture, currentGlyphUV);
+    vec4 frameSample = texture(frame0Texture, currentTextureUV);
 
     // Dipslay Cell
     //
-    if (currentOutputSelector == 1)
+    if (length(currentBackgroundColor) > 0 || length(glyphColor) > glyphThreshold)
     {
-        if (glyphColor.x > glyphThreshold && glyphColor.y > glyphThreshold && glyphColor.z > glyphThreshold && glyphColor.w > glyphThreshold)
+        if (length(glyphColor) > glyphThreshold)
             outputColor = mix(glyphColor, currentForegroundColor, 0.5);
         else
             outputColor = currentBackgroundColor;
@@ -37,8 +40,8 @@ void main()
 
     // Display Frame buffer (DisplayCurrentFrame)
     //
-    else if (currentOutputSelector == 2)
-        outputColor = texture(frame0Texture, currentTextureUV);
+    else if (length(frameSample) > 0)
+        outputColor = frameSample;
 
     // No Display
     else

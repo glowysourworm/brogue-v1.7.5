@@ -1,5 +1,6 @@
 #pragma once
 #include "brogueBackground.h"
+#include "brogueMenuBackground.h"
 #include "brogueButton.h"
 #include "brogueCoordinateConverter.h"
 #include "brogueFlameMenuHeatView.h"
@@ -130,7 +131,7 @@ namespace brogueHd::frontend
 																const color& background2,
 																brogueTextAlignment alignment);
 		brogueTextView* createTextView(brogueUIProgram programName, const gridRect& boundary, const simpleString& text, const color& foreground);
-		brogueBackground* createMenuBackground(brogueUIProgram programName, const gridRect& boundary);
+		brogueMenuBackground* createMenuBackground(brogueUIProgram programName, const gridRect& boundary);
 		brogueBackground* createBackground(brogueUIProgram programName, const gridRect& boundary);
 		brogueScrollView* createScrollView(brogueUIProgram programName, const gridRect& boundary);
 
@@ -1017,7 +1018,7 @@ namespace brogueHd::frontend
 		return new brogueScrollView(_coordinateConverter, _resourceController, _eventController, scrollId, scrollData);
 	}
 
-	brogueBackground* brogueUIBuilder::createMenuBackground(brogueUIProgram programName, const gridRect& boundary)
+	brogueMenuBackground* brogueUIBuilder::createMenuBackground(brogueUIProgram programName, const gridRect& boundary)
 	{
 		gridRect sceneBounds = getBrogueSceneBoundary();
 
@@ -1025,6 +1026,6 @@ namespace brogueHd::frontend
 
 		brogueUIData menuData(boundary, sceneBounds, _zoomLevel, MenuBackgroundColor1(), MenuBackgroundColor2(), brogueGradientType::Circular);
 
-		return new brogueBackground(_coordinateConverter, _resourceController, _eventController, menuId, menuData);
+		return new brogueMenuBackground(_coordinateConverter, _resourceController, _eventController, menuId, menuData);
 	}
 }

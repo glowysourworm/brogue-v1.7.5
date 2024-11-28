@@ -437,7 +437,7 @@ namespace brogueHd::frontend
 				break;
 		}
 
-		glDrawBuffer(GL_COLOR_ATTACHMENT0);
+		//glDrawBuffer(GL_COLOR_ATTACHMENT0);
 
 		// Unbind the frame buffer -> render output to normal GL output
 		_frameBuffer->unBind();

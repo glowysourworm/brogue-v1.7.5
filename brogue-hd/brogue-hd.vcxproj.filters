@@ -731,6 +731,9 @@
     <ClInclude Include="brogueLine.h">
       <Filter>Header Files\frontend\opengl\streamObjects</Filter>
     </ClInclude>
+    <ClInclude Include="brogueMenuBackground.h">
+      <Filter>Header Files\frontend\ui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\resources\model\armor.csv">

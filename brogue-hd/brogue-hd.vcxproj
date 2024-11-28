@@ -178,6 +178,7 @@
   <ItemGroup>
     <ClInclude Include="brogueGraphView.h" />
     <ClInclude Include="brogueLine.h" />
+    <ClInclude Include="brogueMenuBackground.h" />
     <ClInclude Include="brogueQuad.h" />
     <ClInclude Include="brogueRoomTemplate.h" />
     <ClInclude Include="brogueUIColorText.h" />
