@@ -12,13 +12,7 @@ uniform sampler2D frameTexture;
 uniform sampler2D flameTexture;
 uniform sampler2D titleMaskTexture;
 uniform sampler2D uiTexture;
-uniform sampler2D openMenuTexture;
-uniform sampler2D playbackMenuTexture;
 uniform sampler2D gameLogTexture;
-uniform vec4 openMenuClipXY;
-uniform vec2 openMenuScrollUV;
-uniform vec4 playbackMenuClipXY;
-uniform vec2 playbackMenuScrollUV;
 uniform vec2 gameLogOffsetUV;
 uniform int gameMode;
 
@@ -26,12 +20,7 @@ void main()
 {
     // Scrolling Behavior:  Add on an additional scroll offset to the current texture coordinate
     //
-    vec2 openMenuUV = currentTextureUV + openMenuScrollUV;
-    vec2 playbackUV = currentTextureUV + playbackMenuScrollUV;
     vec2 gameLogUV = currentTextureUV + gameLogOffsetUV;
-
-    vec4 openMenuColor = texture(openMenuTexture, openMenuUV);
-    vec4 playbackMenuColor = texture(playbackMenuTexture, playbackUV);
     vec4 gameLogColor = texture(gameLogTexture, gameLogUV);
 
     // Have to check this because of GL_CLAMP_TO_EDGE texture behavior
@@ -40,29 +29,6 @@ void main()
         gameLogUV.y < 0 ||
         gameLogUV.y > 1)
         gameLogColor = vec4(0,0,0,0);
-
-    // Clipping (x, y, width, height) (where (x,y) is the topLeft vertex)
-    if (length(openMenuClipXY) > 0)
-    {
-        if (currentVertex.x < openMenuClipXY.x ||
-            currentVertex.x > openMenuClipXY.x + openMenuClipXY.z ||
-            currentVertex.y < openMenuClipXY.y - openMenuClipXY.w ||
-            currentVertex.y > openMenuClipXY.y)
-        {
-            openMenuColor = vec4(0,0,0,0);
-        }
-    }
-
-    if (length(playbackMenuClipXY) > 0)
-    {
-        if (currentVertex.x < playbackMenuClipXY.x ||
-            currentVertex.x > playbackMenuClipXY.x + playbackMenuClipXY.z ||
-            currentVertex.y < playbackMenuClipXY.y - playbackMenuClipXY.w ||
-            currentVertex.y > playbackMenuClipXY.y)
-        {
-            playbackMenuColor = vec4(0,0,0,0);
-        }
-    }
 
     // Finish output
     outputColor = vec4(0,0,0,0);
@@ -80,13 +46,7 @@ void main()
         case 0:
         {            
             // Favor the UI controls first (one of these may be turned on)
-            if (openMenuColor.w > 0)
-                outputColor = openMenuColor;
-
-            else if (playbackMenuColor.w > 0)
-                outputColor = playbackMenuColor;
-
-            else if (uiOutput.w > 0)
+            if (uiOutput.w > 0)
                 outputColor = uiOutput;
 
             // Blend in the flame background

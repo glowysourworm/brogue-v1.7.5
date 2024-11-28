@@ -107,8 +107,6 @@ namespace brogueHd::frontend
 		simpleTexture* _flameTexture;				// GL_TEXTURE1, Blue Flame Background
 		simpleTexture* _titleMaskTexture;			// GL_TEXTURE2, Title Mask - separated due to frame buffer thrashing.
 		simpleTexture* _uiTexture;					// GL_TEXTURE3, Color Attachment 1, carries the UI components
-		simpleTexture* _openMenuTexture;			// GL_TEXTURE4 (Open Menu Selector) (Clipping / Scrolling Behavior)
-		simpleTexture* _playbackMenuTexture;		// GL_TEXTURE5 (Playback Menu Selector) (Clipping / Scrolling Behavior)
 		simpleTexture* _gameLogTexture;				// GL_TEXTURE6 (Game Log) (Clipping / Scrolling Behavior)
 		simpleTexture* _fontTexture;				// GL_TEXTURE7 (Glyph Map texture) (Clipping / Scrolling Behavior)
 		gridRect* _sceneBoundaryUI;
@@ -176,9 +174,7 @@ namespace brogueHd::frontend
 		_flameTexture = new simpleTexture(nullptr, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE1, GL_RGBA, GL_RGBA8, 4, GL_FLOAT);
 		_titleMaskTexture = new simpleTexture(nullptr, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE2, GL_RGBA, GL_RGBA8, 4, GL_FLOAT);
 		_uiTexture = new simpleTexture(nullptr, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE3, GL_RGBA, GL_RGBA8, 4, GL_FLOAT);
-		_openMenuTexture = new simpleTexture(nullptr, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE4, GL_RGBA, GL_RGBA8, 4, GL_FLOAT);
-		_playbackMenuTexture = new simpleTexture(nullptr, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE5, GL_RGBA, GL_RGBA8, 4, GL_FLOAT);
-		_gameLogTexture = new simpleTexture(nullptr, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE6, GL_RGBA, GL_RGBA8, 4, GL_FLOAT);
+		_gameLogTexture = new simpleTexture(nullptr, sceneBoundaryUI.width, sceneBoundaryUI.height, textureIndex++, GL_TEXTURE4, GL_RGBA, GL_RGBA8, 4, GL_FLOAT);
 
 		// Font Glyphs:  Going to load the max zoom for now
 		simpleBitmap* glyphSheet = resourceController->getFontGlyphs(zoomLevel);
@@ -193,7 +189,7 @@ namespace brogueHd::frontend
 		openglHelper::flipSurface(glyphSurface);
 
 		// void* @_@ (No really good way to own this one until we do it ourselves for each and every data type, that WE own)
-		_fontTexture = new simpleTexture(glyphSurface, glyphSheet->pixelWidth(), glyphSheet->pixelHeight(), textureIndex++, GL_TEXTURE7, GL_RGBA, GL_RGBA, 4, GL_UNSIGNED_BYTE);
+		_fontTexture = new simpleTexture(glyphSurface, glyphSheet->pixelWidth(), glyphSheet->pixelHeight(), textureIndex++, GL_TEXTURE5, GL_RGBA, GL_RGBA, 4, GL_UNSIGNED_BYTE);
 
 		_frameBuffer = new simpleFrameBuffer(sceneBoundaryUI.width, sceneBoundaryUI.height);
 	}
@@ -204,8 +200,6 @@ namespace brogueHd::frontend
 		delete _flameTexture;
 		delete _titleMaskTexture;
 		delete _uiTexture;
-		delete _openMenuTexture;
-		delete _playbackMenuTexture;
 		delete _gameLogTexture;
 		delete _fontTexture;
 		delete _frameBuffer;
@@ -365,35 +359,13 @@ namespace brogueHd::frontend
 				if (_uiPrograms->get(brogueUIProgram::MainMenuProgram)->isActive())
 					_uiPrograms->get(brogueUIProgram::MainMenuProgram)->run();
 
-				// Open Menu Header
-				if (_uiPrograms->get(brogueUIProgram::OpenMenuBackgroundProgram)->isActive())
-					_uiPrograms->get(brogueUIProgram::OpenMenuBackgroundProgram)->run();
-
-				// Put the open menu (scrollable area) on a separate texture to control rendering
-				glDrawBuffer(GL_COLOR_ATTACHMENT4);
-				_openMenuTexture->bind();
-				_openMenuTexture->clearColor(colors::transparent());
-
 				// Open Menu
 				if (_uiPrograms->get(brogueUIProgram::OpenMenuProgram)->isActive())
 					_uiPrograms->get(brogueUIProgram::OpenMenuProgram)->run();
 
-				glDrawBuffer(GL_COLOR_ATTACHMENT3);
-
-				// Playback Menu Header
-				if (_uiPrograms->get(brogueUIProgram::PlaybackMenuBackgroundProgram)->isActive())
-					_uiPrograms->get(brogueUIProgram::PlaybackMenuBackgroundProgram)->run();
-
-				// Put the open menu (scrollable area) on a separate texture to control rendering
-				glDrawBuffer(GL_COLOR_ATTACHMENT5);
-				_playbackMenuTexture->bind();
-				_playbackMenuTexture->clearColor(colors::transparent());
-
 				// Playback Menu
 				if (_uiPrograms->get(brogueUIProgram::PlaybackMenuProgram)->isActive())
 					_uiPrograms->get(brogueUIProgram::PlaybackMenuProgram)->run();
-
-				glDrawBuffer(GL_COLOR_ATTACHMENT3);
 
 				// High Scores
 				if (_uiPrograms->get(brogueUIProgram::HighScoresProgram)->isActive())
@@ -423,7 +395,7 @@ namespace brogueHd::frontend
 					_uiPrograms->get(brogueUIProgram::GameInventoryProgram)->run();
 
 				// Put the game log (scrollable area) on a separate texture to control rendering
-				glDrawBuffer(GL_COLOR_ATTACHMENT6);
+				glDrawBuffer(GL_COLOR_ATTACHMENT4);
 				_gameLogTexture->bind();
 				_gameLogTexture->clearColor(colors::transparent());
 
@@ -447,18 +419,10 @@ namespace brogueHd::frontend
 
 
 		// Get frame program uniforms
-		vec4 openMenuClipXY = _uiPrograms->get(brogueUIProgram::OpenMenuProgram)->getClipXY();
-		vec4 playbackMenuClipXY = _uiPrograms->get(brogueUIProgram::PlaybackMenuProgram)->getClipXY();
-		vec2 openMenuScrollUV = _uiPrograms->get(brogueUIProgram::OpenMenuProgram)->getScrollUV();
-		vec2 playbackMenuScrollUV = _uiPrograms->get(brogueUIProgram::PlaybackMenuProgram)->getScrollUV();
 		vec2 gameLogOffsetUV = _uiPrograms->get(brogueUIProgram::GameLogProgram)->getOffsetUV();
 
 		// Output the frame buffer
 		_frameProgram->bind();
-		_frameProgram->bindUniform4("openMenuClipXY", openMenuClipXY);
-		_frameProgram->bindUniform4("playbackMenuClipXY", playbackMenuClipXY);
-		_frameProgram->bindUniform2("openMenuScrollUV", openMenuScrollUV);
-		_frameProgram->bindUniform2("playbackMenuScrollUV", playbackMenuScrollUV);
 		_frameProgram->bindUniform2("gameLogOffsetUV", gameLogOffsetUV);
 		_frameProgram->draw();
 
@@ -478,8 +442,6 @@ namespace brogueHd::frontend
 		_flameTexture->glCreate(-1);
 		_titleMaskTexture->glCreate(-1);
 		_uiTexture->glCreate(-1);
-		_openMenuTexture->glCreate(-1);
-		_playbackMenuTexture->glCreate(-1);
 		_gameLogTexture->glCreate(-1);
 		_fontTexture->glCreate(-1);
 
@@ -492,9 +454,7 @@ namespace brogueHd::frontend
 		_frameBuffer->attachTexture(_flameTexture->getHandle(), GL_COLOR_ATTACHMENT1);
 		_frameBuffer->attachTexture(_titleMaskTexture->getHandle(), GL_COLOR_ATTACHMENT2);
 		_frameBuffer->attachTexture(_uiTexture->getHandle(), GL_COLOR_ATTACHMENT3);
-		_frameBuffer->attachTexture(_openMenuTexture->getHandle(), GL_COLOR_ATTACHMENT4);
-		_frameBuffer->attachTexture(_playbackMenuTexture->getHandle(), GL_COLOR_ATTACHMENT5);
-		_frameBuffer->attachTexture(_gameLogTexture->getHandle(), GL_COLOR_ATTACHMENT6);
+		_frameBuffer->attachTexture(_gameLogTexture->getHandle(), GL_COLOR_ATTACHMENT4);
 		_frameBuffer->attachRenderBuffer();
 		_frameBuffer->unBind();
 
@@ -671,12 +631,6 @@ namespace brogueHd::frontend
 
 		_uiTexture->bind();
 		_uiTexture->clearColor(colors::transparent());
-
-		_openMenuTexture->bind();
-		_openMenuTexture->clearColor(colors::transparent());
-
-		_playbackMenuTexture->bind();
-		_playbackMenuTexture->clearColor(colors::transparent());
 
 		_gameLogTexture->bind();
 		_gameLogTexture->clearColor(colors::transparent());

@@ -131,6 +131,7 @@ namespace brogueHd::frontend
 																const color& background2,
 																brogueTextAlignment alignment);
 		brogueTextView* createTextView(brogueUIProgram programName, const gridRect& boundary, const simpleString& text, const color& foreground);
+		brogueTextView* createTextViewHeader(brogueUIProgram programName, const gridRect& boundary, const simpleString& text, const color& foreground);
 		brogueMenuBackground* createMainMenuBackground(brogueUIProgram programName, const gridRect& boundary);
 		brogueMenuBackground* createMenuBackground(brogueUIProgram programName,
 													const gridRect& boundary,
@@ -236,8 +237,6 @@ namespace brogueHd::frontend
 				// Creates scrollable view container
 				return createMainMenuSelector(programName, directory);
 			}
-			case brogueUIProgram::OpenMenuBackgroundProgram:
-				return createHeaderedBackground(programName, colorString("~ Open Saved Game ~", colors::yellow()));
 			case brogueUIProgram::PlaybackMenuProgram:
 			{
 				// Read the saved games into the display
@@ -246,8 +245,6 @@ namespace brogueHd::frontend
 				// Creates scrollable view container
 				return createMainMenuSelector(programName, directory);
 			}
-			case brogueUIProgram::PlaybackMenuBackgroundProgram:
-				return createHeaderedBackground(programName, colorString("~ View Recording ~", colors::yellow()));
 			case brogueUIProgram::HighScoresProgram:
 				return createHighScoresView();
 			case brogueUIProgram::BottomBarMenuProgram:
@@ -296,19 +293,6 @@ namespace brogueHd::frontend
 						return gridRect(COLS - 26, ROWS - 12, 24, 11);
 					case brogueUIProgram::OpenMenuProgram:
 					case brogueUIProgram::PlaybackMenuProgram:
-					{
-						int width = COLS / 2;
-						int height = ROWS / 2;
-
-						gridRect result((COLS - width) / 2, (ROWS - height) / 2, width, height);
-
-						// Padding (this should be the scrollable contents' clipping boundary - which is static)
-						result.expand(1);
-
-						return result;
-					}
-					case brogueUIProgram::OpenMenuBackgroundProgram:
-					case brogueUIProgram::PlaybackMenuBackgroundProgram:
 					{
 						int width = COLS / 2;
 						int height = ROWS / 2;
@@ -363,8 +347,6 @@ namespace brogueHd::frontend
 					// Item boundary of the view container for the items of these menus
 					case brogueUIProgram::OpenMenuProgram:
 					case brogueUIProgram::PlaybackMenuProgram:
-					case brogueUIProgram::OpenMenuBackgroundProgram:
-					case brogueUIProgram::PlaybackMenuBackgroundProgram:
 					{
 						int width = COLS / 2;
 						int height = ROWS / 2;
@@ -462,6 +444,11 @@ namespace brogueHd::frontend
 
 		gridRect sceneBounds = getBrogueSceneBoundary();
 		gridRect menuBounds = getBrogueStaticBoundary(backgroundId);
+		gridRect backgroundBounds = menuBounds.createExpanded(1);
+
+		simpleString headerText = programName == brogueUIProgram::OpenMenuProgram ? "~ Open Saved Game ~" :
+								  programName == brogueUIProgram::PlaybackMenuProgram ? "~ View Game Recording ~" :
+								  "~ Header ~";
 
 		simpleList<brogueUIColorText*> items;
 		simpleOrderedList<simpleFileEntry*> filesSorted = files.sort();
@@ -499,16 +486,19 @@ namespace brogueHd::frontend
 			items.add(new brogueUIColorText(colorText, tagAction));
 		}
 
-		// Finally, create the views. The view container will handle the scroll and clipping behavior.
-		//
-		brogueViewProgram* result = new brogueViewProgram(_coordinateConverter, programName, _zoomLevel, true, true, menuBounds, sceneBounds);
+		brogueViewProgram* result = new brogueViewProgram(_coordinateConverter, programName, _zoomLevel, true, true, backgroundBounds, sceneBounds);
 
-		// This background will take the color of the menu while the scroll is applied; and carries the item dimensions.
+		// Header will be a text view with no mouse interaction
+		//
+		brogueTextView* header = createTextViewHeader(programName, backgroundBounds, headerText, colors::yellow());
+
+		// This container will handle the (virtual) scrolling of the items.
 		//
 		brogueScrollView* scrollView = createScrollView(programName, menuBounds);
 
 		scrollView->addRange(items);
 
+		result->addView(header);
 		result->addView(scrollView);
 
 		return result;
@@ -981,6 +971,22 @@ namespace brogueHd::frontend
 		return textView;
 	}
 
+	brogueTextView* brogueUIBuilder::createTextViewHeader(brogueUIProgram programName,
+															const gridRect& boundary,
+															const simpleString& text,
+															const color& foreground)
+	{
+		gridRect sceneBounds = getBrogueSceneBoundary();
+		brogueUIProgramPartId dataId(programName, brogueUIProgramPart::Text, _textCounter++);
+		brogueUIData data(boundary, sceneBounds, _zoomLevel, MenuDefaultBackground());
+
+		brogueTextView* textView = new brogueTextView(_coordinateConverter, _resourceController, _eventController, dataId, data);
+
+		textView->setLine(boundary.top(), text, brogueTextAlignment::Center);
+
+		return textView;
+	}
+
 	brogueTextView* brogueUIBuilder::createTextViewSingleLine(brogueUIProgram programName,
 																const gridRect& boundary,
 																const simpleString& text,
@@ -1018,7 +1024,7 @@ namespace brogueHd::frontend
 
 		brogueUIProgramPartId scrollId(programName, brogueUIProgramPart::MenuBackground, 0);
 
-		brogueUIData scrollData(boundary, sceneBounds, _zoomLevel, MenuBackgroundColor1(), MenuBackgroundColor2(), brogueGradientType::Circular);
+		brogueUIData scrollData(boundary, sceneBounds, _zoomLevel, MenuDefaultBackground(), MenuDefaultBackground(), brogueGradientType::Circular);
 
 		return new brogueScrollView(_coordinateConverter, _resourceController, _eventController, scrollId, scrollData);
 	}

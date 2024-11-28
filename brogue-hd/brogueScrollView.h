@@ -7,6 +7,7 @@
 #include "brogueUIData.h"
 #include "brogueUIProgramPartId.h"
 #include "brogueViewGridCore.h"
+#include "color.h"
 #include "eventController.h"
 #include "gridRect.h"
 #include "resourceController.h"
@@ -74,14 +75,31 @@ namespace brogueHd::frontend
 	{
 		brogueScrollView* that = this;
 		gridRect boundary = this->getUIData()->getBoundary();
+		simpleList<brogueUIColorText*>* textItems = _list;
 
 		// Initialize to use the background color
-		boundary.iterate([&that] (int column, int row)
+		boundary.iterate([&that, &textItems, &boundary] (int column, int row)
 		{
 			brogueCellDisplay cell(column, row);
 
+			int listIndex = row - boundary.top();
+			int textIndex = column - boundary.left();
+
+			// List Item
+			if (listIndex < textItems->count())
+			{
+				// List Item Character
+				if (textIndex < textItems->get(listIndex)->getText().getCount())
+				{
+					cell.foreColor = textItems->get(listIndex)->getText().getColor(textIndex);
+					cell.character = textItems->get(listIndex)->getText().getChar(textIndex);
+				}					
+			}
+
+			// Background
 			cell.backColor = that->getUIData()->calculateGradient(column, row, false, false, false);
 
+			// Set into the data stream
 			that->set(cell);
 
 			return iterationCallback::iterate;

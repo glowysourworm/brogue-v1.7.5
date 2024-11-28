@@ -32,19 +32,9 @@ namespace brogueHd::frontend
 		OpenMenuProgram = 4,
 
 		/// <summary>
-		/// The title screen's open menu header'd background program
-		/// </summary>
-		OpenMenuBackgroundProgram = 5,
-
-		/// <summary>
 		/// The title screen's view recording program (scrollable area)
 		/// </summary>
 		PlaybackMenuProgram = 6,
-
-		/// <summary>
-		/// The title screen's view recording menu header'd background program
-		/// </summary>
-		PlaybackMenuBackgroundProgram = 7,
 
 		/// <summary>
 		/// The title screen's high scores program

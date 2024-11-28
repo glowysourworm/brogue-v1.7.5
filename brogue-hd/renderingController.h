@@ -76,9 +76,7 @@ namespace brogueHd::backend
 		brogueViewProgram* titleMask = _uiBuilder->buildProgramView(brogueUIProgram::FlameMenuTitleMaskProgram);
 		brogueViewProgram* mainMenu = _uiBuilder->buildProgramView(brogueUIProgram::MainMenuProgram);
 		brogueViewProgram* openMenu = _uiBuilder->buildProgramView(brogueUIProgram::OpenMenuProgram);
-		brogueViewProgram* openMenuBackground = _uiBuilder->buildProgramView(brogueUIProgram::OpenMenuBackgroundProgram);
 		brogueViewProgram* playbackMenu = _uiBuilder->buildProgramView(brogueUIProgram::PlaybackMenuProgram);
-		brogueViewProgram* playbackMenuBackground = _uiBuilder->buildProgramView(brogueUIProgram::PlaybackMenuBackgroundProgram);
 		brogueViewProgram* highScoresMenu = _uiBuilder->buildProgramView(brogueUIProgram::HighScoresProgram);
 
 		// Game Screen:  Build program parts
@@ -97,9 +95,7 @@ namespace brogueHd::backend
 		viewList.add(flameView);
 		viewList.add(titleMask);
 		viewList.add(mainMenu);
-		viewList.add(openMenuBackground);
 		viewList.add(openMenu);
-		viewList.add(playbackMenuBackground);
 		viewList.add(playbackMenu);
 		viewList.add(highScoresMenu);
 

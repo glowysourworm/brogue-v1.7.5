@@ -670,7 +670,6 @@ namespace brogueHd::frontend
 						_program->deactivateUIAll();
 						_program->activateUIProgram(brogueUIProgram::FlameMenuProgram);
 						_program->activateUIProgram(brogueUIProgram::FlameMenuTitleMaskProgram);
-						_program->activateUIProgram(brogueUIProgram::OpenMenuBackgroundProgram);
 						_program->activateUIProgram(brogueUIProgram::OpenMenuProgram);
 					}
 					break;
@@ -679,7 +678,6 @@ namespace brogueHd::frontend
 						_program->deactivateUIAll();
 						_program->activateUIProgram(brogueUIProgram::FlameMenuProgram);
 						_program->activateUIProgram(brogueUIProgram::FlameMenuTitleMaskProgram);
-						_program->activateUIProgram(brogueUIProgram::PlaybackMenuBackgroundProgram);
 						_program->activateUIProgram(brogueUIProgram::PlaybackMenuProgram);
 					}
 					break;
