@@ -2,7 +2,7 @@
 #include "brogueCellDisplay.h"
 #include "brogueCoordinateConverter.h"
 #include "brogueUIConstants.h"
-#include "brogueViewContainer.h"
+#include "brogueViewProgram.h"
 #include "gridRect.h"
 #include "simpleException.h"
 #include "simpleKeyboardState.h"
@@ -14,7 +14,7 @@ using namespace brogueHd::simple;
 
 namespace brogueHd::frontend
 {
-	class brogueGameLogContainer : public brogueViewContainer
+	class brogueGameLogContainer : public brogueViewProgram
 	{
 	public:
 
@@ -54,7 +54,7 @@ namespace brogueHd::frontend
 													bool applyClipping,
 													const gridRect& containerBoundary,
 													const gridRect& sceneBoundary)
-		: brogueViewContainer(coordinateConverter, programName, zoomLevel, hasScrollInteraction, applyClipping, containerBoundary, sceneBoundary)
+		: brogueViewProgram(coordinateConverter, programName, zoomLevel, hasScrollInteraction, applyClipping, containerBoundary, sceneBoundary)
 	{
 		_animationCounter = new simplePeriodCounter(300);
 		_animating = false;
@@ -101,7 +101,7 @@ namespace brogueHd::frontend
 		}
 
 		// Pass through to base class
-		brogueViewContainer::checkUpdate(keyboardState, mouseState, millisecondsLapsed);
+		brogueViewProgram::checkUpdate(keyboardState, mouseState, millisecondsLapsed);
 	}
 	void brogueGameLogContainer::initiateStateChange(brogueUIState fromState, brogueUIState toState)
 	{

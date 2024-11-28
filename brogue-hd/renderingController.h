@@ -8,7 +8,7 @@
 #include "brogueMouseState.h"
 #include "brogueUIBuilder.h"
 #include "brogueUIConstants.h"
-#include "brogueViewContainer.h"
+#include "brogueViewProgram.h"
 #include "eventController.h"
 #include "gridRect.h"
 #include "openglRenderer.h"
@@ -72,26 +72,26 @@ namespace brogueHd::backend
 
 		// Title Screen:  Build program parts, load the container
 
-		brogueViewContainer* flameView = _uiBuilder->buildProgramView(brogueUIProgram::FlameMenuProgram);
-		brogueViewContainer* titleMask = _uiBuilder->buildProgramView(brogueUIProgram::FlameMenuTitleMaskProgram);
-		brogueViewContainer* mainMenu = _uiBuilder->buildProgramView(brogueUIProgram::MainMenuProgram);
-		brogueViewContainer* openMenu = _uiBuilder->buildProgramView(brogueUIProgram::OpenMenuProgram);
-		brogueViewContainer* openMenuBackground = _uiBuilder->buildProgramView(brogueUIProgram::OpenMenuBackgroundProgram);
-		brogueViewContainer* playbackMenu = _uiBuilder->buildProgramView(brogueUIProgram::PlaybackMenuProgram);
-		brogueViewContainer* playbackMenuBackground = _uiBuilder->buildProgramView(brogueUIProgram::PlaybackMenuBackgroundProgram);
-		brogueViewContainer* highScoresMenu = _uiBuilder->buildProgramView(brogueUIProgram::HighScoresProgram);
+		brogueViewProgram* flameView = _uiBuilder->buildProgramView(brogueUIProgram::FlameMenuProgram);
+		brogueViewProgram* titleMask = _uiBuilder->buildProgramView(brogueUIProgram::FlameMenuTitleMaskProgram);
+		brogueViewProgram* mainMenu = _uiBuilder->buildProgramView(brogueUIProgram::MainMenuProgram);
+		brogueViewProgram* openMenu = _uiBuilder->buildProgramView(brogueUIProgram::OpenMenuProgram);
+		brogueViewProgram* openMenuBackground = _uiBuilder->buildProgramView(brogueUIProgram::OpenMenuBackgroundProgram);
+		brogueViewProgram* playbackMenu = _uiBuilder->buildProgramView(brogueUIProgram::PlaybackMenuProgram);
+		brogueViewProgram* playbackMenuBackground = _uiBuilder->buildProgramView(brogueUIProgram::PlaybackMenuBackgroundProgram);
+		brogueViewProgram* highScoresMenu = _uiBuilder->buildProgramView(brogueUIProgram::HighScoresProgram);
 
 		// Game Screen:  Build program parts
 
-		brogueViewContainer* gameView = _uiBuilder->buildProgramView(brogueUIProgram::GameProgram);
-		brogueViewContainer* gameMenu = _uiBuilder->buildProgramView(brogueUIProgram::GameMenuProgram);
-		brogueViewContainer* gameLog = _uiBuilder->buildProgramView(brogueUIProgram::GameLogProgram);
-		brogueViewContainer* gameInventory = _uiBuilder->buildProgramView(brogueUIProgram::GameInventoryProgram);
-		brogueViewContainer* gameObjectList = _uiBuilder->buildProgramView(brogueUIProgram::GameObjectListProgram);
-		brogueViewContainer* flavorTextPanel = _uiBuilder->buildProgramView(brogueUIProgram::FlavorTextPanelProgram);
-		brogueViewContainer* bottomMenuBar = _uiBuilder->buildProgramView(brogueUIProgram::BottomBarMenuProgram);
+		brogueViewProgram* gameView = _uiBuilder->buildProgramView(brogueUIProgram::GameProgram);
+		brogueViewProgram* gameMenu = _uiBuilder->buildProgramView(brogueUIProgram::GameMenuProgram);
+		brogueViewProgram* gameLog = _uiBuilder->buildProgramView(brogueUIProgram::GameLogProgram);
+		brogueViewProgram* gameInventory = _uiBuilder->buildProgramView(brogueUIProgram::GameInventoryProgram);
+		brogueViewProgram* gameObjectList = _uiBuilder->buildProgramView(brogueUIProgram::GameObjectListProgram);
+		brogueViewProgram* flavorTextPanel = _uiBuilder->buildProgramView(brogueUIProgram::FlavorTextPanelProgram);
+		brogueViewProgram* bottomMenuBar = _uiBuilder->buildProgramView(brogueUIProgram::BottomBarMenuProgram);
 
-		simpleList<brogueViewContainer*> viewList;
+		simpleList<brogueViewProgram*> viewList;
 
 		// Title Views
 		viewList.add(flameView);

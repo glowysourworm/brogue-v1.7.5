@@ -518,7 +518,7 @@
     <ClInclude Include="simpleBuffer.h">
       <Filter>Header Files\simple</Filter>
     </ClInclude>
-    <ClInclude Include="brogueViewContainer.h">
+    <ClInclude Include="brogueViewProgram.h">
       <Filter>Header Files\frontend\ui</Filter>
     </ClInclude>
     <ClInclude Include="simpleShaderProgram.h">
@@ -732,6 +732,9 @@
       <Filter>Header Files\frontend\opengl\streamObjects</Filter>
     </ClInclude>
     <ClInclude Include="brogueMenuBackground.h">
+      <Filter>Header Files\frontend\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueViewContainer.h">
       <Filter>Header Files\frontend\ui</Filter>
     </ClInclude>
   </ItemGroup>

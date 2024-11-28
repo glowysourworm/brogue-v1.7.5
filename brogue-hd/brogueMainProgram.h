@@ -9,7 +9,7 @@
 #include "brogueUIBuilder.h"
 #include "brogueUIConstants.h"
 #include "brogueUIProgramPartId.h"
-#include "brogueViewContainer.h"
+#include "brogueViewProgram.h"
 #include "color.h"
 #include "eventController.h"
 #include "gl.h"
@@ -49,7 +49,7 @@ namespace brogueHd::frontend
 						  brogueGlyphMap* glyphMap,
 						  const gridRect& sceneBoundaryUI,
 						  int zoomLevel,
-						  const simpleList<brogueViewContainer*>& viewList);
+						  const simpleList<brogueViewProgram*>& viewList);
 		~brogueMainProgram();
 
 		brogueKeyboardState calculateKeyboardState(const simpleKeyboardState& keyboard);
@@ -97,7 +97,7 @@ namespace brogueHd::frontend
 		resourceController* _resourceController;
 		brogueGlyphMap* _glyphMap;
 
-		simpleHash<brogueUIProgram, brogueViewContainer*>* _uiPrograms;
+		simpleHash<brogueUIProgram, brogueViewProgram*>* _uiPrograms;
 
 		simpleShaderProgram* _frameProgram;
 
@@ -123,9 +123,9 @@ namespace brogueHd::frontend
 										 brogueGlyphMap* glyphMap,
 										 const gridRect& sceneBoundaryUI,
 										 int zoomLevel,
-										 const simpleList<brogueViewContainer*>& viewList)
+										 const simpleList<brogueViewProgram*>& viewList)
 	{
-		_uiPrograms = new simpleHash<brogueUIProgram, brogueViewContainer*>();
+		_uiPrograms = new simpleHash<brogueUIProgram, brogueViewProgram*>();
 		_resourceController = resourceController;
 		_glyphMap = glyphMap;
 		_gameMode = BrogueGameMode::Title;
@@ -231,7 +231,7 @@ namespace brogueHd::frontend
 	}
 	void brogueMainProgram::deactivateUIAll()
 	{
-		_uiPrograms->iterate([] (brogueUIProgram name, brogueViewContainer* program)
+		_uiPrograms->iterate([] (brogueUIProgram name, brogueViewProgram* program)
 		{
 			program->deactivate();
 			return iterationCallback::iterate;
@@ -239,7 +239,7 @@ namespace brogueHd::frontend
 	}
 	void brogueMainProgram::initiateStateChange(brogueUIState fromState, brogueUIState toState)
 	{
-		_uiPrograms->iterate([&fromState, &toState] (brogueUIProgram programName, brogueViewContainer* program)
+		_uiPrograms->iterate([&fromState, &toState] (brogueUIProgram programName, brogueViewProgram* program)
 		{
 			if (program->isActive())
 				program->initiateStateChange(fromState, toState);
@@ -249,7 +249,7 @@ namespace brogueHd::frontend
 	}
 	void brogueMainProgram::clearStateChange()
 	{
-		_uiPrograms->iterate([] (brogueUIProgram programName, brogueViewContainer* program)
+		_uiPrograms->iterate([] (brogueUIProgram programName, brogueViewProgram* program)
 		{
 			if (program->isActive())
 				program->clearStateChange();
@@ -261,7 +261,7 @@ namespace brogueHd::frontend
 	{
 		bool result = false;
 
-		_uiPrograms->iterate([&result] (brogueUIProgram programName, brogueViewContainer* program)
+		_uiPrograms->iterate([&result] (brogueUIProgram programName, brogueViewProgram* program)
 		{
 			if (program->isActive())
 				result |= program->checkStateChange();
@@ -281,7 +281,7 @@ namespace brogueHd::frontend
 	}
 	void brogueMainProgram::invalidate(const simpleMouseState& mouse, const simpleKeyboardState& keyboard)
 	{
-		_uiPrograms->iterate([&mouse, &keyboard] (brogueUIProgram programName, brogueViewContainer* program)
+		_uiPrograms->iterate([&mouse, &keyboard] (brogueUIProgram programName, brogueViewProgram* program)
 		{
 			if (program->isActive())
 				program->invalidate(keyboard, mouse);
@@ -511,13 +511,13 @@ namespace brogueHd::frontend
 	{
 		/*
 			Brogue UI Programs:  This will call routines to setup all the shader programs that compose "UI programs",
-								 one (UI program) per brogueViewContainer, which are the primary UI components, have names,
+								 one (UI program) per brogueViewProgram, which are the primary UI components, have names,
 								 interact with the mouse, may be activated and deactivated, and will stay in memory until the
 								 end of the application. These must be initialized before calling "draw"; but there are
 								 lazy compilations of the brogueViewCore that allow data to be set after the constructor.
 		*/
 
-		_uiPrograms->iterate([] (const brogueUIProgram& programName, brogueViewContainer* viewProgram)
+		_uiPrograms->iterate([] (const brogueUIProgram& programName, brogueViewProgram* viewProgram)
 		{
 			// Compile the UI Programs
 			viewProgram->initialize();
@@ -531,7 +531,7 @@ namespace brogueHd::frontend
 										int millisecondsLapsed)
 	{
 		// Iterate UI Programs
-		_uiPrograms->iterate([&keyboardState, &mouseState, &millisecondsLapsed] (brogueUIProgram programName, brogueViewContainer* program)
+		_uiPrograms->iterate([&keyboardState, &mouseState, &millisecondsLapsed] (brogueUIProgram programName, brogueViewProgram* program)
 		{
 			if (program->isActive())
 			{
@@ -545,7 +545,7 @@ namespace brogueHd::frontend
 	{
 		bool result = false;
 
-		_uiPrograms->iterate([&result] (brogueUIProgram programName, brogueViewContainer* program)
+		_uiPrograms->iterate([&result] (brogueUIProgram programName, brogueViewProgram* program)
 		{
 			if (program->isActive())
 			{
@@ -562,7 +562,7 @@ namespace brogueHd::frontend
 	}
 	void brogueMainProgram::clearUpdate()
 	{
-		_uiPrograms->iterate([] (brogueUIProgram programName, brogueViewContainer* program)
+		_uiPrograms->iterate([] (brogueUIProgram programName, brogueViewProgram* program)
 		{
 			if (program->isActive())
 				program->clearUpdate();
@@ -572,7 +572,7 @@ namespace brogueHd::frontend
 	}
 	void brogueMainProgram::clearEvents()
 	{
-		_uiPrograms->iterate([] (brogueUIProgram programName, brogueViewContainer* program)
+		_uiPrograms->iterate([] (brogueUIProgram programName, brogueViewProgram* program)
 		{
 			if (program->isActive())
 				program->clearEvents();
@@ -585,7 +585,7 @@ namespace brogueHd::frontend
 		// Take Framebuffer Offline
 		_frameBuffer->unBind();
 
-		_uiPrograms->iterate([&millisecondsLapsed, &forceUpdate] (brogueUIProgram programName, brogueViewContainer* program)
+		_uiPrograms->iterate([&millisecondsLapsed, &forceUpdate] (brogueUIProgram programName, brogueViewProgram* program)
 		{
 			if (program->isActive() && program->needsUpdate())
 			{
@@ -599,7 +599,7 @@ namespace brogueHd::frontend
 	{
 		bool hasErrors = false;
 
-		_uiPrograms->iterate([&hasErrors] (brogueUIProgram programName, brogueViewContainer* program)
+		_uiPrograms->iterate([&hasErrors] (brogueUIProgram programName, brogueViewProgram* program)
 		{
 			if (program->isActive())
 				hasErrors |= program->hasErrors();
@@ -611,7 +611,7 @@ namespace brogueHd::frontend
 	}
 	void brogueMainProgram::showErrors() const
 	{
-		_uiPrograms->iterate([] (brogueUIProgram programName, brogueViewContainer* program)
+		_uiPrograms->iterate([] (brogueUIProgram programName, brogueViewProgram* program)
 		{
 			if (program->isActive())
 				program->showErrors();
