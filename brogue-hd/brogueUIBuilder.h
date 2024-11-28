@@ -5,7 +5,7 @@
 #include "brogueCoordinateConverter.h"
 #include "brogueFlameMenuHeatView.h"
 #include "brogueFlameMenuTitleMask.h"
-#include "brogueGameLogContainer.h"
+#include "brogueGameLogProgram.h"
 #include "brogueGameView.h"
 #include "brogueGlobal.h"
 #include "brogueGlyphMap.h"
@@ -595,7 +595,7 @@ namespace brogueHd::frontend
 		gridRect sceneBounds = getBrogueSceneBoundary();
 		gridRect boundary = getBrogueStaticBoundary(brogueUIProgramPartId(program, brogueUIProgramPart::Background, 0));
 
-		brogueGameLogContainer* result = new brogueGameLogContainer(_coordinateConverter, program, boundary, sceneBounds);
+		brogueGameLogProgram* result = new brogueGameLogProgram(_coordinateConverter, program, boundary, sceneBounds);
 
 		brogueUIProgramPartId partId(program, brogueUIProgramPart::Text, 0);
 		brogueUIData uiData(boundary, sceneBounds, _zoomLevel, MenuDefaultBackground());
@@ -603,7 +603,7 @@ namespace brogueHd::frontend
 
 		view->setUIAction(brogueUITagAction(brogueUIAction::GameCommand_ToggleLog, ""));
 
-		for (int index = 0; index < ROWS; index++)
+		for (int index = 0; index < boundary.height; index++)
 		{
 			view->setLine(index, simpleString("The rough stone wall is firm and unyielding"), brogueTextAlignment::Left);
 		}

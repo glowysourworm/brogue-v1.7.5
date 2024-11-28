@@ -189,7 +189,7 @@
     <ClInclude Include="brogueButton.h" />
     <ClInclude Include="brogueEvent.h" />
     <ClInclude Include="brogueFlameMenuHeatView.h" />
-    <ClInclude Include="brogueGameLogContainer.h" />
+    <ClInclude Include="brogueGameLogProgram.h" />
     <ClInclude Include="brogueGameView.h" />
     <ClInclude Include="brogueKeyboardState.h" />
     <ClInclude Include="brogueCellQuad.h" />

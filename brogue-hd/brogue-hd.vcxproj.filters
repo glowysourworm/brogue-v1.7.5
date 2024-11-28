@@ -647,7 +647,7 @@
     <ClInclude Include="brogueUIStateChanger.h">
       <Filter>Header Files\frontend\ui</Filter>
     </ClInclude>
-    <ClInclude Include="brogueGameLogContainer.h">
+    <ClInclude Include="brogueGameLogProgram.h">
       <Filter>Header Files\frontend\ui</Filter>
     </ClInclude>
     <ClInclude Include="brogueUIData.h">
