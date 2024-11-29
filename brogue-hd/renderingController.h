@@ -89,19 +89,19 @@ namespace brogueHd::backend
 
 		simpleList<brogueViewProgram*> viewList;
 
-		// Title Views
-		viewList.add(flameView);
-		viewList.add(titleMask);
-		viewList.add(mainMenu);
+		// Title Views (Use Reverse Z-Ordering to check UI events in that order)
+		viewList.add(mainMenu);				// Largest Z-Index
 		viewList.add(openMenu);
 		viewList.add(playbackMenu);
 		viewList.add(highScoresMenu);
+		viewList.add(flameView);
+		viewList.add(titleMask);
 
 		// Game Views
-		viewList.add(gameView);
-		viewList.add(gameMenu);
-		viewList.add(gameLog);
+		viewList.add(gameLog);				// Largest Z-Index
 		viewList.add(gameInventory);
+		viewList.add(gameMenu);
+		viewList.add(gameView);
 		viewList.add(gameObjectList);
 		viewList.add(flavorTextPanel);
 		viewList.add(bottomMenuBar);

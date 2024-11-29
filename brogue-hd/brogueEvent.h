@@ -11,7 +11,7 @@ namespace brogueHd::backend
 	template<isHashable EventSender, isHashable EventData>
 	class brogueEventBase : hashableObject
 	{
-		using DelegateType = std::function<void(EventSender, EventData)>;
+		using DelegateType = std::function<void(const EventSender&, const EventData&)>;
 
 	public:
 
@@ -32,7 +32,7 @@ namespace brogueHd::backend
 
 	public:
 
-		int subscribe(DelegateType listenerDelegate)
+		int subscribe(const DelegateType& listenerDelegate)
 		{
 			// User tokens should start at 1
 			int token = ++_tokenCounter;
@@ -50,7 +50,7 @@ namespace brogueHd::backend
 
 			_delegates->remove(token);
 		}
-		void publish(EventSender sender, EventData payload)
+		void publish(const EventSender& sender, const EventData& payload)
 		{
 			for (int index = 0; index < _delegates->count(); index++)
 			{
