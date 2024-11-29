@@ -54,7 +54,7 @@ namespace brogueHd::backend
 		{
 			for (int index = 0; index < _delegates->count(); index++)
 			{
-				(*(_delegates->getAt(index)->value))(sender, payload);
+				(*(_delegates->getAt(index)->getValue()))(sender, payload);
 			}
 		}
 

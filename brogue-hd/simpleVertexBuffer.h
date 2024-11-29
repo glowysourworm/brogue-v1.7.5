@@ -5,6 +5,7 @@
 #include "simple.h"
 #include "simpleDataStream.h"
 #include "simpleException.h"
+#include "simpleExt.h"
 #include "simpleGlObject.h"
 #include "simpleList.h"
 #include "simpleLogger.h"
@@ -245,7 +246,7 @@ namespace brogueHd::frontend
 				}
 				break;
 				default:
-					throw simpleException("Unhandled vertex array attribute data type:  ", attribute.getAttributeType());
+					throw simpleException(simpleExt::format("Unhandled vertex array attribute data type:  ", attribute.getAttributeType()));
 			}
 
 			// Enable the vertex attribute
@@ -344,7 +345,7 @@ namespace brogueHd::frontend
 			else if (attribute.getAttributeType() == GL_FLOAT_VEC4)
 				return stride + (4 * sizeof(float));
 			else
-				throw simpleException("Unhandled vertex array attribute data type:  ", attribute.getAttributeType());
+				throw simpleException(simpleExt::format("Unhandled vertex array attribute data type:  ", attribute.getAttributeType()));
 		});
 	}
 

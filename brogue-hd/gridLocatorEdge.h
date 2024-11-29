@@ -13,9 +13,6 @@ namespace brogueHd::component
 	{
 	public:
 
-		gridLocator node1;
-		gridLocator node2;
-
 		gridLocatorEdge()
 		{
 			node1 = default_value::value<gridLocator>();

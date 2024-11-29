@@ -15,19 +15,19 @@ namespace brogueHd::frontend
 			desiredState = brogueUIState::MainMenu;
 			tag = default_value::value<simpleString>();
 		}
+		brogueUITagAction(brogueUIAction command)
+		{
+			action = command;
+			desiredState = brogueUIState::GameNormal;
+			tag = default_value::value<simpleString>();
+		}
 		brogueUITagAction(brogueUIState stateChange)
 		{
 			action = brogueUIAction::StateChange;
 			desiredState = stateChange;
 			tag = default_value::value<simpleString>();
 		}
-		brogueUITagAction(brogueUIAction tagAction)
-		{
-			action = tagAction;
-			tag = "";
-			desiredState = brogueUIState::MainMenu;
-		}
-		brogueUITagAction(brogueUIAction fileAction, simpleString fileChosen)
+		brogueUITagAction(brogueUIAction fileAction, const simpleString& fileChosen)
 		{
 			action = fileAction;
 			tag = fileChosen;
@@ -80,8 +80,8 @@ namespace brogueHd::frontend
 		bool compare(const brogueUITagAction& other)
 		{
 			return action == other.action &&
-				desiredState == other.desiredState &&
-				tag == other.tag;
+				   desiredState == other.desiredState &&
+				   tag == other.tag;
 		}
 	};
 }

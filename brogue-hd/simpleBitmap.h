@@ -6,6 +6,7 @@
 #include "simpleArray.h"
 #include "simpleBuffer.h"
 #include "simpleException.h"
+#include "simpleExt.h"
 #include "simpleMaskedInt32.h"
 #include "simplePixel.h"
 #include "simplePixelFilter.h"
@@ -300,7 +301,7 @@ namespace brogueHd::simple
 		}
 		catch (std::exception& ex)
 		{
-			throw simpleException("Error reading bitmap file:  {}", ex.what());
+			throw simpleException(simpleExt::format("Error reading bitmap file : {}", ex.what()));
 		}
 	}
 	void simpleBitmap::toFile(const simpleString& filename)
@@ -340,7 +341,7 @@ namespace brogueHd::simple
 		}
 		catch (std::exception& ex)
 		{
-			throw simpleException("Error reading png file:  {}", ex.what());
+			throw simpleException(simpleExt::format("Error reading png file:  {}", ex.what()));
 		}
 	}
 

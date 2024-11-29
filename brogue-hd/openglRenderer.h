@@ -238,7 +238,7 @@ namespace brogueHd::frontend
 			brogueHd::frontend::KeyState->clearKey(key);
 		}
 		else
-			throw simpleException("Unknown GLFW key callback action {}:  openglRenderer::keyCallback", action);
+			throw simpleException(simpleExt::format("Unknown GLFW key callback action {}:  openglRenderer::keyCallback", action));
 
 		brogueHd::frontend::KeyState->setModifier(mods);
 	}

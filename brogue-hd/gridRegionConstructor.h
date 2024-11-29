@@ -8,6 +8,7 @@
 #include "simple.h"
 #include "simpleArray.h"
 #include "simpleException.h"
+#include "simpleExt.h"
 #include "simpleHash.h"
 #include "simpleMath.h"
 #include <limits>
@@ -341,7 +342,7 @@ namespace brogueHd::component
 		_locations->forEach([&grid] (T key, T value)
 		{
 			if (grid->get(key.column, key.row) != key)
-				throw simpleException("RegionConstructor grid was not valid:  Column={} Row={}", key.column, key.row);
+				throw simpleException(simpleExt::format("RegionConstructor grid was not valid:  Column={} Row={}", key.column, key.row));
 
 			return iterationCallback::iterate;
 		});

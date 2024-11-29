@@ -737,6 +737,18 @@
     <ClInclude Include="brogueViewContainer.h">
       <Filter>Header Files\frontend\ui</Filter>
     </ClInclude>
+    <ClInclude Include="simpleHashCore.h">
+      <Filter>Header Files\simple</Filter>
+    </ClInclude>
+    <ClInclude Include="simplePair.h">
+      <Filter>Header Files\simple</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleHashBasicCore.h">
+      <Filter>Header Files\simple</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleHashStdCore.h">
+      <Filter>Header Files\simple</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\resources\model\armor.csv">

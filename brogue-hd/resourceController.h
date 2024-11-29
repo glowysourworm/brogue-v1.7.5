@@ -11,6 +11,7 @@
 #include "simpleBitmap.h"
 #include "simpleList.h"
 #include "simpleString.h"
+#include "simpleExt.h"
 
 #include "json.hpp"
 
@@ -218,7 +219,7 @@ namespace brogueHd::backend
 		}
 		catch (std::exception& ex)
 		{
-			throw simpleException("Error reading resource config JSON file:  {}", ex.what());
+			throw simpleException(simpleExt::format("Error reading resource config JSON file:  {}", ex.what()));
 		}
 
 		return false;
@@ -281,7 +282,7 @@ namespace brogueHd::backend
 		}
 		catch (std::exception& ex)
 		{
-			throw simpleException("Error reading high scores file:  {}", ex.what());
+			throw simpleException(simpleExt::format("Error reading high scores file:  {}", ex.what()));
 		}
 	}
 
@@ -399,7 +400,7 @@ namespace brogueHd::backend
 		}
 		catch (std::exception& ex)
 		{
-			throw simpleException("gameController::loadKeyMap:  ", ex.what());
+			throw simpleException(simpleExt::format("gameController::loadKeyMap:  ", ex.what()));
 			throw ex;
 		}
 	}
@@ -506,7 +507,7 @@ namespace brogueHd::backend
 		}
 		catch (std::exception ex)
 		{
-			throw simpleException("Error opening colors.csv:  ", ex.what());
+			throw simpleException(simpleExt::format("Error opening colors.csv:  ", ex.what()));
 
 			delete result;
 		}

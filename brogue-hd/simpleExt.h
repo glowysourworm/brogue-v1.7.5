@@ -77,6 +77,43 @@ namespace brogueHd::simple
 			return format(result.c_str(), rest...);
 		}
 
+		//template<isStringConvertible T1, isStringConvertible T2>
+		//static std::string format(const char* formatStr, const T1& param1, const T2& param2)
+		//{
+		//	// Use the single param function overload
+		//	std::string result = format(formatStr, param1);
+
+		//	return format(result, param2);
+		//}
+
+
+		//template<isStringConvertible T1, isStringConvertible T2, isStringConvertible T3>
+		//static std::string format(const char* formatStr, const T1& param1, const T2& param2, const T3& param3)
+		//{
+		//	// Use the single param function overload
+		//	std::string result = format(formatStr, param1);
+
+		//	return format(result, param2, param3);
+		//}
+
+		//template<isStringConvertible T1, isStringConvertible T2, isStringConvertible T3, isStringConvertible T4>
+		//static std::string format(const char* formatStr, const T1& param1, const T2& param2, const T3& param3, const T4& param4)
+		//{
+		//	// Use the single param function overload
+		//	std::string result = format(formatStr, param1);
+
+		//	return format(result, param2, param3, param4);
+		//}
+
+		//template<isStringConvertible T1, isStringConvertible T2, isStringConvertible T3, isStringConvertible T4, isStringConvertible T5>
+		//static std::string format(const char* formatStr, const T1& param1, const T2& param2, const T3& param3, const T4& param4, const T5& param5)
+		//{
+		//	// Use the single param function overload
+		//	std::string result = format(formatStr, param1);
+
+		//	return format(result, param2, param3, param4, param5);
+		//}
+
 		template<isStringConvertible T>
 		static std::string toString(const T& param)
 		{

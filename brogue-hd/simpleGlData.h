@@ -431,7 +431,7 @@ namespace brogueHd::frontend
 				case GL_TRIANGLES:
 					return 6;
 				default:
-					throw simpleException("Unhandled primitive type for GLQuad:  {}", primitiveType);
+					throw simpleException(simpleExt::format("Unhandled primitive type for GLQuad:  {}", primitiveType).c_str());
 					break;
 			}
 		}
@@ -442,7 +442,7 @@ namespace brogueHd::frontend
 				case GL_TRIANGLES:
 					return 12 * sizeof(float);
 				default:
-					throw simpleException("Unhandled primitive type for GLQuad:  {}", primitiveType);
+					throw simpleException(simpleExt::format("Unhandled primitive type for GLQuad:  {}", primitiveType).c_str());
 					break;
 			}
 		}
@@ -466,7 +466,7 @@ namespace brogueHd::frontend
 				}
 				break;
 				default:
-					throw simpleException("Unhandled primitive type for GLQuad:  {}", primitiveType);
+					throw simpleException(simpleExt::format("Unhandled primitive type for GLQuad:  {}", primitiveType).c_str());
 					break;
 			}
 		}
@@ -523,7 +523,7 @@ namespace brogueHd::frontend
 				case GL_TRIANGLES:
 					return 6;
 				default:
-					throw simpleException("Unhandled primitive type for GLQuad:  {}", primitiveType);
+					throw simpleException(simpleExt::format("Unhandled primitive type for GLQuad:  {}", primitiveType).c_str());
 					break;
 			}
 		}
@@ -534,7 +534,7 @@ namespace brogueHd::frontend
 				case GL_TRIANGLES:
 					return 12 * sizeof(int);
 				default:
-					throw simpleException("Unhandled primitive type for GLQuad:  {}", primitiveType);
+					throw simpleException(simpleExt::format("Unhandled primitive type for GLQuad:  {}", primitiveType).c_str());
 					break;
 			}
 		}
@@ -558,7 +558,7 @@ namespace brogueHd::frontend
 				}
 				break;
 				default:
-					throw simpleException("Unhandled primitive type for GLQuad:  {}", primitiveType);
+					throw simpleException(simpleExt::format("Unhandled primitive type for GLQuad:  {}", primitiveType).c_str());
 					break;
 			}
 		}
@@ -624,7 +624,7 @@ namespace brogueHd::frontend
 				case GL_TRIANGLES:
 					return 6;
 				default:
-					throw simpleException("Unhandled primitive type for GLQuad:  {}", primitiveType);
+					throw simpleException(simpleExt::format("Unhandled primitive type for GLQuad:  {}", primitiveType));
 					break;
 			}
 		}
@@ -635,7 +635,7 @@ namespace brogueHd::frontend
 				case GL_TRIANGLES:
 					return 18 * sizeof(float);
 				default:
-					throw simpleException("Unhandled primitive type for GLQuad:  {}", primitiveType);
+					throw simpleException(simpleExt::format("Unhandled primitive type for GLQuad:  {}", primitiveType));
 					break;
 			}
 		}
@@ -659,7 +659,7 @@ namespace brogueHd::frontend
 				}
 				break;
 				default:
-					throw simpleException("Unhandled primitive type for GLQuad:  {}", primitiveType);
+					throw simpleException(simpleExt::format("Unhandled primitive type for GLQuad:  {}", primitiveType));
 					break;
 			}
 		}

@@ -586,7 +586,7 @@ namespace brogueHd::frontend
 		// Deactivate All
 		for (int index = 0; index < _uiPrograms->count(); index++)
 		{
-			_uiPrograms->getAt(index)->value->deactivate();
+			_uiPrograms->getAt(index)->getValue()->deactivate();
 		}
 
 		// Clear All Textures

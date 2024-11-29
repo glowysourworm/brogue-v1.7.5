@@ -319,7 +319,7 @@ namespace brogueHd::frontend
 	{
 		for (int index = 0; index < _orderLookup->count(); index++)
 		{
-			brogueUIProgramPartId partId = _orderLookup->getAt(index)->key;
+			brogueUIProgramPartId partId = _orderLookup->getAt(index)->getKey();
 
 			if (_imageViews->contains(partId))
 				_imageViews->get(partId)->initiateStateChange(fromState, toState);
@@ -342,7 +342,7 @@ namespace brogueHd::frontend
 	{
 		for (int index = 0; index < _orderLookup->count(); index++)
 		{
-			brogueUIProgramPartId partId = _orderLookup->getAt(index)->key;
+			brogueUIProgramPartId partId = _orderLookup->getAt(index)->getKey();
 
 			if (_imageViews->contains(partId))
 				_imageViews->get(partId)->clearStateChange();
@@ -366,7 +366,7 @@ namespace brogueHd::frontend
 
 		for (int index = 0; index < _orderLookup->count(); index++)
 		{
-			brogueUIProgramPartId partId = _orderLookup->getAt(index)->key;
+			brogueUIProgramPartId partId = _orderLookup->getAt(index)->getKey();
 
 			if (_imageViews->contains(partId))
 				result |= _imageViews->get(partId)->checkStateChange();
@@ -397,7 +397,7 @@ namespace brogueHd::frontend
 
 		for (int index = 0; index < _orderLookup->count(); index++)
 		{
-			brogueUIProgramPartId partId = _orderLookup->getAt(index)->key;
+			brogueUIProgramPartId partId = _orderLookup->getAt(index)->getKey();
 
 			if (_imageViews->contains(partId))
 				_imageViews->get(partId)->checkUpdate(keyboardState, mouseState, millisecondsLapsed);
@@ -425,7 +425,7 @@ namespace brogueHd::frontend
 
 		for (int index = 0; index < _orderLookup->count(); index++)
 		{
-			brogueUIProgramPartId partId = _orderLookup->getAt(index)->key;
+			brogueUIProgramPartId partId = _orderLookup->getAt(index)->getKey();
 
 			if (_imageViews->contains(partId))
 				_imageViews->get(partId)->invalidate(keyboardState, mouseState);
@@ -450,7 +450,7 @@ namespace brogueHd::frontend
 
 		for (int index = 0; index < _orderLookup->count(); index++)
 		{
-			brogueUIProgramPartId partId = _orderLookup->getAt(index)->key;
+			brogueUIProgramPartId partId = _orderLookup->getAt(index)->getKey();
 
 			if (_imageViews->contains(partId))
 				result |= _imageViews->get(partId)->needsUpdate();
@@ -474,7 +474,7 @@ namespace brogueHd::frontend
 	{
 		for (int index = 0; index < _orderLookup->count(); index++)
 		{
-			brogueUIProgramPartId partId = _orderLookup->getAt(index)->key;
+			brogueUIProgramPartId partId = _orderLookup->getAt(index)->getKey();
 
 			if (_imageViews->contains(partId))
 				_imageViews->get(partId)->clearUpdate();
@@ -496,7 +496,7 @@ namespace brogueHd::frontend
 	{
 		for (int index = 0; index < _orderLookup->count(); index++)
 		{
-			brogueUIProgramPartId partId = _orderLookup->getAt(index)->key;
+			brogueUIProgramPartId partId = _orderLookup->getAt(index)->getKey();
 
 			if (_imageViews->contains(partId))
 				_imageViews->get(partId)->clearEvents();
@@ -518,7 +518,7 @@ namespace brogueHd::frontend
 	{
 		for (int index = 0; index < _orderLookup->count(); index++)
 		{
-			brogueUIProgramPartId partId = _orderLookup->getAt(index)->key;
+			brogueUIProgramPartId partId = _orderLookup->getAt(index)->getKey();
 
 			if (_imageViews->contains(partId))
 				_imageViews->get(partId)->update(millisecondsLapsed, forceUpdate);
@@ -541,7 +541,7 @@ namespace brogueHd::frontend
 	{
 		for (int index = 0; index < _orderLookup->count(); index++)
 		{
-			brogueUIProgramPartId partId = _orderLookup->getAt(index)->key;
+			brogueUIProgramPartId partId = _orderLookup->getAt(index)->getKey();
 
 			if (_imageViews->contains(partId))
 			{
@@ -575,7 +575,7 @@ namespace brogueHd::frontend
 	{
 		for (int index = 0; index < _orderLookup->count(); index++)
 		{
-			brogueUIProgramPartId partId = _orderLookup->getAt(index)->key;
+			brogueUIProgramPartId partId = _orderLookup->getAt(index)->getKey();
 
 			if (_imageViews->contains(partId))
 				_imageViews->get(partId)->run();
@@ -597,7 +597,7 @@ namespace brogueHd::frontend
 	{
 		for (int index = 0; index < _orderLookup->count(); index++)
 		{
-			brogueUIProgramPartId partId = _orderLookup->getAt(index)->key;
+			brogueUIProgramPartId partId = _orderLookup->getAt(index)->getKey();
 
 			if (_imageViews->contains(partId))
 				_imageViews->get(partId)->activate();
@@ -619,7 +619,7 @@ namespace brogueHd::frontend
 	{
 		for (int index = 0; index < _orderLookup->count(); index++)
 		{
-			brogueUIProgramPartId partId = _orderLookup->getAt(index)->key;
+			brogueUIProgramPartId partId = _orderLookup->getAt(index)->getKey();
 
 			if (_imageViews->contains(partId))
 				_imageViews->get(partId)->deactivate();
@@ -643,7 +643,7 @@ namespace brogueHd::frontend
 
 		for (int index = 0; index < _orderLookup->count(); index++)
 		{
-			brogueUIProgramPartId partId = _orderLookup->getAt(index)->key;
+			brogueUIProgramPartId partId = _orderLookup->getAt(index)->getKey();
 
 			if (_imageViews->contains(partId))
 				result |= _imageViews->get(partId)->hasErrors();
@@ -667,7 +667,7 @@ namespace brogueHd::frontend
 	{
 		for (int index = 0; index < _orderLookup->count(); index++)
 		{
-			brogueUIProgramPartId partId = _orderLookup->getAt(index)->key;
+			brogueUIProgramPartId partId = _orderLookup->getAt(index)->getKey();
 
 			if (_imageViews->contains(partId))
 				_imageViews->get(partId)->showErrors();

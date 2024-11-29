@@ -191,10 +191,12 @@ namespace brogueHd::frontend
 		_randomGenerator = randomGenerator;
 		_zoomLevel = zoomLevel;
 
-		_menuBackgroundCounter = 0;
-		_backgroundCounter = 0;
-		_buttonCounter = 0;
-		_textCounter = 0;
+		// These numbers are important for hashing pieces of the data. So, it's best to keep them off
+		// of zero.
+		_menuBackgroundCounter = 1;
+		_backgroundCounter = 1;
+		_buttonCounter = 1;
+		_textCounter = 1;
 	}
 	brogueUIBuilder::~brogueUIBuilder() 
 	{
@@ -689,10 +691,10 @@ namespace brogueHd::frontend
 
 		// Hotkey, Glyph, Description, Modifiers (class, in hand, worn)
 		simpleString itemFormat = "{}) {} {} {}";
-		simpleString weapon = simpleExt::format(itemFormat.c_str(), "b", brogueGlyphMap::WeaponUnicode, "A +0 dagger", "<12> (in hand)");
-		simpleString armor =  simpleExt::format(itemFormat.c_str(), "d", "[", "Leather Armor", "[3]<10> (worn)");
-		simpleString food = simpleExt::format(itemFormat.c_str(), "a", ";", "Some food", "");
-		simpleString darts = simpleExt::format(itemFormat.c_str(), "c", brogueGlyphMap::WeaponUnicode, "15 +0 darts", "<10>");
+		simpleString weapon = simpleExt::format(itemFormat.c_str(), "b", brogueGlyphMap::WeaponUnicode, "A +0 dagger", "<12> (in hand)").c_str();
+		simpleString armor =  simpleExt::format(itemFormat.c_str(), "d", "[", "Leather Armor", "[3]<10> (worn)").c_str();
+		simpleString food = simpleExt::format(itemFormat.c_str(), "a", ";", "Some food", "").c_str();
+		simpleString darts = simpleExt::format(itemFormat.c_str(), "c", brogueGlyphMap::WeaponUnicode, "15 +0 darts", "<10>").c_str();
 
 		colorString weaponColor(weapon.c_str(), colors::white());
 		colorString armorColor(armor.c_str(), colors::white());
@@ -783,9 +785,9 @@ namespace brogueHd::frontend
 
 			gridRect boundary(sceneBounds.column, sceneBounds.row + index + menuPadding, sceneBounds.width, 1);
 
-			simpleString preamble = simpleExt::format("{}) ", index + 1);
-			simpleString score = simpleExt::toString(entry->getScore());
-			simpleString dateAndDescr = simpleExt::format("{} {}", entry->getDate()->c_str(), entry->getDescription()->c_str());
+			simpleString preamble = simpleExt::format("{}) ", index + 1).c_str();
+			simpleString score = simpleExt::toString(entry->getScore()).c_str();
+			simpleString dateAndDescr = simpleExt::format("{} {}", entry->getDate()->c_str(), entry->getDescription()->c_str()).c_str();
 
 			// Size to line up scores (5)
 			preamble.appendPadding(' ', 5 - preamble.count());
@@ -793,7 +795,7 @@ namespace brogueHd::frontend
 			// Scores (15)
 			score.appendPadding(' ', 15 - score.count() - preamble.count());
 
-			simpleString formattedEntry = simpleExt::format("{}{}{}", preamble.c_str(), score.c_str(), dateAndDescr.c_str());
+			simpleString formattedEntry = simpleExt::format("{}{}{}", preamble.c_str(), score.c_str(), dateAndDescr.c_str()).c_str();
 
 			color foreGround = color::interpolate(colors::white(), colors::black(), index / (float)_resourceController->getHighScoreCount());
 

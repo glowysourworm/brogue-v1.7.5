@@ -308,6 +308,7 @@ namespace brogueHd::simple
 	template<isHashable T>
 	size_t simpleArray<T>::getHash() const
 	{
+		// Take hash of the pointer value (could easily just take the pointer itself!)
 		size_t hash = 0;
 
 		for (int index = 0; index < _count; index++)

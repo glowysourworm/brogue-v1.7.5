@@ -244,6 +244,9 @@
     <ClInclude Include="simpleDirectoryEntry.h" />
     <ClInclude Include="simpleExt.h" />
     <ClInclude Include="simpleFileEntry.h" />
+    <ClInclude Include="simpleHashBasicCore.h" />
+    <ClInclude Include="simpleHashCore.h" />
+    <ClInclude Include="simpleHashStdCore.h" />
     <ClInclude Include="simpleKeyboardState.h" />
     <ClInclude Include="simpleLine.h" />
     <ClInclude Include="simpleLogger.h" />
@@ -337,6 +340,7 @@
     <ClInclude Include="simpleMouseState.h" />
     <ClInclude Include="simpleOpenGL.h" />
     <ClInclude Include="simpleOrderedList.h" />
+    <ClInclude Include="simplePair.h" />
     <ClInclude Include="simplePeriodCounter.h" />
     <ClInclude Include="simplePixel.h" />
     <ClInclude Include="simplePixelFilter.h" />

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <concepts>
+#include <stdexcept>
 #include <type_traits>
 
 namespace brogueHd::simple
@@ -138,37 +139,49 @@ namespace brogueHd::simple
 	{
 	private:
 
-		template<isHashable...Rest>
-		static void hash_combine(size_t& seed, const hashable& next, Rest... rest)
+		template<isHashable T>
+		static size_t createHash(const T& next)
 		{
-			// isHashable<T>
-			size_t nextHash = next.getHash();
+			size_t nextHash = 0;
 
-			seed = seed ^ (nextHash << 1);
+			if constexpr (std::convertible_to<T, hashable>)
+				nextHash = next.getHash();
 
-			(hash_combine(seed, rest), ...);
+			else if constexpr (std::convertible_to<T, hashableObject>)
+				nextHash = next.getHash();
+
+			else if constexpr (isStdHashable<T>)
+				nextHash = std::hash<T>{}(next);
+
+			else
+				throw std::runtime_error("Unhandled hash type:  hashGenerator::hash_combine");
+
+			return nextHash;
 		}
 
-		template<isHashable...Rest>
-		static void hash_combine(size_t& seed, const hashableObject& next, Rest... rest)
+		template<isHashable T>
+		static void hash_combine(size_t& seed, const T& next)
 		{
-			// isHashable<T>
-			size_t nextHash = next.getHash();
+			size_t nextHash = createHash(next);
 
-			seed = seed ^ (nextHash << 1);
-
-			(hash_combine(seed, rest), ...);
+			if (seed == 0)
+				seed = nextHash;
+			else
+				seed = seed ^ (nextHash << 1);
 		}
 
-		template<isStdHashable T, isHashable...Rest>
-		static void hash_combine(size_t& seed, const T& next, Rest...rest)
+		template<isHashable T, isHashable...Rest>
+		static void hash_combine(size_t& seed, const T& next, Rest... rest)
 		{
-			// isChar<T>
-			size_t nextHash = std::hash<T>{}(next);
+			size_t nextHash = createHash(next);
 
-			seed = seed ^ (nextHash << 1);
+			if (seed == 0)
+				seed = nextHash;
+			else
+				seed = seed ^ (nextHash << 1);
 
-			(hash_combine(seed, rest), ...);
+			if (sizeof...(rest) > 0)
+				hash_combine(seed, rest...);
 		}
 
 	public: // These methods will look for the above overloads, variadically... ... ...
@@ -176,9 +189,8 @@ namespace brogueHd::simple
 		template<isHashable ...T>
 		static size_t generateHash(const T&...values)
 		{
-			// Large Prime
-			size_t seed = 5999471;
-			(hash_combine(seed, values), ...);
+			size_t seed = 0;
+			hash_combine(seed, values...);
 			return seed;
 		}
 
@@ -186,7 +198,7 @@ namespace brogueHd::simple
 		static size_t combineHash(const size_t& hashValue, const T&...values)
 		{
 			size_t result = hashValue;
-			(hash_combine(result, values), ...);
+			hash_combine(result, values...);
 			return result;
 		}
 	};

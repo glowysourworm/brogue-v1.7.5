@@ -4,6 +4,7 @@
 #include "simple.h"
 #include "simpleDataStream.h"
 #include "simpleException.h"
+#include "simpleExt.h"
 #include "simpleGlData.h"
 
 namespace brogueHd::frontend
@@ -37,7 +38,7 @@ namespace brogueHd::frontend
 				case GL_LINES:
 					return 2;
 				default:
-					throw simpleException("Unhandled primitive type for brogueLine:  PrimitiveType={}", primitiveType);
+					throw simpleException(simpleExt::format("Unhandled primitive type for brogueLine:  PrimitiveType={}", primitiveType));
 			}
 		}
 
@@ -48,7 +49,7 @@ namespace brogueHd::frontend
 				case GL_LINES:
 					return (4 * sizeof(float));
 				default:
-					throw simpleException("Unhandled primitive type for GLQuad:  {}", primitiveType);
+					throw simpleException(simpleExt::format("Unhandled primitive type for GLQuad:  {}", primitiveType));
 					break;
 			}
 		}

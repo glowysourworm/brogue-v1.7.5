@@ -18,15 +18,7 @@ namespace brogueHd::simple
 		{
 		}
 
-		template<isStringConvertible T, isStringConvertible...Args>
-		simpleException(const char* formatStr, const T& param, const Args&...rest) 
-			: simpleException(simpleExt::format(formatStr, param).c_str(), rest...)
-		{
-		}
-
-		template<isStringConvertible T>
-		simpleException(const char* formatStr, const T& param) 
-			: simpleException(simpleExt::format(formatStr, param).c_str())
+		simpleException(const std::string& message) : simpleException(message.c_str())
 		{
 		}
 
@@ -43,8 +35,8 @@ namespace brogueHd::simple
 				const char* format1 = "Source File:  {}  Line:  {}  \r\n";
 				const char* format2 = "Description:  {} \r\n";
 
-				result += simpleExt::format(format1, stack.source_file().c_str(), stack.source_line());
-				result += simpleExt::format(format2, stack.description().c_str());
+				//result += simpleExt::format(format1, stack.source_file().c_str(), stack.source_line());
+				//result += simpleExt::format(format2, stack.description().c_str());
 			}
 
 #ifdef _DEBUG

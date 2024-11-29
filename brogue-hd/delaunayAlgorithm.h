@@ -21,8 +21,7 @@ namespace brogueHd::component
 	{
 	public:
 
-		delaunayAlgorithm() {};
-		delaunayAlgorithm(graphEdgeConstructor<TNode, TEdge> graphEdgeConstructor);
+		delaunayAlgorithm(const graphEdgeConstructor<TNode, TEdge>& graphEdgeConstructor);
 		~delaunayAlgorithm();
 
 		graph<TNode, TEdge>* run(const simpleList<TNode>& vertices) override;
@@ -36,7 +35,8 @@ namespace brogueHd::component
 	};
 
 	template<isGridLocatorNode TNode, isGridLocatorEdge<TNode> TEdge>
-	delaunayAlgorithm<TNode, TEdge>::delaunayAlgorithm(graphEdgeConstructor<TNode, TEdge> edgeConstructor)
+	delaunayAlgorithm<TNode, TEdge>::delaunayAlgorithm(const graphEdgeConstructor<TNode, TEdge>& edgeConstructor)
+		: graphAlgorithm<TNode, TEdge>(edgeConstructor)
 	{
 	}
 
@@ -153,7 +153,7 @@ namespace brogueHd::component
 		//
 		vertices.forEach([&triangles, &badTriangles, &otherBadTriangles, &vertexLookup] (TNode graphVertex)
 		{
-			simplePoint<int> vertexPoint = vertexLookup[graphVertex];
+			simplePoint<int> vertexPoint = vertexLookup.get(graphVertex);
 
 			// Find triangles in the mesh whose circum-circle contains the new point
 			//
@@ -230,10 +230,10 @@ namespace brogueHd::component
 					return edge.isEquivalent(triangle.point1, triangle.point2);
 				}))
 				{
-					TNode node1 = nodeLookup[triangle.point1];
-					TNode node2 = nodeLookup[triangle.point2];
+					TNode node1 = nodeLookup.get(triangle.point1);
+					TNode node2 = nodeLookup.get(triangle.point2);
 
-					delaunayEdges.add((*(that->edgeConstructor))(node1, node2));
+					delaunayEdges.add(that->edgeConstructor(node1, node2));
 				}
 			}
 
@@ -251,10 +251,10 @@ namespace brogueHd::component
 					return edge.isEquivalent(triangle.point2, triangle.point3);
 				}))
 				{
-					TNode node2 = nodeLookup[triangle.point2];
-					TNode node3 = nodeLookup[triangle.point3];
+					TNode node2 = nodeLookup.get(triangle.point2);
+					TNode node3 = nodeLookup.get(triangle.point3);
 
-					delaunayEdges.add((*(that->edgeConstructor))(node2, node3));
+					delaunayEdges.add(that->edgeConstructor(node2, node3));
 				}
 			}
 
@@ -272,10 +272,10 @@ namespace brogueHd::component
 					return edge.isEquivalent(triangle.point3, triangle.point1);
 				}))
 				{
-					TNode node3 = nodeLookup[triangle.point3];
-					TNode node1 = nodeLookup[triangle.point1];
+					TNode node3 = nodeLookup.get(triangle.point3);
+					TNode node1 = nodeLookup.get(triangle.point1);
 
-					delaunayEdges.add((*(that->edgeConstructor))(node3, node1));
+					delaunayEdges.add(that->edgeConstructor(node3, node1));
 				}
 			}
 

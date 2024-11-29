@@ -2,6 +2,7 @@
 
 #include "playbackData.h"
 #include "simpleException.h"
+#include "simpleExt.h"
 #include <exception>
 #include <fstream>
 #include <iosfwd>
@@ -54,7 +55,7 @@ namespace brogueHd::backend
 			fileStream.open(filePath);
 
 			if (!fileStream.good())
-				throw simpleException("Error opening file:  {}", filePath);
+				throw simpleException(simpleExt::format("Error opening file:  {}", filePath));
 
 			// Store the path of the playback file
 			_playbackData->filePath = filePath;
@@ -66,7 +67,7 @@ namespace brogueHd::backend
 		}
 		catch (std::exception& ex)
 		{
-			throw simpleException("Error opening playback file: ", ex.what());
+			throw simpleException(simpleExt::format("Error opening playback file: ", ex.what()));
 		}
 	}
 }

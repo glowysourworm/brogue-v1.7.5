@@ -1,68 +1,20 @@
 #pragma once
 
-#include "json.hpp"
 #include "simple.h"
-#include "simpleArray.h"
 #include "simpleException.h"
+#include "simpleHashCore.h"
+#include "simpleHashStdCore.h"
 #include "simpleList.h"
-#include "simpleMath.h"
-#include <functional>
+#include "simplePair.h"
 
 namespace brogueHd::simple
 {
-	/// <summary>
-	/// Definition of simple predicate for any key-value map
-	/// </summary>
-	template<isHashable K, isHashable V>
-	using simpleHashPredicate = std::function<bool(const K& key, const V& value)>;
-
-	/// <summary>
-	/// Definition of simple predicate for any key-value map
-	/// </summary>
-	template<isHashable K, isHashable V>
-	using simpleHashCallback = std::function<iterationCallback(const K& key, const V& value)>;
-
-	/// <summary>
-	/// Definition of selector for the value type
-	/// </summary>
-	template<isHashable K, isHashable V, typename VResult>
-	using simpleHashSelector = std::function<VResult(const V& value)>;
-
-	template<isHashable K, isHashable V>
-	struct simplePair : hashable
-	{
-		K key;
-		V value;
-
-		simplePair() {}
-		simplePair(const K& akey, const V& avalue)
-		{
-			key = akey;
-			value = avalue;
-		}
-
-		bool operator==(const simplePair& pair) const
-		{
-			return pair.key == key && pair.value == value;
-		}
-		bool operator!=(const simplePair& pair) const
-		{
-			return pair.key != key || pair.value != value;
-		}
-		size_t getHash() const override
-		{
-			return hashGenerator::generateHash(key);
-		}
-	};
-
-	template<isHashable K, isHashable V>
+	template<isHashable K, typename V>
 	class simpleHash : public hashableObject
 	{
 	public:
 		simpleHash();
 		~simpleHash();
-
-		V operator[](const K& key) const;
 
 		V get(const K& key) const;
 		void add(const K& key, const V& value);
@@ -77,13 +29,6 @@ namespace brogueHd::simple
 		void clear();
 
 		void iterate(const simpleHashCallback<K, V>& callback) const;
-
-	private:
-
-		size_t calculateHashCode(const K& key) const;
-		size_t calculateBucketIndex(int hashCode) const;
-		void rehash(size_t newSize);
-		void checkHash() const;
 
 	public:	// Extension Methods:  mostly queries
 
@@ -105,9 +50,6 @@ namespace brogueHd::simple
 		/// </summary>
 		simpleHash<K, V> except(const simpleHashPredicate<K, V>& predicate) const;
 
-		//K getKeyAt(int index);
-		//V getValueAt(const std::map<K, V>& map, int index);
-
 		simpleList<K> getKeys() const;
 		simpleList<V> getValues() const;
 
@@ -117,294 +59,77 @@ namespace brogueHd::simple
 
 	private:
 
-		// Static Hash Table (with dynamic buckets)
-		simpleArray<simpleList<simplePair<K, V>*>*>* _table;
+		simpleHashCore<K, V>* _core;
 
-		// List follower for the primary table - for index lookup
-		simpleList<simplePair<K, V>*>* _list;
-
-		// Bucket Sizes (prevents iteration of bucket lists during set(..))
-		int _maxBucketSize;
 	};
 
-	template<isHashable K, isHashable V>
+	template<isHashable K, typename V>
 	simpleHash<K, V>::simpleHash()
 	{
-		_table = new simpleArray<simpleList<simplePair<K, V>*>*>(100);
-		_list = new simpleList<simplePair<K, V>*>();
-		_maxBucketSize = 0;
-
-		// (MEMORY!)
-		for (int index = 0; index < _table->count(); index++)
-		{
-			_table->set(index, new simpleList<simplePair<K, V>*>());
-		}
+		_core = new simpleHashStdCore<K, V>();
 	}
 
-	template<isHashable K, isHashable V>
+	template<isHashable K, typename V>
 	simpleHash<K, V>::~simpleHash()
 	{
-		// (MEMORY!)
-		for (int arrayIndex = 0; arrayIndex < _table->count(); arrayIndex++)
-		{
-			for (int index = 0; index < _table->get(arrayIndex)->count(); index++)
-			{
-				delete _table->get(arrayIndex)->get(index);
-			}
-
-			delete _table->get(arrayIndex);
-		}
-
-		delete _table;
-		delete _list;
+		delete _core;
 	}
 
-	template<isHashable K, isHashable V>
+	template<isHashable K, typename V>
 	void simpleHash<K, V>::clear()
 	{
-		simpleList<K> keys = this->getKeys();
-
-		for (int index = 0; index < keys.count(); index++)
-			this->remove(keys.get(index));
+		_core->clear();
 	}
 
-	template<isHashable K, isHashable V>
+	template<isHashable K, typename V>
 	V simpleHash<K, V>::get(const K& key) const
 	{
-		size_t hashCode = this->calculateHashCode(key);
-		size_t bucketIndex = this->calculateBucketIndex(hashCode);
-
-		// TODO: Use Ordered List
-		for (int index = 0; index < _table->get(bucketIndex)->count(); index++)
-		{
-			if (_table->get(bucketIndex)->get(index)->key == key)
-				return _table->get(bucketIndex)->get(index)->value;
-		}
-
-		throw simpleException("Key not found in hash table:  simpleHash.cpp");
+		return _core->get(key);
 	}
 
-	template<isHashable K, isHashable V>
+	template<isHashable K, typename V>
 	simplePair<K, V>* simpleHash<K, V>::getAt(int index)
 	{
-		return _list->get(index);
+		return _core->getAt(index);
 	}
 
-	template<isHashable K, isHashable V>
-	V simpleHash<K, V>::operator[](const K& key) const
-	{
-		return this->get(key);
-	}
-
-	template<isHashable K, isHashable V>
-	void simpleHash<K, V>::checkHash() const
-	{
-		// TODO:  Check hash code integrity
-	}
-
-	template<isHashable K, isHashable V>
+	template<isHashable K, typename V>
 	void simpleHash<K, V>::add(const K& key, const V& value)
 	{
-		if (this->contains(key))
-			throw simpleException("Trying to add duplicate value to simpleHash table. Use set(...)");
-
-		// Check hash integrity
-		checkHash();
-
-		// First rehash will give 100 buckets
-		if (_table->count() == 0)
-			rehash(100);
-
-		// Decision to rehash:
-		//
-		//	1) First bucket set is 100 items (what's "big"?) (# of buckets / 10)?
-		//	2) Log_10 -> An overflow of 3 = 1000 buckets. overflow of 6 = 1000000 buckets. (probably too much)
-		//  3) Log_e  -> Ln -> (~6.9, 1000); (~13.8, 1000000). That's much less aggressive.
-		//
-
-		if (_maxBucketSize > simpleMath::naturalLog(_table->count()))
-		{
-			// Multiply the bucket size by e ~ 2.718281828
-			//
-			rehash(_table->count() * simpleMath::exponential(1));
-		}
-
-		// If there's still overflow, the max size will be set for the next call to set(..)
-		//
-		size_t hashCode = this->calculateHashCode(key);
-		size_t bucketIndex = this->calculateBucketIndex(hashCode);
-
-		// (MEMORY!) Add to the i-th bucket
-		//
-		simplePair<K, V>* pair = new simplePair<K, V>(key, value);
-
-		_table->get(bucketIndex)->add(pair);
-		_list->add(pair);
+		_core->add(key, value);
 	}
 
-	template<isHashable K, isHashable V>
+	template<isHashable K, typename V>
 	void simpleHash<K, V>::set(const K& key, const V& value)
 	{
-		if (!this->contains(key))
-			throw simpleException("Trying to set value for a key-value pair that doesn't exist. Use add(...)");
-
-		V oldValue = this->get(key);
-
-		// Iterate to find the location in the ith bucket
-		size_t hashCode = this->calculateHashCode(key);
-		size_t bucketIndex = this->calculateBucketIndex(hashCode);
-
-		// Iterate to set the item value
-		for (int index = 0; index < _table->get(bucketIndex)->count(); index++)
-		{
-			if (_table->get(bucketIndex)->get(index)->value == oldValue)
-			{
-				simplePair<K, V>* pair = _table->get(bucketIndex)->get(index);
-
-				pair->value = value;
-				break;
-			}
-		}
+		_core->set(key, value);
 	}
 
-	template<isHashable K, isHashable V>
+	template<isHashable K, typename V>
 	bool simpleHash<K, V>::remove(const K& key)
 	{
-		size_t hashCode = this->calculateHashCode(key);
-		size_t bucketIndex = this->calculateBucketIndex(hashCode);
-
-		simplePair<K, V>* item = nullptr;
-
-		// TODO: Use Ordered List
-		for (int index = 0; index < _table->get(bucketIndex)->count(); index++)
-		{
-			if (_table->get(bucketIndex)->get(index)->key == key)
-			{
-				// Check max bucket size / track
-				if (_table->get(bucketIndex)->count() == _maxBucketSize)
-					_maxBucketSize--;
-
-				// Save item pointer
-				item = _table->get(bucketIndex)->get(index);
-
-				// Remove from the array
-				_table->get(bucketIndex)->removeAt(index);
-			}
-		}
-
-		// TODO: Use Ordered List
-		for (int index = 0; index < _list->count(); index++)
-		{
-			if (_list->get(index)->key == key)
-			{
-				// Remove from the parallel list
-				_list->removeAt(index);
-				break;
-			}
-		}
-
-		if (item != nullptr)
-		{
-			delete item;
-			return true;
-		}
-
-		return false;
+		return _core->remove(key);
 	}
 
-	template<isHashable K, isHashable V>
-	size_t simpleHash<K, V>::calculateHashCode(const K& key) const
-	{
-		return hashGenerator::generateHash(key);
-	}
-
-	template<isHashable K, isHashable V>
-	size_t simpleHash<K, V>::calculateBucketIndex(int hashCode) const
-	{
-		return hashCode % (size_t)_table->count();
-	}
-
-	template<isHashable K, isHashable V>
+	template<isHashable K, typename V>
 	bool simpleHash<K, V>::contains(const K& key) const
 	{
-		size_t hashCode = this->calculateHashCode(key);
-		size_t bucketIndex = this->calculateBucketIndex(hashCode);
-
-		// TODO: Use Ordered List
-		for (int index = 0; index < _table->get(bucketIndex)->count(); index++)
-		{
-			if (_table->get(bucketIndex)->get(index)->key == key)
-				return true;
-		}
-
-		return false;
+		return _core->contains(key);
 	}
 
-	template<isHashable K, isHashable V>
+	template<isHashable K, typename V>
 	int simpleHash<K, V>::count() const
 	{
-		return _list->count();
+		return _core->count();
 	}
 
-	template<isHashable K, isHashable V>
+	template<isHashable K, typename V>
 	void simpleHash<K, V>::iterate(const simpleHashCallback<K, V>& callback) const
 	{
-		for (int index = 0; index < _table->count(); index++)
-		{
-			for (int bucketIndex = 0; bucketIndex < _table->get(index)->count(); bucketIndex++)
-			{
-				simplePair<K, V>* pair = _table->get(index)->get(bucketIndex);
-
-				if (callback(pair->key, pair->value) == iterationCallback::breakAndReturn)
-					return;
-			}
-		}
+		_core->iterate(callback);
 	}
 
-	template<isHashable K, isHashable V>
-	void simpleHash<K, V>::rehash(size_t newSize)
-	{
-		// Setup new hash table with the specified size limit
-		simpleArray<simpleList<simplePair<K, V>*>*>* newTable = new simpleArray<simpleList<simplePair<K, V>*>*>(newSize);
-
-		// Setup new follower list for indexOf retrieval
-		simpleList<simplePair<K, V>*>* newList = new simpleList<simplePair<K, V>*>();
-
-		// Reset the max bucket size tracker
-		_maxBucketSize = 0;
-
-		for (int index = 0; index < _table->count(); index++)
-		{
-			for (int bucketIndex = 0; bucketIndex < _table->get(index)->count(); bucketIndex++)
-			{
-				// Get details from each bucket copied over
-				simplePair<K, V>* pair = _table->get(index)->get(bucketIndex);
-
-				size_t hashCode = this->calculateHashCode(pair->key);
-				size_t newBucketIndex = hashCode % newSize;		// Find a bucket for the data
-
-				if (newTable->get(newBucketIndex) == NULL)
-					newTable->set(newBucketIndex, new simpleList<simplePair<K, V>*>());
-
-				newTable->get(newBucketIndex)->add(pair);
-				newList->add(pair);
-
-				// Track the new bucket size while we're here
-				if (newTable->get(newBucketIndex)->count() > _maxBucketSize)
-					_maxBucketSize = newTable->get(newBucketIndex)->count();
-			}
-		}
-
-		// Delete the old data container
-		delete _table;
-		delete _list;
-
-		// Set the new pointer
-		_table = newTable;
-		_list = newList;
-	}
-
-	template<isHashable K, isHashable V>
+	template<isHashable K, typename V>
 	bool simpleHash<K, V>::any(const simpleHashPredicate<K, V>& predicate)
 	{
 		bool result = false;
@@ -423,35 +148,41 @@ namespace brogueHd::simple
 		return result;
 	}
 
-	template<isHashable K, isHashable V>
+	template<isHashable K, typename V>
 	simpleList<simplePair<K, V>> simpleHash<K, V>::removeWhere(const simpleHashPredicate<K, V>& predicate)
 	{
 		simpleList<simplePair<K, V>> result;
 
-		for (int index = _list->count() - 1; index >= 0; index--)
+		// Mark the remove elements
+		_core->iterate([&result, &predicate] (const K& key, const V& value)
 		{
-			if (predicate(_list[index]->key, _list[index]->value))
+			if (predicate(key, value))
 			{
-				result.add(_list[index]);
-
-				// TODO: Either do this all in one loop (here), or make a removeRange function
-				this->remove(_list[index]->key);
+				result.add(simplePair<K, V>(key, value));
 			}
+
+			return iterationCallback::iterate;
+		});
+
+		// Remove the indicated elements (Check Memory related issues!)
+		for (int index = 0; index < result.count(); index++)
+		{
+			_core->remove(result.get(index).getKey());
 		}
 
 		return result;
 	}
 
-	template<isHashable K, isHashable V>
+	template<isHashable K, typename V>
 	K simpleHash<K, V>::firstKey()
 	{
 		if (this->count() == 0)
 			throw simpleException("Trying to access empty simpleHash:  simpleHash::firstKey");
 
-		return this->getAt(0)->key;
+		return _core->getAt(0)->getKey();
 	}
 
-	template<isHashable K, isHashable V>
+	template<isHashable K, typename V>
 	K simpleHash<K, V>::firstKey(const simpleHashPredicate<K, V>& predicate)
 	{
 		K result = default_value::value<K>();
@@ -468,13 +199,13 @@ namespace brogueHd::simple
 		return result;
 	}
 
-	template<isHashable K, isHashable V>
+	template<isHashable K, typename V>
 	V simpleHash<K, V>::firstValue()
 	{
-		return this->getAt(0)->value;
+		return _core->getAt(0)->getValue();
 	}
 
-	template<isHashable K, isHashable V>
+	template<isHashable K, typename V>
 	V simpleHash<K, V>::firstValue(const simpleHashPredicate<K, V>& predicate)
 	{
 		V result = default_value::value<V>();
@@ -491,7 +222,7 @@ namespace brogueHd::simple
 		return result;
 	}
 
-	template<isHashable K, isHashable V>
+	template<isHashable K, typename V>
 	void simpleHash<K, V>::forEach(const simpleHashCallback<K, V>& callback)
 	{
 		this->iterate([&callback] (K key, V value)
@@ -500,7 +231,7 @@ namespace brogueHd::simple
 		});
 	}
 
-	template<isHashable K, isHashable V>
+	template<isHashable K, typename V>
 	K simpleHash<K, V>::firstOrDefaultKey(const simpleHashPredicate<K, V>& predicate)
 	{
 		K result = default_value::value<K>();
@@ -519,7 +250,7 @@ namespace brogueHd::simple
 		return result;
 	}
 
-	template<isHashable K, isHashable V>
+	template<isHashable K, typename V>
 	template<typename VResult>
 	simpleList<VResult> simpleHash<K, V>::selectFromValues(const simpleHashSelector<K, V, VResult>& selector)
 	{
@@ -534,7 +265,7 @@ namespace brogueHd::simple
 		return result;
 	}
 
-	template<isHashable K, isHashable V>
+	template<isHashable K, typename V>
 	simpleHash<K, V> simpleHash<K, V>::except(const simpleHashPredicate<K, V>& predicate) const
 	{
 		simpleHash<K, V> result;
@@ -542,7 +273,7 @@ namespace brogueHd::simple
 		this->iterate([&result, &predicate] (const K& key, const V& value)
 		{
 			if (!predicate(key, value))
-				 result.add(key, value);
+				result.add(key, value);
 
 			return iterationCallback::iterate;
 		});
@@ -550,7 +281,7 @@ namespace brogueHd::simple
 		return result;
 	}
 
-	template<isHashable K, isHashable V>
+	template<isHashable K, typename V>
 	simpleList<K> simpleHash<K, V>::getKeys() const
 	{
 		simpleList<K> result;
@@ -565,7 +296,7 @@ namespace brogueHd::simple
 		return result;
 	}
 
-	template<isHashable K, isHashable V>
+	template<isHashable K, typename V>
 	simpleList<V> simpleHash<K, V>::getValues() const
 	{
 		simpleList<V> result;
@@ -580,7 +311,7 @@ namespace brogueHd::simple
 		return result;
 	}
 
-	template<isHashable K, isHashable V>
+	template<isHashable K, typename V>
 	size_t simpleHash<K, V>::getHash() const
 	{
 		size_t hash = 0;

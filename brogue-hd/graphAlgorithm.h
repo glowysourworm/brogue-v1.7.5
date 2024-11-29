@@ -15,8 +15,7 @@ namespace brogueHd::component
 	class graphAlgorithm
 	{
 	public:
-		graphAlgorithm() {};
-		graphAlgorithm(graphEdgeConstructor<TNode, TEdge> graphEdgeConstructor);
+		graphAlgorithm(const graphEdgeConstructor<TNode, TEdge>& graphEdgeConstructor);
 		~graphAlgorithm();
 
 		virtual graph<TNode, TEdge>* run(const simpleList<TNode>& vertices);
@@ -38,19 +37,18 @@ namespace brogueHd::component
 		/// <summary>
 		/// Delegate that constructs the proper edge type
 		/// </summary>
-		graphEdgeConstructor<TNode, TEdge>* edgeConstructor;
+		graphEdgeConstructor<TNode, TEdge> edgeConstructor;
 	};
 
 	template<isGridLocatorNode TNode, isGridLocatorEdge<TNode> TEdge>
-	graphAlgorithm<TNode, TEdge>::graphAlgorithm(graphEdgeConstructor<TNode, TEdge> edgeConstructor)
+	graphAlgorithm<TNode, TEdge>::graphAlgorithm(const graphEdgeConstructor<TNode, TEdge>& edgeConstructor)
 	{
-		this->edgeConstructor = new graphEdgeConstructor<TNode, TEdge>(edgeConstructor);
+		this->edgeConstructor = edgeConstructor;
 	}
 
 	template<isGridLocatorNode TNode, isGridLocatorEdge<TNode> TEdge>
 	graphAlgorithm<TNode, TEdge>::~graphAlgorithm()
 	{
-		delete this->edgeConstructor;
 	}
 
 	template<isGridLocatorNode TNode, isGridLocatorEdge<TNode> TEdge>
@@ -81,9 +79,9 @@ namespace brogueHd::component
 			simpleList<TEdge> edges;
 			graphAlgorithm<TNode, TEdge>* that = this;
 
-			simpleListExtension<TNode>::distinctPairs(vertices, vertices, [&edges, &that] (TNode node1, TNode node2)
+			simpleListExtension<TNode>::distinctPairs(vertices, vertices, [&edges, &that] (const TNode& node1, const TNode& node2)
 			{
-				edges.add((*(that->edgeConstructor))(node1, node2));
+				edges.add(that->edgeConstructor(node1, node2));
 			});
 
 			return new graph<TNode, TEdge>(vertices.toArray(), edges.toArray());

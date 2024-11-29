@@ -1,13 +1,14 @@
 #pragma once
 
 #include "brogueCellDisplay.h"
-#include "brogueUIConstants.h"
 #include "brogueQuad.h"
+#include "brogueUIConstants.h"
 #include "gl.h"
 #include "gridLocator.h"
 #include "simple.h"
 #include "simpleDataStream.h"
 #include "simpleException.h"
+#include "simpleExt.h"
 #include "simpleGlData.h"
 
 using namespace brogueHd::backend::model;
@@ -62,7 +63,7 @@ namespace brogueHd::frontend
 				case GL_TRIANGLES:
 					return 6;
 				default:
-					throw simpleException("Unhandled primitive type for GLQuad:  {}", primitiveType);
+					throw simpleException(simpleExt::format("Unhandled primitive type for GLQuad:  {}", primitiveType));
 					break;
 			}
 		}
@@ -74,7 +75,7 @@ namespace brogueHd::frontend
 				case GL_TRIANGLES:
 					return 90 * sizeof(float);
 				default:
-					throw simpleException("Unhandled primitive type for GLQuad:  {}", primitiveType);
+					throw simpleException(simpleExt::format("Unhandled primitive type for GLQuad:  {}", primitiveType));
 					break;
 			}
 		}
@@ -146,7 +147,7 @@ namespace brogueHd::frontend
 				}
 				break;
 				default:
-					throw simpleException("Unhandled primitive type for GLQuad:  {}", primitiveType);
+					throw simpleException(simpleExt::format("Unhandled primitive type for GLQuad:  {}", primitiveType));
 					break;
 			}
 		}

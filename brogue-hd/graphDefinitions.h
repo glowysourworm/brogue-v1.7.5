@@ -39,8 +39,8 @@ namespace brogueHd::component
 
 	// Graph Delegates
 	template<isGridLocatorNode TNode, isGridLocatorEdge<TNode> TEdge>
-	using graphNodeConstructor = std::function<TNode(gridLocator)>;
+	using graphNodeConstructor = std::function<TNode(const gridLocator& node)>;
 
 	template<graphNodeType TNode, graphEdgeType<TNode> TEdge>
-	using graphEdgeConstructor = std::function<TEdge(TNode node1, TNode node2)>;
+	using graphEdgeConstructor = std::function<TEdge(const TNode& node1, const TNode& node2)>;
 }
