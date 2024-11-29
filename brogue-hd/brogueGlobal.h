@@ -15,16 +15,20 @@ namespace brogueHd
 		backgroundColorFrag = 3,
 		brogueCellDisplayVert = 4,
 		brogueCellDisplayFrag = 5,
-		diffuseColorUpwardVert = 6,
-		diffuseColorUpwardFrag = 7,
-		mixFrameTexturesVert = 8,
-		mixFrameTexturesFrag = 9
+		brogueLineVert = 6,
+		brogueLineRoomGraphFrag = 7,
+		diffuseColorUpwardVert = 8,
+		diffuseColorUpwardFrag = 9,
+		mixFrameTexturesVert = 10,
+		mixFrameTexturesFrag = 11
 	};
 
 	// {} -> savedGamesDirectory, resourceConfig { ... }, ...
 
 	static const char* ConfigResourceConfig = "resourceConfig";
 
+	static const char* ConfigBrogueLineVertexShader = "brogueLineVertexShader";
+	static const char* ConfigBrogueLineRoomGraphFragmentShader = "brogueLineRoomGraphFragmentShader";
 	static const char* ConfigColorMaskVertShader = "colorMaskVertexShader";
 	static const char* ConfigColorMaskFragShader = "colorMaskFragmentShader";
 	static const char* ConfigBackgroundColorVertexShader = "backgroundColorVertexShader";

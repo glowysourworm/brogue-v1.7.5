@@ -4,6 +4,7 @@
 #include "brogueKeyboardState.h"
 #include "brogueLine.h"
 #include "brogueMouseState.h"
+#include "brogueUIConstants.h"
 #include "brogueUIData.h"
 #include "brogueUIProgramPartId.h"
 #include "brogueViewCore.h"
@@ -78,6 +79,10 @@ namespace brogueHd::frontend
 		/// Returns true if the polygon's graph contains the specified edge
 		/// </summary>
 		bool containsLine(const simpleLine<int>& line);
+
+		virtual void initiateStateChange(brogueUIState fromState, brogueUIState toState);
+		virtual void clearStateChange();
+		virtual bool checkStateChange();
 
 		/// <summary>
 		/// Overload of the checkUpdate function behaves as though the view is a child of a parent view
@@ -162,7 +167,11 @@ namespace brogueHd::frontend
 
 	void brogueViewPolygonCore::setDataStreamElements()
 	{
-		int elementSize = _graphUI->count();
+		// Two point outputs per line
+		int elementSize = _graphUI->count() * 2;
+
+		if (elementSize != brogueViewCore<brogueLine>::getElementCount())
+			brogueViewCore<brogueLine>::resizeElements(elementSize);
 
 		// Now, we can send elements to the stream's buffer; and call createStream / reStream
 		for (int index = 0; index < _graphUI->count(); index++)
@@ -170,10 +179,12 @@ namespace brogueHd::frontend
 			simpleLine<int> line = _graphUI->get(index);
 			vec2 point1 = _coordinateConverter->getViewConverter().convertToNormalizedXY(line.node1.x, line.node1.y);
 			vec2 point2 = _coordinateConverter->getViewConverter().convertToNormalizedXY(line.node2.x, line.node2.y);
-			brogueLine streamElement(point1, point2);
+			brogueLine streamElement1(vec3(point1.x, point1.y, 1), vec4(1,1,1,1));
+			brogueLine streamElement2(vec3(point2.x, point2.y, 1), vec4(1,1,1,1));
 
 			// Stream out elements as the iterator specifies -> ordered onto the stream.
-			this->setElement(streamElement, index);
+			this->setElement(streamElement1, index);
+			this->setElement(streamElement2, index);
 		}
 
 		_invalid = false;
@@ -212,6 +223,7 @@ namespace brogueHd::frontend
 
 	void brogueViewPolygonCore::run()
 	{
+
 		brogueViewCore<brogueLine>::glDraw();
 	}
 
@@ -227,6 +239,19 @@ namespace brogueHd::frontend
 	bool brogueViewPolygonCore::containsLine(const simpleLine<int>& line)
 	{
 		return _graphUI->contains(line);
+	}
+
+	void brogueViewPolygonCore::initiateStateChange(brogueUIState fromState, brogueUIState toState)
+	{
+
+	}
+	void brogueViewPolygonCore::clearStateChange()
+	{
+
+	}
+	bool brogueViewPolygonCore::checkStateChange()
+	{
+		return false;
 	}
 
 	void brogueViewPolygonCore::checkUpdate(const brogueKeyboardState& keyboardState,

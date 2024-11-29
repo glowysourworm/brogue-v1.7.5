@@ -13,6 +13,8 @@
 #include "color.h"
 #include "eventController.h"
 #include "gl.h"
+#include "gridLocator.h"
+#include "gridLocatorEdge.h"
 #include "gridRect.h"
 #include "openglHelper.h"
 #include "resourceController.h"
@@ -24,6 +26,7 @@
 #include "simpleGlData.h"
 #include "simpleHash.h"
 #include "simpleKeyboardState.h"
+#include "simpleLine.h"
 #include "simpleList.h"
 #include "simpleLogger.h"
 #include "simpleMouseState.h"
@@ -86,6 +89,11 @@ namespace brogueHd::frontend
 		/// Primary game data update (see program container)
 		/// </summary>
 		void setGameUpdate(const brogueCellDisplay& data);
+
+		/// <summary>
+		/// Sets the debug polygon data for the level room graph
+		/// </summary>
+		void setDebugPolygonUpdate(const gridLocator& roomCenter, const gridLocatorEdge& roomConnection);
 
 	private:
 
@@ -288,6 +296,14 @@ namespace brogueHd::frontend
 		brogueUIProgramPartId partId(brogueUIProgram::GameProgram, brogueUIProgramPart::GameSurface, 0);
 
 		_uiPrograms->get(brogueUIProgram::GameProgram)->setGridProgram(partId, data);
+	}
+	void brogueMainProgram::setDebugPolygonUpdate(const gridLocator& roomCenter, const gridLocatorEdge& roomConnection)
+	{
+		brogueUIProgramPartId partId(brogueUIProgram::GameProgram, brogueUIProgramPart::Polygon, 0);
+
+		simpleLine<int> line = _uiBuilder->getCoordinateConverter()->convertToUI(roomConnection, true);
+
+		_uiPrograms->get(brogueUIProgram::GameProgram)->setPolygonProgram(partId, line);
 	}
 	void brogueMainProgram::run(int millisecondsElapsed)
 	{

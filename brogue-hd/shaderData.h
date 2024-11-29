@@ -50,6 +50,10 @@ namespace brogueHd::frontend
 			{
 
 				// VERTEX SHADERS
+				case shaderResource::brogueLineVert:
+					this->attributes.add(vertexAttributeData(0, "vertexXY_IsOdd", GL_FLOAT_VEC3));
+					this->attributes.add(vertexAttributeData(1, "lineColor", GL_FLOAT_VEC4));
+					break;
 				case shaderResource::colorMaskVert:
 					this->attributes.add(vertexAttributeData(0, "vertex", GL_FLOAT_VEC2));
 					this->attributes.add(vertexAttributeData(1, "backgroundColor", GL_FLOAT_VEC4));
@@ -80,6 +84,8 @@ namespace brogueHd::frontend
 					break;
 
 					// FRAGMENT SHADERS
+				case shaderResource::brogueLineRoomGraphFrag:
+					break;
 				case shaderResource::colorMaskFrag:
 					this->uniforms4.add(simpleUniform<vec4>("maskColor", GL_FLOAT_VEC4, vec4(0, 0, 0, 0)));
 					break;

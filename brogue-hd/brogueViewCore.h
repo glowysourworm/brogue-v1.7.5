@@ -57,10 +57,6 @@ namespace brogueHd::frontend
 
 	protected:	// GL Functions
 
-		// This draw type is specific to the data streams supported by isGLStream (see simpleOpenGL.h)
-		static constexpr GLenum PrimitiveType = GL_TRIANGLES;
-		static constexpr GLenum PolygonPrimitiveType = GL_LINES;
-
 		bool glHasUniform(const char* name);
 		bool glHasErrors();
 		void glShowErrors();
@@ -156,7 +152,7 @@ namespace brogueHd::frontend
 
 		// (MEMORY!) These are managed by the simple shader program
 		simpleVertexBuffer<float>* programVBO = new simpleVertexBuffer<float>(vertexBufferIndex++, _dataStream, vertexShader.getVertexAttributes());
-		simpleVertexArray<float>* programVAO = new simpleVertexArray<float>(this->PrimitiveType, programVBO);
+		simpleVertexArray<float>* programVAO = new simpleVertexArray<float>(_configuration->glPrimitiveType, programVBO);
 
 		_program = new simpleShaderProgram(vertexShader, fragmentShader, programVAO);
 
@@ -293,11 +289,23 @@ namespace brogueHd::frontend
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		}
 
+		if (_configuration->glPrimitiveType == GL_LINES)
+		{
+			glLineWidth(5.0f);
+			//glPointSize(10.0f);
+		}
+
 		_program->bind();
 		_program->draw();
 
 		if (_configuration->useAlphaBlending)
 			glDisable(GL_BLEND);
+
+		if (_configuration->glPrimitiveType == GL_LINES)
+		{
+			glLineWidth(1.0f);
+			//glPointSize(0.0f);
+		}
 
 		glFlush();
 		glFinish();
@@ -402,22 +410,22 @@ namespace brogueHd::frontend
 			case openglDataStreamType::brogueCellQuad:
 			{
 				brogueCellQuad quad;
-				return new simpleDataStream(elementCount, quad.getElementVertexSize(this->PrimitiveType), quad.getStreamSize(this->PrimitiveType));
+				return new simpleDataStream(elementCount, quad.getElementVertexSize(_configuration->glPrimitiveType), quad.getStreamSize(_configuration->glPrimitiveType));
 			}
 			case openglDataStreamType::brogueColorQuad:
 			{
 				brogueColorQuad quad;
-				return new simpleDataStream(elementCount, quad.getElementVertexSize(this->PrimitiveType), quad.getStreamSize(this->PrimitiveType));
+				return new simpleDataStream(elementCount, quad.getElementVertexSize(_configuration->glPrimitiveType), quad.getStreamSize(_configuration->glPrimitiveType));
 			}
 			case openglDataStreamType::brogueImageQuad:
 			{
 				brogueImageQuad quad;
-				return new simpleDataStream(elementCount, quad.getElementVertexSize(this->PrimitiveType), quad.getStreamSize(this->PrimitiveType));
+				return new simpleDataStream(elementCount, quad.getElementVertexSize(_configuration->glPrimitiveType), quad.getStreamSize(_configuration->glPrimitiveType));
 			}
 			case openglDataStreamType::broguePolygon:
 			{
 				brogueLine element;
-				return new simpleDataStream(elementCount, element.getElementVertexSize(this->PolygonPrimitiveType), element.getStreamSize(this->PolygonPrimitiveType));
+				return new simpleDataStream(elementCount, element.getElementVertexSize(_configuration->glPrimitiveType), element.getStreamSize(_configuration->glPrimitiveType));
 			}
 			default:
 				throw simpleException("Unhandled openglDataStreamType:  brogueViewCore::createDataStream");
@@ -457,25 +465,25 @@ namespace brogueHd::frontend
 			case openglDataStreamType::brogueImageQuad:
 			{
 				brogueImageQuad quad;
-				_dataStream->reCreate(elementSize, quad.getElementVertexSize(this->PrimitiveType), quad.getStreamSize(this->PrimitiveType));
+				_dataStream->reCreate(elementSize, quad.getElementVertexSize(_configuration->glPrimitiveType), quad.getStreamSize(_configuration->glPrimitiveType));
 			}
 			break;
 			case openglDataStreamType::brogueCellQuad:
 			{
 				brogueCellQuad quad;
-				_dataStream->reCreate(elementSize, quad.getElementVertexSize(this->PrimitiveType), quad.getStreamSize(this->PrimitiveType));
+				_dataStream->reCreate(elementSize, quad.getElementVertexSize(_configuration->glPrimitiveType), quad.getStreamSize(_configuration->glPrimitiveType));
 			}
 			break;
 			case openglDataStreamType::brogueColorQuad:
 			{
 				brogueColorQuad quad;
-				_dataStream->reCreate(elementSize, quad.getElementVertexSize(this->PrimitiveType), quad.getStreamSize(this->PrimitiveType));
+				_dataStream->reCreate(elementSize, quad.getElementVertexSize(_configuration->glPrimitiveType), quad.getStreamSize(_configuration->glPrimitiveType));
 			}
 			break;
 			case openglDataStreamType::broguePolygon:
 			{
 				brogueLine element;
-				_dataStream->reCreate(elementSize, element.getElementVertexSize(this->PolygonPrimitiveType), element.getStreamSize(this->PolygonPrimitiveType));
+				_dataStream->reCreate(elementSize, element.getElementVertexSize(_configuration->glPrimitiveType), element.getStreamSize(_configuration->glPrimitiveType));
 			}
 			break;
 			default:
@@ -524,7 +532,7 @@ namespace brogueHd::frontend
 
 			for (int index = 0; index < _elements->count(); index++)
 			{
-				_elements->get(index).streamBuffer(this->PrimitiveType, _dataStream);
+				_elements->get(index).streamBuffer(_configuration->glPrimitiveType, _dataStream);
 			}
 
 			_dataInvalid = false;

@@ -35,8 +35,8 @@ namespace brogueHd::simple
 				const char* format1 = "Source File:  {}  Line:  {}  \r\n";
 				const char* format2 = "Description:  {} \r\n";
 
-				//result += simpleExt::format(format1, stack.source_file().c_str(), stack.source_line());
-				//result += simpleExt::format(format2, stack.description().c_str());
+				result += simpleExt::format(format1, stack.source_file().c_str(), stack.source_line());
+				result += simpleExt::format(format2, stack.description().c_str());
 			}
 
 #ifdef _DEBUG

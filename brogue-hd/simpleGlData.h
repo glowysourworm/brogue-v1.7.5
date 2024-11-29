@@ -98,6 +98,9 @@ namespace brogueHd::frontend
 				case GL_TRIANGLES:
 					return 1;
 					break;
+				case GL_LINES:
+					return 1;
+					break;
 				default:
 					throw simpleException("Unhandled primitive GLenum type:  vec2 in simpleGlData.h");
 			}
@@ -111,6 +114,10 @@ namespace brogueHd::frontend
 			switch (primitiveType)
 			{
 				case GL_TRIANGLES:
+					outputStream->writeFloat(x);
+					outputStream->writeFloat(y);
+					break;
+				case GL_LINES:
 					outputStream->writeFloat(x);
 					outputStream->writeFloat(y);
 					break;
@@ -253,6 +260,9 @@ namespace brogueHd::frontend
 				case GL_TRIANGLES:
 					return 1;
 					break;
+				case GL_LINES:
+					return 1;
+					break;
 				default:
 					throw simpleException("Unhandled primitive GLenum type:  vec2 in simpleGlData.h");
 			}
@@ -266,6 +276,7 @@ namespace brogueHd::frontend
 			switch (primitiveType)
 			{
 				case GL_TRIANGLES:
+				case GL_LINES:
 					outputStream->writeFloat(x);
 					outputStream->writeFloat(y);
 					outputStream->writeFloat(z);
@@ -335,6 +346,8 @@ namespace brogueHd::frontend
 			{
 				case GL_POINTS:
 					return 1;
+				case GL_LINES:
+					return 1;
 				case GL_TRIANGLES:
 					return 1;
 					break;
@@ -350,6 +363,8 @@ namespace brogueHd::frontend
 		{
 			switch (primitiveType)
 			{
+				case GL_POINTS:
+				case GL_LINES:
 				case GL_TRIANGLES:
 					outputStream->writeFloat(x);
 					outputStream->writeFloat(y);

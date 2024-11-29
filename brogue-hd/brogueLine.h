@@ -13,13 +13,13 @@ namespace brogueHd::frontend
 	{
 		brogueLine()
 		{
-			_point1 = default_value::value<vec2>();
-			_point2 = default_value::value<vec2>();
+			_point_isOdd = default_value::value<vec3>();
+			_lineColor = default_value::value<vec4>();
 		}
-		brogueLine(const vec2& point1, const vec2& point2)
+		brogueLine(const vec3& pointIsOdd, const vec4& lineColor)
 		{
-			_point1 = point1;
-			_point2 = point2;
+			_point_isOdd = pointIsOdd;
+			_lineColor = lineColor;
 		}
 		brogueLine(const brogueLine& copy)
 		{
@@ -36,7 +36,7 @@ namespace brogueHd::frontend
 			switch (primitiveType)
 			{
 				case GL_LINES:
-					return 2;
+					return 1;
 				default:
 					throw simpleException(simpleExt::format("Unhandled primitive type for brogueLine:  PrimitiveType={}", primitiveType));
 			}
@@ -47,7 +47,7 @@ namespace brogueHd::frontend
 			switch (primitiveType)
 			{
 				case GL_LINES:
-					return (4 * sizeof(float));
+					return (7 * sizeof(float));
 				default:
 					throw simpleException(simpleExt::format("Unhandled primitive type for GLQuad:  {}", primitiveType));
 					break;
@@ -56,37 +56,38 @@ namespace brogueHd::frontend
 
 		void streamBuffer(GLenum primitiveType, simpleDataStream* outputStream) const override
 		{
-			_point1.streamBuffer(primitiveType, outputStream);	// vec2
-			_point2.streamBuffer(primitiveType, outputStream);	// vec2
+			_point_isOdd.streamBuffer(primitiveType, outputStream);	// vec3
+			_lineColor.streamBuffer(primitiveType, outputStream);	// vec4
 		}
 
 		virtual size_t getHash() const override
 		{
-			return hashGenerator::generateHash(_point1, _point2);
+			return hashGenerator::generateHash(_point_isOdd, _lineColor);
 		}
 
 	private:
 
-		vec2 getPoint1() const
+		vec3 getPointIsOdd() const
 		{
-			return _point1;
+			return _point_isOdd;
 		}
 
-		vec2 getPoint2() const
+		vec4 getLineColor() const
 		{
-			return _point2;
+			return _lineColor;
 		}
 
 		void copyImpl(const brogueLine& copy)
 		{
-			_point1 = copy.getPoint1();
-			_point2 = copy.getPoint2();
+			_point_isOdd = copy.getPointIsOdd();
+			_lineColor = copy.getLineColor();
 		}
 
 	private:
 
-		vec2 _point1;
-		vec2 _point2;
+		// Current point in the point set for the GL line
+		vec3 _point_isOdd;
+		vec4 _lineColor;
 
 	};
 }

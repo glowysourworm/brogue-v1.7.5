@@ -22,7 +22,7 @@ namespace brogueHd::backend::model
 		int getDepth() const;
 
 		void iterateWhereDefined(gridCallback<brogueCell*> callback) const;
-		void iterateRoomGraph(graphIterator<gridLocator, gridLocatorEdge> callback);
+		void iterateRoomGraph(graphIterator<gridLocator, gridLocatorEdge> callback) const;
 		void clearUpdate();
 		bool needsUpdate();
 
@@ -67,7 +67,7 @@ namespace brogueHd::backend::model
 	{
 		_layout->iterateWhereDefined(callback);
 	}
-	void brogueLevel::iterateRoomGraph(graphIterator<gridLocator, gridLocatorEdge> callback)
+	void brogueLevel::iterateRoomGraph(graphIterator<gridLocator, gridLocatorEdge> callback) const
 	{
 		_layout->iterateRoomGraph(callback);
 	}

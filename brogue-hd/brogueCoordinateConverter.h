@@ -2,10 +2,13 @@
 
 #include "brogueCellDisplay.h"
 #include "brogueGlyphMap.h"
+#include "gridLocatorEdge.h"
 #include "gridRect.h"
 #include "openglQuadConverter.h"
 #include "resourceController.h"
 #include "simpleGlData.h"
+#include "simpleLine.h"
+#include "simplePoint.h"
 
 namespace brogueHd::frontend
 {
@@ -28,6 +31,8 @@ namespace brogueHd::frontend
 		~brogueCoordinateConverter();
 
 		gridRect calculateSceneBoundaryUI() const;
+
+		simpleLine<int> convertToUI(const gridLocatorEdge& edge, bool moveToCellCenter = false);
 
 		simpleQuad createFrameQuadXY();
 		simpleQuad createFrameQuadUV();
@@ -87,6 +92,19 @@ namespace brogueHd::frontend
 	gridRect brogueCoordinateConverter::calculateSceneBoundaryUI() const
 	{
 		return gridRect(0, 0, _viewConverter.getViewWidth(), _viewConverter.getViewHeight());
+	}
+	simpleLine<int> brogueCoordinateConverter::convertToUI(const gridLocatorEdge& edge, bool moveToCellCenter)
+	{
+		int centerOffsetX = moveToCellCenter ? brogueCellDisplay::CellWidth(_zoomLevel) / 2.0f : 0;
+		int centerOffsetY = moveToCellCenter ? brogueCellDisplay::CellHeight(_zoomLevel) / 2.0f : 0;
+
+		simplePoint<int> point1(edge.node1.column * brogueCellDisplay::CellWidth(_zoomLevel) + centerOffsetX,
+								edge.node1.row * brogueCellDisplay::CellHeight(_zoomLevel) + centerOffsetY);
+
+		simplePoint<int> point2(edge.node2.column * brogueCellDisplay::CellWidth(_zoomLevel) + centerOffsetX,
+								edge.node2.row * brogueCellDisplay::CellHeight(_zoomLevel) + centerOffsetY);
+
+		return simpleLine<int>(point1, point2);
 	}
 	simpleQuad brogueCoordinateConverter::createFrameQuadXY()
 	{

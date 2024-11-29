@@ -4,6 +4,8 @@
 	"highScoresFile" : "C:\\Backup\\_programs\\Rogue-likes\\Brogue-windows-v1.7.5\\BrogueHighScores.txt",
 	"resourceConfig" : {
 		
+		"brogueLineVertexShader": "C:\\Backup\\_Source\\Git\\brogue-v1.7.5\\resources\\opengl\\brogueLine.vert",
+		"brogueLineRoomGraphFragmentShader": "C:\\Backup\\_Source\\Git\\brogue-v1.7.5\\resources\\opengl\\brogueLineRoomGraph.frag",
 		"colorMaskVertexShader": "C:\\Backup\\_Source\\Git\\brogue-v1.7.5\\resources\\opengl\\colorMask.vert",
 		"colorMaskFragmentShader": "C:\\Backup\\_Source\\Git\\brogue-v1.7.5\\resources\\opengl\\colorMask.frag",
 		"backgroundColorVertexShader": "C:\\Backup\\_Source\\Git\\brogue-v1.7.5\\resources\\opengl\\backgroundColor.vert",

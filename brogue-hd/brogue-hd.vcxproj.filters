@@ -882,6 +882,12 @@
     </None>
     <None Include="packages.config" />
     <None Include="..\config.json" />
+    <None Include="..\resources\opengl\brogueLine.vert">
+      <Filter>Resource Files\opengl</Filter>
+    </None>
+    <None Include="..\resources\opengl\brogueLineRoomGraph.frag">
+      <Filter>Resource Files\opengl</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\resources\fonts\font-1.bmp">

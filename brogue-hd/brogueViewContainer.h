@@ -330,8 +330,8 @@ namespace brogueHd::frontend
 			else if (_cellViews->contains(partId))
 				_cellViews->get(partId)->initiateStateChange(fromState, toState);
 
-			//else if (_lineViews->contains(partId))
-			//	_lineViews->get(partId)->initiateStateChange(fromState, toState);
+			else if (_lineViews->contains(partId))
+				_lineViews->get(partId)->initiateStateChange(fromState, toState);
 
 			else
 				throw simpleException("Program Part Id not found:  brogueViewContainer.h");
@@ -353,8 +353,8 @@ namespace brogueHd::frontend
 			else if (_cellViews->contains(partId))
 				_cellViews->get(partId)->clearStateChange();
 
-			//else if (_lineViews->contains(partId))
-			//	_lineViews->get(partId)->initiateStateChange(fromState, toState);
+			else if (_lineViews->contains(partId))
+				_lineViews->get(partId)->clearStateChange();
 
 			else
 				throw simpleException("Program Part Id not found:  brogueViewContainer.h");
@@ -377,8 +377,8 @@ namespace brogueHd::frontend
 			else if (_cellViews->contains(partId))
 				result |= _cellViews->get(partId)->checkStateChange();
 
-			//else if (_lineViews->contains(partId))
-			//	_lineViews->get(partId)->initiateStateChange(fromState, toState);
+			else if (_lineViews->contains(partId))
+				_lineViews->get(partId)->checkStateChange();
 
 			else
 				throw simpleException("Program Part Id not found:  brogueViewContainer.h");
@@ -393,23 +393,27 @@ namespace brogueHd::frontend
 	{
 		// Apply mouse transform to the mouse state for the child views (utilizes scrolling and render offsets)
 		//
-		brogueMouseState adjustedMouseUI = getAdjustedMouse(mouseState);
+		brogueMouseState adjustedMouse = getAdjustedMouse(mouseState);
+
+		// Block events outside the container boundary - adjusted by the current render offset (used for animations)
+		if (!_containerBoundary->contains(adjustedMouse.getLocation()))
+			return;
 
 		for (int index = 0; index < _orderLookup->count(); index++)
 		{
 			brogueUIProgramPartId partId = _orderLookup->getAt(index)->getKey();
 
 			if (_imageViews->contains(partId))
-				_imageViews->get(partId)->checkUpdate(keyboardState, mouseState, millisecondsLapsed);
+				_imageViews->get(partId)->checkUpdate(keyboardState, adjustedMouse, millisecondsLapsed);
 
 			else if (_colorViews->contains(partId))
-				_colorViews->get(partId)->checkUpdate(keyboardState, mouseState, millisecondsLapsed);
+				_colorViews->get(partId)->checkUpdate(keyboardState, adjustedMouse, millisecondsLapsed);
 
 			else if (_cellViews->contains(partId))
-				_cellViews->get(partId)->checkUpdate(keyboardState, mouseState, millisecondsLapsed);
+				_cellViews->get(partId)->checkUpdate(keyboardState, adjustedMouse, millisecondsLapsed);
 
 			else if (_lineViews->contains(partId))
-				_lineViews->get(partId)->checkUpdate(keyboardState, mouseState, millisecondsLapsed);
+				_lineViews->get(partId)->checkUpdate(keyboardState, adjustedMouse, millisecondsLapsed);
 
 			else
 				throw simpleException("Program Part Id not found:  brogueViewContainer.h");
@@ -421,23 +425,23 @@ namespace brogueHd::frontend
 	{
 		// Apply mouse transform to the mouse state for the child views (utilizes scrolling and render offsets)
 		//
-		brogueMouseState adjustedMouseUI = getAdjustedMouse(mouseState);
+		brogueMouseState adjustedMouse = getAdjustedMouse(mouseState);
 
 		for (int index = 0; index < _orderLookup->count(); index++)
 		{
 			brogueUIProgramPartId partId = _orderLookup->getAt(index)->getKey();
 
 			if (_imageViews->contains(partId))
-				_imageViews->get(partId)->invalidate(keyboardState, mouseState);
+				_imageViews->get(partId)->invalidate(keyboardState, adjustedMouse);
 
 			else if (_colorViews->contains(partId))
-				_colorViews->get(partId)->invalidate(keyboardState, mouseState);
+				_colorViews->get(partId)->invalidate(keyboardState, adjustedMouse);
 
 			else if (_cellViews->contains(partId))
-				_cellViews->get(partId)->invalidate(keyboardState, mouseState);
+				_cellViews->get(partId)->invalidate(keyboardState, adjustedMouse);
 
 			else if (_lineViews->contains(partId))
-				_lineViews->get(partId)->invalidate(keyboardState, mouseState);
+				_lineViews->get(partId)->invalidate(keyboardState, adjustedMouse);
 
 			else
 				throw simpleException("Program Part Id not found:  brogueViewContainer.h");

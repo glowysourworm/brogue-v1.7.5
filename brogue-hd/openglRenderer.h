@@ -36,6 +36,7 @@
 #include "gridLocatorEdge.h"
 #include "brogueUIProgramPartId.h"
 #include "brogueGraphView.h"
+#include "simpleList.h"
 
 using namespace brogueHd::simple;
 using namespace brogueHd::component;
@@ -488,15 +489,15 @@ namespace brogueHd::frontend
 		// 2) Room Graph (or current issue data)
 		//
 		// 
-		// Using mock view to do the UI translation (TODO: This needs to go into the program API stack)
-		//brogueGraphView graphView(_eventController, brogueUIProgramPartId(brogueUIProgram::DebugOverlay, brogueUIProgramPart::Polygon, 0), brogueUIData(10, colors::white()), );
-
-		//level->iterateRoomGraph([&graphView] (const gridLocator& roomCenter, const gridLocatorEdge& roomConnection)
-		//{
-		//	graphView.addEdge(roomConnection);
-
-		//	return iterationCallback::iterate;
-		//});
+		level->iterateRoomGraph([&program] (const gridLocator& roomCenter, const simpleList<gridLocatorEdge>& roomConnections)
+		{
+			for (int index = 0; index < roomConnections.count(); index++)
+			{
+				program->setDebugPolygonUpdate(roomCenter, roomConnections.get(index));
+			}
+			
+			return iterationCallback::iterate;
+		});
 
 
 		_threadLock->unlock();

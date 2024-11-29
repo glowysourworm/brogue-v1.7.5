@@ -1,6 +1,5 @@
 #pragma once
 #include "brogueBackground.h"
-#include "brogueMenuBackground.h"
 #include "brogueButton.h"
 #include "brogueCoordinateConverter.h"
 #include "brogueFlameMenuHeatView.h"
@@ -9,6 +8,8 @@
 #include "brogueGameView.h"
 #include "brogueGlobal.h"
 #include "brogueGlyphMap.h"
+#include "brogueGraphView.h"
+#include "brogueMenuBackground.h"
 #include "brogueScoreEntry.h"
 #include "brogueScrollView.h"
 #include "brogueTextView.h"
@@ -754,9 +755,14 @@ namespace brogueHd::frontend
 		brogueUIData uiData(boundary, sceneBounds, _zoomLevel, colors::black());
 		brogueGameView* gameView = new brogueGameView(_coordinateConverter, _resourceController, _eventController, partId, uiData);
 
+		brogueUIProgramPartId debugPartId(brogueUIProgram::GameProgram, brogueUIProgramPart::Polygon, 0);
+		brogueUIData debugUIData(boundary, sceneBounds, _zoomLevel, colors::transparent());
+		brogueGraphView* graphView = new brogueGraphView(_coordinateConverter, _eventController, _resourceController, debugPartId, debugUIData);
+
 		brogueViewProgram* container = new brogueViewProgram(_coordinateConverter, brogueUIProgram::GameProgram, boundary, sceneBounds);
 
 		container->addView(gameView);
+		container->addView(graphView);
 
 		return container;
 	}

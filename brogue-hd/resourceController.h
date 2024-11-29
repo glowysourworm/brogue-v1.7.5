@@ -164,6 +164,8 @@ namespace brogueHd::backend
 
 			const char* resConfig = brogueHd::ConfigResourceConfig;
 
+			simpleString brogueLineVertSource = simpleFileIO::readTextFile(std::string(jsonConfig[resConfig][brogueHd::ConfigBrogueLineVertexShader]).c_str());
+			simpleString brogueLineRoomGraphFragSource = simpleFileIO::readTextFile(std::string(jsonConfig[resConfig][brogueHd::ConfigBrogueLineRoomGraphFragmentShader]).c_str());
 			simpleString colorMaskVertSource = simpleFileIO::readTextFile(std::string(jsonConfig[resConfig][brogueHd::ConfigColorMaskVertShader]).c_str());
 			simpleString colorMaskFragSource = simpleFileIO::readTextFile(std::string(jsonConfig[resConfig][brogueHd::ConfigColorMaskFragShader]).c_str());
 			simpleString backgroundColorVertSource = simpleFileIO::readTextFile(std::string(jsonConfig[resConfig][brogueHd::ConfigBackgroundColorVertexShader]).c_str());
@@ -175,6 +177,9 @@ namespace brogueHd::backend
 			simpleString mixFrameTexturesVertSource = simpleFileIO::readTextFile(std::string(jsonConfig[resConfig][brogueHd::ConfigMixFrameTexturesVertexShader]).c_str());
 			simpleString mixFrameTexturesFragSource = simpleFileIO::readTextFile(std::string(jsonConfig[resConfig][brogueHd::ConfigMixFrameTexturesFragmentShader]).c_str());
 
+
+			shaderData* brogueLineVert = new shaderData(shaderResource::brogueLineVert, GL_VERTEX_SHADER, brogueLineVertSource);
+			shaderData* brogueLineRoomGraphFrag = new shaderData(shaderResource::brogueLineRoomGraphFrag, GL_FRAGMENT_SHADER, brogueLineRoomGraphFragSource);
 			shaderData* colorMaskVert = new shaderData(shaderResource::colorMaskVert, GL_VERTEX_SHADER, colorMaskVertSource);
 			shaderData* colorMaskFrag = new shaderData(shaderResource::colorMaskFrag, GL_FRAGMENT_SHADER, colorMaskFragSource);
 			shaderData* backgroundColorVert = new shaderData(shaderResource::backgroundColorVert, GL_VERTEX_SHADER, backgroundColorVertSource);
@@ -186,6 +191,8 @@ namespace brogueHd::backend
 			shaderData* mixFrameTexturesVert = new shaderData(shaderResource::mixFrameTexturesVert, GL_VERTEX_SHADER, mixFrameTexturesVertSource);
 			shaderData* mixFrameTexturesFrag = new shaderData(shaderResource::mixFrameTexturesFrag, GL_FRAGMENT_SHADER, mixFrameTexturesFragSource);
 
+			_shaderCache->add(shaderResource::brogueLineVert, brogueLineVert);
+			_shaderCache->add(shaderResource::brogueLineRoomGraphFrag, brogueLineRoomGraphFrag);
 			_shaderCache->add(shaderResource::colorMaskVert, colorMaskVert);
 			_shaderCache->add(shaderResource::colorMaskFrag, colorMaskFrag);
 			_shaderCache->add(shaderResource::backgroundColorVert, backgroundColorVert);
@@ -296,6 +303,7 @@ namespace brogueHd::backend
 												 openglDataStreamType::brogueCellQuad,
 												 openglBrogueCellOutputSelector::NoDisplay,
 												 15,
+												 GL_TRIANGLES,
 												 false,
 												 false);
 
@@ -307,6 +315,7 @@ namespace brogueHd::backend
 												 openglDataStreamType::brogueColorQuad,
 												 openglBrogueCellOutputSelector::DisplayCurrentFrame,
 												 15,
+												 GL_TRIANGLES,
 												 false,
 												 false);
 
@@ -318,6 +327,19 @@ namespace brogueHd::backend
 												 openglDataStreamType::brogueCellQuad,
 												 openglBrogueCellOutputSelector::DisplayCurrentFrame,
 												 0,
+												 GL_TRIANGLES,
+												 false,
+												 false);
+
+		// Game Debug Polygon View
+		brogueUIProgramPartConfiguration* gamePolygonDebug =
+			new brogueUIProgramPartConfiguration(brogueUIProgramPart::Polygon,
+												 shaderResource::brogueLineVert,
+												 shaderResource::brogueLineRoomGraphFrag,
+												 openglDataStreamType::broguePolygon,
+												 openglBrogueCellOutputSelector::DisplayCurrentFrame,
+												 0,
+												 GL_LINES,
 												 false,
 												 false);
 
@@ -329,6 +351,7 @@ namespace brogueHd::backend
 												 openglDataStreamType::brogueCellQuad,
 												 openglBrogueCellOutputSelector::DisplayCurrentFrame,
 												 0,
+												 GL_TRIANGLES,
 												 true,
 												 false);
 
@@ -339,6 +362,7 @@ namespace brogueHd::backend
 												 openglDataStreamType::brogueCellQuad,
 												 openglBrogueCellOutputSelector::DisplayCurrentFrame,
 												 0,
+												 GL_TRIANGLES,
 												 true,
 												 false);
 
@@ -349,6 +373,7 @@ namespace brogueHd::backend
 												 openglDataStreamType::brogueColorQuad,
 												 openglBrogueCellOutputSelector::DisplayCurrentFrame,
 												 0,
+												 GL_TRIANGLES,
 												 false,
 												 false);
 
@@ -359,6 +384,7 @@ namespace brogueHd::backend
 												 openglDataStreamType::brogueCellQuad,
 												 openglBrogueCellOutputSelector::DisplayCurrentFrame,
 												 0,
+												 GL_TRIANGLES,
 												 true,
 												 false);
 
@@ -369,6 +395,7 @@ namespace brogueHd::backend
 		_programPartConfigs->add(brogueUIProgramPart::Background, background);
 		_programPartConfigs->add(brogueUIProgramPart::MenuBackground, menuBackground);
 		_programPartConfigs->add(brogueUIProgramPart::GameSurface, gameSurface);
+		_programPartConfigs->add(brogueUIProgramPart::Polygon, gamePolygonDebug);
 	}
 
 	void resourceController::loadKeymap(keyProcessor& processor)

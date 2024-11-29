@@ -1,6 +1,7 @@
 #pragma once
 #include "brogueGlobal.h"
 #include "brogueUIConstants.h"
+#include "gl.h"
 #include <cstdint>
 
 namespace brogueHd::frontend
@@ -13,6 +14,7 @@ namespace brogueHd::frontend
 										 openglDataStreamType streamType,
 										 openglBrogueCellOutputSelector noDisplayOutput,
 										 uint32_t minUpdatePeriodMilliseconds,
+										 GLenum openglPrimitiveType,
 										 bool alphaBlendingEnable,
 										 bool frameType)
 		{
@@ -22,6 +24,7 @@ namespace brogueHd::frontend
 			dataStreamType = streamType;
 			noDisplaySelector = noDisplayOutput;
 			minimumUpdatePeriodMilliseconds = minUpdatePeriodMilliseconds;
+			glPrimitiveType = openglPrimitiveType;
 			useAlphaBlending = alphaBlendingEnable;
 			isFrameType = frameType;
 		}
@@ -33,6 +36,7 @@ namespace brogueHd::frontend
 			dataStreamType = copy.dataStreamType;
 			noDisplaySelector = copy.noDisplaySelector;
 			minimumUpdatePeriodMilliseconds = copy.minimumUpdatePeriodMilliseconds;
+			glPrimitiveType = copy.glPrimitiveType;
 			useAlphaBlending = copy.useAlphaBlending;
 			isFrameType = copy.isFrameType;
 		}
@@ -45,6 +49,7 @@ namespace brogueHd::frontend
 			dataStreamType = copy.dataStreamType;
 			noDisplaySelector = copy.noDisplaySelector;
 			minimumUpdatePeriodMilliseconds = copy.minimumUpdatePeriodMilliseconds;
+			glPrimitiveType = copy.glPrimitiveType;
 			useAlphaBlending = copy.useAlphaBlending;
 			isFrameType = copy.isFrameType;
 		}
@@ -55,6 +60,7 @@ namespace brogueHd::frontend
 		openglDataStreamType dataStreamType;
 		openglBrogueCellOutputSelector noDisplaySelector;
 		uint32_t minimumUpdatePeriodMilliseconds;
+		GLenum glPrimitiveType;
 		bool useAlphaBlending;
 		bool isFrameType;
 	};
