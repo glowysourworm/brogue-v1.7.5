@@ -79,12 +79,13 @@ namespace brogueHd::backend::model
 		/// <summary>
 		/// Sets graph of rooms for the layout
 		/// </summary>
-		void setRoomGraph(graph<gridLocator, gridLocatorEdge>* roomGraph);
+		void setRoomConnectionGraph(graph<gridLocator, gridLocatorEdge>* connectionGraph);
 
-		/// <summary>
-		/// Iterates the graph and presents the current node, and adjacent edges during a callback
-		/// </summary>
-		void iterateRoomGraph(graphIterator<gridLocator, gridLocatorEdge> callback);
+		void setCorridorConnections(const simpleList<gridLocatorEdge>& connections);
+		simpleList<gridLocatorEdge> getCorridorConnections()
+		{
+			return *_corridorConnections;
+		}
 
 		/// <summary>
 		/// Iterates all graph edges and callsback to the user code
@@ -107,7 +108,9 @@ namespace brogueHd::backend::model
 		// Grid containing flag-enum for categories of features:  TODO
 		grid<dungeonFeatureCategories>* _featureCategoriesGrid;
 
-		graph<gridLocator, gridLocatorEdge>* _roomGraph;
+		graph<gridLocator, gridLocatorEdge>* _connectionGraph;
+
+		simpleList<gridLocatorEdge>* _corridorConnections;
 
 		//int cost;
 
@@ -127,7 +130,8 @@ namespace brogueHd::backend::model
 	brogueLayout::brogueLayout(const gridRect& levelParentBoundary, const gridRect& levelBoundary)
 	{
 		_mainGrid = new grid<brogueCell*>(levelParentBoundary, levelBoundary);
-		_roomGraph = nullptr;
+		_connectionGraph = nullptr;
+		_corridorConnections = new simpleList<gridLocatorEdge>();
 	}
 
 	brogueLayout::~brogueLayout()
@@ -199,22 +203,23 @@ namespace brogueHd::backend::model
 		});
 	}
 
-	void brogueLayout::setRoomGraph(graph<gridLocator, gridLocatorEdge>* roomGraph)
+	void brogueLayout::setRoomConnectionGraph(graph<gridLocator, gridLocatorEdge>* connectionGraph)
 	{
-		_roomGraph = roomGraph;
+		_connectionGraph = connectionGraph;
 	}
 
-	void brogueLayout::iterateRoomGraph(graphIterator<gridLocator, gridLocatorEdge> callback)
+	void brogueLayout::setCorridorConnections(const simpleList<gridLocatorEdge>& connections)
 	{
-		if (_roomGraph == nullptr)
-			throw simpleException("Trying to iterate room graph before setting it");
-
-		_roomGraph->iterate(callback);
+		_corridorConnections->clear();
+		_corridorConnections->addRange(connections);
 	}
 
 	void brogueLayout::iterateRoomConnections(graphSimpleEdgeIterator<gridLocator, gridLocatorEdge> callback)
 	{
-		_roomGraph->iterateEdges(callback);
+		if (_connectionGraph == nullptr)
+			throw simpleException("Trying to iterate room graph before setting it");
+
+		_connectionGraph->iterateEdges(callback);
 	}
 
 	void brogueLayout::iterateAdjacentCells(int column, int row, gridCallback<brogueCell*> callback)

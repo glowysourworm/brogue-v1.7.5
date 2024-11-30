@@ -44,6 +44,14 @@ namespace brogueHd::simple
 			return x == point.x && y == point.y;
 		}
 
+		double distance(const simplePoint<T>& point) const
+		{
+			T dx = point.x - x;
+			T dy = point.y - y;
+
+			return sqrtf((dx * dx) + (dy * dy));
+		}
+
 		size_t getHash() const override
 		{
 			return hashGenerator::generateHash(x, y);

@@ -7,6 +7,7 @@
 #include "gridDefinitions.h"
 #include "gridLocator.h"
 #include "gridLocatorEdge.h"
+#include "simpleList.h"
 
 using namespace brogueHd::component;
 
@@ -22,8 +23,11 @@ namespace brogueHd::backend::model
 		int getDepth() const;
 
 		void iterateWhereDefined(gridCallback<brogueCell*> callback) const;
-		void iterateRoomGraph(graphIterator<gridLocator, gridLocatorEdge> callback) const;
 		void iterateRoomConnections(graphSimpleEdgeIterator<gridLocator, gridLocatorEdge> callback) const;
+		simpleList<gridLocatorEdge> getCorridorConnections() const
+		{
+			return _layout->getCorridorConnections();
+		}
 		void clearUpdate();
 		bool needsUpdate();
 
@@ -67,10 +71,6 @@ namespace brogueHd::backend::model
 	void brogueLevel::iterateWhereDefined(gridCallback<brogueCell*> callback) const
 	{
 		_layout->iterateWhereDefined(callback);
-	}
-	void brogueLevel::iterateRoomGraph(graphIterator<gridLocator, gridLocatorEdge> callback) const
-	{
-		_layout->iterateRoomGraph(callback);
 	}
 	void brogueLevel::iterateRoomConnections(graphSimpleEdgeIterator<gridLocator, gridLocatorEdge> callback) const
 	{

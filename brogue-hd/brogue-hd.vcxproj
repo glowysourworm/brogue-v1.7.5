@@ -347,6 +347,7 @@
     <ClInclude Include="simplePoint.h" />
     <ClInclude Include="simpleQueue.h" />
     <ClInclude Include="simpleRange.h" />
+    <ClInclude Include="simpleRectangle.h" />
     <ClInclude Include="simpleStack.h" />
     <ClInclude Include="simpleTimer.h" />
     <ClInclude Include="simpleUniform.h" />

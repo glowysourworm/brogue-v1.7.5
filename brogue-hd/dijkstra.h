@@ -171,6 +171,8 @@ namespace brogueHd::component
 		_locationMap = new grid<bool>(parentBoundary, relativeBoundary);
 
 		_frontier = new simpleBST<float, simpleHash<T, T>*>();
+		_completedPaths = new simpleHash<T, simpleArray<T>>();
+		_validPaths = new simpleHash<T, bool>();
 	}
 
 	template<isGridLocator T>
@@ -179,6 +181,8 @@ namespace brogueHd::component
 		delete _outputMap;
 		delete _visitedMap;
 		delete _locationMap;
+		delete _completedPaths;
+		delete _validPaths;
 
 		// Must delete the allocated hash table memory
 		_frontier->iterate([] (float key, simpleHash<T, T>* value)
@@ -374,7 +378,7 @@ namespace brogueHd::component
 
 				// Otherwise, set to the next location (should be first dictionary key)
 				if (nextNode == default_value::value<T>())
-					nextNode = nextCostDict->getAt(0)->key;
+					nextNode = nextCostDict->getAt(0)->getKey();
 
 				// Maintain frontier hash
 				nextCostDict->remove(nextNode);
@@ -576,7 +580,7 @@ namespace brogueHd::component
 		int cost = _mapCostPredicate(destColumn, destRow);
 
 		// Update the output map
-		_outputMap->set(destColumn, destRow, simpleMath::minOf(_outputMap->get(destColumn, destRow), currentWeight + cost));
+		_outputMap->set(destColumn, destRow, simpleMath::minOf(_outputMap->get(destColumn, destRow), currentWeight + cost), true);
 
 		// Update the frontier
 		int newWeight = _outputMap->get(destColumn, destRow);

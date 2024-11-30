@@ -11,6 +11,7 @@
 #include "simpleLine.h"
 #include "simpleMath.h"
 #include "simplePoint.h"
+#include "simpleRectangle.h"
 
 namespace brogueHd::frontend
 {
@@ -34,9 +35,11 @@ namespace brogueHd::frontend
 
 		gridRect calculateSceneBoundaryUI() const;
 
+		simpleRectangle<int> convertToUI(const gridRect& rect, bool moveToCellCenter = false);
 		simpleLine<int> convertToUI(const gridLocatorEdge& edge, bool moveToCellCenter = false);
 		simplePoint<int> convertToUI(const gridLocator& location, bool moveToCellCenter = false);
 
+		simpleRectangle<float> convertToUIReal(const gridRect& edge, bool moveToCellCenter = false);
 		simpleLine<float> convertToUIReal(const gridLocatorEdge& edge, bool moveToCellCenter = false);
 		simplePoint<float> convertToUIReal(const gridLocator& location, bool moveToCellCenter = false);
 
@@ -127,6 +130,26 @@ namespace brogueHd::frontend
 								edge.node2.row * brogueCellDisplay::CellHeight(_zoomLevel) + centerOffsetY);
 
 		return simpleLine<int>(point1, point2);
+	}
+	simpleRectangle<int> brogueCoordinateConverter::convertToUI(const gridRect& rect, bool moveToCellCenter)
+	{
+		gridLocator topLeft = rect.topLeft();
+		gridLocator bottomRight = rect.bottomRight();
+
+		simplePoint<int> topLeftUI = convertToUI(topLeft, moveToCellCenter);
+		simplePoint<int> bottomRightUI = convertToUI(bottomRight, moveToCellCenter);
+
+		return simpleRectangle<int>(topLeftUI, bottomRightUI);
+	}
+	simpleRectangle<float> brogueCoordinateConverter::convertToUIReal(const gridRect& rect, bool moveToCellCenter)
+	{
+		gridLocator topLeft = rect.topLeft();
+		gridLocator bottomRight = rect.bottomRight();
+
+		simplePoint<float> topLeftUIReal = convertToUIReal(topLeft, moveToCellCenter);
+		simplePoint<float> bottomRightUIReal = convertToUIReal(bottomRight, moveToCellCenter);
+
+		return simpleRectangle<float>(topLeftUIReal, bottomRightUIReal);
 	}
 	simpleLine<float> brogueCoordinateConverter::convertToUIReal(const gridLocatorEdge& edge, bool moveToCellCenter)
 	{

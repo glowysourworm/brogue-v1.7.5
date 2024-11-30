@@ -749,6 +749,9 @@
     <ClInclude Include="simpleHashStdCore.h">
       <Filter>Header Files\simple</Filter>
     </ClInclude>
+    <ClInclude Include="simpleRectangle.h">
+      <Filter>Header Files\simple</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\resources\model\armor.csv">

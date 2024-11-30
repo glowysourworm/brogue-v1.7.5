@@ -91,6 +91,9 @@ namespace brogueHd::simple
 		template<isHashable TResult>
 		simpleArray<TResult> select(simpleArraySelector<T, TResult> selector);
 
+		template<isHashable TAggregate>
+		T minWith(TAggregate& seedValue, simpleArrayAggregate<T, TAggregate> aggregator);
+
 		template<typename TResult>
 		TResult maxOf(simpleArraySelector<T, TResult> selector) const;
 
@@ -467,6 +470,26 @@ namespace brogueHd::simple
 		for (int index = 0; index < this->count(); index++)
 		{
 			result.set(index, selector(this->get(index)));
+		}
+
+		return result;
+	}
+
+	template<isHashable T>
+	template<isHashable TAggregate>
+	T simpleArray<T>::minWith(TAggregate& seedValue, simpleArrayAggregate<T, TAggregate> aggregator)
+	{
+		T result = default_value::value<T>();
+
+		for (int index = 0; index < this->count(); index++)
+		{
+			TAggregate next = aggregator(seedValue, this->get(index));
+
+			if (next < seedValue)
+			{
+				seedValue = next;
+				result = this->get(index);
+			}
 		}
 
 		return result;

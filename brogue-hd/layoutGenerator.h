@@ -22,11 +22,15 @@
 #include "noiseGenerator.h"
 #include "rectanglePackingAlgorithm.h"
 #include "simple.h"
+#include "simpleArray.h"
 #include "simpleException.h"
 #include "simpleHash.h"
 #include "simpleLine.h"
 #include "simpleList.h"
 #include "simplePoint.h"
+#include <limits>
+#include "simpleRectangle.h"
+#include "dijkstra.h"
 
 using namespace brogueHd::simple;
 using namespace brogueHd::component;
@@ -63,8 +67,13 @@ namespace brogueHd::backend
 		//void designateMachineRooms();
 
 		void triangulateRooms();
+		void triangulateRoomConnections();
 
 		void connectRooms();
+
+	private:
+
+		graph<gridLocator, gridLocatorEdge>* triangulate(const simpleList<gridLocator>& locations);
 
 	private:
 
@@ -77,7 +86,8 @@ namespace brogueHd::backend
 		brogueLayout* _layout;
 		brogueLevelProfile* _profile;
 		simpleList<brogueDesignRect*>* _roomTiles;
-		graph<gridLocator, gridLocatorEdge>* _delaunayGraph;
+		graph<gridLocator, gridLocatorEdge>* _roomGraph;
+		graph<gridLocator, gridLocatorEdge>* _connectionGraph;
 	};
 
 
@@ -91,7 +101,8 @@ namespace brogueHd::backend
 		_layout = nullptr;
 		_profile = nullptr;
 		_roomTiles = nullptr;
-		_delaunayGraph = nullptr;
+		_roomGraph = nullptr;
+		_connectionGraph = nullptr;
 	}
 
 	layoutGenerator::~layoutGenerator()
@@ -127,7 +138,8 @@ namespace brogueHd::backend
 		_layout = new brogueLayout(levelBoundary, levelPaddedBoundary);
 		_profile = profile;
 		_roomTiles = new simpleList<brogueDesignRect*>();
-		_delaunayGraph = nullptr;
+		_roomGraph = nullptr;
+		_connectionGraph = nullptr;
 	}
 
 	brogueLayout* layoutGenerator::generateLayout(brogueLevelProfile* profile)
@@ -180,11 +192,12 @@ namespace brogueHd::backend
 
 		// Triangulate Rooms:  Creates Delaunay Triangulation of the connection point vertices (new _delaunayGraph)
 		triangulateRooms();
+		triangulateRoomConnections();
 
 		// Connect Rooms:  Create cells in the grid for the delaunay triangulation of the 
 		//                 connection points of the room tiles. Runs dijkstra's algorithm to
 		//				   create corridor cells inside the brogueLayout*
-		//connectRooms();
+		connectRooms();
 
 		return _layout;
 	}
@@ -401,25 +414,28 @@ namespace brogueHd::backend
 		});
 	}
 
-	void layoutGenerator::triangulateRooms()
+	graph<gridLocator, gridLocatorEdge>* layoutGenerator::triangulate(const simpleList<gridLocator>& locations)
 	{
+		// Procedure
+		//
+		// 1) Create real-number coordinate transform of the locations
+		// 2) Create delaunay graph of the locations
+		// 3) Validate the result
+		//		-> Ensure all locations have edge connections
+		//		-> Ensure all locations are accounted for
+		// 4) Translate the graph back into grid coordinates
+		//
+
 		// Create delaunay triangulator with graph edge constructor
 		delaunayAlgorithm triangulator;
 
-		// Convert grid locators to UI coordinates: This will scale the delaunay triangulation to make
-		// sense of the line geometry during the calculation.
+		// Convert grid locators to real number coordinates: This is to run bowyer-watson
 		//
 		brogueCoordinateConverter* converter = _uiBuilder->getCoordinateConverter();
 
-		// What to triangulate? Utilize the "biggest sub-rectangle" center. Create corridors using nearest neighbors
-		// from the region edge locations + dijkstra's algorithm.
+		// Convert the locators
 		//
-		simpleList<gridLocator> roomCenters = _roomTiles->select<gridLocator>([&converter] (brogueDesignRect* designRect)
-		{
-			return designRect->getRegion()->getLargestSubRectangle().center();
-		});
-
-		simpleList<simplePoint<float>> connectionNodes = roomCenters.select<simplePoint<float>>([&converter] (const gridLocator& center)
+		simpleList<simplePoint<float>> connectionNodes = locations.select<simplePoint<float>>([&converter] (const gridLocator& center)
 		{
 			// Scales by the cell size; and flips the y-axis
 			//
@@ -429,17 +445,16 @@ namespace brogueHd::backend
 		// (MEMORY!) Create delaunay graph
 		graph<simplePoint<float>, simpleLine<float>>* delaunayGraph = triangulator.run(connectionNodes, [] (simplePoint<float> node1, simplePoint<float> node2)
 		{
-			simpleLine<float> edge(node1, node2);
-
-			return edge;
+			// This constructor is for default graphs (3 or less nodes)
+			return simpleLine<float>(node1, node2);
 		});
 
 		// (MEMORY!) Re-scale back to the grid locators
-		graph<gridLocator, gridLocatorEdge>* roomGraph = new graph<gridLocator, gridLocatorEdge>();
+		graph<gridLocator, gridLocatorEdge>* resultGraph = new graph<gridLocator, gridLocatorEdge>();
 
 		// Convert Back / Validate
 		//
-		delaunayGraph->iterate([&converter, &roomGraph, &roomCenters] (const simplePoint<float>& node, const simpleList<simpleLine<float>>& adjacentEdges)
+		delaunayGraph->iterate([&converter, &resultGraph, &locations] (const simplePoint<float>& node, const simpleList<simpleLine<float>>& adjacentEdges)
 		{
 			// Iterate the graph's edges (per node) and convert back to the room graph
 			for (int index = 0; index < adjacentEdges.count(); index++)
@@ -450,165 +465,305 @@ namespace brogueHd::backend
 				bool node2Found = false;
 
 				// Validate the edge points with the room centers
-				for (int searchIndex = 0; searchIndex < roomCenters.count() && (!node1Found || !node2Found); searchIndex++)
+				for (int searchIndex = 0; searchIndex < locations.count() && (!node1Found || !node2Found); searchIndex++)
 				{
-					if (edge.node1 == roomCenters.get(searchIndex))
+					if (edge.node1 == locations.get(searchIndex))
 						node1Found = true;
 
-					if (edge.node2 == roomCenters.get(searchIndex))
+					if (edge.node2 == locations.get(searchIndex))
 						node2Found = true;
 				}
 
 				if (!node1Found || !node2Found)
-					throw simpleException("Invalid room triangulation:  layoutGenerator::triangulateRooms");
+					throw simpleException("Invalid triangulation:  layoutGenerator::triangulate");
 
 				// Will take care of the node(s)
-				if (!roomGraph->containsEdge(edge))
-					roomGraph->addEdge(edge);
+				if (!resultGraph->containsEdge(edge))
+					resultGraph->addEdge(edge);
 			}
 
 			return iterationCallback::iterate;
 		});
 
 		// VALIDATE:
-		if (roomGraph->getNodeCount() != roomCenters.count())
-			throw simpleException("Room node not found in delaunay room graph:  layoutGenerator.h");
+		if (resultGraph->getNodeCount() != locations.count())
+			throw simpleException("Location node not found in delaunay graph:  layoutGenerator.h");
 
 		// Verify that the graph contains each room 
-		for (int index = 0; index < roomCenters.count(); index++)
+		for (int index = 0; index < locations.count(); index++)
 		{
-			if (!roomGraph->containsNode(roomCenters.get(index)))
+			if (!resultGraph->containsNode(locations.get(index)))
 			{
 				throw simpleException("Room node not found in delaunay room graph:  layoutGenerator.h");
 			}
-			if (roomGraph->getAdjacentEdges(roomCenters.get(index)).count() == 0)
+			if (resultGraph->getAdjacentEdges(locations.get(index)).count() == 0)
 			{
 				throw simpleException("Room node has zero adjacent edges in delaunay room graph:  layoutGenerator.h");
 			}
 		}
 
-		// Set the delaunay graph (private variable probably only needed for the rest of the room layout - if any)
-		_delaunayGraph = roomGraph;
-
-		// Memory is now cared for by the brogueLayout*
-		_layout->setRoomGraph(_delaunayGraph);
-
 		// (MEMORY!) Clean up
 		delete delaunayGraph;
+
+		// (MEMORY!) This is now the caller's responsibility
+		return resultGraph;
+	}
+
+	void layoutGenerator::triangulateRooms()
+	{
+		// What to triangulate? Utilize the "biggest sub-rectangle" center. Create corridors using nearest neighbors
+		// from the region edge locations + dijkstra's algorithm.
+		//
+		simpleList<gridLocator> roomCenters = _roomTiles->select<gridLocator>([] (brogueDesignRect* designRect)
+		{
+			return designRect->getRegion()->getLargestSubRectangle().center();
+		});
+
+		// (MEMORY!) Calculate the room graph
+		_roomGraph = triangulate(roomCenters);
+
+		_layout->setRoomConnectionGraph(_roomGraph);
+	}
+
+	void layoutGenerator::triangulateRoomConnections()
+	{
+		// _roomGraph must be initialized
+
+		// Procedure
+		//
+		// 1) Create nearest neighbor connections between delaunay rooms using edge locations
+		//		-> Condition 1: The room connection line must not intersect any other room 
+		//						rectangle except the two rooms in question. (This may be improved
+		//						by using outline geometry. TODO)
+		// 
+		// 2) Use these to re-triangulate the connections
+		// 3) Remove self-referencing edges
+		// 4) Store the result as corridor connections
+		// 5) Store the larger result as the "connection graph" for the level.
+		//		-> TODO
+		//
+
+		brogueCoordinateConverter* coordinateConverter = _uiBuilder->getCoordinateConverter();
+
+		simpleList<brogueDesignRect*>* roomTiles = _roomTiles;
+		simpleList<gridLocator> connectionNodes;
+
+		// Nearest neighbor edges
+		_roomGraph->iterateEdges([&roomTiles, &connectionNodes, &coordinateConverter] (const gridLocatorEdge& edge)
+		{
+			// Room 1
+			brogueDesignRect* designRect1 = roomTiles->first([&edge] (brogueDesignRect* rect)
+			{
+				return rect->getRegion()->getLargestSubRectangle().center() == edge.node1;
+			});
+
+			// Room 2
+			brogueDesignRect* designRect2 = roomTiles->first([&edge] (brogueDesignRect* rect)
+			{
+				return rect->getRegion()->getLargestSubRectangle().center() == edge.node2;
+			});
+
+			if (designRect1 == designRect2)
+			{
+				return iterationCallback::iterate;
+			}
+
+			simpleArray<gridLocator> edges1 = designRect1->getRegion()->getEdgeLocations();
+			simpleArray<gridLocator> edges2 = designRect2->getRegion()->getEdgeLocations();
+
+			gridLocator minlocation1 = default_value::value<gridLocator>();
+			gridLocator minlocation2 = default_value::value<gridLocator>();
+
+			float distance = std::numeric_limits<float>::max();
+
+			for (int index1 = 0; index1 < edges1.count(); index1++)
+			{
+				for (int index2 = 0; index2 < edges2.count(); index2++)
+				{
+					simplePoint<int> point1UI = coordinateConverter->convertToUI(edges1.get(index1), true);
+					simplePoint<int> point2UI = coordinateConverter->convertToUI(edges2.get(index2), true);
+
+					if (point1UI.distance(point2UI) < distance)
+					{
+						distance = point1UI.distance(point2UI);
+						minlocation1 = edges1.get(index1);
+						minlocation2 = edges2.get(index2);
+					}
+				}
+			}
+
+			if (!connectionNodes.contains(minlocation1))
+				connectionNodes.add(minlocation1);
+
+			if (!connectionNodes.contains(minlocation2))
+				connectionNodes.add(minlocation2);
+
+			return iterationCallback::iterate;
+		});
+		 
+		// (MEMORY!) Re-triangulate with these nearest edge locations
+		graph<gridLocator, gridLocatorEdge>* connectionGraph = triangulate(connectionNodes);
+
+		_connectionGraph = connectionGraph;
+
+		//_layout->setRoomConnectionGraph(connectionGraph);
+
+		simpleList<gridLocatorEdge> corridorEdges;
+
+		// Retrieve the room-edge where the connection was drawn from
+		//
+		_roomGraph->iterateEdges([&connectionGraph, &corridorEdges, &roomTiles, &coordinateConverter] (const gridLocatorEdge& roomEdge)
+		{
+			// Room 1
+			brogueDesignRect* designRect1 = roomTiles->first([&roomEdge] (brogueDesignRect* rect)
+			{
+				return rect->getRegion()->isDefined(roomEdge.node1);
+			});
+
+			// Room 2
+			brogueDesignRect* designRect2 = roomTiles->first([&roomEdge] (brogueDesignRect* rect)
+			{
+				return rect->getRegion()->isDefined(roomEdge.node2);
+			});
+
+			if (designRect1 == designRect2)
+			{
+				return iterationCallback::iterate;
+			}
+
+			float distance = std::numeric_limits<float>::max();
+			gridLocatorEdge minEdge = default_value::value<gridLocatorEdge>();
+
+			// Remove self-referential edges; look for the best edge connection; and store the result as corridor edges
+			connectionGraph->iterateEdges([&minEdge, &designRect1, &designRect2, &distance, &coordinateConverter] (const gridLocatorEdge& edge)
+			{
+				if (designRect1->getRegion()->isDefined(edge.node1) &&
+					designRect2->getRegion()->isDefined(edge.node2))
+				{
+					simplePoint<int> point1UI = coordinateConverter->convertToUI(edge.node1);
+					simplePoint<int> point2UI = coordinateConverter->convertToUI(edge.node2);
+
+					if (point1UI.distance(point2UI) < distance)
+					{
+						distance = point1UI.distance(point2UI);
+						minEdge = edge;
+					}
+				}
+
+				return iterationCallback::iterate;
+			});
+
+			corridorEdges.add(minEdge);
+
+			return iterationCallback::iterate;
+		});
+
+		// Final Verification:  Make sure that each edge does not intersect any other region except for 
+		//						the ones that they're connecting.
+		//
+		for (int index = corridorEdges.count() - 1; index >= 0; index--)
+		{
+			gridLocatorEdge edge = corridorEdges.get(index);
+
+			// Room 1
+			brogueDesignRect* designRect1 = roomTiles->first([&edge] (brogueDesignRect* rect)
+			{
+				return rect->getRegion()->isDefined(edge.node1);
+			});
+
+			// Room 2
+			brogueDesignRect* designRect2 = roomTiles->first([&edge] (brogueDesignRect* rect)
+			{
+				return rect->getRegion()->isDefined(edge.node2);
+			});
+
+			for (int roomIndex = 0; roomIndex < roomTiles->count(); roomIndex++)
+			{
+				if (roomTiles->get(roomIndex) == designRect1 ||
+					roomTiles->get(roomIndex) == designRect2)
+					continue;
+
+				simpleRectangle<float> roomRectUIReal = coordinateConverter->convertToUIReal(roomTiles->get(roomIndex)->getActualBoundary(), true);
+				simpleLine<float> lineUIReal = coordinateConverter->convertToUIReal(edge, true);
+
+				// Found Intersection with another room
+				if (roomRectUIReal.intersects(lineUIReal))
+				{
+					corridorEdges.removeAt(index);
+					break;
+				}
+			}
+		}
+
+
+		_layout->setCorridorConnections(corridorEdges);
 	}
 
 	void layoutGenerator::connectRooms()
 	{
-		//// Procedure
-		////
-		//// 1) Iterate Edges: DELAUNAY GRAPH
-		////      -> Find edges that are not self-referential (use room tiles)
-		////      -> Collect these edges to pass to dijkstra
-		////
-		//// 2) Run Dijkstra to set cells in the primary grid
-		////
+		// Procedure
+		//
+		// 1) Iterate Edges: (DELAUNAY GRAPH) (actually, use the corridor edges.. need to clean up)
+		//      -> Find edges that are not self-referential (use room tiles) (corridor edges)
+		//      -> Collect these edges to pass to dijkstra
+		//
+		// 2) Run Dijkstra to set cells in the primary grid
+		//
 
-		//simpleList<gridLocatorEdge> corridorEdges;
-		//simpleList<brogueDesignRect*>* roomTiles = _roomTiles;
-		//brogueLayout* layout = _layout;
+		brogueLayout* layout = _layout;
 
-		//_delaunayGraph->iterateEdges([&roomTiles, &corridorEdges] (const gridLocatorEdge& edge)
-		//{
-		//	bool isCorridorEdge = false;
+		// (MEMORY!) Use the corridor edges to call dijkstra (on stack usgae has predicate copying)
+		dijkstra<gridLocator>* algorithm = new dijkstra<gridLocator>(
+			_layout->getParentBoundary(),
+			_layout->getBoundary(),
+			true,                           // Cardinal Movement (for laying corridors)
 
-		//	roomTiles->forEach([&edge, &isCorridorEdge] (brogueDesignRect* tile)
-		//	{
-		//		int connectionCount = 0;
+		// Primary Inclusion Predicate (is it in the grid?)
+		[&layout](int column, int row)
+		{
+			return layout->isDefined(column, row);
+		},
 
-		//		// North
-		//		if (tile->hasNorthConnection &&
-		//			(tile->connectionPointN == edge.node1 ||
-		//			tile->connectionPointN == edge.node2))
-		//			connectionCount++;
+		// Then, the map cost is queried (what is the movement cost?)
+		[&layout](int column, int row)
+		{
+			return 1;
+		},
 
-		//		// South
-		//		if (tile->hasSouthConnection &&
-		//			(tile->connectionPointS == edge.node1 ||
-		//			tile->connectionPointS == edge.node2))
-		//			connectionCount++;
+		// Then, it will need the locators from the grid to keep its internal data temporarily
+		[&layout](int column, int row)
+		{
+			// May need design change for this problem (needed to copy grid locators back for dijkstra)
+			return gridLocator(column, row);
+		});
 
-		//		// East
-		//		if (tile->hasEastConnection &&
-		//			(tile->connectionPointE == edge.node1 ||
-		//			tile->connectionPointE == edge.node2))
-		//			connectionCount++;
+		// Iterate each corridor edge and run dijkstra to finalize the connection
+		_layout->getCorridorConnections().forEach([&algorithm, &layout] (const gridLocatorEdge& edge)
+		{
+			gridLocator source = edge.node1;
+			gridLocator targets[1] = { edge.node2 };
 
-		//		// West
-		//		if (tile->hasWestConnection &&
-		//			(tile->connectionPointW == edge.node1 ||
-		//			tile->connectionPointW == edge.node2))
-		//			connectionCount++;
+			// Run Dijkstra
+			algorithm->initialize(source, simpleArray<gridLocator>(targets, 1));
+			algorithm->run();
 
-		//		if (connectionCount == 1)
-		//		{
-		//			isCorridorEdge = true;
-		//			return iterationCallback::breakAndReturn;
-		//		}
+			simpleArray<gridLocator> resultPath = algorithm->getResultPath(targets[0]);
 
-		//		return iterationCallback::iterate;
-		//	});
+			// Set corridors
+			resultPath.forEach([&layout] (gridLocator locator)
+			{
+				brogueCell cell(locator.column, locator.row, colors::green(), colors::white(), 'a');
 
-		//	if (isCorridorEdge)
-		//		corridorEdges.add(edge);
+				layout->createCells(locator, cell, true);
 
-		//	return iterationCallback::iterate;
-		//});
+				return iterationCallback::iterate;
+			});
 
-		//// (MEMORY!) Use the corridor edges to call dijkstra (on stack usgae has predicate copying)
-		//dijkstra<gridLocator>* algorithm = new dijkstra<gridLocator>(
-		//	_layout->getParentBoundary(),
-		//	_layout->getBoundary(),
-		//	true,                           // Cardinal Movement (for laying corridors)
+			return iterationCallback::iterate;
+		});
 
-		//// Primary Inclusion Predicate (is it in the grid?)
-		//[&layout](int column, int row)
-		//{
-		//	return layout->isDefined(column, row);
-		//},
-
-		//// Then, the map cost is queried (what is the movement cost?)
-		//[&layout](int column, int row)
-		//{
-		//	return 1;
-		//},
-
-		//// Then, it will need the locators from the grid to keep its internal data temporarily
-		//[&layout](int column, int row)
-		//{
-		//	// May need design change for this problem (needed to copy grid locators back for dijkstra)
-		//	return gridLocator(column, row);
-		//});
-
-		//// Iterate each corridor edge and run dijkstra to finalize the connection
-		//corridorEdges.forEach([&algorithm, &layout] (const gridLocatorEdge& edge)
-		//{
-		//	gridLocator source = edge.node1;
-		//	gridLocator targets[1] = { edge.node2 };
-
-		//	// Run Dijkstra
-		//	algorithm->initialize(source, simpleArray<gridLocator>(targets, 1));
-		//	algorithm->run();
-
-		//	simpleArray<gridLocator> resultPath = algorithm->getResultPath(targets[0]);
-
-		//	// Set corridors
-		//	resultPath.forEach([&layout] (gridLocator locator)
-		//	{
-		//		layout->createCells(locator);
-
-		//		return iterationCallback::iterate;
-		//	});
-
-		//	return iterationCallback::iterate;
-		//});
-
-		//// Clean up memory
-		//delete algorithm;
+		// Clean up memory
+		delete algorithm;
 	}
 }
 
