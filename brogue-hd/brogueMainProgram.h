@@ -93,7 +93,7 @@ namespace brogueHd::frontend
 		/// <summary>
 		/// Sets the debug polygon data for the level room graph
 		/// </summary>
-		void setDebugPolygonUpdate(const gridLocator& roomCenter, const gridLocatorEdge& roomConnection);
+		void setDebugPolygonUpdate(const gridLocatorEdge& roomConnection);
 
 	private:
 
@@ -297,7 +297,7 @@ namespace brogueHd::frontend
 
 		_uiPrograms->get(brogueUIProgram::GameProgram)->setGridProgram(partId, data);
 	}
-	void brogueMainProgram::setDebugPolygonUpdate(const gridLocator& roomCenter, const gridLocatorEdge& roomConnection)
+	void brogueMainProgram::setDebugPolygonUpdate(const gridLocatorEdge& roomConnection)
 	{
 		brogueUIProgramPartId partId(brogueUIProgram::GameProgram, brogueUIProgramPart::Polygon, 0);
 

@@ -7,6 +7,7 @@
 #include "roomGenerator.h"
 
 #include "brogueCell.h"
+#include "brogueCoordinateConverter.h"
 #include "brogueGlyphMap.h"
 #include "brogueRoomTemplate.h"
 #include "brogueUIBuilder.h"
@@ -21,8 +22,11 @@
 #include "noiseGenerator.h"
 #include "rectanglePackingAlgorithm.h"
 #include "simple.h"
+#include "simpleException.h"
 #include "simpleHash.h"
+#include "simpleLine.h"
 #include "simpleList.h"
+#include "simplePoint.h"
 
 using namespace brogueHd::simple;
 using namespace brogueHd::component;
@@ -400,24 +404,97 @@ namespace brogueHd::backend
 	void layoutGenerator::triangulateRooms()
 	{
 		// Create delaunay triangulator with graph edge constructor
-		delaunayAlgorithm<gridLocator, gridLocatorEdge> triangulator([] (gridLocator node1, gridLocator node2)
-		{
-			gridLocatorEdge edge(node1, node2);
+		delaunayAlgorithm triangulator;
 
-			return edge;
-		});
+		// Convert grid locators to UI coordinates: This will scale the delaunay triangulation to make
+		// sense of the line geometry during the calculation.
+		//
+		brogueCoordinateConverter* converter = _uiBuilder->getCoordinateConverter();
 
 		// What to triangulate? Utilize the "biggest sub-rectangle" center. Create corridors using nearest neighbors
 		// from the region edge locations + dijkstra's algorithm.
 		//
-		simpleList<gridLocator> connectionNodes = _roomTiles->select<gridLocator>([] (brogueDesignRect* designRect)
+		simpleList<gridLocator> roomCenters = _roomTiles->select<gridLocator>([&converter] (brogueDesignRect* designRect)
 		{
 			return designRect->getRegion()->getLargestSubRectangle().center();
 		});
 
-		_delaunayGraph = triangulator.createFullGraph(connectionNodes);
+		simpleList<simplePoint<float>> connectionNodes = roomCenters.select<simplePoint<float>>([&converter] (const gridLocator& center)
+		{
+			// Scales by the cell size; and flips the y-axis
+			//
+			return converter->convertToUIReal(center, true);
+		});
 
+		// (MEMORY!) Create delaunay graph
+		graph<simplePoint<float>, simpleLine<float>>* delaunayGraph = triangulator.run(connectionNodes, [] (simplePoint<float> node1, simplePoint<float> node2)
+		{
+			simpleLine<float> edge(node1, node2);
+
+			return edge;
+		});
+
+		// (MEMORY!) Re-scale back to the grid locators
+		graph<gridLocator, gridLocatorEdge>* roomGraph = new graph<gridLocator, gridLocatorEdge>();
+
+		// Convert Back / Validate
+		//
+		delaunayGraph->iterate([&converter, &roomGraph, &roomCenters] (const simplePoint<float>& node, const simpleList<simpleLine<float>>& adjacentEdges)
+		{
+			// Iterate the graph's edges (per node) and convert back to the room graph
+			for (int index = 0; index < adjacentEdges.count(); index++)
+			{
+				// Converts back to grid locators
+				gridLocatorEdge edge = converter->convertUIRealToGrid(adjacentEdges.get(index), true);
+				bool node1Found = false;
+				bool node2Found = false;
+
+				// Validate the edge points with the room centers
+				for (int searchIndex = 0; searchIndex < roomCenters.count() && (!node1Found || !node2Found); searchIndex++)
+				{
+					if (edge.node1 == roomCenters.get(searchIndex))
+						node1Found = true;
+
+					if (edge.node2 == roomCenters.get(searchIndex))
+						node2Found = true;
+				}
+
+				if (!node1Found || !node2Found)
+					throw simpleException("Invalid room triangulation:  layoutGenerator::triangulateRooms");
+
+				// Will take care of the node(s)
+				if (!roomGraph->containsEdge(edge))
+					roomGraph->addEdge(edge);
+			}
+
+			return iterationCallback::iterate;
+		});
+
+		// VALIDATE:
+		if (roomGraph->getNodeCount() != roomCenters.count())
+			throw simpleException("Room node not found in delaunay room graph:  layoutGenerator.h");
+
+		// Verify that the graph contains each room 
+		for (int index = 0; index < roomCenters.count(); index++)
+		{
+			if (!roomGraph->containsNode(roomCenters.get(index)))
+			{
+				throw simpleException("Room node not found in delaunay room graph:  layoutGenerator.h");
+			}
+			if (roomGraph->getAdjacentEdges(roomCenters.get(index)).count() == 0)
+			{
+				throw simpleException("Room node has zero adjacent edges in delaunay room graph:  layoutGenerator.h");
+			}
+		}
+
+		// Set the delaunay graph (private variable probably only needed for the rest of the room layout - if any)
+		_delaunayGraph = roomGraph;
+
+		// Memory is now cared for by the brogueLayout*
 		_layout->setRoomGraph(_delaunayGraph);
+
+		// (MEMORY!) Clean up
+		delete delaunayGraph;
 	}
 
 	void layoutGenerator::connectRooms()

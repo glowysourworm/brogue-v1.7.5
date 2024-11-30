@@ -292,7 +292,6 @@ namespace brogueHd::frontend
 		if (_configuration->glPrimitiveType == GL_LINES)
 		{
 			glLineWidth(5.0f);
-			//glPointSize(10.0f);
 		}
 
 		_program->bind();
@@ -304,7 +303,6 @@ namespace brogueHd::frontend
 		if (_configuration->glPrimitiveType == GL_LINES)
 		{
 			glLineWidth(1.0f);
-			//glPointSize(0.0f);
 		}
 
 		glFlush();

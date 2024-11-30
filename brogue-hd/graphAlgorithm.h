@@ -11,60 +11,49 @@ using namespace brogueHd::simple;
 
 namespace brogueHd::component
 {
-	template<isGridLocatorNode TNode, isGridLocatorEdge<TNode> TEdge>
+	template<isGraphNode TNode, isGraphEdge<TNode> TEdge>
 	class graphAlgorithm
 	{
 	public:
-		graphAlgorithm(const graphEdgeConstructor<TNode, TEdge>& graphEdgeConstructor);
+		graphAlgorithm();
 		~graphAlgorithm();
 
-		virtual graph<TNode, TEdge>* run(const simpleList<TNode>& vertices);
+		virtual graph<TNode, TEdge>* run(const simpleList<TNode>& vertices, graphEdgeConstructor<TNode, TEdge> edgeConstructor);
 
-		graph<TNode, TEdge>* createFullGraph(const simpleList<TNode>& vertices);
+		graph<TNode, TEdge>* createFullGraph(const simpleList<TNode>& vertices, graphEdgeConstructor<TNode, TEdge> edgeConstructor);
 
 	protected:
 
 		/// <summary>
 		/// Returns FULL GRAPH:  Fully connected graph of all nodes
 		/// </summary>
-		graph<TNode, TEdge>* createDefaultGraph(const simpleList<TNode>& vertices);
-
-		/// <summary>
-		/// Delegate that constructs the proper node type
-		/// </summary>
-		//graphNodeConstructor<TNode, TEdge> nodeConstructor;
-
-		/// <summary>
-		/// Delegate that constructs the proper edge type
-		/// </summary>
-		graphEdgeConstructor<TNode, TEdge> edgeConstructor;
+		graph<TNode, TEdge>* createDefaultGraph(const simpleList<TNode>& vertices, graphEdgeConstructor<TNode, TEdge> edgeConstructor);
 	};
 
-	template<isGridLocatorNode TNode, isGridLocatorEdge<TNode> TEdge>
-	graphAlgorithm<TNode, TEdge>::graphAlgorithm(const graphEdgeConstructor<TNode, TEdge>& edgeConstructor)
+	template<isGraphNode TNode, isGraphEdge<TNode> TEdge>
+	graphAlgorithm<TNode, TEdge>::graphAlgorithm()
 	{
-		this->edgeConstructor = edgeConstructor;
 	}
 
-	template<isGridLocatorNode TNode, isGridLocatorEdge<TNode> TEdge>
+	template<isGraphNode TNode, isGraphEdge<TNode> TEdge>
 	graphAlgorithm<TNode, TEdge>::~graphAlgorithm()
 	{
 	}
 
-	template<isGridLocatorNode TNode, isGridLocatorEdge<TNode> TEdge>
-	graph<TNode, TEdge>* graphAlgorithm<TNode, TEdge>::run(const simpleList<TNode>& vertices)
+	template<isGraphNode TNode, isGraphEdge<TNode> TEdge>
+	graph<TNode, TEdge>* graphAlgorithm<TNode, TEdge>::run(const simpleList<TNode>& vertices, graphEdgeConstructor<TNode, TEdge> edgeConstructor)
 	{
 		throw simpleException("Must override the run function in a child class:  graphAlgorithm.h");
 	}
 
-	template<isGridLocatorNode TNode, isGridLocatorEdge<TNode> TEdge>
-	graph<TNode, TEdge>* graphAlgorithm<TNode, TEdge>::createFullGraph(const simpleList<TNode>& vertices)
+	template<isGraphNode TNode, isGraphEdge<TNode> TEdge>
+	graph<TNode, TEdge>* graphAlgorithm<TNode, TEdge>::createFullGraph(const simpleList<TNode>& vertices, graphEdgeConstructor<TNode, TEdge> edgeConstructor)
 	{
 		return createDefaultGraph(vertices);
 	}
 
-	template<isGridLocatorNode TNode, isGridLocatorEdge<TNode> TEdge>
-	graph<TNode, TEdge>* graphAlgorithm<TNode, TEdge>::createDefaultGraph(const simpleList<TNode>& vertices)
+	template<isGraphNode TNode, isGraphEdge<TNode> TEdge>
+	graph<TNode, TEdge>* graphAlgorithm<TNode, TEdge>::createDefaultGraph(const simpleList<TNode>& vertices, graphEdgeConstructor<TNode, TEdge> edgeConstructor)
 	{
 		if (vertices.count() == 0)
 			throw simpleException("Trying to make a graph with zero vertices: delaunay.h");
@@ -77,11 +66,10 @@ namespace brogueHd::component
 		else
 		{
 			simpleList<TEdge> edges;
-			graphAlgorithm<TNode, TEdge>* that = this;
 
-			simpleListExtension<TNode>::distinctPairs(vertices, vertices, [&edges, &that] (const TNode& node1, const TNode& node2)
+			simpleListExtension<TNode>::distinctPairs(vertices, vertices, [&edges, &edgeConstructor] (const TNode& node1, const TNode& node2)
 			{
-				edges.add(that->edgeConstructor(node1, node2));
+				edges.add(edgeConstructor(node1, node2));
 			});
 
 			return new graph<TNode, TEdge>(vertices.toArray(), edges.toArray());

@@ -9,58 +9,44 @@
 #include "graphDefinitions.h"
 #include "gridRect.h"
 #include "simple.h"
-#include "simpleHash.h"
+#include "simpleException.h"
+#include "simpleLine.h"
 #include <limits>
 
 using namespace brogueHd::simple;
 
 namespace brogueHd::component
 {
-	template<isGridLocatorNode TNode, isGridLocatorEdge<TNode> TEdge>
-	class delaunayAlgorithm : public graphAlgorithm<TNode, TEdge>
+	class delaunayAlgorithm : public graphAlgorithm<simplePoint<float>, simpleLine<float>>
 	{
 	public:
 
-		delaunayAlgorithm(const graphEdgeConstructor<TNode, TEdge>& graphEdgeConstructor);
-		~delaunayAlgorithm();
+		delaunayAlgorithm() {};
+		~delaunayAlgorithm() {};
 
-		graph<TNode, TEdge>* run(const simpleList<TNode>& vertices) override;
+		graph<simplePoint<float>, simpleLine<float>>* run(const simpleList<simplePoint<float>>& vertices, graphEdgeConstructor<simplePoint<float>, simpleLine<float>> edgeConstructor) override;
 
 	protected:
 
 		/// <summary>
 		/// Creates Delaunay triangulation using the Bowyer-Watson algorithm O(n log n). 
 		/// </summary>
-		graph<TNode, TEdge>* bowyerWatson(const simpleList<TNode>& vertices);
+		graph<simplePoint<float>, simpleLine<float>>* bowyerWatson(const simpleList<simplePoint<float>>& vertices, graphEdgeConstructor<simplePoint<float>, simpleLine<float>> edgeConstructor);
 	};
 
-	template<isGridLocatorNode TNode, isGridLocatorEdge<TNode> TEdge>
-	delaunayAlgorithm<TNode, TEdge>::delaunayAlgorithm(const graphEdgeConstructor<TNode, TEdge>& edgeConstructor)
-		: graphAlgorithm<TNode, TEdge>(edgeConstructor)
-	{
-	}
-
-	template<isGridLocatorNode TNode, isGridLocatorEdge<TNode> TEdge>
-	delaunayAlgorithm<TNode, TEdge>::~delaunayAlgorithm()
-	{
-
-	}
-
-	template<isGridLocatorNode TNode, isGridLocatorEdge<TNode> TEdge>
-	graph<TNode, TEdge>* delaunayAlgorithm<TNode, TEdge>::run(const simpleList<TNode>& vertices)
+	graph<simplePoint<float>, simpleLine<float>>* delaunayAlgorithm::run(const simpleList<simplePoint<float>>& vertices, graphEdgeConstructor<simplePoint<float>, simpleLine<float>> edgeConstructor)
 	{
 		if (vertices.count() < 3)
-			return this->createDefaultGraph(vertices);
+			return this->createDefaultGraph(vertices, edgeConstructor);
 
-		return this->bowyerWatson(vertices);
+		return this->bowyerWatson(vertices, edgeConstructor);
 	}
 
-	template<isGridLocatorNode TNode, isGridLocatorEdge<TNode> TEdge>
-	graph<TNode, TEdge>* delaunayAlgorithm<TNode, TEdge>::bowyerWatson(const simpleList<TNode>& vertices)
+	graph<simplePoint<float>, simpleLine<float>>* delaunayAlgorithm::bowyerWatson(const simpleList<simplePoint<float>>& vertices, graphEdgeConstructor<simplePoint<float>, simpleLine<float>> edgeConstructor)
 	{
 		if (vertices.count() < 3)
 		{
-			return this->createDefaultGraph(vertices);
+			return this->createDefaultGraph(vertices, edgeConstructor);
 		}
 
 		// NOTE*** The graph of regions is over the VERTICES of edge connections between two regions (NOT THE 
@@ -97,69 +83,65 @@ namespace brogueHd::component
 		//
 
 		// Create an enclosing rectangle for the points
-		int top = std::numeric_limits<int>::max();
-		int bottom = std::numeric_limits<int>::min();
-		int left = std::numeric_limits<int>::max();
-		int right = std::numeric_limits<int>::min();
+		float top = std::numeric_limits<float>::min();
+		float bottom = std::numeric_limits<float>::max();
+		float left = std::numeric_limits<float>::max();
+		float right = std::numeric_limits<float>::min();
 
-		// Create a lookup to convert from gridLocator to simplePoint
-		simpleHash<TNode, simplePoint<int>> vertexLookup;
-		simpleHash<simplePoint<int>, TNode> nodeLookup;
-
-		vertices.forEach([&top, &bottom, &left, &right, &vertexLookup, &nodeLookup] (TNode vertex)
+		// Real Coordinates
+		vertices.forEach([&top, &bottom, &left, &right] (const simplePoint<float>& vertex)
 		{
-			if (vertex.row < top)
-				top = vertex.row;
+			if (vertex.y > top)
+				top = vertex.y;
 
-			if (vertex.row > bottom)
-				bottom = vertex.row;
+			if (vertex.y < bottom)
+				bottom = vertex.y;
 
-			if (vertex.column < left)
-				left = vertex.column;
+			if (vertex.x < left)
+				left = vertex.x;
 
-			if (vertex.column > right)
-				right = vertex.column;
-
-			// Store these to use later on when creating edges
-			simplePoint<int> point = simplePoint<int>(vertex.column, vertex.row);
-
-			vertexLookup.add(vertex, point);
-			nodeLookup.add(point, vertex);
+			if (vertex.x > right)
+				right = vertex.x;
 
 			return iterationCallback::iterate;
 		});
 
-		gridRect pointRect(left, top, right - left + 1, bottom - top + 1);
+		float width = right - left;
+		float height = top - bottom;
 
-		// Encompass all points
-		pointRect.expand(1);
+		// Create super triangle to encompass all points (put rectangle in super triangle and solve)
+		simplePoint<float> triangleBottomLeft(left - (width / 2.0f), bottom);
+		simplePoint<float> triangleBottomRight(right + (width / 2.0f), bottom);
+		simplePoint<float> triangleTop(left + (width / 2.0f), 2 * height);
 
-		// Create super triangle to encompass all points
-		simplePoint<int> point1(pointRect.left(), pointRect.top());
-		simplePoint<int> point2(((pointRect.right() * 4) + 1), pointRect.top());
-		simplePoint<int> point3(pointRect.left(), ((pointRect.bottom() * 4) + 1));
+		simplePoint<float> point1 = triangleBottomLeft;
+		simplePoint<float> point2 = triangleTop;
+		simplePoint<float> point3 = triangleBottomRight;
 
 		// Initialize the mesh (the "super-triangle" is removed as part of the algorithm)
 		//
-		simpleTriangle<int> superTriangle(point1, point2, point3);
+		simpleTriangle<float> superTriangle(point1, point2, point3);
 
-		simpleList<simpleTriangle<int>> triangles;
-		simpleList<simpleTriangle<int>> badTriangles;
-		simpleList<simpleTriangle<int>> otherBadTriangles;
+		simpleList<simpleTriangle<float>> triangles;
 
 		triangles.add(superTriangle);
 
 		// Add points: one-at-a-time
 		//
-		vertices.forEach([&triangles, &badTriangles, &otherBadTriangles, &vertexLookup] (TNode graphVertex)
+		for (int index = 0; index < vertices.count(); index++)
 		{
-			simplePoint<int> vertexPoint = vertexLookup.get(graphVertex);
+			simplePoint<float> vertexPoint = vertices.get(index);
+			simpleList<simpleLine<float>> polygon;
+
+			// Validate that super triangle was large enough to encompass vertices
+			if (!superTriangle.isPointInTriangle(vertexPoint))
+				throw simpleException("Ill-formed bowyer-watson super triangle, or did not use real numbers:  delaunayAlgorithm.h");
 
 			// Find triangles in the mesh whose circum-circle contains the new point
 			//
 			// Remove those triangles from the mesh and return them
 			//
-			badTriangles = triangles.remove([&vertexPoint] (const simpleTriangle<int>& triangle)
+			simpleList<simpleTriangle<float>> badTriangles = triangles.remove([&vertexPoint] (const simpleTriangle<float>& triangle)
 			{
 				return triangle.circumCircleContains(vertexPoint);
 			});
@@ -167,122 +149,92 @@ namespace brogueHd::component
 			// Use edges from the polygon hole to create new triangles. This should be an "outline" of
 			// the bad triangles. So, use all edges from the bad triangles except for shared edges.
 			//
-			badTriangles.forEach([&otherBadTriangles, &vertexPoint, &badTriangles, &triangles, &vertexLookup] (const simpleTriangle<int>& badTriangle)
+			for (int badIndex = 0; badIndex < badTriangles.count(); badIndex++)
 			{
-				otherBadTriangles = badTriangles.except([&badTriangle] (const simpleTriangle<int>& triangle)
+				simpleTriangle<float> badTriangle = badTriangles.get(badIndex);
+
+				// All other bad triangles except the current
+				simpleList<simpleTriangle<float>> otherBadTriangles = badTriangles.except([&badTriangle] (const simpleTriangle<float>& triangle)
 				{
+					//return triangle.isEquivalentTo(badTriangle);
 					return triangle == badTriangle;
 				});
 
-				bool edge12 = otherBadTriangles.any([&badTriangle] (const simpleTriangle<int>& triangle)
+				bool edge12 = otherBadTriangles.any([&badTriangle] (const simpleTriangle<float>& triangle)
 				{
-					return triangle.containsEqualEdge(triangle.point1, triangle.point2);
+					return triangle.containsEqualEdge(badTriangle.point1, badTriangle.point2);
 				});
 
-				bool edge23 = otherBadTriangles.any([&badTriangle] (const simpleTriangle<int>& triangle)
+				bool edge23 = otherBadTriangles.any([&badTriangle] (const simpleTriangle<float>& triangle)
 				{
-					return triangle.containsEqualEdge(triangle.point2, triangle.point3);
+					return triangle.containsEqualEdge(badTriangle.point2, badTriangle.point3);
 				});
 
-				bool edge31 = otherBadTriangles.any([&badTriangle] (const simpleTriangle<int>& triangle)
+				bool edge31 = otherBadTriangles.any([&badTriangle] (const simpleTriangle<float>& triangle)
 				{
-					return triangle.containsEqualEdge(triangle.point3, triangle.point1);
+					return triangle.containsEqualEdge(badTriangle.point3, badTriangle.point1);
 				});
 
 				// Check Shared Edges 1 -> 2
 				if (!edge12)
-					triangles.add(simpleTriangle<int>(badTriangle.point1, badTriangle.point2, vertexPoint));
+					polygon.add(simpleLine<float>(badTriangle.point1, badTriangle.point2));
 
 				// 2 -> 3
 				if (!edge23)
-					triangles.add(simpleTriangle<int>(badTriangle.point2, badTriangle.point3, vertexPoint));
+					polygon.add(simpleLine<float>(badTriangle.point2, badTriangle.point3));
 
 				// 3 -> 1
 				if (!edge31)
-					triangles.add(simpleTriangle<int>(badTriangle.point3, badTriangle.point1, vertexPoint));
+					polygon.add(simpleLine<float>(badTriangle.point3, badTriangle.point1));
+			}
 
-				return iterationCallback::iterate;
-			});
-
-			return iterationCallback::iterate;
-		});
+			// Create new triangles from the polygon hole
+			for (int polygonIndex = 0; polygonIndex < polygon.count(); polygonIndex++)
+			{
+				triangles.add(simpleTriangle<float>(polygon.get(polygonIndex).node1, polygon.get(polygonIndex).node2, vertexPoint));
+			}
+		}
 
 		// Create the delaunay graph using distinct edges
-		simpleList<TEdge> delaunayEdges;
-		delaunayAlgorithm<TNode, TEdge>* that = this;
+		simpleList<simpleLine<float>> delaunayEdges;
+		delaunayAlgorithm* that = this;
 
-		triangles.forEach([&delaunayEdges, &point1, &point2, &point3, &that, &nodeLookup] (const simpleTriangle<int>& triangle)
+		// Remove any triangle that contains a vertex from the original triangle
+		triangles.remove([&point1, &point2, &point3] (const simpleTriangle<float>& triangle)
 		{
-			// (Cleaning Up) Remove any edges shared with the "super-triangle" vertices
-			//
+			return triangle.point1 == point1 ||
+					triangle.point1 == point2 ||
+					triangle.point1 == point3 ||
 
-			// 1 -> 2
-			if (triangle.point1 != point1 &&
-				triangle.point2 != point1 &&
-				triangle.point1 != point2 &&
-				triangle.point2 != point2 &&
-				triangle.point1 != point3 &&
-				triangle.point2 != point3)
-			{
-				// Check for equivalent edge
-				if (!delaunayEdges.any([&triangle] (const TEdge& edge)
-				{
-					return edge.isEquivalent(triangle.point1, triangle.point2);
-				}))
-				{
-					TNode node1 = nodeLookup.get(triangle.point1);
-					TNode node2 = nodeLookup.get(triangle.point2);
+					triangle.point2 == point1 ||
+					triangle.point2 == point2 ||
+					triangle.point2 == point3 ||
 
-					delaunayEdges.add(that->edgeConstructor(node1, node2));
-				}
-			}
+					triangle.point3 == point1 ||
+					triangle.point3 == point2 ||
+					triangle.point3 == point3;
+		});
 
-			// 2 -> 3
-			if (triangle.point2 != point1 &&
-				triangle.point3 != point1 &&
-				triangle.point2 != point2 &&
-				triangle.point3 != point2 &&
-				triangle.point2 != point3 &&
-				triangle.point3 != point3)
-			{
-				// Check for equivalent edge
-				if (!delaunayEdges.any([&triangle] (const TEdge& edge)
-				{
-					return edge.isEquivalent(triangle.point2, triangle.point3);
-				}))
-				{
-					TNode node2 = nodeLookup.get(triangle.point2);
-					TNode node3 = nodeLookup.get(triangle.point3);
+		// Add the result to the delaunay edges
+		triangles.forEach([&delaunayEdges, &that] (const simpleTriangle<float>& triangle)
+		{
+			simpleLine<float> edge1(triangle.point1, triangle.point2);
+			simpleLine<float> edge2(triangle.point2, triangle.point3);
+			simpleLine<float> edge3(triangle.point3, triangle.point1);
 
-					delaunayEdges.add(that->edgeConstructor(node2, node3));
-				}
-			}
+			if (!delaunayEdges.contains(edge1))
+				delaunayEdges.add(edge1);
 
-			// 3 -> 1
-			if (triangle.point3 != point1 &&
-				triangle.point1 != point1 &&
-				triangle.point3 != point2 &&
-				triangle.point1 != point2 &&
-				triangle.point3 != point3 &&
-				triangle.point1 != point3)
-			{
-				// Check for equivalent edge
-				if (!delaunayEdges.any([&triangle] (const TEdge& edge)
-				{
-					return edge.isEquivalent(triangle.point3, triangle.point1);
-				}))
-				{
-					TNode node3 = nodeLookup.get(triangle.point3);
-					TNode node1 = nodeLookup.get(triangle.point1);
+			if (!delaunayEdges.contains(edge2))
+				delaunayEdges.add(edge2);
 
-					delaunayEdges.add(that->edgeConstructor(node3, node1));
-				}
-			}
+			if (!delaunayEdges.contains(edge3))
+				delaunayEdges.add(edge3);
 
 			return iterationCallback::iterate;
 		});
 
 		// Return a new graph with Delaunay edges
-		return new graph<TNode, TEdge>(vertices.toArray(), delaunayEdges.toArray());
+		return new graph<simplePoint<float>, simpleLine<float>>(vertices.toArray(), delaunayEdges.toArray());
 	}
 }

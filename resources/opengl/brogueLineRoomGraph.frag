@@ -9,8 +9,8 @@ in vec4 currentColor;
 
 void main()
 {
-    if (currentVertexXY_IsOdd.z > 0)
+    //if (currentVertexXY_IsOdd.z > 0)
         outputColor = currentColor;
-    else
-        outputColor = vec4(0,0,0,0);
+   // else
+    //    outputColor = vec4(0,0,0,0);
 }

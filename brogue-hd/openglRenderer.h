@@ -489,12 +489,9 @@ namespace brogueHd::frontend
 		// 2) Room Graph (or current issue data)
 		//
 		// 
-		level->iterateRoomGraph([&program] (const gridLocator& roomCenter, const simpleList<gridLocatorEdge>& roomConnections)
+		level->iterateRoomConnections([&program] (const gridLocatorEdge& connection)
 		{
-			for (int index = 0; index < roomConnections.count(); index++)
-			{
-				program->setDebugPolygonUpdate(roomCenter, roomConnections.get(index));
-			}
+			program->setDebugPolygonUpdate(connection);
 			
 			return iterationCallback::iterate;
 		});

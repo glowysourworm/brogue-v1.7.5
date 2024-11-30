@@ -40,7 +40,7 @@ namespace brogueHd::component
 		bool operator==(const gridLocatorEdge& edge) const
 		{
 			return node1 == edge.node1 &&
-				node2 == edge.node2;
+					node2 == edge.node2;
 		}
 
 		bool operator!=(const gridLocatorEdge& edge) const

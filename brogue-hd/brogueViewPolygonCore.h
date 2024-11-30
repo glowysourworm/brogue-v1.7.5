@@ -173,18 +173,21 @@ namespace brogueHd::frontend
 		if (elementSize != brogueViewCore<brogueLine>::getElementCount())
 			brogueViewCore<brogueLine>::resizeElements(elementSize);
 
+		int cursor = 0;
+
 		// Now, we can send elements to the stream's buffer; and call createStream / reStream
 		for (int index = 0; index < _graphUI->count(); index++)
 		{
 			simpleLine<int> line = _graphUI->get(index);
 			vec2 point1 = _coordinateConverter->getViewConverter().convertToNormalizedXY(line.node1.x, line.node1.y);
 			vec2 point2 = _coordinateConverter->getViewConverter().convertToNormalizedXY(line.node2.x, line.node2.y);
-			brogueLine streamElement1(vec3(point1.x, point1.y, 1), vec4(1,1,1,1));
-			brogueLine streamElement2(vec3(point2.x, point2.y, 1), vec4(1,1,1,1));
+
+			brogueLine streamElement1(vec3(point1.x, point1.y, 1), vec4(1, 1, 1, 1));
+			brogueLine streamElement2(vec3(point2.x, point2.y, 1), vec4(1, 1, 1, 1));
 
 			// Stream out elements as the iterator specifies -> ordered onto the stream.
-			this->setElement(streamElement1, index);
-			this->setElement(streamElement2, index);
+			this->setElement(streamElement1, cursor++);
+			this->setElement(streamElement2, cursor++);
 		}
 
 		_invalid = false;
@@ -223,7 +226,6 @@ namespace brogueHd::frontend
 
 	void brogueViewPolygonCore::run()
 	{
-
 		brogueViewCore<brogueLine>::glDraw();
 	}
 

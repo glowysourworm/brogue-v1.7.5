@@ -86,6 +86,11 @@ namespace brogueHd::backend::model
 		/// </summary>
 		void iterateRoomGraph(graphIterator<gridLocator, gridLocatorEdge> callback);
 
+		/// <summary>
+		/// Iterates all graph edges and callsback to the user code
+		/// </summary>
+		void iterateRoomConnections(graphSimpleEdgeIterator<gridLocator, gridLocatorEdge> callback);
+
 	private:
 
 		simpleList<brogueRoom*>* _rooms;
@@ -205,6 +210,11 @@ namespace brogueHd::backend::model
 			throw simpleException("Trying to iterate room graph before setting it");
 
 		_roomGraph->iterate(callback);
+	}
+
+	void brogueLayout::iterateRoomConnections(graphSimpleEdgeIterator<gridLocator, gridLocatorEdge> callback)
+	{
+		_roomGraph->iterateEdges(callback);
 	}
 
 	void brogueLayout::iterateAdjacentCells(int column, int row, gridCallback<brogueCell*> callback)

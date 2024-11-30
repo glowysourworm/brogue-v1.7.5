@@ -50,13 +50,36 @@ namespace brogueHd::simple
 		bool operator!=(const simpleTriangle<T>& triangle) const
 		{
 			return point1 != triangle.point1 ||
-				point2 != triangle.point2 ||
-				point3 != triangle.point3;
+					point2 != triangle.point2 ||
+					point3 != triangle.point3;
 		}
 
 		size_t getHash() const override
 		{
 			return hashGenerator::generateHash(point1.getHash(), point2.getHash(), point3.getHash());
+		}
+
+		T area() const
+		{
+			return simpleMath::abs((point1.x * (point2.y - point3.y) + 
+									point2.x * (point3.y - point1.y) + 
+									point3.x * (point1.y - point2.y)) / 2.0f);
+		}
+
+		bool isPointInTriangle(const simplePoint<T>& other) const
+		{
+			simpleTriangle<T> subTriangle1(point1, point2, other);
+			simpleTriangle<T> subTriangle2(point2, point3, other);
+			simpleTriangle<T> subTriangle3(point3, point1, other);
+
+			return area() == (subTriangle1.area() + subTriangle2.area() + subTriangle3.area());
+		}
+
+		bool isEquivalentTo(const simpleTriangle<T>& other) const
+		{
+			return containsEqualPoint(other.point1) &&
+				   containsEqualPoint(other.point2) &&
+				   containsEqualPoint(other.point3);
 		}
 
 		bool containsEqualEdge(const simplePoint<T>& vertex1, const simplePoint<T>& vertex2) const
@@ -138,13 +161,13 @@ namespace brogueHd::simple
 
 			T m00 = p1.x - point.x;
 			T m10 = p1.y - point.y;
-			T m20 = simpleMath::power<int>(m00, 2) + simpleMath::power<int>(m10, 2);
+			T m20 = simpleMath::power<float>(m00, 2) + simpleMath::power<float>(m10, 2);
 			T m01 = p2.x - point.x;
 			T m11 = p2.y - point.y;
-			T m21 = simpleMath::power<int>(m01, 2) + simpleMath::power<int>(m11, 2);
+			T m21 = simpleMath::power<float>(m01, 2) + simpleMath::power<float>(m11, 2);
 			T m02 = p3.x - point.x;
 			T m12 = p3.y - point.y;
-			T m22 = simpleMath::power<int>(m02, 2) + simpleMath::power<int>(m12, 2);
+			T m22 = simpleMath::power<float>(m02, 2) + simpleMath::power<float>(m12, 2);
 
 			T d = (m00 * ((m11 * m22) - (m21 * m12))) -
 				  (m10 * ((m01 * m22) - (m21 * m02))) +
@@ -153,7 +176,8 @@ namespace brogueHd::simple
 			// Theorem:  Point lies in the circum-circle iff d > 0 (When 1 -> 2 -> 3 are sorted counter-clockwise)
 			//
 
-			// NOTE*** (Be sure to check this because of UI coordinates (y -> -y))
+			// NOTE*** (Be sure to check this because of UI coordinates (y -> -y)). This class should be operating
+			//		   in real numbers; not UI coordinates.
 			//
 			return d > 0;
 		}

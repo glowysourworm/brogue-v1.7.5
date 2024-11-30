@@ -253,13 +253,13 @@ namespace brogueHd::simple
 		}
 
 		template<isNumber TMath>
-		static TMath powerImpl(const TMath x, const int raisedTo)
+		static float powerImpl(const TMath x, const int raisedTo)
 		{
 			return pow(x, raisedTo);
 		}
 
 		template<isNumber TMath>
-		static TMath powerImpl(const TMath x, const float raisedTo)
+		static float powerImpl(const TMath x, const float raisedTo)
 		{
 			return pow(x, raisedTo);
 		}
