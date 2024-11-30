@@ -1,42 +1,18 @@
 ﻿#pragma once
 
 #include "simple.h"
+#include "simpleBSTNode.h"
 #include "simpleException.h"
 #include "simpleHash.h"
+#include "simpleHashCore.h"
 #include "simpleMath.h"
-#include <algorithm>
 
 namespace brogueHd::simple
 {
 	// Stole this implementation:  This should be a balanced BST. The implementation looks
 	//                             clean enough; and will be changed if there are any issues.
 
-	template<isHashable K, typename T>
-	struct simpleBSTNode : hashable
-	{
-		simpleBSTNode<K, T>* left;
-		simpleBSTNode<K, T>* right;
-		K key;
-		T value;
 
-		int height;
-
-		int balanceFactor()
-		{
-			return ((left == NULL) ? left->height : -1) - ((right == NULL) ? right->height : -1);
-		}
-
-		simpleBSTNode(K akey, T avalue)
-		{
-			key = akey;
-			value = avalue;
-		}
-
-		size_t getHash() const override
-		{
-			return hashGenerator::generateHash(key);
-		}
-	};
 
 	// AVL Binary Search Tree Implementation - https://en.wikipedia.org/wiki/AVL_tree
 	//
@@ -121,7 +97,7 @@ namespace brogueHd::simple
 		// Track values to boost performance for direct lookups
 		_nodeMap = new simpleHash<K, simpleBSTNode<K, T>*>();
 
-		_root = NULL;
+		_root = nullptr;
 	}
 
 	template<isHashable K, typename T>
@@ -136,8 +112,8 @@ namespace brogueHd::simple
 	void simpleBST<K, T>::clear()
 	{
 		// Delete nodes recursively
-		if (_root != NULL)
-			this->remove(_root->key);
+		if (_root != nullptr)
+			this->remove(_root->getKey());
 
 		_nodeMap->clear();
 	}
@@ -165,7 +141,7 @@ namespace brogueHd::simple
 		_root = this->removalImpl(_root, key);
 
 		// Item to return to user
-		T item = _nodeMap->get(key)->value;
+		T item = _nodeMap->get(key)->getValue();
 
 		// Track the values for debugging and fast retrieval using the key
 		_nodeMap->remove(key);
@@ -190,7 +166,7 @@ namespace brogueHd::simple
 	{
 		_nodeMap->iterate([&callback] (K key, simpleBSTNode<K, T>* node)
 		{
-			return callback(key, node->value);
+			return callback(key, node->getValue());
 		});
 	}
 
@@ -199,7 +175,7 @@ namespace brogueHd::simple
 	{
 		// Utilize dictionary for O(1) lookup
 		if (_nodeMap->contains(key))
-			return _nodeMap->get(key)->value;
+			return _nodeMap->get(key)->getValue();
 
 		else
 			throw simpleException("Trying to retrieve hash-backed node from BST without checking");
@@ -210,32 +186,32 @@ namespace brogueHd::simple
 	{
 		// Utilize dictionary for O(1) lookup
 		if (_nodeMap->contains(key))
-			return _nodeMap->get(key)->value;
+			return _nodeMap->get(key)->getValue();
 
 		simpleBSTNode<K, T>* node = this->searchImpl(key, _root);
 
-		if (node != NULL)
-			return node->value;
+		if (node != nullptr)
+			return node->getValue();
 
-		return NULL;
+		return nullptr;
 	}
 
 	template<isHashable K, typename T>
 	simpleBSTNode<K, T>* simpleBST<K, T>::successor(K searchKey)
 	{
 		if (!_nodeMap->contains(searchKey))
-			return NULL;
+			return nullptr;
 
-		return this->successorImpl(searchKey, _root, NULL);
+		return this->successorImpl(searchKey, _root, nullptr);
 	}
 
 	template<isHashable K, typename T>
 	simpleBSTNode<K, T>* simpleBST<K, T>::predecessor(K searchKey)
 	{
 		if (!_nodeMap->contains(searchKey))
-			return NULL;
+			return nullptr;
 
-		return this->predecessorImpl(searchKey, _root, NULL);
+		return this->predecessorImpl(searchKey, _root, nullptr);
 	}
 
 	template<isHashable K, typename T>
@@ -247,7 +223,7 @@ namespace brogueHd::simple
 			return nullptr;
 
 		else
-			return result->value;
+			return result->getValue();
 	}
 
 	template<isHashable K, typename T>
@@ -255,11 +231,11 @@ namespace brogueHd::simple
 	{
 		simpleBSTNode<K, T>* minNode = this->minImpl(_root);
 
-		if (minNode == NULL)
+		if (minNode == nullptr)
 			throw simpleException("Trying to resolve min key from an empty Binary Search Tree");
 
 		else
-			return minNode->key;
+			return minNode->getKey();
 	}
 
 	template<isHashable K, typename T>
@@ -267,11 +243,11 @@ namespace brogueHd::simple
 	{
 		simpleBSTNode<K, T>* result = this->maxImpl(_root);
 
-		if (result == NULL)
-			return NULL;
+		if (result == nullptr)
+			return nullptr;
 
 		else
-			return result->value;
+			return result->getValue();
 	}
 
 	template<isHashable K, typename T>
@@ -279,35 +255,37 @@ namespace brogueHd::simple
 	{
 		simpleBSTNode<K, T>* maxNode = this->maxImpl(_root);
 
-		if (maxNode == NULL)
+		if (maxNode == nullptr)
 			throw simpleException("Trying to resolve max key from an empty Binary Search Tree");
 
 		else
-			return maxNode->key;
+			return maxNode->getKey();
 	}
 
 	template<isHashable K, typename T>
 	simpleBSTNode<K, T>* simpleBST<K, T>::insertImpl(simpleBSTNode<K, T>* node, K key, T value)
 	{
-		if (node == NULL)
+		if (node == nullptr)
 			return new simpleBSTNode<K, T>(key, value);
 
-		int comparison = keyCompare(key, node->key);
+		int comparison = keyCompare(key, node->getKey());
 
 		// Insert Left
 		if (comparison < 0)
-			node->left = this->insertImpl(node->left, key, value);
+			node->setLeft(this->insertImpl(node->getLeft(), key, value));
 
 		// Insert Right
 		else if (comparison > 0)
-			node->right = this->insertImpl(node->right, key, value);
+			node->setRight(this->insertImpl(node->getRight(), key, value));
 
 		else
 			throw simpleException("Duplicate key insertion BinarySearchTree");
 
 		// Set the height
-		node->height = simpleMath::maxOf((node->left != NULL) ? node->left->height : -1,
-										 (node->right != NULL) ? node->right->height : -1) + 1;
+		int height = simpleMath::maxOf((node->getLeft() != nullptr) ? node->getLeft()->getHeight() : -1,
+									   (node->getRight() != nullptr) ? node->getRight()->getHeight() : -1) + 1;
+
+		node->setHeight(height);
 
 		return this->balance(node);
 	}
@@ -318,37 +296,39 @@ namespace brogueHd::simple
 		// Procedure:  https://algs4.cs.princeton.edu/code/edu/princeton/cs/algs4/AVLTreeST.java.html
 		//
 
-		int comparison = keyCompare(key, node->key);
+		int comparison = keyCompare(key, node->getKey());
 
 		if (comparison < 0)
-			node->left = this->removalImpl(node->left, key);
+			node->setLeft(this->removalImpl(node->getLeft(), key));
 
 		else if (comparison > 0)
-			node->right = this->removalImpl(node->right, key);
+			node->setRight(this->removalImpl(node->getRight(), key));
 
 		else
 		{
 			// One child case
-			if (node->left == NULL)
-				return node->right;
+			if (node->getLeft() == nullptr)
+				return node->getRight();
 
-			else if (node->right == NULL)
-				return node->left;
+			else if (node->getRight() == nullptr)
+				return node->getLeft();
 
 			// Next successor case
 			else
 			{
 				simpleBSTNode<K, T>* temp = node;
 
-				node = this->minImpl(temp->right);
-				node->right = this->deleteMin(temp->right);
-				node->left = temp->left;
+				node = this->minImpl(temp->getRight());
+				node->setRight(this->deleteMin(temp->getRight()));
+				node->setLeft(temp->getLeft());
 			}
 		}
 
 		// Set the height
-		node->height = simpleMath::maxOf((node->left != NULL) ? node->left->height : -1,
-										 (node->right != NULL) ? node->right->height : -1) + 1;
+		int height = simpleMath::maxOf((node->getLeft() != nullptr) ? node->getLeft()->getHeight() : -1,
+					   				   (node->getRight() != nullptr) ? node->getRight()->getHeight() : -1) + 1;
+
+		node->setHeight(height);
 
 		return this->balance(node);
 	}
@@ -356,14 +336,16 @@ namespace brogueHd::simple
 	template<isHashable K, typename T>
 	simpleBSTNode<K, T>* simpleBST<K, T>::deleteMin(simpleBSTNode<K, T>* node)
 	{
-		if (node->left == NULL)
-			return node->right;
+		if (node->getLeft() == nullptr)
+			return node->getRight();
 
-		node->left = this->deleteMin(node->left);
+		node->setLeft(this->deleteMin(node->getLeft()));
 
 		// Set the height
-		node->height = simpleMath::maxOf((node->left != NULL) ? node->left->height : -1,
-										 (node->right != NULL) ? node->right->height : -1) + 1;
+		int height = simpleMath::maxOf((node->getLeft() != nullptr) ? node->getLeft()->getHeight() : -1,
+									   (node->getRight() != nullptr) ? node->getRight()->getHeight() : -1) + 1;
+
+		node->setHeight(height);
 
 		return this->balance(node);
 	}
@@ -371,34 +353,34 @@ namespace brogueHd::simple
 	template<isHashable K, typename T>
 	simpleBSTNode<K, T>* simpleBST<K, T>::minImpl(simpleBSTNode<K, T>* node)
 	{
-		if (node == NULL)
-			return NULL;
+		if (node == nullptr)
+			return nullptr;
 
-		return this->minImpl(node->left) != NULL ? node : NULL;
+		return this->minImpl(node->getLeft()) != nullptr ? node : nullptr;
 	}
 
 	template<isHashable K, typename T>
 	simpleBSTNode<K, T>* simpleBST<K, T>::maxImpl(simpleBSTNode<K, T>* node)
 	{
-		if (node == NULL)
-			return NULL;
+		if (node == nullptr)
+			return nullptr;
 
-		return this->maxImpl(node->right) != NULL ? node : NULL;
+		return this->maxImpl(node->getRight()) != nullptr ? node : nullptr;
 	}
 
 	template<isHashable K, typename T>
 	simpleBSTNode<K, T>* simpleBST<K, T>::searchImpl(K key, simpleBSTNode<K, T>* node)
 	{
-		if (node == NULL)
-			return NULL;
+		if (node == nullptr)
+			return nullptr;
 
-		int comparison = keyCompare(key, node->key);
+		int comparison = keyCompare(key, node->getKey());
 
-		if (comparison < 0 && node->left != NULL)
-			return this->searchImpl(key, node->left);
+		if (comparison < 0 && node->getLeft() != nullptr)
+			return this->searchImpl(key, node->getLeft());
 
-		else if (comparison > 0 && node->right != NULL)
-			return this->searchImpl(key, node->right);
+		else if (comparison > 0 && node->getRight() != nullptr)
+			return this->searchImpl(key, node->getRight());
 
 		else
 			return node;
@@ -413,27 +395,27 @@ namespace brogueHd::simple
 		// At the final leaf node - continue looking for the MAX of it's RIGHT sub-tree
 		//
 
-		if (node == NULL)
-			return NULL;
+		if (node == nullptr)
+			return nullptr;
 
 		int comparison = keyCompare(key, node.Key);
 
-		if (comparison < 0 && node->left != NULL)
+		if (comparison < 0 && node->getLeft() != nullptr)
 		{
 			// Keep track of this last parent
 			savedParent = node;
 
-			return this->successorImpl(key, node->left, savedParent);
+			return this->successorImpl(key, node->getLeft(), savedParent);
 		}
 
-		else if (comparison > 0 && node->right != NULL)
-			return this->successorImpl(key, node->right, savedParent);
+		else if (comparison > 0 && node->getRight() != nullptr)
+			return this->successorImpl(key, node->getRight(), savedParent);
 
 		// FOUND NODE!
 		else
 		{
-			if (node->right != NULL)
-				return this->minImpl(node->right);
+			if (node->getRight() != nullptr)
+				return this->minImpl(node->getRight());
 
 			else
 				return savedParent;
@@ -449,27 +431,27 @@ namespace brogueHd::simple
 		// At the final leaf node - continue looking for the MIN of it's LEFT sub-tree
 		//
 
-		if (node == NULL)
-			return NULL;
+		if (node == nullptr)
+			return nullptr;
 
-		int comparison = keyCompare(key, node.Key);
+		int comparison = keyCompare(key, node->getKey());
 
-		if (comparison < 0 && node->left != NULL)
-			return this->predecessorImpl(key, node->left, savedParent);
+		if (comparison < 0 && node->getLeft() != nullptr)
+			return this->predecessorImpl(key, node->getLeft(), savedParent);
 
-		else if (comparison > 0 && node->right != NULL)
+		else if (comparison > 0 && node->getRight() != nullptr)
 		{
 			// Keep track of this last parent
 			savedParent = node;
 
-			return PredecessorImpl(key, node->right, savedParent);
+			return PredecessorImpl(key, node->getRight(), savedParent);
 		}
 
 		// FOUND NODE!
 		else
 		{
-			if (node->left != NULL)
-				return this->maxImpl(node->left);
+			if (node->getLeft() != nullptr)
+				return this->maxImpl(node->getLeft());
 
 			else
 				return savedParent;
@@ -497,16 +479,16 @@ namespace brogueHd::simple
 		if (node->balanceFactor() < -1)
 		{
 			// Left Right
-			if (node->right->balanceFactor() > 0)
-				node->right = this->rotateRight(node->right);
+			if (node->getRight()->balanceFactor() > 0)
+				node->setRight(this->rotateRight(node->getRight()));
 
 			node = this->rotateLeft(node);
 		}
 		else if (node->balanceFactor() > 1)
 		{
 			// Right Left
-			if (node->left->balanceFactor() < 0)
-				node->left = this->rotateLeft(node->left);
+			if (node->getLeft()->balanceFactor() < 0)
+				node->setLeft(this->rotateLeft(node->getLeft()));
 
 			node = this->rotateRight(node);
 		}
@@ -532,18 +514,18 @@ namespace brogueHd::simple
 
 		// Refering to variables from Wikipedia entry
 		simpleBSTNode<K, T>* X = subTree;
-		simpleBSTNode<K, T>* Z = subTree->right;
-		simpleBSTNode<K, T>* W = subTree->right == NULL ? NULL : subTree->right->left;
+		simpleBSTNode<K, T>* Z = subTree->getRight();
+		simpleBSTNode<K, T>* W = subTree->getRight() == nullptr ? nullptr : subTree->getRight()->getLeft();
 
 		// Node's left child becomes node's parent's right child:  X -> T
-		X->right = W;
+		X->setRight(W);
 
 		// Node's parent becomes the left child of node:  X <- Z
-		Z->left = X;
+		Z->setLeft(X);
 
 		// Set up height of nodes
-		X->height = simpleMath::maxOf((X->left != NULL) ? X->left->height : -1, (X->right != NULL) ? X->right->height : -1) + 1;
-		Z->height = simpleMath::maxOf((Z->left != NULL) ? Z->left->height : -1, (Z->right != NULL) ? Z->right->height : -1) + 1;
+		X->setHeight(simpleMath::maxOf((X->getLeft() != nullptr) ? X->getLeft()->getHeight() : -1, (X->getRight() != nullptr) ? X->getRight()->getHeight() : -1) + 1);
+		Z->setHeight(simpleMath::maxOf((Z->getLeft() != nullptr) ? Z->getLeft()->getHeight() : -1, (Z->getRight() != nullptr) ? Z->getRight()->getHeight() : -1) + 1);
 
 		// Return node of the new sub-tree
 		return Z;
@@ -567,18 +549,18 @@ namespace brogueHd::simple
 
 		// Refering to variables from Wikipedia entry
 		simpleBSTNode<K, T>* X = node;
-		simpleBSTNode<K, T>* Z = node->left;
-		simpleBSTNode<K, T>* W = node->left == NULL ? NULL : node->left->right;
+		simpleBSTNode<K, T>* Z = node->getLeft();
+		simpleBSTNode<K, T>* W = node->getLeft() == nullptr ? nullptr : node->getLeft()->getRight();
 
 		// Node's right child becomes node's parent's left child:  T <- X
-		X->left = W;
+		X->setLeft(W);
 
 		// Node's parent becomes the right child of node:  Z -> X
-		Z->right = X;
+		Z->setRight(X);
 
 		// Set up height of nodes
-		X->height = simpleMath::maxOf((X->left != NULL) ? X->left->height : -1, (X->right != NULL) ? X->right->height : -1) + 1;
-		Z->height = simpleMath::maxOf((Z->left != NULL) ? Z->left->height : -1, (Z->right != NULL) ? Z->right->height : -1) + 1;
+		X->setHeight(simpleMath::maxOf((X->getLeft() != nullptr) ? X->getLeft()->getHeight() : -1, (X->getRight() != nullptr) ? X->getRight()->getHeight() : -1) + 1);
+		Z->setHeight(simpleMath::maxOf((Z->getLeft() != nullptr) ? Z->getLeft()->getHeight() : -1, (Z->getRight() != nullptr) ? Z->getRight()->getHeight() : -1) + 1);
 
 		// Return node of the new sub-tree
 		return Z;

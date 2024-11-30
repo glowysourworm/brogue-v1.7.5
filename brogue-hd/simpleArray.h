@@ -314,13 +314,18 @@ namespace brogueHd::simple
 		// Take hash of the pointer value (could easily just take the pointer itself!)
 		size_t hash = 0;
 
-		for (int index = 0; index < _count; index++)
+		for (int index = 0; index < this->count(); index++)
 		{
-			if (hash == 0)
-				hash = hashGenerator::generateHash(_array[index]);
+			size_t lastHash = hash;
+
+			if (index == 0)
+				hash = hashGenerator::generateHash(this->get(index));
 
 			else
-				hash = hashGenerator::combineHash(hash, _array[index]);
+				hash = hashGenerator::combineHash(hash, this->get(index));
+
+			if (hash == lastHash)
+				throw simpleException("Hash zero-value detected (this may cause a hash collision):  simpleArray.h");
 		}
 
 		return hash;

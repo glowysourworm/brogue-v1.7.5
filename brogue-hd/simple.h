@@ -1,6 +1,7 @@
 #pragma once
 
 #include <concepts>
+#include <limits>
 #include <stdexcept>
 #include <type_traits>
 
@@ -159,6 +160,38 @@ namespace brogueHd::simple
 			return nextHash;
 		}
 
+		// Borrowed from boost::hash_combine (There were hash collisions with char arrays, so it will be best to utilize
+		// a better hashing function. I'm going to use boost in the future for some of this rebuilding the wheel)
+		static void hash_combine_impl(size_t& seed, size_t& nextHash)
+		{
+			static constexpr auto digits = std::numeric_limits<std::size_t>::digits;
+			static_assert(digits == 64 || digits == 32);
+
+			if constexpr (digits == 64) {
+				// https://github.com/boostorg/container_hash/blob/ee5285bfa64843a11e29700298c83a37e3132fcd/include/boost/container_hash/detail/hash_mix.hpp#L67
+				std::size_t x = seed + 0x9e3779b9 + nextHash;
+				const std::size_t m = 0xe9846af9b1a615d;
+				x ^= x >> 32;
+				x *= m;
+				x ^= x >> 32;
+				x *= m;
+				x ^= x >> 28;
+				seed = x;
+			}
+			else { // 32-bits
+				// https://github.com/boostorg/container_hash/blob/ee5285bfa64843a11e29700298c83a37e3132fcd/include/boost/container_hash/detail/hash_mix.hpp#L88
+				std::size_t x = seed + 0x9e3779b9 + nextHash;
+				const std::size_t m1 = 0x21f0aaad;
+				const std::size_t m2 = 0x735a2d97;
+				x ^= x >> 16;
+				x *= m1;
+				x ^= x >> 15;
+				x *= m2;
+				x ^= x >> 15;
+				seed = x;
+			}
+		}
+
 		template<isHashable T>
 		static void hash_combine(size_t& seed, const T& next)
 		{
@@ -167,7 +200,7 @@ namespace brogueHd::simple
 			if (seed == 0)
 				seed = nextHash;
 			else
-				seed = seed ^ (nextHash << 1);
+				hash_combine_impl(seed, nextHash);
 		}
 
 		template<isHashable T, isHashable...Rest>
@@ -178,7 +211,7 @@ namespace brogueHd::simple
 			if (seed == 0)
 				seed = nextHash;
 			else
-				seed = seed ^ (nextHash << 1);
+				hash_combine_impl(seed, nextHash);
 
 			if (sizeof...(rest) > 0)
 				hash_combine(seed, rest...);
