@@ -27,11 +27,7 @@ namespace brogueHd::simple
 		}
 		~simpleBSTNode()
 		{
-			if (_left != nullptr)
-				delete _left;
-
-			if (_right != nullptr)
-				delete _right;
+			// Handled by the tree
 		}
 		void operator=(const simpleBSTNode& copy)
 		{

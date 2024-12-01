@@ -140,6 +140,9 @@ namespace brogueHd::simple
 	template<isHashable K, typename T>
 	void simpleBST<K, T>::insert(K key, T value)
 	{
+		if (_nodeMap->contains(key))
+			throw simpleException(createExceptionMessage("Trying to insert a duplicate key in simpleBST tree:  simpleBST::insert"));
+
 		// Insert value into the tree -> Rebalance the tree
 		_root = this->insertImpl(_root, key, value);
 
@@ -148,6 +151,9 @@ namespace brogueHd::simple
 
 		// Track the values for debugging and a fast retrieval using the key
 		_nodeMap->add(key, node);
+
+		// DEBUG
+		std::cout << createOutput().c_str() << std::endl;
 	}
 
 	template<isHashable K, typename T>
@@ -164,6 +170,9 @@ namespace brogueHd::simple
 
 		// Track the values for debugging and fast retrieval using the key
 		_nodeMap->remove(key);
+
+		// DEBUG
+		std::cout << createOutput().c_str() << std::endl;
 
 		return item;
 	}
@@ -616,8 +625,9 @@ namespace brogueHd::simple
 	template<isHashable K, typename T>
 	void simpleBST<K, T>::createOutputRecurse(simpleBSTNode<K,T>* node, int level, simpleString& result)
 	{
-		const char* messageFormat = "Node level {}: Key={} Value={} Height={}";
-		std::string message = simpleExt::format(messageFormat, level, node->getKey(), node->getValue(), node->getHeight());
+		const char* messageFormat = "Node level {}: Key={} Value={} Height={} MAPPED={}";
+		bool nodeFound = _nodeMap->contains(node->getKey());
+		std::string message = simpleExt::format(messageFormat, level, node->getKey(), node->getValue(), node->getHeight(), (int)nodeFound);
 
 		result.appendLine(message.c_str());
 
