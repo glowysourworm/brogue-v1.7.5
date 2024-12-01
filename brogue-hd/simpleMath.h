@@ -93,7 +93,7 @@ namespace brogueHd::simple
 			if (weight < 0 || weight > 1)
 				throw simpleException("Improper interpolation weight simpleMath::interpolate");
 
-			return (weight * value1) + ((1 - weight) * value2);
+			return (value1 * (1 - weight)) + (weight * value2);
 		}
 
 		template<isNumber TMath>

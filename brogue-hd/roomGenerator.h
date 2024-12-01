@@ -73,7 +73,6 @@ namespace brogueHd::backend
 
 		// Sets parameters for use
 		_cellularAutomataGenerator->initialize(_cavernParameters);
-		_perlinNoiseGenerator->initialize(0.3, -1, 0);
 	}
 
 	roomGenerator::~roomGenerator()
@@ -183,6 +182,14 @@ namespace brogueHd::backend
 	void roomGenerator::designCavern(grid<gridLocator>& designGrid, const gridRect& minSize)
 	{
 		gridRegionLocator<gridLocator> regionLocator;
+
+		float frequencyDivisor = 1.0f;
+
+		// Set mesh size, and result slice
+		//_perlinNoiseGenerator->initialize(5, 5, -0.5, 0.5);
+
+		_perlinNoiseGenerator->initialize(designGrid.getRelativeBoundary().width / frequencyDivisor,
+										  designGrid.getRelativeBoundary().height / frequencyDivisor, -0.5, 0.5);
 
 		// Create cellular automata using cavern parameters
 		_perlinNoiseGenerator->run(designGrid.getParentBoundary(), 

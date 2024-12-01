@@ -12,10 +12,9 @@ namespace brogueHd::backend
         /// <summary>
         /// Initializes perlin noise generation parameters (perlin noise map is a random elevation map)
         /// </summary>
-        /// <param name="spatialFrequency">Unit parameter [0, 1] to scale the spatial frequency (from 2 cells -> map boundary)</param>
         /// <param name="resultLow">Map-Low result threshold [-1, 1]</param>
         /// <param name="resultHigh">Map-High result threshold [-1, 1]</param>
-        void initialize(float spatialFrequency, float resultLow, float resultHigh);
+        void initialize(int meshSizeX, int meshSizeY, float resultLow, float resultHigh);
 
 		void run(const gridRect& parentBoundary,
 		         const gridRect& relativeBoundary,
@@ -23,16 +22,15 @@ namespace brogueHd::backend
 
 	private:
 
-        const double PERLIN_NOISE_LOW_FREQUENCY = 0.06;
-        const double PERLIN_NOISE_HIGH_FREQUENCY = 0.5;
-
         double perlinFade(double unitValue);
 
 	private:
 
 		randomGenerator* _randomGenerator;
 
-        float _spatialFrequency;
+        int _meshSizeX;                              // [2, boundary width]
+        int _meshSizeY;                              // [2, boundary height]
+        //float _spatialFrequency;                     // User:    [0, 1]  -> [boundary dimension / 2, 2] (in cells)
         simpleRange<float>* _resultRange;            // Result:  [-1, 1]
 	};
 
@@ -48,9 +46,11 @@ namespace brogueHd::backend
 		delete _resultRange;
 	}
 
-    inline void perlinNoiseGenerator::initialize(float spatialFrequency, float resultLow, float resultHigh)
+    inline void perlinNoiseGenerator::initialize(int meshSizeX, int meshSizeY, float resultLow, float resultHigh)
     {
-        _spatialFrequency = spatialFrequency;
+        _meshSizeX = meshSizeX;
+        _meshSizeY = meshSizeY;
+        //_spatialFrequency = spatialFrequency;
         _resultRange->set(resultLow, resultHigh);
     }
 
@@ -72,7 +72,10 @@ namespace brogueHd::backend
         //
 
         // Scale the frequency input
-        float scaledFrequency = (_spatialFrequency * (PERLIN_NOISE_HIGH_FREQUENCY - PERLIN_NOISE_LOW_FREQUENCY)) + PERLIN_NOISE_LOW_FREQUENCY;
+        //float scaledFrequency = simpleMath::clamp(_spatialFrequency, 0.01f, 1.0f);  // divide by zero
+
+        _meshSizeX = simpleMath::clamp(_meshSizeX, 2, relativeBoundary.width);
+        _meshSizeY = simpleMath::clamp(_meshSizeY, 2, relativeBoundary.height);
 
         // Use a non-offset grid for the map (making sure to translate back)
         gridRect mapBoundary(0, 0, relativeBoundary.width, relativeBoundary.height);
@@ -84,16 +87,25 @@ namespace brogueHd::backend
         //                      the mesh values that have an effect on the grid cells.
         //
 
-        // Mesh Cell Width:  Creates a mesh cell width between 2.0 and the width of the grid
-        int meshCellWidth = simpleMath::clamp((int)(1 / scaledFrequency), 2, relativeBoundary.width);
+        // Mesh Cell Width:  Creates a mesh cell width between 2 and the width of the grid
+        //int meshCellWidth = simpleMath::clamp((int)(1 / scaledFrequency), 2, relativeBoundary.width);
 
-        // Mesh Cell Height:  [2.0, height]
-        int meshCellHeight = simpleMath::clamp((int)(1 / scaledFrequency), 2, relativeBoundary.height);
+        // Mesh Cell Height:  [2, height]
+        //int meshCellHeight = simpleMath::clamp((int)(1 / scaledFrequency), 2, relativeBoundary.height);
+
+        int meshCellWidth = _meshSizeX;
+        int meshCellHeight = _meshSizeY;
 
         // Generate mesh that hangs over the edges of the grid (AT LEAST BY ONE MESH CELL)
         //
-        int meshWidth = (int)(relativeBoundary.width / (double)meshCellWidth) + 2;          // Let it overhang (see coordinate transforms)
-        int meshHeight = (int)(relativeBoundary.height / (double)meshCellHeight) + 2;
+        int meshWidth = (int)(relativeBoundary.width / (double)_meshSizeX) + 2;          // Let it overhang (see coordinate transforms)
+        int meshHeight = (int)(relativeBoundary.height / (double)_meshSizeY) + 2;
+
+        if (meshWidth * _meshSizeX < relativeBoundary.width ||
+            meshHeight * _meshSizeY < relativeBoundary.height)
+        {
+            throw simpleException("Mesh improperly formed. Increase mesh size:  perlinNoiseGenerator.h");
+        }
 
         // The mesh bounds don't live in the same coordinate space. This is for the grid component.
         gridRect meshBounds(0, 0, meshWidth, meshHeight);
@@ -106,7 +118,14 @@ namespace brogueHd::backend
         {
             // Create random vector 
             for (int j = 0; j < meshHeight; j++)
-                mesh.set(i, j, simpleVector<float>((float)_randomGenerator->next() * simpleMath::Pi * 2.0f, 1.0f));
+            {
+                // U[-1, 1]
+                float xRand = -1.0f + (_randomGenerator->next() * 2);
+                float yRand = -1.0f + (_randomGenerator->next() * 2);
+
+                mesh.set(i, j, simpleVector<float>(xRand, yRand));
+            }
+                
         }
 
         float maxValue = std::numeric_limits<float>::min();
@@ -160,8 +179,8 @@ namespace brogueHd::backend
             //
             float normalizedX = (i - meshX0) / ((float)(meshX1 - meshX0));
             float normalizedY = (j - meshY0) / ((float)(meshY1 - meshY0));
-            float easeX = that->perlinFade(1 - normalizedX);
-            float easeY = that->perlinFade(1 - normalizedY);
+            float easeX = that->perlinFade(normalizedX);
+            float easeY = that->perlinFade(normalizedY);
             float weightA = simpleMath::interpolate(dotX0Y0, dotX1Y0, easeX);
             float weightB = simpleMath::interpolate(dotX0Y1, dotX1Y1, easeX);
             float weight = simpleMath::interpolate(weightA, weightB, easeY);
