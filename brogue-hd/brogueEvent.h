@@ -9,7 +9,7 @@ using namespace brogueHd::simple;
 namespace brogueHd::backend
 {
 	template<isHashable EventSender, isHashable EventData>
-	class brogueEventBase : hashableObject
+	class brogueEventBase : simpleObject
 	{
 		using DelegateType = std::function<void(const EventSender&, const EventData&)>;
 

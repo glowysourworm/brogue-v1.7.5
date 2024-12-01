@@ -9,7 +9,7 @@ using namespace brogueHd::simple;
 
 namespace brogueHd::backend::model
 {
-	class brogueScoreEntry : hashableObject
+	class brogueScoreEntry : simpleObject
 	{
 	public:
 

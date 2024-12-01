@@ -36,7 +36,7 @@ namespace brogueHd::backend::model
 
 	*/
 
-	struct brogueRoomTemplate : hashable
+	struct brogueRoomTemplate : simpleStruct
 	{
 	public:
 

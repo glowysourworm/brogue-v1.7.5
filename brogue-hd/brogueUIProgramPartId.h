@@ -6,7 +6,7 @@ using namespace brogueHd::simple;
 
 namespace brogueHd::frontend
 {
-	struct brogueUIProgramPartId : hashable
+	struct brogueUIProgramPartId : simpleStruct
 	{
 		brogueUIProgramPartId()
 		{

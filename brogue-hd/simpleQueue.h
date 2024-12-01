@@ -10,7 +10,7 @@ namespace brogueHd::simple
 	using simpleQueueIterator = std::function<iterationCallback(const T& item)>;
 
 	template<isHashable T>
-	class simpleQueue : public hashableObject
+	class simpleQueue : public simpleObject
 	{
 	public:
 		

@@ -5,7 +5,7 @@
 namespace brogueHd::simple
 {
 	template<isHashable K, typename T>
-	class simpleBSTNode : public hashableObject
+	class simpleBSTNode : public simpleObject
 	{
 	public:
 

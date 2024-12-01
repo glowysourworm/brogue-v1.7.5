@@ -9,7 +9,7 @@
 
 namespace brogueHd::simple
 {
-	class simpleFileEntry : public hashableObject
+	class simpleFileEntry : public simpleObject
 	{
 	public:
 

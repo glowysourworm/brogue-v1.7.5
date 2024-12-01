@@ -11,7 +11,7 @@ using namespace brogueHd::component;
 
 namespace brogueHd::backend::model
 {
-	class brogueRoom : public hashableObject
+	class brogueRoom : public simpleObject
 	{
 	public:
 

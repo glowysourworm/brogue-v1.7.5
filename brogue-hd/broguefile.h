@@ -22,7 +22,7 @@ namespace brogueHd::backend::model
 		char outputCharacter;
 	} keyMap;
 
-	struct brogueEvent : hashable
+	struct brogueEvent : simpleStruct
 	{
 	public:
 

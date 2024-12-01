@@ -49,7 +49,7 @@ namespace brogueHd::simple
 	using simpleArrayValueIndicator = std::function<TResult(const T& item)>;
 
 	template<isHashable T>
-	class simpleArray : public hashableObject
+	class simpleArray : public simpleObject
 	{
 	public:
 

@@ -11,7 +11,7 @@ using namespace brogueHd::simple;
 
 namespace brogueHd::backend::model
 {
-	struct colorString : hashable
+	struct colorString : simpleStruct
 	{
 	public:
 

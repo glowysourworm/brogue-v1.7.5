@@ -26,7 +26,7 @@ namespace brogueHd::simple
 	using simpleHashSelector = std::function<VResult(const V& value)>;
 
 	template<isHashable K, typename V>
-	class simpleHashCore : public hashableObject
+	class simpleHashCore : public simpleObject
 	{
 	public:
 

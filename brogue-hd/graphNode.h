@@ -6,7 +6,7 @@ using namespace brogueHd::simple;
 
 namespace brogueHd::component
 {
-	struct graphNode : public hashable
+	struct graphNode : public simpleStruct
 	{
 		graphNode() {};
 		~graphNode() {};

@@ -4,7 +4,7 @@
 
 namespace brogueHd::frontend
 {
-	class brogueUIMouseData : hashableObject
+	class brogueUIMouseData : simpleObject
 	{
 	public:
 

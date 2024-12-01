@@ -8,7 +8,7 @@
 namespace brogueHd::simple
 {
 	template<isHashable T>
-	struct simpleTriangle : hashable
+	struct simpleTriangle : simpleStruct
 	{
 		simplePoint<T> point1;
 		simplePoint<T> point2;

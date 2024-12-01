@@ -7,7 +7,7 @@ using namespace brogueHd::simple;
 namespace brogueHd::component
 {
 	template<isHashable TNode>
-	struct graphEdge : hashable
+	struct graphEdge : simpleStruct
 	{
 	public:
 

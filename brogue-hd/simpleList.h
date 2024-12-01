@@ -47,7 +47,7 @@ namespace brogueHd::simple
 	using simpleListComparer = std::function<int(const T& item1, const T& item2)>;
 
 	template<isHashable T>
-	class simpleList : public hashableObject
+	class simpleList : public simpleObject
 	{
 	public:
 		simpleList();

@@ -20,7 +20,7 @@ namespace brogueHd::component
 	/// </summary>
 	using gridRectDirectionalIterator = std::function<iterationCallback(int column, int row, brogueCompass direction)>;
 
-	struct gridRect : hashable
+	struct gridRect : simpleStruct
 	{
 	public:
 		int column;

@@ -9,7 +9,7 @@
 namespace brogueHd::simple
 {
 	template<isHashable T>
-	class simpleOrderedList : public hashableObject
+	class simpleOrderedList : public simpleObject
 	{
 	public:
 		simpleOrderedList(simpleListComparer<T> comparer);

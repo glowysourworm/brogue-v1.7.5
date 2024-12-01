@@ -10,7 +10,7 @@ using namespace brogueHd::simple;
 
 namespace brogueHd::frontend
 {
-	class simpleGlObject : public hashableObject
+	class simpleGlObject : public simpleObject
 	{
 	public:
 

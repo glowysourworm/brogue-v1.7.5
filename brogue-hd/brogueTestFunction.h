@@ -8,7 +8,7 @@ using namespace brogueHd::simple;
 
 namespace brogueHd::test
 {
-	struct brogueTestFunction : hashable
+	struct brogueTestFunction : simpleStruct
 	{
 		simpleString name;
 		std::function<bool(void)> testRun;

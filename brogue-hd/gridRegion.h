@@ -20,7 +20,7 @@ namespace brogueHd::component
 	/// offsets are required for use.
 	/// </summary>
 	template<isGridLocator T>
-	class gridRegion : public hashableObject
+	class gridRegion : public simpleObject
 	{
 	public:
 		gridRegion(const simpleArray<T>& locations,

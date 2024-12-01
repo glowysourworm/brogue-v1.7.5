@@ -7,7 +7,7 @@ using namespace brogueHd::component;
 
 namespace brogueHd::backend::model
 {
-	struct cellularAutomataRule : hashable
+	struct cellularAutomataRule : simpleStruct
 	{
 		cellularAutomataRule()
 		{

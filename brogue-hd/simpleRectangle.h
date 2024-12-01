@@ -7,7 +7,7 @@
 namespace brogueHd::simple
 {
 	template<isNumber T>
-	struct simpleRectangle : hashable
+	struct simpleRectangle : simpleStruct
 	{
 		simpleRectangle()
 		{

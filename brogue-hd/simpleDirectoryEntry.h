@@ -8,7 +8,7 @@
 
 namespace brogueHd::simple
 {
-	class simpleDirectoryEntry : hashableObject
+	class simpleDirectoryEntry : simpleObject
 	{
 	public:
 

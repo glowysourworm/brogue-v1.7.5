@@ -6,7 +6,7 @@
 
 namespace brogueHd::simple
 {
-	struct simpleMaskedInt32 : hashable
+	struct simpleMaskedInt32 : simpleStruct
 	{
 		simpleMaskedInt32()
 		{

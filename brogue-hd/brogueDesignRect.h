@@ -17,7 +17,7 @@ namespace brogueHd::backend::model
 	/// Accretion tile is used to help design the layout. The connection points are desired
 	/// locations for doors - which may or may not be on the edge of the region
 	/// </summary>
-	struct brogueDesignRect : hashable
+	struct brogueDesignRect : simpleStruct
 	{
 	public:
 

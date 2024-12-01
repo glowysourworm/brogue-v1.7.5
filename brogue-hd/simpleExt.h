@@ -25,23 +25,35 @@ namespace brogueHd::simple
 
 	private:
 
-		template<isNumber T>
-		static void toStringImpl(const T& param, std::string& result)
-		{
-			result = std::to_string(param);
-		}
+		//template<isNumber T>
+		//static void toStringImpl(const T& param, std::string& result)
+		//{
+		//	result = std::to_string(param);
+		//}
 
-		template<isChar T>
-		static void toStringImpl(const T& param, std::string& result)
-		{
-			result += param;
-		}
+		//template<isChar T>
+		//static void toStringImpl(const T& param, std::string& result)
+		//{
+		//	result += param;
+		//}
 
-		template<isStringLike T>
-		static void toStringImpl(const T& param, std::string& result)
-		{
-			result = std::string(param);
-		}
+		//template<isSimpleObject T>
+		//static void toStringImpl(const T& param, std::string& result)
+		//{
+		//	result = std::string(param.toString());
+		//}
+
+		//template<isStringLike T>
+		//static void toStringImpl(const T& param, std::string& result)
+		//{
+		//	result = std::string(param);
+		//}
+
+		//template<isPointer T>
+		//static void toStringImpl(const T& param, std::string& result)
+		//{
+		//	result = std::string("(pointer)");
+		//}
 
 	public:
 
@@ -50,10 +62,9 @@ namespace brogueHd::simple
 		{
 			// Format String (recurse)
 			std::string result(formatStr);
-			std::string paramStr;
 			std::string replaceStr = "{}";
 
-			simpleExt::toStringImpl(param, paramStr);
+			std::string paramStr = simpleExt::toString(param);
 
 			// Find!
 			size_t index = result.find(replaceStr.c_str());
@@ -119,13 +130,30 @@ namespace brogueHd::simple
 		{
 			std::string result;
 
-			if (isNumber<T>)
+			if constexpr (isNumber<T>)
 			{
-				simpleExt::toStringImpl(param, result);
+				return std::to_string(param);
 			}
-			else if (isStringLike<T>)
+			else if constexpr (std::same_as<T, char>)
 			{
-				simpleExt::toStringImpl(param, result);
+				result += param;
+				return result;
+			}
+			else if constexpr (std::same_as<T, const char*>)
+			{
+				return std::string(param);
+			}
+			else if constexpr (isStringLike<T>)
+			{
+				return std::string(param);
+			}
+			else if constexpr (isSimpleObject<T>)
+			{
+				return std::string(param.getString());
+			}
+			else if constexpr (isPointer<T>)
+			{
+				return std::string("(pointer)");
 			}
 			else
 				showError("Invalid use of concept constraints:  simpleExt::format");

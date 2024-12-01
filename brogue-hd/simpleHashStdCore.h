@@ -42,7 +42,7 @@ namespace brogueHd::simple
 
 		// https://en.cppreference.com/w/cpp/utility/hash
 		// Key comparer:   operator ==
-		// Hash function:  std::hash <-- hashable, hashableObject, hashGenerator
+		// Hash function:  std::hash <-- simpleStruct, simpleObject, hashGenerator
 		// 
 		std::unordered_map<size_t, simplePair<K, V>*>* _map;
 

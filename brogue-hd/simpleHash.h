@@ -11,7 +11,7 @@
 namespace brogueHd::simple
 {
 	template<isHashable K, typename V>
-	class simpleHash : public hashableObject
+	class simpleHash : public simpleObject
 	{
 	public:
 		simpleHash();

@@ -58,13 +58,16 @@ namespace brogueHd::simple
 		T maxValue();
 		K maxKey();
 
-		// Unit-Test Only!
-		simpleBSTNode<K, T>* getRoot() const
-		{
-			return _root;
-		}
-
 		void clear();
+
+	public:
+
+		simpleString createOutput();
+
+	private:
+
+		std::string createExceptionMessage(const char* message);
+		void createOutputRecurse(simpleBSTNode<K, T>* node, int level, simpleString& result);
 
 	private:
 
@@ -151,7 +154,7 @@ namespace brogueHd::simple
 	T simpleBST<K, T>::remove(K key)
 	{
 		if (!_nodeMap->contains(key))
-			throw simpleException("Trying to remove non-existing key from binary search tree");
+			throw simpleException(createExceptionMessage("Trying to remove non-existing key from binary search tree"));
 
 		// Remove the specified key -> Rebalance the tree
 		_root = this->removalImpl(_root, key);
@@ -194,7 +197,7 @@ namespace brogueHd::simple
 			return _nodeMap->get(key)->getValue();
 
 		else
-			throw simpleException("Trying to retrieve hash-backed node from BST without checking");
+			throw simpleException(createExceptionMessage("Trying to retrieve hash-backed node from BST without checking"));
 	}
 
 	template<isHashable K, typename T>
@@ -248,7 +251,7 @@ namespace brogueHd::simple
 		simpleBSTNode<K, T>* minNode = this->minImpl(_root);
 
 		if (minNode == nullptr)
-			throw simpleException("Trying to resolve min key from an empty Binary Search Tree");
+			throw simpleException(createExceptionMessage("Trying to resolve min key from an empty Binary Search Tree"));
 
 		else
 			return minNode->getKey();
@@ -272,7 +275,7 @@ namespace brogueHd::simple
 		simpleBSTNode<K, T>* maxNode = this->maxImpl(_root);
 
 		if (maxNode == nullptr)
-			throw simpleException("Trying to resolve max key from an empty Binary Search Tree");
+			throw simpleException(createExceptionMessage("Trying to resolve max key from an empty Binary Search Tree"));
 
 		else
 			return maxNode->getKey();
@@ -295,7 +298,7 @@ namespace brogueHd::simple
 			node->setRight(this->insertImpl(node->getRight(), key, value));
 
 		else
-			throw simpleException("Duplicate key insertion BinarySearchTree");
+			throw simpleException(createExceptionMessage("Duplicate key insertion BinarySearchTree"));
 
 		// Set the height
 		int height = simpleMath::maxOf((node->getLeft() != nullptr) ? node->getLeft()->getHeight() : -1,
@@ -586,5 +589,42 @@ namespace brogueHd::simple
 
 		// Return node of the new sub-tree
 		return Z;
+	}
+
+	template<isHashable K, typename T>
+	std::string simpleBST<K, T>::createExceptionMessage(const char* message)
+	{
+		simpleString result;
+
+		result.appendLine(message);
+
+		simpleString treeOutput = createOutput();
+
+		result.appendLine(treeOutput);
+
+		return std::string(result.c_str());
+	}
+
+	template<isHashable K, typename T>
+	simpleString simpleBST<K, T>::createOutput()
+	{
+		simpleString output;
+		createOutputRecurse(_root, 0, output);
+		return output;
+	}
+
+	template<isHashable K, typename T>
+	void simpleBST<K, T>::createOutputRecurse(simpleBSTNode<K,T>* node, int level, simpleString& result)
+	{
+		const char* messageFormat = "Node level {}: Key={} Value={} Height={}";
+		std::string message = simpleExt::format(messageFormat, level, node->getKey(), node->getValue(), node->getHeight());
+
+		result.appendLine(message.c_str());
+
+		if (node->getLeft() != nullptr)
+			createOutputRecurse(node->getLeft(), level + 1, result);
+
+		if (node->getRight() != nullptr)
+			createOutputRecurse(node->getRight(), level + 1, result);
 	}
 }

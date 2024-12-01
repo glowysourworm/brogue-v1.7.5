@@ -15,7 +15,7 @@
 
 namespace brogueHd::simple
 {
-	class simpleString : public hashableObject
+	class simpleString : public simpleObject
 	{
 	protected:
 
@@ -63,6 +63,9 @@ namespace brogueHd::simple
 
 		void append(const simpleString& other);
 		void append(const char* chars);
+		void appendLine(const simpleString& other);
+		void appendLine(const char* chars);
+
 		void appendPadding(char padChar, int length);
 		void insert(int index, const char* replacement);
 		void insert(int index, const simpleString& replacement);
@@ -345,6 +348,16 @@ namespace brogueHd::simple
 			_array = newArray;
 		}
 	}
+	void simpleString::appendLine(const simpleString& other)
+	{
+		this->append(other);
+		this->appendPadding('\n', 1);
+	}
+	void simpleString::appendLine(const char* chars)
+	{
+		this->append(chars);
+		this->appendPadding('\n', 1);
+	}
 	void simpleString::appendPadding(char padChar, int length)
 	{
 		// TODO: Figure out how to create an empty space string without garbage 
@@ -352,7 +365,7 @@ namespace brogueHd::simple
 		//
 		for (int index = 0; index < length; index++)
 		{
-			this->append(" ");
+			this->append(padChar);
 		}
 	}
 

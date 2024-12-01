@@ -7,7 +7,7 @@
 
 namespace brogueHd::simple
 {
-	struct simplePixel : hashable
+	struct simplePixel : simpleStruct
 	{
 		enum colorChannel
 		{

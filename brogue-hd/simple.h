@@ -21,7 +21,7 @@ namespace brogueHd::simple
 
 	*/
 
-	// More hashable issues:  Check for std::hash support:
+	// More simpleStruct issues:  Check for std::hash support:
 	//
 	// These were copied in. Essentially, these are playing with the
 	// way to know if std::hash was successful. If there are cleaner ways
@@ -42,9 +42,15 @@ namespace brogueHd::simple
 	/// <summary>
 	/// Class to extend std::hash functionality. Inherit and extend getHash().
 	/// </summary>
-	class hashableObject
+	class simpleObject
 	{
 	public:
+
+		virtual const char* toString() const
+		{
+			return "";
+		}
+
 		virtual size_t getHash() const
 		{
 			return 0;
@@ -54,9 +60,15 @@ namespace brogueHd::simple
 	/// <summary>
 	/// Struct to extend std::hash functionality. Inherit and extend getHash().
 	/// </summary>
-	struct hashable
+	struct simpleStruct
 	{
 	public:
+
+		virtual const char* toString() const
+		{
+			return "";
+		}
+
 		virtual size_t getHash() const
 		{
 			return 0;
@@ -68,17 +80,6 @@ namespace brogueHd::simple
 	*/
 
 	class simpleString;
-
-	// Constraint that the type T must inherit from gridOperator<T>
-	template<typename T>
-	concept isComparable = requires(T a, T b)
-	{
-		{ a <= b } -> std::convertible_to<bool>;
-		{ a < b }  -> std::convertible_to<bool>;
-		{ a > b }  -> std::convertible_to<bool>;
-		{ a >= b } -> std::convertible_to<bool>;
-		{ a == b } -> std::convertible_to<bool>;
-	};
 
 	template<typename T>
 	concept isIntLike = std::same_as<T, unsigned long> ||
@@ -99,12 +100,6 @@ namespace brogueHd::simple
 	template<typename T>
 	concept isChar = std::same_as<T, char>;
 
-	//template<typename T>
-	//concept isEnum = std::is_enum<T>{}();
-	//
-	//template<typename T>
-	//concept isBool = std::same_as<T, bool>;
-
 	template<typename T>
 	concept isPointer = std::is_pointer<T>::value;
 
@@ -122,19 +117,20 @@ namespace brogueHd::simple
 		std::convertible_to<T, const char*>;
 
 	template<typename T>
-	concept isStringConvertible = isNumber<T> || isStringLike<T>;
-
-	template<typename T>
 	concept isStdHashable = is_std_hashable<T>::value;
 
 	template<typename T>
-	concept isHashable = std::convertible_to<T, hashable> ||
-		std::convertible_to<T, hashableObject> ||
+	concept isHashable = std::convertible_to<T, simpleStruct> ||
+		std::convertible_to<T, simpleObject> ||
 		std::same_as<T, simpleString> ||
 		isStdHashable<T>;
 
 	template<typename T>
-	concept isSimpleCompatible = isHashable<T> && isComparable<T>;
+	concept isSimpleObject = std::convertible_to<T, simpleStruct> ||
+		                     std::convertible_to<T, simpleObject>;
+
+	template<typename T>
+	concept isStringConvertible = isNumber<T> || isStringLike<T> || isSimpleObject<T> || isPointer<T>;
 
 	class hashGenerator
 	{
@@ -145,10 +141,10 @@ namespace brogueHd::simple
 		{
 			size_t nextHash = 0;
 
-			if constexpr (std::convertible_to<T, hashable>)
+			if constexpr (std::convertible_to<T, simpleStruct>)
 				nextHash = next.getHash();
 
-			else if constexpr (std::convertible_to<T, hashableObject>)
+			else if constexpr (std::convertible_to<T, simpleObject>)
 				nextHash = next.getHash();
 
 			else if constexpr (isStdHashable<T>)

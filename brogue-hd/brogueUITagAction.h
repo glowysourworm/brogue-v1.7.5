@@ -7,7 +7,7 @@ using namespace brogueHd::simple;
 
 namespace brogueHd::frontend
 {
-	struct brogueUITagAction : hashable
+	struct brogueUITagAction : simpleStruct
 	{
 		brogueUITagAction()
 		{

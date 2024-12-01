@@ -7,7 +7,7 @@ using namespace brogueHd::simple;
 
 namespace brogueHd::backend::model
 {
-	struct color : public hashable
+	struct color : public simpleStruct
 	{
 
 	public:

@@ -10,7 +10,7 @@ using namespace brogueHd::simple;
 
 namespace brogueHd::backend::model
 {
-	struct messageData : hashable
+	struct messageData : simpleStruct
 	{
 	public:
 

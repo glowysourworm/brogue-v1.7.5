@@ -11,7 +11,7 @@ namespace brogueHd::frontend
 	/// <summary>
 	/// Simple class to handle streaming the GL data vector
 	/// </summary>
-	class simpleDataStream : public hashableObject
+	class simpleDataStream : public simpleObject
 	{
 	public:
 

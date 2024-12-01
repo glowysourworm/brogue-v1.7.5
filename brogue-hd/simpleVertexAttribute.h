@@ -11,7 +11,7 @@ namespace brogueHd::frontend
 	/// <summary>
 	/// Describes a single vertex attribute "in" parameter for a shader
 	/// </summary>
-	struct simpleVertexAttribute : hashable
+	struct simpleVertexAttribute : simpleStruct
 	{
 	public:
 		simpleVertexAttribute()

@@ -16,7 +16,7 @@ using namespace brogueHd::simple;
 
 namespace brogueHd::frontend
 {
-	struct simpleGlData : hashable
+	struct simpleGlData : simpleStruct
 	{
 		simpleGlData() {}
 		simpleGlData(const simpleGlData& copy) {}
@@ -688,7 +688,7 @@ namespace brogueHd::frontend
 		}
 	};
 
-	struct vertexAttributeData : hashable
+	struct vertexAttributeData : simpleStruct
 	{
 		vertexAttributeData()
 		{

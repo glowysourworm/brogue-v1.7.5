@@ -19,7 +19,7 @@
 
 namespace brogueHd::simple
 {
-	class simpleBitmap : hashableObject
+	class simpleBitmap : simpleObject
 	{
 	public:
 

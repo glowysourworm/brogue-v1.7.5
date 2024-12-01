@@ -23,7 +23,7 @@ namespace brogueHd::frontend
 
 
 	template<isOpenGlUniform T>
-	struct simpleUniform : hashable
+	struct simpleUniform : simpleStruct
 	{
 	public:
 

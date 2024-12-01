@@ -8,7 +8,7 @@ using namespace brogueHd::backend::model;
 
 namespace brogueHd::frontend
 {
-	class brogueUIColorText : hashableObject
+	class brogueUIColorText : simpleObject
 	{
 	public:
 

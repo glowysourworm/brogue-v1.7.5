@@ -12,7 +12,7 @@ namespace brogueHd::backend::model
 		Circular = 2
 	};
 
-	struct colorGradient : hashable
+	struct colorGradient : simpleStruct
 	{
 		colorGradient()
 		{

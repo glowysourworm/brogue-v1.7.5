@@ -6,7 +6,7 @@
 namespace brogueHd::simple
 {
 	template<isHashable T>
-	class simpleStack : hashableObject
+	class simpleStack : simpleObject
 	{
 	public:
 

@@ -6,7 +6,7 @@
 namespace brogueHd::simple
 {
 	template<isNumber T>
-	class simpleRange : hashableObject
+	class simpleRange : simpleObject
 	{
 	public:
 

@@ -5,7 +5,7 @@
 namespace brogueHd::simple
 {
 	template<isHashable K, typename V>
-	struct simplePair : hashable
+	struct simplePair : simpleStruct
 	{
 		simplePair(const K& key, const V& value)
 		{
