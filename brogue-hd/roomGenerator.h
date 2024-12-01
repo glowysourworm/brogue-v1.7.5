@@ -10,6 +10,7 @@
 #include "gridRegionConstructor.h"
 #include "gridRegionLocator.h"
 #include "cellularAutomataGenerator.h"
+#include "perlinNoiseGenerator.h"
 #include "randomGenerator.h"
 #include "simple.h"
 #include "simpleException.h"
@@ -46,7 +47,7 @@ namespace brogueHd::backend
 		randomGenerator* _randomGenerator;
 		brogueUIBuilder* _uiBuilder;
 
-		//perlinNoiseGenerator* _perlinNoiseGenerator;
+		perlinNoiseGenerator* _perlinNoiseGenerator;
 		cellularAutomataGenerator* _cellularAutomataGenerator;
 		cellularAutomataParameters* _cavernParameters;
 	};
@@ -67,13 +68,19 @@ namespace brogueHd::backend
 		_cavernParameters = new cellularAutomataParameters(fillRatio, iterations, padding, polarity, rule1, rule2);
 		_cellularAutomataGenerator = new cellularAutomataGenerator(randomGenerator);
 
+		// Perlin Noise Generator:  Use for smoothly varying random "elevation" noise maps
+		_perlinNoiseGenerator = new perlinNoiseGenerator(randomGenerator);
+
 		// Sets parameters for use
 		_cellularAutomataGenerator->initialize(_cavernParameters);
+		_perlinNoiseGenerator->initialize(0.3, -1, 0);
 	}
 
 	roomGenerator::~roomGenerator()
 	{
 		delete _cavernParameters;
+		delete _perlinNoiseGenerator;
+		delete _cellularAutomataGenerator;
 	}
 
 	gridRegion<gridLocator>* roomGenerator::designRoom(brogueRoomType roomType, const gridRect& designRect, const gridRect& minSize, const gridRect& parentBoundary)
@@ -178,8 +185,8 @@ namespace brogueHd::backend
 		gridRegionLocator<gridLocator> regionLocator;
 
 		// Create cellular automata using cavern parameters
-		_cellularAutomataGenerator->run(designGrid.getParentBoundary(), 
-										designGrid.getRelativeBoundary(), 
+		_perlinNoiseGenerator->run(designGrid.getParentBoundary(), 
+									designGrid.getRelativeBoundary(), 
 		[&designGrid] (int column, int row, bool result)
 		{
 			if (result)
@@ -195,23 +202,7 @@ namespace brogueHd::backend
 		// (MEMORY) Locate Regions
 		simpleList<gridRegion<gridLocator>*> regions = regionLocator.locateRegions(designGrid);
 
-		// Filter regions to comply to size constraints
-		validRegions = regions.where([&minSize] (gridRegion<gridLocator>* region)
-		{
-			return region->getBoundary().width >= minSize.width &&
-				region->getBoundary().height >= minSize.height;
-		});
-
-		// Valid CA result
-		if (validRegions.count() > 0)
-		{
-			// Select largest area region from valid regions
-			maxRegion = validRegions.withMax<int>([] (gridRegion<gridLocator>* region)
-			{
-				return region->getBoundary().area();
-			});
-		}
-		else
+		if (regions.count() == 0)
 		{
 			gridRegionConstructor<gridLocator> constructor(designGrid.getParentBoundary(), true);
 			gridRect defaultRect(((designGrid.getRelativeBoundary().width - minSize.width) / 2) + designGrid.getRelativeBoundary().column,
@@ -227,8 +218,50 @@ namespace brogueHd::backend
 			});
 
 			// (MEMORY!) This will be the default region
-			maxRegion = constructor.complete();
+			maxRegion = constructor.complete();			
 		}
+		else
+		{
+			maxRegion = regions.withMax<int>([] (gridRegion<gridLocator>* region)
+			{
+				return region->getBoundary().area();
+			});
+		}
+
+		//// Filter regions to comply to size constraints
+		//validRegions = regions.where([&minSize] (gridRegion<gridLocator>* region)
+		//{
+		//	return region->getBoundary().width >= minSize.width &&
+		//		region->getBoundary().height >= minSize.height;
+		//});
+
+		//// Valid CA result
+		//if (validRegions.count() > 0)
+		//{
+		//	// Select largest area region from valid regions
+		//	maxRegion = validRegions.withMax<int>([] (gridRegion<gridLocator>* region)
+		//	{
+		//		return region->getBoundary().area();
+		//	});
+		//}
+		//else
+		//{
+		//	gridRegionConstructor<gridLocator> constructor(designGrid.getParentBoundary(), true);
+		//	gridRect defaultRect(((designGrid.getRelativeBoundary().width - minSize.width) / 2) + designGrid.getRelativeBoundary().column,
+		//						 ((designGrid.getRelativeBoundary().height - minSize.height) / 2) + designGrid.getRelativeBoundary().row,
+		//						 minSize.width,
+		//						 minSize.height);
+
+		//	defaultRect.iterate([&constructor] (int column, int row)
+		//	{
+		//		constructor.add(column, row, gridLocator(column, row));
+
+		//		return iterationCallback::iterate;
+		//	});
+
+		//	// (MEMORY!) This will be the default region
+		//	maxRegion = constructor.complete();
+		//}
 
 		// Position the new cave in the middle of the grid...
 		gridRect blobBoundary = maxRegion->getBoundary();

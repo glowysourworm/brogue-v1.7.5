@@ -31,6 +31,16 @@ namespace brogueHd::simple
             x = copy.x;
             y = copy.y;
         }
+        bool operator==(const simpleVector<T>& other)
+        {
+            return x == other.x &&
+                y == other.y;
+        }
+        bool operator!=(const simpleVector<T>& other)
+        {
+            return x != other.x ||
+                y != other.y;
+        }
 
         void set(T ax, T ay)
         {

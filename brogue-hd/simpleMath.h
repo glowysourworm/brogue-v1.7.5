@@ -88,6 +88,15 @@ namespace brogueHd::simple
 		}
 
 		template<isNumber TMath>
+		static double interpolate(TMath value1, TMath value2, double weight)
+		{
+			if (weight < 0 || weight > 1)
+				throw simpleException("Improper interpolation weight simpleMath::interpolate");
+
+			return (weight * value1) + ((1 - weight) * value2);
+		}
+
+		template<isNumber TMath>
 		static float easeATan(const TMath x)
 		{
 			// Calculated based on asymptotic functions using the ratio of the defender to the attacker's attribute values.
@@ -110,6 +119,12 @@ namespace brogueHd::simple
 
 		template<isNumber TMath>
 		static TMath power(const TMath x, const TMath raisedTo)
+		{
+			return powerImpl(x, raisedTo);
+		}
+
+		template<isNumber TMath>
+		static TMath power(const TMath x, const int raisedTo)
 		{
 			return powerImpl(x, raisedTo);
 		}
@@ -212,6 +227,24 @@ namespace brogueHd::simple
 				return low;
 
 			else if (x > high)
+				return high;
+
+			return x;
+		}
+
+		template<isNumber TMath>
+		static TMath lowLimit(TMath x, TMath low)
+		{
+			if (x < low)
+				return low;
+
+			return x;
+		}
+
+		template<isNumber TMath>
+		static TMath highLimit(TMath x, TMath high)
+		{
+			if (x > high)
 				return high;
 
 			return x;

@@ -49,8 +49,6 @@ namespace brogueHd::backend
 
 	cellularAutomataGenerator::~cellularAutomataGenerator()
 	{
-		if (_parameters != nullptr)
-			delete _parameters;
 	}
 
 	void cellularAutomataGenerator::initialize(cellularAutomataParameters* parameters)
