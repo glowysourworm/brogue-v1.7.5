@@ -29,108 +29,63 @@ namespace brogueHd::simple
 			this->node1 = copy.node1;
 			this->node2 = copy.node2;
 		}
-		bool intersects(const simpleLine<float>& other, simplePoint<float>& intersection)
+		bool intersects(const simpleLine<T>& other, simplePoint<T>& intersection)
 		{
-			// Parametric form of Line Segment Intersection:
-			// 
-			//https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection
+			// Line Segment Intersection:
 			//
-            //
+			// https://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect/
+			/*
+				Two segments (p1,q1) and (p2,q2) intersect iff one of the following two
+				conditions is true:
 
-			// Use the parametric form for the intersection that resolves as a
-			// simple vector algebra equation:
-			//
-			// Let:  v(s) = v_center + (s * v_ray)      s in [0, inf]
-			//
-			//       v(t) = v_1 + (t * (v_2 - v_1))     t in [0, 1]
-			//
-			// Substitute:
-			//
-			//       w_1 = v_center - v_1
-			//       w_2 = v_2 - v_1
-			//       w_3 = { -v_ray_y, v_ray_x }        Negative perpendicular vector to the ray (NOT A UNIT VECTOR!)
-			//
-			// Then:
-			//
-			//       s = |w_2 x w_1| / w_2 * w_3        (cross and dot products)
-			//
-			//       t =  w_1 * w_3 / w_2 * w_3
-			//
+				1. General Case:
+				– (p1, q1, p2) and (p1, q1, q2) have different orientations and
+				– (p2, q2, p1) and (p2, q2, q1) have different orientations.
 
-			// v_ray => rayPoint - rayCenter
+				2. Special Case:
+				– (p1, q1, p2), (p1, q1, q2), (p2, q2, p1), and (p2, q2, q1) are all collinear and
+				– the x-projections of (p1, q1) and (p2, q2) intersect
+				– the y-projections of (p1, q1) and (p2, q2) intersect
+			 *
+			 */
 
-			simplePoint<float> rayPoint = this->node2;
-			simplePoint<float> rayCenter = this->node1;
-			simplePoint<float> lineVertex1 = other.node1;
-			simplePoint<float> lineVertex2 = other.node2;
+			simplePoint<T> p1 = this->node1;		// Their notation was off... p/q are not vectors (>_<)
+			simplePoint<T> q1 = this->node2;
+			simplePoint<T> p2 = other.node1;
+			simplePoint<T> q2 = other.node2;
 
-			// PERFORMANCE:  Don't allocate new memory
-			float dX = rayPoint.x - rayCenter.x;
-			float dY = rayPoint.y - rayCenter.y;
+			// Find the four orientations needed for general and 
+			// special cases 
+			T o1 = simpleMath::orientationPoint(p1, q1, p2);		// TODO TODO!!! We have bigger issues with Real V.S. UI Coordinates. 
+			T o2 = simpleMath::orientationPoint(p1, q1, q2);		// These need to be explicit! And, all our math has to be done in
+			T o3 = simpleMath::orientationPoint(p2, q2, p1);		// REAL coordinates unless the algorithm / function stipulates it explicitly!
+			T o4 = simpleMath::orientationPoint(p2, q2, q1);
 
-			float w1X = rayCenter.x - lineVertex1.x;
-			float w1Y = rayCenter.y - lineVertex1.y;
+			// General case 
+			if ((o1 != o2) && (o3 != o4))
+				return true;
 
-			float w2X = lineVertex2.x - lineVertex1.x;
-			float w2Y = lineVertex2.y - lineVertex1.y;
+			// Special Cases (collinear)
+			// p1, q1 and p2 are collinear and p2 lies on segment p1q1 
+			if (o1 == 0 && simpleMath::onSegmentCollinear(p1, p2, q1)) 
+				return true;
 
-			float w3X = -1 * dY;
-			float w3Y = dX;
+			// p1, q1 and q2 are collinear and q2 lies on segment p1q1 
+			if (o2 == 0 && simpleMath::onSegmentCollinear(p1, q2, q1))
+				return true;
 
-			simpleVector<float> w1(w1X, w1Y);
-			simpleVector<float> w2(w2X, w2Y);
-			simpleVector<float> w3(w3X, w3Y);
+			// p2, q2 and p1 are collinear and p1 lies on segment p2q2 
+			if (o3 == 0 && simpleMath::onSegmentCollinear(p2, p1, q2))
+				return true;
 
-			float dot23 = w2.dot(w3);
+			// p2, q2 and q1 are collinear and q1 lies on segment p2q2 
+			if (o4 == 0 && simpleMath::onSegmentCollinear(p2, q1, q2))
+				return true;
 
-			// Parallel
-			if (dot23 == 0)
-				return false;
+			return false;
 
-			float cross21 = w2.cross(w1);
-			float dot13 = w1.dot(w3);
-
-			// simpleVector.cross returns the magnitude of the cross product (NOT TO BE CONFUSED WITH THE ABS VALUE OF A NUMBER!)
-			float s = cross21 / dot23;
-			float t = dot13 / dot23;
-
-			// Now, check that t is in the interval [0, 1] and that s >= 0
-			//
-
-			if (t < 0 || t > 1)
-				return false;
-
-			else
-			{
-				if (s < 0)
-					return false;
-
-				// Gives a point along the ray where the parameter s is at the intersection point
-				//
-				//      intersection = v_center + (s * v_ray)
-				//
-				//      intersection = v_1 + (t * (v_2 - v_1))
-				//
-
-				intersection.x = lineVertex1.x + (w2X * t);
-				intersection.y = lineVertex1.y + (w2Y * t);
-
-				float otherIntersectionX = rayCenter.x + (dY * s);
-				float otherIntersectionY = rayCenter.y + (dY * s);
-
-				//// Tolerances not liked...
-				//if (simpleMath::abs(t - 1) > 0.0001 ||
-				//	simpleMath::abs(t) > 0.0001)
-				//	return true;
-
-				// These two parameters will align for the intersection
-				if (simpleMath::abs(otherIntersectionX - intersection.x) < 0.1 &&
-					simpleMath::abs(otherIntersectionY - intersection.y) < 0.1)
-					return true;
-
-				return false;
-			}
 		}
+
 		void operator=(const simpleLine<T>& other)
 		{
 			this->node1 = other.node1;

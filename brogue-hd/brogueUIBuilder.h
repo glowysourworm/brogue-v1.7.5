@@ -81,15 +81,15 @@ namespace brogueHd::frontend
 
 		static const color GameFontSubduedColor() { return colors::getGray(0.5); }
 
-		static const color GameMenuBackgroundColor1() { return MenuBackgroundColor1() * 0.75f; }
-		static const color GameMenuBackgroundColor2() { return MenuBackgroundColor2() * 0.75f; }
+		static const color GameMenuBackgroundColor1() { return MenuBackgroundColor1() * 0.9f; }
+		static const color GameMenuBackgroundColor2() { return MenuBackgroundColor2() * 0.9f; }
 
-		static const color GameMenuButtonColor1() { return MenuButtonColor1() * 0.75f; }
-		static const color GameMenuButtonColor2() { return MenuButtonColor2() * 0.75f; }
-		static const color GameMenuButtonActiveColor1() { return MenuButtonActiveColor1() * 0.75f; }
-		static const color GameMenuButtonActiveColor2() { return MenuButtonActiveColor2() * 0.75f; }
-		static const color GameMenuButtonPressedColor1() { return MenuButtonPressedColor1() * 0.75f; }
-		static const color GameMenuButtonPressedColor2() { return MenuButtonPressedColor2() * 0.75f; }
+		static const color GameMenuButtonColor1() { return MenuButtonColor1() * 0.9f; }
+		static const color GameMenuButtonColor2() { return MenuButtonColor2() * 0.9f; }
+		static const color GameMenuButtonActiveColor1() { return MenuButtonActiveColor1() * 0.9f; }
+		static const color GameMenuButtonActiveColor2() { return MenuButtonActiveColor2() * 0.9f; }
+		static const color GameMenuButtonPressedColor1() { return MenuButtonPressedColor1() * 0.9f; }
+		static const color GameMenuButtonPressedColor2() { return MenuButtonPressedColor2() * 0.9f; }
 
 		static const color MenuBackgroundColor1() { return color(0.156f, 0.137f, 0.329f, 1.0f); }
 		static const color MenuBackgroundColor2() { return color(0.078f, 0.058f, 0.156f, 0.0f); }
@@ -632,13 +632,13 @@ namespace brogueHd::frontend
 		brogueButton* button3 = createGameMenuButton(program, itemBoundary, brogueUITagAction(brogueUIAction::GameCommand_EasyMode), "&: Easy Mode", brogueTextAlignment::Left, 0);
 		itemBoundary.translate(0, 1);
 
-		brogueTextView* spacer1 = createTextViewSingleLine(program, itemBoundary, "  ---", colors::white(), GameMenuBackgroundColor1(), GameMenuBackgroundColor2(), brogueTextAlignment::Left);
+		brogueTextView* spacer1 = createTextViewSingleLine(program, itemBoundary, "  ---", colors::white(), FlatMenuButtonColor(), FlatMenuButtonColor(), brogueTextAlignment::Left);
 		itemBoundary.translate(0, 1);
 
 		brogueButton* button4 = createGameMenuButton(program, itemBoundary, brogueUITagAction(brogueUIAction::GameCommand_Rest), "]: Display Stealth Range", brogueTextAlignment::Left, 0);
 		itemBoundary.translate(0, 1);
 
-		brogueTextView* spacer2 = createTextViewSingleLine(program, itemBoundary, "  ---", colors::white(), GameMenuBackgroundColor1(), GameMenuBackgroundColor2(), brogueTextAlignment::Left);
+		brogueTextView* spacer2 = createTextViewSingleLine(program, itemBoundary, "  ---", colors::white(), FlatMenuButtonColor(), FlatMenuButtonColor(), brogueTextAlignment::Left);
 		itemBoundary.translate(0, 1);
 
 		brogueButton* button5 = createGameMenuButton(program, itemBoundary, brogueUITagAction(brogueUIState::GameDiscoveredItemsOpen), "D: Discovered Items", brogueTextAlignment::Left, 0);
@@ -648,7 +648,7 @@ namespace brogueHd::frontend
 		brogueButton* button7 = createGameMenuButton(program, itemBoundary, brogueUITagAction(brogueUIState::GameHelpOpen), "?: Help", brogueTextAlignment::Left, 0);
 		itemBoundary.translate(0, 1);
 
-		brogueTextView* spacer3 = createTextViewSingleLine(program, itemBoundary, "  ---", colors::white(), GameMenuBackgroundColor1(), GameMenuBackgroundColor2(), brogueTextAlignment::Left);
+		brogueTextView* spacer3 = createTextViewSingleLine(program, itemBoundary, "  ---", colors::white(), FlatMenuButtonColor(), FlatMenuButtonColor(), brogueTextAlignment::Left);
 		itemBoundary.translate(0, 1);
 
 		brogueButton* button8 = createGameMenuButton(program, itemBoundary, brogueUITagAction(brogueUIAction::GameCommand_Save), "S: Save Game", brogueTextAlignment::Left, 0);
@@ -924,12 +924,12 @@ namespace brogueHd::frontend
 	brogueButton* brogueUIBuilder::createGameMenuButton(brogueUIProgram programName, const gridRect& boundary, const brogueUITagAction& action, const colorString& text, brogueTextAlignment alignment)
 	{
 		return createButton(programName, boundary, text, action, 
-							GameMenuBackgroundColor1(), 
-							GameMenuBackgroundColor2(), 
-							GameMenuButtonActiveColor1(), 
-							GameMenuButtonActiveColor2(), 
-							GameMenuButtonPressedColor1(), 
-							GameMenuButtonPressedColor2(), 
+							FlatMenuButtonColor(), 
+							FlatMenuButtonColor(),
+							FlatMenuButtonActiveColor1(), 
+							FlatMenuButtonActiveColor2(), 
+							FlatMenuButtonPressedColor1(), 
+							FlatMenuButtonPressedColor2(), 
 							alignment);
 	}
 

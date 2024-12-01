@@ -101,6 +101,8 @@ namespace brogueHd::simple
 		simpleBSTNode<K, T>* rotateLeft(simpleBSTNode<K, T>* subTree);
 		simpleBSTNode<K, T>* rotateRight(simpleBSTNode<K, T>* node);
 
+		void clearImpl(simpleBSTNode<K, T>* node);
+
 	private:
 
 		// Root of the BST
@@ -131,9 +133,11 @@ namespace brogueHd::simple
 	void simpleBST<K, T>::clear()
 	{
 		// Delete nodes recursively
-		if (_root != nullptr)
-			this->remove(_root->getKey());
+		clearImpl(_root);
 
+		_root = nullptr;
+
+		// Clear out hash table
 		_nodeMap->clear();
 	}
 
@@ -151,9 +155,6 @@ namespace brogueHd::simple
 
 		// Track the values for debugging and a fast retrieval using the key
 		_nodeMap->add(key, node);
-
-		// DEBUG
-		std::cout << createOutput().c_str() << std::endl;
 	}
 
 	template<isHashable K, typename T>
@@ -170,9 +171,6 @@ namespace brogueHd::simple
 
 		// Track the values for debugging and fast retrieval using the key
 		_nodeMap->remove(key);
-
-		// DEBUG
-		std::cout << createOutput().c_str() << std::endl;
 
 		return item;
 	}
@@ -598,6 +596,22 @@ namespace brogueHd::simple
 
 		// Return node of the new sub-tree
 		return Z;
+	}
+
+	template<isHashable K, typename T>
+	void simpleBST<K, T>::clearImpl(simpleBSTNode<K, T>* node)
+	{
+		if (node == nullptr)
+			return;
+
+		if (node->getLeft() != nullptr)
+			clearImpl(node->getLeft());
+
+		if (node->getRight() != nullptr)
+			clearImpl(node->getRight());
+
+		if (node != nullptr)
+			delete node;
 	}
 
 	template<isHashable K, typename T>

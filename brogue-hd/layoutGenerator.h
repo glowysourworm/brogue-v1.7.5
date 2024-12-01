@@ -395,10 +395,10 @@ namespace brogueHd::backend
 			{
 				color backColor(0.3f, 0.3f, 0.3f, 0.5f);
 
-				if (designRect->getConfiguration().getRoomType() == brogueRoomType::ChunkyRoom)
-				{
-					backColor.red = 1;
-				}
+				//if (designRect->getConfiguration().getRoomType() == brogueRoomType::ChunkyRoom)
+				//{
+				//	backColor.red = 1;
+				//}
 
 				brogueCell prototype(column, row, backColor, colors::white(), '.');
 
@@ -637,6 +637,13 @@ namespace brogueHd::backend
 			// Remove self-referential edges; look for the best edge connection; and store the result as corridor edges
 			connectionGraph->iterateEdges([&minEdge, &designRect1, &designRect2, &distance, &coordinateConverter] (const gridLocatorEdge& edge)
 			{
+				if (edge.node1 == default_value::value<gridLocator>() ||
+					edge.node2 == default_value::value<gridLocator>())
+				{
+					throw simpleException("No edge found for corridor placement:  layoutGenerator::triangulateRoomConnections");
+				}
+
+				// Edge forward
 				if (designRect1->getRegion()->isDefined(edge.node1) &&
 					designRect2->getRegion()->isDefined(edge.node2))
 				{
@@ -650,10 +657,32 @@ namespace brogueHd::backend
 					}
 				}
 
+				// Edge reverse
+				if (designRect1->getRegion()->isDefined(edge.node2) &&
+					designRect2->getRegion()->isDefined(edge.node1))
+				{
+					simplePoint<int> point1UI = coordinateConverter->convertToUI(edge.node2);
+					simplePoint<int> point2UI = coordinateConverter->convertToUI(edge.node1);
+
+					if (point1UI.distance(point2UI) < distance)
+					{
+						distance = point1UI.distance(point2UI);
+						minEdge = edge;
+					}
+				}
+
 				return iterationCallback::iterate;
 			});
 
-			corridorEdges.add(minEdge);
+			if (minEdge.node1 == default_value::value<gridLocator>() ||
+				minEdge.node2 == default_value::value<gridLocator>())
+			{
+				// TODO: Figure out what happened to triangulation
+				//throw simpleException("No edge found for corridor placement:  layoutGenerator::triangulateRoomConnections");
+				
+			}
+			else
+				corridorEdges.add(minEdge);
 
 			return iterationCallback::iterate;
 		});
@@ -711,6 +740,7 @@ namespace brogueHd::backend
 		//
 
 		brogueLayout* layout = _layout;
+		const simpleList<brogueDesignRect*>* roomTiles = _roomTiles;
 
 		// (MEMORY!) Use the corridor edges to call dijkstra (on stack usgae has predicate copying)
 		dijkstra<gridLocator>* algorithm = new dijkstra<gridLocator>(
@@ -725,9 +755,19 @@ namespace brogueHd::backend
 		},
 
 		// Then, the map cost is queried (what is the movement cost?)
-		[&layout](int column, int row)
+		[&layout, &roomTiles](int column, int row)
 		{
-			return 1;
+			//// TODO: Remove this and clean up the layout generator
+			//if (roomTiles->any([&column, &row] (brogueDesignRect* designRect)
+			//{
+			//	return designRect->getRegion()->isDefined(column, row);
+			//}))
+			//{
+			//	return 10;
+			//}
+
+			//else
+				return 1;
 		},
 
 		// Then, it will need the locators from the grid to keep its internal data temporarily
@@ -752,7 +792,9 @@ namespace brogueHd::backend
 			// Set corridors
 			resultPath.forEach([&layout] (gridLocator locator)
 			{
-				brogueCell cell(locator.column, locator.row, colors::green(), colors::white(), 'a');
+				color backColor(0.3f, 0.3f, 0.3f, 0.5f);
+
+				brogueCell cell(locator.column, locator.row, backColor, colors::white(), '.');
 
 				layout->createCells(locator, cell, true);
 
