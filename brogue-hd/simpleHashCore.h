@@ -31,7 +31,7 @@ namespace brogueHd::simple
 	public:
 
 		simpleHashCore();
-		~simpleHashCore();
+		virtual ~simpleHashCore();
 
 		virtual V get(const K& key) const;
 		virtual void add(const K& key, const V& value);

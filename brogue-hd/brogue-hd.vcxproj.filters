@@ -755,6 +755,9 @@
     <ClInclude Include="simpleBSTNode.h">
       <Filter>Header Files\simple</Filter>
     </ClInclude>
+    <ClInclude Include="simpleBSTTests.h">
+      <Filter>Header Files\unit-test</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\resources\model\armor.csv">

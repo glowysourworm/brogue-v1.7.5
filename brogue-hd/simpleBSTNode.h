@@ -58,7 +58,7 @@ namespace brogueHd::simple
 		}
 		int balanceFactor() const
 		{
-			return ((_left == nullptr) ? _left->getHeight() : -1) - ((_right == nullptr) ? _right->getHeight() : -1);
+			return ((_left != nullptr) ? _left->getHeight() : -1) - ((_right != nullptr) ? _right->getHeight() : -1);
 		}
 		int getHeight() const
 		{

@@ -67,6 +67,9 @@ namespace brogueHd::simple
 
 		void operator=(const simpleArray<T>& other);
 
+		bool operator==(const simpleArray<T>& other);
+		bool operator!=(const simpleArray<T>& other);
+
 	public:
 
 		const T* getArray();
@@ -306,6 +309,36 @@ namespace brogueHd::simple
 		{
 			_array[index] = other.get(index);
 		}
+	}
+
+	template<isHashable T>
+	bool simpleArray<T>::operator==(const simpleArray<T>& other)
+	{
+		if (_count != other.count())
+			return false;
+
+		for (int index = 0; index < _count; index++)
+		{
+			if (this->get(index) != other.get(index))
+				return false;
+		}
+
+		return true;
+	}
+
+	template<isHashable T>
+	bool simpleArray<T>::operator!=(const simpleArray<T>& other)
+	{
+		if (_count != other.count())
+			return true;
+
+		for (int index = 0; index < _count; index++)
+		{
+			if (this->get(index) != other.get(index))
+				return true;
+		}
+
+		return false;
 	}
 
 	template<isHashable T>

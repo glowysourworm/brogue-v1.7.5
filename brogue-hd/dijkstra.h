@@ -226,13 +226,13 @@ namespace brogueHd::component
 				// Initialize output map (set to infinity for initialization
 				int outputValue = ((column == _sourceLocation.column) && (row == _sourceLocation.row) && passesPredicate) ? 0 : std::numeric_limits<int>::max();
 
-				_outputMap->set(column, row, outputValue);
+				_outputMap->set(column, row, outputValue, true);
 
 				// Initialize visited map
-				_visitedMap->set(column, row, false);
+				_visitedMap->set(column, row, false, true);
 
 				// Initialize location map
-				_locationMap->set(column, row, false);
+				_locationMap->set(column, row, false, true);
 			}
 		}
 

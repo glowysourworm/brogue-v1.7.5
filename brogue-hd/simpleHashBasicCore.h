@@ -18,17 +18,22 @@ namespace brogueHd::simple
 		simpleHashBasicCore();
 		~simpleHashBasicCore();
 
-		V get(const K& key) const;
-		void add(const K& key, const V& value);
-		void set(const K& key, const V& value);
+		V get(const K& key) const override;
+		void add(const K& key, const V& value) override;
+		void set(const K& key, const V& value) override;
 
-		simplePair<K, V>* getAt(int index);
+		simplePair<K, V>* getAt(int index) override;
 
-		bool contains(const K& key) const;
-		int count() const;
+		bool contains(const K& key) const override;
+		int count() const override;
 
-		bool remove(const K& key);
-		void clear();
+		bool remove(const K& key) override;
+		void clear() override;
+
+	public:
+
+		simpleList<K> getKeys() const;
+		void iterate(const simpleHashCallback<K, V>& callback) const override;
 
 	private:
 
@@ -89,14 +94,7 @@ namespace brogueHd::simple
 	template<isHashable K, typename V>
 	size_t simpleHashBasicCore<K, V>::calculateBucketIndex(size_t hashCode) const
 	{
-		size_t value = hashCode % _table->count();
-
-		if (value >= _table->count())
-		{
-			int foo = 4;
-		}
-
-		return value;
+		return hashCode % _table->count();
 	}
 
 	template<isHashable K, typename V>
@@ -118,10 +116,10 @@ namespace brogueHd::simple
 				// Get details from each bucket copied over
 				simplePair<K, V>* pair = _table->get(index)->get(bucketIndex);
 
-				size_t hashCode = this->calculateHashCode(pair->key);
+				size_t hashCode = this->calculateHashCode(pair->getKey());
 				size_t newBucketIndex = hashCode % newSize;		// Find a bucket for the data
 
-				if (newTable->get(newBucketIndex) == NULL)
+				if (newTable->get(newBucketIndex) == nullptr)
 					newTable->set(newBucketIndex, new simpleList<simplePair<K, V>*>());
 
 				newTable->get(newBucketIndex)->add(pair);
@@ -232,7 +230,7 @@ namespace brogueHd::simple
 			{
 				simplePair<K, V>* pair = _table->get(bucketIndex)->get(index);
 
-				pair->value = value;
+				pair->setValue(value);
 				break;
 			}
 		}
@@ -307,5 +305,23 @@ namespace brogueHd::simple
 	int simpleHashBasicCore<K, V>::count() const
 	{
 		return _list->count();
+	}
+
+	template<isHashable K, typename V>
+	simpleList<K> simpleHashBasicCore<K, V>::getKeys() const
+	{
+		return _list->select<K>([] (simplePair<K, V>* pair)
+		{
+			return pair->getKey();
+		});
+	}
+
+	template<isHashable K, typename V>
+	void simpleHashBasicCore<K, V>::iterate(const simpleHashCallback<K, V>& callback) const
+	{
+		_list->forEach([&callback] (simplePair<K, V>* pair)
+		{
+			return callback(pair->getKey(), pair->getValue());
+		});
 	}
 }

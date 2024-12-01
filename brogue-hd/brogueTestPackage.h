@@ -87,6 +87,11 @@ namespace brogueHd::test
 				simpleLogger::logColor(brogueConsoleColor::Red, "Unit Test {} Assertion {} Failed!", _currentTestName.c_str(), assertName.c_str());
 		}
 
+		void output(const char* message, brogueConsoleColor color = brogueConsoleColor::White)
+		{
+			simpleLogger::logColor(color, message);
+		}
+
 		simpleString getName()
 		{
 			return _batteryName;

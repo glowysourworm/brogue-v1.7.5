@@ -58,13 +58,29 @@ namespace brogueHd::simple
 		T maxValue();
 		K maxKey();
 
+		// Unit-Test Only!
+		simpleBSTNode<K, T>* getRoot() const
+		{
+			return _root;
+		}
+
 		void clear();
 
 	private:
 
 		static int keyCompare(K key1, K key2)
 		{
-			return (key1 > key2) - (key1 < key2);
+			if (key1 > key2)
+				return 1;
+
+			else if (key1 < key2)
+				return -1;
+
+			else if (key1 == key2)
+				return 0;
+
+			else
+				throw simpleException("Unhandled binary comparison operator:  simpleBST.h");
 		}
 
 		simpleBSTNode<K, T>* successor(K searchKey);
@@ -75,7 +91,7 @@ namespace brogueHd::simple
 		simpleBSTNode<K, T>* deleteMin(simpleBSTNode<K, T>* node);
 		simpleBSTNode<K, T>* minImpl(simpleBSTNode<K, T>* node);
 		simpleBSTNode<K, T>* maxImpl(simpleBSTNode<K, T>* node);
-		simpleBSTNode<K, T>* searchImpl(K key, simpleBSTNode<K, T>* node);
+		simpleBSTNode<K, T>* searchImpl(K key, simpleBSTNode<K, T>* node) const;
 		simpleBSTNode<K, T>* successorImpl(K key, simpleBSTNode<K, T>* node, simpleBSTNode<K, T>* savedParent);
 		simpleBSTNode<K, T>* predecessorImpl(K key, simpleBSTNode<K, T>* node, simpleBSTNode<K, T>* savedParent);
 		simpleBSTNode<K, T>* balance(simpleBSTNode<K, T>* node);
@@ -128,7 +144,7 @@ namespace brogueHd::simple
 		simpleBSTNode<K, T>* node = this->searchImpl(key, _root);
 
 		// Track the values for debugging and a fast retrieval using the key
-		_nodeMap->set(key, node);
+		_nodeMap->add(key, node);
 	}
 
 	template<isHashable K, typename T>
@@ -356,7 +372,10 @@ namespace brogueHd::simple
 		if (node == nullptr)
 			return nullptr;
 
-		return this->minImpl(node->getLeft()) != nullptr ? node : nullptr;
+		if (node->getLeft() == nullptr)
+			return node;
+
+		return this->minImpl(node->getLeft());
 	}
 
 	template<isHashable K, typename T>
@@ -365,11 +384,14 @@ namespace brogueHd::simple
 		if (node == nullptr)
 			return nullptr;
 
-		return this->maxImpl(node->getRight()) != nullptr ? node : nullptr;
+		if (node->getRight() == nullptr)
+			return node;
+
+		return this->maxImpl(node->getRight());
 	}
 
 	template<isHashable K, typename T>
-	simpleBSTNode<K, T>* simpleBST<K, T>::searchImpl(K key, simpleBSTNode<K, T>* node)
+	simpleBSTNode<K, T>* simpleBST<K, T>::searchImpl(K key, simpleBSTNode<K, T>* node) const
 	{
 		if (node == nullptr)
 			return nullptr;
@@ -517,7 +539,7 @@ namespace brogueHd::simple
 		simpleBSTNode<K, T>* Z = subTree->getRight();
 		simpleBSTNode<K, T>* W = subTree->getRight() == nullptr ? nullptr : subTree->getRight()->getLeft();
 
-		// Node's left child becomes node's parent's right child:  X -> T
+		// Node's left child becomes node's parent's right child:  X -> W
 		X->setRight(W);
 
 		// Node's parent becomes the left child of node:  X <- Z

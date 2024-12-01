@@ -22,6 +22,10 @@ namespace brogueHd::simple
 			_key = key;
 			_value = value;
 		}
+		void setValue(const V& value)
+		{
+			_value = value;
+		}
 		void operator=(const simplePair& pair)
 		{
 			_key = pair.getKey();

@@ -4,6 +4,7 @@
 #include "simpleException.h"
 #include "simpleHashCore.h"
 #include "simpleHashStdCore.h"
+#include "simpleHashBasicCore.h"
 #include "simpleList.h"
 #include "simplePair.h"
 
@@ -66,7 +67,8 @@ namespace brogueHd::simple
 	template<isHashable K, typename V>
 	simpleHash<K, V>::simpleHash()
 	{
-		_core = new simpleHashStdCore<K, V>();
+		//_core = new simpleHashStdCore<K, V>();
+		_core = new simpleHashBasicCore<K, V>();
 	}
 
 	template<isHashable K, typename V>

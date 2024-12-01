@@ -241,6 +241,7 @@
     <ClInclude Include="rectanglePackingAlgorithm.h" />
     <ClInclude Include="simpleBoundingBox.h" />
     <ClInclude Include="simpleBSTNode.h" />
+    <ClInclude Include="simpleBSTTests.h" />
     <ClInclude Include="simpleBuffer.h" />
     <ClInclude Include="simpleDirectoryEntry.h" />
     <ClInclude Include="simpleExt.h" />

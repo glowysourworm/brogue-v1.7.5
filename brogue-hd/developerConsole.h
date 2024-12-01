@@ -6,6 +6,7 @@
 #include "simpleComponentTests.h"
 #include "simpleHashTests.h"
 #include "simpleString.h"
+#include "simpleBSTTests.h"
 #include <iosfwd>
 #include <ostream>
 
@@ -67,10 +68,12 @@ namespace brogueHd::console
 		simpleArrayTests arrayTests;
 		simpleHashTests hashTests;
 		simpleComponentTests componentTests;
+		simpleBSTTests bstTests;
 
 		bool result = arrayTests.run();
 		result &= hashTests.run();
 		result &= componentTests.run();
+		result &= bstTests.run();
 
 		return result;
 	}

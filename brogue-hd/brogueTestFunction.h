@@ -21,7 +21,14 @@ namespace brogueHd::test
 			name = aname;
 			testRun = runFunc;
 		}
-
+		bool operator==(const brogueTestFunction& other)
+		{
+			return name == other.name;
+		}
+		bool operator!=(const brogueTestFunction& other)
+		{
+			return name != other.name;
+		}
 		size_t getHash() const override
 		{
 			return hashGenerator::generateHash(name);
