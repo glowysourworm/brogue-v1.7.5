@@ -52,7 +52,7 @@ namespace brogueHd::backend
 		{
 			brogueLevelTemplate* levelTemplate = gameTemplate->getLevel(index + 1);
 
-			layoutGenerator layoutGen(_uiBuilder, _randomGenerator, _noiseGenerator);
+			layoutGenerator layoutGen(_uiBuilder, _randomGenerator);
 			terrainGenerator terrainGen(_randomGenerator);
 			contentGenerator contentGen(*_gameBoundary);
 

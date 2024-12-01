@@ -9,7 +9,7 @@
 #include "gridRegion.h"
 #include "gridRegionConstructor.h"
 #include "gridRegionLocator.h"
-#include "noiseGenerator.h"
+#include "cellularAutomataGenerator.h"
 #include "randomGenerator.h"
 #include "simple.h"
 #include "simpleException.h"
@@ -25,7 +25,7 @@ namespace brogueHd::backend
 	{
 	public:
 
-		roomGenerator(brogueUIBuilder* uiBuilder, noiseGenerator* noiseGenerator, randomGenerator* randomGenerator);
+		roomGenerator(brogueUIBuilder* uiBuilder, randomGenerator* randomGenerator);
 		~roomGenerator();
 
 		gridRegion<gridLocator>* designRoom(brogueRoomType roomType, const gridRect& designRect, const gridRect& minSize, const gridRect& parentBoundary);
@@ -43,28 +43,32 @@ namespace brogueHd::backend
 
 	private:
 
-		noiseGenerator* _noiseGenerator;
 		randomGenerator* _randomGenerator;
 		brogueUIBuilder* _uiBuilder;
 
+		//perlinNoiseGenerator* _perlinNoiseGenerator;
+		cellularAutomataGenerator* _cellularAutomataGenerator;
 		cellularAutomataParameters* _cavernParameters;
 	};
 
-	roomGenerator::roomGenerator(brogueUIBuilder* uiBuilder, noiseGenerator* noiseGenerator, randomGenerator* randomGenerator)
+	roomGenerator::roomGenerator(brogueUIBuilder* uiBuilder, randomGenerator* randomGenerator)
 	{
 		_uiBuilder = uiBuilder;
 		_randomGenerator = randomGenerator;
-		_noiseGenerator = noiseGenerator;
 
 		bool polarity = true;							// Make walls
-		float fillRatio = 0.55f;						// Fill 45% with walls
-		int iterations = 4;							// # iterations
+		float fillRatio = 0.40f;						// Fill 45% with walls
+		int iterations = 4;								// # iterations
+		int padding = 1;								// Prevent collecting cells by the wall
 		cellularAutomataRule rule1(4, true, true);		// Rule 1 (OR) Rule 2 (passes) -> set to [polarity = wall]
 		cellularAutomataRule rule2(5, false, true);		// Rule 2
 
-
 		// CA Algorithm Parameters:  These are for the cavern room (Brogue v1.7.5)
-		_cavernParameters = new cellularAutomataParameters(fillRatio, iterations, polarity, rule1, rule2);
+		_cavernParameters = new cellularAutomataParameters(fillRatio, iterations, padding, polarity, rule1, rule2);
+		_cellularAutomataGenerator = new cellularAutomataGenerator(randomGenerator);
+
+		// Sets parameters for use
+		_cellularAutomataGenerator->initialize(_cavernParameters);
 	}
 
 	roomGenerator::~roomGenerator()
@@ -174,9 +178,8 @@ namespace brogueHd::backend
 		gridRegionLocator<gridLocator> regionLocator;
 
 		// Create cellular automata using cavern parameters
-		_noiseGenerator->cellularAutomata(designGrid.getParentBoundary(),
-										  designGrid.getRelativeBoundary(),
-										  *_cavernParameters,
+		_cellularAutomataGenerator->run(designGrid.getParentBoundary(), 
+										designGrid.getRelativeBoundary(), 
 		[&designGrid] (int column, int row, bool result)
 		{
 			if (result)

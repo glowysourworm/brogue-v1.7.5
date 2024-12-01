@@ -758,6 +758,12 @@
     <ClInclude Include="simpleBSTTests.h">
       <Filter>Header Files\unit-test</Filter>
     </ClInclude>
+    <ClInclude Include="cellularAutomataGenerator.h">
+      <Filter>Header Files\backend\generator</Filter>
+    </ClInclude>
+    <ClInclude Include="perlinNoiseGenerator.h">
+      <Filter>Header Files\backend\generator</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\resources\model\armor.csv">

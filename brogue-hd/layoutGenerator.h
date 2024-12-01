@@ -46,7 +46,7 @@ namespace brogueHd::backend
 		/// <summary>
 		/// Creates the base layout, terrain, and machine terrain for the level.
 		/// </summary>
-		layoutGenerator(brogueUIBuilder* uiBuilder, randomGenerator* randomGenerator, noiseGenerator* noiseGenerator);
+		layoutGenerator(brogueUIBuilder* uiBuilder, randomGenerator* randomGenerator);
 		~layoutGenerator();
 
 		brogueLayout* generateLayout(brogueLevelProfile* profile);
@@ -91,11 +91,11 @@ namespace brogueHd::backend
 	};
 
 
-	layoutGenerator::layoutGenerator(brogueUIBuilder* uiBuilder, randomGenerator* randomGenerator, noiseGenerator* noiseGenerator)
+	layoutGenerator::layoutGenerator(brogueUIBuilder* uiBuilder, randomGenerator* randomGenerator)
 	{
 		_uiBuilder = uiBuilder;
 		_randomGenerator = randomGenerator;
-		_roomGenerator = new roomGenerator(uiBuilder, noiseGenerator, randomGenerator);
+		_roomGenerator = new roomGenerator(uiBuilder, randomGenerator);
 
 		// Layout Data
 		_layout = nullptr;
@@ -191,13 +191,13 @@ namespace brogueHd::backend
 		// Machine Rooms
 
 		// Triangulate Rooms:  Creates Delaunay Triangulation of the connection point vertices (new _delaunayGraph)
-		triangulateRooms();
-		triangulateRoomConnections();
+		//triangulateRooms();
+		//triangulateRoomConnections();
 
 		// Connect Rooms:  Create cells in the grid for the delaunay triangulation of the 
 		//                 connection points of the room tiles. Runs dijkstra's algorithm to
 		//				   create corridor cells inside the brogueLayout*
-		connectRooms();
+		//connectRooms();
 
 		return _layout;
 	}
@@ -218,12 +218,13 @@ namespace brogueHd::backend
 		simpleHash<brogueDesignRect*, gridRect> tiling;
 
 		gridLocator rectPackingFocus;
-		int maxIterations = 35;
+		int maxIterations = 1;
 		int iteration = 0;
 
 		while (iteration < maxIterations)
 		{
-			brogueRoomTemplate configuration = (iteration == 0) ? _profile->getEntranceRoom(_randomGenerator) : _profile->getRandomRoomInfo(_randomGenerator);
+			//brogueRoomTemplate configuration = (iteration == 0) ? _profile->getEntranceRoom(_randomGenerator) : _profile->getRandomRoomInfo(_randomGenerator);
+			brogueRoomTemplate configuration(_layout->getBoundary(), brogueRoomType::Cavern, 1);
 			brogueDesignRect* designRect = nullptr;
 			int roomPadding = iteration == 0 ? 0 : 1;
 
@@ -231,7 +232,7 @@ namespace brogueHd::backend
 			//
 			if (iteration == 0)
 			{
-				designRect = new brogueDesignRect(configuration, _layout->getBoundary(), roomPadding);
+				designRect = new brogueDesignRect(configuration, _layout->getBoundary().createPadded(1), roomPadding);
 
 				gridLocator topLeft = gridLocator(_layout->getBoundary().centerX() - (designRect->getBoundary().width / 2),
 												  _layout->getBoundary().bottom() - designRect->getBoundary().height);
@@ -716,11 +717,11 @@ namespace brogueHd::backend
 				simpleLine<float> lineUIReal = coordinateConverter->convertToUIReal(edge, true);
 
 				// Found Intersection with another room
-				if (roomRectUIReal.intersects(lineUIReal))
-				{
-					corridorEdges.removeAt(index);
-					break;
-				}
+				//if (roomRectUIReal.intersects(lineUIReal))
+				//{
+				//	corridorEdges.removeAt(index);
+				//	break;
+				//}
 			}
 		}
 

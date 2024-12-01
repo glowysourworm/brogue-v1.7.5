@@ -61,10 +61,12 @@ namespace brogueHd::backend::model
 			_rules = new simpleList<cellularAutomataRule>();
 			_iterations = 5;
 			_resultPolarity = true;
+			_padding = 0;
 		}
 
 		cellularAutomataParameters(float fillRatio,
 								   int smoothingIterations,
+								   int padding,
 								   bool resultPolarity,
 								   const cellularAutomataRule& rule1,
 								   const cellularAutomataRule& rule2)
@@ -73,6 +75,7 @@ namespace brogueHd::backend::model
 			_rules = new simpleList<cellularAutomataRule>();
 			_iterations = smoothingIterations;
 			_resultPolarity = resultPolarity;
+			_padding = padding;
 
 			_rules->add(rule1);
 			_rules->add(rule2);
@@ -84,6 +87,7 @@ namespace brogueHd::backend::model
 			_rules = copy.getRules();
 			_iterations = copy.getIterations();
 			_resultPolarity = copy.getResultPolarity();
+			_padding = copy.getPadding();
 		}
 
 		void operator=(const cellularAutomataParameters& copy)
@@ -92,6 +96,7 @@ namespace brogueHd::backend::model
 			_rules = copy.getRules();
 			_iterations = copy.getIterations();
 			_resultPolarity = copy.getResultPolarity();
+			_padding = copy.getPadding();
 		}
 
 	public:
@@ -104,6 +109,11 @@ namespace brogueHd::backend::model
 		int getIterations() const
 		{
 			return _iterations;
+		}
+
+		int getPadding() const
+		{
+			return _padding;
 		}
 
 		simpleList<cellularAutomataRule>* getRules() const
@@ -120,6 +130,7 @@ namespace brogueHd::backend::model
 
 		float _fillRatio;
 		int _iterations;
+		int _padding;
 		bool _resultPolarity;
 		simpleList<cellularAutomataRule>* _rules;
 	};
