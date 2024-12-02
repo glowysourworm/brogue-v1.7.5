@@ -60,7 +60,7 @@ namespace brogueHd::simple
 
 		T get(int index) const;
 		int count() const;
-
+		void set(int index, const T& item);
 		void add(const T& item);
 		void addRange(const T* list, int listLength);
 		void addRange(const simpleList<T>& list);
@@ -213,6 +213,12 @@ namespace brogueHd::simple
 	int simpleList<T>::count() const
 	{
 		return _count;
+	}
+
+	template<isHashable T>
+	void simpleList<T>::set(int index, const T& item)
+	{
+		_array->set(index, item);
 	}
 
 	template<isHashable T>

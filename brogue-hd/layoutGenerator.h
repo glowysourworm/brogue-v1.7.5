@@ -191,13 +191,13 @@ namespace brogueHd::backend
 		// Machine Rooms
 
 		// Triangulate Rooms:  Creates Delaunay Triangulation of the connection point vertices (new _delaunayGraph)
-		//triangulateRooms();
-		//triangulateRoomConnections();
+		triangulateRooms();
+		triangulateRoomConnections();
 
 		// Connect Rooms:  Create cells in the grid for the delaunay triangulation of the 
 		//                 connection points of the room tiles. Runs dijkstra's algorithm to
 		//				   create corridor cells inside the brogueLayout*
-		//connectRooms();
+		connectRooms();
 
 		return _layout;
 	}
@@ -218,13 +218,12 @@ namespace brogueHd::backend
 		simpleHash<brogueDesignRect*, gridRect> tiling;
 
 		gridLocator rectPackingFocus;
-		int maxIterations = 1;
+		int maxIterations = 35;
 		int iteration = 0;
 
 		while (iteration < maxIterations)
 		{
-			//brogueRoomTemplate configuration = (iteration == 0) ? _profile->getEntranceRoom(_randomGenerator) : _profile->getRandomRoomInfo(_randomGenerator);
-			brogueRoomTemplate configuration(_layout->getBoundary(), brogueRoomType::Cavern, 1);
+			brogueRoomTemplate configuration = (iteration == 0) ? _profile->getEntranceRoom(_randomGenerator) : _profile->getRandomRoomInfo(_randomGenerator);
 			brogueDesignRect* designRect = nullptr;
 			int roomPadding = iteration == 0 ? 0 : 1;
 

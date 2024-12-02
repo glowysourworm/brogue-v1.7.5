@@ -210,13 +210,13 @@ namespace brogueHd::backend
         }
 
         // Scale [0, 1] wall removal ratio
-        float safeRemovalRatio = ((MAZE_WALL_REMOVAL_HIGH - MAZE_WALL_REMOVAL_LOW) * wallRemovalRatio) + MAZE_WALL_REMOVAL_LOW;
+        //float safeRemovalRatio = ((MAZE_WALL_REMOVAL_HIGH - MAZE_WALL_REMOVAL_LOW) * wallRemovalRatio) + MAZE_WALL_REMOVAL_LOW;
 
         randomGenerator* randomGenerator = _randomGenerator;
         grid<gridLocator>* mazeGrid = _mazeGrid;
 
         // Process wall removals -> and send results back to user
-        _mazeGrid->iterate([&inclusionPredicate, &safeRemovalRatio, &randomGenerator, &mazeGrid, &callback](int column, int row, const gridLocator& location)
+        _mazeGrid->iterate([&inclusionPredicate, &wallRemovalRatio, &randomGenerator, &mazeGrid, &callback](int column, int row, const gridLocator& location)
         {
             // RETURN A 2D ARRAY OF BOOLEANS AS THE RESULT (NULL -> WALL REMOVED)
 
@@ -229,7 +229,7 @@ namespace brogueHd::backend
                 return iterationCallback::iterate;
 
             // Check random wall removal ratio
-            else if (randomGenerator->next() > safeRemovalRatio)
+            else if (randomGenerator->next() > wallRemovalRatio)
                 return iterationCallback::iterate;
 
             // Remove the wall (maze grid is essentially finished here; but for record keeping and debugging...)
@@ -248,7 +248,7 @@ namespace brogueHd::backend
                                                                double horizontalVerticalBias)
     {
         // Used to limit bias
-        float biasDivisor = 0.8f;
+        float biasDivisor = 1.0f;
 
         // Horizontal
         if (horizontalVerticalBias < 0.5)
