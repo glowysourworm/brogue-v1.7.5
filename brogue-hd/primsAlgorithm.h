@@ -5,60 +5,33 @@
 #include "graphDefinitions.h"
 #include "simpleException.h"
 #include "simpleList.h"
+#include "simplePoint.h"
+#include "simpleLine.h"
 #include <limits>
+
+using namespace brogueHd::simple;
 
 namespace brogueHd::component
 {
 	/// <summary>
 	/// Defines the Minimum Spanning Tree (MST) algorithm Prim's Algorithm
 	/// </summary>
-	template<isGridLocatorNode TNode, isGridLocatorEdge<TNode> TEdge>
-	class primsAlgorithm : public graphAlgorithm<TNode, TEdge>
+	class primsAlgorithm : public graphAlgorithm<simplePoint<float>, simpleLine<float>>
 	{
 	public:
 
-		primsAlgorithm(graphEdgeConstructor<TNode, TEdge> graphEdgeConstructor);
-		~primsAlgorithm();
+		primsAlgorithm() {};
+		~primsAlgorithm() {};
 
-		graph<TNode, TEdge>* run(const simpleList<TNode>& vertices) override;
-
-	protected:
-
-		/// <summary>
-		/// Creates MST using Prim's Algorithm - which takes O(n log n)
-		/// </summary>
-		graph<TNode, TEdge>* createMST(const simpleList<TNode>& vertices);
+		graph<simplePoint<float>, simpleLine<float>>* run(const simpleList<simplePoint<float>>& vertices, 
+														  graphEdgeConstructor<simplePoint<float>, simpleLine<float>> edgeConstructor) override;
 
 	};
 
-	template<isGridLocatorNode TNode, isGridLocatorEdge<TNode> TEdge>
-	primsAlgorithm<TNode, TEdge>::primsAlgorithm(graphEdgeConstructor<TNode, TEdge> graphEdgeConstructor)
-	{
-
-	}
-
-	template<isGridLocatorNode TNode, isGridLocatorEdge<TNode> TEdge>
-	primsAlgorithm<TNode, TEdge>::~primsAlgorithm()
-	{
-
-	}
-
-	template<isGridLocatorNode TNode, isGridLocatorEdge<TNode> TEdge>
-	graph<TNode, TEdge>* primsAlgorithm<TNode, TEdge>::run(const simpleList<TNode>& vertices)
+	graph<simplePoint<float>, simpleLine<float>>* primsAlgorithm::run(const simpleList<simplePoint<float>>& vertices, graphEdgeConstructor<simplePoint<float>, simpleLine<float>> edgeConstructor)
 	{
 		if (vertices.count() < 3)
-			return this->createDefaultGraph(vertices);
-
-		return this->createMST(vertices);
-	}
-
-	template<isGridLocatorNode TNode, isGridLocatorEdge<TNode> TEdge>
-	graph<TNode, TEdge>* primsAlgorithm<TNode, TEdge>::createMST(const simpleList<TNode>& vertices)
-	{
-		// NOTE*** The MST is being created on a graph of REGIONS. This will behave differently than a
-		//         graph of vertices. So, the input graph should be the FULL GRAPH to avoid issues with
-		//         creating an MST of REGIONS.
-		//         
+			return this->createDefaultGraph(vertices, edgeConstructor);
 
 		// Procedure (Prim's Algorithm)
 		//
@@ -70,71 +43,71 @@ namespace brogueHd::component
 
 		primsAlgorithm* that = this;
 
-		simpleList<TNode> unusedVertices(vertices);
-		simpleList<TNode> usedVertices;
-		simpleList<TEdge> treeEdges;
+		simpleList<simplePoint<float>> unusedVertices(vertices);
+		simpleList<simplePoint<float>> usedVertices;
+		simpleList<simpleLine<float>> treeEdges;
 
 		while (usedVertices.count() < vertices.count())
 		{
-			TNode nextVertex = NULL;
-			TEdge nextEdge = NULL;
+			simplePoint<float> nextVertex = default_value::value<simplePoint<float>>();
+			simpleLine<float> nextEdge = default_value::value<simpleLine<float>>();
 
-			// Initialize the tree
-			if (treeEdges.count() == 0)
-			{
-				TNode firstVertex = unusedVertices[0];
+			//// Initialize the tree
+			//if (treeEdges.count() == 0)
+			//{
+			//	simplePoint<float> firstVertex = unusedVertices.get(0);
 
-				// Remove the first vertex - add to the used collection
-				unusedVertices.remove(firstVertex);
-				usedVertices.add(firstVertex);
+			//	// Remove the first vertex - add to the used collection
+			//	unusedVertices.remove(firstVertex);
+			//	usedVertices.add(firstVertex);
 
-				nextVertex = unusedVertices.withMin<int>([&firstVertex] (TNode vertex)
-				{
-					return firstVertex.calculateDistance(vertex);
-				});
+			//	nextVertex = unusedVertices.withMin<int>([&firstVertex] (const simplePoint<float>& vertex)
+			//	{
+			//		return firstVertex.distance(vertex);
+			//	});
 
-				nextEdge = this->graphEdgeConstructor(firstVertex, nextVertex);
-			}
+			//	nextEdge = graphEdgeConstructor(firstVertex, nextVertex);
+			//}
 
-			else
-			{
-				// Get the next edge that connects an UNUSED vertex to a USED vertex
-				unusedVertices.forEach([&treeEdges, &that] (TNode vertex)
-				{
-					// Edges in the current tree
-					int potentialEdgeWeight = std::numeric_limits<int>::max();
-					TNode potentialNode = NULL;
+			//else
+			//{
+			//	// Get the next edge that connects an UNUSED vertex to a USED vertex
+			//	unusedVertices.forEach([&treeEdges, &that] (const simplePoint<float>& vertex)
+			//	{
+			//		// Edges in the current tree
+			//		int potentialEdgeWeight = std::numeric_limits<int>::max();
+			//		simplePoint<float> potentialNode = default_value::value<simplePoint<float>>();
 
-					treeEdges.forEach([&vertex, &potentialEdgeWeight, &that] (TEdge edge)
-					{
-						int distance = edge.node1.calculateDistance(vertex);
+			//		treeEdges.forEach([&vertex, &potentialEdgeWeight, &that] (TEdge edge)
+			//		{
+			//			int distance = edge.node1.calculateDistance(vertex);
 
-						if (distance < potentialEdgeWeight)
-						{
-							potentialEdgeWeight = distance;
-							potentialNode = edge.node1;
-						}
+			//			if (distance < potentialEdgeWeight)
+			//			{
+			//				potentialEdgeWeight = distance;
+			//				potentialNode = edge.node1;
+			//			}
 
-						distance = edge.node2.calculateDistance(vertex);
+			//			distance = edge.node2.calculateDistance(vertex);
 
-						if (distance < potentialEdgeWeight)
-						{
-							potentialEdgeWeight = distance;
-							potentialNode = edge.node2;
-						}
-					});
+			//			if (distance < potentialEdgeWeight)
+			//			{
+			//				potentialEdgeWeight = distance;
+			//				potentialNode = edge.node2;
+			//			}
+			//		});
 
-					// Check both potential edges for the least distant choice
-					if (nextEdge == NULL || potentialEdgeWeight < nextEdge.weight())
-					{
-						nextEdge = that->graphEdgeConstructor(potentialNode, vertex);
-						nextVertex = vertex;
-					}
-				});
-			}
+			//		// Check both potential edges for the least distant choice
+			//		if (nextEdge == default_value::value<simplePoint<float>>() || potentialEdgeWeight < nextEdge.weight())
+			//		{
+			//			nextEdge = graphEdgeConstructor(potentialNode, vertex);
+			//			nextVertex = vertex;
+			//		}
+			//	});
+			//}
 
-			if (nextEdge == NULL)
-				throw simpleException("No connection found between regions Minimum Spanning Tree:  primsAlgorithm.cpp");
+			//if (nextEdge == default_value::value<simpleLine<float>>())
+			//	throw simpleException("No connection found between regions Minimum Spanning Tree:  primsAlgorithm.h");
 
 			unusedVertices.remove(nextVertex);
 			usedVertices.add(nextVertex);
@@ -143,6 +116,6 @@ namespace brogueHd::component
 			treeEdges.add(nextEdge);
 		}
 
-		return new graph<TNode, TEdge>(vertices, treeEdges);
+		return new graph<simplePoint<float>, simpleLine<float>>(vertices.toArray(), treeEdges.toArray());
 	}
 }

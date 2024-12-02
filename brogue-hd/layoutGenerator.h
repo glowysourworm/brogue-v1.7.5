@@ -12,6 +12,7 @@
 #include "brogueRoomTemplate.h"
 #include "brogueUIBuilder.h"
 #include "color.h"
+#include "primsAlgorithm.h"
 #include "delaunayAlgorithm.h"
 #include "dungeonConstants.h"
 #include "graph.h"
@@ -427,7 +428,8 @@ namespace brogueHd::backend
 		//
 
 		// Create delaunay triangulator with graph edge constructor
-		delaunayAlgorithm triangulator;
+		//delaunayAlgorithm triangulator;
+		primsAlgorithm triangulator;
 
 		// Convert grid locators to real number coordinates: This is to run bowyer-watson
 		//
