@@ -112,6 +112,8 @@ namespace brogueHd::simple
 		template<typename TResult>
 		T withMax(simpleListSelector<T, TResult> selector) const;
 
+		int count(simpleListPredicate<T> predicate) const;
+
 		simpleList<T> sort(simpleListComparer<T> comparer) const;
 
 	public:
@@ -616,12 +618,26 @@ namespace brogueHd::simple
 	}
 
 	template<isHashable T>
+	int simpleList<T>::count(simpleListPredicate<T> predicate) const
+	{
+		int result = 0;
+
+		for (int index = 0; index < this->count(); index++)
+		{
+			if (predicate(this->get(index)))
+				result++;
+		}
+
+		return result;
+	}
+
+	template<isHashable T>
 	template<typename TResult>
 	TResult simpleList<T>::aggregate(TResult& seed, const simpleListAggregator<T, TResult>& aggregator) const
 	{
-		for (int index = 0; index < _count; index++)
+		for (int index = 0; index < this->count(); index++)
 		{
-			seed = aggregator(seed, _array->get(index));
+			seed = aggregator(seed, this->get(index));
 		}
 
 		return seed;

@@ -40,6 +40,19 @@ namespace brogueHd::backend::model
 		MainEntranceRoom
 	};
 
+	enum class brogueMazeType
+	{
+		/// <summary>
+		/// Specifies counting rule with more "open" feel
+		/// </summary>
+		Open,
+
+		/// <summary>
+		/// Specifies counting rule with more boxy, or "closed in" feel
+		/// </summary>
+		Filled
+	};
+
 	// Dungeon flags
 	enum tileFlags
 	{

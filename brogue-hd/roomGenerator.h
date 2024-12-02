@@ -3,6 +3,7 @@
 #include "brogueUIBuilder.h"
 #include "cellularAutomataParameters.h"
 #include "dungeonConstants.h"
+#include "mazeGenerator.h"
 #include "grid.h"
 #include "gridLocator.h"
 #include "gridRect.h"
@@ -47,6 +48,7 @@ namespace brogueHd::backend
 		randomGenerator* _randomGenerator;
 		brogueUIBuilder* _uiBuilder;
 
+		mazeGenerator* _mazeGenerator;
 		perlinNoiseGenerator* _perlinNoiseGenerator;
 		cellularAutomataGenerator* _cellularAutomataGenerator;
 		cellularAutomataParameters* _cavernParameters;
@@ -71,6 +73,9 @@ namespace brogueHd::backend
 		// Perlin Noise Generator:  Use for smoothly varying random "elevation" noise maps
 		_perlinNoiseGenerator = new perlinNoiseGenerator(randomGenerator);
 
+		// Maze Generator:  Make a maze in any room!
+		_mazeGenerator = new mazeGenerator(randomGenerator);
+
 		// Sets parameters for use
 		_cellularAutomataGenerator->initialize(_cavernParameters);
 	}
@@ -80,6 +85,7 @@ namespace brogueHd::backend
 		delete _cavernParameters;
 		delete _perlinNoiseGenerator;
 		delete _cellularAutomataGenerator;
+		delete _mazeGenerator;
 	}
 
 	gridRegion<gridLocator>* roomGenerator::designRoom(brogueRoomType roomType, const gridRect& designRect, const gridRect& minSize, const gridRect& parentBoundary)
@@ -183,22 +189,39 @@ namespace brogueHd::backend
 	{
 		gridRegionLocator<gridLocator> regionLocator;
 
-		float frequencyDivisor = 1.0f;
+		//float frequencyDivisor = 1.0f;
 
 		// Set mesh size, and result slice
 		//_perlinNoiseGenerator->initialize(5, 5, -0.5, 0.5);
 
-		_perlinNoiseGenerator->initialize(designGrid.getRelativeBoundary().width / frequencyDivisor,
-										  designGrid.getRelativeBoundary().height / frequencyDivisor, -0.5, 0.5);
+		//_perlinNoiseGenerator->initialize(designGrid.getRelativeBoundary().width / frequencyDivisor,
+		//								  designGrid.getRelativeBoundary().height / frequencyDivisor, -0.5, 0.5);
 
-		// Create cellular automata using cavern parameters
-		_perlinNoiseGenerator->run(designGrid.getParentBoundary(), 
-									designGrid.getRelativeBoundary(), 
-		[&designGrid] (int column, int row, bool result)
+		//// Create cellular automata using cavern parameters
+		//_perlinNoiseGenerator->run(designGrid.getParentBoundary(), 
+		//							designGrid.getRelativeBoundary(), 
+		//[&designGrid] (int column, int row, bool result)
+		//{
+		//	if (result)
+		//		designGrid.set(column, row, gridLocator(column, row));
+
+		//	return iterationCallback::iterate;
+		//});
+
+		_mazeGenerator->initialize(designGrid.getParentBoundary(), designGrid.getRelativeBoundary());
+
+		_mazeGenerator->run(0.0, 0.5, brogueMazeType::Open,
+
+		// Inclusion Predicate
+		[](int column, int row, const gridLocator& item)
 		{
-			if (result)
-				designGrid.set(column, row, gridLocator(column, row));
+			return true;
+		},
 
+		// Callback (complete!)
+		[&designGrid] (int column, int row, bool isCell)
+		{
+			designGrid.set(column, row, gridLocator(column, row), true);
 			return iterationCallback::iterate;
 		});
 

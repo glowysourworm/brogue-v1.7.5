@@ -64,6 +64,18 @@ namespace brogueHd::backend
 		int randomIndex(const simpleArray<T>& weights, randomVariable type = randomVariable::Uniform, float mean = 0.5f, float stdDev = GAUSS_STD_DEV);
 
 		/// <summary>
+		///	Returns uniform random element from collection
+		/// </summary>
+		template<typename T>
+		T getRandomElement(const simpleArray<T>& collection);
+
+		/// <summary>
+		///	Returns uniform random element from collection
+		/// </summary>
+		template<typename T>
+		T getRandomElement(const simpleList<T>& collection);
+
+		/// <summary>
 		/// Randomizes the input array using Uniform random draws
 		/// </summary>
 		template<typename T>
@@ -204,12 +216,12 @@ namespace brogueHd::backend
 
 	int randomGenerator::randomRangeInclusive(int lowerBound, int upperBound, randomVariable type, float mean, float stdDev)
 	{
-		return nextInt(lowerBound, upperBound, true, type, mean, stdDev);
+		return nextInt(lowerBound, upperBound, false, type, mean, stdDev);
 	}
 
 	int randomGenerator::randomRangeExclusive(int lowerBound, int upperBound, randomVariable type, float mean, float stdDev)
 	{
-		return nextInt(lowerBound, upperBound, false, type, mean, stdDev);
+		return nextInt(lowerBound, upperBound, true, type, mean, stdDev);
 	}
 
 	template<isNumber T>
@@ -237,9 +249,22 @@ namespace brogueHd::backend
 		return weights.count() - 1;
 	}
 
-	/// <summary>
-	/// Randomizes the input array using Uniform random draws
-	/// </summary>
+	template<typename T>
+	T randomGenerator::getRandomElement(const simpleArray<T>& collection)
+	{
+		int index = randomRangeExclusive(0, collection.count());
+
+		return collection.get(index);
+	}
+
+	template<typename T>
+	T randomGenerator::getRandomElement(const simpleList<T>& collection)
+	{
+		int index = randomRangeExclusive(0, collection.count());
+
+		return collection.get(index);
+	}
+
 	template<typename T>
 	simpleArray<T> randomGenerator::shuffle(const simpleArray<T>& array)
 	{

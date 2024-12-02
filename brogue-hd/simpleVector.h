@@ -6,7 +6,7 @@
 namespace brogueHd::simple
 {
     template<isNumber T>
-    struct simpleVector
+    struct simpleVector : simpleStruct
     {
         T x;
         T y;
@@ -85,6 +85,11 @@ namespace brogueHd::simple
         T cross(const simpleVector<T>& vector)
         {
             return (x * vector.y) - (vector.x * y);
+        }
+
+        size_t getHash() const override
+        {
+            return hashGenerator::generateHash(x, y);
         }
     };
 }

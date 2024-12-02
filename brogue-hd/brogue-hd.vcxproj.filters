@@ -764,6 +764,12 @@
     <ClInclude Include="perlinNoiseGenerator.h">
       <Filter>Header Files\backend\generator</Filter>
     </ClInclude>
+    <ClInclude Include="mazeGenerator.h">
+      <Filter>Header Files\backend\generator</Filter>
+    </ClInclude>
+    <ClInclude Include="gridMethods.h">
+      <Filter>Header Files\component</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\resources\model\armor.csv">

@@ -16,7 +16,7 @@ using namespace brogueHd::simple;
 
 namespace brogueHd::component
 {
-	template<typename T>
+	template<isHashable T>
 	class grid
 	{
 	public:
@@ -171,6 +171,43 @@ namespace brogueHd::component
 		/// </summary>
 		gridRect calculateLargestRectangle(const gridRect& minSize) const;
 
+		/// <summary>
+		/// Returns a list of elements that satisy the given predicate
+		/// </summary>
+		simpleList<T> collectWhere(gridPredicate<T> predicate) const;
+
+		/// <summary>
+		/// Returns list of elements adjacent to the specified location (using safe iterators)
+		/// </summary>
+		simpleList<T> getAdjacentElements(int column, int row) const;
+
+		/// <summary>
+		/// Returns list of elements cardinally adjacent to the specified location (using safe iterators)
+		/// </summary>
+		simpleList<T> getCardinallyAdjacentElements(int column, int row) const;
+
+		/// <summary>
+		/// Returns list of elements adjacent to the specified location (using unsafe iterators may return null / default)
+		/// </summary>
+		simpleList<T> getAdjacentElementsUnsafe(int column, int row) const;
+
+		/// <summary>
+		/// Returns list of elements cardinally adjacent to the specified location (using unsafe iterators may return null / default)
+		/// </summary>
+		simpleList<T> getCardinallyAdjacentElementsUnsafe(int column, int row) const;
+
+		/// <summary>
+		/// Returns list of elements adjacent to the specified location (using safe iterators) that satisfy
+		/// the given predicate.
+		/// </summary>
+		simpleList<T> getAdjacentElements(int column, int row, gridPredicate<T> predicate) const;
+
+		/// <summary>
+		/// Returns list of elements cardinally adjacent to the specified location (using safe iterators) that
+		/// satisfy the given predicate.
+		/// </summary>
+		simpleList<T> getCardinallyAdjacentElements(int column, int row, gridPredicate<T> predicate) const;
+
 	private:
 
 		T** _grid;
@@ -179,7 +216,7 @@ namespace brogueHd::component
 		gridRect* _relativeBoundary;
 	};
 
-	template<typename T>
+	template<isHashable T>
 	grid<T>::grid(const gridRect& parentBoundary, const gridRect& relativeBoundary)
 	{
 		if (!parentBoundary.contains(relativeBoundary))
@@ -193,7 +230,7 @@ namespace brogueHd::component
 			_grid[index] = new T[relativeBoundary.height]{ default_value::value<T>() };
 	}
 
-	template<typename T>
+	template<isHashable T>
 	grid<T>::~grid()
 	{
 		// Added grid cells from this class
@@ -206,7 +243,7 @@ namespace brogueHd::component
 		delete _relativeBoundary;
 	}
 
-	template<typename T>
+	template<isHashable T>
 	T grid<T>::get(int column, int row) const
 	{
 		if (column < _relativeBoundary->column ||
@@ -219,7 +256,7 @@ namespace brogueHd::component
 		return _grid[column - _relativeBoundary->column][row - _relativeBoundary->row];
 	}
 
-	template<typename T>
+	template<isHashable T>
 	T grid<T>::getUnsafe(int column, int row) const
 	{
 		if (column < _relativeBoundary->column ||
@@ -232,7 +269,7 @@ namespace brogueHd::component
 		return _grid[column - _relativeBoundary->column][row - _relativeBoundary->row];
 	}
 
-	template<typename T>
+	template<isHashable T>
 	T grid<T>::getAdjacentUnsafe(int column, int row, brogueCompass direction) const
 	{
 		switch (direction)
@@ -265,7 +302,7 @@ namespace brogueHd::component
 		}
 	}
 
-	template<typename T>
+	template<isHashable T>
 	T grid<T>::getAdjacent(int column, int row, brogueCompass direction) const
 	{
 		switch (direction)
@@ -318,7 +355,7 @@ namespace brogueHd::component
 		}
 	}
 
-	template<typename T>
+	template<isHashable T>
 	gridLocator grid<T>::getAdjacentLocator(int column, int row, brogueCompass direction) const
 	{
 		switch (direction)
@@ -378,7 +415,7 @@ namespace brogueHd::component
 		}
 	}
 
-	template<typename T>
+	template<isHashable T>
 	gridLocator grid<T>::getAdjacentLocatorUnsafe(int column, int row, brogueCompass direction) const
 	{
 		switch (direction)
@@ -438,31 +475,31 @@ namespace brogueHd::component
 		}
 	}
 
-	template<typename T>
+	template<isHashable T>
 	gridRect grid<T>::getRelativeBoundary() const
 	{
 		return *_relativeBoundary;
 	}
 
-	template<typename T>
+	template<isHashable T>
 	gridRect grid<T>::getParentBoundary() const
 	{
 		return *_parentBoundary;
 	}
 
-	template<typename T>
+	template<isHashable T>
 	bool grid<T>::isDefined(int column, int row) const
 	{
 		return  this->get(column, row) != default_value::value<T>();
 	}
 
-	template<typename T>
+	template<isHashable T>
 	bool grid<T>::isInBounds(int column, int row) const
 	{
 		return _relativeBoundary->contains(column, row);
 	}
 
-	template<typename T>
+	template<isHashable T>
 	void grid<T>::set(int column, int row, T value, bool overwrite)
 	{
 		if (!this->isInBounds(column, row))
@@ -475,7 +512,7 @@ namespace brogueHd::component
 		_grid[column - _relativeBoundary->column][row - _relativeBoundary->row] = value;
 	}
 
-	template<typename T>
+	template<isHashable T>
 	T grid<T>::search(gridAggregateComparer<T> aggregateComparator) const
 	{
 		T searchValue = default_value::value<T>();
@@ -491,7 +528,7 @@ namespace brogueHd::component
 		return searchValue;
 	}
 
-	template<typename T>
+	template<isHashable T>
 	bool grid<T>::isEdge(int column, int row) const
 	{
 		return this->isEdgeWhere(column, row, [] (int acolumn, int arow, T item)
@@ -500,7 +537,7 @@ namespace brogueHd::component
 		});
 	}
 
-	template<typename T>
+	template<isHashable T>
 	bool grid<T>::isEdgeWhere(int column, int row, gridPredicate<T> predicate) const
 	{
 		T north = this->getUnsafe(column, row - 1);
@@ -522,7 +559,7 @@ namespace brogueHd::component
 			(southWest == default_value::value<T>() || (southWest != default_value::value<T>() && !predicate(column - 1, row + 1, southWest)));
 	}
 
-	template<typename T>
+	template<isHashable T>
 	bool grid<T>::isExposedEdge(int column, int row, brogueCompass direction, gridPredicate<T> predicate) const
 	{
 		T north = this->getUnsafe(column, row - 1);
@@ -546,7 +583,7 @@ namespace brogueHd::component
 			throw simpleException("Invalid use of direction parameter:  grid.isExposedEdge");
 	}
 
-	template<typename T>
+	template<isHashable T>
 	bool grid<T>::isExposedCorner(int column, int row, brogueCompass direction, gridPredicate<T> predicate) const
 	{
 		if (direction == brogueCompass::NW)
@@ -569,7 +606,7 @@ namespace brogueHd::component
 			throw simpleException("Invalid use of direction parameter:  grid.isExposedCorner");
 	}
 
-	template<typename T>
+	template<isHashable T>
 	bool grid<T>::areAdjacent(T location, T otherLocation) const
 	{
 		if (!this->isDefined(location.column, location.row))
@@ -587,7 +624,7 @@ namespace brogueHd::component
 		return true;
 	}
 
-	template<typename T>
+	template<isHashable T>
 	void grid<T>::translate(int column, int row)
 	{
 		gridLocator translation(column, row);
@@ -598,7 +635,7 @@ namespace brogueHd::component
 		_relativeBoundary->translate(translation);
 	}
 
-	template<typename T>
+	template<isHashable T>
 	void grid<T>::iterate(gridCallback<T> callback) const
 	{
 		bool userBreak = false;
@@ -615,7 +652,7 @@ namespace brogueHd::component
 		}
 	}
 
-	template<typename T>
+	template<isHashable T>
 	void grid<T>::iterateWhereDefined(gridCallback<T> callback) const
 	{
 		bool userBreak = false;
@@ -636,7 +673,7 @@ namespace brogueHd::component
 		}
 	}
 
-	template<typename T>
+	template<isHashable T>
 	void grid<T>::iterateFrom(const gridLocator& start, const gridLocator& end, gridCallback<T> callback) const
 	{
 		if (start.row > end.row ||
@@ -669,7 +706,7 @@ namespace brogueHd::component
 		}
 	}
 
-	template<typename T>
+	template<isHashable T>
 	void grid<T>::iterateOutward(int centerColumn,
 		int centerRow,
 		int distance,
@@ -694,7 +731,7 @@ namespace brogueHd::component
 		}
 	}
 
-	template<typename T>
+	template<isHashable T>
 	void grid<T>::iterateIn(gridRect boundary, gridCallback<T> callback) const
 	{
 		bool userBreak = false;
@@ -714,7 +751,7 @@ namespace brogueHd::component
 		}
 	}
 
-	template<typename T>
+	template<isHashable T>
 	void grid<T>::iterateAdjacent(int column, int row, bool withinBounds, gridCallbackAdjacent<T> callback) const
 	{
 		bool userBreak = false;
@@ -752,13 +789,13 @@ namespace brogueHd::component
 			userBreak = callback(column - 1, row + 1, brogueCompass::SW, this->getAdjacentUnsafe(column, row, brogueCompass::SW));
 	}
 
-	template<typename T>
+	template<isHashable T>
 	void grid<T>::iterateAroundCardinal(int column, int row, bool withinBounds, gridCallback<T> callback) const
 	{
 		iterationCallback response = iterationCallback::iterate;
 
 		// North
-		T north = this->getAdjacentUnsafe(column, row - 1);
+		T north = this->getAdjacentUnsafe(column, row, brogueCompass::N);
 
 		if (this->isInBounds(column, row - 1))
 			response = callback(column, row - 1, north);
@@ -770,7 +807,7 @@ namespace brogueHd::component
 			return;
 
 		// South
-		T south = this->getAdjacentUnsafe(column, row + 1);
+		T south = this->getAdjacentUnsafe(column, row, brogueCompass::S);
 
 		if (this->isInBounds(column, row + 1))
 			response = callback(column, row + 1, south);
@@ -782,7 +819,7 @@ namespace brogueHd::component
 			return;
 
 		// East
-		T east = this->getAdjacentUnsafe(column + 1, row);
+		T east = this->getAdjacentUnsafe(column, row, brogueCompass::E);
 
 		if (this->isInBounds(column + 1, row))
 			response = callback(column + 1, row, east);
@@ -794,7 +831,7 @@ namespace brogueHd::component
 			return;
 
 		// West
-		T west = this->getAdjacentUnsafe(column - 1, row);
+		T west = this->getAdjacentUnsafe(column, row, brogueCompass::W);
 
 		if (this->isInBounds(column - 1, row))
 			response = callback(column - 1, row, west);
@@ -803,7 +840,112 @@ namespace brogueHd::component
 			response = callback(column - 1, row, west);
 	}
 
-	template<typename T>
+	template<isHashable T>
+	simpleList<T> grid<T>::collectWhere(gridPredicate<T> predicate) const
+	{
+		simpleList<T> result;
+
+		this->iterate([&result, &predicate] (int column, int row, const T& item)
+		{
+			if (predicate(column, row, item))
+				result.add(item);
+
+			return iterationCallback::iterate;
+		});
+
+		return result;
+	}
+
+	template<isHashable T>
+	simpleList<T> grid<T>::getAdjacentElements(int column, int row) const
+	{
+		simpleList<T> result;
+
+		this->iterateAdjacent(column, row, true, [&result] (int column, int row, brogueCompass direction, const T& item)
+		{
+			result.add(item);
+			return iterationCallback::iterate;
+		});
+
+		return result;
+	}
+
+	template<isHashable T>
+	simpleList<T> grid<T>::getCardinallyAdjacentElements(int column, int row) const
+	{
+		simpleList<T> result;
+
+		this->iterateAroundCardinal(column, row, true, [&result] (int column, int row, const T& item)
+		{
+			result.add(item);
+			return iterationCallback::iterate;
+		});
+
+		return result;
+	}
+
+	template<isHashable T>
+	simpleList<T> grid<T>::getAdjacentElementsUnsafe(int column, int row) const
+	{
+		simpleList<T> result;
+
+		this->iterateAdjacent(column, row, false, [&result] (int column, int row, brogueCompass direction, const T& item)
+		{
+			result.add(item);
+			return iterationCallback::iterate;
+		});
+
+		return result;
+	}
+
+	template<isHashable T>
+	simpleList<T> grid<T>::getCardinallyAdjacentElementsUnsafe(int column, int row) const
+	{
+		simpleList<T> result;
+
+		this->iterateAroundCardinal(column, row, false, [&result] (int column, int row, const T& item)
+		{
+			result.add(item);
+			return iterationCallback::iterate;
+		});
+
+		return result;
+	}
+
+	template<isHashable T>
+	simpleList<T> grid<T>::getAdjacentElements(int column, int row, gridPredicate<T> predicate) const
+	{
+		simpleList<T> result;
+
+		this->iterateAdjacent(column, row, true, [&result, &predicate] (int acolumn, int arow, brogueCompass direction, const T& item)
+		{
+			if (predicate(acolumn, arow, item))
+				result.add(item);
+
+			return iterationCallback::iterate;
+		});
+
+		return result;
+	}
+
+	template<isHashable T>
+	simpleList<T> grid<T>::getCardinallyAdjacentElements(int column, int row, gridPredicate<T> predicate) const
+	{
+		simpleList<T> result;
+
+		this->iterateAroundCardinal(column, row, true, [&result, &predicate] (int acolumn, int arow, const T& item)
+		{
+			if (predicate(acolumn, arow, item))
+				result.add(item);
+
+			return iterationCallback::iterate;
+		});
+
+		return result;
+	}
+
+
+	template<isHashable T>
 	gridRect grid<T>::calculateLargestRectangle(const gridRect& minSize) const
 	{
 		const grid<T>* that = this;
@@ -814,7 +956,7 @@ namespace brogueHd::component
 		});
 	}
 
-	template<typename T>
+	template<isHashable T>
 	gridRect grid<T>::calculateLargestRectangle(const gridRect& minSize, gridPredicate<T> predicate) const
 	{
 		const grid<T>* that = this;
@@ -1124,7 +1266,7 @@ return result;
 //// Takes a grid as a mask of valid locations, chooses one randomly and returns it as (x, y).
 //// If there are no valid locations, returns (-1, -1).
 
-//template<typename T>
+//template<isHashable T>
 //void grid<T>::randomLocationInGrid(int* x, int* y, int validValue) 
 //{
 //    const int locationCount = validLocationCount(grid, validValue);
@@ -1152,7 +1294,7 @@ return result;
 //// Finds the lowest positive number in a grid, chooses one location with that number randomly and returns it as (x, y).
 //// If there are no valid locations, returns (-1, -1).
 
-//template<typename T>
+//template<isHashable T>
 //void grid<T>::randomLeastPositiveLocationInGrid(int** grid, int* x, int* y, boolean deterministic) {
 //    const int targetValue = leastPositiveValueInGrid(grid);
 //    int locationCount;
@@ -1193,7 +1335,7 @@ return result;
 //    return;
 //}
 
-//template<typename T>
+//template<isHashable T>
 //boolean grid<T>::getQualifyingPathLocNear(int* retValX, int* retValY,
 //    int x, int y,
 //    boolean hallwaysAllowed,
