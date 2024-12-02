@@ -1,0 +1,192 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\constants">
+      <UniqueIdentifier>{17f43688-5869-4167-bd4d-24c5d404ae51}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\game">
+      <UniqueIdentifier>{cc933855-7333-4313-89a8-c125876743dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\layout">
+      <UniqueIdentifier>{7572c2de-8be7-4537-ad36-05b4205ef721}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\serialization">
+      <UniqueIdentifier>{691f3668-0330-4b7c-8b96-a8b251e15130}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\template">
+      <UniqueIdentifier>{1695b2c5-6818-4d21-b937-2e24a859867d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="brogueLevel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="blueprintDeclaration.h">
+      <Filter>Header Files\constants</Filter>
+    </ClInclude>
+    <ClInclude Include="bolt.h">
+      <Filter>Header Files\game</Filter>
+    </ClInclude>
+    <ClInclude Include="boltConstants.h">
+      <Filter>Header Files\constants</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueCellDisplay.h">
+      <Filter>Header Files\game</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueCell.h">
+      <Filter>Header Files\game</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueContentGrid.h">
+      <Filter>Header Files\layout</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueCreature.h">
+      <Filter>Header Files\game</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueCreatureHorde.h">
+      <Filter>Header Files\game</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueDesignRect.h">
+      <Filter>Header Files\layout</Filter>
+    </ClInclude>
+    <ClInclude Include="broguefile.h">
+      <Filter>Header Files\serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueGame.h">
+      <Filter>Header Files\game</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueGameTemplate.h">
+      <Filter>Header Files\template</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueItem.h">
+      <Filter>Header Files\game</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueLayout.h">
+      <Filter>Header Files\layout</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueLevelProfile.h">
+      <Filter>Header Files\template</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueLevelTemplate.h">
+      <Filter>Header Files\template</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueMachine.h">
+      <Filter>Header Files\layout</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueObject.h">
+      <Filter>Header Files\game</Filter>
+    </ClInclude>
+    <ClInclude Include="broguePlayer.h">
+      <Filter>Header Files\game</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueRememberedCell.h">
+      <Filter>Header Files\layout</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueRoomTemplate.h">
+      <Filter>Header Files\template</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueRoom.h">
+      <Filter>Header Files\layout</Filter>
+    </ClInclude>
+    <ClInclude Include="colorConstants.h">
+      <Filter>Header Files\constants</Filter>
+    </ClInclude>
+    <ClInclude Include="creatureBehavior.h">
+      <Filter>Header Files\game</Filter>
+    </ClInclude>
+    <ClInclude Include="creature.h">
+      <Filter>Header Files\game</Filter>
+    </ClInclude>
+    <ClInclude Include="creatureBehaviorConstants.h">
+      <Filter>Header Files\constants</Filter>
+    </ClInclude>
+    <ClInclude Include="creatureBehaviorMap.h">
+      <Filter>Header Files\game</Filter>
+    </ClInclude>
+    <ClInclude Include="creatureConstants.h">
+      <Filter>Header Files\constants</Filter>
+    </ClInclude>
+    <ClInclude Include="dungeonConstants.h">
+      <Filter>Header Files\constants</Filter>
+    </ClInclude>
+    <ClInclude Include="dungeonFeatureConstants.h">
+      <Filter>Header Files\constants</Filter>
+    </ClInclude>
+    <ClInclude Include="gameConstants.h">
+      <Filter>Header Files\constants</Filter>
+    </ClInclude>
+    <ClInclude Include="itemConstants.h">
+      <Filter>Header Files\constants</Filter>
+    </ClInclude>
+    <ClInclude Include="feat.h">
+      <Filter>Header Files\game</Filter>
+    </ClInclude>
+    <ClInclude Include="flare.h">
+      <Filter>Header Files\game</Filter>
+    </ClInclude>
+    <ClInclude Include="floorTileType.h">
+      <Filter>Header Files\game</Filter>
+    </ClInclude>
+    <ClInclude Include="gameData.h">
+      <Filter>Header Files\game</Filter>
+    </ClInclude>
+    <ClInclude Include="item.h">
+      <Filter>Header Files\game</Filter>
+    </ClInclude>
+    <ClInclude Include="dungeonTemplate.h">
+      <Filter>Header Files\template</Filter>
+    </ClInclude>
+    <ClInclude Include="dungeonFeature.h">
+      <Filter>Header Files\game</Filter>
+    </ClInclude>
+    <ClInclude Include="lightConstants.h">
+      <Filter>Header Files\constants</Filter>
+    </ClInclude>
+    <ClInclude Include="machineConstants.h">
+      <Filter>Header Files\constants</Filter>
+    </ClInclude>
+    <ClInclude Include="terrainDeclaration.h">
+      <Filter>Header Files\constants</Filter>
+    </ClInclude>
+    <ClInclude Include="linearGenerationParameters.h">
+      <Filter>Header Files\template</Filter>
+    </ClInclude>
+    <ClInclude Include="machineTemplate.h">
+      <Filter>Header Files\template</Filter>
+    </ClInclude>
+    <ClInclude Include="itemTemplate.h">
+      <Filter>Header Files\template</Filter>
+    </ClInclude>
+    <ClInclude Include="levelData.h">
+      <Filter>Header Files\game</Filter>
+    </ClInclude>
+    <ClInclude Include="light.h">
+      <Filter>Header Files\game</Filter>
+    </ClInclude>
+    <ClInclude Include="powerTables.h">
+      <Filter>Header Files\constants</Filter>
+    </ClInclude>
+    <ClInclude Include="randomRange.h">
+      <Filter>Header Files\template</Filter>
+    </ClInclude>
+    <ClInclude Include="playerCharacter.h">
+      <Filter>Header Files\game</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="brogue-hd.model.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

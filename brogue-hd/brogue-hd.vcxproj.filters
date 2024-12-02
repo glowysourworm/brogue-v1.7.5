@@ -22,9 +22,6 @@
     <Filter Include="Header Files\backend\controller">
       <UniqueIdentifier>{b90b1eb1-aae0-4b99-a787-0f9cd0599697}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\backend\generator">
-      <UniqueIdentifier>{09ef548a-044f-4227-8706-0f97a0f082c5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\frontend">
       <UniqueIdentifier>{a4ff17c9-6e65-4f3e-a119-7b291dd21a75}</UniqueIdentifier>
     </Filter>
@@ -37,9 +34,6 @@
     <Filter Include="Header Files\backend\model">
       <UniqueIdentifier>{87b38ca5-f6b7-4b61-8e0c-8f02ea02b258}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\backend\model\layout">
-      <UniqueIdentifier>{dacca4eb-ea81-4b09-8674-cc98a9df6fd3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\backend\methods">
       <UniqueIdentifier>{19e8db3f-3028-4fc5-a766-0acc4a985a66}</UniqueIdentifier>
     </Filter>
@@ -49,23 +43,14 @@
     <Filter Include="Header Files\backend\model\io">
       <UniqueIdentifier>{d535729d-24d4-4195-a5c1-5f3aa2922602}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\backend\model\construction">
-      <UniqueIdentifier>{4cf08ea0-1b5a-4aa1-bd85-35d32b4b2d85}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\console">
       <UniqueIdentifier>{15f65e3e-9bc9-4e95-8b4a-717a8edd7943}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\backend\modelConstant">
       <UniqueIdentifier>{03af9654-3ceb-4669-bae7-524b19acd782}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\backend\model\gameTemplate">
-      <UniqueIdentifier>{d5740300-4ce7-4c66-96b9-3bd63b86651d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\global">
       <UniqueIdentifier>{521d8daf-d249-4afa-af4f-54259bf512b1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\component">
-      <UniqueIdentifier>{40a45b12-d99d-469f-bf31-009ce66f16a5}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\unit-test">
       <UniqueIdentifier>{1f590ab0-d252-4222-bd33-0db49b360e64}</UniqueIdentifier>
@@ -84,9 +69,6 @@
     </Filter>
     <Filter Include="Resource Files\model">
       <UniqueIdentifier>{98d455ff-7ca8-4858-8854-a2055c70503f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\simple">
-      <UniqueIdentifier>{27876192-d83a-47bf-a2c2-07eeb972ed3c}</UniqueIdentifier>
     </Filter>
     <Filter Include="Resource Files\opengl\brogueFlameMenu">
       <UniqueIdentifier>{7906081a-6a2a-4d0b-b850-d6365885aa6a}</UniqueIdentifier>
@@ -125,24 +107,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="brogueCellDisplay.h">
-      <Filter>Header Files\backend\model\layout</Filter>
-    </ClInclude>
-    <ClInclude Include="brogueItem.h">
-      <Filter>Header Files\backend\model</Filter>
-    </ClInclude>
-    <ClInclude Include="brogueCell.h">
-      <Filter>Header Files\backend\model\layout</Filter>
-    </ClInclude>
-    <ClInclude Include="brogueLevel.h">
-      <Filter>Header Files\backend\model</Filter>
-    </ClInclude>
-    <ClInclude Include="gridCell.h">
-      <Filter>Header Files\backend\model\layout</Filter>
-    </ClInclude>
-    <ClInclude Include="brogueGame.h">
-      <Filter>Header Files\backend\model</Filter>
-    </ClInclude>
     <ClInclude Include="brogueMessageQueue.h">
       <Filter>Header Files\backend\model</Filter>
     </ClInclude>
@@ -154,12 +118,6 @@
     </ClInclude>
     <ClInclude Include="playbackProcessor.h">
       <Filter>Header Files\backend\processor</Filter>
-    </ClInclude>
-    <ClInclude Include="randomGenerator.h">
-      <Filter>Header Files\backend\generator</Filter>
-    </ClInclude>
-    <ClInclude Include="layoutGenerator.h">
-      <Filter>Header Files\backend\generator</Filter>
     </ClInclude>
     <ClInclude Include="keyProcessor.h">
       <Filter>Header Files\backend\processor</Filter>
@@ -173,56 +131,8 @@
     <ClInclude Include="levelProcessor.h">
       <Filter>Header Files\backend\processor</Filter>
     </ClInclude>
-    <ClInclude Include="contentGenerator.h">
-      <Filter>Header Files\backend\generator</Filter>
-    </ClInclude>
     <ClInclude Include="brogueLevelMethods.h">
       <Filter>Header Files\backend\methods</Filter>
-    </ClInclude>
-    <ClInclude Include="brogueRememberedCell.h">
-      <Filter>Header Files\backend\model\layout</Filter>
-    </ClInclude>
-    <ClInclude Include="brogueMachine.h">
-      <Filter>Header Files\backend\model</Filter>
-    </ClInclude>
-    <ClInclude Include="blueprintDeclaration.h">
-      <Filter>Header Files\backend\model\layout</Filter>
-    </ClInclude>
-    <ClInclude Include="linearGenerationParameters.h">
-      <Filter>Header Files\backend\model\construction</Filter>
-    </ClInclude>
-    <ClInclude Include="floorTileType.h">
-      <Filter>Header Files\backend\model\layout</Filter>
-    </ClInclude>
-    <ClInclude Include="broguePlayer.h">
-      <Filter>Header Files\backend\model</Filter>
-    </ClInclude>
-    <ClInclude Include="brogueObject.h">
-      <Filter>Header Files\backend\model</Filter>
-    </ClInclude>
-    <ClInclude Include="brogueContentGrid.h">
-      <Filter>Header Files\backend\model</Filter>
-    </ClInclude>
-    <ClInclude Include="brogueCreature.h">
-      <Filter>Header Files\backend\model</Filter>
-    </ClInclude>
-    <ClInclude Include="brogueCreatureHorde.h">
-      <Filter>Header Files\backend\model</Filter>
-    </ClInclude>
-    <ClInclude Include="terrainDeclaration.h">
-      <Filter>Header Files\backend\model\layout</Filter>
-    </ClInclude>
-    <ClInclude Include="color.h">
-      <Filter>Header Files\backend\model\game</Filter>
-    </ClInclude>
-    <ClInclude Include="colorString.h">
-      <Filter>Header Files\backend\model\game</Filter>
-    </ClInclude>
-    <ClInclude Include="feat.h">
-      <Filter>Header Files\backend\model\game</Filter>
-    </ClInclude>
-    <ClInclude Include="broguefile.h">
-      <Filter>Header Files\backend\model\io</Filter>
     </ClInclude>
     <ClInclude Include="fileio.h">
       <Filter>Header Files\backend\model\io</Filter>
@@ -233,34 +143,7 @@
     <ClInclude Include="messageData.h">
       <Filter>Header Files\backend\model\game</Filter>
     </ClInclude>
-    <ClInclude Include="powerTables.h">
-      <Filter>Header Files\backend\model\game</Filter>
-    </ClInclude>
-    <ClInclude Include="roomGenerator.h">
-      <Filter>Header Files\backend\generator</Filter>
-    </ClInclude>
-    <ClInclude Include="cellularAutomataParameters.h">
-      <Filter>Header Files\backend\model\layout</Filter>
-    </ClInclude>
-    <ClInclude Include="brogueLayout.h">
-      <Filter>Header Files\backend\model</Filter>
-    </ClInclude>
-    <ClInclude Include="terrainGenerator.h">
-      <Filter>Header Files\backend\generator</Filter>
-    </ClInclude>
     <ClInclude Include="brogueGameProfile.h">
-      <Filter>Header Files\backend\model</Filter>
-    </ClInclude>
-    <ClInclude Include="brogueLevelProfile.h">
-      <Filter>Header Files\backend\model</Filter>
-    </ClInclude>
-    <ClInclude Include="brogueDesignRect.h">
-      <Filter>Header Files\backend\model\layout</Filter>
-    </ClInclude>
-    <ClInclude Include="noiseGenerator.h">
-      <Filter>Header Files\backend\generator</Filter>
-    </ClInclude>
-    <ClInclude Include="brogueRoom.h">
       <Filter>Header Files\backend\model</Filter>
     </ClInclude>
     <ClInclude Include="brogueConsole.h">
@@ -281,137 +164,14 @@
     <ClInclude Include="brogueColorMap.h">
       <Filter>Header Files\backend\model</Filter>
     </ClInclude>
-    <ClInclude Include="dungeonConstants.h">
-      <Filter>Header Files\backend\modelConstant</Filter>
-    </ClInclude>
-    <ClInclude Include="colorConstants.h">
-      <Filter>Header Files\backend\modelConstant</Filter>
-    </ClInclude>
-    <ClInclude Include="gameConstants.h">
-      <Filter>Header Files\backend\modelConstant</Filter>
-    </ClInclude>
-    <ClInclude Include="creatureBehaviorConstants.h">
-      <Filter>Header Files\backend\modelConstant</Filter>
-    </ClInclude>
-    <ClInclude Include="boltConstants.h">
-      <Filter>Header Files\backend\modelConstant</Filter>
-    </ClInclude>
-    <ClInclude Include="creatureConstants.h">
-      <Filter>Header Files\backend\modelConstant</Filter>
-    </ClInclude>
-    <ClInclude Include="dungeonFeatureConstants.h">
-      <Filter>Header Files\backend\modelConstant</Filter>
-    </ClInclude>
     <ClInclude Include="statusEffectConstants.h">
       <Filter>Header Files\backend\modelConstant</Filter>
     </ClInclude>
     <ClInclude Include="statusEffect.h">
       <Filter>Header Files\backend\model\game</Filter>
     </ClInclude>
-    <ClInclude Include="dungeonFeature.h">
-      <Filter>Header Files\backend\model\game</Filter>
-    </ClInclude>
-    <ClInclude Include="bolt.h">
-      <Filter>Header Files\backend\model\game</Filter>
-    </ClInclude>
-    <ClInclude Include="creatureBehavior.h">
-      <Filter>Header Files\backend\model\game</Filter>
-    </ClInclude>
-    <ClInclude Include="creatureBehaviorMap.h">
-      <Filter>Header Files\backend\model\game</Filter>
-    </ClInclude>
-    <ClInclude Include="creature.h">
-      <Filter>Header Files\backend\model\game</Filter>
-    </ClInclude>
-    <ClInclude Include="itemConstants.h">
-      <Filter>Header Files\backend\modelConstant</Filter>
-    </ClInclude>
-    <ClInclude Include="dungeonTemplate.h">
-      <Filter>Header Files\backend\model\gameTemplate</Filter>
-    </ClInclude>
-    <ClInclude Include="itemTemplate.h">
-      <Filter>Header Files\backend\model\gameTemplate</Filter>
-    </ClInclude>
-    <ClInclude Include="item.h">
-      <Filter>Header Files\backend\model\game</Filter>
-    </ClInclude>
-    <ClInclude Include="playerCharacter.h">
-      <Filter>Header Files\backend\model\game</Filter>
-    </ClInclude>
-    <ClInclude Include="levelData.h">
-      <Filter>Header Files\backend\model\game</Filter>
-    </ClInclude>
-    <ClInclude Include="gameData.h">
-      <Filter>Header Files\backend\model\game</Filter>
-    </ClInclude>
-    <ClInclude Include="lightConstants.h">
-      <Filter>Header Files\backend\modelConstant</Filter>
-    </ClInclude>
-    <ClInclude Include="light.h">
-      <Filter>Header Files\backend\model\game</Filter>
-    </ClInclude>
-    <ClInclude Include="flare.h">
-      <Filter>Header Files\backend\model\game</Filter>
-    </ClInclude>
-    <ClInclude Include="machineConstants.h">
-      <Filter>Header Files\backend\modelConstant</Filter>
-    </ClInclude>
-    <ClInclude Include="machineTemplate.h">
-      <Filter>Header Files\backend\model\gameTemplate</Filter>
-    </ClInclude>
     <ClInclude Include="brogueGlobal.h">
       <Filter>Header Files\global</Filter>
-    </ClInclude>
-    <ClInclude Include="delaunayAlgorithm.h">
-      <Filter>Header Files\component</Filter>
-    </ClInclude>
-    <ClInclude Include="dijkstra.h">
-      <Filter>Header Files\component</Filter>
-    </ClInclude>
-    <ClInclude Include="graph.h">
-      <Filter>Header Files\component</Filter>
-    </ClInclude>
-    <ClInclude Include="graphAlgorithm.h">
-      <Filter>Header Files\component</Filter>
-    </ClInclude>
-    <ClInclude Include="graphDefinitions.h">
-      <Filter>Header Files\component</Filter>
-    </ClInclude>
-    <ClInclude Include="graphEdge.h">
-      <Filter>Header Files\component</Filter>
-    </ClInclude>
-    <ClInclude Include="graphEdgeCollection.h">
-      <Filter>Header Files\component</Filter>
-    </ClInclude>
-    <ClInclude Include="graphNode.h">
-      <Filter>Header Files\component</Filter>
-    </ClInclude>
-    <ClInclude Include="grid.h">
-      <Filter>Header Files\component</Filter>
-    </ClInclude>
-    <ClInclude Include="gridDefinitions.h">
-      <Filter>Header Files\component</Filter>
-    </ClInclude>
-    <ClInclude Include="gridLocator.h">
-      <Filter>Header Files\component</Filter>
-    </ClInclude>
-    <ClInclude Include="gridLocatorEdge.h">
-      <Filter>Header Files\component</Filter>
-    </ClInclude>
-    <ClInclude Include="gridRect.h">
-      <Filter>Header Files\component</Filter>
-    </ClInclude>
-    <ClInclude Include="gridRegion.h">
-      <Filter>Header Files\component</Filter>
-    </ClInclude>
-    <ClInclude Include="gridRegionConstructor.h">
-      <Filter>Header Files\component</Filter>
-    </ClInclude>
-    <ClInclude Include="gridRegionLocator.h">
-      <Filter>Header Files\component</Filter>
-    </ClInclude>
-    <ClInclude Include="primsAlgorithm.h">
-      <Filter>Header Files\component</Filter>
     </ClInclude>
     <ClInclude Include="simpleComponentTests.h">
       <Filter>Header Files\unit-test</Filter>
@@ -428,59 +188,11 @@
     <ClInclude Include="brogueBackground.h">
       <Filter>Header Files\frontend\ui</Filter>
     </ClInclude>
-    <ClInclude Include="simple.h">
-      <Filter>Header Files\simple</Filter>
-    </ClInclude>
-    <ClInclude Include="simpleArray.h">
-      <Filter>Header Files\simple</Filter>
-    </ClInclude>
-    <ClInclude Include="simpleBST.h">
-      <Filter>Header Files\simple</Filter>
-    </ClInclude>
-    <ClInclude Include="simpleHash.h">
-      <Filter>Header Files\simple</Filter>
-    </ClInclude>
-    <ClInclude Include="simpleList.h">
-      <Filter>Header Files\simple</Filter>
-    </ClInclude>
-    <ClInclude Include="simpleListExtension.h">
-      <Filter>Header Files\simple</Filter>
-    </ClInclude>
-    <ClInclude Include="simpleString.h">
-      <Filter>Header Files\simple</Filter>
-    </ClInclude>
-    <ClInclude Include="simpleMath.h">
-      <Filter>Header Files\simple</Filter>
-    </ClInclude>
-    <ClInclude Include="simplePoint.h">
-      <Filter>Header Files\simple</Filter>
-    </ClInclude>
-    <ClInclude Include="simpleVector.h">
-      <Filter>Header Files\simple</Filter>
-    </ClInclude>
-    <ClInclude Include="simpleTriangle.h">
-      <Filter>Header Files\simple</Filter>
-    </ClInclude>
-    <ClInclude Include="simpleException.h">
-      <Filter>Header Files\simple</Filter>
-    </ClInclude>
-    <ClInclude Include="simpleLogger.h">
-      <Filter>Header Files\simple</Filter>
-    </ClInclude>
-    <ClInclude Include="simpleEnumString.h">
-      <Filter>Header Files\simple</Filter>
-    </ClInclude>
     <ClInclude Include="brogueMacroDeclaration.h">
       <Filter>Header Files\global</Filter>
     </ClInclude>
-    <ClInclude Include="simpleExt.h">
-      <Filter>Header Files\simple</Filter>
-    </ClInclude>
     <ClInclude Include="brogueTestFunction.h">
       <Filter>Header Files\unit-test</Filter>
-    </ClInclude>
-    <ClInclude Include="simpleQueue.h">
-      <Filter>Header Files\simple</Filter>
     </ClInclude>
     <ClInclude Include="openglHelper.h">
       <Filter>Header Files\frontend\opengl</Filter>
@@ -499,24 +211,6 @@
     </ClInclude>
     <ClInclude Include="brogueGlyphMap.h">
       <Filter>Header Files\frontend\ui</Filter>
-    </ClInclude>
-    <ClInclude Include="simpleBitmap.h">
-      <Filter>Header Files\simple</Filter>
-    </ClInclude>
-    <ClInclude Include="bitmap.h">
-      <Filter>Header Files\global</Filter>
-    </ClInclude>
-    <ClInclude Include="simplePixel.h">
-      <Filter>Header Files\simple</Filter>
-    </ClInclude>
-    <ClInclude Include="simpleMaskedInt32.h">
-      <Filter>Header Files\simple</Filter>
-    </ClInclude>
-    <ClInclude Include="simplePixelFilter.h">
-      <Filter>Header Files\simple</Filter>
-    </ClInclude>
-    <ClInclude Include="simpleBuffer.h">
-      <Filter>Header Files\simple</Filter>
     </ClInclude>
     <ClInclude Include="brogueViewProgram.h">
       <Filter>Header Files\frontend\ui</Filter>
@@ -581,18 +275,6 @@
     <ClInclude Include="brogueUIBuilder.h">
       <Filter>Header Files\frontend\ui</Filter>
     </ClInclude>
-    <ClInclude Include="simpleFileEntry.h">
-      <Filter>Header Files\simple</Filter>
-    </ClInclude>
-    <ClInclude Include="simpleFileIO.h">
-      <Filter>Header Files\simple</Filter>
-    </ClInclude>
-    <ClInclude Include="colorGradient.h">
-      <Filter>Header Files\backend\model\game</Filter>
-    </ClInclude>
-    <ClInclude Include="simpleDirectoryEntry.h">
-      <Filter>Header Files\simple</Filter>
-    </ClInclude>
     <ClInclude Include="brogueUIConstants.h">
       <Filter>Header Files\frontend</Filter>
     </ClInclude>
@@ -641,9 +323,6 @@
     <ClInclude Include="brogueFlameMenuHeatView.h">
       <Filter>Header Files\frontend\ui</Filter>
     </ClInclude>
-    <ClInclude Include="simpleOrderedList.h">
-      <Filter>Header Files\simple</Filter>
-    </ClInclude>
     <ClInclude Include="brogueUIStateChanger.h">
       <Filter>Header Files\frontend\ui</Filter>
     </ClInclude>
@@ -655,9 +334,6 @@
     </ClInclude>
     <ClInclude Include="brogueUIText.h">
       <Filter>Header Files\frontend\ui</Filter>
-    </ClInclude>
-    <ClInclude Include="simpleTimer.h">
-      <Filter>Header Files\simple</Filter>
     </ClInclude>
     <ClInclude Include="simpleKeyboardState.h">
       <Filter>Header Files\frontend\opengl\program</Filter>
@@ -671,23 +347,8 @@
     <ClInclude Include="brogueGameView.h">
       <Filter>Header Files\frontend\ui</Filter>
     </ClInclude>
-    <ClInclude Include="gameGenerator.h">
-      <Filter>Header Files\backend\generator</Filter>
-    </ClInclude>
-    <ClInclude Include="brogueGameTemplate.h">
-      <Filter>Header Files\backend\model\gameTemplate</Filter>
-    </ClInclude>
-    <ClInclude Include="brogueLevelTemplate.h">
-      <Filter>Header Files\backend\model\gameTemplate</Filter>
-    </ClInclude>
     <ClInclude Include="cppstopwatch.h">
       <Filter>Header Files\vendor</Filter>
-    </ClInclude>
-    <ClInclude Include="gridRegionExtension.h">
-      <Filter>Header Files\component</Filter>
-    </ClInclude>
-    <ClInclude Include="rectanglePackingAlgorithm.h">
-      <Filter>Header Files\component</Filter>
     </ClInclude>
     <ClInclude Include="brogueScrollView.h">
       <Filter>Header Files\frontend\ui</Filter>
@@ -695,23 +356,8 @@
     <ClInclude Include="brogueUIColorText.h">
       <Filter>Header Files\frontend\ui</Filter>
     </ClInclude>
-    <ClInclude Include="brogueRoomTemplate.h">
-      <Filter>Header Files\backend\model\gameTemplate</Filter>
-    </ClInclude>
-    <ClInclude Include="randomRange.h">
-      <Filter>Header Files\backend\model\game</Filter>
-    </ClInclude>
-    <ClInclude Include="simpleStack.h">
-      <Filter>Header Files\simple</Filter>
-    </ClInclude>
-    <ClInclude Include="simpleRange.h">
-      <Filter>Header Files\simple</Filter>
-    </ClInclude>
     <ClInclude Include="brogueGraphView.h">
       <Filter>Header Files\frontend\ui</Filter>
-    </ClInclude>
-    <ClInclude Include="simpleLine.h">
-      <Filter>Header Files\simple</Filter>
     </ClInclude>
     <ClInclude Include="brogueViewGridCore.h">
       <Filter>Header Files\frontend\ui</Filter>
@@ -737,38 +383,14 @@
     <ClInclude Include="brogueViewContainer.h">
       <Filter>Header Files\frontend\ui</Filter>
     </ClInclude>
-    <ClInclude Include="simpleHashCore.h">
-      <Filter>Header Files\simple</Filter>
-    </ClInclude>
-    <ClInclude Include="simplePair.h">
-      <Filter>Header Files\simple</Filter>
-    </ClInclude>
-    <ClInclude Include="simpleHashBasicCore.h">
-      <Filter>Header Files\simple</Filter>
-    </ClInclude>
-    <ClInclude Include="simpleHashStdCore.h">
-      <Filter>Header Files\simple</Filter>
-    </ClInclude>
-    <ClInclude Include="simpleRectangle.h">
-      <Filter>Header Files\simple</Filter>
-    </ClInclude>
-    <ClInclude Include="simpleBSTNode.h">
-      <Filter>Header Files\simple</Filter>
-    </ClInclude>
     <ClInclude Include="simpleBSTTests.h">
       <Filter>Header Files\unit-test</Filter>
     </ClInclude>
-    <ClInclude Include="cellularAutomataGenerator.h">
-      <Filter>Header Files\backend\generator</Filter>
+    <ClInclude Include="colorGradient.h">
+      <Filter>Header Files\frontend\ui</Filter>
     </ClInclude>
-    <ClInclude Include="perlinNoiseGenerator.h">
-      <Filter>Header Files\backend\generator</Filter>
-    </ClInclude>
-    <ClInclude Include="mazeGenerator.h">
-      <Filter>Header Files\backend\generator</Filter>
-    </ClInclude>
-    <ClInclude Include="gridMethods.h">
-      <Filter>Header Files\component</Filter>
+    <ClInclude Include="colorString.h">
+      <Filter>Header Files\frontend\ui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

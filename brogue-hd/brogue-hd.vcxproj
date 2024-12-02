@@ -79,10 +79,10 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <AllProjectIncludesArePublic>true</AllProjectIncludesArePublic>
-    <IncludePath>C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\include;C:\Backup\_Source\Git\brogue-v1.7.5\packages\sdl2.nuget.2.30.8\build\native\include;C:\Backup\_Source\Git\brogue-v1.7.5\packages\sdl2_image.nuget.2.8.2\build\native\include;$(IncludePath)</IncludePath>
-    <ReferencePath>C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\lib-vc2022;C:\Backup\_Source\Git\brogue-v1.7.5\packages\sdl2.nuget.2.30.8\build\native\lib\x64;C:\Backup\_Source\Git\brogue-v1.7.5\packages\sdl2_image.nuget.2.8.2\build\native\lib\x64;$(ReferencePath)</ReferencePath>
-    <SourcePath>C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\include;C:\Backup\_Source\Git\brogue-v1.7.5\packages\sdl2.nuget.2.30.8\build\native\include;C:\Backup\_Source\Git\brogue-v1.7.5\packages\sdl2_image.nuget.2.8.2\build\native\include;$(SourcePath)</SourcePath>
-    <LibraryPath>C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\lib-vc2022;C:\Backup\_Source\Git\brogue-v1.7.5\packages\sdl2.nuget.2.30.8\build\native\lib\x64;C:\Backup\_Source\Git\brogue-v1.7.5\packages\sdl2_image.nuget.2.8.2\build\native\lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\include;C:\Backup\_Source\Git\brogue-v1.7.5\packages\sdl2.nuget.2.30.8\build\native\include;C:\Backup\_Source\Git\brogue-v1.7.5\packages\sdl2_image.nuget.2.8.2\build\native\include;C:\Backup\_Source\Git\brogue-v1.7.5\brogue-hd.component;C:\Backup\_Source\Git\simple\simple.core;C:\Backup\_Source\Git\simple\simple.math;$(IncludePath)</IncludePath>
+    <ReferencePath>C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\lib-vc2022;C:\Backup\_Source\Git\brogue-v1.7.5\packages\sdl2.nuget.2.30.8\build\native\lib\x64;C:\Backup\_Source\Git\brogue-v1.7.5\packages\sdl2_image.nuget.2.8.2\build\native\lib\x64;C:\Backup\_Source\Git\simple\x64\Debug;$(ReferencePath)</ReferencePath>
+    <SourcePath>C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\include;C:\Backup\_Source\Git\brogue-v1.7.5\packages\sdl2.nuget.2.30.8\build\native\include;C:\Backup\_Source\Git\brogue-v1.7.5\packages\sdl2_image.nuget.2.8.2\build\native\include;C:\Backup\_Source\Git\simple\simple.core;C:\Backup\_Source\Git\simple\simple.math;$(SourcePath)</SourcePath>
+    <LibraryPath>C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\lib-vc2022;C:\Backup\_Source\Git\brogue-v1.7.5\packages\sdl2.nuget.2.30.8\build\native\lib\x64;C:\Backup\_Source\Git\brogue-v1.7.5\packages\sdl2_image.nuget.2.8.2\build\native\lib\x64;C:\Backup\_Source\Git\simple\x64\Debug;$(LibraryPath)</LibraryPath>
     <ExecutablePath>C:\Backup\_Source\Git\brogue-v1.7.5\packages\sdl2.nuget.2.30.8\build\native\lib\x64;C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\lib-vc2022;C:\Backup\_Source\Git\brogue-v1.7.5\packages\sdl2_image.nuget.2.8.2\build\native\lib\x64;$(ExecutablePath)</ExecutablePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -130,7 +130,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;GLFW_INCLUDE_NONE;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\include;C:\Backup\_Source\Git\brogue-v1.7.5\packages\sdl2.nuget.2.30.8\build\native\include;C:\Backup\_Source\Git\brogue-v1.7.5\packages\sdl2_image.nuget.2.8.2\build\native\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\include;C:\Backup\_Source\Git\brogue-v1.7.5\packages\sdl2.nuget.2.30.8\build\native\include;C:\Backup\_Source\Git\brogue-v1.7.5\packages\sdl2_image.nuget.2.8.2\build\native\include;C:\Backup\_Source\Git\simple\simple.core;C:\Backup\_Source\Git\brogue-v1.7.5\brogue-hd.component;C:\Backup\_Source\Git\simple\simple.math;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard_C>stdclatest</LanguageStandard_C>
       <DisableSpecificWarnings>4267;4244;4104;4101;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
@@ -141,8 +141,8 @@
       <ImportLibrary>
       </ImportLibrary>
       <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\lib-vc2022;C:\Backup\_Source\Git\brogue-v1.7.5\packages\sdl2.nuget.2.30.8\build\native\lib\x64;C:\Backup\_Source\Git\brogue-v1.7.5\packages\sdl2_image.nuget.2.8.2\build\native\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glfw3dll.lib;opengl32.lib;SDL2.lib;SDL2Main.lib;SDL2_image.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\lib-vc2022;C:\Backup\_Source\Git\brogue-v1.7.5\packages\sdl2.nuget.2.30.8\build\native\lib\x64;C:\Backup\_Source\Git\brogue-v1.7.5\packages\sdl2_image.nuget.2.8.2\build\native\lib\x64;C:\Backup\_Source\Git\simple\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>simple.core.lib;simple.math.lib;glfw3dll.lib;opengl32.lib;SDL2.lib;SDL2Main.lib;SDL2_image.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ProjectReference>
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
@@ -180,11 +180,7 @@
     <ClInclude Include="brogueLine.h" />
     <ClInclude Include="brogueMenuBackground.h" />
     <ClInclude Include="brogueQuad.h" />
-    <ClInclude Include="brogueRoomTemplate.h" />
     <ClInclude Include="brogueUIColorText.h" />
-    <ClInclude Include="brogueDesignRect.h" />
-    <ClInclude Include="bitmap.h" />
-    <ClInclude Include="boltConstants.h" />
     <ClInclude Include="boudingBox2D.h" />
     <ClInclude Include="brogueButton.h" />
     <ClInclude Include="brogueEvent.h" />
@@ -193,10 +189,8 @@
     <ClInclude Include="brogueGameView.h" />
     <ClInclude Include="brogueKeyboardState.h" />
     <ClInclude Include="brogueCellQuad.h" />
-    <ClInclude Include="brogueLevelTemplate.h" />
     <ClInclude Include="brogueMainProgram.h" />
     <ClInclude Include="brogueMouseState.h" />
-    <ClInclude Include="brogueGameTemplate.h" />
     <ClInclude Include="brogueScrollView.h" />
     <ClInclude Include="brogueTitleGrid.h" />
     <ClInclude Include="brogueUIData.h" />
@@ -217,55 +211,26 @@
     <ClInclude Include="brogueColorMap.h" />
     <ClInclude Include="brogueColorQuad.h" />
     <ClInclude Include="brogueConsole.h" />
-    <ClInclude Include="brogueContentGrid.h" />
-    <ClInclude Include="brogueCreature.h" />
-    <ClInclude Include="brogueCreatureHorde.h" />
     <ClInclude Include="brogueGlobal.h" />
     <ClInclude Include="brogueGameProfile.h" />
     <ClInclude Include="brogueImageQuad.h" />
-    <ClInclude Include="brogueLevelProfile.h" />
     <ClInclude Include="brogueMacroDeclaration.h" />
     <ClInclude Include="brogueTestFunction.h" />
     <ClInclude Include="brogueGlyphMap.h" />
     <ClInclude Include="brogueViewProgram.h" />
-    <ClInclude Include="cellularAutomataGenerator.h" />
     <ClInclude Include="colorGradient.h" />
+    <ClInclude Include="colorString.h" />
     <ClInclude Include="cppstopwatch.h" />
     <ClInclude Include="eventController.h" />
     <ClInclude Include="brogueFlameMenuTitleMask.h" />
-    <ClInclude Include="gameGenerator.h" />
-    <ClInclude Include="gridMethods.h" />
-    <ClInclude Include="gridRegionExtension.h" />
-    <ClInclude Include="mazeGenerator.h" />
     <ClInclude Include="openglQuadConverter.h" />
     <ClInclude Include="openglHelper.h" />
     <ClInclude Include="brogueUIConstants.h" />
-    <ClInclude Include="perlinNoiseGenerator.h" />
-    <ClInclude Include="randomRange.h" />
-    <ClInclude Include="rectanglePackingAlgorithm.h" />
     <ClInclude Include="simpleBoundingBox.h" />
-    <ClInclude Include="simpleBSTNode.h" />
     <ClInclude Include="simpleBSTTests.h" />
-    <ClInclude Include="simpleBuffer.h" />
-    <ClInclude Include="simpleDirectoryEntry.h" />
-    <ClInclude Include="simpleExt.h" />
-    <ClInclude Include="simpleFileEntry.h" />
-    <ClInclude Include="simpleHashBasicCore.h" />
-    <ClInclude Include="simpleHashCore.h" />
-    <ClInclude Include="simpleHashStdCore.h" />
     <ClInclude Include="simpleKeyboardState.h" />
-    <ClInclude Include="simpleLine.h" />
-    <ClInclude Include="simpleLogger.h" />
-    <ClInclude Include="brogueMachine.h" />
-    <ClInclude Include="simpleMaskedInt32.h" />
-    <ClInclude Include="simpleMath.h" />
-    <ClInclude Include="brogueObject.h" />
-    <ClInclude Include="broguePlayer.h" />
-    <ClInclude Include="brogueRoom.h" />
     <ClInclude Include="brogueTestPackage.h" />
-    <ClInclude Include="cellularAutomataParameters.h" />
     <ClInclude Include="brogueCoordinateConverter.h" />
-    <ClInclude Include="simpleFileIO.h" />
     <ClInclude Include="gl.h" />
     <ClInclude Include="json.hpp" />
     <ClInclude Include="shaderData.h" />
@@ -275,121 +240,36 @@
     <ClInclude Include="khrplatform.h" />
     <ClInclude Include="simpleArrayTests.h" />
     <ClInclude Include="simpleComponentTests.h" />
-    <ClInclude Include="creatureBehaviorConstants.h" />
-    <ClInclude Include="creatureBehavior.h" />
-    <ClInclude Include="creatureBehaviorMap.h" />
-    <ClInclude Include="creatureConstants.h" />
-    <ClInclude Include="delaunayAlgorithm.h" />
     <ClInclude Include="developerConsole.h" />
-    <ClInclude Include="dijkstra.h" />
-    <ClInclude Include="dungeonFeature.h" />
-    <ClInclude Include="dungeonFeatureConstants.h" />
-    <ClInclude Include="dungeonTemplate.h" />
-    <ClInclude Include="simpleEnumString.h" />
-    <ClInclude Include="simpleException.h" />
     <ClInclude Include="gameConsole.h" />
-    <ClInclude Include="graph.h" />
-    <ClInclude Include="graphAlgorithm.h" />
-    <ClInclude Include="graphDefinitions.h" />
-    <ClInclude Include="graphEdge.h" />
-    <ClInclude Include="graphEdgeCollection.h" />
-    <ClInclude Include="graphNode.h" />
-    <ClInclude Include="grid.h" />
-    <ClInclude Include="gridDefinitions.h" />
-    <ClInclude Include="gridLocator.h" />
-    <ClInclude Include="gridLocatorEdge.h" />
-    <ClInclude Include="gridRect.h" />
-    <ClInclude Include="gridRegion.h" />
-    <ClInclude Include="gridRegionConstructor.h" />
-    <ClInclude Include="gridRegionLocator.h" />
-    <ClInclude Include="item.h" />
-    <ClInclude Include="itemTemplate.h" />
-    <ClInclude Include="linearGenerationParameters.h" />
-    <ClInclude Include="machineTemplate.h" />
-    <ClInclude Include="blueprintDeclaration.h" />
-    <ClInclude Include="bolt.h" />
-    <ClInclude Include="brogueCell.h" />
-    <ClInclude Include="broguefile.h" />
-    <ClInclude Include="brogueGame.h" />
-    <ClInclude Include="brogueLayout.h" />
-    <ClInclude Include="brogueLevel.h" />
     <ClInclude Include="brogueMessageQueue.h" />
-    <ClInclude Include="brogueRememberedCell.h" />
     <ClInclude Include="brogueBackground.h" />
-    <ClInclude Include="brogueCellDisplay.h" />
-    <ClInclude Include="gridCell.h" />
-    <ClInclude Include="color.h" />
-    <ClInclude Include="colorConstants.h" />
-    <ClInclude Include="colorString.h" />
-    <ClInclude Include="contentGenerator.h" />
-    <ClInclude Include="creature.h" />
-    <ClInclude Include="dungeonConstants.h" />
-    <ClInclude Include="feat.h" />
     <ClInclude Include="fileio.h" />
-    <ClInclude Include="flare.h" />
-    <ClInclude Include="floorTileType.h" />
-    <ClInclude Include="gameConstants.h" />
     <ClInclude Include="gameController.h" />
-    <ClInclude Include="gameData.h" />
     <ClInclude Include="brogueLevelMethods.h" />
-    <ClInclude Include="brogueItem.h" />
-    <ClInclude Include="itemConstants.h" />
     <ClInclude Include="keyProcessor.h" />
-    <ClInclude Include="layoutGenerator.h" />
-    <ClInclude Include="levelData.h" />
     <ClInclude Include="levelProcessor.h" />
     <ClInclude Include="levelRenderer.h" />
-    <ClInclude Include="light.h" />
-    <ClInclude Include="lightConstants.h" />
-    <ClInclude Include="machineConstants.h" />
-    <ClInclude Include="simpleBitmap.h" />
     <ClInclude Include="simpleMouseState.h" />
     <ClInclude Include="simpleOpenGL.h" />
-    <ClInclude Include="simpleOrderedList.h" />
-    <ClInclude Include="simplePair.h" />
     <ClInclude Include="simplePeriodCounter.h" />
-    <ClInclude Include="simplePixel.h" />
-    <ClInclude Include="simplePixelFilter.h" />
-    <ClInclude Include="simplePoint.h" />
-    <ClInclude Include="simpleQueue.h" />
-    <ClInclude Include="simpleRange.h" />
-    <ClInclude Include="simpleRectangle.h" />
-    <ClInclude Include="simpleStack.h" />
-    <ClInclude Include="simpleTimer.h" />
     <ClInclude Include="simpleUniform.h" />
-    <ClInclude Include="simpleVector.h" />
     <ClInclude Include="messageData.h" />
-    <ClInclude Include="noiseGenerator.h" />
     <ClInclude Include="openglRenderer.h" />
     <ClInclude Include="playbackProcessor.h" />
-    <ClInclude Include="playerCharacter.h" />
-    <ClInclude Include="powerTables.h" />
-    <ClInclude Include="primsAlgorithm.h" />
-    <ClInclude Include="randomGenerator.h" />
     <ClInclude Include="playbackData.h" />
     <ClInclude Include="resourceConsole.h" />
     <ClInclude Include="resourceController.h" />
-    <ClInclude Include="roomGenerator.h" />
     <ClInclude Include="renderingController.h" />
-    <ClInclude Include="simple.h" />
-    <ClInclude Include="simpleArray.h" />
-    <ClInclude Include="simpleBST.h" />
-    <ClInclude Include="simpleHash.h" />
     <ClInclude Include="simpleHashTests.h" />
-    <ClInclude Include="simpleList.h" />
-    <ClInclude Include="simpleListExtension.h" />
     <ClInclude Include="simpleShader.h" />
     <ClInclude Include="simpleShaderProgram.h" />
-    <ClInclude Include="simpleString.h" />
     <ClInclude Include="simpleTexture.h" />
     <ClInclude Include="simpleVertexArray.h" />
     <ClInclude Include="simpleVertexAttribute.h" />
     <ClInclude Include="simpleVertexBuffer.h" />
     <ClInclude Include="statusEffectConstants.h" />
     <ClInclude Include="statusEffect.h" />
-    <ClInclude Include="terrainDeclaration.h" />
-    <ClInclude Include="terrainGenerator.h" />
-    <ClInclude Include="simpleTriangle.h" />
     <ClInclude Include="simpleGlData.h" />
   </ItemGroup>
   <ItemGroup>
