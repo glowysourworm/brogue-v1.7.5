@@ -5,9 +5,9 @@
 #include "dungeonConstants.h"
 #include "lightConstants.h"
 
-namespace brogueHd::backend::model
+namespace brogueHd::model
 {
-	struct dungeonFeature 
+	struct dungeonFeature
 	{
 		// tile info:
 		tileType tile;

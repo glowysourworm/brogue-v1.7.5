@@ -5,11 +5,12 @@
 #include "simpleList.h"
 #include <iosfwd>
 
-using namespace brogueHd::simple;
-
-namespace brogueHd::backend::model
+namespace brogueHd::model
 {
-	typedef struct fileEntry {
+	using namespace simple;
+
+	typedef struct fileEntry
+	{
 		char* path;
 		char date[100];
 	} fileEntry;
@@ -17,7 +18,8 @@ namespace brogueHd::backend::model
 	/// <summary>
 	/// Simple keymap used to customize key processor functionality
 	/// </summary>
-	typedef struct keyMap {
+	typedef struct keyMap
+	{
 		char inputCharacter;
 		char outputCharacter;
 	} keyMap;
@@ -25,7 +27,6 @@ namespace brogueHd::backend::model
 	struct brogueEvent : simpleStruct
 	{
 	public:
-
 		enum BrogueEventType eventType;
 		signed long param1;
 		signed long param2;

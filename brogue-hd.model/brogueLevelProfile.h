@@ -10,15 +10,13 @@
 #include "simpleHash.h"
 #include "simpleMath.h"
 
-using namespace brogueHd::simple;
-using namespace brogueHd::backend;
-
-namespace brogueHd::backend::model
+namespace brogueHd::model
 {
+	using namespace simple;
+
 	class brogueLevelProfile
 	{
 	public:
-
 		brogueLevelProfile(int depth, levelTypes type);
 		~brogueLevelProfile();
 
@@ -27,11 +25,9 @@ namespace brogueHd::backend::model
 		brogueRoomTemplate getDefaultRoom();
 
 	private:
-
 		brogueRoomTemplate createRoomInfo(brogueRoomType roomType);
 
 	private:
-
 		simpleHash<brogueRoomType, brogueRoomTemplate>* _roomInfo;
 
 		// Room Frequency static data
@@ -73,7 +69,7 @@ namespace brogueHd::backend::model
 
 		_roomInfo = new simpleHash<brogueRoomType, brogueRoomTemplate>();
 		_roomFrequencyMap = new simpleHash<levelTypes, simpleHash<brogueRoomType, int>*>();
-		_corridorFrequencyMap = new simpleHash< levelTypes, int>();
+		_corridorFrequencyMap = new simpleHash<levelTypes, int>();
 		_levelType = type;
 		_depth = depth;
 
@@ -139,7 +135,8 @@ namespace brogueHd::backend::model
 
 		// Set up room info's
 		_roomInfo->add(brogueRoomType::CrossRoom, createRoomInfo(brogueRoomType::CrossRoom));
-		_roomInfo->add(brogueRoomType::SmallSymmetricalCrossRoom, createRoomInfo(brogueRoomType::SmallSymmetricalCrossRoom));
+		_roomInfo->add(brogueRoomType::SmallSymmetricalCrossRoom,
+		               createRoomInfo(brogueRoomType::SmallSymmetricalCrossRoom));
 		_roomInfo->add(brogueRoomType::SmallRoom, createRoomInfo(brogueRoomType::SmallRoom));
 		_roomInfo->add(brogueRoomType::CircularRoom, createRoomInfo(brogueRoomType::CircularRoom));
 		_roomInfo->add(brogueRoomType::ChunkyRoom, createRoomInfo(brogueRoomType::ChunkyRoom));
@@ -148,12 +145,11 @@ namespace brogueHd::backend::model
 		_roomInfo->add(brogueRoomType::CaveLargeNS, createRoomInfo(brogueRoomType::CaveLargeNS));
 		_roomInfo->add(brogueRoomType::Cavern, createRoomInfo(brogueRoomType::Cavern));
 		_roomInfo->add(brogueRoomType::MainEntranceRoom, createRoomInfo(brogueRoomType::MainEntranceRoom));
-
 	}
 
 	brogueLevelProfile::~brogueLevelProfile()
 	{
-		_roomFrequencyMap->iterate([] (levelTypes type, simpleHash<brogueRoomType, int>* map)
+		_roomFrequencyMap->iterate([](levelTypes type, simpleHash<brogueRoomType, int>* map)
 		{
 			delete map;
 
@@ -173,7 +169,8 @@ namespace brogueHd::backend::model
 		if (_depth == 1)
 		{
 			if (roomType == brogueRoomType::MainEntranceRoom)
-				return brogueRoomTemplate(levelBoundary, roomType, _corridorFrequencyMap->get(levelTypes::DP_BASIC_FIRST_ROOM));
+				return brogueRoomTemplate(levelBoundary, roomType,
+				                          _corridorFrequencyMap->get(levelTypes::DP_BASIC_FIRST_ROOM));
 		}
 
 		// ADJUST FOR DEPTH (Brogue v1.7.5)
@@ -186,31 +183,31 @@ namespace brogueHd::backend::model
 		// Additional adjustment for first room
 		switch (roomType)
 		{
-			case brogueRoomType::CrossRoom:
-				roomFrequency += 20 * (100 - descentPercent) / 100;
-				break;
-			case brogueRoomType::SmallSymmetricalCrossRoom:
-				roomFrequency += 10 * (100 - descentPercent) / 100;
-				break;
-			case brogueRoomType::SmallRoom:
-				break;
-			case brogueRoomType::CircularRoom:
-				roomFrequency += 7 * (100 - descentPercent) / 100;
-				break;
-			case brogueRoomType::ChunkyRoom:
-				break;
-			case brogueRoomType::CaveCompact:
-			case brogueRoomType::CaveLargeNS:
-			case brogueRoomType::CaveLargeEW:
-				roomFrequency += 10 * (100 - descentPercent) / 100;
-				break;
-			case brogueRoomType::Cavern:
-				roomFrequency += 50 * descentPercent / 100;
-				break;
-			case brogueRoomType::MainEntranceRoom:
-				break;
-			default:
-				break;
+		case brogueRoomType::CrossRoom:
+			roomFrequency += 20 * (100 - descentPercent) / 100;
+			break;
+		case brogueRoomType::SmallSymmetricalCrossRoom:
+			roomFrequency += 10 * (100 - descentPercent) / 100;
+			break;
+		case brogueRoomType::SmallRoom:
+			break;
+		case brogueRoomType::CircularRoom:
+			roomFrequency += 7 * (100 - descentPercent) / 100;
+			break;
+		case brogueRoomType::ChunkyRoom:
+			break;
+		case brogueRoomType::CaveCompact:
+		case brogueRoomType::CaveLargeNS:
+		case brogueRoomType::CaveLargeEW:
+			roomFrequency += 10 * (100 - descentPercent) / 100;
+			break;
+		case brogueRoomType::Cavern:
+			roomFrequency += 50 * descentPercent / 100;
+			break;
+		case brogueRoomType::MainEntranceRoom:
+			break;
+		default:
+			break;
 		}
 
 		corridorFrequency += 80 * (100 - descentPercent) / 100;

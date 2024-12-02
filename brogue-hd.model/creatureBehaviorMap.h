@@ -7,24 +7,27 @@
 #include "gridLocator.h"
 #include "simpleList.h"
 
-using namespace brogueHd::component;
-
-namespace brogueHd::backend::model
+namespace brogueHd::model
 {
 	class creatureBehaviorMap
 	{
 	public:
+		creatureBehaviorMap()
+		{
+		};
 
-		creatureBehaviorMap() {};
-		~creatureBehaviorMap() {};
+		~creatureBehaviorMap()
+		{
+		};
 
 		/// <summary>
 		/// Updates creature behavior maps based on gloabl maps. Should be run each turn.
 		/// </summary>
-		void update(grid<brogueCell>* layoutGrid, grid<brogueObject>* contentGrid) {};
+		void update(grid<brogueCell>* layoutGrid, grid<brogueObject>* contentGrid)
+		{
+		};
 
 	private:
-
 		creatureBehavior* _behavior;
 
 		/*	Creature States
@@ -44,15 +47,15 @@ namespace brogueHd::backend::model
 		*/
 
 		grid<bool>* _visibilityMap;
-		grid<bool>* _visibilityMapLastTurn;	// Map from last turn
-		grid<int>* _goalMap;					// This map varies depending on the creature (also, friendly or enemy, "mapToMe")
+		grid<bool>* _visibilityMapLastTurn; // Map from last turn
+		grid<int>* _goalMap; // This map varies depending on the creature (also, friendly or enemy, "mapToMe")
 		grid<int>* _fleeMap;
 		grid<int>* _scentMap;
 
 		// Collections of cells left over from updating the visibility. These will indicate cells that
 		// have changed.
 		simpleList<gridLocator>* _visibleCells;
-		simpleList<gridLocator>* _visibleCellsDiff;			// Difference between last turn and this turn
+		simpleList<gridLocator>* _visibleCellsDiff; // Difference between last turn and this turn
 
 		// UNSURE:  These should be sent in during calculation
 		int _numberOfWaypoints;

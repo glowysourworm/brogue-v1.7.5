@@ -1,54 +1,54 @@
 #pragma once
 
-#include "brogueGlobal.h"
+#include <simpleMacros.h>
 
-namespace brogueHd::backend::model
+namespace brogueHd::model
 {
-	enum itemFlags 
+	enum itemFlags
 	{
-		ITEM_IDENTIFIED = Fl(0),
-		ITEM_EQUIPPED = Fl(1),
-		ITEM_CURSED = Fl(2),
-		ITEM_PROTECTED = Fl(3),
-		// unused               = Fl(4),
-		ITEM_RUNIC = Fl(5),
-		ITEM_RUNIC_HINTED = Fl(6),
-		ITEM_RUNIC_IDENTIFIED = Fl(7),
-		ITEM_CAN_BE_IDENTIFIED = Fl(8),
-		ITEM_PREPLACED = Fl(9),
-		ITEM_FLAMMABLE = Fl(10),
-		ITEM_MAGIC_DETECTED = Fl(11),
-		ITEM_MAX_CHARGES_KNOWN = Fl(12),
-		ITEM_IS_KEY = Fl(13),
+		ITEM_IDENTIFIED = EnumFlag(0),
+		ITEM_EQUIPPED = EnumFlag(1),
+		ITEM_CURSED = EnumFlag(2),
+		ITEM_PROTECTED = EnumFlag(3),
+		// unused               = EnumFlag(4),
+		ITEM_RUNIC = EnumFlag(5),
+		ITEM_RUNIC_HINTED = EnumFlag(6),
+		ITEM_RUNIC_IDENTIFIED = EnumFlag(7),
+		ITEM_CAN_BE_IDENTIFIED = EnumFlag(8),
+		ITEM_PREPLACED = EnumFlag(9),
+		ITEM_FLAMMABLE = EnumFlag(10),
+		ITEM_MAGIC_DETECTED = EnumFlag(11),
+		ITEM_MAX_CHARGES_KNOWN = EnumFlag(12),
+		ITEM_IS_KEY = EnumFlag(13),
 
-		ITEM_ATTACKS_STAGGER = Fl(14),	// mace, hammer
-		ITEM_ATTACKS_EXTEND = Fl(15),   // whip
-		ITEM_ATTACKS_QUICKLY = Fl(16),   // rapier
-		ITEM_ATTACKS_PENETRATE = Fl(17),	// spear, pike
-		ITEM_ATTACKS_ALL_ADJACENT = Fl(18),	// axe, war axe
-		ITEM_LUNGE_ATTACKS = Fl(19),   // rapier
-		ITEM_SNEAK_ATTACK_BONUS = Fl(20),   // dagger
-		ITEM_PASS_ATTACKS = Fl(21),   // flail
+		ITEM_ATTACKS_STAGGER = EnumFlag(14), // mace, hammer
+		ITEM_ATTACKS_EXTEND = EnumFlag(15), // whip
+		ITEM_ATTACKS_QUICKLY = EnumFlag(16), // rapier
+		ITEM_ATTACKS_PENETRATE = EnumFlag(17), // spear, pike
+		ITEM_ATTACKS_ALL_ADJACENT = EnumFlag(18), // axe, war axe
+		ITEM_LUNGE_ATTACKS = EnumFlag(19), // rapier
+		ITEM_SNEAK_ATTACK_BONUS = EnumFlag(20), // dagger
+		ITEM_PASS_ATTACKS = EnumFlag(21), // flail
 
-		ITEM_KIND_AUTO_ID = Fl(22),	// the item type will become known when the item is picked up.
-		ITEM_PLAYER_AVOIDS = Fl(23),	// explore and travel will try to avoid picking the item up
+		ITEM_KIND_AUTO_ID = EnumFlag(22), // the item type will become known when the item is picked up.
+		ITEM_PLAYER_AVOIDS = EnumFlag(23), // explore and travel will try to avoid picking the item up
 	};
 
-	enum itemCategory 
+	enum itemCategory
 	{
-		FOOD = Fl(0),
-		WEAPON = Fl(1),
-		ARMOR = Fl(2),
-		POTION = Fl(3),
-		SCROLL = Fl(4),
-		STAFF = Fl(5),
-		WAND = Fl(6),
-		RING = Fl(7),
-		CHARM = Fl(8),
-		GOLD = Fl(9),
-		AMULET = Fl(10),
-		GEM = Fl(11),
-		KEY = Fl(12)
+		FOOD = EnumFlag(0),
+		WEAPON = EnumFlag(1),
+		ARMOR = EnumFlag(2),
+		POTION = EnumFlag(3),
+		SCROLL = EnumFlag(4),
+		STAFF = EnumFlag(5),
+		WAND = EnumFlag(6),
+		RING = EnumFlag(7),
+		CHARM = EnumFlag(8),
+		GOLD = EnumFlag(9),
+		AMULET = EnumFlag(10),
+		GEM = EnumFlag(11),
+		KEY = EnumFlag(12)
 
 		//CAN_BE_DETECTED = (WEAPON | ARMOR | POTION | SCROLL | RING | CHARM | WAND | STAFF | AMULET),
 		//PRENAMED_CATEGORY = (FOOD | GOLD | AMULET | GEM | KEY),
@@ -57,20 +57,23 @@ namespace brogueHd::backend::model
 		//ALL_ITEMS = (FOOD | POTION | WEAPON | ARMOR | STAFF | WAND | SCROLL | RING | CHARM | GOLD | AMULET | GEM | KEY),
 	};
 
-	enum keyKind {
+	enum keyKind
+	{
 		KEY_DOOR,
 		KEY_CAGE,
 		KEY_PORTAL,
 		NUMBER_KEY_TYPES
 	};
 
-	enum foodKind {
+	enum foodKind
+	{
 		RATION,
 		FRUIT,
 		NUMBER_FOOD_KINDS
 	};
 
-	enum potionKind {
+	enum potionKind
+	{
 		POTION_LIFE,
 		POTION_STRENGTH,
 		POTION_TELEPATHY,
@@ -90,7 +93,8 @@ namespace brogueHd::backend::model
 		NUMBER_POTION_KINDS
 	};
 
-	enum weaponKind {
+	enum weaponKind
+	{
 		DAGGER,
 		SWORD,
 		BROADSWORD,
@@ -114,7 +118,8 @@ namespace brogueHd::backend::model
 		NUMBER_WEAPON_KINDS
 	};
 
-	enum weaponEnchants {
+	enum weaponEnchants
+	{
 		W_SPEED,
 		W_QUIETUS,
 		W_PARALYSIS,
@@ -129,7 +134,8 @@ namespace brogueHd::backend::model
 		NUMBER_WEAPON_RUNIC_KINDS
 	};
 
-	enum armorKind {
+	enum armorKind
+	{
 		LEATHER_ARMOR,
 		SCALE_MAIL,
 		CHAIN_MAIL,
@@ -139,7 +145,8 @@ namespace brogueHd::backend::model
 		NUMBER_ARMOR_KINDS
 	};
 
-	enum armorEnchants {
+	enum armorEnchants
+	{
 		A_MULTIPLICITY,
 		A_MUTUALITY,
 		A_ABSORPTION,
@@ -155,7 +162,8 @@ namespace brogueHd::backend::model
 		NUMBER_ARMOR_ENCHANT_KINDS,
 	};
 
-	enum wandKind {
+	enum wandKind
+	{
 		WAND_TELEPORT,
 		WAND_SLOW,
 		WAND_POLYMORPH,
@@ -168,7 +176,8 @@ namespace brogueHd::backend::model
 		NUMBER_WAND_KINDS
 	};
 
-	enum staffKind {
+	enum staffKind
+	{
 		STAFF_LIGHTNING,
 		STAFF_FIRE,
 		STAFF_POISON,
@@ -185,7 +194,8 @@ namespace brogueHd::backend::model
 	};
 
 	// these must be wand bolts, in order, and then staff bolts, in order:
-	enum boltType {
+	enum boltType
+	{
 		BOLT_NONE = 0,
 		BOLT_TELEPORT,
 		BOLT_SLOW,
@@ -219,7 +229,8 @@ namespace brogueHd::backend::model
 		NUMBER_BOLT_KINDS
 	};
 
-	enum ringKind {
+	enum ringKind
+	{
 		RING_CLAIRVOYANCE,
 		RING_STEALTH,
 		RING_REGENERATION,
@@ -231,7 +242,8 @@ namespace brogueHd::backend::model
 		NUMBER_RING_KINDS
 	};
 
-	enum charmKind {
+	enum charmKind
+	{
 		CHARM_HEALTH,
 		CHARM_PROTECTION,
 		CHARM_HASTE,
@@ -247,7 +259,8 @@ namespace brogueHd::backend::model
 		NUMBER_CHARM_KINDS
 	};
 
-	enum scrollKind {
+	enum scrollKind
+	{
 		SCROLL_ENCHANTING,
 		SCROLL_IDENTIFY,
 		SCROLL_TELEPORT,

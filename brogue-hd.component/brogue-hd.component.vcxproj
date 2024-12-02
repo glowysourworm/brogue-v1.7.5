@@ -19,6 +19,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="brogueContentGrid.h" />
+    <ClInclude Include="brogueDesignRect.h" />
+    <ClInclude Include="brogueLayout.h" />
+    <ClInclude Include="brogueLevel.h" />
+    <ClInclude Include="brogueRoom.h" />
     <ClInclude Include="cellularAutomataGenerator.h" />
     <ClInclude Include="cellularAutomataParameters.h" />
     <ClInclude Include="contentGenerator.h" />

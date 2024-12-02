@@ -8,9 +8,7 @@
 #include "lightConstants.h"
 #include "randomRange.h"
 
-using namespace brogueHd::simple;
-
-namespace brogueHd::backend::model
+namespace brogueHd::model
 {
 	struct creatureWords
 	{
@@ -79,7 +77,7 @@ namespace brogueHd::backend::model
 		int defense;
 		int accuracy;
 		randomRange damage;
-		long turnsBetweenRegen;		// turns to wait before regaining 1 HP
+		long turnsBetweenRegen; // turns to wait before regaining 1 HP
 		int movementSpeed;
 		int attackSpeed;
 
@@ -91,11 +89,10 @@ namespace brogueHd::backend::model
 		//		   will be some sort of "special effect" class, or "dungeon alteration", which
 		//		   will be shared among brogueObject instances.
 
-		int DFChance;						// percent chance to spawn the dungeon feature per awake turn
-		permanentDungeonLayers DFType;	// kind of dungeon feature
+		int DFChance; // percent chance to spawn the dungeon feature per awake turn
+		permanentDungeonLayers DFType; // kind of dungeon feature
 		//boltType bolts[20];
 		unsigned long flags;
 		unsigned long abilityFlags;
 	};
 }
-

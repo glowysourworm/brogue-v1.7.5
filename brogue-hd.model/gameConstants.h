@@ -1,8 +1,9 @@
 #pragma once
 
-namespace brogueHd::backend::model
+namespace brogueHd::model
 {
-	enum BrogueEventType : int {
+	enum BrogueEventType : int
+	{
 		KEYSTROKE,
 		MOUSE_UP,
 		MOUSE_DOWN,

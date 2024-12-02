@@ -1,16 +1,14 @@
 #pragma once
 
-#include "brogueGlobal.h"
 #include "dungeonConstants.h"
-#include "gridRect.h"
-#include "simple.h"
-#include "simpleException.h"
+#include <simpleGridRect.h>
+#include <simple.h>
+#include <simpleException.h>
 
-using namespace brogueHd::component;
-using namespace brogueHd::simple;
-
-namespace brogueHd::backend::model
+namespace brogueHd::model
 {
+	using namespace simple;
+	using namespace simple::math;
 
 	/*
 
@@ -39,19 +37,21 @@ namespace brogueHd::backend::model
 	struct brogueRoomTemplate : simpleStruct
 	{
 	public:
-
 		brogueRoomTemplate()
 		{
 			init(brogueRoomType::MainEntranceRoom, 0.0);
 		}
+
 		brogueRoomTemplate(const gridRect& levelBoundary, brogueRoomType type, float frequency)
 		{
 			init(type, frequency);
 		}
+
 		brogueRoomTemplate(const brogueRoomTemplate& copy)
 		{
 			copyImpl(copy);
 		}
+
 		void operator=(const brogueRoomTemplate& copy)
 		{
 			copyImpl(copy);
@@ -61,6 +61,7 @@ namespace brogueHd::backend::model
 		{
 			return compare(info);
 		}
+
 		bool operator!=(const brogueRoomTemplate& info) const
 		{
 			return !compare(info);
@@ -75,6 +76,7 @@ namespace brogueHd::backend::model
 		{
 			return maxSize;
 		}
+
 		gridRect getMinSize() const
 		{
 			return minSize;
@@ -91,7 +93,6 @@ namespace brogueHd::backend::model
 		}
 
 	private:
-
 		brogueStartLocation startLocation;
 		brogueRoomType roomType;
 		gridRect minSize;
@@ -99,7 +100,6 @@ namespace brogueHd::backend::model
 		float frequency;
 
 	private:
-
 		void copyImpl(const brogueRoomTemplate& copy)
 		{
 			roomType = copy.roomType;
@@ -131,63 +131,63 @@ namespace brogueHd::backend::model
 		{
 			switch (type)
 			{
-				case brogueRoomType::Default:
-					aminSize = gridRect(0, 0, 2, 2);
-					amaxSize = gridRect(0, 0, 2, 2);
-					break;
+			case brogueRoomType::Default:
+				aminSize = gridRect(0, 0, 2, 2);
+				amaxSize = gridRect(0, 0, 2, 2);
+				break;
 
-				case brogueRoomType::CaveCompact:
-					aminSize = gridRect(0, 0, 3, 4);
-					amaxSize = gridRect(0, 0, 12, 8);
-					break;
+			case brogueRoomType::CaveCompact:
+				aminSize = gridRect(0, 0, 3, 4);
+				amaxSize = gridRect(0, 0, 12, 8);
+				break;
 
-				case brogueRoomType::CaveLargeNS:
-					aminSize = gridRect(0, 0, 3, 15);
-					amaxSize = gridRect(0, 0, 12, DROWS);
-					break;
+			case brogueRoomType::CaveLargeNS:
+				aminSize = gridRect(0, 0, 3, 15);
+				amaxSize = gridRect(0, 0, 12, DROWS);
+				break;
 
-				case brogueRoomType::CaveLargeEW:
-					aminSize = gridRect(0, 0, 20, 4);
-					amaxSize = gridRect(0, 0, DCOLS, 8);
-					break;
+			case brogueRoomType::CaveLargeEW:
+				aminSize = gridRect(0, 0, 20, 4);
+				amaxSize = gridRect(0, 0, DCOLS, 8);
+				break;
 
-				case brogueRoomType::Cavern:
-					aminSize = gridRect(0, 0, CAVE_MIN_WIDTH, CAVE_MIN_HEIGHT);
-					amaxSize = gridRect(0, 0, DCOLS, DROWS);
-					break;
+			case brogueRoomType::Cavern:
+				aminSize = gridRect(0, 0, CAVE_MIN_WIDTH, CAVE_MIN_HEIGHT);
+				amaxSize = gridRect(0, 0, DCOLS, DROWS);
+				break;
 
-				case brogueRoomType::ChunkyRoom:
-					aminSize = gridRect(0, 0, 2, 2);
-					amaxSize = gridRect(0, 0, 7, 7);
-					break;
+			case brogueRoomType::ChunkyRoom:
+				aminSize = gridRect(0, 0, 2, 2);
+				amaxSize = gridRect(0, 0, 7, 7);
+				break;
 
-				case brogueRoomType::CircularRoom:
-					aminSize = gridRect(0, 0, 4, 4);
-					amaxSize = gridRect(0, 0, 20, 20);
-					break;
+			case brogueRoomType::CircularRoom:
+				aminSize = gridRect(0, 0, 4, 4);
+				amaxSize = gridRect(0, 0, 20, 20);
+				break;
 
-				case brogueRoomType::CrossRoom:
-					aminSize = gridRect(0, 0, 4, 3);
-					amaxSize = gridRect(0, 0, 20, 7);
-					break;
+			case brogueRoomType::CrossRoom:
+				aminSize = gridRect(0, 0, 4, 3);
+				amaxSize = gridRect(0, 0, 20, 7);
+				break;
 
-				case brogueRoomType::MainEntranceRoom:
-					aminSize = gridRect(0, 0, 20, 10);
-					amaxSize = gridRect(0, 0, 20, 10);
-					break;
+			case brogueRoomType::MainEntranceRoom:
+				aminSize = gridRect(0, 0, 20, 10);
+				amaxSize = gridRect(0, 0, 20, 10);
+				break;
 
-				case brogueRoomType::SmallRoom:
-					aminSize = gridRect(0, 0, 3, 2);
-					amaxSize = gridRect(0, 0, 6, 4);
-					break;
+			case brogueRoomType::SmallRoom:
+				aminSize = gridRect(0, 0, 3, 2);
+				amaxSize = gridRect(0, 0, 6, 4);
+				break;
 
-				case brogueRoomType::SmallSymmetricalCrossRoom:
-					aminSize = gridRect(0, 0, 4, 4);
-					amaxSize = gridRect(0, 0, 8, 5);
-					break;
+			case brogueRoomType::SmallSymmetricalCrossRoom:
+				aminSize = gridRect(0, 0, 4, 4);
+				amaxSize = gridRect(0, 0, 8, 5);
+				break;
 
-				default:
-					throw simpleException("Unhandled room type:  brogueRoomInfo::init");
+			default:
+				throw simpleException("Unhandled room type:  brogueRoomInfo::init");
 			}
 		}
 	};

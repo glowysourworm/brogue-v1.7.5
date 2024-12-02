@@ -4,9 +4,7 @@
 #include "color.h"
 #include "gridLocator.h"
 
-using namespace brogueHd::component;
-
-namespace brogueHd::backend::model
+namespace brogueHd::model
 {
 	//struct pdsLink {
 	//	int distance;
@@ -24,7 +22,6 @@ namespace brogueHd::backend::model
 	struct brogueCell : public gridLocator
 	{
 	public:
-
 		// Sets default values (isEmpty() == true)
 		brogueCell()
 		{
@@ -32,12 +29,14 @@ namespace brogueHd::backend::model
 			_display->backColor = colors::getGray(0.5);
 			_display->foreColor = colors::blue();
 		}
+
 		brogueCell(int column, int row)
 		{
 			_display = new brogueCellDisplay(column, row);
 			_display->backColor = colors::getGray(0.5);
 			_display->foreColor = colors::blue();
 		}
+
 		brogueCell(int column, int row, const color& backColor, const color& foreColor, char symbol)
 		{
 			_display = new brogueCellDisplay(column, row);
@@ -45,6 +44,7 @@ namespace brogueHd::backend::model
 			_display->foreColor = foreColor;
 			_display->character = symbol;
 		}
+
 		~brogueCell()
 		{
 			delete _display;
@@ -56,7 +56,6 @@ namespace brogueHd::backend::model
 		}
 
 	public:
-
 		brogueCellDisplay* _display;
 
 		//int terrainRandomValues[8];					// TODO: Figure this out!
@@ -66,4 +65,3 @@ namespace brogueHd::backend::model
 		//bool disposableHere;
 	};
 }
-

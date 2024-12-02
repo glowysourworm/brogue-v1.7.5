@@ -7,10 +7,10 @@
 #include "brogueGlobal.h"
 #include "simpleString.h"
 
-using namespace brogueHd::simple;
-
-namespace brogueHd::backend::model
+namespace brogueHd::model
 {
+	using namespace simple;
+
 	// Item Declarations:  This struct hierarchy will take care of item types (or "kinds" from Brogue)
 	//					   with enums galore! ...just separated by struct type inference. 
 	//

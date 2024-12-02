@@ -3,20 +3,22 @@
 #include "dungeonConstants.h"
 #include "simple.h"
 
-namespace brogueHd::backend::model
+namespace brogueHd::model
 {
-	class brogueLevelTemplate 
+	class brogueLevelTemplate
 	{
 	public:
 		brogueLevelTemplate()
 		{
 			_profile = nullptr;
 		}
-		brogueLevelTemplate(int depth, levelTypes types) 
+
+		brogueLevelTemplate(int depth, levelTypes types)
 		{
 			_profile = new brogueLevelProfile(depth, types);
 		};
-		~brogueLevelTemplate() 
+
+		~brogueLevelTemplate()
 		{
 			delete _profile;
 		};
@@ -27,7 +29,6 @@ namespace brogueHd::backend::model
 		}
 
 	private:
-
 		brogueLevelProfile* _profile;
 	};
 }

@@ -3,12 +3,11 @@
 #include "machineConstants.h"
 #include "machineTemplate.h"
 
-namespace brogueHd::backend::model
+namespace brogueHd::model
 {
 	class brogueMachine
 	{
 	public:
-		
 		brogueMachine(machineBase generator, machineFeatureFlags featureFlags);
 		~brogueMachine();
 
@@ -16,10 +15,8 @@ namespace brogueHd::backend::model
 		machineFeatureFlags getFeatureFlags() const;
 
 	private:
-
 		machineBase _generator;
 		machineFeatureFlags _featureFlags;
-
 	};
 
 	brogueMachine::brogueMachine(machineBase generator, machineFeatureFlags featureFlags)
@@ -27,18 +24,18 @@ namespace brogueHd::backend::model
 		_generator = generator;
 		_featureFlags = featureFlags;
 	}
+
 	brogueMachine::~brogueMachine()
 	{
-
 	}
 
 	machineBase brogueMachine::getGenerator() const
 	{
 		return _generator;
 	}
+
 	machineFeatureFlags brogueMachine::getFeatureFlags() const
 	{
 		return _featureFlags;
 	}
 }
-

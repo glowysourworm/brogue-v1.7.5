@@ -1,6 +1,6 @@
 #pragma once
 
-namespace brogueHd::backend::model
+namespace brogueHd::model
 {
 	struct linearGenerationParameters
 	{
@@ -8,7 +8,7 @@ namespace brogueHd::backend::model
 		int maxDepth;
 		int frequency;
 		int minNumberIntercept; // actually intercept * 100
-		int minNumberSlope;	  // actually slope * 100
+		int minNumberSlope; // actually slope * 100
 		int maxNumber;
 	};
 }

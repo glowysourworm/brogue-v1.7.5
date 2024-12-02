@@ -1,8 +1,5 @@
 #pragma once
 
-
-using namespace brogueHd::backend::model;
-
 // The Great Pender Prime: ...
 //
 // As of v1.7.5, Brogue does not use floating-point math in any calculations
@@ -34,7 +31,7 @@ using namespace brogueHd::backend::model;
 //                                  what we come up with.
 //
 
-namespace brogueHd::backend::model
+namespace brogueHd::model
 {
 	//class brogueCalculations
 	//{
@@ -43,7 +40,6 @@ namespace brogueHd::backend::model
 	//        return (monst.currentHP * 5 < monst.info.maxHP) ? 100 : max(0, 100 * ((monst)->info.maxHP - (monst)->currentHP) / (monst)->info.maxHP);
 	//    }
 	//};
-
 
 
 	//// All "enchant" parameters must already be multiplied by FP_FACTOR:
@@ -430,5 +426,4 @@ namespace brogueHd::backend::model
 
 	//    return chance;
 	//}
-
 }

@@ -7,11 +7,10 @@
 #include "grid.h"
 #include "simpleList.h"
 
-using namespace brogueHd::simple;
-using namespace brogueHd::component;
-
-namespace brogueHd::backend::model
+namespace brogueHd::component
 {
+	using namespace simple;
+
 	/// <summary>
 	/// Component that handles collections of brogueObject types; and sets them
 	/// into the grid by storing private collections.
@@ -19,12 +18,10 @@ namespace brogueHd::backend::model
 	class brogueContentGrid
 	{
 	public:
-
 		brogueContentGrid();
 		~brogueContentGrid();
 
 	private:
-
 		broguePlayer* _player;
 		//brogueGrid* _grid;
 
@@ -50,11 +47,9 @@ namespace brogueHd::backend::model
 
 	brogueContentGrid::brogueContentGrid()
 	{
-
 	}
+
 	brogueContentGrid::~brogueContentGrid()
 	{
-
 	}
 }
-

@@ -5,28 +5,25 @@
 #include "playerCharacter.h"
 #include "simpleString.h"
 
-using namespace brogueHd::simple;
-
-namespace brogueHd::backend::model
+namespace brogueHd::model
 {
+	using namespace simple;
+
 	class gameData
 	{
-
 		// Moved from playerCharacter since they have to do with the game processing
 		//
 	public:
-
-		int depthLevel;					// which dungeon level are we on
+		int depthLevel; // which dungeon level are we on
 		int deepestLevel;
-		bool disturbed;					// player should stop auto-acting
-		bool gameHasEnded;				// stop everything and go to death screen
-		bool highScoreSaved;				// so that it saves the high score only once
-		bool blockCombatText;			// busy auto-fighting
-		bool autoPlayingLevel;			// seriously, don't interrupt
-		bool automationActive;			// cut some corners during redraws to speed things up
+		bool disturbed; // player should stop auto-acting
+		bool gameHasEnded; // stop everything and go to death screen
+		bool highScoreSaved; // so that it saves the high score only once
+		bool blockCombatText; // busy auto-fighting
+		bool autoPlayingLevel; // seriously, don't interrupt
+		bool automationActive; // cut some corners during redraws to speed things up
 
 	public:
-
 		//tcell tmap[DCOLS][DROWS];						// grids with info about the map
 		//pcell pmap[DCOLS][DROWS];
 		//int** scentMap;
@@ -40,7 +37,6 @@ namespace brogueHd::backend::model
 		int numberOfWaypoints;
 
 	public:
-
 		levelData* levels;
 
 		//creature player;
@@ -54,7 +50,6 @@ namespace brogueHd::backend::model
 		//item* monsterItemsHopper;
 
 	public:
-
 		char displayedMessage[MESSAGE_LINES][COLS * 2];
 		bool messageConfirmed[MESSAGE_LINES];
 		char combatText[COLS * 2];
@@ -63,7 +58,8 @@ namespace brogueHd::backend::model
 
 		simpleString currentFilePath;
 
-		char displayDetail[DCOLS][DROWS];		// used to make certain per-cell data accessible to external code (e.g. terminal adaptations)
+		char displayDetail[DCOLS][DROWS];
+		// used to make certain per-cell data accessible to external code (e.g. terminal adaptations)
 
 		//unsigned char inputRecordBuffer[INPUT_RECORD_BUFFER + 100];
 		unsigned int locationInRecordingBuffer;
@@ -83,4 +79,3 @@ namespace brogueHd::backend::model
 		bool noMenu = false;
 	};
 }
-

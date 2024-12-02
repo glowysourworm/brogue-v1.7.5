@@ -1,7 +1,11 @@
 #pragma once
 
-namespace brogueHd::backend::model
+#include <simpleMacros.h>
+
+namespace brogueHd::model
 {
+	using namespace simple;
+
 	enum boltEffects
 	{
 		BE_NONE,
@@ -30,15 +34,17 @@ namespace brogueHd::backend::model
 
 	enum boltFlags
 	{
-		BF_PASSES_THRU_CREATURES = Fl(0),	// Bolt continues through creatures (e.g. lightning and tunneling)
-		BF_HALTS_BEFORE_OBSTRUCTION = Fl(1),    // Bolt takes effect the space before it terminates (e.g. conjuration, obstruction, blinking)
-		BF_TARGET_ALLIES = Fl(2),    // Staffs/wands/creatures that shoot this bolt will auto-target allies.
-		BF_TARGET_ENEMIES = Fl(3),    // Staffs/wands/creatures that shoot this bolt will auto-target enemies.
-		BF_FIERY = Fl(4),    // Bolt will light flammable terrain on fire as it passes, and will ignite monsters hit.
-		BF_NEVER_REFLECTS = Fl(6),    // Bolt will never reflect (e.g. spiderweb, arrows).
-		BF_NOT_LEARNABLE = Fl(7),    // This technique cannot be absorbed by empowered allies.
-		BF_NOT_NEGATABLE = Fl(8),    // Won't be erased by negation.
-		BF_ELECTRIC = Fl(9),    // Activates terrain that has TM_PROMOTES_ON_ELECTRICITY
-		BF_DISPLAY_CHAR_ALONG_LENGTH = Fl(10),   // Display the character along the entire length of the bolt instead of just at the front.
+		BF_PASSES_THRU_CREATURES = EnumFlag(0), // Bolt continues through creatures (e.g. lightning and tunneling)
+		BF_HALTS_BEFORE_OBSTRUCTION = EnumFlag(1),
+		// Bolt takes effect the space before it terminates (e.g. conjuration, obstruction, blinking)
+		BF_TARGET_ALLIES = EnumFlag(2), // Staffs/wands/creatures that shoot this bolt will auto-target allies.
+		BF_TARGET_ENEMIES = EnumFlag(3), // Staffs/wands/creatures that shoot this bolt will auto-target enemies.
+		BF_FIERY = EnumFlag(4), // Bolt will light flammable terrain on fire as it passes, and will ignite monsters hit.
+		BF_NEVER_REFLECTS = EnumFlag(6), // Bolt will never reflect (e.g. spiderweb, arrows).
+		BF_NOT_LEARNABLE = EnumFlag(7), // This technique cannot be absorbed by empowered allies.
+		BF_NOT_NEGATABLE = EnumFlag(8), // Won't be erased by negation.
+		BF_ELECTRIC = EnumFlag(9), // Activates terrain that has TM_PROMOTES_ON_ELECTRICITY
+		BF_DISPLAY_CHAR_ALONG_LENGTH = EnumFlag(10),
+		// Display the character along the entire length of the bolt instead of just at the front.
 	};
 }

@@ -1,14 +1,12 @@
 #pragma once
 
-#include "brogueGlobal.h"
 #include <cstdint>
 
-namespace brogueHd::backend::model
+namespace brogueHd::model
 {
 	class playerCharacter
 	{
 	public:
-
 		//int depthLevel;					// which dungeon level are we on
 		//int deepestLevel;
 		//boolean disturbed;					// player should stop auto-acting
@@ -17,30 +15,31 @@ namespace brogueHd::backend::model
 		//boolean blockCombatText;			// busy auto-fighting
 		//boolean autoPlayingLevel;			// seriously, don't interrupt
 		//boolean automationActive;			// cut some corners during redraws to speed things up
-		bool justRested;					// previous turn was a rest -- used in stealth
-		bool justSearched;				// previous turn was a search -- used in manual searches
-		bool cautiousMode;				// used to prevent careless deaths caused by holding down a key
-		bool receivedLevitationWarning;	// only warn you once when you're hovering dangerously over liquid
-		bool updatedSafetyMapThisTurn;	// so it's updated no more than once per turn
-		bool updatedAllySafetyMapThisTurn;	// so it's updated no more than once per turn
-		bool updatedMapToSafeTerrainThisTurn;// so it's updated no more than once per turn
-		bool updatedMapToShoreThisTurn;		// so it's updated no more than once per turn
-		bool easyMode;					// enables easy mode
-		bool inWater;					// helps with the blue water filter effect
-		bool heardCombatThisTurn;		// so you get only one "you hear combat in the distance" per turn
-		bool creaturesWillFlashThisTurn;	// there are creatures out there that need to flash before the turn ends
-		bool staleLoopMap;				// recalculate the loop map at the end of the turn
-		bool alreadyFell;				// so the player can fall only one depth per turn
-		bool eligibleToUseStairs;		// so the player uses stairs only when he steps onto them
-		bool trueColorMode;				// whether lighting effects are disabled
-		bool displayAggroRangeMode;      // whether your stealth range is displayed
-		bool quit;						// to skip the typical end-game theatrics when the player quits
-		unsigned long seed;					// the master seed for generating the entire dungeon
-		int RNG;							// which RNG are we currently using?
-		unsigned long gold;					// how much gold we have
-		unsigned long goldGenerated;		// how much gold has been generated on the levels, not counting gold held by monsters
+		bool justRested; // previous turn was a rest -- used in stealth
+		bool justSearched; // previous turn was a search -- used in manual searches
+		bool cautiousMode; // used to prevent careless deaths caused by holding down a key
+		bool receivedLevitationWarning; // only warn you once when you're hovering dangerously over liquid
+		bool updatedSafetyMapThisTurn; // so it's updated no more than once per turn
+		bool updatedAllySafetyMapThisTurn; // so it's updated no more than once per turn
+		bool updatedMapToSafeTerrainThisTurn; // so it's updated no more than once per turn
+		bool updatedMapToShoreThisTurn; // so it's updated no more than once per turn
+		bool easyMode; // enables easy mode
+		bool inWater; // helps with the blue water filter effect
+		bool heardCombatThisTurn; // so you get only one "you hear combat in the distance" per turn
+		bool creaturesWillFlashThisTurn; // there are creatures out there that need to flash before the turn ends
+		bool staleLoopMap; // recalculate the loop map at the end of the turn
+		bool alreadyFell; // so the player can fall only one depth per turn
+		bool eligibleToUseStairs; // so the player uses stairs only when he steps onto them
+		bool trueColorMode; // whether lighting effects are disabled
+		bool displayAggroRangeMode; // whether your stealth range is displayed
+		bool quit; // to skip the typical end-game theatrics when the player quits
+		unsigned long seed; // the master seed for generating the entire dungeon
+		int RNG; // which RNG are we currently using?
+		unsigned long gold; // how much gold we have
+		unsigned long goldGenerated;
+		// how much gold has been generated on the levels, not counting gold held by monsters
 		int strength;
-		unsigned int monsterSpawnFuse;	// how much longer till a random monster spawns
+		unsigned int monsterSpawnFuse; // how much longer till a random monster spawns
 
 		//item* weapon;
 		//item* armor;
@@ -55,28 +54,28 @@ namespace brogueHd::backend::model
 
 		//lightSource minersLight;
 		int64_t minersLightRadius;
-		int ticksTillUpdateEnvironment;	// so that some periodic things happen in objective time
-		unsigned int scentTurnNumber;		// helps make scent-casting work
-		unsigned long playerTurnNumber;     // number of input turns in recording. Does not increment during paralysis.
-		unsigned long absoluteTurnNumber;   // number of turns since the beginning of time. Always increments.
-		signed long milliseconds;			// milliseconds since launch, to decide whether to engage cautious mode
-		int xpxpThisTurn;					// how many squares the player explored this turn
-		int aggroRange;                   // distance from which monsters will notice you
+		int ticksTillUpdateEnvironment; // so that some periodic things happen in objective time
+		unsigned int scentTurnNumber; // helps make scent-casting work
+		unsigned long playerTurnNumber; // number of input turns in recording. Does not increment during paralysis.
+		unsigned long absoluteTurnNumber; // number of turns since the beginning of time. Always increments.
+		signed long milliseconds; // milliseconds since launch, to decide whether to engage cautious mode
+		int xpxpThisTurn; // how many squares the player explored this turn
+		int aggroRange; // distance from which monsters will notice you
 
-		int previousPoisonPercent;        // and your poison proportion, to display percentage alerts for each.
+		int previousPoisonPercent; // and your poison proportion, to display percentage alerts for each.
 
-		int upLoc[2];						// upstairs location this level
-		int downLoc[2];					// downstairs location this level
+		int upLoc[2]; // upstairs location this level
+		int downLoc[2]; // downstairs location this level
 
-		int cursorLoc[2];					// used for the return key functionality
+		int cursorLoc[2]; // used for the return key functionality
 		//creature* lastTarget;				// to keep track of the last monster the player has thrown at or zapped
-		int rewardRoomsGenerated;			// to meter the number of reward machines
-		int machineNumber;				// so each machine on a level gets a unique number
-		int sidebarLocationList[ROWS * 2][2];	// to keep track of which location each line of the sidebar references
+		int rewardRoomsGenerated; // to meter the number of reward machines
+		int machineNumber; // so each machine on a level gets a unique number
+		int sidebarLocationList[ROWS * 2][2]; // to keep track of which location each line of the sidebar references
 
 		// maps
-		int** mapToShore;					// how many steps to get back to shore
-		int** mapToSafeTerrain;			// so monsters can get to safety
+		int** mapToShore; // how many steps to get back to shore
+		int** mapToSafeTerrain; // so monsters can get to safety
 
 		//// recording info
 		//boolean playbackMode;				// whether we're viewing a recording instead of playing
@@ -95,7 +94,7 @@ namespace brogueHd::backend::model
 		//unsigned long locationInAnnotationFile; // how far we've read in the annotations file
 
 		// metered items
-		int64_t foodSpawned;					// amount of nutrition units spawned so far this game
+		int64_t foodSpawned; // amount of nutrition units spawned so far this game
 		int lifePotionFrequency;
 		int lifePotionsSpawned;
 		int strengthPotionFrequency;

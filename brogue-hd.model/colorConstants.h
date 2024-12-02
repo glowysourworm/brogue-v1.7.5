@@ -1,7 +1,7 @@
 #pragma once
 
 
-namespace brogueHd::backend::model
+namespace brogueHd::model
 {
 	enum colorCollections
 	{

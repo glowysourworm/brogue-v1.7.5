@@ -3,10 +3,10 @@
 #include "creature.h"
 #include "item.h"
 
-namespace brogueHd::backend::model
+namespace brogueHd::model
 {
 	// Stores the necessary info about a level so it can be regenerated:
-	struct levelData 
+	struct levelData
 	{
 		bool visited;
 		//pcell mapStorage[DCOLS][DROWS];
@@ -21,4 +21,3 @@ namespace brogueHd::backend::model
 		unsigned long awaySince;
 	};
 }
-

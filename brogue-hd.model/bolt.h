@@ -3,9 +3,7 @@
 #include "color.h"
 #include "simpleString.h"
 
-using namespace brogueHd::simple;
-
-namespace brogueHd::backend::model
+namespace brogueHd::model
 {
 	struct bolt
 	{

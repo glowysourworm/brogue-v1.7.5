@@ -3,9 +3,7 @@
 #include "color.h"
 #include "simple.h"
 
-using namespace brogueHd::simple;
-
-namespace brogueHd::backend::model
+namespace brogueHd::model
 {
 	/// <summary>
 	/// Base class for anything on the map that takes just a single tile. This contains just the display 
@@ -14,11 +12,11 @@ namespace brogueHd::backend::model
 	class brogueObject : public simpleObject
 	{
 	public:
-
-		brogueObject() {}
+		brogueObject()
+		{
+		}
 
 	public:
-
 		bool operator==(const brogueObject& other) const
 		{
 			return character == other.character &&
@@ -34,13 +32,13 @@ namespace brogueHd::backend::model
 				backColor != other.backColor ||
 				opacity != other.opacity;
 		}
+
 		size_t getHash() const override
 		{
 			return hashGenerator::generateHash(character, opacity);
 		}
 
 	public:
-
 		char character;
 		color foreColor;
 		color backColor;

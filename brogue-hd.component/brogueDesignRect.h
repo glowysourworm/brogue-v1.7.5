@@ -2,17 +2,17 @@
 
 #include "brogueRoomTemplate.h"
 #include "gridLocator.h"
-#include "gridRect.h"
 #include "gridRegion.h"
-#include "simple.h"
-#include "simpleException.h"
-#include "simpleMath.h"
+#include <simpleGridRect.h>
+#include <simple.h>
+#include <simpleException.h>
+#include <simpleMath.h>
 
-using namespace brogueHd::simple;
-using namespace brogueHd::component;
-
-namespace brogueHd::backend::model
+namespace brogueHd::component
 {
+	using namespace simple;
+	using namespace simple::math;
+
 	/// <summary>
 	/// Accretion tile is used to help design the layout. The connection points are desired
 	/// locations for doors - which may or may not be on the edge of the region
@@ -20,11 +20,10 @@ namespace brogueHd::backend::model
 	struct brogueDesignRect : simpleStruct
 	{
 	public:
-
 		brogueDesignRect()
 		{
 			_configuration = default_value::value<brogueRoomTemplate>();
-			_boundary = default_value::value <gridRect>();
+			_boundary = default_value::value<gridRect>();
 			_minSize = default_value::value<gridRect>();
 			_complete = false;
 			_region = nullptr;
@@ -42,10 +41,12 @@ namespace brogueHd::backend::model
 
 			applyConstraintImpl(constraint, true, padding);
 		}
+
 		brogueDesignRect(const brogueDesignRect& copy)
 		{
 			copyImpl(copy);
 		}
+
 		~brogueDesignRect()
 		{
 			// Nothing to do.
@@ -55,10 +56,12 @@ namespace brogueHd::backend::model
 		{
 			copyImpl(copy);
 		}
+
 		bool operator==(const brogueDesignRect& other)
 		{
 			return compare(other);
 		}
+
 		bool operator!=(const brogueDesignRect& other)
 		{
 			return !compare(other);
@@ -116,37 +119,41 @@ namespace brogueHd::backend::model
 		}
 
 	public:
-
 		gridRegion<gridLocator>* getRegion() const
 		{
 			return _region;
 		}
+
 		brogueRoomTemplate getConfiguration() const
 		{
 			return _configuration;
 		}
+
 		gridRect getBoundary() const
 		{
 			return _boundary;
 		}
+
 		gridRect getMinSize() const
 		{
 			return _minSize;
 		}
+
 		gridRect getActualBoundary() const
 		{
 			if (!_complete)
-				throw simpleException("Cannot retrieve actual boundary from the design rect until it is complete:  brogueDesignRect.h");
+				throw simpleException(
+					"Cannot retrieve actual boundary from the design rect until it is complete:  brogueDesignRect.h");
 
 			return _region->getBoundary();
 		}
+
 		bool getIsComplete() const
 		{
 			return _complete;
 		}
 
 	private:
-
 		void applyConstraintImpl(const gridRect& constraint, bool forceUpdate, int padding)
 		{
 			if (_complete)
@@ -178,17 +185,17 @@ namespace brogueHd::backend::model
 				_complete == other.getIsComplete() &&
 				_region == other.getRegion();
 		}
+
 		void copyImpl(const brogueDesignRect& copy)
 		{
 			_configuration = copy.getConfiguration();
 			_boundary = copy.getBoundary();
 			_minSize = copy.getMinSize();
 			_complete = copy.getIsComplete();
-			_region = copy.getRegion();						// Pointer Only!
+			_region = copy.getRegion(); // Pointer Only!
 		}
 
 	private:
-
 		// Final (Actual) Region
 		gridRegion<gridLocator>* _region;
 

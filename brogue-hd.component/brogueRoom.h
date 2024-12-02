@@ -7,20 +7,17 @@
 #include "gridRegionExtension.h"
 #include "simple.h"
 
-using namespace brogueHd::component;
-
-namespace brogueHd::backend::model
+namespace brogueHd::component
 {
 	class brogueRoom : public simpleObject
 	{
 	public:
-
-		template<isGridLocator T>
+		template <isGridLocator T>
 		brogueRoom(gridRegion<T>* region,
-				   const gridLocator& connectionPointN,
-				   const gridLocator& connectionPointS,
-				   const gridLocator& connectionPointE,
-				   const gridLocator& connectionPointW)
+		           const gridLocator& connectionPointN,
+		           const gridLocator& connectionPointS,
+		           const gridLocator& connectionPointE,
+		           const gridLocator& connectionPointW)
 		{
 			//// (MEMORY!)
 			//_region = gridRegionExtension::map(region, [] (const T& locator)
@@ -34,7 +31,7 @@ namespace brogueHd::backend::model
 			_connectionPointW = new gridLocator(connectionPointW);
 		}
 
-		~brogueRoom() 
+		~brogueRoom()
 		{
 			//_region->iterateLocations([] (int column, int row, brogueCell* item)
 			//{
@@ -54,14 +51,12 @@ namespace brogueHd::backend::model
 		};
 
 	public:
-
 		size_t getHash() const override
 		{
 			return 0;
 		}
 
 	private:
-
 		gridRegion<brogueCell>* _region;
 
 		// Connection points are inside the region:  THEY ARE NOT DOORS!

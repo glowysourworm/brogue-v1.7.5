@@ -2,7 +2,7 @@
 
 #include "brogueCreature.h"
 
-namespace brogueHd::backend::model
+namespace brogueHd::model
 {
 	/// <summary>
 	/// Contains data about a horde of brogueCreature types. This would include specifics
@@ -11,15 +11,18 @@ namespace brogueHd::backend::model
 	class brogueCreatureHorde
 	{
 	public:
+		brogueCreatureHorde()
+		{
+		};
 
-		brogueCreatureHorde(){};
-		~brogueCreatureHorde(){};
+		~brogueCreatureHorde()
+		{
+		};
 
 	private:
-
-		brogueCreature* _leader;			// only if monster is a follower
-		brogueCreature* _carriedMonster;	// when vampires turn into bats, one of the bats restores the vampire when it dies
+		brogueCreature* _leader; // only if monster is a follower
+		brogueCreature* _carriedMonster;
+		// when vampires turn into bats, one of the bats restores the vampire when it dies
 		brogueCreature* _nextCreature;
 	};
 }
-

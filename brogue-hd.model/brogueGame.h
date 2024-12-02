@@ -9,15 +9,11 @@
 #include "playerCharacter.h"
 #include "simpleList.h"
 
-using namespace brogueHd::simple;
-using namespace brogueHd::component;
-
-namespace brogueHd::backend::model
+namespace brogueHd::model
 {
 	class brogueGame
 	{
 	public:
-
 		brogueGame(bool serverMode, bool noMenu, const simpleList<brogueLevel*>& levels);
 		~brogueGame();
 
@@ -30,7 +26,6 @@ namespace brogueHd::backend::model
 		brogueLevel* getCurrentLevel() const;
 
 	private:
-
 		simpleList<brogueLevel*>* _levels;
 
 		brogueMessageQueue* _messageQueue;
@@ -52,14 +47,14 @@ namespace brogueHd::backend::model
 		brogueItem* packItems;
 		brogueItem* monsterItemsHopper;
 
-		int currentDepth;					// which dungeon level are we on
+		int currentDepth; // which dungeon level are we on
 		//int deepesteLevel;
-		bool disturbed;					// player should stop auto-acting
-		bool gameHasEnded;				// stop everything and go to death screen
-		bool highScoreSaved;				// so that it saves the high score only once
-		bool blockCombatText;			// busy auto-fighting
-		bool autoPlayingLevel;			// seriously, don't interrupt
-		bool automationActive;			// cut some corners during redraws to speed things up
+		bool disturbed; // player should stop auto-acting
+		bool gameHasEnded; // stop everything and go to death screen
+		bool highScoreSaved; // so that it saves the high score only once
+		bool blockCombatText; // busy auto-fighting
+		bool autoPlayingLevel; // seriously, don't interrupt
+		bool automationActive; // cut some corners during redraws to speed things up
 
 		//tcell tmap[DCOLS][DROWS];						// grids with info about the map
 		//pcell pmap[DCOLS][DROWS];
@@ -74,9 +69,7 @@ namespace brogueHd::backend::model
 		//int numberOfWaypoints;
 
 
-
 	private:
-
 		//		char displayedMessage[MESSAGE_LINES][COLS * 2];
 		//		boolean messageConfirmed[MESSAGE_LINES];
 		//		char combatText[COLS * 2];
@@ -91,22 +84,22 @@ namespace brogueHd::backend::model
 		//		FILE* RNGLogFile;
 		//#endif
 
-				//unsigned char inputRecordBuffer[INPUT_RECORD_BUFFER + 100];
-				//unsigned int locationInRecordingBuffer;
-				//unsigned long randomNumbersGenerated;
-				//unsigned long positionInPlaybackFile;
-				//unsigned long lengthOfPlaybackFile;
-				//unsigned long recordingLocation;
-				//unsigned long maxLevelChanges;
-				//char annotationPathname[BROGUE_FILENAME_MAX];	// pathname of annotation file
-				//unsigned long gameSeed;
+		//unsigned char inputRecordBuffer[INPUT_RECORD_BUFFER + 100];
+		//unsigned int locationInRecordingBuffer;
+		//unsigned long randomNumbersGenerated;
+		//unsigned long positionInPlaybackFile;
+		//unsigned long lengthOfPlaybackFile;
+		//unsigned long recordingLocation;
+		//unsigned long maxLevelChanges;
+		//char annotationPathname[BROGUE_FILENAME_MAX];	// pathname of annotation file
+		//unsigned long gameSeed;
 
-				//// Console / Game related declarations
-				//playerCharacter rogue;
-				////brogueConsole currentConsole;
+		//// Console / Game related declarations
+		//playerCharacter rogue;
+		////brogueConsole currentConsole;
 
-				//boolean serverMode = false;
-				//boolean noMenu = false;
+		//boolean serverMode = false;
+		//boolean noMenu = false;
 	};
 
 	brogueGame::brogueGame(bool serverMode, bool noMenu, const simpleList<brogueLevel*>& levels)
@@ -117,6 +110,7 @@ namespace brogueHd::backend::model
 		_serverMode = serverMode;
 		_noMenu = noMenu;
 	}
+
 	brogueGame::~brogueGame()
 	{
 		delete _messageQueue;
@@ -127,14 +121,17 @@ namespace brogueHd::backend::model
 	{
 		return _serverMode;
 	}
+
 	bool brogueGame::getNoMenu()
 	{
 		return _noMenu;
 	}
+
 	brogueLevel* brogueGame::getLevel(int depth) const
 	{
 		return _levels->get(depth - 1);
 	}
+
 	brogueLevel* brogueGame::getCurrentLevel() const
 	{
 		return _levels->get(currentDepth - 1);
@@ -145,4 +142,3 @@ namespace brogueHd::backend::model
 		_messageQueue->addMessage(msg, theColor, requireAcknowledgment);
 	}
 }
-

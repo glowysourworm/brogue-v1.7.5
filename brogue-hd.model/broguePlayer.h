@@ -2,10 +2,9 @@
 
 #include "brogueCreature.h"
 
-namespace brogueHd::backend::model
+namespace brogueHd::model
 {
 	class broguePlayer : public brogueCreature
 	{
 	};
 }
-

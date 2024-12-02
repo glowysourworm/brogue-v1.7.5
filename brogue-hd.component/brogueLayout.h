@@ -12,31 +12,29 @@
 #include "gridDefinitions.h"
 #include "gridLocator.h"
 #include "gridLocatorEdge.h"
-#include "gridRect.h"
+#include <simpleGridRect.h>
 #include "gridRegion.h"
 #include "simple.h"
 #include "simpleException.h"
 #include <functional>
 
-using namespace brogueHd::simple;
-using namespace brogueHd::component;
-
-namespace brogueHd::backend::model
+namespace brogueHd::component
 {
+	using namespace simple;
+	using namespace simple::math;
+
 	class brogueLayout
 	{
-
 	public:
-
-		brogueLayout(const gridRect& levelParentBoundary, const gridRect& levelBoundary);
+		brogueLayout(const simpleGridRect& levelParentBoundary, const simpleGridRect& levelBoundary);
 		~brogueLayout();
 
 		bool isDefined(int column, int row) const;
 
 		brogueCell* get(int column, int row) const;
 
-		gridRect getBoundary() const;
-		gridRect getParentBoundary() const;
+		simpleGridRect getBoundary() const;
+		simpleGridRect getParentBoundary() const;
 
 		/// <summary>
 		/// Iterates adjacent cells to satisfy the user predicate. Returns the result cell, (or null), and 
@@ -62,13 +60,13 @@ namespace brogueHd::backend::model
 		/// <summary>
 		/// Ensures that the layout has cells in the specified locations.
 		/// </summary>
-		template<isGridLocator T>
+		template <isGridLocator T>
 		void createCells(gridRegion<T>* region, const brogueCell& prototype, bool overwrite = false);
 
 		/// <summary>
 		/// Ensures that cell is created for specified location
 		/// </summary>
-		template<isGridLocator T>
+		template <isGridLocator T>
 		void createCells(const T& locator, const brogueCell& prototype, bool overwrite = false);
 
 		/// <summary>
@@ -82,6 +80,7 @@ namespace brogueHd::backend::model
 		void setRoomConnectionGraph(graph<gridLocator, gridLocatorEdge>* connectionGraph);
 
 		void setCorridorConnections(const simpleList<gridLocatorEdge>& connections);
+
 		simpleList<gridLocatorEdge> getCorridorConnections()
 		{
 			return *_corridorConnections;
@@ -93,7 +92,6 @@ namespace brogueHd::backend::model
 		void iterateRoomConnections(graphSimpleEdgeIterator<gridLocator, gridLocatorEdge> callback);
 
 	private:
-
 		simpleList<brogueRoom*>* _rooms;
 
 		// May need to break into separate grids
@@ -124,7 +122,6 @@ namespace brogueHd::backend::model
 		// REFACTORED VOLUME:  Separates gases
 		//unsigned int poisonGasVolume;
 		//unsigned int swampGasVolume;
-
 	};
 
 	brogueLayout::brogueLayout(const gridRect& levelParentBoundary, const gridRect& levelBoundary)
@@ -136,7 +133,7 @@ namespace brogueHd::backend::model
 
 	brogueLayout::~brogueLayout()
 	{
-		_mainGrid->iterate([] (int column, int row, brogueCell* cell)
+		_mainGrid->iterate([](int column, int row, brogueCell* cell)
 		{
 			delete cell;
 
@@ -150,10 +147,12 @@ namespace brogueHd::backend::model
 	{
 		return _mainGrid->getRelativeBoundary();
 	}
+
 	gridRect brogueLayout::getParentBoundary() const
 	{
 		return _mainGrid->getParentBoundary();
 	}
+
 	bool brogueLayout::isDefined(int column, int row) const
 	{
 		return _mainGrid->isDefined(column, row);
@@ -168,36 +167,38 @@ namespace brogueHd::backend::model
 	{
 		grid<brogueCell*>* mainGrid = _mainGrid;
 
-		return _mainGrid->calculateLargestRectangle(minSize, [&mainGrid] (int column, int row, brogueCell* cell)
+		return _mainGrid->calculateLargestRectangle(minSize, [&mainGrid](int column, int row, brogueCell* cell)
 		{
 			return !mainGrid->isDefined(column, row);
 		});
 	}
 
-	template<isGridLocator T>
+	template <isGridLocator T>
 	void brogueLayout::createCells(const T& locator, const brogueCell& prototype, bool overwrite)
 	{
 		brogueCellDisplay display = prototype.getDisplay();
 
 		_mainGrid->set(locator.column,
-					   locator.row,
-					   new brogueCell(locator.column, locator.row, display.backColor, display.foreColor, display.character),
-					   overwrite);
+		               locator.row,
+		               new brogueCell(locator.column, locator.row, display.backColor, display.foreColor,
+		                              display.character),
+		               overwrite);
 	}
 
-	template<isGridLocator T>
+	template <isGridLocator T>
 	void brogueLayout::createCells(gridRegion<T>* region, const brogueCell& prototype, bool overwrite)
 	{
 		grid<brogueCell*>* mainGrid = _mainGrid;
 		brogueCellDisplay display = prototype.getDisplay();
 
 		// Check cells
-		region->iterateLocations([&mainGrid, &display, &overwrite] (int column, int row, const T& locator)
+		region->iterateLocations([&mainGrid, &display, &overwrite](int column, int row, const T& locator)
 		{
 			mainGrid->set(locator.column,
-						  locator.row,
-						  new brogueCell(locator.column, locator.row, display.backColor, display.foreColor, display.character),
-						  overwrite);
+			              locator.row,
+			              new brogueCell(locator.column, locator.row, display.backColor, display.foreColor,
+			                             display.character),
+			              overwrite);
 
 			return iterationCallback::iterate;
 		});
@@ -224,11 +225,13 @@ namespace brogueHd::backend::model
 
 	void brogueLayout::iterateAdjacentCells(int column, int row, gridCallback<brogueCell*> callback)
 	{
-		_mainGrid->iterateAdjacent(column, row, true, [&callback] (int column, int row, brogueCompass direction, brogueCell* item)
-		{
-			return callback(column, row, item);
-		});
+		_mainGrid->iterateAdjacent(column, row, true,
+		                           [&callback](int column, int row, brogueCompass direction, brogueCell* item)
+		                           {
+			                           return callback(column, row, item);
+		                           });
 	}
+
 	void brogueLayout::iterate(gridCallback<brogueCell*> callback) const
 	{
 		_mainGrid->iterate(callback);
@@ -236,7 +239,7 @@ namespace brogueHd::backend::model
 
 	void brogueLayout::iterateWhereDefined(gridCallback<brogueCell*> callback) const
 	{
-		_mainGrid->iterate([&callback] (int column, int row, brogueCell* cell)
+		_mainGrid->iterate([&callback](int column, int row, brogueCell* cell)
 		{
 			if (cell != nullptr)
 				callback(column, row, cell);
@@ -249,18 +252,19 @@ namespace brogueHd::backend::model
 	{
 		brogueCell* result;
 
-		_mainGrid->iterateAdjacent(column, row, true, [&predicate, &result] (int acolumn, int arow, brogueCompass direction, brogueCell* cell)
-		{
-			if (predicate(acolumn, arow, cell))
-			{
-				result = cell;
-				return iterationCallback::breakAndReturn;
-			}
+		_mainGrid->iterateAdjacent(column, row, true,
+		                           [&predicate, &result](int acolumn, int arow, brogueCompass direction,
+		                                                 brogueCell* cell)
+		                           {
+			                           if (predicate(acolumn, arow, cell))
+			                           {
+				                           result = cell;
+				                           return iterationCallback::breakAndReturn;
+			                           }
 
-			return iterationCallback::iterate;
-		});
+			                           return iterationCallback::iterate;
+		                           });
 
 		return result;
 	}
 }
-

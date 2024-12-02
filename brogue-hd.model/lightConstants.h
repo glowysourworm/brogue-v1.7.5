@@ -1,8 +1,8 @@
 #pragma once
 
-namespace brogueHd::backend::model
+namespace brogueHd::model
 {
-	enum lightType 
+	enum lightType
 	{
 		NO_LIGHT,
 		MINERS_LIGHT,

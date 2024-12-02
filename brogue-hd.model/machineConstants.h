@@ -1,45 +1,58 @@
 #pragma once
 
-#include "brogueGlobal.h"
+#include <simpleMacros.h>
 
-namespace brogueHd::backend::model
+namespace brogueHd::model
 {
-	enum machineFeatureFlags 
+	using namespace simple;
+
+	enum machineFeatureFlags
 	{
-		MF_GENERATE_ITEM = Fl(0),	// feature entails generating an item (overridden if the machine is adopting an item)
-		MF_OUTSOURCE_ITEM_TO_MACHINE = Fl(1),	// item must be adopted by another machine
-		MF_BUILD_VESTIBULE = Fl(2),	// call this at the origin of a door room to create a new door guard machine there
-		MF_ADOPT_ITEM = Fl(3),	// this feature will take the adopted item (be it from another machine or a previous feature)
-		MF_NO_THROWING_WEAPONS = Fl(4),	// the generated item cannot be a throwing weapon
-		MF_GENERATE_HORDE = Fl(5),	// generate a monster horde that has all of the horde flags
-		MF_BUILD_AT_ORIGIN = Fl(6),	// generate this feature at the room entrance
-		// unused                       = Fl(7),	//
-		MF_PERMIT_BLOCKING = Fl(8),	// permit the feature to block the map's passability (e.g. to add a locked door)
-		MF_TREAT_AS_BLOCKING = Fl(9),	// treat this terrain as though it blocks, for purposes of deciding whether it can be placed there
-		MF_NEAR_ORIGIN = Fl(10),	// feature must spawn in the rough quarter of tiles closest to the origin
-		MF_FAR_FROM_ORIGIN = Fl(11),	// feature must spawn in the rough quarter of tiles farthest from the origin
-		MF_MONSTER_TAKE_ITEM = Fl(12),	// the item associated with this feature (including if adopted) will be in possession of the horde leader that's generated
-		MF_MONSTER_SLEEPING = Fl(13),	// the monsters should be asleep when generated
-		MF_MONSTER_FLEEING = Fl(14),   // the monsters should be permanently fleeing when generated
-		MF_EVERYWHERE = Fl(15),	// generate the feature on every tile of the machine (e.g. carpeting)
-		MF_ALTERNATIVE = Fl(16),	// build only one feature that has this flag per machine; the rest are skipped
-		MF_ALTERNATIVE_2 = Fl(17),	// same as MF_ALTERNATIVE, but provides for a second set of alternatives of which only one will be chosen
-		MF_REQUIRE_GOOD_RUNIC = Fl(18),	// generated item must be uncursed runic
-		MF_MONSTERS_DORMANT = Fl(19),	// monsters are dormant, and appear when a dungeon feature with DFF_ACTIVATE_DORMANT_MONSTER spawns on their tile
-		// unused                       = Fl(20),	//
-		MF_BUILD_IN_WALLS = Fl(21),	// build in an impassable tile that is adjacent to the interior
-		MF_BUILD_ANYWHERE_ON_LEVEL = Fl(22),	// build anywhere on the level that is not inside the machine
-		MF_REPEAT_UNTIL_NO_PROGRESS = Fl(23),	// keep trying to build this feature set until no changes are made
-		MF_IMPREGNABLE = Fl(24),	// this feature's location will be immune to tunneling
-		MF_IN_VIEW_OF_ORIGIN = Fl(25),	// this feature must be in view of the origin
-		MF_IN_PASSABLE_VIEW_OF_ORIGIN = Fl(26),	// this feature must be in view of the origin, where "view" is blocked by pathing blockers
-		MF_NOT_IN_HALLWAY = Fl(27),	// the feature location must have a passableArcCount of <= 1
-		MF_NOT_ON_LEVEL_PERIMETER = Fl(28),	// don't build it in the outermost walls of the level
-		MF_SKELETON_KEY = Fl(29),	// if a key is generated or adopted by this feature, it will open all locks in this machine.
-		MF_KEY_DISPOSABLE = Fl(30),	// if a key is generated or adopted, it will self-destruct after being used at this current location.
+		MF_GENERATE_ITEM = EnumFlag(0),
+		// feature entails generating an item (overridden if the machine is adopting an item)
+		MF_OUTSOURCE_ITEM_TO_MACHINE = EnumFlag(1), // item must be adopted by another machine
+		MF_BUILD_VESTIBULE = EnumFlag(2),
+		// call this at the origin of a door room to create a new door guard machine there
+		MF_ADOPT_ITEM = EnumFlag(3),
+		// this feature will take the adopted item (be it from another machine or a previous feature)
+		MF_NO_THROWING_WEAPONS = EnumFlag(4), // the generated item cannot be a throwing weapon
+		MF_GENERATE_HORDE = EnumFlag(5), // generate a monster horde that has all of the horde flags
+		MF_BUILD_AT_ORIGIN = EnumFlag(6), // generate this feature at the room entrance
+		// unused                       = EnumFlag(7),	//
+		MF_PERMIT_BLOCKING = EnumFlag(8),
+		// permit the feature to block the map's passability (e.g. to add a locked door)
+		MF_TREAT_AS_BLOCKING = EnumFlag(9),
+		// treat this terrain as though it blocks, for purposes of deciding whether it can be placed there
+		MF_NEAR_ORIGIN = EnumFlag(10), // feature must spawn in the rough quarter of tiles closest to the origin
+		MF_FAR_FROM_ORIGIN = EnumFlag(11), // feature must spawn in the rough quarter of tiles farthest from the origin
+		MF_MONSTER_TAKE_ITEM = EnumFlag(12),
+		// the item associated with this feature (including if adopted) will be in possession of the horde leader that's generated
+		MF_MONSTER_SLEEPING = EnumFlag(13), // the monsters should be asleep when generated
+		MF_MONSTER_FLEEING = EnumFlag(14), // the monsters should be permanently fleeing when generated
+		MF_EVERYWHERE = EnumFlag(15), // generate the feature on every tile of the machine (e.g. carpeting)
+		MF_ALTERNATIVE = EnumFlag(16), // build only one feature that has this flag per machine; the rest are skipped
+		MF_ALTERNATIVE_2 = EnumFlag(17),
+		// same as MF_ALTERNATIVE, but provides for a second set of alternatives of which only one will be chosen
+		MF_REQUIRE_GOOD_RUNIC = EnumFlag(18), // generated item must be uncursed runic
+		MF_MONSTERS_DORMANT = EnumFlag(19),
+		// monsters are dormant, and appear when a dungeon feature with DFF_ACTIVATE_DORMANT_MONSTER spawns on their tile
+		// unused                       = EnumFlag(20),	//
+		MF_BUILD_IN_WALLS = EnumFlag(21), // build in an impassable tile that is adjacent to the interior
+		MF_BUILD_ANYWHERE_ON_LEVEL = EnumFlag(22), // build anywhere on the level that is not inside the machine
+		MF_REPEAT_UNTIL_NO_PROGRESS = EnumFlag(23), // keep trying to build this feature set until no changes are made
+		MF_IMPREGNABLE = EnumFlag(24), // this feature's location will be immune to tunneling
+		MF_IN_VIEW_OF_ORIGIN = EnumFlag(25), // this feature must be in view of the origin
+		MF_IN_PASSABLE_VIEW_OF_ORIGIN = EnumFlag(26),
+		// this feature must be in view of the origin, where "view" is blocked by pathing blockers
+		MF_NOT_IN_HALLWAY = EnumFlag(27), // the feature location must have a passableArcCount of <= 1
+		MF_NOT_ON_LEVEL_PERIMETER = EnumFlag(28), // don't build it in the outermost walls of the level
+		MF_SKELETON_KEY = EnumFlag(29),
+		// if a key is generated or adopted by this feature, it will open all locks in this machine.
+		MF_KEY_DISPOSABLE = EnumFlag(30),
+		// if a key is generated or adopted, it will self-destruct after being used at this current location.
 	};
 
-	enum machineTypes 
+	enum machineTypes
 	{
 		// Reward rooms:
 		MT_REWARD_MULTI_LIBRARY = 1,

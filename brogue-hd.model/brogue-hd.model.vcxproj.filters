@@ -30,9 +30,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="brogueLevel.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="blueprintDeclaration.h">
       <Filter>Header Files\constants</Filter>
     </ClInclude>
@@ -48,17 +45,11 @@
     <ClInclude Include="brogueCell.h">
       <Filter>Header Files\game</Filter>
     </ClInclude>
-    <ClInclude Include="brogueContentGrid.h">
-      <Filter>Header Files\layout</Filter>
-    </ClInclude>
     <ClInclude Include="brogueCreature.h">
       <Filter>Header Files\game</Filter>
     </ClInclude>
     <ClInclude Include="brogueCreatureHorde.h">
       <Filter>Header Files\game</Filter>
-    </ClInclude>
-    <ClInclude Include="brogueDesignRect.h">
-      <Filter>Header Files\layout</Filter>
     </ClInclude>
     <ClInclude Include="broguefile.h">
       <Filter>Header Files\serialization</Filter>
@@ -71,9 +62,6 @@
     </ClInclude>
     <ClInclude Include="brogueItem.h">
       <Filter>Header Files\game</Filter>
-    </ClInclude>
-    <ClInclude Include="brogueLayout.h">
-      <Filter>Header Files\layout</Filter>
     </ClInclude>
     <ClInclude Include="brogueLevelProfile.h">
       <Filter>Header Files\template</Filter>
@@ -95,9 +83,6 @@
     </ClInclude>
     <ClInclude Include="brogueRoomTemplate.h">
       <Filter>Header Files\template</Filter>
-    </ClInclude>
-    <ClInclude Include="brogueRoom.h">
-      <Filter>Header Files\layout</Filter>
     </ClInclude>
     <ClInclude Include="colorConstants.h">
       <Filter>Header Files\constants</Filter>

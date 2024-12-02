@@ -1,14 +1,12 @@
 #pragma once
 
-namespace brogueHd::backend::model
+namespace brogueHd::model
 {
 	struct keyLocation
 	{
-
 	};
 
 	struct dungeonTemplate
 	{
-
 	};
 }

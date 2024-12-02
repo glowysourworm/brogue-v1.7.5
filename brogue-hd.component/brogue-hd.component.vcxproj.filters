@@ -19,6 +19,9 @@
     <Filter Include="Header Files\generator">
       <UniqueIdentifier>{79e93819-3d35-40ce-a4a4-def5ccbbb040}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\model">
+      <UniqueIdentifier>{94818a8c-a90b-41ab-8d3c-8c43dc91ae93}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dijkstra.h">
@@ -92,6 +95,21 @@
     </ClInclude>
     <ClInclude Include="contentGenerator.h">
       <Filter>Header Files\generator</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueContentGrid.h">
+      <Filter>Header Files\model</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueDesignRect.h">
+      <Filter>Header Files\model</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueLayout.h">
+      <Filter>Header Files\model</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueLevel.h">
+      <Filter>Header Files\model</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueRoom.h">
+      <Filter>Header Files\model</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

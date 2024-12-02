@@ -6,16 +6,11 @@
 #include "simple.h"
 #include "simpleException.h"
 
-using namespace brogueHd::simple;
-using namespace brogueHd::component;
-using namespace brogueHd::frontend;
-
-namespace brogueHd::backend::model
+namespace brogueHd::model
 {
 	struct brogueCellDisplay : gridLocator
 	{
 	public:
-
 		// TODO:  CHANGE THIS TO WORK ON THE WHOLE DISPLAY PROBLEM STARTING WITH BROGUE 1.7.5.
 		//
 		// Glyph Sheet:  16 Columns x 17 Rows
@@ -27,21 +22,21 @@ namespace brogueHd::backend::model
 			// Must derive these from dividing the glyph sheet into a grid
 			switch (zoomLevel)
 			{
-				case 1:	return 0;
-				case 2: return 0;
-				case 3: return 0;
-				case 4: return 0;
-				case 5: return 0;
-				case 6: return 0;
-				case 7: return 0;
-				case 8: return 0;
-				case 9: return 15.0;
-				case 10: return 16.0;
-				case 11: return 17.0;
-				case 12: return 18.0;
-				case 13: return 19.0;
-				default:
-					throw simpleException("Invalid zoom level:  brogueCellDisplay::CellWidth");
+			case 1: return 0;
+			case 2: return 0;
+			case 3: return 0;
+			case 4: return 0;
+			case 5: return 0;
+			case 6: return 0;
+			case 7: return 0;
+			case 8: return 0;
+			case 9: return 15.0;
+			case 10: return 16.0;
+			case 11: return 17.0;
+			case 12: return 18.0;
+			case 13: return 19.0;
+			default:
+				throw simpleException("Invalid zoom level:  brogueCellDisplay::CellWidth");
 			}
 		}
 
@@ -59,26 +54,25 @@ namespace brogueHd::backend::model
 			//
 			switch (zoomLevel)
 			{
-				case 1:	return 0;
-				case 2: return 0;
-				case 3: return 0;
-				case 4: return 0;
-				case 5: return 0;
-				case 6: return 0;
-				case 7: return 0;
-				case 8: return 0;
-				case 9: return 25.0;
-				case 10: return 27.0;
-				case 11: return 29.0;
-				case 12: return 31.0;
-				case 13: return 31.0;
-				default:
-					throw simpleException("Invalid zoom level:  brogueCellDisplay::CellHeight");
+			case 1: return 0;
+			case 2: return 0;
+			case 3: return 0;
+			case 4: return 0;
+			case 5: return 0;
+			case 6: return 0;
+			case 7: return 0;
+			case 8: return 0;
+			case 9: return 25.0;
+			case 10: return 27.0;
+			case 11: return 29.0;
+			case 12: return 31.0;
+			case 13: return 31.0;
+			default:
+				throw simpleException("Invalid zoom level:  brogueCellDisplay::CellHeight");
 			}
 		}
 
 	public:
-
 		int character;
 		color foreColor;
 		color backColor;
@@ -119,10 +113,12 @@ namespace brogueHd::backend::model
 			: brogueCellDisplay(-1, -1)
 		{
 		}
-		brogueCellDisplay(int column, int row) 
+
+		brogueCellDisplay(int column, int row)
 			: brogueCellDisplay(column, row, colors::transparent())
 		{
 		}
+
 		brogueCellDisplay(int column, int row, const color& abackColor)
 		{
 			this->column = column;
@@ -134,6 +130,7 @@ namespace brogueHd::backend::model
 			needsUpdate = false;
 			noDisplay = false;
 		}
+
 		brogueCellDisplay(const brogueCellDisplay& copy)
 		{
 			copyImpl(copy);
@@ -143,10 +140,12 @@ namespace brogueHd::backend::model
 		{
 			copyImpl(copy);
 		}
+
 		bool operator==(const brogueCellDisplay& other) const
 		{
 			return compare(other);
 		}
+
 		bool operator!=(const brogueCellDisplay& other) const
 		{
 			return !compare(other);
@@ -158,8 +157,8 @@ namespace brogueHd::backend::model
 		void setUI(const brogueCellDisplay& other)
 		{
 			character = other.character;
-			foreColor = other.foreColor;									// Careful with instances. These are non-unique
-			backColor = other.backColor;									// Careful with instances. These are non-unique
+			foreColor = other.foreColor; // Careful with instances. These are non-unique
+			backColor = other.backColor; // Careful with instances. These are non-unique
 			opacity = other.opacity;
 			noDisplay = other.noDisplay;
 		}
@@ -176,20 +175,21 @@ namespace brogueHd::backend::model
 				row == display.row;
 			//lighting.compare(display.lighting);
 		}
+
 		size_t getHash() const override
 		{
-			return hashGenerator::generateHash(column, row, character, foreColor.getHash(), backColor.getHash(), opacity, needsUpdate, noDisplay);
+			return hashGenerator::generateHash(column, row, character, foreColor.getHash(), backColor.getHash(),
+			                                   opacity, needsUpdate, noDisplay);
 		}
 
 	private:
-
 		void copyImpl(const brogueCellDisplay& copy)
 		{
 			column = copy.column;
 			row = copy.row;
 			character = copy.character;
-			foreColor = copy.foreColor;									// Careful with instances. These are non-unique
-			backColor = copy.backColor;									// Careful with instances. These are non-unique
+			foreColor = copy.foreColor; // Careful with instances. These are non-unique
+			backColor = copy.backColor; // Careful with instances. These are non-unique
 			opacity = copy.opacity;
 			needsUpdate = copy.needsUpdate;
 			noDisplay = copy.noDisplay;

@@ -1,9 +1,11 @@
 #pragma once
 
-#include "brogueGlobal.h"
+#include <simpleMacros.h>
 
-namespace brogueHd::backend::model
+namespace brogueHd::model
 {
+	using namespace simple;
+
 	enum levelTypes : int
 	{
 		DP_BASIC,
@@ -56,42 +58,45 @@ namespace brogueHd::backend::model
 	// Dungeon flags
 	enum tileFlags
 	{
-		DISCOVERED = Fl(0),
-		VISIBLE = Fl(1),	// cell has sufficient light and is in field of view, ready to draw.
-		HAS_PLAYER = Fl(2),
-		HAS_MONSTER = Fl(3),
-		HAS_DORMANT_MONSTER = Fl(4),	// hidden monster on the square
-		HAS_ITEM = Fl(5),
-		IN_FIELD_OF_VIEW = Fl(6),	// player has unobstructed line of sight whether or not there is enough light
-		WAS_VISIBLE = Fl(7),
-		HAS_STAIRS = Fl(8),
-		SEARCHED_FROM_HERE = Fl(9),    // player already auto-searched here; can't auto-search here again
-		IS_IN_SHADOW = Fl(10),	// so that a player gains an automatic stealth bonus
-		MAGIC_MAPPED = Fl(11),
-		ITEM_DETECTED = Fl(12),
-		CLAIRVOYANT_VISIBLE = Fl(13),
-		WAS_CLAIRVOYANT_VISIBLE = Fl(14),
-		CLAIRVOYANT_DARKENED = Fl(15),	// magical blindness from a cursed ring of clairvoyance
-		CAUGHT_FIRE_THIS_TURN = Fl(16),	// so that fire does not spread asymmetrically
-		PRESSURE_PLATE_DEPRESSED = Fl(17),	// so that traps do not trigger repeatedly while you stand on them
-		STABLE_MEMORY = Fl(18),	// redraws will be pulled from the memory array, not recalculated
-		KNOWN_TO_BE_TRAP_FREE = Fl(19),	// keep track of where the player has stepped or watched monsters step as he knows no traps are there
-		IS_IN_PATH = Fl(20),	// the yellow trail leading to the cursor
-		IN_LOOP = Fl(21),	// this cell is part of a terrain loop
-		IS_CHOKEPOINT = Fl(22),	// if this cell is blocked, part of the map will be rendered inaccessible
-		IS_GATE_SITE = Fl(23),	// consider placing a locked door here
-		IS_IN_ROOM_MACHINE = Fl(24),
-		IS_IN_AREA_MACHINE = Fl(25),
-		IS_POWERED = Fl(26),	// has been activated by machine power this turn (flag can probably be eliminated if needed)
-		IMPREGNABLE = Fl(27),	// no tunneling allowed!
-		TERRAIN_COLORS_DANCING = Fl(28),	// colors here will sparkle when the game is idle
-		TELEPATHIC_VISIBLE = Fl(29),	// potions of telepathy let you see through other creatures' eyes
-		WAS_TELEPATHIC_VISIBLE = Fl(30),	// potions of telepathy let you see through other creatures' eyes
+		DISCOVERED = EnumFlag(0),
+		VISIBLE = EnumFlag(1), // cell has sufficient light and is in field of view, ready to draw.
+		HAS_PLAYER = EnumFlag(2),
+		HAS_MONSTER = EnumFlag(3),
+		HAS_DORMANT_MONSTER = EnumFlag(4), // hidden monster on the square
+		HAS_ITEM = EnumFlag(5),
+		IN_FIELD_OF_VIEW = EnumFlag(6), // player has unobstructed line of sight whether or not there is enough light
+		WAS_VISIBLE = EnumFlag(7),
+		HAS_STAIRS = EnumFlag(8),
+		SEARCHED_FROM_HERE = EnumFlag(9), // player already auto-searched here; can't auto-search here again
+		IS_IN_SHADOW = EnumFlag(10), // so that a player gains an automatic stealth bonus
+		MAGIC_MAPPED = EnumFlag(11),
+		ITEM_DETECTED = EnumFlag(12),
+		CLAIRVOYANT_VISIBLE = EnumFlag(13),
+		WAS_CLAIRVOYANT_VISIBLE = EnumFlag(14),
+		CLAIRVOYANT_DARKENED = EnumFlag(15), // magical blindness from a cursed ring of clairvoyance
+		CAUGHT_FIRE_THIS_TURN = EnumFlag(16), // so that fire does not spread asymmetrically
+		PRESSURE_PLATE_DEPRESSED = EnumFlag(17), // so that traps do not trigger repeatedly while you stand on them
+		STABLE_MEMORY = EnumFlag(18), // redraws will be pulled from the memory array, not recalculated
+		KNOWN_TO_BE_TRAP_FREE = EnumFlag(19),
+		// keep track of where the player has stepped or watched monsters step as he knows no traps are there
+		IS_IN_PATH = EnumFlag(20), // the yellow trail leading to the cursor
+		IN_LOOP = EnumFlag(21), // this cell is part of a terrain loop
+		IS_CHOKEPOINT = EnumFlag(22), // if this cell is blocked, part of the map will be rendered inaccessible
+		IS_GATE_SITE = EnumFlag(23), // consider placing a locked door here
+		IS_IN_ROOM_MACHINE = EnumFlag(24),
+		IS_IN_AREA_MACHINE = EnumFlag(25),
+		IS_POWERED = EnumFlag(26),
+		// has been activated by machine power this turn (flag can probably be eliminated if needed)
+		IMPREGNABLE = EnumFlag(27), // no tunneling allowed!
+		TERRAIN_COLORS_DANCING = EnumFlag(28), // colors here will sparkle when the game is idle
+		TELEPATHIC_VISIBLE = EnumFlag(29), // potions of telepathy let you see through other creatures' eyes
+		WAS_TELEPATHIC_VISIBLE = EnumFlag(30), // potions of telepathy let you see through other creatures' eyes
 
-		IS_IN_MACHINE = (IS_IN_ROOM_MACHINE | IS_IN_AREA_MACHINE), 	// sacred ground; don't generate items here, or teleport randomly to it
+		IS_IN_MACHINE = (IS_IN_ROOM_MACHINE | IS_IN_AREA_MACHINE),
+		// sacred ground; don't generate items here, or teleport randomly to it
 
 		PERMANENT_TILE_FLAGS = (DISCOVERED | MAGIC_MAPPED | ITEM_DETECTED | HAS_ITEM | HAS_DORMANT_MONSTER
-		| HAS_STAIRS | SEARCHED_FROM_HERE | PRESSURE_PLATE_DEPRESSED
+			| HAS_STAIRS | SEARCHED_FROM_HERE | PRESSURE_PLATE_DEPRESSED
 			| STABLE_MEMORY | KNOWN_TO_BE_TRAP_FREE | IN_LOOP
 			| IS_CHOKEPOINT | IS_GATE_SITE | IS_IN_MACHINE | IMPREGNABLE),
 
@@ -108,28 +113,28 @@ namespace brogueHd::backend::model
 		DUNGEON = 0,
 
 		// Wall tiles - (see features for torch, and other data)
-		WALL = Fl(1),
+		WALL = EnumFlag(1),
 
 		// Door tiles: machine or otherwise; locked or unlocked
-		DOOR = Fl(2),
+		DOOR = EnumFlag(2),
 
 		// Shallow water:  permanent; and on the edges of the water region
-		WATER_SHALLOW = Fl(3),
+		WATER_SHALLOW = EnumFlag(3),
 
 		// Deep water: permanent. Dynamic layers are added on top of permanent layers
-		WATER_DEEP = Fl(4),
+		WATER_DEEP = EnumFlag(4),
 
 		// Edge of a swamp:  permanent, and walkable
-		SWAMP_SHALLOW = Fl(5),
+		SWAMP_SHALLOW = EnumFlag(5),
 
 		// Interior of a swamp:  permanent, and not easily walkable
-		SWAMP_DEEP = Fl(6),
+		SWAMP_DEEP = EnumFlag(6),
 
 		// Lava:  permanent
-		LAVA = Fl(7),
+		LAVA = EnumFlag(7),
 
 		// Chasm:  permanent. Edges of a chasm are NOT a chasm - they are a dungeon tile feature.
-		CHASM = Fl(8)
+		CHASM = EnumFlag(8)
 	};
 
 
@@ -143,19 +148,19 @@ namespace brogueHd::backend::model
 		CHASM = 0,
 
 		// Fire:  Active fires are temporary terrain alterations
-		FIRE = Fl(1),
+		FIRE = EnumFlag(1),
 
 		// Gas:  All gas types are considered a hazard
-		GAS = Fl(2),
+		GAS = EnumFlag(2),
 
 		// Net:  Net traps will leave these
-		NET = Fl(3),
+		NET = EnumFlag(3),
 
 		// Spider's Web:  These are temporary grid alterations
-		SPIDER_WEB = Fl(4),
+		SPIDER_WEB = EnumFlag(4),
 
 		// Temporary Water:  Pools of water will be stored when traps are set
-		WATER = Fl(5)
+		WATER = EnumFlag(5)
 	};
 
 	/// <summary>
@@ -164,29 +169,29 @@ namespace brogueHd::backend::model
 	/// </summary>
 	enum dungeonFeatureCategories
 	{
-		FEATURE_DECORATION = Fl(1),
-		FEATURE_WALL = Fl(2),
-		FEATURE_FOLIAGE = Fl(3),
-		FEATURE_LIGHT = Fl(4),
-		FEATURE_TRAP = Fl(5),
-		FEATURE_BODILY_FLUIDS = Fl(6),
-		FEATURE_ENEMY = Fl(7),
-		FEATURE_EXPLOSION = Fl(8),
-		FEATURE_MAGIC = Fl(9),
-		FEATURE_GAS = Fl(10),
-		FEATURE_POTION = Fl(11),
-		FEATURE_RUBBLE = Fl(12),
-		FEATURE_INTERACTION = Fl(13),
-		FEATURE_BRIMSTONE = Fl(14),
-		FEATURE_DEWARS = Fl(15),
-		FEATURE_DOOR = Fl(16),
-		FEATURE_OTHER_DOOR = Fl(17),
-		FEATURE_ALTAR = Fl(18),
-		FEATURE_SWAMP = Fl(19),
-		FEATURE_CHASM = Fl(20),
-		FEATURE_FIRE = Fl(21),
-		FEATURE_OTHER_ITEMS = Fl(22),
-		FEATURE_STENCH = Fl(23)
+		FEATURE_DECORATION = EnumFlag(1),
+		FEATURE_WALL = EnumFlag(2),
+		FEATURE_FOLIAGE = EnumFlag(3),
+		FEATURE_LIGHT = EnumFlag(4),
+		FEATURE_TRAP = EnumFlag(5),
+		FEATURE_BODILY_FLUIDS = EnumFlag(6),
+		FEATURE_ENEMY = EnumFlag(7),
+		FEATURE_EXPLOSION = EnumFlag(8),
+		FEATURE_MAGIC = EnumFlag(9),
+		FEATURE_GAS = EnumFlag(10),
+		FEATURE_POTION = EnumFlag(11),
+		FEATURE_RUBBLE = EnumFlag(12),
+		FEATURE_INTERACTION = EnumFlag(13),
+		FEATURE_BRIMSTONE = EnumFlag(14),
+		FEATURE_DEWARS = EnumFlag(15),
+		FEATURE_DOOR = EnumFlag(16),
+		FEATURE_OTHER_DOOR = EnumFlag(17),
+		FEATURE_ALTAR = EnumFlag(18),
+		FEATURE_SWAMP = EnumFlag(19),
+		FEATURE_CHASM = EnumFlag(20),
+		FEATURE_FIRE = EnumFlag(21),
+		FEATURE_OTHER_ITEMS = EnumFlag(22),
+		FEATURE_STENCH = EnumFlag(23)
 	};
 
 	/// <summary>
@@ -194,164 +199,164 @@ namespace brogueHd::backend::model
 	/// </summary>
 	enum dungeonFeatureDecoration
 	{
-		CARPET = Fl(1),
+		CARPET = EnumFlag(1),
 
 		// camp:
-		HAY = Fl(2),
-		JUNK = Fl(3)
+		HAY = EnumFlag(2),
+		JUNK = EnumFlag(3)
 	};
 
 	enum dungeonFeatureWall
 	{
-		GRANITE_COLUMN = Fl(1),
-		CRYSTAL_WALL = Fl(2),
+		GRANITE_COLUMN = EnumFlag(1),
+		CRYSTAL_WALL = EnumFlag(2),
 
 		// worm den:
-		WALL_SHATTER = Fl(3)
+		WALL_SHATTER = EnumFlag(3)
 	};
 
 	enum dungeonFeatureFoliage
 	{
-		ALGAE_1 = Fl(1),
-		ALGAE_2 = Fl(2),
-		ALGAE_1_FREEZE = Fl(3),
-		ALGAE_2_FREEZE = Fl(4),
-		ALGAE_REVERT = Fl(5),
-		BUILD_ALGAE_WELL = Fl(6),
+		ALGAE_1 = EnumFlag(1),
+		ALGAE_2 = EnumFlag(2),
+		ALGAE_1_FREEZE = EnumFlag(3),
+		ALGAE_2_FREEZE = EnumFlag(4),
+		ALGAE_REVERT = EnumFlag(5),
+		BUILD_ALGAE_WELL = EnumFlag(6),
 
-		BLOODFLOWER_PODS_GROW_INITIAL = Fl(7),
-		BLOODFLOWER_PODS_GROW = Fl(8),
-		BLOODFLOWER_POD_BURST = Fl(9),
+		BLOODFLOWER_PODS_GROW_INITIAL = EnumFlag(7),
+		BLOODFLOWER_PODS_GROW = EnumFlag(8),
+		BLOODFLOWER_POD_BURST = EnumFlag(9),
 
-		DEAD_FOLIAGE = Fl(10),
-		DEAD_GRASS = Fl(11),
-		DEAD_GRASS_SMALL = Fl(12),
+		DEAD_FOLIAGE = EnumFlag(10),
+		DEAD_GRASS = EnumFlag(11),
+		DEAD_GRASS_SMALL = EnumFlag(12),
 
-		FOLIAGE = Fl(13),
-		FOLIAGE_REGROW = Fl(14),
-		FOLIAGE_TRAMPLED = Fl(15),
+		FOLIAGE = EnumFlag(13),
+		FOLIAGE_REGROW = EnumFlag(14),
+		FOLIAGE_TRAMPLED = EnumFlag(15),
 
-		FUNGUS_FOREST = Fl(16),
-		FUNGUS_FOREST_REGROW = Fl(17),
-		FUNGUS_FOREST_TRAMPLED = Fl(18),
-		FUNGUS_LUMINESCENT = Fl(19),
+		FUNGUS_FOREST = EnumFlag(16),
+		FUNGUS_FOREST_REGROW = EnumFlag(17),
+		FUNGUS_FOREST_TRAMPLED = EnumFlag(18),
+		FUNGUS_LUMINESCENT = EnumFlag(19),
 
-		GRASS = Fl(20),
+		GRASS = EnumFlag(20),
 
-		LICHEN_GROW = Fl(21),
-		LICHEN_MUTATION = Fl(22),
-		LICHEN_PLANTED = Fl(23)
+		LICHEN_GROW = EnumFlag(21),
+		LICHEN_MUTATION = EnumFlag(22),
+		LICHEN_PLANTED = EnumFlag(23)
 	};
 
 	enum dungeonFeatureLight
 	{
-		SUNLIGHT = Fl(1),
-		DARKNESS = Fl(2)
+		SUNLIGHT = EnumFlag(1),
+		DARKNESS = EnumFlag(2)
 	};
 
 	enum dungeonFeatureTrap
 	{
-		POISON_GAS_TRAP = Fl(1),
-		PARALYSIS_GAS_TRAP = Fl(2),
-		TRAPDOOR = Fl(3),
-		CONFUSION_GAS_TRAP = Fl(4),
-		FLAMETHROWER_TRAP = Fl(5),
-		FLOOD_TRAP = Fl(6),
-		NET_TRAP = Fl(7),
-		ALARM_TRAP = Fl(8)
+		POISON_GAS_TRAP = EnumFlag(1),
+		PARALYSIS_GAS_TRAP = EnumFlag(2),
+		TRAPDOOR = EnumFlag(3),
+		CONFUSION_GAS_TRAP = EnumFlag(4),
+		FLAMETHROWER_TRAP = EnumFlag(5),
+		FLOOD_TRAP = EnumFlag(6),
+		NET_TRAP = EnumFlag(7),
+		ALARM_TRAP = EnumFlag(8)
 	};
 
 	enum dungeonFeatureBodilyFluids
 	{
-		RED_BLOOD = Fl(1),
-		GREEN_BLOOD = Fl(2),
-		PURPLE_BLOOD = Fl(3),
-		WORM_BLOOD = Fl(4),
-		ACID_BLOOD = Fl(5),
-		ASH_BLOOD = Fl(6),
-		EMBER_BLOOD = Fl(7),
-		ECTOPLASM_BLOOD = Fl(8),
-		RUBBLE_BLOOD = Fl(9),
-		ROT_GAS_BLOOD = Fl(10),
-		VOMIT = Fl(11),
-		URINE = Fl(12),
-		UNICORN_POOP = Fl(13)
+		RED_BLOOD = EnumFlag(1),
+		GREEN_BLOOD = EnumFlag(2),
+		PURPLE_BLOOD = EnumFlag(3),
+		WORM_BLOOD = EnumFlag(4),
+		ACID_BLOOD = EnumFlag(5),
+		ASH_BLOOD = EnumFlag(6),
+		EMBER_BLOOD = EnumFlag(7),
+		ECTOPLASM_BLOOD = EnumFlag(8),
+		RUBBLE_BLOOD = EnumFlag(9),
+		ROT_GAS_BLOOD = EnumFlag(10),
+		VOMIT = EnumFlag(11),
+		URINE = EnumFlag(12),
+		UNICORN_POOP = EnumFlag(13)
 	};
 
 	enum dungeonFeatureEnemy
 	{
-		FLAMEDANCER_CORONA = Fl(1),
+		FLAMEDANCER_CORONA = EnumFlag(1),
 
-		SALAMANDER_FLAME = Fl(2),
+		SALAMANDER_FLAME = EnumFlag(2),
 
-		WEB_SMALL = Fl(3),
-		WEB_LARGE = Fl(4),
+		WEB_SMALL = EnumFlag(3),
+		WEB_LARGE = EnumFlag(4),
 
-		ANCIENT_SPIRIT_VINES = Fl(5),
-		ANCIENT_SPIRIT_GRASS = Fl(6),
+		ANCIENT_SPIRIT_VINES = EnumFlag(5),
+		ANCIENT_SPIRIT_GRASS = EnumFlag(6),
 
 		// remnants:
-		REMNANT = Fl(7),
-		REMNANT_ASH = Fl(8)
+		REMNANT = EnumFlag(7),
+		REMNANT_ASH = EnumFlag(8)
 	};
 
 	enum dungeonFeatureExplosion
 	{
-		BLOAT_EXPLOSION = Fl(1),
-		BLOOD_EXPLOSION = Fl(2),
-		MUTATION_EXPLOSION = Fl(3)
+		BLOAT_EXPLOSION = EnumFlag(1),
+		BLOOD_EXPLOSION = EnumFlag(2),
+		MUTATION_EXPLOSION = EnumFlag(3)
 	};
 
 	enum dungeonFeatureMagic
 	{
-		REPEL_CREATURES = Fl(1),
-		SHATTERING_SPELL = Fl(2),
-		ECTOPLASM_DROPLET = Fl(3),
-		FORCEFIELD = Fl(4),
-		FORCEFIELD_MELT = Fl(5)
+		REPEL_CREATURES = EnumFlag(1),
+		SHATTERING_SPELL = EnumFlag(2),
+		ECTOPLASM_DROPLET = EnumFlag(3),
+		FORCEFIELD = EnumFlag(4),
+		FORCEFIELD_MELT = EnumFlag(5)
 	};
 
 	enum dungeonFeatureGas
 	{
-		ROT_GAS_PUFF = Fl(1),
-		STEAM_PUFF = Fl(2),
-		STEAM_ACCUMULATION = Fl(3),
-		METHANE_GAS_PUFF = Fl(4),
+		ROT_GAS_PUFF = EnumFlag(1),
+		STEAM_PUFF = EnumFlag(2),
+		STEAM_ACCUMULATION = EnumFlag(3),
+		METHANE_GAS_PUFF = EnumFlag(4),
 
-		POISON_GAS_CLOUD = Fl(5),
-		CONFUSION_GAS_TRAP_CLOUD = Fl(6),
-		METHANE_GAS_ARMAGEDDON  = Fl(7),
+		POISON_GAS_CLOUD = EnumFlag(5),
+		CONFUSION_GAS_TRAP_CLOUD = EnumFlag(6),
+		METHANE_GAS_ARMAGEDDON = EnumFlag(7),
 	};
 
 	enum dungeonFeaturePotion
 	{
 		// potions
-		POISON_GAS_CLOUD_POTION = Fl(1),
-		PARALYSIS_GAS_CLOUD_POTION = Fl(2),
-		CONFUSION_GAS_CLOUD_POTION = Fl(3),
-		INCINERATION_POTION = Fl(4),
-		DARKNESS_POTION = Fl(5),
-		HOLE_POTION = Fl(6)
+		POISON_GAS_CLOUD_POTION = EnumFlag(1),
+		PARALYSIS_GAS_CLOUD_POTION = EnumFlag(2),
+		CONFUSION_GAS_CLOUD_POTION = EnumFlag(3),
+		INCINERATION_POTION = EnumFlag(4),
+		DARKNESS_POTION = EnumFlag(5),
+		HOLE_POTION = EnumFlag(6)
 	};
 
 	enum dungeonFeatureRubble
 	{
-		ASH = Fl(1),
-		TUNNELIZE = Fl(2)
+		ASH = EnumFlag(1),
+		TUNNELIZE = EnumFlag(2)
 	};
 
 	enum dungeonFeatureInteraction
 	{
 		// Machine
-		SACRED_GLYPHS = Fl(1),
-		SILENT_GLYPH_GLOW = Fl(2),
-		GUARDIAN_STEP = Fl(3),
-		MIRROR_TOTEM_STEP = Fl(4),
-		GLYPH_INACTIVE = Fl(5),
-		GLYPH_CIRCLE = Fl(6),
-		GLYPH_ACTIVE = Fl(7),
-		ITEM_CAGE_OPEN = Fl(8),
-		ITEM_CAGE_CLOSED = Fl(9),
+		SACRED_GLYPHS = EnumFlag(1),
+		SILENT_GLYPH_GLOW = EnumFlag(2),
+		GUARDIAN_STEP = EnumFlag(3),
+		MIRROR_TOTEM_STEP = EnumFlag(4),
+		GLYPH_INACTIVE = EnumFlag(5),
+		GLYPH_CIRCLE = EnumFlag(6),
+		GLYPH_ACTIVE = EnumFlag(7),
+		ITEM_CAGE_OPEN = EnumFlag(8),
+		ITEM_CAGE_CLOSED = EnumFlag(9),
 
 		// Other
 		BRIDGE_FALL_PREP,
@@ -471,35 +476,35 @@ namespace brogueHd::backend::model
 
 	enum dungeonFeatureBrimstone
 	{
-		BRIMSTONE_ACTIVE = Fl(1),
-		BRIMSTONE_INERT = Fl(2)
+		BRIMSTONE_ACTIVE = EnumFlag(1),
+		BRIMSTONE_INERT = EnumFlag(2)
 	};
 
 	enum dungeonFeatureDewars
 	{
-		DEWAR_CAUSTIC = Fl(1),
-		DEWAR_CONFUSION = Fl(2),
-		DEWAR_PARALYSIS = Fl(3),
-		DEWAR_METHANE = Fl(4),
-		DEWAR_GLASS = Fl(5)
+		DEWAR_CAUSTIC = EnumFlag(1),
+		DEWAR_CONFUSION = EnumFlag(2),
+		DEWAR_PARALYSIS = EnumFlag(3),
+		DEWAR_METHANE = EnumFlag(4),
+		DEWAR_GLASS = EnumFlag(5)
 	};
 
 	enum dungeonFeatureDoor
 	{
-		DOOR_OPEN = Fl(1),
-		DOOR_CLOSED = Fl(2),
+		DOOR_OPEN = EnumFlag(1),
+		DOOR_CLOSED = EnumFlag(2),
 	};
 
 	enum dungeonFeatureOtherDoor
 	{
-		IRON_DOOR_OPEN_INERT = Fl(1),
-		PORTAL_ACTIVATE = Fl(2)
+		IRON_DOOR_OPEN_INERT = EnumFlag(1),
+		PORTAL_ACTIVATE = EnumFlag(2)
 	};
 
 	enum dungeonFeatureAltar
 	{
-		ALTAR_INERT = Fl(1),
-		ALTER_RETRACT = Fl(2)
+		ALTAR_INERT = EnumFlag(1),
+		ALTER_RETRACT = EnumFlag(2)
 	};
 
 	enum dungeonFeatureWater
@@ -534,8 +539,8 @@ namespace brogueHd::backend::model
 
 	enum dungeonFeatureChasm
 	{
-		HOLE_2 = Fl(1),
-		HOLE_DRAIN = Fl(2),
+		HOLE_2 = EnumFlag(1),
+		HOLE_DRAIN = EnumFlag(2),
 
 		// chasm catwalk:
 		CHASM_HOLE,
@@ -544,18 +549,18 @@ namespace brogueHd::backend::model
 
 	enum dungeonFeatureFire
 	{
-		PLAIN_FIRE = Fl(1),
-		GAS_FIRE = Fl(2),
-		EXPLOSION_FIRE = Fl(3),
-		DART_EXPLOSION = Fl(4),
-		BRIMSTONE_FIRE = Fl(5),
-		BRIDGE_FIRE = Fl(6),
-		FLAMETHROWER = Fl(7),
-		EMBERS = Fl(8),
-		EMBERS_PATCH = Fl(9),
-		OBSIDIAN = Fl(10),
-		ITEM_FIRE = Fl(11),
-		CREATURE_FIRE = Fl(12)
+		PLAIN_FIRE = EnumFlag(1),
+		GAS_FIRE = EnumFlag(2),
+		EXPLOSION_FIRE = EnumFlag(3),
+		DART_EXPLOSION = EnumFlag(4),
+		BRIMSTONE_FIRE = EnumFlag(5),
+		BRIDGE_FIRE = EnumFlag(6),
+		FLAMETHROWER = EnumFlag(7),
+		EMBERS = EnumFlag(8),
+		EMBERS_PATCH = EnumFlag(9),
+		OBSIDIAN = EnumFlag(10),
+		ITEM_FIRE = EnumFlag(11),
+		CREATURE_FIRE = EnumFlag(12)
 	};
 
 	enum dungeonFeatureOtherItems
@@ -572,7 +577,7 @@ namespace brogueHd::backend::model
 		STENCH_SMOLDER,
 	};
 
-	enum class tileType 
+	enum class tileType
 	{
 		NOTHING = 0,
 		GRANITE,
