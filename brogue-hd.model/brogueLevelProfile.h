@@ -230,10 +230,10 @@ namespace brogueHd::model
 
 	brogueRoomTemplate brogueLevelProfile::getRoomInfo(int index)
 	{
-		return _roomInfo->get((brogueRoomType)index);
+		return _roomInfo->getAt(index)->getValue();
 	}
 
-	brogueRoomTemplate brogueLevelProfile::getDefaultRoom()
+	brogueRoomTemplate brogueLevelProfile::getDefaultRoom() 
 	{
 		simpleRect levelBoundary(COLS - DCOLS, ROWS - DROWS, DCOLS, DROWS);
 
