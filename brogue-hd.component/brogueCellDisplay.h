@@ -6,7 +6,7 @@
 #include "simple.h"
 #include "simpleException.h"
 
-namespace brogueHd::model
+namespace brogueHd::component
 {
 	struct brogueCellDisplay : gridLocator
 	{

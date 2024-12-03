@@ -7,10 +7,12 @@
 #include "broguePlayer.h"
 #include "color.h"
 #include "playerCharacter.h"
-#include "simpleList.h"
+#include <simpleList.h>
 
-namespace brogueHd::model
+namespace brogueHd::component
 {
+	using namespace simple;
+
 	class brogueGame
 	{
 	public:
@@ -28,7 +30,7 @@ namespace brogueHd::model
 	private:
 		simpleList<brogueLevel*>* _levels;
 
-		brogueMessageQueue* _messageQueue;
+		//brogueMessageQueue* _messageQueue;
 
 		bool _serverMode;
 		bool _noMenu;
@@ -104,7 +106,7 @@ namespace brogueHd::model
 
 	brogueGame::brogueGame(bool serverMode, bool noMenu, const simpleList<brogueLevel*>& levels)
 	{
-		_messageQueue = new brogueMessageQueue();
+		//_messageQueue = new brogueMessageQueue();
 		_levels = new simpleList<brogueLevel*>(levels);
 
 		_serverMode = serverMode;
@@ -113,7 +115,7 @@ namespace brogueHd::model
 
 	brogueGame::~brogueGame()
 	{
-		delete _messageQueue;
+		//delete _messageQueue;
 		delete _levels;
 	}
 
@@ -139,6 +141,6 @@ namespace brogueHd::model
 
 	void brogueGame::outputMessage(char* msg, color theColor, bool requireAcknowledgment)
 	{
-		_messageQueue->addMessage(msg, theColor, requireAcknowledgment);
+		//_messageQueue->addMessage(msg, theColor, requireAcknowledgment);
 	}
 }

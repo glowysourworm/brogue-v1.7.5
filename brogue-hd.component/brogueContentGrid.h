@@ -1,15 +1,16 @@
 #pragma once
 
-#include "brogueCreature.h"
-#include "brogueItem.h"
-#include "brogueObject.h"
-#include "broguePlayer.h"
 #include "grid.h"
-#include "simpleList.h"
+#include <brogueCreature.h>
+#include <brogueItem.h>
+#include <brogueObject.h>
+#include <broguePlayer.h>
+#include <simpleList.h>
 
 namespace brogueHd::component
 {
 	using namespace simple;
+	using namespace brogueHd::model;
 
 	/// <summary>
 	/// Component that handles collections of brogueObject types; and sets them

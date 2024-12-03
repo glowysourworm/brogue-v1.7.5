@@ -11,10 +11,11 @@
 #include <simpleVector.h>
 #include <limits>
 
-using namespace brogueHd::backend;
-
 namespace brogueHd::component
 {
+	using namespace simple;
+	using namespace simple::math;
+
 	/// <summary>
 	/// Simple rectangle packing algorithm that packs rectangles using a distance heuristic
 	/// comparing the centers of each rectangle with the first.

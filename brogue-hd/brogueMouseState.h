@@ -3,10 +3,10 @@
 #include "gridLocator.h"
 #include "simple.h"
 
-using namespace brogueHd::component;
-
 namespace brogueHd::frontend
 {
+	using namespace brogueHd::component;
+
 	struct brogueMouseState
 	{
 		brogueMouseState()
@@ -18,7 +18,9 @@ namespace brogueHd::frontend
 			_scrollNegativeY = false;
 			_mouseLeft = false;
 		}
-		brogueMouseState(int column, int row, bool scrollPendingX, bool scrollPendingY, bool negativeX, bool negativeY, bool mouseLeft)
+
+		brogueMouseState(int column, int row, bool scrollPendingX, bool scrollPendingY, bool negativeX, bool negativeY,
+		                 bool mouseLeft)
 		{
 			_location = gridLocator(column, row);
 			_scrollPendingX = scrollPendingX;
@@ -27,7 +29,9 @@ namespace brogueHd::frontend
 			_scrollNegativeY = negativeY;
 			_mouseLeft = mouseLeft;
 		}
-		brogueMouseState(gridLocator location, bool scrollPendingX, bool scrollPendingY, bool negativeX, bool negativeY, bool mouseLeft)
+
+		brogueMouseState(gridLocator location, bool scrollPendingX, bool scrollPendingY, bool negativeX, bool negativeY,
+		                 bool mouseLeft)
 		{
 			_location = location;
 			_scrollPendingX = scrollPendingX;
@@ -36,6 +40,7 @@ namespace brogueHd::frontend
 			_scrollNegativeY = negativeY;
 			_mouseLeft = mouseLeft;
 		}
+
 		brogueMouseState(const brogueMouseState& copy)
 		{
 			_location = copy.getLocation();
@@ -45,6 +50,7 @@ namespace brogueHd::frontend
 			_scrollNegativeY = getScrollNegativeY();
 			_mouseLeft = copy.getMouseLeft();
 		}
+
 		void operator=(const brogueMouseState& copy)
 		{
 			_location = copy.getLocation();
@@ -59,35 +65,38 @@ namespace brogueHd::frontend
 		{
 			return _location;
 		}
+
 		bool getScrollPendingX() const
 		{
 			return _scrollPendingX;
 		}
+
 		bool getScrollPendingY() const
 		{
 			return _scrollPendingY;
 		}
+
 		bool getScrollNegativeX() const
 		{
 			return _scrollNegativeX;
 		}
+
 		bool getScrollNegativeY() const
 		{
 			return _scrollNegativeY;
 		}
+
 		bool getMouseLeft() const
 		{
 			return _mouseLeft;
 		}
 
 	private:
-
 		gridLocator _location;
 		bool _scrollPendingX;
 		bool _scrollPendingY;
 		bool _scrollNegativeX;
 		bool _scrollNegativeY;
 		bool _mouseLeft;
-
 	};
 }

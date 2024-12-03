@@ -2,7 +2,7 @@
 
 #include "brogueCellDisplay.h"
 
-namespace brogueHd::model
+namespace brogueHd::component
 {
 	struct brogueRememberedCell
 	{

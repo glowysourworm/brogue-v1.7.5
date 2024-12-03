@@ -10,10 +10,10 @@
 #include <iosfwd>
 #include <ostream>
 
-using namespace brogueHd::test;
-
 namespace brogueHd::console
 {
+	using namespace brogueHd::test;
+
 	class developerConsole : public brogueConsole
 	{
 	public:
@@ -30,7 +30,10 @@ namespace brogueHd::console
 	{
 		this->consoleName = "Brogue Developer Console";
 	}
-	developerConsole::~developerConsole() {}
+
+	developerConsole::~developerConsole()
+	{
+	}
 
 	brogueConsoleReturn developerConsole::command(simpleString input, std::ostream& stream)
 	{
@@ -41,7 +44,7 @@ namespace brogueHd::console
 
 		switch (choice)
 		{
-			case 1:
+		case 1:
 			{
 				if (this->runUnitTests())
 					return brogueConsoleReturn::Completed;
@@ -50,8 +53,8 @@ namespace brogueHd::console
 					return brogueConsoleReturn::CompletedWithError;
 			}
 			break;
-			default:
-				return brogueConsoleReturn::Completed;
+		default:
+			return brogueConsoleReturn::Completed;
 		}
 	}
 
@@ -67,12 +70,10 @@ namespace brogueHd::console
 		// Brogue Tests map output to the console using brogueLogger
 		simpleArrayTests arrayTests;
 		simpleHashTests hashTests;
-		simpleComponentTests componentTests;
 		simpleBSTTests bstTests;
 
 		bool result = arrayTests.run();
 		result &= hashTests.run();
-		result &= componentTests.run();
 		result &= bstTests.run();
 
 		return result;

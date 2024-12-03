@@ -11,8 +11,6 @@
 #include "simpleExt.h"
 #include "simpleGlData.h"
 
-using namespace brogueHd::backend::model;
-
 namespace brogueHd::frontend
 {
 	struct brogueCellQuad : public brogueQuad
@@ -26,15 +24,17 @@ namespace brogueHd::frontend
 			foregroundColor = default_value::value<vec4>();
 			backgroundColor = default_value::value<vec4>();
 		}
+
 		brogueCellQuad(const brogueCellQuad& copy)
 		{
 			copyImpl(copy);
 		}
+
 		brogueCellQuad(const brogueCellDisplay& cell,
-						const simpleQuad& averticesXY,
-						const simpleQuad& atextureUV,
-						const simpleQuad& aglyphUV,
-						openglBrogueCellOutputSelector aoutputSelector)
+		               const simpleQuad& averticesXY,
+		               const simpleQuad& atextureUV,
+		               const simpleQuad& aglyphUV,
+		               openglBrogueCellOutputSelector aoutputSelector)
 		{
 			// Cache the location data
 			location.column = cell.column;
@@ -50,6 +50,7 @@ namespace brogueHd::frontend
 			glyphUV = aglyphUV;
 			outputSelector = aoutputSelector;
 		}
+
 		void operator=(const brogueCellQuad& copy)
 		{
 			copyImpl(copy);
@@ -60,30 +61,32 @@ namespace brogueHd::frontend
 			// Total # of calls to the shader
 			switch (primitiveType)
 			{
-				case GL_TRIANGLES:
-					return 6;
-				default:
-					throw simpleException(simpleExt::format("Unhandled primitive type for GLQuad:  {}", primitiveType));
-					break;
+			case GL_TRIANGLES:
+				return 6;
+			default:
+				throw simpleException(simpleExt::format("Unhandled primitive type for GLQuad:  {}", primitiveType));
+				break;
 			}
 		}
+
 		int getStreamSize(GLenum primitiveType) const override
 		{
 			// Total # of float / int values. (not bytes!) (assert(sizeof(int) == sizeof(float)))
 			switch (primitiveType)
 			{
-				case GL_TRIANGLES:
-					return 90 * sizeof(float);
-				default:
-					throw simpleException(simpleExt::format("Unhandled primitive type for GLQuad:  {}", primitiveType));
-					break;
+			case GL_TRIANGLES:
+				return 90 * sizeof(float);
+			default:
+				throw simpleException(simpleExt::format("Unhandled primitive type for GLQuad:  {}", primitiveType));
+				break;
 			}
 		}
+
 		void streamBuffer(GLenum primitiveType, simpleDataStream* outputStream) const override
 		{
 			switch (primitiveType)
 			{
-				case GL_TRIANGLES:
+			case GL_TRIANGLES:
 				{
 					// Need to map out the vertex shader's "layout" parameters. Each shader call is 
 					// to the current vertex. So, for a triangle pair, each of the values must go out
@@ -98,57 +101,57 @@ namespace brogueHd::frontend
 					// Total Data:  15 floats per vertex * 6 vertices = 90 (floats)
 
 					// Triangle 1: Top Left (32 floats total)
-					vertexXY.topLeft.streamBuffer(primitiveType, outputStream);				// vec2
-					textureUV.topLeft.streamBuffer(primitiveType, outputStream);			// vec2
-					glyphUV.topLeft.streamBuffer(primitiveType, outputStream);				// vec2
-					foregroundColor.streamBuffer(primitiveType, outputStream);				// vec4
-					backgroundColor.streamBuffer(primitiveType, outputStream);				// vec4
-					outputStream->writeFloat((float)outputSelector);						// float
+					vertexXY.topLeft.streamBuffer(primitiveType, outputStream); // vec2
+					textureUV.topLeft.streamBuffer(primitiveType, outputStream); // vec2
+					glyphUV.topLeft.streamBuffer(primitiveType, outputStream); // vec2
+					foregroundColor.streamBuffer(primitiveType, outputStream); // vec4
+					backgroundColor.streamBuffer(primitiveType, outputStream); // vec4
+					outputStream->writeFloat((float)outputSelector); // float
 
 					// Triangle 1:  Top Right
-					vertexXY.topRight.streamBuffer(primitiveType, outputStream);			// vec2
-					textureUV.topRight.streamBuffer(primitiveType, outputStream);			// vec2
-					glyphUV.topRight.streamBuffer(primitiveType, outputStream);				// vec2
-					foregroundColor.streamBuffer(primitiveType, outputStream);				// vec4
-					backgroundColor.streamBuffer(primitiveType, outputStream);				// vec4
-					outputStream->writeFloat((float)outputSelector);						// float
+					vertexXY.topRight.streamBuffer(primitiveType, outputStream); // vec2
+					textureUV.topRight.streamBuffer(primitiveType, outputStream); // vec2
+					glyphUV.topRight.streamBuffer(primitiveType, outputStream); // vec2
+					foregroundColor.streamBuffer(primitiveType, outputStream); // vec4
+					backgroundColor.streamBuffer(primitiveType, outputStream); // vec4
+					outputStream->writeFloat((float)outputSelector); // float
 
 					// Triangle 1:  Bottom Right
-					vertexXY.bottomRight.streamBuffer(primitiveType, outputStream);			// vec2
-					textureUV.bottomRight.streamBuffer(primitiveType, outputStream);		// vec2
-					glyphUV.bottomRight.streamBuffer(primitiveType, outputStream);			// vec2
-					foregroundColor.streamBuffer(primitiveType, outputStream);				// vec4
-					backgroundColor.streamBuffer(primitiveType, outputStream);				// vec4
-					outputStream->writeFloat((float)outputSelector);						// float
+					vertexXY.bottomRight.streamBuffer(primitiveType, outputStream); // vec2
+					textureUV.bottomRight.streamBuffer(primitiveType, outputStream); // vec2
+					glyphUV.bottomRight.streamBuffer(primitiveType, outputStream); // vec2
+					foregroundColor.streamBuffer(primitiveType, outputStream); // vec4
+					backgroundColor.streamBuffer(primitiveType, outputStream); // vec4
+					outputStream->writeFloat((float)outputSelector); // float
 
 					// Triangle 2: Top Left
-					vertexXY.topLeft.streamBuffer(primitiveType, outputStream);				// vec2
-					textureUV.topLeft.streamBuffer(primitiveType, outputStream);			// vec2
-					glyphUV.topLeft.streamBuffer(primitiveType, outputStream);				// vec2
-					foregroundColor.streamBuffer(primitiveType, outputStream);				// vec4
-					backgroundColor.streamBuffer(primitiveType, outputStream);				// vec4
-					outputStream->writeFloat((float)outputSelector);						// float
+					vertexXY.topLeft.streamBuffer(primitiveType, outputStream); // vec2
+					textureUV.topLeft.streamBuffer(primitiveType, outputStream); // vec2
+					glyphUV.topLeft.streamBuffer(primitiveType, outputStream); // vec2
+					foregroundColor.streamBuffer(primitiveType, outputStream); // vec4
+					backgroundColor.streamBuffer(primitiveType, outputStream); // vec4
+					outputStream->writeFloat((float)outputSelector); // float
 
 					// Triangle 2:  Bottom Right
-					vertexXY.bottomRight.streamBuffer(primitiveType, outputStream);			// vec2
-					textureUV.bottomRight.streamBuffer(primitiveType, outputStream);		// vec2
-					glyphUV.bottomRight.streamBuffer(primitiveType, outputStream);			// vec2
-					foregroundColor.streamBuffer(primitiveType, outputStream);				// vec4
-					backgroundColor.streamBuffer(primitiveType, outputStream);				// vec4
-					outputStream->writeFloat((float)outputSelector);						// float
+					vertexXY.bottomRight.streamBuffer(primitiveType, outputStream); // vec2
+					textureUV.bottomRight.streamBuffer(primitiveType, outputStream); // vec2
+					glyphUV.bottomRight.streamBuffer(primitiveType, outputStream); // vec2
+					foregroundColor.streamBuffer(primitiveType, outputStream); // vec4
+					backgroundColor.streamBuffer(primitiveType, outputStream); // vec4
+					outputStream->writeFloat((float)outputSelector); // float
 
 					// Triangle 2:  Bottom Left
-					vertexXY.bottomLeft.streamBuffer(primitiveType, outputStream);			// vec2
-					textureUV.bottomLeft.streamBuffer(primitiveType, outputStream);			// vec2
-					glyphUV.bottomLeft.streamBuffer(primitiveType, outputStream);			// vec2
-					foregroundColor.streamBuffer(primitiveType, outputStream);				// vec4
-					backgroundColor.streamBuffer(primitiveType, outputStream);				// vec4
-					outputStream->writeFloat((float)outputSelector);						// float
+					vertexXY.bottomLeft.streamBuffer(primitiveType, outputStream); // vec2
+					textureUV.bottomLeft.streamBuffer(primitiveType, outputStream); // vec2
+					glyphUV.bottomLeft.streamBuffer(primitiveType, outputStream); // vec2
+					foregroundColor.streamBuffer(primitiveType, outputStream); // vec4
+					backgroundColor.streamBuffer(primitiveType, outputStream); // vec4
+					outputStream->writeFloat((float)outputSelector); // float
 				}
 				break;
-				default:
-					throw simpleException(simpleExt::format("Unhandled primitive type for GLQuad:  {}", primitiveType));
-					break;
+			default:
+				throw simpleException(simpleExt::format("Unhandled primitive type for GLQuad:  {}", primitiveType));
+				break;
 			}
 		}
 
@@ -165,7 +168,6 @@ namespace brogueHd::frontend
 		}
 
 	private:
-
 		void copyImpl(const brogueCellQuad& copy)
 		{
 			location = copy.location;
@@ -180,7 +182,6 @@ namespace brogueHd::frontend
 		}
 
 	public:
-
 		simpleQuad vertexXY;
 		simpleQuad textureUV;
 

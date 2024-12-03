@@ -1,5 +1,8 @@
 #pragma once
+
+#include "gridRect.h"
 #include "noiseGenerator.h"
+#include <simpleRange.h>
 
 namespace brogueHd::component
 {

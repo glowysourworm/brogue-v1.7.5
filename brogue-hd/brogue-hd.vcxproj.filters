@@ -143,9 +143,6 @@
     <ClInclude Include="messageData.h">
       <Filter>Header Files\backend\model\game</Filter>
     </ClInclude>
-    <ClInclude Include="brogueGameProfile.h">
-      <Filter>Header Files\backend\model</Filter>
-    </ClInclude>
     <ClInclude Include="brogueConsole.h">
       <Filter>Header Files\console</Filter>
     </ClInclude>
@@ -176,23 +173,11 @@
     <ClInclude Include="simpleComponentTests.h">
       <Filter>Header Files\unit-test</Filter>
     </ClInclude>
-    <ClInclude Include="brogueTestPackage.h">
-      <Filter>Header Files\unit-test</Filter>
-    </ClInclude>
-    <ClInclude Include="simpleArrayTests.h">
-      <Filter>Header Files\unit-test</Filter>
-    </ClInclude>
-    <ClInclude Include="simpleHashTests.h">
-      <Filter>Header Files\unit-test</Filter>
-    </ClInclude>
     <ClInclude Include="brogueBackground.h">
       <Filter>Header Files\frontend\ui</Filter>
     </ClInclude>
     <ClInclude Include="brogueMacroDeclaration.h">
       <Filter>Header Files\global</Filter>
-    </ClInclude>
-    <ClInclude Include="brogueTestFunction.h">
-      <Filter>Header Files\unit-test</Filter>
     </ClInclude>
     <ClInclude Include="openglHelper.h">
       <Filter>Header Files\frontend\opengl</Filter>
@@ -208,9 +193,6 @@
     </ClInclude>
     <ClInclude Include="json.hpp">
       <Filter>Header Files\vendor\glad</Filter>
-    </ClInclude>
-    <ClInclude Include="brogueGlyphMap.h">
-      <Filter>Header Files\frontend\ui</Filter>
     </ClInclude>
     <ClInclude Include="brogueViewProgram.h">
       <Filter>Header Files\frontend\ui</Filter>
@@ -382,9 +364,6 @@
     </ClInclude>
     <ClInclude Include="brogueViewContainer.h">
       <Filter>Header Files\frontend\ui</Filter>
-    </ClInclude>
-    <ClInclude Include="simpleBSTTests.h">
-      <Filter>Header Files\unit-test</Filter>
     </ClInclude>
     <ClInclude Include="colorGradient.h">
       <Filter>Header Files\frontend\ui</Filter>

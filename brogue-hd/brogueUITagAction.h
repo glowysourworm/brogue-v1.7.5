@@ -3,10 +3,10 @@
 #include "simple.h"
 #include "simpleString.h"
 
-using namespace brogueHd::simple;
-
 namespace brogueHd::frontend
 {
+	using namespace simple;
+
 	struct brogueUITagAction : simpleStruct
 	{
 		brogueUITagAction()
@@ -15,46 +15,54 @@ namespace brogueHd::frontend
 			desiredState = brogueUIState::MainMenu;
 			tag = default_value::value<simpleString>();
 		}
+
 		brogueUITagAction(brogueUIAction command)
 		{
 			action = command;
 			desiredState = brogueUIState::GameNormal;
 			tag = default_value::value<simpleString>();
 		}
+
 		brogueUITagAction(brogueUIState stateChange)
 		{
 			action = brogueUIAction::StateChange;
 			desiredState = stateChange;
 			tag = default_value::value<simpleString>();
 		}
+
 		brogueUITagAction(brogueUIAction fileAction, const simpleString& fileChosen)
 		{
 			action = fileAction;
 			tag = fileChosen;
 			desiredState = brogueUIState::MainMenu;
 		}
+
 		brogueUITagAction(const brogueUITagAction& copy)
 		{
 			action = copy.action;
 			tag = copy.tag;
 			desiredState = copy.desiredState;
 		}
+
 		void set(const brogueUITagAction& copy)
 		{
 			action = copy.action;
 			tag = copy.tag;
 			desiredState = copy.desiredState;
 		}
+
 		void operator=(const brogueUITagAction& copy)
 		{
 			action = copy.action;
 			tag = copy.tag;
 			desiredState = copy.desiredState;
 		}
+
 		bool operator==(const brogueUITagAction& other)
 		{
 			return compare(other);
 		}
+
 		bool operator!=(const brogueUITagAction& other)
 		{
 			return !compare(other);
@@ -76,12 +84,11 @@ namespace brogueHd::frontend
 		brogueUIAction action;
 
 	private:
-
 		bool compare(const brogueUITagAction& other)
 		{
 			return action == other.action &&
-				   desiredState == other.desiredState &&
-				   tag == other.tag;
+				desiredState == other.desiredState &&
+				tag == other.tag;
 		}
 	};
 }

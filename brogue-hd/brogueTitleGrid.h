@@ -3,30 +3,35 @@
 #include "gridRect.h"
 #include <cctype>
 
-using namespace brogueHd::component;
-
 namespace brogueHd::frontend
 {
+	using namespace brogueHd::component;
+
 	class brogueTitleGrid
 	{
 	public:
-
 		//
 		// Brogue v1.7.5 (Brian Walker a.k.a. penderprime) (preserved as well as possible)
 		//
-		brogueTitleGrid() {}
-		~brogueTitleGrid() {}
+		brogueTitleGrid()
+		{
+		}
+
+		~brogueTitleGrid()
+		{
+		}
 
 		gridRect textBounds()
 		{
 			// Took one off of this guy because of the odd width of the title.
 			// It's just the location of the bounding box - to center the text.
 			//
-			return   gridRect((COLS - MENU_TITLE_WIDTH) / 2,
-							  (ROWS - MENU_TITLE_HEIGHT) / 2,
-							  MENU_TITLE_WIDTH,
-							  MENU_TITLE_HEIGHT);
+			return gridRect((COLS - MENU_TITLE_WIDTH) / 2,
+			                (ROWS - MENU_TITLE_HEIGHT) / 2,
+			                MENU_TITLE_WIDTH,
+			                MENU_TITLE_HEIGHT);
 		}
+
 		gridRect sceneBounds()
 		{
 			return gridRect(0, 0, COLS, ROWS);
@@ -68,7 +73,5 @@ namespace brogueHd::frontend
 			"                            ##                                            ",
 			"                           ####                                           ",
 		};
-
-
 	};
 }

@@ -4,17 +4,16 @@
 #include "colorConstants.h"
 #include "simpleHash.h"
 
-using namespace brogueHd::simple;
-
 namespace brogueHd::backend::model
 {
+	using namespace simple;
+
 	class brogueColorMap
 	{
 	public:
-
 		brogueColorMap();
 		~brogueColorMap();
-		
+
 		void setColor(gameColors colorSelector, color value);
 		void setColor(boltColors colorSelector, color value);
 		void setColor(tileColors colorSelector, color value);
@@ -63,6 +62,7 @@ namespace brogueHd::backend::model
 		_gasColors = new simpleHash<gasColors, color>();
 		_interfaceColors = new simpleHash<interfaceColors, color>();
 	}
+
 	brogueColorMap::~brogueColorMap()
 	{
 		delete _gameColors;
@@ -81,38 +81,47 @@ namespace brogueHd::backend::model
 	{
 		return _gameColors->get(colorSelector);
 	}
+
 	color brogueColorMap::getColor(boltColors colorSelector) const
 	{
 		return _boltColors->get(colorSelector);
 	}
+
 	color brogueColorMap::getColor(tileColors colorSelector) const
 	{
 		return _tileColors->get(colorSelector);
 	}
+
 	color brogueColorMap::getColor(creatureColors colorSelector) const
 	{
 		return _creatureColors->get(colorSelector);
 	}
+
 	color brogueColorMap::getColor(lightColors colorSelector) const
 	{
 		return _lightColors->get(colorSelector);
 	}
+
 	color brogueColorMap::getColor(flareColors colorSelector) const
 	{
 		return _flareColors->get(colorSelector);
 	}
+
 	color brogueColorMap::getColor(colorMultipliers colorSelector) const
 	{
 		return _colorMultipliers->get(colorSelector);
 	}
+
 	color brogueColorMap::getColor(bloodColors colorSelector) const
 	{
 		return _bloodColors->get(colorSelector);
 	}
+
 	color brogueColorMap::getColor(gasColors colorSelector) const
 	{
 		return _gasColors->get(colorSelector);
 	}
+
 	color brogueColorMap::getColor(interfaceColors colorSelector) const
 	{
 		return _interfaceColors->get(colorSelector);
@@ -122,38 +131,47 @@ namespace brogueHd::backend::model
 	{
 		_gameColors->add(colorSelector, value);
 	}
+
 	void brogueColorMap::setColor(boltColors colorSelector, color value)
 	{
 		_boltColors->add(colorSelector, value);
 	}
+
 	void brogueColorMap::setColor(tileColors colorSelector, color value)
 	{
 		_tileColors->add(colorSelector, value);
 	}
+
 	void brogueColorMap::setColor(creatureColors colorSelector, color value)
 	{
 		_creatureColors->add(colorSelector, value);
 	}
+
 	void brogueColorMap::setColor(lightColors colorSelector, color value)
 	{
 		_lightColors->add(colorSelector, value);
 	}
+
 	void brogueColorMap::setColor(flareColors colorSelector, color value)
 	{
 		_flareColors->add(colorSelector, value);
 	}
+
 	void brogueColorMap::setColor(colorMultipliers colorSelector, color value)
 	{
 		_colorMultipliers->add(colorSelector, value);
 	}
+
 	void brogueColorMap::setColor(bloodColors colorSelector, color value)
 	{
 		_bloodColors->add(colorSelector, value);
 	}
+
 	void brogueColorMap::setColor(gasColors colorSelector, color value)
 	{
 		_gasColors->add(colorSelector, value);
 	}
+
 	void brogueColorMap::setColor(interfaceColors colorSelector, color value)
 	{
 		_interfaceColors->add(colorSelector, value);

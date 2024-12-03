@@ -1,32 +1,34 @@
 #pragma once
 
-#include "brogueUIBuilder.h"
-#include "cellularAutomataParameters.h"
-#include "dungeonConstants.h"
-#include "mazeGenerator.h"
 #include "grid.h"
 #include "gridLocator.h"
 #include "gridRect.h"
 #include "gridRegion.h"
 #include "gridRegionConstructor.h"
 #include "gridRegionLocator.h"
+
 #include "cellularAutomataGenerator.h"
 #include "perlinNoiseGenerator.h"
 #include "randomGenerator.h"
-#include "simple.h"
-#include "simpleException.h"
-#include "simpleList.h"
-#include "simpleMath.h"
+#include "cellularAutomataParameters.h"
+#include "dungeonConstants.h"
+#include "mazeGenerator.h"
 
-using namespace brogueHd::component;
-using namespace brogueHd::backend::model;
+#include <simple.h>
+#include <simpleRect.h>
+#include <simpleException.h>
+#include <simpleList.h>
+#include <simpleMath.h>
 
 namespace brogueHd::component
 {
+	using namespace simple;
+	using namespace brogueHd::model;
+
 	class roomGenerator
 	{
 	public:
-		roomGenerator(brogueUIBuilder* uiBuilder, randomGenerator* randomGenerator);
+		roomGenerator(randomGenerator* randomGenerator);
 		~roomGenerator();
 
 		gridRegion<gridLocator>* designRoom(brogueRoomType roomType, const gridRect& designRect,
@@ -44,7 +46,6 @@ namespace brogueHd::component
 
 	private:
 		randomGenerator* _randomGenerator;
-		brogueUIBuilder* _uiBuilder;
 
 		mazeGenerator* _mazeGenerator;
 		perlinNoiseGenerator* _perlinNoiseGenerator;
@@ -52,9 +53,8 @@ namespace brogueHd::component
 		cellularAutomataParameters* _cavernParameters;
 	};
 
-	roomGenerator::roomGenerator(brogueUIBuilder* uiBuilder, randomGenerator* randomGenerator)
+	roomGenerator::roomGenerator(randomGenerator* randomGenerator)
 	{
-		_uiBuilder = uiBuilder;
 		_randomGenerator = randomGenerator;
 
 		bool polarity = true; // Make walls

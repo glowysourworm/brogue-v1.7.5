@@ -4,22 +4,22 @@
 #include "simpleHash.h"
 #include <functional>
 
-using namespace brogueHd::simple;
-
 namespace brogueHd::backend
 {
-	template<isHashable EventSender, isHashable EventData>
+	using namespace simple;
+
+	template <isHashable EventSender, isHashable EventData>
 	class brogueEventBase : simpleObject
 	{
 		using DelegateType = std::function<void(const EventSender&, const EventData&)>;
 
 	public:
-
 		brogueEventBase()
 		{
 			_delegates = new simpleHash<int, DelegateType*>();
 			_tokenCounter = 0;
 		};
+
 		~brogueEventBase()
 		{
 			for (int index = 0; index < _delegates->count(); index++)
@@ -31,7 +31,6 @@ namespace brogueHd::backend
 		}
 
 	public:
-
 		int subscribe(const DelegateType& listenerDelegate)
 		{
 			// User tokens should start at 1
@@ -41,6 +40,7 @@ namespace brogueHd::backend
 
 			return token;
 		}
+
 		void unSubscribe(int token)
 		{
 			if (!_delegates->contains(token))
@@ -50,6 +50,7 @@ namespace brogueHd::backend
 
 			_delegates->remove(token);
 		}
+
 		void publish(const EventSender& sender, const EventData& payload)
 		{
 			for (int index = 0; index < _delegates->count(); index++)
@@ -59,7 +60,6 @@ namespace brogueHd::backend
 		}
 
 	private:
-
 		int _tokenCounter;
 
 		simpleHash<int, DelegateType*>* _delegates;

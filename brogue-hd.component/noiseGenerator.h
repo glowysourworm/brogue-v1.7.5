@@ -1,14 +1,14 @@
 #pragma once
 
-#include "grid.h"
+#include "gridRect.h"
 #include "gridDefinitions.h"
 #include "randomGenerator.h"
-
-using namespace brogueHd::component;
-using namespace brogueHd::backend::model;
+#include <simpleException.h>
 
 namespace brogueHd::component
 {
+	using namespace simple;
+
 	class noiseGenerator
 	{
 	public:

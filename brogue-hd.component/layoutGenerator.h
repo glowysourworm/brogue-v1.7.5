@@ -1,51 +1,53 @@
 #pragma once
 
+#include <simple.h>
+#include <simpleArray.h>
+#include <simpleException.h>
+#include <simpleHash.h>
+#include <simpleLine.h>
+#include <simpleList.h>
+#include <color.h>
+
+#include <simplePoint.h>
+#include <simpleRectangle.h>
+#include <simpleGraph.h>
+#include <delaunayAlgorithm.h>
+#include <primsAlgorithm.h>
+#include <dungeonConstants.h>
+#include <brogueRoomTemplate.h>
+
+#include <brogueLevelProfile.h>
+
 #include "brogueDesignRect.h"
 #include "brogueLayout.h"
-#include "brogueLevelProfile.h"
+#include "brogueCell.h"
+
 #include "randomGenerator.h"
 #include "roomGenerator.h"
+#include "layoutCoordinateConverter.h"
 
-#include "brogueCell.h"
-#include "brogueCoordinateConverter.h"
-#include "brogueGlyphMap.h"
-#include "brogueRoomTemplate.h"
-#include "brogueUIBuilder.h"
-#include "color.h"
-#include "primsAlgorithm.h"
-#include "delaunayAlgorithm.h"
-#include "dungeonConstants.h"
-#include "graph.h"
 #include "gridLocator.h"
 #include "gridLocatorEdge.h"
 #include "gridRect.h"
 #include "gridRegion.h"
 #include "noiseGenerator.h"
 #include "rectanglePackingAlgorithm.h"
-#include "simple.h"
-#include "simpleArray.h"
-#include "simpleException.h"
-#include "simpleHash.h"
-#include "simpleLine.h"
-#include "simpleList.h"
-#include "simplePoint.h"
 #include <limits>
-#include "simpleRectangle.h"
 #include "dijkstra.h"
-
-using namespace brogueHd::simple;
-using namespace brogueHd::component;
-using namespace brogueHd::backend::model;
 
 namespace brogueHd::component
 {
+	using namespace simple;
+	using namespace simple::math;
+	using namespace brogueHd::model;
+
 	class layoutGenerator
 	{
 	public:
 		/// <summary>
 		/// Creates the base layout, terrain, and machine terrain for the level.
 		/// </summary>
-		layoutGenerator(brogueUIBuilder* uiBuilder, randomGenerator* randomGenerator);
+		layoutGenerator(randomGenerator* randomGenerator, const gridRect& layoutParentBoundary, int zoomLevel);
 		~layoutGenerator();
 
 		brogueLayout* generateLayout(brogueLevelProfile* profile);
@@ -70,28 +72,29 @@ namespace brogueHd::component
 		void connectRooms();
 
 	private:
-		graph<gridLocator, gridLocatorEdge>* triangulate(const simpleList<gridLocator>& locations);
+		simpleGraph<gridLocator, gridLocatorEdge>* triangulate(const simpleList<gridLocator>& locations);
 
 	private:
 		roomGenerator* _roomGenerator;
 		randomGenerator* _randomGenerator;
-		brogueUIBuilder* _uiBuilder;
+		layoutCoordinateConverter* _coordinateConverter;
 
 		// Generation Data Stores:
 		//
 		brogueLayout* _layout;
 		brogueLevelProfile* _profile;
 		simpleList<brogueDesignRect*>* _roomTiles;
-		graph<gridLocator, gridLocatorEdge>* _roomGraph;
-		graph<gridLocator, gridLocatorEdge>* _connectionGraph;
+		simpleGraph<gridLocator, gridLocatorEdge>* _roomGraph;
+		simpleGraph<gridLocator, gridLocatorEdge>* _connectionGraph;
 	};
 
 
-	layoutGenerator::layoutGenerator(brogueUIBuilder* uiBuilder, randomGenerator* randomGenerator)
+	layoutGenerator::layoutGenerator(randomGenerator* randomGenerator, const gridRect& layoutParentBoundary,
+	                                 int zoomLevel)
 	{
-		_uiBuilder = uiBuilder;
 		_randomGenerator = randomGenerator;
-		_roomGenerator = new roomGenerator(uiBuilder, randomGenerator);
+		_roomGenerator = new roomGenerator(randomGenerator);
+		_coordinateConverter = new layoutCoordinateConverter(layoutParentBoundary, zoomLevel);
 
 		// Layout Data
 		_layout = nullptr;
@@ -113,6 +116,7 @@ namespace brogueHd::component
 		delete _roomTiles;
 
 		delete _roomGenerator;
+		delete _coordinateConverter;
 	}
 
 	void layoutGenerator::initialize(brogueLevelProfile* profile)
@@ -128,7 +132,8 @@ namespace brogueHd::component
 			delete _roomTiles;
 		}
 
-		gridRect levelBoundary = _uiBuilder->getBrogueGameBoundary();
+		// Create the level boundary (add 1 to the layout (parent) boundary)
+		gridRect levelBoundary = _coordinateConverter->getLayoutBoundary();
 		gridRect levelPaddedBoundary = levelBoundary.createPadded(1);
 
 		_layout = new brogueLayout(levelBoundary, levelPaddedBoundary);
@@ -219,9 +224,11 @@ namespace brogueHd::component
 
 		while (iteration < maxIterations)
 		{
+			int randomRoomIndex = _randomGenerator->randomRangeExclusive(0, _profile->getRoomInfoCount());
+
 			brogueRoomTemplate configuration = (iteration == 0)
-				                                   ? _profile->getEntranceRoom(_randomGenerator)
-				                                   : _profile->getRandomRoomInfo(_randomGenerator);
+				                                   ? _profile->getEntranceRoom()
+				                                   : _profile->getRoomInfo(randomRoomIndex);
 			brogueDesignRect* designRect = nullptr;
 			int roomPadding = iteration == 0 ? 0 : 1;
 
@@ -250,8 +257,8 @@ namespace brogueHd::component
 			else
 			{
 				// Get next space in which to create a room
-				gridRect largestSubRect = algorithm.getLargestUnusedRectangle(
-					configuration.getMinSize().createExpanded(roomPadding));
+				gridRect minRect(configuration.getMinSize());
+				gridRect largestSubRect = algorithm.getLargestUnusedRectangle(minRect.createExpanded(roomPadding));
 
 				if (largestSubRect == default_value::value<gridRect>())
 				{
@@ -419,7 +426,7 @@ namespace brogueHd::component
 		});
 	}
 
-	graph<gridLocator, gridLocatorEdge>* layoutGenerator::triangulate(const simpleList<gridLocator>& locations)
+	simpleGraph<gridLocator, gridLocatorEdge>* layoutGenerator::triangulate(const simpleList<gridLocator>& locations)
 	{
 		// Procedure
 		//
@@ -437,7 +444,7 @@ namespace brogueHd::component
 
 		// Convert grid locators to real number coordinates: This is to run bowyer-watson
 		//
-		brogueCoordinateConverter* converter = _uiBuilder->getCoordinateConverter();
+		layoutCoordinateConverter* converter = _coordinateConverter;
 
 		// Convert the locators
 		//
@@ -450,7 +457,7 @@ namespace brogueHd::component
 			});
 
 		// (MEMORY!) Create delaunay graph
-		graph<simplePoint<float>, simpleLine<float>>* delaunayGraph = triangulator.run(
+		simpleGraph<simplePoint<float>, simpleLine<float>>* delaunayGraph = triangulator.run(
 			connectionNodes, [](simplePoint<float> node1, simplePoint<float> node2)
 			{
 				// This constructor is for default graphs (3 or less nodes)
@@ -458,7 +465,7 @@ namespace brogueHd::component
 			});
 
 		// (MEMORY!) Re-scale back to the grid locators
-		graph<gridLocator, gridLocatorEdge>* resultGraph = new graph<gridLocator, gridLocatorEdge>();
+		simpleGraph<gridLocator, gridLocatorEdge>* resultGraph = new simpleGraph<gridLocator, gridLocatorEdge>();
 
 		// Convert Back / Validate
 		//
@@ -554,7 +561,7 @@ namespace brogueHd::component
 		//		-> TODO
 		//
 
-		brogueCoordinateConverter* coordinateConverter = _uiBuilder->getCoordinateConverter();
+		layoutCoordinateConverter* coordinateConverter = _coordinateConverter;
 
 		simpleList<brogueDesignRect*>* roomTiles = _roomTiles;
 		simpleList<gridLocator> connectionNodes;
@@ -613,7 +620,7 @@ namespace brogueHd::component
 		});
 
 		// (MEMORY!) Re-triangulate with these nearest edge locations
-		graph<gridLocator, gridLocatorEdge>* connectionGraph = triangulate(connectionNodes);
+		simpleGraph<gridLocator, gridLocatorEdge>* connectionGraph = triangulate(connectionNodes);
 
 		_connectionGraph = connectionGraph;
 

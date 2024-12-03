@@ -7,24 +7,25 @@
 #include "simpleString.h"
 #include <cstring>
 
-using namespace brogueHd::simple;
-
-namespace brogueHd::backend::model
+namespace brogueHd::frontend
 {
+	using namespace simple;
+
 	struct colorString : simpleStruct
 	{
 	public:
-
 		colorString()
 		{
 			_characters = new simpleArray<int>();
 			_colors = new simpleArray<color>();
 		}
+
 		colorString(int capacity)
 		{
 			_characters = new simpleArray<int>(capacity);
 			_colors = new simpleArray<color>(capacity);
 		}
+
 		colorString(const char* message)
 		{
 			_characters = new simpleArray<int>(strnlen_s(message, COLS * 2));
@@ -37,6 +38,7 @@ namespace brogueHd::backend::model
 				_colors->set(index, colors::white());
 			}
 		}
+
 		colorString(const char* message, color foreColor)
 		{
 			_characters = new simpleArray<int>(strnlen_s(message, COLS * 2));
@@ -49,6 +51,7 @@ namespace brogueHd::backend::model
 				_colors->set(index, foreColor);
 			}
 		}
+
 		colorString(const colorString& copy)
 		{
 			_characters = new simpleArray<int>(copy.getCount());
@@ -56,11 +59,13 @@ namespace brogueHd::backend::model
 
 			copyImpl(copy);
 		}
+
 		~colorString()
 		{
 			delete _characters;
 			delete _colors;
 		}
+
 		void operator=(const colorString& copy)
 		{
 			if (_characters != nullptr)
@@ -74,14 +79,17 @@ namespace brogueHd::backend::model
 
 			copyImpl(copy);
 		}
+
 		bool operator==(const colorString& other)
 		{
 			return compare(other);
 		}
+
 		bool operator!=(const colorString& other)
 		{
 			return !compare(other);
 		}
+
 		simpleString getString() const
 		{
 			simpleString result(_characters->count());
@@ -93,29 +101,35 @@ namespace brogueHd::backend::model
 
 			return result;
 		}
+
 		simpleString getSubstring(int startIndex, int length) const
 		{
 			simpleString result = getString();
 
 			return result.subString(startIndex, length);
 		}
+
 		char getChar(int index) const
 		{
 			return _characters->get(index);
 		}
+
 		color getColor(int index) const
 		{
 			return _colors->get(index);
 		}
+
 		void set(int index, char character, const color& color)
 		{
 			_characters->set(index, character);
 			_colors->set(index, color);
 		}
+
 		void setColor(int index, const color& color)
 		{
 			_colors->set(index, color);
 		}
+
 		void setColorRange(int index, int count, const color& color)
 		{
 			for (int i = index; i < index + count; i++)
@@ -123,10 +137,12 @@ namespace brogueHd::backend::model
 				_colors->set(i, color);
 			}
 		}
+
 		int getCount() const
 		{
 			return _characters->count();
 		}
+
 		size_t getHash() const override
 		{
 			size_t characterHash = _characters->getHash();
@@ -136,7 +152,6 @@ namespace brogueHd::backend::model
 		}
 
 	private:
-
 		void copyImpl(const colorString& copy)
 		{
 			// The arrays must already be new'd in the constructor
@@ -167,7 +182,6 @@ namespace brogueHd::backend::model
 		}
 
 	private:
-
 		simpleArray<int>* _characters;
 		simpleArray<color>* _colors;
 	};

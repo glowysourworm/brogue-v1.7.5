@@ -4,19 +4,17 @@
 #include "colorString.h"
 #include "brogueUITagAction.h"
 
-using namespace brogueHd::backend::model;
-
 namespace brogueHd::frontend
 {
 	class brogueUIColorText : simpleObject
 	{
 	public:
-
 		brogueUIColorText(const colorString& text, const brogueUITagAction& tagAction)
 		{
 			_text = new colorString(text);
 			_tagAction = new brogueUITagAction(tagAction);
 		}
+
 		~brogueUIColorText()
 		{
 			delete _text;
@@ -27,6 +25,7 @@ namespace brogueHd::frontend
 		{
 			return *_text;
 		}
+
 		brogueUITagAction getAction() const
 		{
 			return *_tagAction;
@@ -38,7 +37,6 @@ namespace brogueHd::frontend
 		}
 
 	private:
-
 		colorString* _text;
 		brogueUITagAction* _tagAction;
 	};

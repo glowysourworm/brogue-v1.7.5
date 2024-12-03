@@ -1,14 +1,16 @@
 #pragma once
-
-#include "brogueCell.h"
 #include "gridDefinitions.h"
 #include "gridLocator.h"
 #include "gridRegion.h"
 #include "gridRegionExtension.h"
-#include "simple.h"
+
+#include <simple.h>
+#include <brogueCell.h>
 
 namespace brogueHd::component
 {
+	using namespace simple;
+
 	class brogueRoom : public simpleObject
 	{
 	public:

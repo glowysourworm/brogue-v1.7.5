@@ -11,11 +11,11 @@
 #include <SDL_main.h>
 
 using namespace brogueHd;
-using namespace brogueHd::simple;
+using namespace simple;
+using namespace simple::math;
 using namespace brogueHd::console;
 using namespace brogueHd::component;
 using namespace brogueHd::backend;
-using namespace brogueHd::backend::model;
 
 int main(int argc, char* argv[])
 {
@@ -26,7 +26,8 @@ int main(int argc, char* argv[])
 
 	if (argc < 2)
 	{
-		std::cout << "Must include the resource-config.json file path in the command line (first parameter)" << std::endl;
+		std::cout << "Must include the resource-config.json file path in the command line (first parameter)" <<
+			std::endl;
 		return 1;
 	}
 
@@ -35,7 +36,8 @@ int main(int argc, char* argv[])
 
 	if (!brogueResourceController->initialize(argv[1]))
 	{
-		std::cout << "Must include the resource-config.json file path in the command line (first parameter)" << std::endl;
+		std::cout << "Must include the resource-config.json file path in the command line (first parameter)" <<
+			std::endl;
 		return 1;
 	}
 
@@ -50,11 +52,11 @@ int main(int argc, char* argv[])
 
 			switch (returnValue)
 			{
-				case brogueConsoleReturn::Continue:
-				case brogueConsoleReturn::Completed:
-					currentConsole = defaultConsole;
-					break;
-				case brogueConsoleReturn::Completed_SetMode_Game:
+			case brogueConsoleReturn::Continue:
+			case brogueConsoleReturn::Completed:
+				currentConsole = defaultConsole;
+				break;
+			case brogueConsoleReturn::Completed_SetMode_Game:
 				{
 					if (currentConsole != defaultConsole)
 						delete currentConsole;
@@ -62,7 +64,7 @@ int main(int argc, char* argv[])
 					currentConsole = new gameConsole(brogueResourceController);
 				}
 				break;
-				case brogueConsoleReturn::Completed_SetMode_Dev:
+			case brogueConsoleReturn::Completed_SetMode_Dev:
 				{
 					if (currentConsole != defaultConsole)
 						delete currentConsole;
@@ -70,7 +72,7 @@ int main(int argc, char* argv[])
 					currentConsole = new developerConsole();
 				}
 				break;
-				case brogueConsoleReturn::Completed_SetMode_Resource:
+			case brogueConsoleReturn::Completed_SetMode_Resource:
 				{
 					if (currentConsole != defaultConsole)
 						delete currentConsole;
@@ -78,12 +80,12 @@ int main(int argc, char* argv[])
 					currentConsole = new resourceConsole(brogueResourceController);
 				}
 				break;
-				case brogueConsoleReturn::CompletedWithError:
-					break;
-				case brogueConsoleReturn::Exit:
-				default:
-					iterate = false;
-					break;
+			case brogueConsoleReturn::CompletedWithError:
+				break;
+			case brogueConsoleReturn::Exit:
+			default:
+				iterate = false;
+				break;
 			}
 		}
 
@@ -115,4 +117,3 @@ int main(int argc, char* argv[])
 
 	return 0;
 }
-

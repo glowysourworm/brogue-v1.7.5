@@ -4,17 +4,16 @@
 #include "simpleArray.h"
 #include <cstring>
 
-using namespace brogueHd::simple;
-
 namespace brogueHd::frontend
 {
+	using namespace simple;
+
 	/// <summary>
 	/// Simple class to handle streaming the GL data vector
 	/// </summary>
 	class simpleDataStream : public simpleObject
 	{
 	public:
-
 		simpleDataStream()
 		{
 			_streamNumberElements = 0;
@@ -22,6 +21,7 @@ namespace brogueHd::frontend
 			_array = nullptr;
 			_cursor = 0;
 		}
+
 		~simpleDataStream()
 		{
 			delete _array;
@@ -86,6 +86,7 @@ namespace brogueHd::frontend
 			for (int index = 0; index < sizeof(float); index++)
 				_array->set(_cursor++, floatBytes[index]);
 		}
+
 		void writeInt(int primitive)
 		{
 			char intBytes[sizeof(int)];
@@ -107,7 +108,6 @@ namespace brogueHd::frontend
 		}
 
 	private:
-
 		simpleArray<char>* _array;
 
 		int _cursor;

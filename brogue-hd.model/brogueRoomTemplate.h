@@ -1,7 +1,7 @@
 #pragma once
 
 #include "dungeonConstants.h"
-#include <simpleGridRect.h>
+#include <simpleRect.h>
 #include <simple.h>
 #include <simpleException.h>
 
@@ -42,7 +42,7 @@ namespace brogueHd::model
 			init(brogueRoomType::MainEntranceRoom, 0.0);
 		}
 
-		brogueRoomTemplate(const gridRect& levelBoundary, brogueRoomType type, float frequency)
+		brogueRoomTemplate(const simpleRect& levelBoundary, brogueRoomType type, float frequency)
 		{
 			init(type, frequency);
 		}
@@ -72,12 +72,12 @@ namespace brogueHd::model
 			return hashGenerator::generateHash(roomType, startLocation, minSize, maxSize, frequency);
 		}
 
-		gridRect getMaxSize() const
+		simpleRect getMaxSize() const
 		{
 			return maxSize;
 		}
 
-		gridRect getMinSize() const
+		simpleRect getMinSize() const
 		{
 			return minSize;
 		}
@@ -95,8 +95,8 @@ namespace brogueHd::model
 	private:
 		brogueStartLocation startLocation;
 		brogueRoomType roomType;
-		gridRect minSize;
-		gridRect maxSize;
+		simpleRect minSize;
+		simpleRect maxSize;
 		float frequency;
 
 	private:
@@ -127,63 +127,63 @@ namespace brogueHd::model
 			getSize(type, minSize, maxSize);
 		}
 
-		void getSize(brogueRoomType type, gridRect& aminSize, gridRect& amaxSize) const
+		void getSize(brogueRoomType type, simpleRect& aminSize, simpleRect& amaxSize) const
 		{
 			switch (type)
 			{
 			case brogueRoomType::Default:
-				aminSize = gridRect(0, 0, 2, 2);
-				amaxSize = gridRect(0, 0, 2, 2);
+				aminSize = simpleRect(0, 0, 2, 2);
+				amaxSize = simpleRect(0, 0, 2, 2);
 				break;
 
 			case brogueRoomType::CaveCompact:
-				aminSize = gridRect(0, 0, 3, 4);
-				amaxSize = gridRect(0, 0, 12, 8);
+				aminSize = simpleRect(0, 0, 3, 4);
+				amaxSize = simpleRect(0, 0, 12, 8);
 				break;
 
 			case brogueRoomType::CaveLargeNS:
-				aminSize = gridRect(0, 0, 3, 15);
-				amaxSize = gridRect(0, 0, 12, DROWS);
+				aminSize = simpleRect(0, 0, 3, 15);
+				amaxSize = simpleRect(0, 0, 12, DROWS);
 				break;
 
 			case brogueRoomType::CaveLargeEW:
-				aminSize = gridRect(0, 0, 20, 4);
-				amaxSize = gridRect(0, 0, DCOLS, 8);
+				aminSize = simpleRect(0, 0, 20, 4);
+				amaxSize = simpleRect(0, 0, DCOLS, 8);
 				break;
 
 			case brogueRoomType::Cavern:
-				aminSize = gridRect(0, 0, CAVE_MIN_WIDTH, CAVE_MIN_HEIGHT);
-				amaxSize = gridRect(0, 0, DCOLS, DROWS);
+				aminSize = simpleRect(0, 0, CAVE_MIN_WIDTH, CAVE_MIN_HEIGHT);
+				amaxSize = simpleRect(0, 0, DCOLS, DROWS);
 				break;
 
 			case brogueRoomType::ChunkyRoom:
-				aminSize = gridRect(0, 0, 2, 2);
-				amaxSize = gridRect(0, 0, 7, 7);
+				aminSize = simpleRect(0, 0, 2, 2);
+				amaxSize = simpleRect(0, 0, 7, 7);
 				break;
 
 			case brogueRoomType::CircularRoom:
-				aminSize = gridRect(0, 0, 4, 4);
-				amaxSize = gridRect(0, 0, 20, 20);
+				aminSize = simpleRect(0, 0, 4, 4);
+				amaxSize = simpleRect(0, 0, 20, 20);
 				break;
 
 			case brogueRoomType::CrossRoom:
-				aminSize = gridRect(0, 0, 4, 3);
-				amaxSize = gridRect(0, 0, 20, 7);
+				aminSize = simpleRect(0, 0, 4, 3);
+				amaxSize = simpleRect(0, 0, 20, 7);
 				break;
 
 			case brogueRoomType::MainEntranceRoom:
-				aminSize = gridRect(0, 0, 20, 10);
-				amaxSize = gridRect(0, 0, 20, 10);
+				aminSize = simpleRect(0, 0, 20, 10);
+				amaxSize = simpleRect(0, 0, 20, 10);
 				break;
 
 			case brogueRoomType::SmallRoom:
-				aminSize = gridRect(0, 0, 3, 2);
-				amaxSize = gridRect(0, 0, 6, 4);
+				aminSize = simpleRect(0, 0, 3, 2);
+				amaxSize = simpleRect(0, 0, 6, 4);
 				break;
 
 			case brogueRoomType::SmallSymmetricalCrossRoom:
-				aminSize = gridRect(0, 0, 4, 4);
-				amaxSize = gridRect(0, 0, 8, 5);
+				aminSize = simpleRect(0, 0, 4, 4);
+				amaxSize = simpleRect(0, 0, 8, 5);
 				break;
 
 			default:

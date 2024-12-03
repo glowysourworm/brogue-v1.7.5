@@ -39,12 +39,6 @@
     <ClInclude Include="boltConstants.h">
       <Filter>Header Files\constants</Filter>
     </ClInclude>
-    <ClInclude Include="brogueCellDisplay.h">
-      <Filter>Header Files\game</Filter>
-    </ClInclude>
-    <ClInclude Include="brogueCell.h">
-      <Filter>Header Files\game</Filter>
-    </ClInclude>
     <ClInclude Include="brogueCreature.h">
       <Filter>Header Files\game</Filter>
     </ClInclude>
@@ -53,9 +47,6 @@
     </ClInclude>
     <ClInclude Include="broguefile.h">
       <Filter>Header Files\serialization</Filter>
-    </ClInclude>
-    <ClInclude Include="brogueGame.h">
-      <Filter>Header Files\game</Filter>
     </ClInclude>
     <ClInclude Include="brogueGameTemplate.h">
       <Filter>Header Files\template</Filter>
@@ -77,9 +68,6 @@
     </ClInclude>
     <ClInclude Include="broguePlayer.h">
       <Filter>Header Files\game</Filter>
-    </ClInclude>
-    <ClInclude Include="brogueRememberedCell.h">
-      <Filter>Header Files\layout</Filter>
     </ClInclude>
     <ClInclude Include="brogueRoomTemplate.h">
       <Filter>Header Files\template</Filter>

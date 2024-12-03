@@ -1,10 +1,10 @@
 #pragma once
 #include "brogueUIConstants.h"
 
-using namespace brogueHd::simple;
-
 namespace brogueHd::frontend
 {
+	using namespace simple;
+
 	struct brogueUIStateChanger
 	{
 		brogueUIStateChanger(brogueUIState current)
@@ -34,7 +34,6 @@ namespace brogueHd::frontend
 		}
 
 	private:
-
 		brogueUIState nextState;
 		brogueUIState currentState;
 	};

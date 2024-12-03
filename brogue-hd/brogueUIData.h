@@ -6,14 +6,13 @@
 #include "simpleException.h"
 #include "simpleMath.h"
 
-using namespace brogueHd::simple;
-
 namespace brogueHd::frontend
 {
+	using namespace simple;
+
 	class brogueUIData
 	{
 	public:
-
 		brogueUIData()
 		{
 			_viewBoundary = new gridRect();
@@ -25,6 +24,7 @@ namespace brogueHd::frontend
 			_zoomLevel = 0;
 			_zIndex = 0;
 		};
+
 		brogueUIData(const brogueUIData& copy)
 		{
 			_viewBoundary = new gridRect();
@@ -35,10 +35,12 @@ namespace brogueHd::frontend
 
 			copyImpl(copy);
 		}
+
 		void operator=(const brogueUIData& copy)
 		{
 			copyImpl(copy);
 		}
+
 		~brogueUIData()
 		{
 			delete _viewBoundary;
@@ -47,40 +49,52 @@ namespace brogueHd::frontend
 			delete _hoverBackground;
 			delete _pressedBackground;
 		}
-		brogueUIData(const gridRect& viewBoundary, const gridRect& sceneBoundary, int zoomLevel, const color& background)
-			: brogueUIData(viewBoundary, sceneBoundary, zoomLevel, background, background, brogueGradientType::Horizontal)
-		{
-		}
-		brogueUIData(const gridRect& viewBoundary, const gridRect& sceneBoundary, int zoomLevel, const color& background, const color& mouseHoverBackground)
-			: brogueUIData(viewBoundary, sceneBoundary, zoomLevel, background, background, mouseHoverBackground, mouseHoverBackground, brogueGradientType::Horizontal)
-		{
-		}
-		brogueUIData(const gridRect& viewBoundary, const gridRect& sceneBoundary, int zoomLevel, const color& background1, const color& background2, brogueGradientType gradientType)
-			: brogueUIData(viewBoundary, sceneBoundary, zoomLevel, background1, background2, background1, background2, gradientType)
-		{
-		}
+
 		brogueUIData(const gridRect& viewBoundary, const gridRect& sceneBoundary, int zoomLevel,
-					 const color& background1,
-					 const color& background2,
-					 const color& mouseBackground1,
-					 const color& mouseBackground2,
-					 brogueGradientType gradientType)
-			: brogueUIData(viewBoundary, sceneBoundary, zoomLevel, background1, background2, mouseBackground1, mouseBackground2, mouseBackground1, mouseBackground2, gradientType)
+		             const color& background)
+			: brogueUIData(viewBoundary, sceneBoundary, zoomLevel, background, background,
+			               brogueGradientType::Horizontal)
 		{
 		}
+
+		brogueUIData(const gridRect& viewBoundary, const gridRect& sceneBoundary, int zoomLevel,
+		             const color& background, const color& mouseHoverBackground)
+			: brogueUIData(viewBoundary, sceneBoundary, zoomLevel, background, background, mouseHoverBackground,
+			               mouseHoverBackground, brogueGradientType::Horizontal)
+		{
+		}
+
+		brogueUIData(const gridRect& viewBoundary, const gridRect& sceneBoundary, int zoomLevel,
+		             const color& background1, const color& background2, brogueGradientType gradientType)
+			: brogueUIData(viewBoundary, sceneBoundary, zoomLevel, background1, background2, background1, background2,
+			               gradientType)
+		{
+		}
+
+		brogueUIData(const gridRect& viewBoundary, const gridRect& sceneBoundary, int zoomLevel,
+		             const color& background1,
+		             const color& background2,
+		             const color& mouseBackground1,
+		             const color& mouseBackground2,
+		             brogueGradientType gradientType)
+			: brogueUIData(viewBoundary, sceneBoundary, zoomLevel, background1, background2, mouseBackground1,
+			               mouseBackground2, mouseBackground1, mouseBackground2, gradientType)
+		{
+		}
+
 		brogueUIData(const gridRect& viewBoundary,
-					 const gridRect& sceneBoundary,
-					 int zoomLevel,
-					 const color& gradient1,
-					 const color& gradient2,
-					 const color& mouseBackground1,
-					 const color& mouseBackground2,
-					 const color& mousePressed1,
-					 const color& mousePressed2,
-					 brogueGradientType gradientType)
+		             const gridRect& sceneBoundary,
+		             int zoomLevel,
+		             const color& gradient1,
+		             const color& gradient2,
+		             const color& mouseBackground1,
+		             const color& mouseBackground2,
+		             const color& mousePressed1,
+		             const color& mousePressed2,
+		             brogueGradientType gradientType)
 		{
 			_zoomLevel = zoomLevel;
-			_zIndex = -1;									// TODO: ZIndex
+			_zIndex = -1; // TODO: ZIndex
 			_viewBoundary = new gridRect(viewBoundary);
 			_viewParentBoundary = new gridRect(sceneBoundary);
 			_background = new colorGradient(gradient1, gradient2, gradientType);
@@ -93,33 +107,38 @@ namespace brogueHd::frontend
 		{
 			return _zIndex;
 		}
+
 		int getZoomLevel() const
 		{
 			return _zoomLevel;
 		}
+
 		gridRect getBoundary() const
 		{
 			return *_viewBoundary;
 		}
+
 		gridRect getParentBoundary() const
 		{
 			return *_viewParentBoundary;
 		}
+
 		colorGradient getBackground() const
 		{
 			return *_background;
 		}
+
 		colorGradient getHoverBackground() const
 		{
 			return *_hoverBackground;
 		}
+
 		colorGradient getPressedBackground() const
 		{
 			return *_pressedBackground;
 		}
 
 	public:
-
 		color calculateGradient(int column, int row, bool hasMouseInteraction, bool mouseOver, bool mouseDown) const
 		{
 			if (mouseOver && mouseDown && hasMouseInteraction)
@@ -133,7 +152,6 @@ namespace brogueHd::frontend
 		}
 
 	private:
-
 		color calculateGradientImpl(int column, int row, const colorGradient& gradient) const
 		{
 			gridRect boundary = this->getBoundary();
@@ -143,23 +161,24 @@ namespace brogueHd::frontend
 
 			switch (gradient.gradientType)
 			{
-				case brogueGradientType::Horizontal:
+			case brogueGradientType::Horizontal:
 				{
 					if (menuColumn < (boundary.width / 2.0f))
 						return gradient.getColor((boundary.width - (2 * (menuColumn))) / (float)boundary.width);
 					else
-						return gradient.getColor((2 * ((menuColumn)-(boundary.width / 2.0f))) / (float)boundary.width);
+						return gradient.
+							getColor((2 * ((menuColumn) - (boundary.width / 2.0f))) / (float)boundary.width);
 				}
 				break;
-				case brogueGradientType::Vertical:
+			case brogueGradientType::Vertical:
 				{
 					if (menuRow < (boundary.height / 2.0f))
 						return gradient.getColor((boundary.height - (2 * (menuRow))) / (float)boundary.height);
 					else
-						return gradient.getColor((2 * ((menuRow)-(boundary.height / 2.0f))) / (float)boundary.height);
+						return gradient.getColor((2 * ((menuRow) - (boundary.height / 2.0f))) / (float)boundary.height);
 				}
 				break;
-				case brogueGradientType::Circular:
+			case brogueGradientType::Circular:
 				{
 					// This was made slightly non-linear to match Brogue v1.7.5
 					//
@@ -170,13 +189,12 @@ namespace brogueHd::frontend
 					return gradient.getColor(weight);
 				}
 				break;
-				default:
-					throw simpleException("Unhandled brogueGradientType:  brogueUIData.h");
+			default:
+				throw simpleException("Unhandled brogueGradientType:  brogueUIData.h");
 			}
 		}
 
 	private:
-
 		void copyImpl(const brogueUIData& copy)
 		{
 			_viewBoundary->set(copy.getBoundary());
@@ -189,7 +207,6 @@ namespace brogueHd::frontend
 		}
 
 	private:
-
 		gridRect* _viewBoundary;
 		gridRect* _viewParentBoundary;
 		colorGradient* _background;

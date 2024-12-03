@@ -1,0 +1,3 @@
+﻿simple.math.lib(simpleTimer.obj) : warning LNK4006: "public: void __cdecl simple::simpleTimer::mark(void)" (?mark@simpleTimer@simple@@QEAAXXZ) already defined in simple.core.lib(simpleTimer.obj); second definition ignored
+simple.math.lib(simpleTimer.obj) : warning LNK4006: "public: int __cdecl simple::simpleTimer::markMilliseconds(void)" (?markMilliseconds@simpleTimer@simple@@QEAAHXZ) already defined in simple.core.lib(simpleTimer.obj); second definition ignored
+  brogue-hd.model.vcxproj -> C:\Backup\_Source\Git\brogue-v1.7.5\x64\Debug\brogue-hd.model.lib

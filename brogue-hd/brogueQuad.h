@@ -6,26 +6,28 @@
 #include "simpleException.h"
 #include "simpleGlData.h"
 
-using namespace brogueHd::simple;
-
 namespace brogueHd::frontend
 {
+	using namespace simple;
+
 	struct brogueQuad : simpleGlData
 	{
 	public:
-
 		brogueQuad()
 		{
 			location = default_value::value<gridLocator>();
 		}
+
 		brogueQuad(const brogueQuad& copy)
 		{
 			copyImpl(copy);
 		}
+
 		brogueQuad(const gridLocator& locator)
 		{
 			location = locator;
 		}
+
 		void operator=(const brogueQuad& copy)
 		{
 			copyImpl(copy);
@@ -35,10 +37,12 @@ namespace brogueHd::frontend
 		{
 			throw simpleException("getElementVertexSize must be overridden in child class");
 		}
+
 		virtual int getStreamSize(GLenum primitiveType) const override
 		{
 			throw simpleException("getStreamSize must be overridden in child class");
 		}
+
 		virtual void streamBuffer(GLenum primitiveType, simpleDataStream* outputStream) const override
 		{
 			throw simpleException("streamBuffer must be overridden in child class");
@@ -50,14 +54,12 @@ namespace brogueHd::frontend
 		}
 
 	private:
-
 		void copyImpl(const brogueQuad& copy)
 		{
 			location = copy.location;
 		}
 
 	public:
-
 		// Cached location value (used for re-streaming)
 		gridLocator location;
 	};

@@ -1,17 +1,19 @@
 #pragma once
 
-#include "brogueRoomTemplate.h"
 #include "gridLocator.h"
 #include "gridRegion.h"
-#include <simpleGridRect.h>
+#include "gridRect.h"
 #include <simple.h>
+#include <simpleRect.h>
 #include <simpleException.h>
 #include <simpleMath.h>
+#include <brogueRoomTemplate.h>
 
 namespace brogueHd::component
 {
 	using namespace simple;
 	using namespace simple::math;
+	using namespace brogueHd::model;
 
 	/// <summary>
 	/// Accretion tile is used to help design the layout. The connection points are desired
@@ -163,7 +165,9 @@ namespace brogueHd::component
 			{
 				_minSize = _configuration.getMinSize();
 
-				_boundary = _configuration.getMaxSize().createExpanded(padding);
+				gridRect maxSize(_configuration.getMaxSize());
+
+				_boundary = maxSize.createExpanded(padding);
 
 				_boundary.column = constraint.column;
 				_boundary.row = constraint.row;

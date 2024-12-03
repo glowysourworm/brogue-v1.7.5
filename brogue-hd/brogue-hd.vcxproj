@@ -44,6 +44,7 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -79,11 +80,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <AllProjectIncludesArePublic>true</AllProjectIncludesArePublic>
-    <IncludePath>C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\include;C:\Backup\_Source\Git\brogue-v1.7.5\packages\sdl2.nuget.2.30.8\build\native\include;C:\Backup\_Source\Git\brogue-v1.7.5\packages\sdl2_image.nuget.2.8.2\build\native\include;C:\Backup\_Source\Git\brogue-v1.7.5\brogue-hd.component;C:\Backup\_Source\Git\simple\simple.core;C:\Backup\_Source\Git\simple\simple.math;$(IncludePath)</IncludePath>
-    <ReferencePath>C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\lib-vc2022;C:\Backup\_Source\Git\brogue-v1.7.5\packages\sdl2.nuget.2.30.8\build\native\lib\x64;C:\Backup\_Source\Git\brogue-v1.7.5\packages\sdl2_image.nuget.2.8.2\build\native\lib\x64;C:\Backup\_Source\Git\simple\x64\Debug;$(ReferencePath)</ReferencePath>
-    <SourcePath>C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\include;C:\Backup\_Source\Git\brogue-v1.7.5\packages\sdl2.nuget.2.30.8\build\native\include;C:\Backup\_Source\Git\brogue-v1.7.5\packages\sdl2_image.nuget.2.8.2\build\native\include;C:\Backup\_Source\Git\simple\simple.core;C:\Backup\_Source\Git\simple\simple.math;$(SourcePath)</SourcePath>
-    <LibraryPath>C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\lib-vc2022;C:\Backup\_Source\Git\brogue-v1.7.5\packages\sdl2.nuget.2.30.8\build\native\lib\x64;C:\Backup\_Source\Git\brogue-v1.7.5\packages\sdl2_image.nuget.2.8.2\build\native\lib\x64;C:\Backup\_Source\Git\simple\x64\Debug;$(LibraryPath)</LibraryPath>
-    <ExecutablePath>C:\Backup\_Source\Git\brogue-v1.7.5\packages\sdl2.nuget.2.30.8\build\native\lib\x64;C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\lib-vc2022;C:\Backup\_Source\Git\brogue-v1.7.5\packages\sdl2_image.nuget.2.8.2\build\native\lib\x64;$(ExecutablePath)</ExecutablePath>
+    <IncludePath>C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\include;C:\Backup\_Source\Git\brogue-v1.7.5\packages\sdl2.nuget.2.30.8\build\native\include;C:\Backup\_Source\Git\brogue-v1.7.5\packages\sdl2_image.nuget.2.8.2\build\native\include;C:\Backup\_Source\Git\brogue-v1.7.5\brogue-hd.component;C:\Backup\_Source\Git\simple\simple.core;C:\Backup\_Source\Git\simple\simple.math;C:\Backup\_Source\Git\simple\simple.unit-test;C:\Backup\_Source\Git\brogue-v1.7.5\brogue-hd.model;$(IncludePath)</IncludePath>
+    <ReferencePath>C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\lib-vc2022;C:\Backup\_Source\Git\brogue-v1.7.5\packages\sdl2.nuget.2.30.8\build\native\lib\x64;C:\Backup\_Source\Git\brogue-v1.7.5\packages\sdl2_image.nuget.2.8.2\build\native\lib\x64;C:\Backup\_Source\Git\simple\x64\Debug;C:\Backup\_Source\Git\brogue-v1.7.5\x64\Debug;$(ReferencePath)</ReferencePath>
+    <SourcePath>C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\include;C:\Backup\_Source\Git\brogue-v1.7.5\packages\sdl2.nuget.2.30.8\build\native\include;C:\Backup\_Source\Git\brogue-v1.7.5\packages\sdl2_image.nuget.2.8.2\build\native\include;C:\Backup\_Source\Git\simple\simple.core;C:\Backup\_Source\Git\simple\simple.math;C:\Backup\_Source\Git\simple\simple.unit-test;C:\Backup\_Source\Git\brogue-v1.7.5\brogue-hd.model;C:\Backup\_Source\Git\brogue-v1.7.5\brogue-hd.component;$(SourcePath)</SourcePath>
+    <LibraryPath>C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\lib-vc2022;C:\Backup\_Source\Git\brogue-v1.7.5\packages\sdl2.nuget.2.30.8\build\native\lib\x64;C:\Backup\_Source\Git\brogue-v1.7.5\packages\sdl2_image.nuget.2.8.2\build\native\lib\x64;C:\Backup\_Source\Git\simple\x64\Debug;C:\Backup\_Source\Git\brogue-v1.7.5\x64\Debug;$(LibraryPath)</LibraryPath>
+    <ExecutablePath>C:\Backup\_Source\Git\brogue-v1.7.5\packages\sdl2.nuget.2.30.8\build\native\lib\x64;C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\lib-vc2022;C:\Backup\_Source\Git\brogue-v1.7.5\packages\sdl2_image.nuget.2.8.2\build\native\lib\x64;C:\Backup\_Source\Git\simple\x64\Debug;$(ExecutablePath)</ExecutablePath>
+    <ExternalIncludePath>C:\Backup\_Source\Git\simple\simple.core;C:\Backup\_Source\Git\simple\simple.math;C:\Backup\_Source\Git\simple\simple.unit-test;C:\Backup\_Source\Git\brogue-v1.7.5\brogue-hd.component;C:\Backup\_Source\Git\brogue-v1.7.5\brogue-hd.model;$(ExternalIncludePath)</ExternalIncludePath>
+    <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -130,19 +133,19 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;GLFW_INCLUDE_NONE;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\include;C:\Backup\_Source\Git\brogue-v1.7.5\packages\sdl2.nuget.2.30.8\build\native\include;C:\Backup\_Source\Git\brogue-v1.7.5\packages\sdl2_image.nuget.2.8.2\build\native\include;C:\Backup\_Source\Git\simple\simple.core;C:\Backup\_Source\Git\brogue-v1.7.5\brogue-hd.component;C:\Backup\_Source\Git\simple\simple.math;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\include;C:\Backup\_Source\Git\brogue-v1.7.5\packages\sdl2.nuget.2.30.8\build\native\include;C:\Backup\_Source\Git\brogue-v1.7.5\packages\sdl2_image.nuget.2.8.2\build\native\include;C:\Backup\_Source\Git\brogue-v1.7.5\brogue-hd.component;C:\Backup\_Source\Git\brogue-v1.7.5\brogue-hd.model;C:\Backup\_Source\Git\simple\simple.core;C:\Backup\_Source\Git\simple\simple.math;C:\Backup\_Source\Git\simple\simple.unit-test;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard_C>stdclatest</LanguageStandard_C>
       <DisableSpecificWarnings>4267;4244;4104;4101;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
-      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/bigobj</AdditionalOptions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ImportLibrary>
       </ImportLibrary>
       <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\lib-vc2022;C:\Backup\_Source\Git\brogue-v1.7.5\packages\sdl2.nuget.2.30.8\build\native\lib\x64;C:\Backup\_Source\Git\brogue-v1.7.5\packages\sdl2_image.nuget.2.8.2\build\native\lib\x64;C:\Backup\_Source\Git\simple\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>simple.core.lib;simple.math.lib;glfw3dll.lib;opengl32.lib;SDL2.lib;SDL2Main.lib;SDL2_image.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Backup\_Source\Git\brogue-v1.7.5\vendor\glfw-3.4.bin.WIN64\glfw-3.4.bin.WIN64\lib-vc2022;C:\Backup\_Source\Git\brogue-v1.7.5\packages\sdl2.nuget.2.30.8\build\native\lib\x64;C:\Backup\_Source\Git\brogue-v1.7.5\packages\sdl2_image.nuget.2.8.2\build\native\lib\x64;C:\Backup\_Source\Git\simple\x64\Debug;C:\Backup\_Source\Git\brogue-v1.7.5\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>simple.core.lib;simple.math.lib;brogue-hd.component.lib;brogue-hd.model.lib;glfw3dll.lib;opengl32.lib;SDL2.lib;SDL2Main.lib;SDL2_image.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ProjectReference>
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
@@ -212,11 +215,8 @@
     <ClInclude Include="brogueColorQuad.h" />
     <ClInclude Include="brogueConsole.h" />
     <ClInclude Include="brogueGlobal.h" />
-    <ClInclude Include="brogueGameProfile.h" />
     <ClInclude Include="brogueImageQuad.h" />
     <ClInclude Include="brogueMacroDeclaration.h" />
-    <ClInclude Include="brogueTestFunction.h" />
-    <ClInclude Include="brogueGlyphMap.h" />
     <ClInclude Include="brogueViewProgram.h" />
     <ClInclude Include="colorGradient.h" />
     <ClInclude Include="colorString.h" />
@@ -227,9 +227,7 @@
     <ClInclude Include="openglHelper.h" />
     <ClInclude Include="brogueUIConstants.h" />
     <ClInclude Include="simpleBoundingBox.h" />
-    <ClInclude Include="simpleBSTTests.h" />
     <ClInclude Include="simpleKeyboardState.h" />
-    <ClInclude Include="brogueTestPackage.h" />
     <ClInclude Include="brogueCoordinateConverter.h" />
     <ClInclude Include="gl.h" />
     <ClInclude Include="json.hpp" />
@@ -238,7 +236,6 @@
     <ClInclude Include="simpleFrameBuffer.h" />
     <ClInclude Include="simpleGlObject.h" />
     <ClInclude Include="khrplatform.h" />
-    <ClInclude Include="simpleArrayTests.h" />
     <ClInclude Include="simpleComponentTests.h" />
     <ClInclude Include="developerConsole.h" />
     <ClInclude Include="gameConsole.h" />
@@ -261,7 +258,6 @@
     <ClInclude Include="resourceConsole.h" />
     <ClInclude Include="resourceController.h" />
     <ClInclude Include="renderingController.h" />
-    <ClInclude Include="simpleHashTests.h" />
     <ClInclude Include="simpleShader.h" />
     <ClInclude Include="simpleShaderProgram.h" />
     <ClInclude Include="simpleTexture.h" />

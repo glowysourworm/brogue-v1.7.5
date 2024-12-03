@@ -1,40 +1,41 @@
 #pragma once
 
-#include "brogueRoom.h"
-#include "dungeonConstants.h"
-
 #include "grid.h"
-#include "simpleList.h"
-
-#include "brogueCell.h"
-#include "brogueCellDisplay.h"
-#include "graph.h"
 #include "gridDefinitions.h"
 #include "gridLocator.h"
 #include "gridLocatorEdge.h"
-#include <simpleGridRect.h>
 #include "gridRegion.h"
-#include "simple.h"
-#include "simpleException.h"
+#include "brogueRoom.h"
+
+#include <brogueCell.h>
+#include <brogueCellDisplay.h>
+#include <dungeonConstants.h>
+
+#include <simple.h>
+#include <simpleList.h>
+#include <simpleException.h>
+#include <simpleGraph.h>
+#include <simpleRect.h>
 #include <functional>
 
 namespace brogueHd::component
 {
 	using namespace simple;
 	using namespace simple::math;
+	using namespace brogueHd::model;
 
 	class brogueLayout
 	{
 	public:
-		brogueLayout(const simpleGridRect& levelParentBoundary, const simpleGridRect& levelBoundary);
+		brogueLayout(const gridRect& levelParentBoundary, const gridRect& levelBoundary);
 		~brogueLayout();
 
 		bool isDefined(int column, int row) const;
 
 		brogueCell* get(int column, int row) const;
 
-		simpleGridRect getBoundary() const;
-		simpleGridRect getParentBoundary() const;
+		gridRect getBoundary() const;
+		gridRect getParentBoundary() const;
 
 		/// <summary>
 		/// Iterates adjacent cells to satisfy the user predicate. Returns the result cell, (or null), and 
@@ -77,7 +78,7 @@ namespace brogueHd::component
 		/// <summary>
 		/// Sets graph of rooms for the layout
 		/// </summary>
-		void setRoomConnectionGraph(graph<gridLocator, gridLocatorEdge>* connectionGraph);
+		void setRoomConnectionGraph(simpleGraph<gridLocator, gridLocatorEdge>* connectionGraph);
 
 		void setCorridorConnections(const simpleList<gridLocatorEdge>& connections);
 
@@ -106,7 +107,7 @@ namespace brogueHd::component
 		// Grid containing flag-enum for categories of features:  TODO
 		grid<dungeonFeatureCategories>* _featureCategoriesGrid;
 
-		graph<gridLocator, gridLocatorEdge>* _connectionGraph;
+		simpleGraph<gridLocator, gridLocatorEdge>* _connectionGraph;
 
 		simpleList<gridLocatorEdge>* _corridorConnections;
 
@@ -204,7 +205,7 @@ namespace brogueHd::component
 		});
 	}
 
-	void brogueLayout::setRoomConnectionGraph(graph<gridLocator, gridLocatorEdge>* connectionGraph)
+	void brogueLayout::setRoomConnectionGraph(simpleGraph<gridLocator, gridLocatorEdge>* connectionGraph)
 	{
 		_connectionGraph = connectionGraph;
 	}

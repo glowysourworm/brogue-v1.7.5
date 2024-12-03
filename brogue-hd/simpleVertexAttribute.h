@@ -4,10 +4,10 @@
 #include "simple.h"
 #include "simpleString.h"
 
-using namespace brogueHd::simple;
-
 namespace brogueHd::frontend
 {
+	using namespace simple;
+
 	/// <summary>
 	/// Describes a single vertex attribute "in" parameter for a shader
 	/// </summary>
@@ -20,10 +20,12 @@ namespace brogueHd::frontend
 			_name = default_value::value<simpleString>();
 			_attributeType = 0;
 		}
+
 		simpleVertexAttribute(const simpleVertexAttribute& copy)
 		{
 			copyImpl(copy);
 		}
+
 		simpleVertexAttribute(GLuint index, const simpleString& name, int glActiveUniformType)
 		{
 			_index = index;
@@ -47,10 +49,12 @@ namespace brogueHd::frontend
 		{
 			return _index;
 		}
+
 		simpleString getName() const
 		{
 			return _name;
 		}
+
 		GLenum getAttributeType() const
 		{
 			return _attributeType;
@@ -62,7 +66,6 @@ namespace brogueHd::frontend
 		}
 
 	private:
-
 		void copyImpl(const simpleVertexAttribute& copy)
 		{
 			_index = copy.getIndex();
@@ -71,7 +74,6 @@ namespace brogueHd::frontend
 		}
 
 	private:
-
 		GLuint _index;
 		simpleString _name;
 

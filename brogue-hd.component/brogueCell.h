@@ -4,7 +4,7 @@
 #include "color.h"
 #include "gridLocator.h"
 
-namespace brogueHd::model
+namespace brogueHd::component
 {
 	//struct pdsLink {
 	//	int distance;

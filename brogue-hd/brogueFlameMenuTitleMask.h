@@ -15,19 +15,18 @@
 #include "resourceController.h"
 #include "simple.h"
 
-using namespace brogueHd::backend;
-
 namespace brogueHd::frontend
 {
+	using namespace brogueHd::backend;
+
 	class brogueFlameMenuTitleMask : public brogueViewGridCore<brogueColorQuad>
 	{
 	public:
-
 		brogueFlameMenuTitleMask(brogueCoordinateConverter* coordinateConverter,
-								 resourceController* resourceController,
-								 eventController* eventController,
-								 const brogueUIProgramPartId& partId,
-								 const brogueUIData& data)
+		                         resourceController* resourceController,
+		                         eventController* eventController,
+		                         const brogueUIProgramPartId& partId,
+		                         const brogueUIData& data)
 			: brogueViewGridCore(coordinateConverter, resourceController, eventController, partId, data, false)
 		{
 			_titleGrid = new brogueTitleGrid();
@@ -43,6 +42,7 @@ namespace brogueHd::frontend
 			// Set initial stream data
 			update(0, true);
 		}
+
 		~brogueFlameMenuTitleMask()
 		{
 			delete _titleGrid;
@@ -51,8 +51,8 @@ namespace brogueHd::frontend
 		}
 
 		void checkUpdate(const brogueKeyboardState& keyboardState,
-						 const brogueMouseState& mouseState,
-						 int millisecondsLapsed) override
+		                 const brogueMouseState& mouseState,
+		                 int millisecondsLapsed) override
 		{
 			// Prevent updating
 		}
@@ -70,20 +70,20 @@ namespace brogueHd::frontend
 		{
 			return false;
 		}
+
 		bool isTheText(int column, int row)
 		{
 			return _titleGrid->isTheText(column, row);
 		}
 
 	private:
-
 		void updateImpl(int millisecondsLapsed, int forceUpdate)
 		{
 			brogueFlameMenuTitleMask* that = this;
 			brogueTitleGrid* titleGrid = _titleGrid;
 			brogueCellDisplay* maskCell = _maskCell;
 
-			_titleGrid->sceneBounds().iterate([&that, &titleGrid, &maskCell] (int column, int row)
+			_titleGrid->sceneBounds().iterate([&that, &titleGrid, &maskCell](int column, int row)
 			{
 				brogueCellDisplay cell(column, row);
 
@@ -97,7 +97,6 @@ namespace brogueHd::frontend
 		}
 
 	private:
-
 		brogueTitleGrid* _titleGrid;
 		brogueCellDisplay* _maskCell;
 		brogueCellDisplay* _defaultCell;

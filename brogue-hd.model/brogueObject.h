@@ -1,10 +1,12 @@
 #pragma once
 
-#include "color.h"
-#include "simple.h"
+#include <color.h>
+#include <simple.h>
 
 namespace brogueHd::model
 {
+	using namespace simple;
+
 	/// <summary>
 	/// Base class for anything on the map that takes just a single tile. This contains just the display 
 	///	information for any dungeon object. Also, wants to handle data serialization.

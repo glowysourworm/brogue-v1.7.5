@@ -1,17 +1,16 @@
 #pragma once
 
-#include "color.h"
-#include "simple.h"
-#include "simpleArray.h"
-#include "simpleException.h"
-#include "simpleMath.h"
+#include <color.h>
+#include <simple.h>
+#include <simpleArray.h>
+#include <simpleException.h>
+#include <simpleMath.h>
 #include <random>
-
-using namespace brogueHd::simple;
-using namespace brogueHd::backend::model;
 
 namespace brogueHd::component
 {
+	using namespace simple;
+
 	enum class randomVariable
 	{
 		Uniform = 0,

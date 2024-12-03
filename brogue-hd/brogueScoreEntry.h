@@ -5,30 +5,32 @@
 #include "simpleString.h"
 #include <corecrt.h>
 
-using namespace brogueHd::simple;
-
 namespace brogueHd::backend::model
 {
+	using namespace simple;
+
 	class brogueScoreEntry : simpleObject
 	{
 	public:
-
 		brogueScoreEntry()
 		{
 			_score = 0;
 			_date = nullptr;
 			_description = nullptr;
 		}
+
 		brogueScoreEntry(const brogueScoreEntry& copy)
 		{
 			copyImpl(copy);
 		}
+
 		brogueScoreEntry(int score, time_t dateTime, const char* description)
 		{
 			_score = score;
 			_date = new simpleString(simpleExt::formatDate(dateTime, true));
 			_description = new simpleString(description);
 		}
+
 		~brogueScoreEntry()
 		{
 			delete _date;
@@ -69,7 +71,6 @@ namespace brogueHd::backend::model
 		}
 
 	private:
-
 		void copyImpl(const brogueScoreEntry& copy)
 		{
 			_score = copy.getScore();
@@ -78,10 +79,8 @@ namespace brogueHd::backend::model
 		}
 
 	private:
-
 		int _score;
 		simpleString* _date;
 		simpleString* _description;
-
 	};
 }

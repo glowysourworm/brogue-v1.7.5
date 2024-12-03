@@ -3,8 +3,10 @@
 #include "color.h"
 #include "simple.h"
 
-namespace brogueHd::backend::model
+namespace brogueHd::frontend
 {
+	using namespace simple;
+
 	enum brogueGradientType
 	{
 		Horizontal = 0,
@@ -20,12 +22,14 @@ namespace brogueHd::backend::model
 			gradient2 = default_value::value<color>();
 			gradientType = default_value::value<brogueGradientType>();
 		}
+
 		colorGradient(const color& color1, const color& color2, brogueGradientType type)
 		{
 			gradient1 = color1;
 			gradient2 = color2;
 			gradientType = type;
 		}
+
 		colorGradient(const colorGradient& copy)
 		{
 			gradient1 = copy.gradient1;

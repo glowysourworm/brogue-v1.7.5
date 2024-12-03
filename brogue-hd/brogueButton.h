@@ -18,51 +18,52 @@
 #include "simple.h"
 #include "simpleString.h"
 
-using namespace brogueHd::component;
-using namespace brogueHd::simple;
-
 namespace brogueHd::frontend
 {
+	using namespace simple;
+	using namespace brogueHd::component;
+
 	class brogueButton : public brogueViewGridCore<brogueCellQuad>
 	{
 	public:
-
 		brogueButton(brogueCoordinateConverter* coordinateConverter,
-					 resourceController* resourceController,
-					 eventController* eventController,
-					 const brogueUIProgramPartId& partId,
-					 const brogueUIData& data);
+		             resourceController* resourceController,
+		             eventController* eventController,
+		             const brogueUIProgramPartId& partId,
+		             const brogueUIData& data);
 		~brogueButton();
 
 		virtual void update(int millisecondsLapsed, bool forceUpdate) override;
 		virtual bool needsUpdate() const override;
 
-		void setUI(const simpleString& text, int hotkeyIndex, const color& foreground, const color& hotkeyForeground, brogueTextAlignment alignment);
+		void setUI(const simpleString& text, int hotkeyIndex, const color& foreground, const color& hotkeyForeground,
+		           brogueTextAlignment alignment);
 		void setUI(const colorString& text, brogueTextAlignment alignment);
 
 	private:
-
 		void updateImpl(int millisecondsLapsed, bool forceUpdate);
 
 	private:
-
 		brogueUIText* _uiText;
 	};
 
 	brogueButton::brogueButton(brogueCoordinateConverter* coordinateConverter,
-							   resourceController* resourceController,
-							   eventController* eventController,
-							   const brogueUIProgramPartId& partId,
-							   const brogueUIData& data)
+	                           resourceController* resourceController,
+	                           eventController* eventController,
+	                           const brogueUIProgramPartId& partId,
+	                           const brogueUIData& data)
 		: brogueViewGridCore(coordinateConverter, resourceController, eventController, partId, data, true)
 	{
 		_uiText = new brogueUIText(data.getParentBoundary(), data.getBoundary(), simpleString(""));
 	}
+
 	brogueButton::~brogueButton()
 	{
 		delete _uiText;
 	}
-	void brogueButton::setUI(const simpleString& text, int hotkeyIndex, const color& foreground, const color& hotkeyForeground, brogueTextAlignment alignment)
+
+	void brogueButton::setUI(const simpleString& text, int hotkeyIndex, const color& foreground,
+	                         const color& hotkeyForeground, brogueTextAlignment alignment)
 	{
 		gridRect boundary = this->getUIData()->getBoundary();
 
@@ -74,6 +75,7 @@ namespace brogueHd::frontend
 
 		brogueViewGridCore::invalidate();
 	}
+
 	void brogueButton::setUI(const colorString& text, brogueTextAlignment alignment)
 	{
 		gridRect boundary = this->getUIData()->getBoundary();
@@ -82,6 +84,7 @@ namespace brogueHd::frontend
 
 		brogueViewGridCore::invalidate();
 	}
+
 	bool brogueButton::needsUpdate() const
 	{
 		// Adding the mouse enter / leave events
@@ -91,6 +94,7 @@ namespace brogueHd::frontend
 			this->getMouseEnter() ||
 			this->getMousePressedChanged();
 	}
+
 	void brogueButton::updateImpl(int millisecondsLapsed, bool forceUpdate)
 	{
 		brogueUIData* uiData = this->getUIData();
@@ -100,19 +104,23 @@ namespace brogueHd::frontend
 
 		// Iterate THIS boundary:  Apply mouse data
 		//
-		uiData->getBoundary().iterate([&that, &uiData, &uiText, &glyphMap] (int column, int row)
+		uiData->getBoundary().iterate([&that, &uiData, &uiText, &glyphMap](int column, int row)
 		{
 			brogueCellDisplay cell(column, row);
 
 			cell.foreColor = uiText->getForeground(column, row);
-			cell.backColor = uiData->calculateGradient(column, row, that->getHasMouseInteraction(), that->getMouseOver(), that->getMousePressed());
-			cell.character = glyphMap.isGlyphDefined(uiText->getCharacter(column, row)) ? uiText->getCharacter(column, row) : glyphMap.Empty;
+			cell.backColor = uiData->calculateGradient(column, row, that->getHasMouseInteraction(),
+			                                           that->getMouseOver(), that->getMousePressed());
+			cell.character = glyphMap.isGlyphDefined(uiText->getCharacter(column, row))
+				                 ? uiText->getCharacter(column, row)
+				                 : glyphMap.Empty;
 
 			that->set(cell);
 
 			return iterationCallback::iterate;
 		});
 	}
+
 	void brogueButton::update(int millisecondsLapsed, bool forceUpdate)
 	{
 		// Update data elements in the view

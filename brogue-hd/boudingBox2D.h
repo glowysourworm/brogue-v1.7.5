@@ -4,10 +4,10 @@
 #include "simpleArray.h"
 #include "simpleGlData.h"
 
-using namespace brogueHd::simple;
-
 namespace brogueHd::frontend
 {
+	using namespace simple;
+
 	/// <summary>
 	/// Rectangle that stores coordinates for a bounding box in all coordinate systems: UI-coordinates, UV-coordinates,
 	/// and XY-coordinates relative to the 2D scene pixel dimensions.
@@ -17,7 +17,8 @@ namespace brogueHd::frontend
 	public:
 		boundingBox2D();
 		boundingBox2D(const boundingBox2D& copy);
-		boundingBox2D(int pixelX, int pixelY, int pixelWidth, int pixelHeight, int scenePixelWidth, int scenePixelHeight);
+		boundingBox2D(int pixelX, int pixelY, int pixelWidth, int pixelHeight, int scenePixelWidth,
+		              int scenePixelHeight);
 
 		/// <summary>
 		/// Prepares a data vector for the GLImage2D with { vertex-x, vertex-y, texture-x, texture-y } to create the vertex map
@@ -39,26 +40,32 @@ namespace brogueHd::frontend
 		{
 			return _pixelX;
 		}
+
 		int getPixelY() const
 		{
 			return _pixelY;
 		}
+
 		int getPixelWidth() const
 		{
 			return _pixelWidth;
 		}
+
 		int getPixelHeight() const
 		{
 			return _pixelHeight;
 		}
+
 		int getScenePixelWidth() const
 		{
 			return _scenePixelWidth;
 		}
+
 		int getScenePixelHeight() const
 		{
 			return _scenePixelHeight;
 		}
+
 		openglQuadConverter getCoordinateConverter() const
 		{
 			return _coordinateConverter;
@@ -86,6 +93,7 @@ namespace brogueHd::frontend
 
 		_coordinateConverter = openglQuadConverter(0, 0, 0, 0);
 	}
+
 	boundingBox2D::boundingBox2D(const boundingBox2D& copy)
 	{
 		_pixelX = copy.getPixelX();
@@ -96,7 +104,9 @@ namespace brogueHd::frontend
 		_scenePixelWidth = copy.getScenePixelWidth();
 		_coordinateConverter = copy.getCoordinateConverter();
 	}
-	boundingBox2D::boundingBox2D(int pixelX, int pixelY, int pixelWidth, int pixelHeight, int scenePixelWidth, int scenePixelHeight)
+
+	boundingBox2D::boundingBox2D(int pixelX, int pixelY, int pixelWidth, int pixelHeight, int scenePixelWidth,
+	                             int scenePixelHeight)
 	{
 		_pixelX = pixelX;
 		_pixelY = pixelY;
@@ -115,10 +125,10 @@ namespace brogueHd::frontend
 	{
 		simpleArray<vec2> result(4);
 
-		result.set(0, vec2(_pixelX, _pixelY));                              // Top-left
-		result.set(1, vec2(_pixelX + _pixelWidth, _pixelY));                // Top-right
+		result.set(0, vec2(_pixelX, _pixelY)); // Top-left
+		result.set(1, vec2(_pixelX + _pixelWidth, _pixelY)); // Top-right
 		result.set(2, vec2(_pixelX + _pixelWidth, _pixelY + _pixelHeight)); // Bottom-right
-		result.set(3, vec2(_pixelX, _pixelY + _pixelHeight));               // Bottom-left
+		result.set(3, vec2(_pixelX, _pixelY + _pixelHeight)); // Bottom-left
 
 		return result;
 	}

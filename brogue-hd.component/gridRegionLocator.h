@@ -11,6 +11,8 @@
 
 namespace brogueHd::component
 {
+	using namespace simple;
+
 	template <isGridLocator T>
 	class gridRegionLocator
 	{

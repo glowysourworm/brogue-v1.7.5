@@ -5,7 +5,6 @@
 #include "brogueLayout.h"
 #include "brogueLevel.h"
 #include "brogueLevelTemplate.h"
-#include "brogueUIBuilder.h"
 #include "contentGenerator.h"
 #include "gridRect.h"
 #include "layoutGenerator.h"
@@ -16,30 +15,32 @@
 
 namespace brogueHd::component
 {
+	using namespace brogueHd::model;
+
 	class gameGenerator
 	{
 	public:
-		gameGenerator(brogueUIBuilder* uiBuilder, randomGenerator* randomMain, noiseGenerator* noiseGenerator,
-		              const gridRect& gameBoundary)
+		gameGenerator(randomGenerator* randomMain, noiseGenerator* noiseGenerator, const gridRect& layoutParentBoundary,
+		              int zoomLevel)
 		{
-			_uiBuilder = uiBuilder;
 			_randomGenerator = randomMain;
 			_noiseGenerator = noiseGenerator;
-			_gameBoundary = new gridRect(gameBoundary);
+			_layoutParentBoundary = new gridRect(layoutParentBoundary);
+			_zoomLevel = zoomLevel;
 		};
 
 		~gameGenerator()
 		{
-			delete _gameBoundary;
+			delete _layoutParentBoundary;
 		};
 
 		brogueGame* createGame(unsigned long seed, brogueGameTemplate* gameTemplate);
 
 	private:
-		brogueUIBuilder* _uiBuilder;
 		randomGenerator* _randomGenerator;
 		noiseGenerator* _noiseGenerator;
-		gridRect* _gameBoundary;
+		gridRect* _layoutParentBoundary;
+		int _zoomLevel;
 	};
 
 	brogueGame* gameGenerator::createGame(unsigned long seed, brogueGameTemplate* gameTemplate)
@@ -51,9 +52,9 @@ namespace brogueHd::component
 		{
 			brogueLevelTemplate* levelTemplate = gameTemplate->getLevel(index + 1);
 
-			layoutGenerator layoutGen(_uiBuilder, _randomGenerator);
+			layoutGenerator layoutGen(_randomGenerator, *_layoutParentBoundary, _zoomLevel);
 			terrainGenerator terrainGen(_randomGenerator);
-			contentGenerator contentGen(*_gameBoundary);
+			contentGenerator contentGen(*_layoutParentBoundary);
 
 			// Level Layout
 			brogueLayout* layout = layoutGen.generateLayout(levelTemplate->getProfile());

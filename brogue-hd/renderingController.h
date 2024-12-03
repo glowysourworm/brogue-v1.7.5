@@ -17,15 +17,15 @@
 #include "simpleList.h"
 #include "simpleString.h"
 
-using namespace brogueHd::frontend;
-
 namespace brogueHd::backend
 {
+	using namespace brogueHd::frontend;
+
 	class renderingController
 	{
 	public:
-
-		renderingController(eventController* eventController, resourceController* resourceController, randomGenerator* randomGenerator, int zoomLevel);
+		renderingController(eventController* eventController, resourceController* resourceController,
+		                    randomGenerator* randomGenerator, int zoomLevel);
 		~renderingController();
 
 		/// <summary>
@@ -49,7 +49,6 @@ namespace brogueHd::backend
 		void updateGameData(const brogueLevel* level);
 
 	private:
-
 		brogueMainProgram* _mainProgram;
 		brogueUIBuilder* _uiBuilder;
 		randomGenerator* _randomGenerator;
@@ -59,7 +58,8 @@ namespace brogueHd::backend
 		brogueGlyphMap* _glyphMap;
 	};
 
-	renderingController::renderingController(eventController* eventController, resourceController* resourceController, randomGenerator* randomGenerator, int zoomLevel)
+	renderingController::renderingController(eventController* eventController, resourceController* resourceController,
+	                                         randomGenerator* randomGenerator, int zoomLevel)
 	{
 		_glyphMap = new brogueGlyphMap();
 		_openglRenderer = new openglRenderer(eventController);
@@ -90,7 +90,7 @@ namespace brogueHd::backend
 		simpleList<brogueViewProgram*> viewList;
 
 		// Title Views (Use Reverse Z-Ordering to check UI events in that order)
-		viewList.add(mainMenu);				// Largest Z-Index
+		viewList.add(mainMenu); // Largest Z-Index
 		viewList.add(openMenu);
 		viewList.add(playbackMenu);
 		viewList.add(highScoresMenu);
@@ -98,7 +98,7 @@ namespace brogueHd::backend
 		viewList.add(titleMask);
 
 		// Game Views
-		viewList.add(gameLog);				// Largest Z-Index
+		viewList.add(gameLog); // Largest Z-Index
 		viewList.add(gameInventory);
 		viewList.add(gameMenu);
 		viewList.add(gameView);
@@ -108,8 +108,10 @@ namespace brogueHd::backend
 
 		gridRect sceneBoundaryUI = _uiBuilder->getBrogueSceneBoundaryUI();
 
-		_mainProgram = new brogueMainProgram(_uiBuilder, resourceController, eventController, _glyphMap, sceneBoundaryUI, zoomLevel, viewList);
+		_mainProgram = new brogueMainProgram(_uiBuilder, resourceController, eventController, _glyphMap,
+		                                     sceneBoundaryUI, zoomLevel, viewList);
 	}
+
 	renderingController::~renderingController()
 	{
 		delete _openglRenderer;
@@ -123,14 +125,17 @@ namespace brogueHd::backend
 		_openglRenderer->setProgram(_mainProgram, BrogueGameMode::Title);
 		_openglRenderer->startProgram();
 	}
+
 	brogueKeyboardState renderingController::getKeyboardState() const
 	{
 		return _openglRenderer->getKeyboardState();
 	}
+
 	brogueMouseState renderingController::getMouseState() const
 	{
 		return _openglRenderer->getMouseState();
 	}
+
 	BrogueGameMode renderingController::getGameModeRequest(bool& newGame, bool& openGame, simpleString& fileName) const
 	{
 		return _openglRenderer->getRequestedMode(newGame, openGame, fileName);
@@ -150,14 +155,13 @@ namespace brogueHd::backend
 	{
 		switch (mode)
 		{
-			case BrogueGameMode::Title:
-			case BrogueGameMode::Game:
-			case BrogueGameMode::Playback:
-				_openglRenderer->setGameMode(mode);
-				break;
-			default:
-				break;
+		case BrogueGameMode::Title:
+		case BrogueGameMode::Game:
+		case BrogueGameMode::Playback:
+			_openglRenderer->setGameMode(mode);
+			break;
+		default:
+			break;
 		}
 	}
 }
-

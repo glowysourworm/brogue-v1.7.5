@@ -1,16 +1,21 @@
 #pragma once
 
-#include "brogueCell.h"
-#include "brogueContentGrid.h"
-#include "brogueLayout.h"
-#include "graph.h"
 #include "gridDefinitions.h"
 #include "gridLocator.h"
 #include "gridLocatorEdge.h"
-#include "simpleList.h"
+#include "brogueContentGrid.h"
+#include "brogueLayout.h"
+
+#include <brogueCell.h>
+#include <simpleGraph.h>
+#include <simpleList.h>
 
 namespace brogueHd::component
 {
+	using namespace simple;
+	using namespace simple::math;
+	using namespace brogueHd::model;
+
 	class brogueLevel
 	{
 	public:

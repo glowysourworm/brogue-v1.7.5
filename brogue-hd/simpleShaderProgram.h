@@ -13,15 +13,15 @@
 #include "simpleLogger.h"
 #include "simpleUniform.h"
 
-using namespace brogueHd::simple;
-
 namespace brogueHd::frontend
 {
+	using namespace simple;
+
 	class simpleShaderProgram : public simpleGlObject
 	{
 	public:
-
-		simpleShaderProgram(const simpleShader& vertexShader, const simpleShader& fragmentShader, simpleVertexArray<float>* programVAO);
+		simpleShaderProgram(const simpleShader& vertexShader, const simpleShader& fragmentShader,
+		                    simpleVertexArray<float>* programVAO);
 		~simpleShaderProgram();
 
 		void compile();
@@ -34,18 +34,22 @@ namespace brogueHd::frontend
 		{
 			return openglHelper::getProgramCreated(this->handle);
 		}
+
 		bool isBound() const override
 		{
 			return openglHelper::getActiveProgram() == this->handle;
 		}
+
 		bool hasErrors() const override
 		{
 			return openglHelper::getProgramError(this->handle);
 		}
+
 		void showErrors() const override
 		{
 			openglHelper::outputProgramInfoLog(this->handle);
 		}
+
 		void showActives();
 
 		/// <summary>
@@ -53,7 +57,7 @@ namespace brogueHd::frontend
 		/// "forceNew" will delete the existing buffer on the GPU; and re-initialize the storage.
 		/// </summary>
 		void reBuffer(bool forceNew);
-		
+
 		/// <summary>
 		/// Returns a pointer to the VAO's data stream (currently one-per-VAO, assigned to the VBO). Use this
 		/// to rebuffer the stream; but must keep same data size and format!
@@ -70,19 +74,20 @@ namespace brogueHd::frontend
 		bool hasUniform(const char* name);
 
 	private:
-
 		simpleVertexArray<float>* _programVAO;
 
 		simpleShader _vertexShader;
 		simpleShader _fragmentShader;
 	};
 
-	simpleShaderProgram::simpleShaderProgram(const simpleShader& vertexShader, const simpleShader& fragmentShader, simpleVertexArray<float>* programVAO)
+	simpleShaderProgram::simpleShaderProgram(const simpleShader& vertexShader, const simpleShader& fragmentShader,
+	                                         simpleVertexArray<float>* programVAO)
 	{
 		_programVAO = programVAO;
 		_vertexShader = vertexShader;
 		_fragmentShader = fragmentShader;
 	}
+
 	simpleShaderProgram::~simpleShaderProgram()
 	{
 		delete _programVAO;
@@ -123,7 +128,7 @@ namespace brogueHd::frontend
 
 		// Bind Uniforms (default values)
 		if (!bindUniforms())
-			simpleLogger::logColor(brogueConsoleColor::Blue, "Problem binding uniforms:  Program={}", this->handle);
+			simpleLogger::logColor(simpleConsoleColor::Blue, "Problem binding uniforms:  Program={}", this->handle);
 
 		// Show output for this program:  errors, actives, etc...
 		openglHelper::outputShaderInfoLog(_vertexShader.getHandle());
@@ -132,7 +137,7 @@ namespace brogueHd::frontend
 		openglHelper::outputProgramParameters(this->handle);
 
 		if (!this->isCreated())
-			simpleLogger::logColor(brogueConsoleColor::Red, "Error creating simpleShaderProgram");
+			simpleLogger::logColor(simpleConsoleColor::Red, "Error creating simpleShaderProgram");
 	}
 
 	void simpleShaderProgram::showActives()
@@ -141,7 +146,7 @@ namespace brogueHd::frontend
 		openglHelper::outputShaderInfoLog(_fragmentShader.getHandle());
 		openglHelper::outputProgramInfoLog(this->handle);
 		openglHelper::outputProgramParameters(this->handle);
-		
+
 		_programVAO->showActives();
 	}
 
@@ -168,6 +173,7 @@ namespace brogueHd::frontend
 		_programVAO->bind();
 		_programVAO->reBuffer(this->handle, forceNew);
 	}
+
 	simpleDataStream* simpleShaderProgram::getStream() const
 	{
 		if (!this->isCreated())
@@ -175,6 +181,7 @@ namespace brogueHd::frontend
 
 		return _programVAO->getStream();
 	}
+
 	void simpleShaderProgram::bind()
 	{
 		if (!this->isCreated())
@@ -190,10 +197,12 @@ namespace brogueHd::frontend
 
 		glUseProgram(NULL);
 	}
+
 	bool simpleShaderProgram::hasUniform(const char* name)
 	{
 		return glGetUniformLocation(this->handle, name) >= 0;
 	}
+
 	bool simpleShaderProgram::bindUniforms()
 	{
 		if (!this->isCreated())
@@ -286,7 +295,8 @@ namespace brogueHd::frontend
 
 		if (location < 0)
 		{
-			simpleLogger::logColor(brogueConsoleColor::Blue, "Uniform not found:  Program={} Uniform={}", this->handle, name);
+			simpleLogger::logColor(simpleConsoleColor::Blue, "Uniform not found:  Program={} Uniform={}", this->handle,
+			                       name);
 			return false;
 		}
 
@@ -294,14 +304,15 @@ namespace brogueHd::frontend
 
 		return true;
 	}
+
 	bool simpleShaderProgram::bindUniform1(const char* name, float uniformValue)
 	{
-
 		GLint location = glGetUniformLocation(this->handle, name);
 
 		if (location < 0)
 		{
-			simpleLogger::logColor(brogueConsoleColor::Blue, "Uniform not found:  Program={} Uniform={}", this->handle, name);
+			simpleLogger::logColor(simpleConsoleColor::Blue, "Uniform not found:  Program={} Uniform={}", this->handle,
+			                       name);
 			return false;
 		}
 
@@ -309,13 +320,15 @@ namespace brogueHd::frontend
 
 		return true;
 	}
+
 	bool simpleShaderProgram::bindUniform2(const char* name, const vec2& uniformValue)
 	{
 		GLint location = glGetUniformLocation(this->handle, name);
 
 		if (location < 0)
 		{
-			simpleLogger::logColor(brogueConsoleColor::Blue, "Uniform not found:  Program={} Uniform={}", this->handle, name);
+			simpleLogger::logColor(simpleConsoleColor::Blue, "Uniform not found:  Program={} Uniform={}", this->handle,
+			                       name);
 			return false;
 		}
 
@@ -323,13 +336,15 @@ namespace brogueHd::frontend
 
 		return true;
 	}
+
 	bool simpleShaderProgram::bindUniform2i(const char* name, const ivec2& uniformValue)
 	{
 		GLint location = glGetUniformLocation(this->handle, name);
 
 		if (location < 0)
 		{
-			simpleLogger::logColor(brogueConsoleColor::Blue, "Uniform not found:  Program={} Uniform={}", this->handle, name);
+			simpleLogger::logColor(simpleConsoleColor::Blue, "Uniform not found:  Program={} Uniform={}", this->handle,
+			                       name);
 			return false;
 		}
 
@@ -337,13 +352,15 @@ namespace brogueHd::frontend
 
 		return true;
 	}
+
 	bool simpleShaderProgram::bindUniform4(const char* name, const vec4& uniformValue)
 	{
 		GLint location = glGetUniformLocation(this->handle, name);
 
 		if (location < 0)
 		{
-			simpleLogger::logColor(brogueConsoleColor::Blue, "Uniform not found:  Program={} Uniform={}", this->handle, name);
+			simpleLogger::logColor(simpleConsoleColor::Blue, "Uniform not found:  Program={} Uniform={}", this->handle,
+			                       name);
 			return false;
 		}
 
@@ -356,10 +373,12 @@ namespace brogueHd::frontend
 	{
 		if (!this->isCreated())
 		{
-			simpleLogger::logColor(brogueConsoleColor::Yellow, "simpleShaderProgram showing deleted by the backend - not the user code");
-			simpleLogger::logColor(brogueConsoleColor::Yellow, "simpleShaderProgram-> continuing on to try and delete its resources");
+			simpleLogger::logColor(simpleConsoleColor::Yellow,
+			                       "simpleShaderProgram showing deleted by the backend - not the user code");
+			simpleLogger::logColor(simpleConsoleColor::Yellow,
+			                       "simpleShaderProgram-> continuing on to try and delete its resources");
 		}
-			
+
 
 		// Procedure
 		//

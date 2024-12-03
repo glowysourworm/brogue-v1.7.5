@@ -38,12 +38,12 @@
 #include "brogueGraphView.h"
 #include "simpleList.h"
 
-using namespace brogueHd::simple;
-using namespace brogueHd::component;
-using namespace sw;
-
 namespace brogueHd::frontend
 {
+	using namespace simple;
+	using namespace brogueHd::component;
+	using namespace sw;
+
 	// Contended Resources
 	static simpleKeyboardState* KeyState;
 	static simpleMouseState* MouseState;
@@ -51,7 +51,6 @@ namespace brogueHd::frontend
 	class openglRenderer
 	{
 	public:
-
 		openglRenderer(eventController* eventController);
 		~openglRenderer();
 
@@ -93,12 +92,10 @@ namespace brogueHd::frontend
 		brogueMouseState getMouseState() const;
 
 	private:
-
 		bool isInitializedGL() const;
 		void initializeOpenGL(const gridRect& sceneBoundaryUI);
 
 	private:
-
 		void destroyGL();
 
 		// OpenGL backend callbacks via GLFW
@@ -118,23 +115,20 @@ namespace brogueHd::frontend
 
 		// GL Debug Enable
 		static void debugMessage(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
-								 const GLchar* message, const void* userParam);
+		                         const GLchar* message, const void* userParam);
 
 		static const char* getGLErrorString(GLenum error);
 		static const char* getGLTypeString(GLenum errorType);
 		static const char* getGLSourceString(GLenum errorSource);
 
 	public:
-
 		void thread_brogueUIClickEvent(brogueUIProgram sender, const brogueUITagAction& response);
 		void thread_brogueUIHoverEvent(brogueUIProgram sender, const brogueUITagAction& response);
 
 	private:
-
 		void thread_start();
 
 	private:
-
 		eventController* _eventController;
 		int _clickToken;
 		int _hoverToken;
@@ -151,7 +145,7 @@ namespace brogueHd::frontend
 		simpleString* _fileNameOut;
 		bool _newGameOut;
 		bool _openGameOut;
-		
+
 
 		GLFWwindow* _window;
 		bool _initializedGL;
@@ -173,12 +167,15 @@ namespace brogueHd::frontend
 		_stopwatch = new simpleTimer();
 		_fileNameOut = new simpleString();
 
-		_clickToken = eventController->getUIClickEvent()->subscribe(std::bind(&openglRenderer::thread_brogueUIClickEvent, this, std::placeholders::_1, std::placeholders::_2));
-		_hoverToken = eventController->getUIHoverEvent()->subscribe(std::bind(&openglRenderer::thread_brogueUIHoverEvent, this, std::placeholders::_1, std::placeholders::_2));
+		_clickToken = eventController->getUIClickEvent()->subscribe(
+			std::bind(&openglRenderer::thread_brogueUIClickEvent, this, std::placeholders::_1, std::placeholders::_2));
+		_hoverToken = eventController->getUIHoverEvent()->subscribe(
+			std::bind(&openglRenderer::thread_brogueUIHoverEvent, this, std::placeholders::_1, std::placeholders::_2));
 		_gameModeOut = BrogueGameMode::Title;
 		_gameModeIn = BrogueGameMode::Title;
 		_gameMode = BrogueGameMode::Title;
 	}
+
 	openglRenderer::~openglRenderer()
 	{
 		if (_thread != nullptr)
@@ -212,8 +209,10 @@ namespace brogueHd::frontend
 	{
 		// THREAD SAFETY:  The std::cout is the only shared static object on this execution stack. Pretty sure it is thread safe.
 		//
-		simpleLogger::logColor(brogueConsoleColor::Red, "GLFW Error {} {}", simpleExt::toString(error).c_str(), message);
+		simpleLogger::logColor(simpleConsoleColor::Red, "GLFW Error {} {}", simpleExt::toString(error).c_str(),
+		                       message);
 	}
+
 	void openglRenderer::forceLastErrorGLFW()
 	{
 		int errorCode = glfwGetError(NULL);
@@ -221,10 +220,13 @@ namespace brogueHd::frontend
 		if (errorCode)
 			errorCallback(errorCode, "No Message");
 	}
+
 	void openglRenderer::debugMessage(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
-									  const GLchar* message, const void* userParam)
+	                                  const GLchar* message, const void* userParam)
 	{
-		simpleLogger::log("GL Debug:  Source: {} Type: {} Id: {} Severity:{} Message:   {}", openglRenderer::getGLSourceString(source), openglRenderer::getGLTypeString(type), id, severity, message);
+		simpleLogger::log("GL Debug:  Source: {} Type: {} Id: {} Severity:{} Message:   {}",
+		                  openglRenderer::getGLSourceString(source), openglRenderer::getGLTypeString(type), id,
+		                  severity, message);
 	}
 
 	void openglRenderer::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -239,29 +241,35 @@ namespace brogueHd::frontend
 			brogueHd::frontend::KeyState->clearKey(key);
 		}
 		else
-			throw simpleException(simpleExt::format("Unknown GLFW key callback action {}:  openglRenderer::keyCallback", action));
+			throw simpleException(simpleExt::format("Unknown GLFW key callback action {}:  openglRenderer::keyCallback",
+			                                        action));
 
 		brogueHd::frontend::KeyState->setModifier(mods);
 	}
+
 	void openglRenderer::mousePositionCallback(GLFWwindow* window, double xpos, double ypos)
 	{
 		brogueHd::frontend::MouseState->updatePosition(xpos, ypos);
 	}
+
 	void openglRenderer::mouseEnterLeaveCallback(GLFWwindow* window, int entered)
 	{
 		brogueHd::frontend::MouseState->updateWindowEnter(entered > 0);
 		brogueHd::frontend::MouseState->updateWindowLeave(entered <= 0);
 	}
+
 	void openglRenderer::mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 	{
 		brogueHd::frontend::MouseState->updateButtons(glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT),
-										  glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT),
-										  glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE));
+		                                              glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT),
+		                                              glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE));
 	}
+
 	void openglRenderer::mouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 	{
 		brogueHd::frontend::MouseState->updateScroll(xoffset, yoffset);
 	}
+
 	void openglRenderer::resizeCallback(GLFWwindow* window, int height, int width)
 	{
 		// This will reset the coordinate system. Probably only needed once if the 
@@ -270,11 +278,13 @@ namespace brogueHd::frontend
 		// 
 		//glViewport(0, 0, width, height);
 	}
+
 	void openglRenderer::refreshCallback(GLFWwindow* window)
 	{
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
+
 	void openglRenderer::windowCloseCallback(GLFWwindow* window)
 	{
 		glfwDestroyWindow(window);
@@ -301,21 +311,22 @@ namespace brogueHd::frontend
 
 			switch (glfwGetPlatform())
 			{
-				case GLFW_PLATFORM_WIN32:
-					simpleLogger::logColor(brogueConsoleColor::Yellow, "glfwGetPlatform() == GLFW_PLATFORM_WIN32");
-					break;
-				case GLFW_PLATFORM_COCOA:
-					simpleLogger::logColor(brogueConsoleColor::Yellow, "glfwGetPlatform() == GLFW_PLATFORM_WIN32");
-					break;
-				case GLFW_PLATFORM_ERROR:
-					simpleLogger::logColor(brogueConsoleColor::Red, "glfwGetPlatform() == GLFW_PLATFORM_ERROR");
-					break;
-				case GLFW_PLATFORM_NULL:
-					simpleLogger::logColor(brogueConsoleColor::Red, "glfwGetPlatform() == GLFW_PLATFORM_NULL");
-					break;
-				default:
-					simpleLogger::logColor(brogueConsoleColor::Red, "glfwGetPlatform() not setup properly. Showing some other platform openglRenderer.h");
-					break;
+			case GLFW_PLATFORM_WIN32:
+				simpleLogger::logColor(simpleConsoleColor::Yellow, "glfwGetPlatform() == GLFW_PLATFORM_WIN32");
+				break;
+			case GLFW_PLATFORM_COCOA:
+				simpleLogger::logColor(simpleConsoleColor::Yellow, "glfwGetPlatform() == GLFW_PLATFORM_WIN32");
+				break;
+			case GLFW_PLATFORM_ERROR:
+				simpleLogger::logColor(simpleConsoleColor::Red, "glfwGetPlatform() == GLFW_PLATFORM_ERROR");
+				break;
+			case GLFW_PLATFORM_NULL:
+				simpleLogger::logColor(simpleConsoleColor::Red, "glfwGetPlatform() == GLFW_PLATFORM_NULL");
+				break;
+			default:
+				simpleLogger::logColor(simpleConsoleColor::Red,
+				                       "glfwGetPlatform() not setup properly. Showing some other platform openglRenderer.h");
+				break;
 			}
 
 			// Get full screen window details
@@ -326,15 +337,15 @@ namespace brogueHd::frontend
 			glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
 			glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
 			glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
-			
+
 			// Set the window position based on the scene boundary
 			int offsetX = (mode->width - sceneBoundaryUI.width) / 2.0f;
 			int offsetY = (mode->height - sceneBoundaryUI.height) / 2.0f;
-			
+
 			glfwWindowHint(GLFW_POSITION_X, offsetX);
 			glfwWindowHint(GLFW_POSITION_Y, offsetY);
 
-			simpleLogger::logColor(brogueConsoleColor::Yellow, glfwGetVersionString());
+			simpleLogger::logColor(simpleConsoleColor::Yellow, glfwGetVersionString());
 
 			_initializedGL = true;
 		}
@@ -347,7 +358,6 @@ namespace brogueHd::frontend
 		// Windowed Mode
 		_window = glfwCreateWindow(sceneBoundaryUI.width, sceneBoundaryUI.height, "Brogue v1.7.5", NULL, NULL);
 
-		
 
 		// Open GL Context
 		glfwMakeContextCurrent(_window);
@@ -356,7 +366,7 @@ namespace brogueHd::frontend
 
 		if (!version)
 		{
-			simpleLogger::logColor(brogueConsoleColor::Red, "Error calling gladLoadGL");
+			simpleLogger::logColor(simpleConsoleColor::Red, "Error calling gladLoadGL");
 
 			glfwDestroyWindow(_window);
 			//glfwTerminate();
@@ -366,11 +376,13 @@ namespace brogueHd::frontend
 		else
 		{
 			// Version
-			simpleLogger::logColor(brogueConsoleColor::Yellow, "Glad Version:  {}.{}", GLAD_VERSION_MAJOR(version), GLAD_VERSION_MINOR(version));
-			simpleLogger::logColor(brogueConsoleColor::Yellow, "GL Shading Language:  {}", (char*)glGetString(GL_SHADING_LANGUAGE_VERSION));
-			simpleLogger::logColor(brogueConsoleColor::Yellow, "GL Version:  {}", (char*)glGetString(GL_VERSION));
-			simpleLogger::logColor(brogueConsoleColor::Yellow, "GL Vendor:  {}", (char*)glGetString(GL_VENDOR));
-			simpleLogger::logColor(brogueConsoleColor::Yellow, "GL Renderer:  {}", (char*)glGetString(GL_RENDERER));
+			simpleLogger::logColor(simpleConsoleColor::Yellow, "Glad Version:  {}.{}", GLAD_VERSION_MAJOR(version),
+			                       GLAD_VERSION_MINOR(version));
+			simpleLogger::logColor(simpleConsoleColor::Yellow, "GL Shading Language:  {}",
+			                       (char*)glGetString(GL_SHADING_LANGUAGE_VERSION));
+			simpleLogger::logColor(simpleConsoleColor::Yellow, "GL Version:  {}", (char*)glGetString(GL_VERSION));
+			simpleLogger::logColor(simpleConsoleColor::Yellow, "GL Vendor:  {}", (char*)glGetString(GL_VENDOR));
+			simpleLogger::logColor(simpleConsoleColor::Yellow, "GL Renderer:  {}", (char*)glGetString(GL_RENDERER));
 
 			// Print out extension(s)
 			GLint numExtensions;
@@ -378,7 +390,8 @@ namespace brogueHd::frontend
 
 			for (GLint index = 0; index < numExtensions; index++)
 			{
-				simpleLogger::logColor(brogueConsoleColor::Yellow, "GL Extension (loaded):  {}", (char*)glGetStringi(GL_EXTENSIONS, index));
+				simpleLogger::logColor(simpleConsoleColor::Yellow, "GL Extension (loaded):  {}",
+				                       (char*)glGetStringi(GL_EXTENSIONS, index));
 			}
 		}
 
@@ -420,6 +433,7 @@ namespace brogueHd::frontend
 		// Initialize the viewport
 		glViewport(0, 0, sceneBoundaryUI.width, sceneBoundaryUI.height);
 	}
+
 	void openglRenderer::setProgram(brogueMainProgram* program, BrogueGameMode gameMode)
 	{
 		// (CRITICAL!)  The program pointer is shared. So, this set function is called during 
@@ -432,6 +446,7 @@ namespace brogueHd::frontend
 		_gameModeIn = gameMode;
 		_gameModeOut = gameMode;
 	}
+
 	void openglRenderer::setGameMode(BrogueGameMode gameMode)
 	{
 		_threadLock->lock();
@@ -445,17 +460,17 @@ namespace brogueHd::frontend
 
 		switch (gameMode)
 		{
-			case BrogueGameMode::Game:
-				_uiStateChanger->set(brogueUIState::GameNormal);
-				break;
-			case BrogueGameMode::Playback:
-				_uiStateChanger->set(brogueUIState::MainMenu);		// TODO
-				break;
-			case BrogueGameMode::Title:
-				_uiStateChanger->set(brogueUIState::MainMenu);
-				break;
-			default:
-				break;
+		case BrogueGameMode::Game:
+			_uiStateChanger->set(brogueUIState::GameNormal);
+			break;
+		case BrogueGameMode::Playback:
+			_uiStateChanger->set(brogueUIState::MainMenu); // TODO
+			break;
+		case BrogueGameMode::Title:
+			_uiStateChanger->set(brogueUIState::MainMenu);
+			break;
+		default:
+			break;
 		}
 
 		// Force state change to clear - signals a fresh UI pass
@@ -463,6 +478,7 @@ namespace brogueHd::frontend
 
 		_threadLock->unlock();
 	}
+
 	void openglRenderer::setGameData(const brogueLevel* level)
 	{
 		// Primary Backend -> Frontend Data Handoff:
@@ -476,7 +492,7 @@ namespace brogueHd::frontend
 		brogueMainProgram* program = _program;
 
 		// Level Rendering
-		level->iterateWhereDefined([&program] (int column, int row, brogueCell* cell)
+		level->iterateWhereDefined([&program](int column, int row, brogueCell* cell)
 		{
 			// Stack copy of brogueCellDisplay
 			program->setGameUpdate(cell->getDisplay());
@@ -489,10 +505,10 @@ namespace brogueHd::frontend
 		// 2) Room Graph (or current issue data)
 		//
 		// 
-		level->getCorridorConnections().forEach([&program] (const gridLocatorEdge& connection)
+		level->getCorridorConnections().forEach([&program](const gridLocatorEdge& connection)
 		{
 			program->setDebugPolygonUpdate(connection);
-			
+
 			return iterationCallback::iterate;
 		});
 
@@ -506,18 +522,21 @@ namespace brogueHd::frontend
 
 		_threadLock->unlock();
 	}
+
 	void openglRenderer::startProgram()
 	{
 		if (_program == nullptr)
 			throw simpleException("Trying to start program before setting it. Please call setProgram(..)");
 
 		if (_thread != nullptr)
-			throw simpleException("Trying to start program on opengl renderer - which is currently running. Must call terminateProgram() first.");
+			throw simpleException(
+				"Trying to start program on opengl renderer - which is currently running. Must call terminateProgram() first.");
 
 		// Hook anything specific to the window on the other thread
 		//
 		_thread = new std::thread(&openglRenderer::thread_start, this);
 	}
+
 	void openglRenderer::terminateProgram()
 	{
 		if (_thread == nullptr)
@@ -535,10 +554,12 @@ namespace brogueHd::frontend
 		brogueHd::frontend::MouseState = nullptr;
 		_program = nullptr;
 	}
+
 	void openglRenderer::destroyGL()
 	{
 		if (_thread != nullptr)
-			throw simpleException("Trying to terminate GL backend before shutting down rendering thread. Please call terminateProgram() first.");
+			throw simpleException(
+				"Trying to terminate GL backend before shutting down rendering thread. Please call terminateProgram() first.");
 
 		glfwTerminate();
 
@@ -566,6 +587,7 @@ namespace brogueHd::frontend
 
 		return mode;
 	}
+
 	BrogueGameMode openglRenderer::getRenderingMode() const
 	{
 		BrogueGameMode mode;
@@ -578,6 +600,7 @@ namespace brogueHd::frontend
 
 		return mode;
 	}
+
 	brogueKeyboardState openglRenderer::getKeyboardState() const
 	{
 		brogueKeyboardState keyboard;
@@ -594,6 +617,7 @@ namespace brogueHd::frontend
 
 		return keyboard;
 	}
+
 	brogueMouseState openglRenderer::getMouseState() const
 	{
 		brogueMouseState mouse;
@@ -610,6 +634,7 @@ namespace brogueHd::frontend
 
 		return mouse;
 	}
+
 	bool openglRenderer::isInitializedGL() const
 	{
 		return _initializedGL;
@@ -622,8 +647,8 @@ namespace brogueHd::frontend
 		// 1) To help clear the UI tree for mouse-leave
 		// 2) To handle the hover text (tag action)
 		//
-
 	}
+
 	void openglRenderer::thread_brogueUIClickEvent(brogueUIProgram sender, const brogueUITagAction& tagAction)
 	{
 		// Thread Mutex Lock (Still Active)
@@ -636,8 +661,8 @@ namespace brogueHd::frontend
 
 		switch (tagAction.action)
 		{
-			// Click registered by a background program (typically)
-			case brogueUIAction::None:
+		// Click registered by a background program (typically)
+		case brogueUIAction::None:
 			{
 				if (sender == brogueUIProgram::FlameMenuProgram)
 				{
@@ -658,11 +683,11 @@ namespace brogueHd::frontend
 			}
 			break;
 
-			case brogueUIAction::StateChange:
+		case brogueUIAction::StateChange:
 			{
 				switch (tagAction.desiredState)
 				{
-					case brogueUIState::MainMenu:
+				case brogueUIState::MainMenu:
 					{
 						_program->deactivateUIAll();
 						_program->activateUIProgram(brogueUIProgram::FlameMenuProgram);
@@ -670,7 +695,7 @@ namespace brogueHd::frontend
 						_program->activateUIProgram(brogueUIProgram::MainMenuProgram);
 					}
 					break;
-					case brogueUIState::OpenMenu:
+				case brogueUIState::OpenMenu:
 					{
 						_program->deactivateUIAll();
 						_program->activateUIProgram(brogueUIProgram::FlameMenuProgram);
@@ -678,7 +703,7 @@ namespace brogueHd::frontend
 						_program->activateUIProgram(brogueUIProgram::OpenMenuProgram);
 					}
 					break;
-					case brogueUIState::PlaybackMenu:
+				case brogueUIState::PlaybackMenu:
 					{
 						_program->deactivateUIAll();
 						_program->activateUIProgram(brogueUIProgram::FlameMenuProgram);
@@ -686,13 +711,13 @@ namespace brogueHd::frontend
 						_program->activateUIProgram(brogueUIProgram::PlaybackMenuProgram);
 					}
 					break;
-					case brogueUIState::HighScores:
+				case brogueUIState::HighScores:
 					{
 						_program->deactivateUIAll();
 						_program->activateUIProgram(brogueUIProgram::HighScoresProgram);
 					}
 					break;
-					case brogueUIState::GameNormal:
+				case brogueUIState::GameNormal:
 					{
 						_program->deactivateUIAll();
 						_program->activateUIProgram(brogueUIProgram::GameProgram);
@@ -702,12 +727,11 @@ namespace brogueHd::frontend
 						_program->activateUIProgram(brogueUIProgram::FlavorTextPanelProgram);
 					}
 					break;
-					case brogueUIState::GameLogOpen:
+				case brogueUIState::GameLogOpen:
 					{
-
 					}
 					break;
-					case brogueUIState::GameMenuOpen:
+				case brogueUIState::GameMenuOpen:
 					{
 						_program->deactivateUIAll();
 						_program->activateUIProgram(brogueUIProgram::GameProgram);
@@ -718,7 +742,7 @@ namespace brogueHd::frontend
 						_program->activateUIProgram(brogueUIProgram::FlavorTextPanelProgram);
 					}
 					break;
-					case brogueUIState::GameInventoryOpen:
+				case brogueUIState::GameInventoryOpen:
 					{
 						_program->deactivateUIAll();
 						_program->activateUIProgram(brogueUIProgram::GameProgram);
@@ -729,11 +753,11 @@ namespace brogueHd::frontend
 						_program->activateUIProgram(brogueUIProgram::FlavorTextPanelProgram);
 					}
 					break;
-					case brogueUIState::GameDiscoveredItemsOpen:
-					case brogueUIState::GameHelpOpen:
-					case brogueUIState::Modal:
-					default:
-						break;
+				case brogueUIState::GameDiscoveredItemsOpen:
+				case brogueUIState::GameHelpOpen:
+				case brogueUIState::Modal:
+				default:
+					break;
 				}
 
 				// Clear out mouse events (action handled)
@@ -747,7 +771,7 @@ namespace brogueHd::frontend
 			}
 			break;
 
-			case brogueUIAction::NewGame:
+		case brogueUIAction::NewGame:
 			{
 				_newGameOut = true;
 				_openGameOut = false;
@@ -756,7 +780,7 @@ namespace brogueHd::frontend
 			}
 			break;
 
-			case brogueUIAction::OpenGame:
+		case brogueUIAction::OpenGame:
 			{
 				_newGameOut = false;
 				_openGameOut = true;
@@ -766,13 +790,12 @@ namespace brogueHd::frontend
 			}
 			break;
 
-			case brogueUIAction::QuitGame:
+		case brogueUIAction::QuitGame:
 			{
-
 			}
 			break;
 
-			case brogueUIAction::GameCommand_Menu:
+		case brogueUIAction::GameCommand_Menu:
 			{
 				// TODO: REDESIGN STATE HANDLING INTO THE PROGRAM CONTAINER
 				if (_uiStateChanger->getCurrentState() == brogueUIState::GameMenuOpen)
@@ -791,7 +814,7 @@ namespace brogueHd::frontend
 			}
 			break;
 
-			case brogueUIAction::GameCommand_Inventory:
+		case brogueUIAction::GameCommand_Inventory:
 			{
 				// TODO: REDESIGN STATE HANDLING INTO THE PROGRAM CONTAINER
 				if (_uiStateChanger->getCurrentState() == brogueUIState::GameInventoryOpen)
@@ -810,7 +833,7 @@ namespace brogueHd::frontend
 			}
 			break;
 
-			case brogueUIAction::GameCommand_ToggleLog:
+		case brogueUIAction::GameCommand_ToggleLog:
 			{
 				brogueUIState desiredState;
 
@@ -829,10 +852,11 @@ namespace brogueHd::frontend
 				_program->initiateStateChange(_uiStateChanger->getCurrentState(), desiredState);
 			}
 			break;
-			default:
-				break;
+		default:
+			break;
 		}
 	}
+
 	void openglRenderer::thread_start()
 	{
 		int intervalMilliseconds = 5;
@@ -850,7 +874,7 @@ namespace brogueHd::frontend
 		// *** Compile our program for the main loop:  GL Functions must be called after calling glfwMakeContextCurrent.
 		//
 		_program->initialize();
-		_program->setMode(_gameMode);	// TODO: Make this part of the initialize call
+		_program->setMode(_gameMode); // TODO: Make this part of the initialize call
 
 		if (_program->hasErrors())
 		{
@@ -959,9 +983,9 @@ namespace brogueHd::frontend
 				_program->update(milliSecondsActual, gameModeChangeThisIteration);
 
 			// Run drawing program
-			_program->run(milliSecondsActual);											// Run() -> Draws the buffers
-			_program->showErrors();														// Log Errors to simpleLogger -> std::cout
-			_program->clearUpdate();													// Clear Update (and invalidate) Flags
+			_program->run(milliSecondsActual); // Run() -> Draws the buffers
+			_program->showErrors(); // Log Errors to simpleLogger -> std::cout
+			_program->clearUpdate(); // Clear Update (and invalidate) Flags
 
 			GLenum error = glGetError();
 
@@ -992,48 +1016,49 @@ namespace brogueHd::frontend
 	{
 		switch (error)
 		{
-			case GL_NO_ERROR:          return "No Error";
-			case GL_INVALID_ENUM:      return "Invalid Enum";
-			case GL_INVALID_VALUE:     return "Invalid Value";
-			case GL_INVALID_OPERATION: return "Invalid Operation";
-			case GL_INVALID_FRAMEBUFFER_OPERATION: return "Invalid Framebuffer Operation";
-			case GL_OUT_OF_MEMORY:     return "Out of Memory";
-			case GL_STACK_UNDERFLOW:   return "Stack Underflow";
-			case GL_STACK_OVERFLOW:    return "Stack Overflow";
-			case GL_CONTEXT_LOST:      return "Context Lost";
-			default:                   return "Unknown Error";
+		case GL_NO_ERROR: return "No Error";
+		case GL_INVALID_ENUM: return "Invalid Enum";
+		case GL_INVALID_VALUE: return "Invalid Value";
+		case GL_INVALID_OPERATION: return "Invalid Operation";
+		case GL_INVALID_FRAMEBUFFER_OPERATION: return "Invalid Framebuffer Operation";
+		case GL_OUT_OF_MEMORY: return "Out of Memory";
+		case GL_STACK_UNDERFLOW: return "Stack Underflow";
+		case GL_STACK_OVERFLOW: return "Stack Overflow";
+		case GL_CONTEXT_LOST: return "Context Lost";
+		default: return "Unknown Error";
 		}
 	}
+
 	const char* openglRenderer::getGLTypeString(GLenum errorType)
 	{
 		switch (errorType)
 		{
-			case GL_DEBUG_TYPE_ERROR:				return "GL_DEBUG_TYPE_ERROR";
-			case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: return "GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR";
-			case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:	return "GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR";
-			case GL_DEBUG_TYPE_PORTABILITY:			return "GL_DEBUG_TYPE_PORTABILITY";
-			case GL_DEBUG_TYPE_PERFORMANCE:			return "GL_DEBUG_TYPE_PERFORMANCE";
-			case GL_DEBUG_TYPE_MARKER:				return "GL_DEBUG_TYPE_MARKER";
-			case GL_DEBUG_TYPE_PUSH_GROUP:			return "GL_DEBUG_TYPE_PUSH_GROUP";
-			case GL_DEBUG_TYPE_POP_GROUP:			return "GL_DEBUG_TYPE_POP_GROUP";
-			case GL_DEBUG_TYPE_OTHER:				return "GL_DEBUG_TYPE_OTHER";
-			default:
-				return "Unknown Error Type";
+		case GL_DEBUG_TYPE_ERROR: return "GL_DEBUG_TYPE_ERROR";
+		case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: return "GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR";
+		case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR: return "GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR";
+		case GL_DEBUG_TYPE_PORTABILITY: return "GL_DEBUG_TYPE_PORTABILITY";
+		case GL_DEBUG_TYPE_PERFORMANCE: return "GL_DEBUG_TYPE_PERFORMANCE";
+		case GL_DEBUG_TYPE_MARKER: return "GL_DEBUG_TYPE_MARKER";
+		case GL_DEBUG_TYPE_PUSH_GROUP: return "GL_DEBUG_TYPE_PUSH_GROUP";
+		case GL_DEBUG_TYPE_POP_GROUP: return "GL_DEBUG_TYPE_POP_GROUP";
+		case GL_DEBUG_TYPE_OTHER: return "GL_DEBUG_TYPE_OTHER";
+		default:
+			return "Unknown Error Type";
 		}
 	}
+
 	const char* openglRenderer::getGLSourceString(GLenum errorSource)
 	{
 		switch (errorSource)
 		{
-			case GL_DEBUG_SOURCE_API:				return "GL_DEBUG_SOURCE_API";
-			case GL_DEBUG_SOURCE_WINDOW_SYSTEM:		return "GL_DEBUG_SOURCE_WINDOW_SYSTEM";
-			case GL_DEBUG_SOURCE_SHADER_COMPILER:	return "GL_DEBUG_SOURCE_SHADER_COMPILER";
-			case GL_DEBUG_SOURCE_THIRD_PARTY:		return "GL_DEBUG_SOURCE_THIRD_PARTY";
-			case GL_DEBUG_SOURCE_APPLICATION:		return "GL_DEBUG_SOURCE_APPLICATION";
-			case GL_DEBUG_SOURCE_OTHER:				return "GL_DEBUG_SOURCE_OTHER";
-			default:
-				return "Unknown Source Type";
+		case GL_DEBUG_SOURCE_API: return "GL_DEBUG_SOURCE_API";
+		case GL_DEBUG_SOURCE_WINDOW_SYSTEM: return "GL_DEBUG_SOURCE_WINDOW_SYSTEM";
+		case GL_DEBUG_SOURCE_SHADER_COMPILER: return "GL_DEBUG_SOURCE_SHADER_COMPILER";
+		case GL_DEBUG_SOURCE_THIRD_PARTY: return "GL_DEBUG_SOURCE_THIRD_PARTY";
+		case GL_DEBUG_SOURCE_APPLICATION: return "GL_DEBUG_SOURCE_APPLICATION";
+		case GL_DEBUG_SOURCE_OTHER: return "GL_DEBUG_SOURCE_OTHER";
+		default:
+			return "Unknown Source Type";
 		}
 	}
 }
-

@@ -10,18 +10,17 @@
 #include "simpleMouseState.h"
 #include "simplePeriodCounter.h"
 
-using namespace brogueHd::simple;
-
 namespace brogueHd::frontend
 {
+	using namespace simple;
+
 	class brogueGameLogProgram : public brogueViewProgram
 	{
 	public:
-
 		brogueGameLogProgram(brogueCoordinateConverter* coordinateConverter,
-								brogueUIProgram programName,
-								const gridRect& containerBoundary,
-								const gridRect& sceneBoundary);
+		                     brogueUIProgram programName,
+		                     const gridRect& containerBoundary,
+		                     const gridRect& sceneBoundary);
 		~brogueGameLogProgram();
 
 		virtual void initiateStateChange(brogueUIState fromState, brogueUIState toState) override;
@@ -29,26 +28,23 @@ namespace brogueHd::frontend
 		virtual bool checkStateChange() override;
 
 		virtual void checkUpdate(const simpleKeyboardState& keyboardState,
-								 const simpleMouseState& mouseState,
-								 int millisecondsLapsed) override;
+		                         const simpleMouseState& mouseState,
+		                         int millisecondsLapsed) override;
 
 	private:
-
 		void setAnimation(float periodValue);
 
 	private:
-
 		brogueCoordinateConverter* _coordinateConverter;
 		simplePeriodCounter* _animationCounter;
 		bool _animating;
 		bool _closing;
-
 	};
 
 	brogueGameLogProgram::brogueGameLogProgram(brogueCoordinateConverter* coordinateConverter,
-													brogueUIProgram programName,
-													const gridRect& containerBoundary,
-													const gridRect& sceneBoundary)
+	                                           brogueUIProgram programName,
+	                                           const gridRect& containerBoundary,
+	                                           const gridRect& sceneBoundary)
 		: brogueViewProgram(coordinateConverter, programName, containerBoundary, sceneBoundary)
 	{
 		_coordinateConverter = coordinateConverter;
@@ -58,26 +54,30 @@ namespace brogueHd::frontend
 
 		setAnimation(1);
 	}
+
 	brogueGameLogProgram::~brogueGameLogProgram()
 	{
 		delete _animationCounter;
 	}
+
 	void brogueGameLogProgram::setAnimation(float periodValue)
 	{
 		if (!_closing)
 			periodValue = 1 - periodValue;
 
 		// Set a rough offset
-		float offset = -1 * periodValue * (this->getContainerBoundary().height - 3);	// Offset from the top of the screen
+		float offset = -1 * periodValue * (this->getContainerBoundary().height - 3);
+		// Offset from the top of the screen
 
 		// Convert to UI coordinates
 		int offsetUI = offset * brogueCellDisplay::CellHeight(_coordinateConverter->getZoomLevel());
 
 		this->setRenderOffsetUI(0, offsetUI);
 	}
+
 	void brogueGameLogProgram::checkUpdate(const simpleKeyboardState& keyboardState,
-											 const simpleMouseState& mouseState,
-											 int millisecondsLapsed)
+	                                       const simpleMouseState& mouseState,
+	                                       int millisecondsLapsed)
 	{
 		// Check for state animation
 		if (_animating && !_animationCounter->pending())
@@ -99,6 +99,7 @@ namespace brogueHd::frontend
 		// Pass through to base class
 		brogueViewProgram::checkUpdate(keyboardState, mouseState, millisecondsLapsed);
 	}
+
 	void brogueGameLogProgram::initiateStateChange(brogueUIState fromState, brogueUIState toState)
 	{
 		if (_animating)
@@ -114,17 +115,19 @@ namespace brogueHd::frontend
 
 		// Closing
 		else if (fromState == brogueUIState::GameLogOpen &&
-				 toState == brogueUIState::GameNormal)
+			toState == brogueUIState::GameNormal)
 		{
 			_animating = true;
 			_closing = true;
 		}
 	}
+
 	void brogueGameLogProgram::clearStateChange()
 	{
 		_animationCounter->reset();
 		_animating = false;
 	}
+
 	bool brogueGameLogProgram::checkStateChange()
 	{
 		// Pending => period has elapsed. Return true to signal we're still animating.

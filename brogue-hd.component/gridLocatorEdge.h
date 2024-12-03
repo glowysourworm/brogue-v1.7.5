@@ -1,6 +1,5 @@
 #pragma once
 
-#include "graphEdge.h"
 #include "gridLocator.h"
 #include <simple.h>
 #include <simplePoint.h>

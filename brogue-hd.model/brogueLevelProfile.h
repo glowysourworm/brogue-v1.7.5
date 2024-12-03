@@ -20,9 +20,14 @@ namespace brogueHd::model
 		brogueLevelProfile(int depth, levelTypes type);
 		~brogueLevelProfile();
 
-		brogueRoomTemplate getRandomRoomInfo(randomGenerator* randomMain);
-		brogueRoomTemplate getEntranceRoom(randomGenerator* randomMain);
+		brogueRoomTemplate getRoomInfo(int index);
+		brogueRoomTemplate getEntranceRoom();
 		brogueRoomTemplate getDefaultRoom();
+
+		int getRoomInfoCount() const
+		{
+			return _roomInfo->count();
+		}
 
 	private:
 		brogueRoomTemplate createRoomInfo(brogueRoomType roomType);
@@ -164,7 +169,7 @@ namespace brogueHd::model
 	brogueRoomTemplate brogueLevelProfile::createRoomInfo(brogueRoomType roomType)
 	{
 		// TODO: GET RID OF STATIC LAYOUT
-		gridRect levelBoundary(COLS - DCOLS, ROWS - DROWS, DCOLS, DROWS);
+		simpleRect levelBoundary(COLS - DCOLS, ROWS - DROWS, DCOLS, DROWS);
 
 		if (_depth == 1)
 		{
@@ -215,24 +220,22 @@ namespace brogueHd::model
 		return brogueRoomTemplate(levelBoundary, roomType, roomFrequency / 100.0f);
 	}
 
-	brogueRoomTemplate brogueLevelProfile::getEntranceRoom(randomGenerator* randomMaim)
+	brogueRoomTemplate brogueLevelProfile::getEntranceRoom()
 	{
 		// TODO: GET RID OF STATIC LAYOUT
-		gridRect levelBoundary(COLS - DCOLS, ROWS - DROWS, DCOLS, DROWS);
+		simpleRect levelBoundary(COLS - DCOLS, ROWS - DROWS, DCOLS, DROWS);
 
 		return brogueRoomTemplate(levelBoundary, brogueRoomType::MainEntranceRoom, 1.0);
 	}
 
-	brogueRoomTemplate brogueLevelProfile::getRandomRoomInfo(randomGenerator* randomMaim)
+	brogueRoomTemplate brogueLevelProfile::getRoomInfo(int index)
 	{
-		int index = randomMaim->randomRangeInclusive(1, 10);
-
 		return _roomInfo->get((brogueRoomType)index);
 	}
 
 	brogueRoomTemplate brogueLevelProfile::getDefaultRoom()
 	{
-		gridRect levelBoundary(COLS - DCOLS, ROWS - DROWS, DCOLS, DROWS);
+		simpleRect levelBoundary(COLS - DCOLS, ROWS - DROWS, DCOLS, DROWS);
 
 		return brogueRoomTemplate(levelBoundary, brogueRoomType::Default, 1.0f);
 	}

@@ -1,19 +1,19 @@
 #pragma once
 
 #include "brogueGlobal.h"
-#include "color.h"
 #include "colorString.h"
-#include "simple.h"
-#include "simpleException.h"
-
-using namespace brogueHd::simple;
+#include <color.h>
+#include <simple.h>
+#include <simpleException.h>
 
 namespace brogueHd::backend::model
 {
+	using namespace simple;
+	using namespace brogueHd::frontend;
+
 	struct messageData : simpleStruct
 	{
 	public:
-
 		colorString message;
 		bool confirmed;
 
@@ -22,6 +22,7 @@ namespace brogueHd::backend::model
 			message = colorString("No Message", color(1, 1, 1, 1));
 			confirmed = false;
 		}
+
 		messageData(const char* amessage, color textColor, bool aconfirmed)
 		{
 			// Check message length
@@ -39,6 +40,7 @@ namespace brogueHd::backend::model
 			message = colorString(amessage, atextColor);
 			confirmed = aconfirmed;
 		}
+
 		size_t getHash() const override
 		{
 			return hashGenerator::generateHash(message, confirmed);

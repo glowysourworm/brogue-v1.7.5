@@ -7,14 +7,13 @@
 #include <SDL_surface.h>
 #include <cstring>
 
-using namespace brogueHd::simple;
-
 namespace brogueHd::frontend
 {
+	using namespace simple;
+
 	class openglHelper
 	{
 	public:
-
 		static GLint getActiveVBO()
 		{
 			GLint handle = -1;
@@ -95,7 +94,7 @@ namespace brogueHd::frontend
 		static bool getShaderCompilerError(GLuint shaderHandle)
 		{
 			GLchar buffer[1000];
-			GLsizei  length = 0;
+			GLsizei length = 0;
 
 			// Check info log for the errors
 			glGetShaderInfoLog(shaderHandle, 1000, &length, buffer);
@@ -106,7 +105,7 @@ namespace brogueHd::frontend
 		static bool getProgramError(GLuint programHandle)
 		{
 			GLchar buffer[10000];
-			GLsizei  length = 0;
+			GLsizei length = 0;
 
 			// Check info log for the errors
 			glGetProgramInfoLog(programHandle, 10000, &length, buffer);
@@ -117,27 +116,27 @@ namespace brogueHd::frontend
 		static void outputShaderInfoLog(GLuint shaderHandle)
 		{
 			GLchar buffer[1000];
-			GLsizei  length = 0;
+			GLsizei length = 0;
 
 			// Check info log for the errors
 			glGetShaderInfoLog(shaderHandle, 1000, &length, buffer);
 
 			// For now, just show the exception from the shader
 			if (length > 0)
-				simpleLogger::logColor(brogueConsoleColor::Red, buffer);
+				simpleLogger::logColor(simpleConsoleColor::Red, buffer);
 		}
 
 		static void outputProgramInfoLog(GLuint programHandle)
 		{
 			GLchar buffer[10000];
-			GLsizei  length = 0;
+			GLsizei length = 0;
 
 			// Check info log for the errors
 			glGetProgramInfoLog(programHandle, 10000, &length, buffer);
 
 			// For now, just show the exception from the shader
 			if (length > 0)
-				simpleLogger::logColor(brogueConsoleColor::Red, buffer);
+				simpleLogger::logColor(simpleConsoleColor::Red, buffer);
 		}
 
 		static void outputBufferParameters(GLuint vertexBufferHandle)
@@ -150,13 +149,14 @@ namespace brogueHd::frontend
 			glGetNamedBufferParameteriv(vertexBufferHandle, GL_BUFFER_SIZE, &size);
 			glGetNamedBufferParameteriv(vertexBufferHandle, GL_BUFFER_MAP_OFFSET, &mapOffset);
 
-			simpleLogger::log("Vertex Buffer:  Id={} Usage={} Size={} MapOffset={}", vertexBufferHandle, usage, size, mapOffset);
+			simpleLogger::log("Vertex Buffer:  Id={} Usage={} Size={} MapOffset={}", vertexBufferHandle, usage, size,
+			                  mapOffset);
 		}
 
 		static void outputProgramParameters(GLuint programHandle)
 		{
 			GLchar name[256];
-			GLenum properties[3]{ GL_NAME_LENGTH , GL_TYPE, GL_ARRAY_SIZE };
+			GLenum properties[3]{GL_NAME_LENGTH, GL_TYPE, GL_ARRAY_SIZE};
 			GLint values[3];
 
 			GLint numActiveAttribs = 0;
@@ -170,7 +170,8 @@ namespace brogueHd::frontend
 				glGetProgramResourceiv(programHandle, GL_PROGRAM_INPUT, attrib, 3, &properties[0], 3, NULL, &values[0]);
 				glGetProgramResourceName(programHandle, GL_PROGRAM_INPUT, attrib, values[0], NULL, &name[0]);
 
-				simpleLogger::log("Active Attribute:  Program={} Type={} Attribute={}", programHandle, values[1], simpleString(name).c_str());
+				simpleLogger::log("Active Attribute:  Program={} Type={} Attribute={}", programHandle, values[1],
+				                  simpleString(name).c_str());
 			}
 
 			for (int attrib = 0; attrib < numActiveUniforms; ++attrib)
@@ -178,7 +179,8 @@ namespace brogueHd::frontend
 				glGetProgramResourceiv(programHandle, GL_UNIFORM, attrib, 3, &properties[0], 3, NULL, &values[0]);
 				glGetProgramResourceName(programHandle, GL_UNIFORM, attrib, values[0], NULL, &name[0]);
 
-				simpleLogger::log("Active Uniform:  Program={} Type={} Uniform={}", programHandle, values[1], simpleString(name).c_str());
+				simpleLogger::log("Active Uniform:  Program={} Type={} Uniform={}", programHandle, values[1],
+				                  simpleString(name).c_str());
 			}
 		}
 
@@ -200,7 +202,8 @@ namespace brogueHd::frontend
 			char* temp = new char[pitch]; // intermediate buffer
 			char* pixels = (char*)surface->pixels;
 
-			for (int i = 0; i < surface->h / 2; ++i) {
+			for (int i = 0; i < surface->h / 2; ++i)
+			{
 				// get pointers to the two rows to swap
 				char* row1 = pixels + i * pitch;
 				char* row2 = pixels + (surface->h - i - 1) * pitch;

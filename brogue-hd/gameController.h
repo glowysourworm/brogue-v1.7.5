@@ -19,14 +19,13 @@
 #include "simpleString.h"
 #include <exception>
 
-using namespace brogueHd::simple;
-
 namespace brogueHd::backend
 {
+	using namespace simple;
+
 	class gameController
 	{
 	public:
-
 		gameController(resourceController* resourceController);
 		~gameController();
 
@@ -82,7 +81,6 @@ namespace brogueHd::backend
 	private:
 
 	private:
-
 		bool runMenu();
 		bool runGame();
 		bool runOpenGame();
@@ -92,7 +90,6 @@ namespace brogueHd::backend
 		bool runScum();
 
 	private:
-
 		renderingController* _renderingController;
 		resourceController* _resourceController;
 		eventController* _eventController;
@@ -128,7 +125,8 @@ namespace brogueHd::backend
 		_noiseGenerator = new noiseGenerator(_randomMain);
 		_eventController = new eventController();
 		_resourceController = resourceController;
-		_renderingController = new renderingController(_eventController, resourceController, _randomCosmetic, _zoomLevel);
+		_renderingController = new renderingController(_eventController, resourceController, _randomCosmetic,
+		                                               _zoomLevel);
 		_gameMode = BrogueGameMode::Title;
 	}
 
@@ -156,12 +154,10 @@ namespace brogueHd::backend
 
 	void gameController::loadKeymap()
 	{
-
 	}
 
 	void gameController::setMode(BrogueGameMode gameMode)
 	{
-
 	}
 
 	void gameController::closeGame()
@@ -185,8 +181,8 @@ namespace brogueHd::backend
 
 		brogueGameTemplate* gameTemplate = _resourceController->getBrogueDesign_v1_7_5();
 		brogueUIBuilder uiBuilder(_eventController, _resourceController, _randomMain, _zoomLevel);
-		gridRect boundary = uiBuilder.getBrogueSceneBoundary();
-		gameGenerator generator(&uiBuilder, _randomMain, _noiseGenerator, boundary);
+		gridRect boundary = uiBuilder.getBrogueGameBoundary();
+		gameGenerator generator(_randomMain, _noiseGenerator, boundary, _zoomLevel);
 
 		_game = generator.createGame(seed, gameTemplate);
 	}
@@ -205,7 +201,8 @@ namespace brogueHd::backend
 	void gameController::initPlayback(const char* recordingPath)
 	{
 		if (_game != nullptr)
-			throw simpleException("Trying to initialize playback while a current one is loaded:  call closeGame() first");
+			throw simpleException(
+				"Trying to initialize playback while a current one is loaded:  call closeGame() first");
 
 		if (recordingPath == NULL)
 			throw simpleException("Recording path not specified");
@@ -237,13 +234,11 @@ namespace brogueHd::backend
 
 	bool gameController::runOpenGame()
 	{
-
 		return false;
 	}
 
 	bool gameController::runPlayback()
 	{
-
 		return false;
 	}
 
@@ -297,7 +292,7 @@ namespace brogueHd::backend
 		// Return Control
 		switch (_gameMode)
 		{
-			case BrogueGameMode::Game:
+		case BrogueGameMode::Game:
 			{
 				// Get the actual processing game mode for the render thread
 				BrogueGameMode renderMode = _renderingController->getRenderingGameMode();
@@ -314,13 +309,13 @@ namespace brogueHd::backend
 
 				return true;
 			}
-			case BrogueGameMode::Playback:
-			case BrogueGameMode::Title:
-				return true;
+		case BrogueGameMode::Playback:
+		case BrogueGameMode::Title:
+			return true;
 
-			case BrogueGameMode::Exit:
-			default:
-				return false;
+		case BrogueGameMode::Exit:
+		default:
+			return false;
 		}
 	}
 
@@ -340,4 +335,3 @@ namespace brogueHd::backend
 		return false;
 	}
 }
-

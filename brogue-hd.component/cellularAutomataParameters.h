@@ -1,12 +1,12 @@
 #pragma once
 
-#include "simple.h"
-#include "simpleList.h"
-
-using namespace brogueHd::component;
+#include <simple.h>
+#include <simpleList.h>
 
 namespace brogueHd::component
 {
+	using namespace simple;
+
 	struct cellularAutomataRule : simpleStruct
 	{
 		cellularAutomataRule()

@@ -22,12 +22,9 @@
     <ClInclude Include="blueprintDeclaration.h" />
     <ClInclude Include="bolt.h" />
     <ClInclude Include="boltConstants.h" />
-    <ClInclude Include="brogueCell.h" />
-    <ClInclude Include="brogueCellDisplay.h" />
     <ClInclude Include="brogueCreature.h" />
     <ClInclude Include="brogueCreatureHorde.h" />
     <ClInclude Include="broguefile.h" />
-    <ClInclude Include="brogueGame.h" />
     <ClInclude Include="brogueGameTemplate.h" />
     <ClInclude Include="brogueItem.h" />
     <ClInclude Include="brogueLevelProfile.h" />
@@ -35,7 +32,6 @@
     <ClInclude Include="brogueMachine.h" />
     <ClInclude Include="brogueObject.h" />
     <ClInclude Include="broguePlayer.h" />
-    <ClInclude Include="brogueRememberedCell.h" />
     <ClInclude Include="brogueRoomTemplate.h" />
     <ClInclude Include="colorConstants.h" />
     <ClInclude Include="creature.h" />
@@ -95,6 +91,7 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
@@ -121,6 +118,13 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>C:\Backup\_Source\Git\simple\simple.core;C:\Backup\_Source\Git\simple\simple.math;$(IncludePath)</IncludePath>
+    <ExternalIncludePath>C:\Backup\_Source\Git\simple\simple.core;C:\Backup\_Source\Git\simple\simple.math;$(ExternalIncludePath)</ExternalIncludePath>
+    <ReferencePath>C:\Backup\_Source\Git\simple\x64\Debug;$(ReferencePath)</ReferencePath>
+    <LibraryPath>C:\Backup\_Source\Git\simple\x64\Debug;$(LibraryPath)</LibraryPath>
+    <SourcePath>C:\Backup\_Source\Git\simple\simple.core;C:\Backup\_Source\Git\simple\simple.math;$(SourcePath)</SourcePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -161,16 +165,23 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdclatest</LanguageStandard_C>
+      <AdditionalIncludeDirectories>C:\Backup\_Source\Git\simple\simple.core;C:\Backup\_Source\Git\simple\simple.math;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>
       </SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <Lib>
+      <AdditionalLibraryDirectories>C:\Backup\_Source\Git\simple\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>simple.core.lib;simple.math.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>

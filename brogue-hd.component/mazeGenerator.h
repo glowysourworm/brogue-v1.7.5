@@ -3,17 +3,18 @@
 #include "grid.h"
 #include "gridRect.h"
 #include "gridMethods.h"
-#include "dungeonConstants.h"
 #include "randomGenerator.h"
-#include "simpleList.h"
-#include "simpleStack.h"
 
-using namespace brogueHd::simple;
-using namespace brogueHd::backend::model;
-using namespace brogueHd::component;
+#include <dungeonConstants.h>
+
+#include <simpleList.h>
+#include <simpleStack.h>
 
 namespace brogueHd::component
 {
+	using namespace simple;
+	using namespace brogueHd::model;
+
 	class mazeGenerator
 	{
 	public:

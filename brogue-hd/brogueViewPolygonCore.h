@@ -16,20 +16,19 @@
 #include "simpleOpenGL.h"
 #include "simplePoint.h"
 
-using namespace brogueHd::simple;
-using namespace brogueHd::component;
-
 namespace brogueHd::frontend
 {
+	using namespace simple;
+	using namespace brogueHd::component;
+
 	class brogueViewPolygonCore : public brogueViewCore<brogueLine>
 	{
 	public:
-
 		brogueViewPolygonCore(brogueCoordinateConverter* coordinateConverter,
-							  eventController* eventController,
-							  resourceController* resourceController,
-							  const brogueUIProgramPartId& partId,
-							  const brogueUIData& uiData);
+		                      eventController* eventController,
+		                      resourceController* resourceController,
+		                      const brogueUIProgramPartId& partId,
+		                      const brogueUIData& uiData);
 		~brogueViewPolygonCore();
 
 		/// <summary>
@@ -65,11 +64,10 @@ namespace brogueHd::frontend
 		/// <summary>
 		/// Sets uniform value for the brogueViewCore shader program
 		/// </summary>
-		template<isGLUniform TUniform>
+		template <isGLUniform TUniform>
 		void setUniform(const char* name, const TUniform& value);
 
 	public:
-
 		/// <summary>
 		/// Adds an edge to the polygon; but will throw an exception if it cannot be placed in a graph structure (with adjacency)
 		/// </summary>
@@ -88,20 +86,20 @@ namespace brogueHd::frontend
 		/// Overload of the checkUpdate function behaves as though the view is a child of a parent view
 		/// </summary>
 		virtual void checkUpdate(const brogueKeyboardState& keyboardState,
-								 const brogueMouseState& mouseState,
-								 int millisecondsLapsed);
+		                         const brogueMouseState& mouseState,
+		                         int millisecondsLapsed);
 
 		/// <summary>
 		/// Invalidate function that is used to check view re-buffer conditions
 		/// </summary>
 		virtual void invalidate(const brogueKeyboardState& keyboardState,
-								const brogueMouseState& mouseState);
+		                        const brogueMouseState& mouseState);
 
 		/// <summary>
 		/// Updates the view's grid cells when there has been a change to the view
 		/// </summary>
 		virtual void update(int millisecondsLapsed,
-							bool forceUpdate);
+		                    bool forceUpdate);
 
 		/// <summary>
 		/// Clears update flags from the UI tree
@@ -119,18 +117,15 @@ namespace brogueHd::frontend
 		virtual bool needsUpdate() const;
 
 	private:
-
 		/// <summary>
 		/// Sets data stream elements in the core; and resets the invalid flag.
 		/// </summary>
 		void setDataStreamElements();
 
 	protected:
-
 		brogueUIData* getUIData() const;
 
 	private:
-
 		brogueCoordinateConverter* _coordinateConverter;
 		eventController* _eventController;
 		brogueUIData* _uiData;
@@ -141,10 +136,10 @@ namespace brogueHd::frontend
 	};
 
 	brogueViewPolygonCore::brogueViewPolygonCore(brogueCoordinateConverter* coordinateConverter,
-												 eventController* eventController,
-												 resourceController* resourceController,
-												 const brogueUIProgramPartId& partId,
-												 const brogueUIData& uiData)
+	                                             eventController* eventController,
+	                                             resourceController* resourceController,
+	                                             const brogueUIProgramPartId& partId,
+	                                             const brogueUIData& uiData)
 		: brogueViewCore(resourceController, partId, uiData.getParentBoundary(), uiData.getBoundary())
 	{
 		_coordinateConverter = coordinateConverter;
@@ -179,8 +174,8 @@ namespace brogueHd::frontend
 		for (int index = 0; index < _graphUI->count(); index++)
 		{
 			simpleLine<int> line = _graphUI->get(index);
-			vec2 point1 = _coordinateConverter->getViewConverter().convertToNormalizedXY(line.node1.x, line.node1.y);
-			vec2 point2 = _coordinateConverter->getViewConverter().convertToNormalizedXY(line.node2.x, line.node2.y);
+			vec2 point1 = _coordinateConverter->getViewConverter()->convertToNormalizedXY(line.node1.x, line.node1.y);
+			vec2 point2 = _coordinateConverter->getViewConverter()->convertToNormalizedXY(line.node2.x, line.node2.y);
 
 			brogueLine streamElement1(vec3(point1.x, point1.y, 1), vec4(1, 1, 1, 1));
 			brogueLine streamElement2(vec3(point2.x, point2.y, 1), vec4(1, 1, 1, 1));
@@ -218,7 +213,7 @@ namespace brogueHd::frontend
 		return brogueViewCore<brogueLine>::glHasUniform(name);
 	}
 
-	template<isGLUniform TUniform>
+	template <isGLUniform TUniform>
 	void brogueViewPolygonCore::setUniform(const char* name, const TUniform& value)
 	{
 		brogueViewCore<brogueLine>::setUniform(name, value);
@@ -245,32 +240,32 @@ namespace brogueHd::frontend
 
 	void brogueViewPolygonCore::initiateStateChange(brogueUIState fromState, brogueUIState toState)
 	{
-
 	}
+
 	void brogueViewPolygonCore::clearStateChange()
 	{
-
 	}
+
 	bool brogueViewPolygonCore::checkStateChange()
 	{
 		return false;
 	}
 
 	void brogueViewPolygonCore::checkUpdate(const brogueKeyboardState& keyboardState,
-											const brogueMouseState& mouseState,
-											int millisecondsLapsed)
+	                                        const brogueMouseState& mouseState,
+	                                        int millisecondsLapsed)
 	{
 		// TODO
 	}
 
 	void brogueViewPolygonCore::invalidate(const brogueKeyboardState& keyboardState,
-											const brogueMouseState& mouseState)
+	                                       const brogueMouseState& mouseState)
 	{
 		_invalid = true;
 	}
 
 	void brogueViewPolygonCore::update(int millisecondsLapsed,
-										bool forceUpdate)
+	                                   bool forceUpdate)
 	{
 		if (_invalid)
 		{

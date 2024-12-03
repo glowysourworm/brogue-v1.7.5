@@ -7,6 +7,7 @@
 namespace brogueHd::component
 {
 	using namespace simple;
+	using namespace simple::math;
 
 	struct gridLocator : simpleGraphNode
 	{

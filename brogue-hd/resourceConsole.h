@@ -7,11 +7,11 @@
 #include <iosfwd>
 #include <iostream>
 
-using namespace brogueHd::simple;
-using namespace brogueHd::backend;
-
 namespace brogueHd::console
 {
+	using namespace simple;
+	using namespace brogueHd::backend;
+
 	class resourceConsole : public brogueConsole
 	{
 	public:
@@ -22,7 +22,6 @@ namespace brogueHd::console
 		void printHelp(std::ostream& stream) override;
 
 	private:
-
 		resourceController* _resourceController;
 	};
 
@@ -32,7 +31,10 @@ namespace brogueHd::console
 
 		this->consoleName = "Brogue Resource Console";
 	}
-	resourceConsole::~resourceConsole() {}
+
+	resourceConsole::~resourceConsole()
+	{
+	}
 
 	brogueConsoleReturn resourceConsole::command(simpleString input, std::ostream& stream)
 	{
@@ -43,18 +45,19 @@ namespace brogueHd::console
 
 		switch (choice)
 		{
-			case 1:
+		case 1:
 			{
 				stream << "Running unit tests..." << std::endl;
 				return brogueConsoleReturn::Completed;
 			}
 			break;
-			default:
-				return brogueConsoleReturn::Exit;
+		default:
+			return brogueConsoleReturn::Exit;
 		}
 
 		return brogueConsoleReturn::Completed;
 	}
+
 	void resourceConsole::printHelp(std::ostream& stream)
 	{
 		stream << "Brogue Resource Console:" << std::endl << std::endl;

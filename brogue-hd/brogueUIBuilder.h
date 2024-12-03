@@ -36,17 +36,16 @@
 #include "simpleOrderedList.h"
 #include "simpleString.h"
 
-using namespace brogueHd::simple;
-using namespace brogueHd::component;
-using namespace brogueHd::backend::model;
-
 namespace brogueHd::frontend
 {
+	using namespace simple;
+	using namespace brogueHd::component;
+
 	class brogueUIBuilder
 	{
 	public:
-
-		brogueUIBuilder(eventController* eventController, resourceController* resourceController, randomGenerator* randomGenerator, int zoomLevel);
+		brogueUIBuilder(eventController* eventController, resourceController* resourceController,
+		                randomGenerator* randomGenerator, int zoomLevel);
 		~brogueUIBuilder();
 
 		/// <summary>
@@ -61,7 +60,6 @@ namespace brogueHd::frontend
 		brogueCoordinateConverter* getCoordinateConverter() const;
 
 	protected:
-
 		const int FlamePeriodFadeMilliseconds = 5000;
 
 		// Brogue v1.7.5
@@ -72,7 +70,7 @@ namespace brogueHd::frontend
 		static const color FontHighScoresColor() { return color(0.596f, 0.494f, 0.996f, 1); }
 		static const color FontDefaultHotkeyColor() { return colors::yellow(); }
 		static const color FontDefaultBackgroundColor() { return color(0, 0, 0, 0); }
-		
+
 		static const color FlatMenuButtonColor() { return color(0, 0, 0, 0.85f); }
 		static const color FlatMenuButtonActiveColor1() { return color(0.3f, 0.3f, 0.3f, 0.85f); }
 		static const color FlatMenuButtonActiveColor2() { return color(0.1f, 0.1f, 0.1f, 0.85f); }
@@ -103,7 +101,6 @@ namespace brogueHd::frontend
 		static const color MenuButtonPressedColor2() { return color(0.078f, 0.058f, 0.156f, 1.0f); }
 
 	private:
-
 		gridRect getBrogueStaticBoundary(const brogueUIProgramPartId& partId);
 		gridRect getBrogueDynamicBoundary(const brogueUIProgramPartId& partId, int numberOfItems);
 
@@ -123,49 +120,60 @@ namespace brogueHd::frontend
 		brogueViewProgram* createPlaceholder(brogueUIProgram programName, const gridRect& boundary);
 
 	private:
-
 		brogueTextView* createTextViewSingleLine(brogueUIProgram programName,
-																const gridRect& boundary,
-																const simpleString& text,
-																const color& foreground,
-																const color& background1,
-																const color& background2,
-																brogueTextAlignment alignment);
-		brogueTextView* createTextView(brogueUIProgram programName, const gridRect& boundary, const simpleString& text, const color& foreground);
-		brogueTextView* createTextViewHeader(brogueUIProgram programName, const gridRect& boundary, const simpleString& text, const color& foreground);
+		                                         const gridRect& boundary,
+		                                         const simpleString& text,
+		                                         const color& foreground,
+		                                         const color& background1,
+		                                         const color& background2,
+		                                         brogueTextAlignment alignment);
+		brogueTextView* createTextView(brogueUIProgram programName, const gridRect& boundary, const simpleString& text,
+		                               const color& foreground);
+		brogueTextView* createTextViewHeader(brogueUIProgram programName, const gridRect& boundary,
+		                                     const simpleString& text, const color& foreground);
 		brogueMenuBackground* createMainMenuBackground(brogueUIProgram programName, const gridRect& boundary);
 		brogueMenuBackground* createMenuBackground(brogueUIProgram programName,
-													const gridRect& boundary,
-													const color& background1,
-													const color& background2,
-													brogueGradientType gradient);
+		                                           const gridRect& boundary,
+		                                           const color& background1,
+		                                           const color& background2,
+		                                           brogueGradientType gradient);
 		brogueBackground* createBackground(brogueUIProgram programName, const gridRect& boundary);
 		brogueScrollView* createScrollView(brogueUIProgram programName, const gridRect& boundary);
 
-		brogueButton* createFlatMenuButton(brogueUIProgram programName, const gridRect& boundary, const simpleString& text, int hotkeyIndex, brogueUIAction action);
-		brogueButton* createFlatMenuButton(brogueUIProgram programName, const gridRect& boundary, const simpleString& text, int hotkeyIndex, const brogueUITagAction& action);
-		brogueButton* createFlatMenuButton(brogueUIProgram programName, const gridRect& boundary, const colorString& text, const brogueUITagAction& action);
+		brogueButton* createFlatMenuButton(brogueUIProgram programName, const gridRect& boundary,
+		                                   const simpleString& text, int hotkeyIndex, brogueUIAction action);
+		brogueButton* createFlatMenuButton(brogueUIProgram programName, const gridRect& boundary,
+		                                   const simpleString& text, int hotkeyIndex, const brogueUITagAction& action);
+		brogueButton* createFlatMenuButton(brogueUIProgram programName, const gridRect& boundary,
+		                                   const colorString& text, const brogueUITagAction& action);
 
-		brogueButton* createMenuButton(brogueUIProgram programName, const gridRect& boundary, const simpleString& text, int hotkeyIndex, const brogueUITagAction& tagAction);
-		brogueButton* createMenuButton(brogueUIProgram programName, const gridRect& boundary, const simpleString& text, int hotkeyIndex, brogueUIAction action);
-		brogueButton* createMenuButton(brogueUIProgram programName, const gridRect& boundary, const colorString& text, const brogueUITagAction& action);
+		brogueButton* createMenuButton(brogueUIProgram programName, const gridRect& boundary, const simpleString& text,
+		                               int hotkeyIndex, const brogueUITagAction& tagAction);
+		brogueButton* createMenuButton(brogueUIProgram programName, const gridRect& boundary, const simpleString& text,
+		                               int hotkeyIndex, brogueUIAction action);
+		brogueButton* createMenuButton(brogueUIProgram programName, const gridRect& boundary, const colorString& text,
+		                               const brogueUITagAction& action);
 
-		brogueButton* createGameMenuButton(brogueUIProgram programName, const gridRect& boundary, const brogueUITagAction& action, const simpleString& text, brogueTextAlignment alignment, int hotkeyIndex);
-		brogueButton* createGameMenuButton(brogueUIProgram programName, const gridRect& boundary, const brogueUITagAction& action, const colorString& text, brogueTextAlignment alignment);
+		brogueButton* createGameMenuButton(brogueUIProgram programName, const gridRect& boundary,
+		                                   const brogueUITagAction& action, const simpleString& text,
+		                                   brogueTextAlignment alignment, int hotkeyIndex);
+		brogueButton* createGameMenuButton(brogueUIProgram programName, const gridRect& boundary,
+		                                   const brogueUITagAction& action, const colorString& text,
+		                                   brogueTextAlignment alignment);
 
-		brogueButton* createButton(brogueUIProgram programName, 
-								   const gridRect& boundary, 
-								   const colorString& text,
-								   const brogueUITagAction& tagAction,
-								   const color& background1,
-								   const color& background2,
-								   const color& hover1,
-								   const color& hover2,
-								   const color& pressed1,
-								   const color& pressed2,
-								   brogueTextAlignment alignment);
+		brogueButton* createButton(brogueUIProgram programName,
+		                           const gridRect& boundary,
+		                           const colorString& text,
+		                           const brogueUITagAction& tagAction,
+		                           const color& background1,
+		                           const color& background2,
+		                           const color& hover1,
+		                           const color& hover2,
+		                           const color& pressed1,
+		                           const color& pressed2,
+		                           brogueTextAlignment alignment);
 
-	private:	// These counters will make it a little easier to keep things separate w/o yet another constructor variable
+	private: // These counters will make it a little easier to keep things separate w/o yet another constructor variable
 
 		int _menuBackgroundCounter;
 		int _backgroundCounter;
@@ -173,7 +181,6 @@ namespace brogueHd::frontend
 		int _textCounter;
 
 	private:
-
 		brogueCoordinateConverter* _coordinateConverter;
 		eventController* _eventController;
 		resourceController* _resourceController;
@@ -181,12 +188,17 @@ namespace brogueHd::frontend
 		int _zoomLevel;
 	};
 
-	brogueUIBuilder::brogueUIBuilder(eventController* eventController, resourceController* resourceController, randomGenerator* randomGenerator, int zoomLevel)
+	brogueUIBuilder::brogueUIBuilder(eventController* eventController, resourceController* resourceController,
+	                                 randomGenerator* randomGenerator, int zoomLevel)
 	{
 		// Set up coordinate converter once -> pass it down the UI tree.
-		gridRect sceneBoundary = getBrogueStaticBoundary(brogueUIProgramPartId(brogueUIProgram::FlameMenuProgram, brogueUIProgramPart::FlameDisplay, 0));
+		gridRect sceneBoundary = getBrogueStaticBoundary(
+			brogueUIProgramPartId(brogueUIProgram::FlameMenuProgram, brogueUIProgramPart::FlameDisplay, 0));
 
-		_coordinateConverter = new brogueCoordinateConverter(resourceController, sceneBoundary.width, sceneBoundary.height, zoomLevel);
+		gridRect levelParentBoundary = getBrogueGameBoundary();
+
+		_coordinateConverter = new brogueCoordinateConverter(resourceController, sceneBoundary, levelParentBoundary,
+		                                                     zoomLevel);
 		_eventController = eventController;
 		_resourceController = resourceController;
 		_randomGenerator = randomGenerator;
@@ -199,7 +211,8 @@ namespace brogueHd::frontend
 		_buttonCounter = 1;
 		_textCounter = 1;
 	}
-	brogueUIBuilder::~brogueUIBuilder() 
+
+	brogueUIBuilder::~brogueUIBuilder()
 	{
 		delete _coordinateConverter;
 	}
@@ -208,13 +221,16 @@ namespace brogueHd::frontend
 	{
 		return gridRect(0, 0, COLS, ROWS);
 	}
+
 	gridRect brogueUIBuilder::getBrogueSceneBoundaryUI()
 	{
 		return _coordinateConverter->calculateSceneBoundaryUI();
 	}
+
 	gridRect brogueUIBuilder::getBrogueGameBoundary()
 	{
-		return getBrogueStaticBoundary(brogueUIProgramPartId(brogueUIProgram::GameProgram, brogueUIProgramPart::Background, 0));
+		return getBrogueStaticBoundary(
+			brogueUIProgramPartId(brogueUIProgram::GameProgram, brogueUIProgramPart::Background, 0));
 	}
 
 	brogueCoordinateConverter* brogueUIBuilder::getCoordinateConverter() const
@@ -226,61 +242,63 @@ namespace brogueHd::frontend
 	{
 		switch (programName)
 		{
-			case brogueUIProgram::FlameMenuProgram:
-				return createFlameMenu();
-			case brogueUIProgram::FlameMenuTitleMaskProgram:
-				return createFlameMenuTitleMask();
-			case brogueUIProgram::MainMenuProgram:
-				return createMainMenu();
-			case brogueUIProgram::OpenMenuProgram:
+		case brogueUIProgram::FlameMenuProgram:
+			return createFlameMenu();
+		case brogueUIProgram::FlameMenuTitleMaskProgram:
+			return createFlameMenuTitleMask();
+		case brogueUIProgram::MainMenuProgram:
+			return createMainMenu();
+		case brogueUIProgram::OpenMenuProgram:
 			{
 				// Read the saved games into the display
-				simpleDirectoryEntry directory = simpleFileIO::readDirectory(_resourceController->getGamesDirectory()->c_str(), ".broguesave");
+				simpleDirectoryEntry directory = simpleFileIO::readDirectory(
+					_resourceController->getGamesDirectory()->c_str(), ".broguesave");
 
 				// Creates scrollable view container
 				return createMainMenuSelector(programName, directory);
 			}
-			case brogueUIProgram::PlaybackMenuProgram:
+		case brogueUIProgram::PlaybackMenuProgram:
 			{
 				// Read the saved games into the display
-				simpleDirectoryEntry directory = simpleFileIO::readDirectory(_resourceController->getPlaybackDirectory()->c_str(), ".broguerec");
+				simpleDirectoryEntry directory = simpleFileIO::readDirectory(
+					_resourceController->getPlaybackDirectory()->c_str(), ".broguerec");
 
 				// Creates scrollable view container
 				return createMainMenuSelector(programName, directory);
 			}
-			case brogueUIProgram::HighScoresProgram:
-				return createHighScoresView();
-			case brogueUIProgram::BottomBarMenuProgram:
-				return createBottomMenuBar();
-			case brogueUIProgram::FlavorTextPanelProgram:
-				return createFlavorText();
-			case brogueUIProgram::GameObjectListProgram:
-				return createGameObjectList();
-			case brogueUIProgram::GameLogProgram:
-				return createGameLog();
-			case brogueUIProgram::GameInventoryProgram:
-				return createGameInventory();
-			case brogueUIProgram::GameMenuProgram:
-				return createGameMenu();
-			case brogueUIProgram::GameProgram:
-				return createGame();
-			case brogueUIProgram::ModalProgram:
-			case brogueUIProgram::GameHelpProgram:
-			case brogueUIProgram::GameDiscoveredItems:
+		case brogueUIProgram::HighScoresProgram:
+			return createHighScoresView();
+		case brogueUIProgram::BottomBarMenuProgram:
+			return createBottomMenuBar();
+		case brogueUIProgram::FlavorTextPanelProgram:
+			return createFlavorText();
+		case brogueUIProgram::GameObjectListProgram:
+			return createGameObjectList();
+		case brogueUIProgram::GameLogProgram:
+			return createGameLog();
+		case brogueUIProgram::GameInventoryProgram:
+			return createGameInventory();
+		case brogueUIProgram::GameMenuProgram:
+			return createGameMenu();
+		case brogueUIProgram::GameProgram:
+			return createGame();
+		case brogueUIProgram::ModalProgram:
+		case brogueUIProgram::GameHelpProgram:
+		case brogueUIProgram::GameDiscoveredItems:
 			{
 				brogueUIProgramPartId partId(programName, brogueUIProgramPart::Background, 0);
 				gridRect boundary = getBrogueStaticBoundary(partId);
 				return createPlaceholder(programName, boundary);
 			}
-			case brogueUIProgram::GameHoverTextProgram:
+		case brogueUIProgram::GameHoverTextProgram:
 			{
 				brogueUIProgramPartId partId(programName, brogueUIProgramPart::Background, 0);
 				gridRect boundary = getBrogueDynamicBoundary(partId, 3);
 				return createPlaceholder(programName, boundary);
 			}
-			case brogueUIProgram::ContainerControlledProgram:
-			default:
-				throw simpleException("Unhandled program type:  brogueUIBuilder::buildProgramView");
+		case brogueUIProgram::ContainerControlledProgram:
+		default:
+			throw simpleException("Unhandled program type:  brogueUIBuilder::buildProgramView");
 		}
 	}
 
@@ -288,55 +306,55 @@ namespace brogueHd::frontend
 	{
 		switch (partId.getPartName())
 		{
-			case brogueUIProgramPart::MenuBackground:
-			case brogueUIProgramPart::Background:
-			case brogueUIProgramPart::GameSurface:
-				switch (partId.getName())
+		case brogueUIProgramPart::MenuBackground:
+		case brogueUIProgramPart::Background:
+		case brogueUIProgramPart::GameSurface:
+			switch (partId.getName())
+			{
+			case brogueUIProgram::MainMenuProgram:
+				return gridRect(COLS - 26, ROWS - 12, 24, 11);
+			case brogueUIProgram::OpenMenuProgram:
+			case brogueUIProgram::PlaybackMenuProgram:
 				{
-					case brogueUIProgram::MainMenuProgram:
-						return gridRect(COLS - 26, ROWS - 12, 24, 11);
-					case brogueUIProgram::OpenMenuProgram:
-					case brogueUIProgram::PlaybackMenuProgram:
-					{
-						int width = COLS / 2;
-						int height = ROWS / 2;
+					int width = COLS / 2;
+					int height = ROWS / 2;
 
-						return gridRect((COLS - width) / 2, (ROWS - height) / 2, width, height);
-					}
-					case brogueUIProgram::HighScoresProgram:
-						return getBrogueSceneBoundary();
-					case brogueUIProgram::BottomBarMenuProgram:
-						return gridRect(0, ROWS - 1, COLS, 1);
-					case brogueUIProgram::GameObjectListProgram:
-						return gridRect(0, 0, COLS - DCOLS, ROWS - 1);
-					case brogueUIProgram::FlavorTextPanelProgram:
-						return gridRect(COLS - DCOLS, ROWS - 2, DCOLS, 1);
-					case brogueUIProgram::GameProgram:
-						return gridRect(COLS - DCOLS, ROWS - DROWS, DCOLS, DROWS - 1);
-					case brogueUIProgram::GameHelpProgram:
-					case brogueUIProgram::GameDiscoveredItems:
-						return gridRect(COLS - DCOLS, 0, DCOLS, ROWS);
-					case brogueUIProgram::GameMenuProgram:
-						return gridRect(COLS - 30 - 1, ROWS - 13, 30, 16);
-					case brogueUIProgram::GameLogProgram:
-						return gridRect(COLS - DCOLS, 0, DCOLS, ROWS);
-
-						// Dynamically Sized
-					case brogueUIProgram::GameInventoryProgram:
-					case brogueUIProgram::GameHoverTextProgram:
-					case brogueUIProgram::ModalProgram:
-					default:
-						throw simpleException("Unhandled brogueUIProgram part boundary:  brogueUIBuilder::getBrogueBoundary");
+					return gridRect((COLS - width) / 2, (ROWS - height) / 2, width, height);
 				}
-				break;
-			case brogueUIProgramPart::FlameDisplay:
+			case brogueUIProgram::HighScoresProgram:
 				return getBrogueSceneBoundary();
-			case brogueUIProgramPart::ColorMask:
-				return getBrogueSceneBoundary();
-			case brogueUIProgramPart::Button:
-			case brogueUIProgramPart::Text:
+			case brogueUIProgram::BottomBarMenuProgram:
+				return gridRect(0, ROWS - 1, COLS, 1);
+			case brogueUIProgram::GameObjectListProgram:
+				return gridRect(0, 0, COLS - DCOLS, ROWS - 1);
+			case brogueUIProgram::FlavorTextPanelProgram:
+				return gridRect(COLS - DCOLS, ROWS - 2, DCOLS, 1);
+			case brogueUIProgram::GameProgram:
+				return gridRect(COLS - DCOLS, ROWS - DROWS, DCOLS, DROWS - 1);
+			case brogueUIProgram::GameHelpProgram:
+			case brogueUIProgram::GameDiscoveredItems:
+				return gridRect(COLS - DCOLS, 0, DCOLS, ROWS);
+			case brogueUIProgram::GameMenuProgram:
+				return gridRect(COLS - 30 - 1, ROWS - 13, 30, 16);
+			case brogueUIProgram::GameLogProgram:
+				return gridRect(COLS - DCOLS, 0, DCOLS, ROWS);
+
+			// Dynamically Sized
+			case brogueUIProgram::GameInventoryProgram:
+			case brogueUIProgram::GameHoverTextProgram:
+			case brogueUIProgram::ModalProgram:
 			default:
 				throw simpleException("Unhandled brogueUIProgram part boundary:  brogueUIBuilder::getBrogueBoundary");
+			}
+			break;
+		case brogueUIProgramPart::FlameDisplay:
+			return getBrogueSceneBoundary();
+		case brogueUIProgramPart::ColorMask:
+			return getBrogueSceneBoundary();
+		case brogueUIProgramPart::Button:
+		case brogueUIProgramPart::Text:
+		default:
+			throw simpleException("Unhandled brogueUIProgram part boundary:  brogueUIBuilder::getBrogueBoundary");
 		}
 	}
 
@@ -344,34 +362,36 @@ namespace brogueHd::frontend
 	{
 		switch (partId.getPartName())
 		{
-			case brogueUIProgramPart::MenuBackground:
-			case brogueUIProgramPart::Background:
-				switch (partId.getName())
+		case brogueUIProgramPart::MenuBackground:
+		case brogueUIProgramPart::Background:
+			switch (partId.getName())
+			{
+			// Item boundary of the view container for the items of these menus
+			case brogueUIProgram::OpenMenuProgram:
+			case brogueUIProgram::PlaybackMenuProgram:
 				{
-					// Item boundary of the view container for the items of these menus
-					case brogueUIProgram::OpenMenuProgram:
-					case brogueUIProgram::PlaybackMenuProgram:
-					{
-						int width = COLS / 2;
-						int height = ROWS / 2;
+					int width = COLS / 2;
+					int height = ROWS / 2;
 
-						return gridRect((COLS - width) / 2, (ROWS - height) / 2, width, numberOfItems);
-					}
-
-					// Dynamically Sized
-					case brogueUIProgram::GameObjectListProgram:
-					case brogueUIProgram::GameInventoryProgram:
-						return gridRect(COLS - 40, 3, 40, numberOfItems);
-					case brogueUIProgram::GameHoverTextProgram:
-					case brogueUIProgram::GameLogProgram:
-						return gridRect(COLS - DCOLS, 0, DCOLS, numberOfItems);
-					case brogueUIProgram::ModalProgram:
-					default:
-						throw simpleException("Unhandled brogueUIProgram part dynamic boundary:  brogueUIBuilder::getBrogueBoundary");
+					return gridRect((COLS - width) / 2, (ROWS - height) / 2, width, numberOfItems);
 				}
-				break;
+
+			// Dynamically Sized
+			case brogueUIProgram::GameObjectListProgram:
+			case brogueUIProgram::GameInventoryProgram:
+				return gridRect(COLS - 40, 3, 40, numberOfItems);
+			case brogueUIProgram::GameHoverTextProgram:
+			case brogueUIProgram::GameLogProgram:
+				return gridRect(COLS - DCOLS, 0, DCOLS, numberOfItems);
+			case brogueUIProgram::ModalProgram:
 			default:
-				throw simpleException("Unhandled brogueUIProgram part dynamic boundary:  brogueUIBuilder::getBrogueBoundary");
+				throw simpleException(
+					"Unhandled brogueUIProgram part dynamic boundary:  brogueUIBuilder::getBrogueBoundary");
+			}
+			break;
+		default:
+			throw simpleException(
+				"Unhandled brogueUIProgram part dynamic boundary:  brogueUIBuilder::getBrogueBoundary");
 		}
 	}
 
@@ -383,8 +403,11 @@ namespace brogueHd::frontend
 		brogueUIData heatData(sceneBoundary, sceneBoundary, _zoomLevel, colors::transparent());
 		brogueUITagAction action(brogueUIState::MainMenu);
 
-		brogueFlameMenuHeatView* heatView = new brogueFlameMenuHeatView(_coordinateConverter, _resourceController, _eventController, _randomGenerator, heatId, heatData, this->FlamePeriodFadeMilliseconds);
-		brogueViewProgram* result = new brogueViewProgram(_coordinateConverter, brogueUIProgram::FlameMenuProgram, sceneBoundary, sceneBoundary);
+		brogueFlameMenuHeatView* heatView = new brogueFlameMenuHeatView(_coordinateConverter, _resourceController,
+		                                                                _eventController, _randomGenerator, heatId,
+		                                                                heatData, this->FlamePeriodFadeMilliseconds);
+		brogueViewProgram* result = new brogueViewProgram(_coordinateConverter, brogueUIProgram::FlameMenuProgram,
+		                                                  sceneBoundary, sceneBoundary);
 
 		// Set state change action
 		heatView->setUIAction(action);
@@ -400,9 +423,12 @@ namespace brogueHd::frontend
 
 		brogueUIProgramPartId titleId(brogueUIProgram::FlameMenuTitleMaskProgram, brogueUIProgramPart::ColorMask, 0);
 		brogueUIData titleMaskData(sceneBounds, sceneBounds, _zoomLevel, colors::transparent());
-		brogueFlameMenuTitleMask* titleMask = new brogueFlameMenuTitleMask(_coordinateConverter, _resourceController, _eventController, titleId, titleMaskData);
+		brogueFlameMenuTitleMask* titleMask = new brogueFlameMenuTitleMask(
+			_coordinateConverter, _resourceController, _eventController, titleId, titleMaskData);
 
-		brogueViewProgram* result = new brogueViewProgram(_coordinateConverter, brogueUIProgram::FlameMenuTitleMaskProgram, sceneBounds, sceneBounds);
+		brogueViewProgram* result = new brogueViewProgram(_coordinateConverter,
+		                                                  brogueUIProgram::FlameMenuTitleMaskProgram, sceneBounds,
+		                                                  sceneBounds);
 
 		result->addView(titleMask);
 		return result;
@@ -411,10 +437,12 @@ namespace brogueHd::frontend
 	brogueViewProgram* brogueUIBuilder::createMainMenu()
 	{
 		gridRect sceneBounds = getBrogueSceneBoundary();
-		gridRect menuBounds = getBrogueStaticBoundary(brogueUIProgramPartId(brogueUIProgram::MainMenuProgram, brogueUIProgramPart::MenuBackground, 0));
+		gridRect menuBounds = getBrogueStaticBoundary(
+			brogueUIProgramPartId(brogueUIProgram::MainMenuProgram, brogueUIProgramPart::MenuBackground, 0));
 		gridRect paddedBounds = menuBounds.createPadded(1);
 
-		brogueViewProgram* result = new brogueViewProgram(_coordinateConverter, brogueUIProgram::MainMenuProgram, menuBounds, sceneBounds);
+		brogueViewProgram* result = new brogueViewProgram(_coordinateConverter, brogueUIProgram::MainMenuProgram,
+		                                                  menuBounds, sceneBounds);
 
 		int buttonPadding = 1;
 
@@ -423,16 +451,30 @@ namespace brogueHd::frontend
 		for (int index = 0; index < 5; index++)
 		{
 			gridRect boundary(paddedBounds.column + buttonPadding,
-							  paddedBounds.row + ((index * buttonPadding) + ((index - 1) * buttonPadding)) + 1,
-							  paddedBounds.width - (2 * buttonPadding), 1);
+			                  paddedBounds.row + ((index * buttonPadding) + ((index - 1) * buttonPadding)) + 1,
+			                  paddedBounds.width - (2 * buttonPadding), 1);
 
-			simpleString text = index == 0 ? "New Game" : index == 1 ? "Open Game" : index == 2 ? "View Recording" : index == 3 ? "High Scores" : "Quit";
+			simpleString text = index == 0
+				                    ? "New Game"
+				                    : index == 1
+				                    ? "Open Game"
+				                    : index == 2
+				                    ? "View Recording"
+				                    : index == 3
+				                    ? "High Scores"
+				                    : "Quit";
 
-			brogueUIState state = index == 1 ? brogueUIState::OpenMenu :
-								  index == 2 ? brogueUIState::PlaybackMenu :
-								  index == 3 ? brogueUIState::HighScores : brogueUIState::Modal;
+			brogueUIState state = index == 1
+				                      ? brogueUIState::OpenMenu
+				                      : index == 2
+				                      ? brogueUIState::PlaybackMenu
+				                      : index == 3
+				                      ? brogueUIState::HighScores
+				                      : brogueUIState::Modal;
 
-			brogueUITagAction tagAction = index == 0 ? brogueUITagAction(brogueUIAction::NewGame, "") : brogueUITagAction(state);
+			brogueUITagAction tagAction = index == 0
+				                              ? brogueUITagAction(brogueUIAction::NewGame, "")
+				                              : brogueUITagAction(state);
 
 			brogueButton* button = createMenuButton(brogueUIProgram::MainMenuProgram, boundary, text, 0, tagAction);
 
@@ -442,7 +484,8 @@ namespace brogueHd::frontend
 		return result;
 	}
 
-	brogueViewProgram* brogueUIBuilder::createMainMenuSelector(brogueUIProgram programName, const simpleDirectoryEntry& files)
+	brogueViewProgram* brogueUIBuilder::createMainMenuSelector(brogueUIProgram programName,
+	                                                           const simpleDirectoryEntry& files)
 	{
 		brogueUIProgramPartId backgroundId(programName, brogueUIProgramPart::MenuBackground, 0);
 
@@ -450,9 +493,11 @@ namespace brogueHd::frontend
 		gridRect menuBounds = getBrogueStaticBoundary(backgroundId);
 		gridRect backgroundBounds = menuBounds.createExpanded(1);
 
-		simpleString headerText = programName == brogueUIProgram::OpenMenuProgram ? "~ Open Saved Game ~" :
-								  programName == brogueUIProgram::PlaybackMenuProgram ? "~ View Game Recording ~" :
-								  "~ Header ~";
+		simpleString headerText = programName == brogueUIProgram::OpenMenuProgram
+			                          ? "~ Open Saved Game ~"
+			                          : programName == brogueUIProgram::PlaybackMenuProgram
+			                          ? "~ View Game Recording ~"
+			                          : "~ Header ~";
 
 		simpleList<brogueUIColorText*> items;
 		simpleOrderedList<simpleFileEntry*> filesSorted = files.sort();
@@ -490,7 +535,8 @@ namespace brogueHd::frontend
 			items.add(new brogueUIColorText(colorText, tagAction));
 		}
 
-		brogueViewProgram* result = new brogueViewProgram(_coordinateConverter, programName, backgroundBounds, sceneBounds);
+		brogueViewProgram* result = new brogueViewProgram(_coordinateConverter, programName, backgroundBounds,
+		                                                  sceneBounds);
 
 		// Header will be a text view with no mouse interaction
 		//
@@ -528,16 +574,25 @@ namespace brogueHd::frontend
 		column += buttonWidth;
 		gridRect button5(column, ROWS - 1, buttonWidth - 2, 1);
 
-		brogueTextView* depthText = createTextViewSingleLine(brogueUIProgram::BottomBarMenuProgram, depthBounds, "-- Depth 1 --", colors::white(), colors::black(), colors::black(), brogueTextAlignment::Center);
-		brogueButton* exploreButton = createMenuButton(brogueUIProgram::BottomBarMenuProgram, button1, "Explore", 1, brogueUIAction::GameCommand_Explore);
-		brogueButton* restButton = createMenuButton(brogueUIProgram::BottomBarMenuProgram, button2, "Rest (z)", 6, brogueUIAction::GameCommand_Rest);
-		brogueButton* searchButton = createMenuButton(brogueUIProgram::BottomBarMenuProgram, button3, "Search (s)", 8, brogueUIAction::GameCommand_Search);
-		brogueButton* menuButton = createMenuButton(brogueUIProgram::BottomBarMenuProgram, button4, "Menu", -1, brogueUIAction::GameCommand_Menu);
-		brogueButton* inventoryButton = createMenuButton(brogueUIProgram::BottomBarMenuProgram, button5, "Inventory", 0, brogueUIAction::GameCommand_Inventory);
+		brogueTextView* depthText = createTextViewSingleLine(brogueUIProgram::BottomBarMenuProgram, depthBounds,
+		                                                     "-- Depth 1 --", colors::white(), colors::black(),
+		                                                     colors::black(), brogueTextAlignment::Center);
+		brogueButton* exploreButton = createMenuButton(brogueUIProgram::BottomBarMenuProgram, button1, "Explore", 1,
+		                                               brogueUIAction::GameCommand_Explore);
+		brogueButton* restButton = createMenuButton(brogueUIProgram::BottomBarMenuProgram, button2, "Rest (z)", 6,
+		                                            brogueUIAction::GameCommand_Rest);
+		brogueButton* searchButton = createMenuButton(brogueUIProgram::BottomBarMenuProgram, button3, "Search (s)", 8,
+		                                              brogueUIAction::GameCommand_Search);
+		brogueButton* menuButton = createMenuButton(brogueUIProgram::BottomBarMenuProgram, button4, "Menu", -1,
+		                                            brogueUIAction::GameCommand_Menu);
+		brogueButton* inventoryButton = createMenuButton(brogueUIProgram::BottomBarMenuProgram, button5, "Inventory", 0,
+		                                                 brogueUIAction::GameCommand_Inventory);
 
-		gridRect boundary = getBrogueStaticBoundary(brogueUIProgramPartId(brogueUIProgram::BottomBarMenuProgram, brogueUIProgramPart::Background, 0));
+		gridRect boundary = getBrogueStaticBoundary(
+			brogueUIProgramPartId(brogueUIProgram::BottomBarMenuProgram, brogueUIProgramPart::Background, 0));
 
-		brogueViewProgram* result = new brogueViewProgram(_coordinateConverter, brogueUIProgram::BottomBarMenuProgram, boundary, sceneBounds);
+		brogueViewProgram* result = new brogueViewProgram(_coordinateConverter, brogueUIProgram::BottomBarMenuProgram,
+		                                                  boundary, sceneBounds);
 
 		result->addView(depthText);
 		result->addView(exploreButton);
@@ -556,7 +611,9 @@ namespace brogueHd::frontend
 		// Brogue v1.7.5
 		gridRect sceneBounds = getBrogueSceneBoundary();
 		gridRect boundary = getBrogueStaticBoundary(brogueUIProgramPartId(program, brogueUIProgramPart::Background, 0));
-		brogueTextView* flavorText = createTextViewSingleLine(program, boundary, "You see a large Troll...", FontFlavorTextColor(), colors::black(), colors::black(), brogueTextAlignment::Left);
+		brogueTextView* flavorText = createTextViewSingleLine(program, boundary, "You see a large Troll...",
+		                                                      FontFlavorTextColor(), colors::black(), colors::black(),
+		                                                      brogueTextAlignment::Left);
 		brogueViewProgram* result = new brogueViewProgram(_coordinateConverter, program, boundary, sceneBounds);
 
 		result->addView(flavorText);
@@ -569,7 +626,8 @@ namespace brogueHd::frontend
 		brogueUIProgram programName = brogueUIProgram::GameObjectListProgram;
 
 		gridRect sceneBounds = getBrogueSceneBoundary();
-		gridRect boundary = getBrogueStaticBoundary(brogueUIProgramPartId(programName, brogueUIProgramPart::Background, 0));
+		gridRect boundary = getBrogueStaticBoundary(
+			brogueUIProgramPartId(programName, brogueUIProgramPart::Background, 0));
 		gridRect itemBounds(0, 0, COLS - DCOLS, 1);
 
 		brogueViewProgram* result = new brogueViewProgram(_coordinateConverter, programName, boundary, sceneBounds);
@@ -578,15 +636,20 @@ namespace brogueHd::frontend
 		result->addView(createBackground(programName, boundary));
 
 		// Place holders
-		result->addView(createTextViewSingleLine(programName, itemBounds, "@: You (lit)", colors::white(), colors::black(), colors::black(), brogueTextAlignment::Left));
+		result->addView(createTextViewSingleLine(programName, itemBounds, "@: You (lit)", colors::white(),
+		                                         colors::black(), colors::black(), brogueTextAlignment::Left));
 		itemBounds.translate(0, 1);
-		result->addView(createTextViewSingleLine(programName, itemBounds, "Health", colors::red(), colors::black(), colors::black(), brogueTextAlignment::Center));
+		result->addView(createTextViewSingleLine(programName, itemBounds, "Health", colors::red(), colors::black(),
+		                                         colors::black(), brogueTextAlignment::Center));
 		itemBounds.translate(0, 1);
-		result->addView(createTextViewSingleLine(programName, itemBounds, "Nutrition", colors::orange(), colors::black(), colors::black(), brogueTextAlignment::Center));
+		result->addView(createTextViewSingleLine(programName, itemBounds, "Nutrition", colors::orange(),
+		                                         colors::black(), colors::black(), brogueTextAlignment::Center));
 		itemBounds.translate(0, 1);
-		result->addView(createTextViewSingleLine(programName, itemBounds, "Str: 12 Armor: 3", colors::white(), colors::black(), colors::black(), brogueTextAlignment::Center));
+		result->addView(createTextViewSingleLine(programName, itemBounds, "Str: 12 Armor: 3", colors::white(),
+		                                         colors::black(), colors::black(), brogueTextAlignment::Center));
 		itemBounds.translate(0, 1);
-		result->addView(createTextViewSingleLine(programName, itemBounds, "Stealth Range: 14", colors::white(), colors::black(), colors::black(), brogueTextAlignment::Center));
+		result->addView(createTextViewSingleLine(programName, itemBounds, "Stealth Range: 14", colors::white(),
+		                                         colors::black(), colors::black(), brogueTextAlignment::Center));
 
 		return result;
 	}
@@ -602,13 +665,15 @@ namespace brogueHd::frontend
 
 		brogueUIProgramPartId partId(program, brogueUIProgramPart::Text, 0);
 		brogueUIData uiData(boundary, sceneBounds, _zoomLevel, MenuDefaultBackground());
-		brogueTextView* view = new brogueTextView(_coordinateConverter, _resourceController, _eventController, partId, uiData);
+		brogueTextView* view = new brogueTextView(_coordinateConverter, _resourceController, _eventController, partId,
+		                                          uiData);
 
 		view->setUIAction(brogueUITagAction(brogueUIAction::GameCommand_ToggleLog, ""));
 
 		for (int index = 0; index < boundary.height; index++)
 		{
-			view->setLine(index, simpleString("The rough stone wall is firm and unyielding"), brogueTextAlignment::Left);
+			view->setLine(index, simpleString("The rough stone wall is firm and unyielding"),
+			              brogueTextAlignment::Left);
 		}
 
 		result->addView(view);
@@ -625,36 +690,60 @@ namespace brogueHd::frontend
 		gridRect boundary = getBrogueStaticBoundary(backgroundId);
 		gridRect itemBoundary(boundary.left(), boundary.top(), boundary.width, 1);
 
-		brogueButton* button1 = createGameMenuButton(program, itemBoundary, brogueUITagAction(brogueUIAction::GameCommand_Rest), "Z: Rest Until Better", brogueTextAlignment::Left, 0);
+		brogueButton* button1 = createGameMenuButton(program, itemBoundary,
+		                                             brogueUITagAction(brogueUIAction::GameCommand_Rest),
+		                                             "Z: Rest Until Better", brogueTextAlignment::Left, 0);
 		itemBoundary.translate(0, 1);
-		brogueButton* button2 = createGameMenuButton(program, itemBoundary, brogueUITagAction(brogueUIAction::GameCommand_Autopilot), "A: Autopilot", brogueTextAlignment::Left, 0);
+		brogueButton* button2 = createGameMenuButton(program, itemBoundary,
+		                                             brogueUITagAction(brogueUIAction::GameCommand_Autopilot),
+		                                             "A: Autopilot", brogueTextAlignment::Left, 0);
 		itemBoundary.translate(0, 1);
-		brogueButton* button3 = createGameMenuButton(program, itemBoundary, brogueUITagAction(brogueUIAction::GameCommand_EasyMode), "&: Easy Mode", brogueTextAlignment::Left, 0);
-		itemBoundary.translate(0, 1);
-
-		brogueTextView* spacer1 = createTextViewSingleLine(program, itemBoundary, "  ---", colors::white(), FlatMenuButtonColor(), FlatMenuButtonColor(), brogueTextAlignment::Left);
-		itemBoundary.translate(0, 1);
-
-		brogueButton* button4 = createGameMenuButton(program, itemBoundary, brogueUITagAction(brogueUIAction::GameCommand_Rest), "]: Display Stealth Range", brogueTextAlignment::Left, 0);
-		itemBoundary.translate(0, 1);
-
-		brogueTextView* spacer2 = createTextViewSingleLine(program, itemBoundary, "  ---", colors::white(), FlatMenuButtonColor(), FlatMenuButtonColor(), brogueTextAlignment::Left);
+		brogueButton* button3 = createGameMenuButton(program, itemBoundary,
+		                                             brogueUITagAction(brogueUIAction::GameCommand_EasyMode),
+		                                             "&: Easy Mode", brogueTextAlignment::Left, 0);
 		itemBoundary.translate(0, 1);
 
-		brogueButton* button5 = createGameMenuButton(program, itemBoundary, brogueUITagAction(brogueUIState::GameDiscoveredItemsOpen), "D: Discovered Items", brogueTextAlignment::Left, 0);
-		itemBoundary.translate(0, 1);
-		brogueButton* button6 = createGameMenuButton(program, itemBoundary, brogueUITagAction(brogueUIAction::GameCommand_ViewDungeonSeed), "~: View Dungeon Seed", brogueTextAlignment::Left, 0);
-		itemBoundary.translate(0, 1);
-		brogueButton* button7 = createGameMenuButton(program, itemBoundary, brogueUITagAction(brogueUIState::GameHelpOpen), "?: Help", brogueTextAlignment::Left, 0);
+		brogueTextView* spacer1 = createTextViewSingleLine(program, itemBoundary, "  ---", colors::white(),
+		                                                   FlatMenuButtonColor(), FlatMenuButtonColor(),
+		                                                   brogueTextAlignment::Left);
 		itemBoundary.translate(0, 1);
 
-		brogueTextView* spacer3 = createTextViewSingleLine(program, itemBoundary, "  ---", colors::white(), FlatMenuButtonColor(), FlatMenuButtonColor(), brogueTextAlignment::Left);
+		brogueButton* button4 = createGameMenuButton(program, itemBoundary,
+		                                             brogueUITagAction(brogueUIAction::GameCommand_Rest),
+		                                             "]: Display Stealth Range", brogueTextAlignment::Left, 0);
 		itemBoundary.translate(0, 1);
 
-		brogueButton* button8 = createGameMenuButton(program, itemBoundary, brogueUITagAction(brogueUIAction::GameCommand_Save), "S: Save Game", brogueTextAlignment::Left, 0);
+		brogueTextView* spacer2 = createTextViewSingleLine(program, itemBoundary, "  ---", colors::white(),
+		                                                   FlatMenuButtonColor(), FlatMenuButtonColor(),
+		                                                   brogueTextAlignment::Left);
 		itemBoundary.translate(0, 1);
 
-		brogueButton* button9 = createGameMenuButton(program, itemBoundary, brogueUITagAction(brogueUIAction::GameCommand_Rest), "Q: Quit", brogueTextAlignment::Left, 0);
+		brogueButton* button5 = createGameMenuButton(program, itemBoundary,
+		                                             brogueUITagAction(brogueUIState::GameDiscoveredItemsOpen),
+		                                             "D: Discovered Items", brogueTextAlignment::Left, 0);
+		itemBoundary.translate(0, 1);
+		brogueButton* button6 = createGameMenuButton(program, itemBoundary,
+		                                             brogueUITagAction(brogueUIAction::GameCommand_ViewDungeonSeed),
+		                                             "~: View Dungeon Seed", brogueTextAlignment::Left, 0);
+		itemBoundary.translate(0, 1);
+		brogueButton* button7 = createGameMenuButton(program, itemBoundary,
+		                                             brogueUITagAction(brogueUIState::GameHelpOpen), "?: Help",
+		                                             brogueTextAlignment::Left, 0);
+		itemBoundary.translate(0, 1);
+
+		brogueTextView* spacer3 = createTextViewSingleLine(program, itemBoundary, "  ---", colors::white(),
+		                                                   FlatMenuButtonColor(), FlatMenuButtonColor(),
+		                                                   brogueTextAlignment::Left);
+		itemBoundary.translate(0, 1);
+
+		brogueButton* button8 = createGameMenuButton(program, itemBoundary,
+		                                             brogueUITagAction(brogueUIAction::GameCommand_Save),
+		                                             "S: Save Game", brogueTextAlignment::Left, 0);
+		itemBoundary.translate(0, 1);
+
+		brogueButton* button9 = createGameMenuButton(program, itemBoundary,
+		                                             brogueUITagAction(brogueUIAction::GameCommand_Rest), "Q: Quit",
+		                                             brogueTextAlignment::Left, 0);
 
 		brogueViewProgram* result = new brogueViewProgram(_coordinateConverter, program, boundary, sceneBounds);
 
@@ -687,15 +776,19 @@ namespace brogueHd::frontend
 		gridRect boundary = getBrogueDynamicBoundary(backgroundId, 8);
 		gridRect itemBoundary(boundary.left(), boundary.top(), boundary.width, 1);
 
-		brogueTextView* header = createTextViewSingleLine(program, itemBoundary, "~ Inventory ~", HeaderForegroundColor(), FlatMenuButtonColor(), FlatMenuButtonColor(), brogueTextAlignment::Center);
+		brogueTextView* header = createTextViewSingleLine(program, itemBoundary, "~ Inventory ~",
+		                                                  HeaderForegroundColor(), FlatMenuButtonColor(),
+		                                                  FlatMenuButtonColor(), brogueTextAlignment::Center);
 		itemBoundary.translate(0, 1);
 
 		// Hotkey, Glyph, Description, Modifiers (class, in hand, worn)
 		simpleString itemFormat = "{}) {} {} {}";
-		simpleString weapon = simpleExt::format(itemFormat.c_str(), "b", brogueGlyphMap::WeaponUnicode, "A +0 dagger", "<12> (in hand)").c_str();
-		simpleString armor =  simpleExt::format(itemFormat.c_str(), "d", "[", "Leather Armor", "[3]<10> (worn)").c_str();
+		simpleString weapon = simpleExt::format(itemFormat.c_str(), "b", brogueGlyphMap::WeaponUnicode, "A +0 dagger",
+		                                        "<12> (in hand)").c_str();
+		simpleString armor = simpleExt::format(itemFormat.c_str(), "d", "[", "Leather Armor", "[3]<10> (worn)").c_str();
 		simpleString food = simpleExt::format(itemFormat.c_str(), "a", ";", "Some food", "").c_str();
-		simpleString darts = simpleExt::format(itemFormat.c_str(), "c", brogueGlyphMap::WeaponUnicode, "15 +0 darts", "<10>").c_str();
+		simpleString darts = simpleExt::format(itemFormat.c_str(), "c", brogueGlyphMap::WeaponUnicode, "15 +0 darts",
+		                                       "<10>").c_str();
 
 		colorString weaponColor(weapon.c_str(), colors::white());
 		colorString armorColor(armor.c_str(), colors::white());
@@ -712,22 +805,32 @@ namespace brogueHd::frontend
 		foodColor.setColorRange(13, food.count() - 13, GameFontSubduedColor());
 		dartsColor.setColorRange(15, darts.count() - 15, GameFontSubduedColor());
 
-		brogueButton* button1 = createFlatMenuButton(program, itemBoundary, weaponColor, brogueUITagAction(brogueUIAction::GameCommand_InventorySelect));
+		brogueButton* button1 = createFlatMenuButton(program, itemBoundary, weaponColor,
+		                                             brogueUITagAction(brogueUIAction::GameCommand_InventorySelect));
 		itemBoundary.translate(0, 1);
-		brogueButton* button2 = createFlatMenuButton(program, itemBoundary, armorColor, brogueUITagAction(brogueUIAction::GameCommand_InventorySelect));
-		itemBoundary.translate(0, 1);
-
-		brogueTextView* spacer1 = createTextViewSingleLine(program, itemBoundary, "   ---", GameFontSubduedColor(), FlatMenuButtonColor(), FlatMenuButtonColor(), brogueTextAlignment::Left);
-		itemBoundary.translate(0, 1);
-
-		brogueButton* button3 = createFlatMenuButton(program, itemBoundary, foodColor, brogueUITagAction(brogueUIAction::GameCommand_InventorySelect));
-		itemBoundary.translate(0, 1);
-		brogueButton* button4 = createFlatMenuButton(program, itemBoundary, dartsColor, brogueUITagAction(brogueUIAction::GameCommand_InventorySelect));
+		brogueButton* button2 = createFlatMenuButton(program, itemBoundary, armorColor,
+		                                             brogueUITagAction(brogueUIAction::GameCommand_InventorySelect));
 		itemBoundary.translate(0, 1);
 
-		brogueTextView* spacer2 = createTextViewSingleLine(program, itemBoundary, "   You have room for 22 more items", GameFontSubduedColor(), FlatMenuButtonColor(), FlatMenuButtonColor(), brogueTextAlignment::Left);
+		brogueTextView* spacer1 = createTextViewSingleLine(program, itemBoundary, "   ---", GameFontSubduedColor(),
+		                                                   FlatMenuButtonColor(), FlatMenuButtonColor(),
+		                                                   brogueTextAlignment::Left);
 		itemBoundary.translate(0, 1);
-		brogueTextView* spacer3 = createTextViewSingleLine(program, itemBoundary, "   -- press (a-z) for more info --", GameFontSubduedColor(), FlatMenuButtonColor(), FlatMenuButtonColor(), brogueTextAlignment::Left);
+
+		brogueButton* button3 = createFlatMenuButton(program, itemBoundary, foodColor,
+		                                             brogueUITagAction(brogueUIAction::GameCommand_InventorySelect));
+		itemBoundary.translate(0, 1);
+		brogueButton* button4 = createFlatMenuButton(program, itemBoundary, dartsColor,
+		                                             brogueUITagAction(brogueUIAction::GameCommand_InventorySelect));
+		itemBoundary.translate(0, 1);
+
+		brogueTextView* spacer2 = createTextViewSingleLine(program, itemBoundary, "   You have room for 22 more items",
+		                                                   GameFontSubduedColor(), FlatMenuButtonColor(),
+		                                                   FlatMenuButtonColor(), brogueTextAlignment::Left);
+		itemBoundary.translate(0, 1);
+		brogueTextView* spacer3 = createTextViewSingleLine(program, itemBoundary, "   -- press (a-z) for more info --",
+		                                                   GameFontSubduedColor(), FlatMenuButtonColor(),
+		                                                   FlatMenuButtonColor(), brogueTextAlignment::Left);
 		itemBoundary.translate(0, 1);
 
 		brogueViewProgram* result = new brogueViewProgram(_coordinateConverter, program, boundary, sceneBounds);
@@ -753,13 +856,16 @@ namespace brogueHd::frontend
 		gridRect boundary = getBrogueStaticBoundary(partId);
 		gridRect sceneBounds = getBrogueSceneBoundary();
 		brogueUIData uiData(boundary, sceneBounds, _zoomLevel, colors::black());
-		brogueGameView* gameView = new brogueGameView(_coordinateConverter, _resourceController, _eventController, partId, uiData);
+		brogueGameView* gameView = new brogueGameView(_coordinateConverter, _resourceController, _eventController,
+		                                              partId, uiData);
 
 		brogueUIProgramPartId debugPartId(brogueUIProgram::GameProgram, brogueUIProgramPart::Polygon, 0);
 		brogueUIData debugUIData(boundary, sceneBounds, _zoomLevel, colors::transparent());
-		brogueGraphView* graphView = new brogueGraphView(_coordinateConverter, _eventController, _resourceController, debugPartId, debugUIData);
+		brogueGraphView* graphView = new brogueGraphView(_coordinateConverter, _eventController, _resourceController,
+		                                                 debugPartId, debugUIData);
 
-		brogueViewProgram* container = new brogueViewProgram(_coordinateConverter, brogueUIProgram::GameProgram, boundary, sceneBounds);
+		brogueViewProgram* container = new brogueViewProgram(_coordinateConverter, brogueUIProgram::GameProgram,
+		                                                     boundary, sceneBounds);
 
 		container->addView(gameView);
 		container->addView(graphView);
@@ -773,17 +879,20 @@ namespace brogueHd::frontend
 
 		gridRect sceneBounds = getBrogueSceneBoundary();
 
-		brogueViewProgram* result = new brogueViewProgram(_coordinateConverter, brogueUIProgram::HighScoresProgram, sceneBounds, sceneBounds);
+		brogueViewProgram* result = new brogueViewProgram(_coordinateConverter, brogueUIProgram::HighScoresProgram,
+		                                                  sceneBounds, sceneBounds);
 
 		brogueUIProgramPartId partId(brogueUIProgram::HighScoresProgram, brogueUIProgramPart::Text, 0);
 		brogueUIData uiData(sceneBounds, sceneBounds, _zoomLevel, MenuDefaultBackground());
-		brogueTextView* textView = new brogueTextView(_coordinateConverter, _resourceController, _eventController, partId, uiData);
+		brogueTextView* textView = new brogueTextView(_coordinateConverter, _resourceController, _eventController,
+		                                              partId, uiData);
 
 		textView->setUIAction(brogueUITagAction(brogueUIState::MainMenu));
 
 		// Header and Footer
 		textView->setLine(0, "-- High Scores --", colors::yellow(), brogueTextAlignment::Center);
-		textView->setLine(sceneBounds.height - 1, "Press space to continue", FontHighScoresColor(), brogueTextAlignment::Center);
+		textView->setLine(sceneBounds.height - 1, "Press space to continue", FontHighScoresColor(),
+		                  brogueTextAlignment::Center);
 
 		for (int index = 0; index < _resourceController->getHighScoreCount(); index++)
 		{
@@ -793,7 +902,8 @@ namespace brogueHd::frontend
 
 			simpleString preamble = simpleExt::format("{}) ", index + 1).c_str();
 			simpleString score = simpleExt::toString(entry->getScore()).c_str();
-			simpleString dateAndDescr = simpleExt::format("{} {}", entry->getDate()->c_str(), entry->getDescription()->c_str()).c_str();
+			simpleString dateAndDescr = simpleExt::format("{} {}", entry->getDate()->c_str(),
+			                                              entry->getDescription()->c_str()).c_str();
 
 			// Size to line up scores (5)
 			preamble.appendPadding(' ', 5 - preamble.count());
@@ -801,9 +911,11 @@ namespace brogueHd::frontend
 			// Scores (15)
 			score.appendPadding(' ', 15 - score.count() - preamble.count());
 
-			simpleString formattedEntry = simpleExt::format("{}{}{}", preamble.c_str(), score.c_str(), dateAndDescr.c_str()).c_str();
+			simpleString formattedEntry = simpleExt::format("{}{}{}", preamble.c_str(), score.c_str(),
+			                                                dateAndDescr.c_str()).c_str();
 
-			color foreGround = color::interpolate(colors::white(), colors::black(), index / (float)_resourceController->getHighScoreCount());
+			color foreGround = color::interpolate(colors::white(), colors::black(),
+			                                      index / (float)_resourceController->getHighScoreCount());
 
 			colorString coloredEntry(formattedEntry.c_str(), foreGround);
 
@@ -816,7 +928,8 @@ namespace brogueHd::frontend
 		return result;
 	}
 
-	brogueViewProgram* brogueUIBuilder::createHeaderedBackground(brogueUIProgram programName, const colorString& headerText)
+	brogueViewProgram* brogueUIBuilder::createHeaderedBackground(brogueUIProgram programName,
+	                                                             const colorString& headerText)
 	{
 		brogueUIProgramPartId menuId(programName, brogueUIProgramPart::MenuBackground, 0);
 
@@ -829,10 +942,12 @@ namespace brogueHd::frontend
 		brogueUIProgramPartId partId(programName, brogueUIProgramPart::Text, 0);
 
 		// Menu Background
-		brogueUIData uiData(boundary, sceneBounds, _zoomLevel, MenuBackgroundColor1(), MenuBackgroundColor2(), brogueGradientType::Circular);
+		brogueUIData uiData(boundary, sceneBounds, _zoomLevel, MenuBackgroundColor1(), MenuBackgroundColor2(),
+		                    brogueGradientType::Circular);
 
 		// Handles lines of text / a paragraph
-		brogueTextView* textView = new brogueTextView(_coordinateConverter, _resourceController, _eventController, partId, uiData);
+		brogueTextView* textView = new brogueTextView(_coordinateConverter, _resourceController, _eventController,
+		                                              partId, uiData);
 
 		// Header
 		textView->setLine(boundary.top(), headerText, brogueTextAlignment::Center);
@@ -846,8 +961,10 @@ namespace brogueHd::frontend
 	{
 		brogueUIProgramPartId partId(programName, brogueUIProgramPart::Background, 0);
 		gridRect sceneBounds = getBrogueSceneBoundary();
-		brogueUIData uiData(boundary, sceneBounds, _zoomLevel, _randomGenerator->nextColor(colors::getGray(0.2f), colors::getGray(0.5f)));
-		brogueBackground* background = new brogueBackground(_coordinateConverter, _resourceController, _eventController, partId, uiData);
+		brogueUIData uiData(boundary, sceneBounds, _zoomLevel,
+		                    _randomGenerator->nextColor(colors::getGray(0.2f), colors::getGray(0.5f)));
+		brogueBackground* background = new brogueBackground(_coordinateConverter, _resourceController, _eventController,
+		                                                    partId, uiData);
 		brogueViewProgram* container = new brogueViewProgram(_coordinateConverter, programName, boundary, sceneBounds);
 
 		container->addView(background);
@@ -855,7 +972,9 @@ namespace brogueHd::frontend
 		return container;
 	}
 
-	brogueButton* brogueUIBuilder::createFlatMenuButton(brogueUIProgram programName, const gridRect& boundary, const simpleString& text, int hotkeyIndex, const brogueUITagAction& action)
+	brogueButton* brogueUIBuilder::createFlatMenuButton(brogueUIProgram programName, const gridRect& boundary,
+	                                                    const simpleString& text, int hotkeyIndex,
+	                                                    const brogueUITagAction& action)
 	{
 		colorString colorText(text.c_str(), FontDefaultColor());
 
@@ -865,24 +984,28 @@ namespace brogueHd::frontend
 		return createFlatMenuButton(programName, boundary, colorText, action);
 	}
 
-	brogueButton* brogueUIBuilder::createFlatMenuButton(brogueUIProgram programName, const gridRect& boundary, const simpleString& text, int hotkeyIndex, brogueUIAction action)
+	brogueButton* brogueUIBuilder::createFlatMenuButton(brogueUIProgram programName, const gridRect& boundary,
+	                                                    const simpleString& text, int hotkeyIndex,
+	                                                    brogueUIAction action)
 	{
 		return createFlatMenuButton(programName, boundary, text, hotkeyIndex, brogueUITagAction(action));
 	}
 
-	brogueButton* brogueUIBuilder::createFlatMenuButton(brogueUIProgram programName, const gridRect& boundary, const colorString& text, const brogueUITagAction& action)
+	brogueButton* brogueUIBuilder::createFlatMenuButton(brogueUIProgram programName, const gridRect& boundary,
+	                                                    const colorString& text, const brogueUITagAction& action)
 	{
 		return createButton(programName, boundary, text, action,
-							FlatMenuButtonColor(),
-							FlatMenuButtonColor(),
-							FlatMenuButtonActiveColor1(),
-							FlatMenuButtonActiveColor2(),
-							FlatMenuButtonPressedColor1(),
-							FlatMenuButtonPressedColor2(),
-							brogueTextAlignment::Left);
+		                    FlatMenuButtonColor(),
+		                    FlatMenuButtonColor(),
+		                    FlatMenuButtonActiveColor1(),
+		                    FlatMenuButtonActiveColor2(),
+		                    FlatMenuButtonPressedColor1(),
+		                    FlatMenuButtonPressedColor2(),
+		                    brogueTextAlignment::Left);
 	}
 
-	brogueButton* brogueUIBuilder::createMenuButton(brogueUIProgram programName, const gridRect& boundary, const simpleString& text, int hotkeyIndex, brogueUIAction action)
+	brogueButton* brogueUIBuilder::createMenuButton(brogueUIProgram programName, const gridRect& boundary,
+	                                                const simpleString& text, int hotkeyIndex, brogueUIAction action)
 	{
 		colorString colorText(text.c_str(), FontDefaultColor());
 
@@ -891,7 +1014,10 @@ namespace brogueHd::frontend
 
 		return createMenuButton(programName, boundary, colorText, action);
 	}
-	brogueButton* brogueUIBuilder::createMenuButton(brogueUIProgram programName, const gridRect& boundary, const simpleString& text, int hotkeyIndex, const brogueUITagAction& tagAction)
+
+	brogueButton* brogueUIBuilder::createMenuButton(brogueUIProgram programName, const gridRect& boundary,
+	                                                const simpleString& text, int hotkeyIndex,
+	                                                const brogueUITagAction& tagAction)
 	{
 		colorString colorText(text.c_str(), FontDefaultColor());
 
@@ -900,19 +1026,24 @@ namespace brogueHd::frontend
 
 		return createMenuButton(programName, boundary, colorText, tagAction);
 	}
-	brogueButton* brogueUIBuilder::createMenuButton(brogueUIProgram programName, const gridRect& boundary, const colorString& text, const brogueUITagAction& action)
+
+	brogueButton* brogueUIBuilder::createMenuButton(brogueUIProgram programName, const gridRect& boundary,
+	                                                const colorString& text, const brogueUITagAction& action)
 	{
-		return createButton(programName, boundary, text, 
-							brogueUITagAction(action),
-							MenuButtonColor1(),
-							MenuButtonColor2(),
-							MenuButtonActiveColor1(),
-							MenuButtonActiveColor2(),
-							MenuButtonPressedColor1(),
-							MenuButtonPressedColor2(),
-							brogueTextAlignment::Center);
+		return createButton(programName, boundary, text,
+		                    brogueUITagAction(action),
+		                    MenuButtonColor1(),
+		                    MenuButtonColor2(),
+		                    MenuButtonActiveColor1(),
+		                    MenuButtonActiveColor2(),
+		                    MenuButtonPressedColor1(),
+		                    MenuButtonPressedColor2(),
+		                    brogueTextAlignment::Center);
 	}
-	brogueButton* brogueUIBuilder::createGameMenuButton(brogueUIProgram programName, const gridRect& boundary, const brogueUITagAction& action, const simpleString& text, brogueTextAlignment alignment, int hotkeyIndex)
+
+	brogueButton* brogueUIBuilder::createGameMenuButton(brogueUIProgram programName, const gridRect& boundary,
+	                                                    const brogueUITagAction& action, const simpleString& text,
+	                                                    brogueTextAlignment alignment, int hotkeyIndex)
 	{
 		colorString colorText(text.c_str(), FontDefaultColor());
 
@@ -921,59 +1052,65 @@ namespace brogueHd::frontend
 
 		return createGameMenuButton(programName, boundary, action, colorText, alignment);
 	}
-	brogueButton* brogueUIBuilder::createGameMenuButton(brogueUIProgram programName, const gridRect& boundary, const brogueUITagAction& action, const colorString& text, brogueTextAlignment alignment)
+
+	brogueButton* brogueUIBuilder::createGameMenuButton(brogueUIProgram programName, const gridRect& boundary,
+	                                                    const brogueUITagAction& action, const colorString& text,
+	                                                    brogueTextAlignment alignment)
 	{
-		return createButton(programName, boundary, text, action, 
-							FlatMenuButtonColor(), 
-							FlatMenuButtonColor(),
-							FlatMenuButtonActiveColor1(), 
-							FlatMenuButtonActiveColor2(), 
-							FlatMenuButtonPressedColor1(), 
-							FlatMenuButtonPressedColor2(), 
-							alignment);
+		return createButton(programName, boundary, text, action,
+		                    FlatMenuButtonColor(),
+		                    FlatMenuButtonColor(),
+		                    FlatMenuButtonActiveColor1(),
+		                    FlatMenuButtonActiveColor2(),
+		                    FlatMenuButtonPressedColor1(),
+		                    FlatMenuButtonPressedColor2(),
+		                    alignment);
 	}
 
 	brogueButton* brogueUIBuilder::createButton(brogueUIProgram programName,
-											    const gridRect& boundary,
-											    const colorString& text,
-											    const brogueUITagAction& tagAction,
-												const color& background1,
-												const color& background2,
-												const color& hover1,
-												const color& hover2,
-												const color& pressed1,
-												const color& pressed2,
-											    brogueTextAlignment alignment)
+	                                            const gridRect& boundary,
+	                                            const colorString& text,
+	                                            const brogueUITagAction& tagAction,
+	                                            const color& background1,
+	                                            const color& background2,
+	                                            const color& hover1,
+	                                            const color& hover2,
+	                                            const color& pressed1,
+	                                            const color& pressed2,
+	                                            brogueTextAlignment alignment)
 	{
 		gridRect sceneBounds = getBrogueSceneBoundary();
 
 		brogueUIProgramPartId partId(programName, brogueUIProgramPart::Button, _buttonCounter++);
 
 		brogueUIData buttonData(boundary,
-								sceneBounds,
-								_zoomLevel,
-								background1, background2,
-								hover1, hover2,
-								pressed1, pressed2,
-								brogueGradientType::Horizontal);
+		                        sceneBounds,
+		                        _zoomLevel,
+		                        background1, background2,
+		                        hover1, hover2,
+		                        pressed1, pressed2,
+		                        brogueGradientType::Horizontal);
 
-		brogueButton* button = new brogueButton(_coordinateConverter, _resourceController, _eventController, partId, buttonData);
+		brogueButton* button = new brogueButton(_coordinateConverter, _resourceController, _eventController, partId,
+		                                        buttonData);
 
 		button->setUI(text, alignment);
 		button->setUIAction(tagAction);
 
 		return button;
 	}
-	brogueTextView* brogueUIBuilder::createTextView(brogueUIProgram programName, 
-													const gridRect& boundary, 
-													const simpleString& text, 
-													const color& foreground)
+
+	brogueTextView* brogueUIBuilder::createTextView(brogueUIProgram programName,
+	                                                const gridRect& boundary,
+	                                                const simpleString& text,
+	                                                const color& foreground)
 	{
 		gridRect sceneBounds = getBrogueSceneBoundary();
 		brogueUIProgramPartId dataId(programName, brogueUIProgramPart::Text, _textCounter++);
 		brogueUIData data(boundary, sceneBounds, _zoomLevel, FontDefaultBackgroundColor());
 
-		brogueTextView* textView = new brogueTextView(_coordinateConverter, _resourceController, _eventController, dataId, data);
+		brogueTextView* textView = new brogueTextView(_coordinateConverter, _resourceController, _eventController,
+		                                              dataId, data);
 
 		textView->setText(colorString(text.c_str(), foreground));
 
@@ -981,15 +1118,16 @@ namespace brogueHd::frontend
 	}
 
 	brogueTextView* brogueUIBuilder::createTextViewHeader(brogueUIProgram programName,
-															const gridRect& boundary,
-															const simpleString& text,
-															const color& foreground)
+	                                                      const gridRect& boundary,
+	                                                      const simpleString& text,
+	                                                      const color& foreground)
 	{
 		gridRect sceneBounds = getBrogueSceneBoundary();
 		brogueUIProgramPartId dataId(programName, brogueUIProgramPart::Text, _textCounter++);
 		brogueUIData data(boundary, sceneBounds, _zoomLevel, MenuDefaultBackground());
 
-		brogueTextView* textView = new brogueTextView(_coordinateConverter, _resourceController, _eventController, dataId, data);
+		brogueTextView* textView = new brogueTextView(_coordinateConverter, _resourceController, _eventController,
+		                                              dataId, data);
 
 		textView->setLine(boundary.top(), text, brogueTextAlignment::Center);
 
@@ -997,19 +1135,20 @@ namespace brogueHd::frontend
 	}
 
 	brogueTextView* brogueUIBuilder::createTextViewSingleLine(brogueUIProgram programName,
-																const gridRect& boundary,
-																const simpleString& text,
-																const color& foreground,
-																const color& background1,
-																const color& background2,
-																brogueTextAlignment alignment)
+	                                                          const gridRect& boundary,
+	                                                          const simpleString& text,
+	                                                          const color& foreground,
+	                                                          const color& background1,
+	                                                          const color& background2,
+	                                                          brogueTextAlignment alignment)
 	{
 		gridRect sceneBounds = getBrogueSceneBoundary();
 
 		brogueUIProgramPartId dataId(programName, brogueUIProgramPart::Text, _textCounter++);
 		brogueUIData data(boundary, sceneBounds, _zoomLevel, background1, background2, brogueGradientType::Horizontal);
 
-		brogueTextView* textView = new brogueTextView(_coordinateConverter, _resourceController, _eventController, dataId, data);
+		brogueTextView* textView = new brogueTextView(_coordinateConverter, _resourceController, _eventController,
+		                                              dataId, data);
 
 		textView->setLine(boundary.top(), colorString(text.c_str(), foreground), alignment);
 
@@ -1033,26 +1172,31 @@ namespace brogueHd::frontend
 
 		brogueUIProgramPartId scrollId(programName, brogueUIProgramPart::MenuBackground, 0);
 
-		brogueUIData scrollData(boundary, sceneBounds, _zoomLevel, MenuDefaultBackground(), MenuDefaultBackground(), brogueGradientType::Circular);
+		brogueUIData scrollData(boundary, sceneBounds, _zoomLevel, MenuDefaultBackground(), MenuDefaultBackground(),
+		                        brogueGradientType::Circular);
 
 		return new brogueScrollView(_coordinateConverter, _resourceController, _eventController, scrollId, scrollData);
 	}
 
-	brogueMenuBackground* brogueUIBuilder::createMainMenuBackground(brogueUIProgram programName, const gridRect& boundary)
+	brogueMenuBackground* brogueUIBuilder::createMainMenuBackground(brogueUIProgram programName,
+	                                                                const gridRect& boundary)
 	{
-		return createMenuBackground(programName, boundary, MenuDefaultBackground(), colors::transparent(), brogueGradientType::Circular);
+		return createMenuBackground(programName, boundary, MenuDefaultBackground(), colors::transparent(),
+		                            brogueGradientType::Circular);
 	}
-	brogueMenuBackground* brogueUIBuilder::createMenuBackground(brogueUIProgram programName, 
-																const gridRect& boundary, 
-																const color& background1, 
-																const color& background2, 
-																brogueGradientType gradient)
+
+	brogueMenuBackground* brogueUIBuilder::createMenuBackground(brogueUIProgram programName,
+	                                                            const gridRect& boundary,
+	                                                            const color& background1,
+	                                                            const color& background2,
+	                                                            brogueGradientType gradient)
 	{
 		gridRect sceneBounds = getBrogueSceneBoundary();
 
 		brogueUIProgramPartId menuId(programName, brogueUIProgramPart::MenuBackground, _menuBackgroundCounter++);
 
-		brogueUIData menuData(boundary, sceneBounds, _zoomLevel, background1, background2, brogueGradientType::Circular);
+		brogueUIData menuData(boundary, sceneBounds, _zoomLevel, background1, background2,
+		                      brogueGradientType::Circular);
 
 		return new brogueMenuBackground(_coordinateConverter, _resourceController, _eventController, menuId, menuData);
 	}

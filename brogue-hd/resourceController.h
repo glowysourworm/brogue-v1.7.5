@@ -33,16 +33,16 @@
 #include <iosfwd>
 #include <string>
 
-using namespace brogueHd::simple;
-using namespace brogueHd::component;
-using namespace brogueHd::frontend;
-
 namespace brogueHd::backend
 {
+	using namespace simple;
+	using namespace brogueHd::component;
+	using namespace brogueHd::frontend;
+	using namespace brogueHd::backend::model;
+
 	class resourceController
 	{
 	public:
-
 		resourceController();
 		~resourceController();
 
@@ -118,19 +118,16 @@ namespace brogueHd::backend
 		}
 
 	private:
-
 		void loadHighScores(const char* path);
 		void loadPartConfigs();
 
 	private:
-
 		simpleHash<shaderResource, shaderData*>* _shaderCache;
 		simpleHash<int, simpleBitmap*>* _fontGlyphs;
 		simpleHash<brogueUIProgramPart, brogueUIProgramPartConfiguration*>* _programPartConfigs;
 		simpleList<brogueScoreEntry*>* _highScores;
 		simpleString* _gameDirectory;
 		simpleString* _playbackDirectory;
-
 	};
 
 	resourceController::resourceController()
@@ -142,6 +139,7 @@ namespace brogueHd::backend
 		_gameDirectory = nullptr;
 		_playbackDirectory = nullptr;
 	}
+
 	resourceController::~resourceController()
 	{
 		delete _shaderCache;
@@ -164,32 +162,56 @@ namespace brogueHd::backend
 
 			const char* resConfig = brogueHd::ConfigResourceConfig;
 
-			simpleString brogueLineVertSource = simpleFileIO::readTextFile(std::string(jsonConfig[resConfig][brogueHd::ConfigBrogueLineVertexShader]).c_str());
-			simpleString brogueLineRoomGraphFragSource = simpleFileIO::readTextFile(std::string(jsonConfig[resConfig][brogueHd::ConfigBrogueLineRoomGraphFragmentShader]).c_str());
-			simpleString colorMaskVertSource = simpleFileIO::readTextFile(std::string(jsonConfig[resConfig][brogueHd::ConfigColorMaskVertShader]).c_str());
-			simpleString colorMaskFragSource = simpleFileIO::readTextFile(std::string(jsonConfig[resConfig][brogueHd::ConfigColorMaskFragShader]).c_str());
-			simpleString backgroundColorVertSource = simpleFileIO::readTextFile(std::string(jsonConfig[resConfig][brogueHd::ConfigBackgroundColorVertexShader]).c_str());
-			simpleString backgroundColorFragSource = simpleFileIO::readTextFile(std::string(jsonConfig[resConfig][brogueHd::ConfigBackgroundColorFragmentShader]).c_str());
-			simpleString brogueCellDisplayVertSource = simpleFileIO::readTextFile(std::string(jsonConfig[resConfig][brogueHd::ConfigBrogueCellDisplayVertShader]).c_str());
-			simpleString brogueCellDisplayFragSource = simpleFileIO::readTextFile(std::string(jsonConfig[resConfig][brogueHd::ConfigBrogueCellDisplayFragShader]).c_str());
-			simpleString diffuseColorUpwardVertSource = simpleFileIO::readTextFile(std::string(jsonConfig[resConfig][brogueHd::ConfigDiffuseColorUpwardVertexShader]).c_str());
-			simpleString diffuseColorUpwardFragSource = simpleFileIO::readTextFile(std::string(jsonConfig[resConfig][brogueHd::ConfigDiffuseColorUpwardFragmentShader]).c_str());
-			simpleString mixFrameTexturesVertSource = simpleFileIO::readTextFile(std::string(jsonConfig[resConfig][brogueHd::ConfigMixFrameTexturesVertexShader]).c_str());
-			simpleString mixFrameTexturesFragSource = simpleFileIO::readTextFile(std::string(jsonConfig[resConfig][brogueHd::ConfigMixFrameTexturesFragmentShader]).c_str());
+			simpleString brogueLineVertSource = simpleFileIO::readTextFile(
+				std::string(jsonConfig[resConfig][brogueHd::ConfigBrogueLineVertexShader]).c_str());
+			simpleString brogueLineRoomGraphFragSource = simpleFileIO::readTextFile(
+				std::string(jsonConfig[resConfig][brogueHd::ConfigBrogueLineRoomGraphFragmentShader]).c_str());
+			simpleString colorMaskVertSource = simpleFileIO::readTextFile(
+				std::string(jsonConfig[resConfig][brogueHd::ConfigColorMaskVertShader]).c_str());
+			simpleString colorMaskFragSource = simpleFileIO::readTextFile(
+				std::string(jsonConfig[resConfig][brogueHd::ConfigColorMaskFragShader]).c_str());
+			simpleString backgroundColorVertSource = simpleFileIO::readTextFile(
+				std::string(jsonConfig[resConfig][brogueHd::ConfigBackgroundColorVertexShader]).c_str());
+			simpleString backgroundColorFragSource = simpleFileIO::readTextFile(
+				std::string(jsonConfig[resConfig][brogueHd::ConfigBackgroundColorFragmentShader]).c_str());
+			simpleString brogueCellDisplayVertSource = simpleFileIO::readTextFile(
+				std::string(jsonConfig[resConfig][brogueHd::ConfigBrogueCellDisplayVertShader]).c_str());
+			simpleString brogueCellDisplayFragSource = simpleFileIO::readTextFile(
+				std::string(jsonConfig[resConfig][brogueHd::ConfigBrogueCellDisplayFragShader]).c_str());
+			simpleString diffuseColorUpwardVertSource = simpleFileIO::readTextFile(
+				std::string(jsonConfig[resConfig][brogueHd::ConfigDiffuseColorUpwardVertexShader]).c_str());
+			simpleString diffuseColorUpwardFragSource = simpleFileIO::readTextFile(
+				std::string(jsonConfig[resConfig][brogueHd::ConfigDiffuseColorUpwardFragmentShader]).c_str());
+			simpleString mixFrameTexturesVertSource = simpleFileIO::readTextFile(
+				std::string(jsonConfig[resConfig][brogueHd::ConfigMixFrameTexturesVertexShader]).c_str());
+			simpleString mixFrameTexturesFragSource = simpleFileIO::readTextFile(
+				std::string(jsonConfig[resConfig][brogueHd::ConfigMixFrameTexturesFragmentShader]).c_str());
 
 
-			shaderData* brogueLineVert = new shaderData(shaderResource::brogueLineVert, GL_VERTEX_SHADER, brogueLineVertSource);
-			shaderData* brogueLineRoomGraphFrag = new shaderData(shaderResource::brogueLineRoomGraphFrag, GL_FRAGMENT_SHADER, brogueLineRoomGraphFragSource);
-			shaderData* colorMaskVert = new shaderData(shaderResource::colorMaskVert, GL_VERTEX_SHADER, colorMaskVertSource);
-			shaderData* colorMaskFrag = new shaderData(shaderResource::colorMaskFrag, GL_FRAGMENT_SHADER, colorMaskFragSource);
-			shaderData* backgroundColorVert = new shaderData(shaderResource::backgroundColorVert, GL_VERTEX_SHADER, backgroundColorVertSource);
-			shaderData* backgroundColorFrag = new shaderData(shaderResource::backgroundColorFrag, GL_FRAGMENT_SHADER, backgroundColorFragSource);
-			shaderData* brogueCellDisplayVert = new shaderData(shaderResource::brogueCellDisplayVert, GL_VERTEX_SHADER, brogueCellDisplayVertSource);
-			shaderData* brogueCellDisplayFrag = new shaderData(shaderResource::brogueCellDisplayFrag, GL_FRAGMENT_SHADER, brogueCellDisplayFragSource);
-			shaderData* diffuseColorUpwardVert = new shaderData(shaderResource::diffuseColorUpwardVert, GL_VERTEX_SHADER, diffuseColorUpwardVertSource);
-			shaderData* diffuseColorUpwardFrag = new shaderData(shaderResource::diffuseColorUpwardFrag, GL_FRAGMENT_SHADER, diffuseColorUpwardFragSource);
-			shaderData* mixFrameTexturesVert = new shaderData(shaderResource::mixFrameTexturesVert, GL_VERTEX_SHADER, mixFrameTexturesVertSource);
-			shaderData* mixFrameTexturesFrag = new shaderData(shaderResource::mixFrameTexturesFrag, GL_FRAGMENT_SHADER, mixFrameTexturesFragSource);
+			shaderData* brogueLineVert = new shaderData(shaderResource::brogueLineVert, GL_VERTEX_SHADER,
+			                                            brogueLineVertSource);
+			shaderData* brogueLineRoomGraphFrag = new shaderData(shaderResource::brogueLineRoomGraphFrag,
+			                                                     GL_FRAGMENT_SHADER, brogueLineRoomGraphFragSource);
+			shaderData* colorMaskVert = new shaderData(shaderResource::colorMaskVert, GL_VERTEX_SHADER,
+			                                           colorMaskVertSource);
+			shaderData* colorMaskFrag = new shaderData(shaderResource::colorMaskFrag, GL_FRAGMENT_SHADER,
+			                                           colorMaskFragSource);
+			shaderData* backgroundColorVert = new shaderData(shaderResource::backgroundColorVert, GL_VERTEX_SHADER,
+			                                                 backgroundColorVertSource);
+			shaderData* backgroundColorFrag = new shaderData(shaderResource::backgroundColorFrag, GL_FRAGMENT_SHADER,
+			                                                 backgroundColorFragSource);
+			shaderData* brogueCellDisplayVert = new shaderData(shaderResource::brogueCellDisplayVert, GL_VERTEX_SHADER,
+			                                                   brogueCellDisplayVertSource);
+			shaderData* brogueCellDisplayFrag = new shaderData(shaderResource::brogueCellDisplayFrag,
+			                                                   GL_FRAGMENT_SHADER, brogueCellDisplayFragSource);
+			shaderData* diffuseColorUpwardVert = new shaderData(shaderResource::diffuseColorUpwardVert,
+			                                                    GL_VERTEX_SHADER, diffuseColorUpwardVertSource);
+			shaderData* diffuseColorUpwardFrag = new shaderData(shaderResource::diffuseColorUpwardFrag,
+			                                                    GL_FRAGMENT_SHADER, diffuseColorUpwardFragSource);
+			shaderData* mixFrameTexturesVert = new shaderData(shaderResource::mixFrameTexturesVert, GL_VERTEX_SHADER,
+			                                                  mixFrameTexturesVertSource);
+			shaderData* mixFrameTexturesFrag = new shaderData(shaderResource::mixFrameTexturesFrag, GL_FRAGMENT_SHADER,
+			                                                  mixFrameTexturesFragSource);
 
 			_shaderCache->add(shaderResource::brogueLineVert, brogueLineVert);
 			_shaderCache->add(shaderResource::brogueLineRoomGraphFrag, brogueLineRoomGraphFrag);
@@ -208,7 +230,8 @@ namespace brogueHd::backend
 
 			for (int index = MIN_ZOOM; index <= MAX_ZOOM; index++)
 			{
-				simpleString fileName = simpleExt::format(brogueHd::FontGlyphFileNameFormat_RGBA24_UNSIGNED, index).c_str();
+				simpleString fileName = simpleExt::format(brogueHd::FontGlyphFileNameFormat_RGBA24_UNSIGNED, index).
+					c_str();
 				simpleString fullPath = simpleFileIO::filePathConcat(fontDir, fileName);
 
 				simpleBitmap* glyphSheet = simpleBitmap::fromFile(fullPath);
@@ -274,12 +297,14 @@ namespace brogueHd::backend
 
 			for (int index = 0; index < 30; index++)
 			{
-				brogueScoreEntry* entry = new brogueScoreEntry(rand(), std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()), "Killed by a Dragon");
+				brogueScoreEntry* entry = new brogueScoreEntry(
+					rand(), std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()),
+					"Killed by a Dragon");
 
 				unsorted.add(entry);
 			}
 
-			simpleList<brogueScoreEntry*> sorted = unsorted.sort([] (brogueScoreEntry* item1, brogueScoreEntry* item2)
+			simpleList<brogueScoreEntry*> sorted = unsorted.sort([](brogueScoreEntry* item1, brogueScoreEntry* item2)
 			{
 				return brogueScoreEntry::compare(*item1, *item2);
 			});
@@ -298,95 +323,95 @@ namespace brogueHd::backend
 		// Title View
 		brogueUIProgramPartConfiguration* flameDisplay =
 			new brogueUIProgramPartConfiguration(brogueUIProgramPart::FlameDisplay,
-												 shaderResource::diffuseColorUpwardVert,
-												 shaderResource::diffuseColorUpwardFrag,
-												 openglDataStreamType::brogueCellQuad,
-												 openglBrogueCellOutputSelector::NoDisplay,
-												 15,
-												 GL_TRIANGLES,
-												 false,
-												 false);
+			                                     shaderResource::diffuseColorUpwardVert,
+			                                     shaderResource::diffuseColorUpwardFrag,
+			                                     openglDataStreamType::brogueCellQuad,
+			                                     openglBrogueCellOutputSelector::NoDisplay,
+			                                     15,
+			                                     GL_TRIANGLES,
+			                                     false,
+			                                     false);
 
 		// Title View - Color Mask (Generic Part)
 		brogueUIProgramPartConfiguration* colorMask =
 			new brogueUIProgramPartConfiguration(brogueUIProgramPart::ColorMask,
-												 shaderResource::backgroundColorVert,
-												 shaderResource::backgroundColorFrag,
-												 openglDataStreamType::brogueColorQuad,
-												 openglBrogueCellOutputSelector::DisplayCurrentFrame,
-												 15,
-												 GL_TRIANGLES,
-												 false,
-												 false);
+			                                     shaderResource::backgroundColorVert,
+			                                     shaderResource::backgroundColorFrag,
+			                                     openglDataStreamType::brogueColorQuad,
+			                                     openglBrogueCellOutputSelector::DisplayCurrentFrame,
+			                                     15,
+			                                     GL_TRIANGLES,
+			                                     false,
+			                                     false);
 
 		// Game View
 		brogueUIProgramPartConfiguration* gameSurface =
 			new brogueUIProgramPartConfiguration(brogueUIProgramPart::GameSurface,
-												 shaderResource::brogueCellDisplayVert,
-												 shaderResource::brogueCellDisplayFrag,
-												 openglDataStreamType::brogueCellQuad,
-												 openglBrogueCellOutputSelector::DisplayCurrentFrame,
-												 0,
-												 GL_TRIANGLES,
-												 false,
-												 false);
+			                                     shaderResource::brogueCellDisplayVert,
+			                                     shaderResource::brogueCellDisplayFrag,
+			                                     openglDataStreamType::brogueCellQuad,
+			                                     openglBrogueCellOutputSelector::DisplayCurrentFrame,
+			                                     0,
+			                                     GL_TRIANGLES,
+			                                     false,
+			                                     false);
 
 		// Game Debug Polygon View
 		brogueUIProgramPartConfiguration* gamePolygonDebug =
 			new brogueUIProgramPartConfiguration(brogueUIProgramPart::Polygon,
-												 shaderResource::brogueLineVert,
-												 shaderResource::brogueLineRoomGraphFrag,
-												 openglDataStreamType::broguePolygon,
-												 openglBrogueCellOutputSelector::DisplayCurrentFrame,
-												 0,
-												 GL_LINES,
-												 false,
-												 false);
+			                                     shaderResource::brogueLineVert,
+			                                     shaderResource::brogueLineRoomGraphFrag,
+			                                     openglDataStreamType::broguePolygon,
+			                                     openglBrogueCellOutputSelector::DisplayCurrentFrame,
+			                                     0,
+			                                     GL_LINES,
+			                                     false,
+			                                     false);
 
 		// Generic Parts
 		brogueUIProgramPartConfiguration* button =
 			new brogueUIProgramPartConfiguration(brogueUIProgramPart::Button,
-												 shaderResource::brogueCellDisplayVert,
-												 shaderResource::brogueCellDisplayFrag,
-												 openglDataStreamType::brogueCellQuad,
-												 openglBrogueCellOutputSelector::DisplayCurrentFrame,
-												 0,
-												 GL_TRIANGLES,
-												 true,
-												 false);
+			                                     shaderResource::brogueCellDisplayVert,
+			                                     shaderResource::brogueCellDisplayFrag,
+			                                     openglDataStreamType::brogueCellQuad,
+			                                     openglBrogueCellOutputSelector::DisplayCurrentFrame,
+			                                     0,
+			                                     GL_TRIANGLES,
+			                                     true,
+			                                     false);
 
 		brogueUIProgramPartConfiguration* text =
 			new brogueUIProgramPartConfiguration(brogueUIProgramPart::Text,
-												 shaderResource::brogueCellDisplayVert,
-												 shaderResource::brogueCellDisplayFrag,
-												 openglDataStreamType::brogueCellQuad,
-												 openglBrogueCellOutputSelector::DisplayCurrentFrame,
-												 0,
-												 GL_TRIANGLES,
-												 true,
-												 false);
+			                                     shaderResource::brogueCellDisplayVert,
+			                                     shaderResource::brogueCellDisplayFrag,
+			                                     openglDataStreamType::brogueCellQuad,
+			                                     openglBrogueCellOutputSelector::DisplayCurrentFrame,
+			                                     0,
+			                                     GL_TRIANGLES,
+			                                     true,
+			                                     false);
 
 		brogueUIProgramPartConfiguration* background =
 			new brogueUIProgramPartConfiguration(brogueUIProgramPart::Background,
-												 shaderResource::backgroundColorVert,
-												 shaderResource::backgroundColorFrag,
-												 openglDataStreamType::brogueColorQuad,
-												 openglBrogueCellOutputSelector::DisplayCurrentFrame,
-												 0,
-												 GL_TRIANGLES,
-												 false,
-												 false);
+			                                     shaderResource::backgroundColorVert,
+			                                     shaderResource::backgroundColorFrag,
+			                                     openglDataStreamType::brogueColorQuad,
+			                                     openglBrogueCellOutputSelector::DisplayCurrentFrame,
+			                                     0,
+			                                     GL_TRIANGLES,
+			                                     false,
+			                                     false);
 
 		brogueUIProgramPartConfiguration* menuBackground =
 			new brogueUIProgramPartConfiguration(brogueUIProgramPart::MenuBackground,
-												 shaderResource::brogueCellDisplayVert,
-												 shaderResource::brogueCellDisplayFrag,
-												 openglDataStreamType::brogueCellQuad,
-												 openglBrogueCellOutputSelector::DisplayCurrentFrame,
-												 0,
-												 GL_TRIANGLES,
-												 true,
-												 false);
+			                                     shaderResource::brogueCellDisplayVert,
+			                                     shaderResource::brogueCellDisplayFrag,
+			                                     openglDataStreamType::brogueCellQuad,
+			                                     openglBrogueCellOutputSelector::DisplayCurrentFrame,
+			                                     0,
+			                                     GL_TRIANGLES,
+			                                     true,
+			                                     false);
 
 		_programPartConfigs->add(brogueUIProgramPart::FlameDisplay, flameDisplay);
 		_programPartConfigs->add(brogueUIProgramPart::ColorMask, colorMask);

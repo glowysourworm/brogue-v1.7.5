@@ -14,10 +14,10 @@
 #include "simpleVertexAttribute.h"
 #include <concepts>
 
-using namespace brogueHd::simple;
-
 namespace brogueHd::frontend
 {
+	using namespace simple;
+
 	/// <summary>
 	/// Representation of a shader shared by the GPU. This contains the shader handle and data needed to
 	/// compile the shader at runtime.
@@ -44,6 +44,7 @@ namespace brogueHd::frontend
 		{
 			return _source;
 		}
+
 		GLenum getShaderType() const
 		{
 			return _shaderType;
@@ -64,38 +65,38 @@ namespace brogueHd::frontend
 			openglHelper::outputShaderInfoLog(this->handle);
 		}
 
-		template<isOpenGlUniform T>
+		template <isOpenGlUniform T>
 		bool hasUniform(const simpleString& name)
 		{
 			if (std::same_as<T, int>)
-				return _uniforms1i->any([&name] (simpleUniform<int> item)
-			{
-				item.name == name;
-			});
+				return _uniforms1i->any([&name](simpleUniform<int> item)
+				{
+					item.name == name;
+				});
 
 			else if (std::same_as<T, float>)
-				return _uniforms1->any([&name] (simpleUniform<float> item)
-			{
-				item.name == name;
-			});
+				return _uniforms1->any([&name](simpleUniform<float> item)
+				{
+					item.name == name;
+				});
 
 			else if (std::same_as<T, vec2>)
-				return _uniforms2->any([&name] (simpleUniform<vec2> item)
-			{
-				item.name == name;
-			});
+				return _uniforms2->any([&name](simpleUniform<vec2> item)
+				{
+					item.name == name;
+				});
 
 			else if (std::same_as<T, ivec2>)
-				return _uniforms2i->any([&name] (simpleUniform<ivec2> item)
-			{
-				item.name == name;
-			});
+				return _uniforms2i->any([&name](simpleUniform<ivec2> item)
+				{
+					item.name == name;
+				});
 
 			else if (std::same_as<T, vec4>)
-				return _uniforms4->any([&name] (simpleUniform<vec4> item)
-			{
-				item.name == name;
-			});
+				return _uniforms4->any([&name](simpleUniform<vec4> item)
+				{
+					item.name == name;
+				});
 
 			else
 				throw simpleException("Unhandled uniform type simpleShader.h");
@@ -107,18 +108,22 @@ namespace brogueHd::frontend
 		{
 			return _uniforms1i->count();
 		}
+
 		int getUniform1Count() const
 		{
 			return _uniforms1->count();
 		}
+
 		int getUniform2Count() const
 		{
 			return _uniforms2->count();
 		}
+
 		int getUniform2iCount() const
 		{
 			return _uniforms2i->count();
 		}
+
 		int getUniform4Count() const
 		{
 			return _uniforms4->count();
@@ -128,24 +133,28 @@ namespace brogueHd::frontend
 		{
 			return _uniforms1i->get(index);
 		}
+
 		simpleUniform<float> getUniform1(int index) const
 		{
 			return _uniforms1->get(index);
 		}
+
 		simpleUniform<vec2> getUniform2(int index) const
 		{
 			return _uniforms2->get(index);
 		}
+
 		simpleUniform<ivec2> getUniform2i(int index) const
 		{
 			return _uniforms2i->get(index);
 		}
+
 		simpleUniform<vec4> getUniform4(int index) const
 		{
 			return _uniforms4->get(index);
 		}
 
-		template<isOpenGlUniform T>
+		template <isOpenGlUniform T>
 		simpleUniform<T> getUniform(int index) const
 		{
 			if (std::same_as<T, int>)
@@ -168,38 +177,40 @@ namespace brogueHd::frontend
 		}
 
 	public:
-
 		simpleArray<simpleUniform<int>> getUniforms1i() const
 		{
 			return *_uniforms1i;
 		}
+
 		simpleArray<simpleUniform<float>> getUniforms1() const
 		{
 			return *_uniforms1;
 		}
+
 		simpleArray<simpleUniform<vec2>> getUniforms2() const
 		{
 			return *_uniforms2;
 		}
+
 		simpleArray<simpleUniform<ivec2>> getUniforms2i() const
 		{
 			return *_uniforms2i;
 		}
+
 		simpleArray<simpleUniform<vec4>> getUniforms4() const
 		{
 			return *_uniforms4;
 		}
+
 		simpleArray<simpleVertexAttribute> getVertexAttributes() const
 		{
 			return *_vertexAttributes;
 		}
 
 	private:
-
 		void copyImpl(const simpleShader& copy);
 
 	private:
-
 		GLenum _shaderType;
 		simpleString _source;
 
@@ -223,6 +234,7 @@ namespace brogueHd::frontend
 
 		_shaderType = NULL;
 	}
+
 	simpleShader::~simpleShader()
 	{
 		delete _uniforms1i;
@@ -232,10 +244,12 @@ namespace brogueHd::frontend
 		delete _uniforms4;
 		delete _vertexAttributes;
 	}
+
 	simpleShader::simpleShader(const simpleShader& copy)
 	{
 		copyImpl(copy);
 	}
+
 	simpleShader::simpleShader(shaderData* data)
 	{
 		this->handle = NULL;
@@ -283,7 +297,7 @@ namespace brogueHd::frontend
 	{
 		if (!this->isCreated())
 		{
-			simpleLogger::logColor(brogueConsoleColor::Yellow, "simpleShader already deleted from the backend");
+			simpleLogger::logColor(simpleConsoleColor::Yellow, "simpleShader already deleted from the backend");
 		}
 
 		// Deletes the shader object from the GL backend

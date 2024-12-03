@@ -4,14 +4,13 @@
 #include "creature.h"
 #include "item.h"
 
-using namespace brogueHd::backend::model;
-
 namespace brogueHd::backend
 {
+	using namespace brogueHd::component;
+
 	class levelProcessor
 	{
 	public:
-
 		levelProcessor(brogueLevel* level);
 		~levelProcessor();
 
@@ -20,11 +19,11 @@ namespace brogueHd::backend
 		//color messageColorFromVictim(creatureInfo* monst);
 
 	private:
-
 		brogueLevel* _level;
 
 		creatureInfo* _player;
 	};
+
 	levelProcessor::levelProcessor(brogueLevel* level)
 	{
 		_level = level;
@@ -32,7 +31,6 @@ namespace brogueHd::backend
 
 	levelProcessor::~levelProcessor()
 	{
-
 	}
 
 	void levelProcessor::initialize()
@@ -243,36 +241,36 @@ namespace brogueHd::backend
 		//	levels[rogue.depthLevel - 1].dormantMonsters = NULL;
 		//	levels[rogue.depthLevel - 1].items = NULL;
 
-			// digDungeon();
-			// initializeLevel();
-			// setUpWaypoints();
+		// digDungeon();
+		// initializeLevel();
+		// setUpWaypoints();
 
-			//shuffleTerrainColors(100, false);
+		//shuffleTerrainColors(100, false);
 
-			//// If we somehow failed to generate the amulet altar,
-			//// just toss an amulet in there somewhere.
-			//// It'll be fiiine!
-			//if (rogue.depthLevel == AMULET_LEVEL
-			//	&& !numberOfMatchingPackItems(AMULET, 0, 0, false)
-			//	&& levels[rogue.depthLevel - 1].visited == false) {
+		//// If we somehow failed to generate the amulet altar,
+		//// just toss an amulet in there somewhere.
+		//// It'll be fiiine!
+		//if (rogue.depthLevel == AMULET_LEVEL
+		//	&& !numberOfMatchingPackItems(AMULET, 0, 0, false)
+		//	&& levels[rogue.depthLevel - 1].visited == false) {
 
-			//	for (theItem = floorItems->nextItem; theItem != NULL; theItem = theItem->nextItem) {
-			//		if (theItem->category & AMULET) {
-			//			break;
-			//		}
-			//	}
-			//	for (monst = monsters->nextCreature; monst != NULL; monst = monst->nextCreature) {
-			//		if (monst->carriedItem
-			//			&& (monst->carriedItem->category & AMULET)) {
+		//	for (theItem = floorItems->nextItem; theItem != NULL; theItem = theItem->nextItem) {
+		//		if (theItem->category & AMULET) {
+		//			break;
+		//		}
+		//	}
+		//	for (monst = monsters->nextCreature; monst != NULL; monst = monst->nextCreature) {
+		//		if (monst->carriedItem
+		//			&& (monst->carriedItem->category & AMULET)) {
 
-			//			theItem = monst->carriedItem;
-			//			break;
-			//		}
-			//	}
-			//	if (!theItem) {
-			//		placeItem(generateItem(AMULET, 0), 0, 0);
-			//	}
-			//}
+		//			theItem = monst->carriedItem;
+		//			break;
+		//		}
+		//	}
+		//	if (!theItem) {
+		//		placeItem(generateItem(AMULET, 0), 0, 0);
+		//	}
+		//}
 		//	//seedRandomGenerator(oldSeed);
 
 		//	//logLevel();
@@ -456,4 +454,3 @@ namespace brogueHd::backend
 	//	}
 	//}
 }
-

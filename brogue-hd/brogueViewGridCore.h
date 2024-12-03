@@ -26,27 +26,25 @@
 #include "simpleOpenGL.h"
 #include <concepts>
 
-using namespace brogueHd::backend::model;
-using namespace brogueHd::backend;
-
 namespace brogueHd::frontend
 {
+	using namespace brogueHd::backend::model;
+	using namespace brogueHd::backend;
+
 	/// <summary>
 	/// The view core's responsibility is to contain the simpleShaderProgram; and handle translations
 	/// back-and-forth from UI coordinates -> GL backend coordinates + stream maintenance.
 	/// </summary>	
-	template<isGLStream TStream>
+	template <isGLStream TStream>
 	class brogueViewGridCore : public brogueViewCore<TStream>
 	{
-
 	public:
-
 		brogueViewGridCore(brogueCoordinateConverter* coordinateConverter,
-						   resourceController* resourceController,
-						   eventController* eventController,
-						   const brogueUIProgramPartId& partId,
-						   const brogueUIData& data,
-						   bool hasMouseInteraction);
+		                   resourceController* resourceController,
+		                   eventController* eventController,
+		                   const brogueUIProgramPartId& partId,
+		                   const brogueUIData& data,
+		                   bool hasMouseInteraction);
 		~brogueViewGridCore();
 
 		/// <summary>
@@ -77,7 +75,7 @@ namespace brogueHd::frontend
 		/// <summary>
 		/// Sets uniform value for the brogueViewCore shader program
 		/// </summary>
-		template<isGLUniform TUniform>
+		template <isGLUniform TUniform>
 		void setUniform(const char* name, const TUniform& value);
 
 		/// <summary>
@@ -90,18 +88,21 @@ namespace brogueHd::frontend
 		/// </summary>
 		void showErrors();
 
-	private:	// GL Stream Functions
+	private: // GL Stream Functions
 
 		/// <summary>
 		/// Function used to copy over view's data elements when it is invalid
 		/// </summary>
 		void setDataStreamElements();
 
-		brogueImageQuad createBrogueImageQuad(const brogueCellDisplay& cell, openglBrogueCellOutputSelector outputSelector);
-		brogueCellQuad createBrogueCellQuad(const brogueCellDisplay& cell, openglBrogueCellOutputSelector outputSelector);
-		brogueColorQuad createBrogueColorQuad(const brogueCellDisplay& cell, openglBrogueCellOutputSelector outputSelector);
+		brogueImageQuad createBrogueImageQuad(const brogueCellDisplay& cell,
+		                                      openglBrogueCellOutputSelector outputSelector);
+		brogueCellQuad createBrogueCellQuad(const brogueCellDisplay& cell,
+		                                    openglBrogueCellOutputSelector outputSelector);
+		brogueColorQuad createBrogueColorQuad(const brogueCellDisplay& cell,
+		                                      openglBrogueCellOutputSelector outputSelector);
 
-	public:		// UI Functions
+	public: // UI Functions
 
 		/// <summary>
 		/// Gets the specified view cell's data
@@ -123,7 +124,8 @@ namespace brogueHd::frontend
 		/// from the start location -> end location. This will mirror the way the data
 		/// stream for openGL is built. So, it would be useful to use for stream operations.
 		/// </summary>
-		void iterateFrom(const gridLocator& start, const gridLocator& end, gridCallback<brogueCellDisplay> callback) const;
+		void iterateFrom(const gridLocator& start, const gridLocator& end,
+		                 gridCallback<brogueCellDisplay> callback) const;
 
 		/// <summary>
 		/// Starts animation sequences for the UI. Normal reports are drawn from checkUpdate; but the
@@ -147,20 +149,20 @@ namespace brogueHd::frontend
 		/// Overload of the checkUpdate function behaves as though the view is a child of a parent view
 		/// </summary>
 		virtual void checkUpdate(const brogueKeyboardState& keyboardState,
-								 const brogueMouseState& mouseState,
-								 int millisecondsLapsed);
+		                         const brogueMouseState& mouseState,
+		                         int millisecondsLapsed);
 
 		/// <summary>
 		/// Invalidate function that is used to check view re-buffer conditions
 		/// </summary>
 		virtual void invalidate(const brogueKeyboardState& keyboardState,
-								const brogueMouseState& mouseState);
+		                        const brogueMouseState& mouseState);
 
 		/// <summary>
 		/// Updates the view's grid cells when there has been a change to the view
 		/// </summary>
 		virtual void update(int millisecondsLapsed,
-							bool forceUpdate);
+		                    bool forceUpdate);
 
 		/// <summary>
 		/// Clears update flags from the UI tree
@@ -177,7 +179,7 @@ namespace brogueHd::frontend
 		/// </summary>
 		virtual bool needsUpdate() const;
 
-	public:		// UI Data Functions
+	public: // UI Data Functions
 
 		brogueUIProgramPartId getPartId() const;
 
@@ -190,23 +192,20 @@ namespace brogueHd::frontend
 		int getZoomLevel() const;
 		int getZIndex() const;
 
-	public:		// UI Setters
+	public: // UI Setters
 
 		void setUIAction(const brogueUITagAction& action);
 
 	protected:
-
 		brogueUIData* getUIData() const;
 		void raiseClickEvent(const brogueUITagAction& response);
 		void raiseHoverEvent(const brogueUITagAction& response);
 		virtual void setUpdate(bool mousePressed, bool mouseOver);
 
 	private:
-
 		bool _hasMouseInteraction;
 
 	private:
-
 		brogueCoordinateConverter* _coordinateConverter;
 		brogueUIProgramPartConfiguration* _configuration;
 		brogueUIProgramPartId* _partId;
@@ -218,37 +217,37 @@ namespace brogueHd::frontend
 		bool _invalid;
 
 	private:
-
 		eventController* _eventController;
 	};
 
-	template<isGLStream TStream>
+	template <isGLStream TStream>
 	brogueViewGridCore<TStream>::brogueViewGridCore(brogueCoordinateConverter* coordinateConverter,
-													resourceController* resourceController,
-													eventController* eventController,
-													const brogueUIProgramPartId& partId,
-													const brogueUIData& data,
-													bool hasMouseInteraction)
+	                                                resourceController* resourceController,
+	                                                eventController* eventController,
+	                                                const brogueUIProgramPartId& partId,
+	                                                const brogueUIData& data,
+	                                                bool hasMouseInteraction)
 		: brogueViewCore<TStream>(resourceController, partId, data.getParentBoundary(), data.getBoundary())
 	{
 		_eventController = eventController;
 		_coordinateConverter = coordinateConverter;
 		_view = new grid<brogueCellDisplay*>(data.getParentBoundary(), data.getBoundary());
-		_configuration = new brogueUIProgramPartConfiguration(*resourceController->getUIPartConfig(partId.getPartName()));
+		_configuration = new brogueUIProgramPartConfiguration(
+			*resourceController->getUIPartConfig(partId.getPartName()));
 		_partId = new brogueUIProgramPartId(partId);
 		_uiData = new brogueUIData(data);
 		_mouseData = new brogueUIMouseData();
 		_tagAction = new brogueUITagAction();
-		_hasMouseInteraction = hasMouseInteraction;											
+		_hasMouseInteraction = hasMouseInteraction;
 		_invalid = false;
 	}
 
-	template<isGLStream TStream>
+	template <isGLStream TStream>
 	brogueViewGridCore<TStream>::~brogueViewGridCore()
 	{
 		grid<brogueCellDisplay*>* grid = _view;
 
-		_view->getRelativeBoundary().iterate([&grid] (int column, int row)
+		_view->getRelativeBoundary().iterate([&grid](int column, int row)
 		{
 			if (grid->isDefined(column, row))
 				delete grid->get(column, row);
@@ -264,7 +263,7 @@ namespace brogueHd::frontend
 		delete _configuration;
 	}
 
-	template<isGLStream TStream>
+	template <isGLStream TStream>
 	void brogueViewGridCore<TStream>::setDataStreamElements()
 	{
 		// Procedure: Check the stream's size before setting elements into their place. This requires
@@ -274,7 +273,7 @@ namespace brogueHd::frontend
 		int elementSize = 0;
 
 		// Must iterate to get the size of the data stream
-		_view->iterateWhereDefined([&elementSize] (int column, int row, brogueCellDisplay* cell)
+		_view->iterateWhereDefined([&elementSize](int column, int row, brogueCellDisplay* cell)
 		{
 			elementSize++;
 
@@ -294,40 +293,41 @@ namespace brogueHd::frontend
 
 		// Now, we can send elements to the stream's buffer; and re-buffer the view's output stream to the GPU
 		//
-		_view->iterateWhereDefined([&that, &noDisplaySelector, &cursor, &configuration] (int column, int row, brogueCellDisplay* cell)
-		{
-			// Stream out elements as the iterator specifies -> ordered onto the stream.
-			if constexpr (std::same_as<TStream, brogueImageQuad>)
+		_view->iterateWhereDefined(
+			[&that, &noDisplaySelector, &cursor, &configuration](int column, int row, brogueCellDisplay* cell)
 			{
-				brogueImageQuad quad = that->createBrogueImageQuad(*cell, noDisplaySelector);
-				that->setElement(quad, cursor++);
-			}
-			else if constexpr (std::same_as<TStream, brogueCellQuad>)
-			{
-				brogueCellQuad quad = that->createBrogueCellQuad(*cell, noDisplaySelector);
-				that->setElement(quad, cursor++);
-			}
-			else if constexpr (std::same_as<TStream, brogueColorQuad>)
-			{
-				brogueColorQuad quad = that->createBrogueColorQuad(*cell, noDisplaySelector);
-				that->setElement(quad, cursor++);
-			}
-			else
-				throw simpleException("Unhandled openglDataStreamType:  brogueViewGridCore.h");
+				// Stream out elements as the iterator specifies -> ordered onto the stream.
+				if constexpr (std::same_as<TStream, brogueImageQuad>)
+				{
+					brogueImageQuad quad = that->createBrogueImageQuad(*cell, noDisplaySelector);
+					that->setElement(quad, cursor++);
+				}
+				else if constexpr (std::same_as<TStream, brogueCellQuad>)
+				{
+					brogueCellQuad quad = that->createBrogueCellQuad(*cell, noDisplaySelector);
+					that->setElement(quad, cursor++);
+				}
+				else if constexpr (std::same_as<TStream, brogueColorQuad>)
+				{
+					brogueColorQuad quad = that->createBrogueColorQuad(*cell, noDisplaySelector);
+					that->setElement(quad, cursor++);
+				}
+				else
+					throw simpleException("Unhandled openglDataStreamType:  brogueViewGridCore.h");
 
-			return iterationCallback::iterate;
-		});
+				return iterationCallback::iterate;
+			});
 
 		_invalid = false;
 	}
 
-	template<isGLStream TStream>
+	template <isGLStream TStream>
 	brogueCellDisplay brogueViewGridCore<TStream>::get(int column, int row) const
 	{
 		return *(_view->get(column, row));
 	}
 
-	template<isGLStream TStream>
+	template <isGLStream TStream>
 	void brogueViewGridCore<TStream>::set(const brogueCellDisplay& cell)
 	{
 		if (!_view->isInBounds(cell.column, cell.row))
@@ -348,92 +348,92 @@ namespace brogueHd::frontend
 		_invalid = true;
 	}
 
-	template<isGLStream TStream>
+	template <isGLStream TStream>
 	bool brogueViewGridCore<TStream>::hasUniform(const char* name)
 	{
 		return brogueViewCore<TStream>::glHasUniform(name);
 	}
 
-	template<isGLStream TStream>
-	template<isGLUniform TUniform>
+	template <isGLStream TStream>
+	template <isGLUniform TUniform>
 	void brogueViewGridCore<TStream>::setUniform(const char* name, const TUniform& value)
 	{
 		brogueViewCore<TStream>::setUniform(name, value);
 	}
 
-	template<isGLStream TStream>
+	template <isGLStream TStream>
 	bool brogueViewGridCore<TStream>::hasErrors()
 	{
 		return brogueViewCore<TStream>::glHasErrors();
 	}
 
-	template<isGLStream TStream>
+	template <isGLStream TStream>
 	void brogueViewGridCore<TStream>::showErrors()
 	{
 		brogueViewCore<TStream>::glShowErrors();
 	}
 
-	template<isGLStream TStream>
+	template <isGLStream TStream>
 	brogueUIProgramPartId brogueViewGridCore<TStream>::getPartId() const
 	{
 		return *_partId;
 	}
 
-	template<isGLStream TStream>
+	template <isGLStream TStream>
 	brogueUIData* brogueViewGridCore<TStream>::getUIData() const
 	{
 		return _uiData;
 	}
 
-	template<isGLStream TStream>
+	template <isGLStream TStream>
 	bool brogueViewGridCore<TStream>::getHasMouseInteraction() const
 	{
 		return _hasMouseInteraction;
 	}
 
-	template<isGLStream TStream>
+	template <isGLStream TStream>
 	bool brogueViewGridCore<TStream>::getMouseOver() const
 	{
 		return _mouseData->getMouseOver();
 	}
 
-	template<isGLStream TStream>
+	template <isGLStream TStream>
 	bool brogueViewGridCore<TStream>::getMouseEnter() const
 	{
 		return _mouseData->getMouseEnter();
 	}
 
-	template<isGLStream TStream>
+	template <isGLStream TStream>
 	bool brogueViewGridCore<TStream>::getMouseLeave() const
 	{
 		return _mouseData->getMouseLeave();
 	}
 
-	template<isGLStream TStream>
+	template <isGLStream TStream>
 	bool brogueViewGridCore<TStream>::getMousePressed() const
 	{
-		return _mouseData->getMouseDown();	// Check that capture works like it should
+		return _mouseData->getMouseDown(); // Check that capture works like it should
 	}
 
-	template<isGLStream TStream>
+	template <isGLStream TStream>
 	bool brogueViewGridCore<TStream>::getMousePressedChanged() const
 	{
 		return _mouseData->getMousePressedChanged();
 	}
 
-	template<isGLStream TStream>
+	template <isGLStream TStream>
 	int brogueViewGridCore<TStream>::getZoomLevel() const
 	{
 		return _uiData->getZoomLevel();
 	}
 
-	template<isGLStream TStream>
+	template <isGLStream TStream>
 	int brogueViewGridCore<TStream>::getZIndex() const
 	{
 		return _uiData->getZIndex();
 	}
 
-	template<isGLStream TStream>
+	template <isGLStream TStream>
 	void brogueViewGridCore<TStream>::setUIAction(const brogueUITagAction& action)
 	{
 		_tagAction->set(action);
@@ -442,90 +442,90 @@ namespace brogueHd::frontend
 		_hasMouseInteraction = true;
 	}
 
-	template<isGLStream TStream>
+	template <isGLStream TStream>
 	void brogueViewGridCore<TStream>::raiseClickEvent(const brogueUITagAction& response)
 	{
 		_eventController->getUIClickEvent()->publish(_partId->getName(), response);
 	}
 
-	template<isGLStream TStream>
+	template <isGLStream TStream>
 	void brogueViewGridCore<TStream>::raiseHoverEvent(const brogueUITagAction& response)
 	{
 		_eventController->getUIHoverEvent()->publish(_partId->getName(), response);
 	}
 
-	template<isGLStream TStream>
+	template <isGLStream TStream>
 	void brogueViewGridCore<TStream>::setUpdate(bool mousePressed, bool mouseOver)
 	{
 		_mouseData->setUpdate(mousePressed, mouseOver);
 	}
 
-	template<isGLStream TStream>
+	template <isGLStream TStream>
 	void brogueViewGridCore<TStream>::initiateStateChange(brogueUIState fromState, brogueUIState toState)
 	{
 		// Must inherit this function
 	}
 
-	template<isGLStream TStream>
+	template <isGLStream TStream>
 	void brogueViewGridCore<TStream>::clearStateChange()
 	{
 		// Nothing to do
 	}
 
-	template<isGLStream TStream>
+	template <isGLStream TStream>
 	bool brogueViewGridCore<TStream>::checkStateChange()
 	{
 		// Finished with changes (nothing to do)
 		return false;
 	}
 
-	template<isGLStream TStream>
+	template <isGLStream TStream>
 	void brogueViewGridCore<TStream>::clearUpdate()
 	{
 		_invalid = false;
 	}
 
-	template<isGLStream TStream>
+	template <isGLStream TStream>
 	void brogueViewGridCore<TStream>::clearEvents()
 	{
 		_mouseData->clear();
 	}
 
-	template<isGLStream TStream>
+	template <isGLStream TStream>
 	void brogueViewGridCore<TStream>::invalidate(const brogueKeyboardState& keyboardState,
-												 const brogueMouseState& mouseState)
+	                                             const brogueMouseState& mouseState)
 	{
 		_invalid = true;
 	}
 
-	template<isGLStream TStream>
+	template <isGLStream TStream>
 	void brogueViewGridCore<TStream>::invalidate()
 	{
 		_invalid = true;
 	}
 
-	template<isGLStream TStream>
+	template <isGLStream TStream>
 	void brogueViewGridCore<TStream>::run()
 	{
 		brogueViewCore<TStream>::glDraw();
 	}
 
-	template<isGLStream TStream>
+	template <isGLStream TStream>
 	void brogueViewGridCore<TStream>::activate()
 	{
 		brogueViewCore<TStream>::glActivate();
 	}
 
-	template<isGLStream TStream>
+	template <isGLStream TStream>
 	void brogueViewGridCore<TStream>::deactivate()
 	{
 		brogueViewCore<TStream>::glDeactivate();
 	}
 
-	template<isGLStream TStream>
+	template <isGLStream TStream>
 	void brogueViewGridCore<TStream>::checkUpdate(const brogueKeyboardState& keyboardState,
-												  const brogueMouseState& mouseState,
-												  int millisecondsLapsed)
+	                                              const brogueMouseState& mouseState,
+	                                              int millisecondsLapsed)
 	{
 		// Check for mouse over (calculate for THIS render-cycle)
 		bool isMouseOver = _uiData->getBoundary().contains(mouseState.getLocation());
@@ -547,9 +547,9 @@ namespace brogueHd::frontend
 		}
 	}
 
-	template<isGLStream TStream>
+	template <isGLStream TStream>
 	void brogueViewGridCore<TStream>::update(int millisecondsLapsed,
-											 bool forceUpdate)
+	                                         bool forceUpdate)
 	{
 		// Invalid:  Re-Buffer the output stream
 		//
@@ -560,7 +560,7 @@ namespace brogueHd::frontend
 		}
 	}
 
-	template<isGLStream TStream>
+	template <isGLStream TStream>
 	bool brogueViewGridCore<TStream>::needsUpdate() const
 	{
 		// For more granularity, there needs to be overrides in the child class. Also, 
@@ -568,43 +568,47 @@ namespace brogueHd::frontend
 		return _invalid;
 	}
 
-	template<isGLStream TStream>
+	template <isGLStream TStream>
 	void brogueViewGridCore<TStream>::iterate(gridCallback<brogueCellDisplay> callback) const
 	{
 		_view->iterateWhereDefined(callback);
 	}
 
-	template<isGLStream TStream>
-	void brogueViewGridCore<TStream>::iterateFrom(const gridLocator& start, const gridLocator& end, gridCallback<brogueCellDisplay> callback) const
+	template <isGLStream TStream>
+	void brogueViewGridCore<TStream>::iterateFrom(const gridLocator& start, const gridLocator& end,
+	                                              gridCallback<brogueCellDisplay> callback) const
 	{
 		_view->iterateFrom(start, end, callback);
 	}
 
-	template<isGLStream TStream>
-	brogueImageQuad brogueViewGridCore<TStream>::createBrogueImageQuad(const brogueCellDisplay& cell, openglBrogueCellOutputSelector outputSelector)
+	template <isGLStream TStream>
+	brogueImageQuad brogueViewGridCore<TStream>::createBrogueImageQuad(const brogueCellDisplay& cell,
+	                                                                   openglBrogueCellOutputSelector outputSelector)
 	{
-		simpleQuad quadXY = _coordinateConverter->getViewConverter().createQuadNormalizedXY_FromLocator(cell.column, cell.row);
-		simpleQuad quadUV = _coordinateConverter->getViewConverter().createQuadNormalizedUV_FromLocator(cell.column, cell.row);
+		simpleQuad quadXY = _coordinateConverter->getViewConverter()->createQuadNormalizedXY_FromLocator(cell.column, cell.row);
+		simpleQuad quadUV = _coordinateConverter->getViewConverter()->createQuadNormalizedUV_FromLocator(cell.column, cell.row);
 
 		return brogueImageQuad(cell, quadXY, quadUV);
 	}
 
-	template<isGLStream TStream>
-	brogueCellQuad brogueViewGridCore<TStream>::createBrogueCellQuad(const brogueCellDisplay& cell, openglBrogueCellOutputSelector outputSelector)
+	template <isGLStream TStream>
+	brogueCellQuad brogueViewGridCore<TStream>::createBrogueCellQuad(const brogueCellDisplay& cell,
+	                                                                 openglBrogueCellOutputSelector outputSelector)
 	{
 		gridLocator glyphLocation = _coordinateConverter->getGlyphMap()->getGlyphLocation(cell.character);
 
-		simpleQuad quadXY = _coordinateConverter->getViewConverter().createQuadNormalizedXY_FromLocator(cell.column, cell.row);
-		simpleQuad quadUV = _coordinateConverter->getViewConverter().createQuadNormalizedUV_FromLocator(cell.column, cell.row);
-		simpleQuad glyphUV = _coordinateConverter->getGlyphConverter().createQuadNormalizedUV_FromLocator(glyphLocation);
+		simpleQuad quadXY = _coordinateConverter->getViewConverter()->createQuadNormalizedXY_FromLocator(cell.column, cell.row);
+		simpleQuad quadUV = _coordinateConverter->getViewConverter()->createQuadNormalizedUV_FromLocator(cell.column, cell.row);
+		simpleQuad glyphUV = _coordinateConverter->getGlyphConverter()->createQuadNormalizedUV_FromLocator(glyphLocation);
 
 		return brogueCellQuad(cell, quadXY, quadUV, glyphUV, outputSelector);
 	}
 
-	template<isGLStream TStream>
-	brogueColorQuad brogueViewGridCore<TStream>::createBrogueColorQuad(const brogueCellDisplay& cell, openglBrogueCellOutputSelector outputSelector)
+	template <isGLStream TStream>
+	brogueColorQuad brogueViewGridCore<TStream>::createBrogueColorQuad(const brogueCellDisplay& cell,
+	                                                                   openglBrogueCellOutputSelector outputSelector)
 	{
-		simpleQuad quadXY = _coordinateConverter->getViewConverter().createQuadNormalizedXY_FromLocator(cell.column, cell.row);
+		simpleQuad quadXY = _coordinateConverter->getViewConverter()->createQuadNormalizedXY_FromLocator(cell.column, cell.row);
 
 		return brogueColorQuad(cell, quadXY);
 	}

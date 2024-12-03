@@ -9,18 +9,16 @@
 #include "gridRect.h"
 #include "item.h"
 
-using namespace brogueHd::component;
-
-namespace brogueHd::backend
+namespace brogueHd::component
 {
 	class contentGenerator
 	{
 	public:
-
 		contentGenerator(const gridRect& levelBoundary)
 		{
 			_validLocations = new grid<bool>(levelBoundary, levelBoundary);
 		}
+
 		~contentGenerator()
 		{
 			delete _validLocations;
@@ -29,18 +27,16 @@ namespace brogueHd::backend
 		brogueContentGrid* generateLevelContents(brogueLayout* layout);
 
 	private:
-
 		void placeStairs();
 
 	private:
-
 		grid<bool>* _validLocations;
 	};
 
 	brogueContentGrid* contentGenerator::generateLevelContents(brogueLayout* layout)
 	{
 		int i, j, dir;
-		int upLoc[2], downLoc[2], ** mapToStairs, ** mapToPit;
+		int upLoc[2], downLoc[2], **mapToStairs, **mapToPit;
 		creatureInfo* monst;
 		itemBase* theItem;
 		char grid[DCOLS][DROWS];

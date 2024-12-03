@@ -11,8 +11,6 @@
 #include "simpleExt.h"
 #include "simpleGlData.h"
 
-using namespace brogueHd::backend::model;
-
 namespace brogueHd::frontend
 {
 	struct brogueColorQuad : public brogueQuad
@@ -22,12 +20,14 @@ namespace brogueHd::frontend
 			vertexCoordinates = default_value::value<simpleQuad>();
 			backgroundColor = default_value::value<vec4>();
 		}
+
 		brogueColorQuad(const brogueColorQuad& copy)
 		{
 			copyImpl(copy);
 		}
+
 		brogueColorQuad(const brogueCellDisplay& cell,
-						const simpleQuad& vertices)
+		                const simpleQuad& vertices)
 		{
 			location.column = cell.column;
 			location.row = cell.row;
@@ -38,9 +38,10 @@ namespace brogueHd::frontend
 
 			vertexCoordinates = vertices;
 		}
+
 		brogueColorQuad(const gridLocator& locator,
-						const color& theColor,
-						const simpleQuad& vertices)
+		                const color& theColor,
+		                const simpleQuad& vertices)
 		{
 			location.column = locator.column;
 			location.row = locator.row;
@@ -51,6 +52,7 @@ namespace brogueHd::frontend
 
 			vertexCoordinates = vertices;
 		}
+
 		void operator=(const brogueColorQuad& copy)
 		{
 			copyImpl(copy);
@@ -61,29 +63,31 @@ namespace brogueHd::frontend
 			// Total # of calls to the shader
 			switch (primitiveType)
 			{
-				case GL_TRIANGLES:
-					return 6;
-				default:
-					throw simpleException(simpleExt::format("Unhandled primitive type for GLQuad:  {}", primitiveType));
-					break;
+			case GL_TRIANGLES:
+				return 6;
+			default:
+				throw simpleException(simpleExt::format("Unhandled primitive type for GLQuad:  {}", primitiveType));
+				break;
 			}
 		}
+
 		int getStreamSize(GLenum primitiveType) const override
 		{
 			switch (primitiveType)
 			{
-				case GL_TRIANGLES:
-					return 36 * sizeof(float);
-				default:
-					throw simpleException(simpleExt::format("Unhandled primitive type for GLQuad:  {}", primitiveType));
-					break;
+			case GL_TRIANGLES:
+				return 36 * sizeof(float);
+			default:
+				throw simpleException(simpleExt::format("Unhandled primitive type for GLQuad:  {}", primitiveType));
+				break;
 			}
 		}
+
 		void streamBuffer(GLenum primitiveType, simpleDataStream* outputStream) const override
 		{
 			switch (primitiveType)
 			{
-				case GL_TRIANGLES:
+			case GL_TRIANGLES:
 				{
 					// Need to map out the vertex shader's "layout" parameters. Each shader call is 
 					// to the current vertex. So, for a triangle pair, each of the values must go out
@@ -98,33 +102,33 @@ namespace brogueHd::frontend
 					// Total Data:  6 floats per vertex * 6 vertices = 36 (floats)
 
 					// Triangle 1: Top Left (32 floats total)
-					vertexCoordinates.topLeft.streamBuffer(primitiveType, outputStream);			// vec2
-					backgroundColor.streamBuffer(primitiveType, outputStream);						// vec4
+					vertexCoordinates.topLeft.streamBuffer(primitiveType, outputStream); // vec2
+					backgroundColor.streamBuffer(primitiveType, outputStream); // vec4
 
 					// Triangle 1:  Top Right
-					vertexCoordinates.topRight.streamBuffer(primitiveType, outputStream);			// vec2
-					backgroundColor.streamBuffer(primitiveType, outputStream);						// vec4
+					vertexCoordinates.topRight.streamBuffer(primitiveType, outputStream); // vec2
+					backgroundColor.streamBuffer(primitiveType, outputStream); // vec4
 
 					// Triangle 1:  Bottom Right
-					vertexCoordinates.bottomRight.streamBuffer(primitiveType, outputStream);		// vec2
-					backgroundColor.streamBuffer(primitiveType, outputStream);						// vec4
+					vertexCoordinates.bottomRight.streamBuffer(primitiveType, outputStream); // vec2
+					backgroundColor.streamBuffer(primitiveType, outputStream); // vec4
 
 					// Triangle 2: Top Left
-					vertexCoordinates.topLeft.streamBuffer(primitiveType, outputStream);			// vec2
-					backgroundColor.streamBuffer(primitiveType, outputStream);						// vec4
+					vertexCoordinates.topLeft.streamBuffer(primitiveType, outputStream); // vec2
+					backgroundColor.streamBuffer(primitiveType, outputStream); // vec4
 
 					// Triangle 2:  Bottom Right
-					vertexCoordinates.bottomRight.streamBuffer(primitiveType, outputStream);		// vec2
-					backgroundColor.streamBuffer(primitiveType, outputStream);						// vec4
+					vertexCoordinates.bottomRight.streamBuffer(primitiveType, outputStream); // vec2
+					backgroundColor.streamBuffer(primitiveType, outputStream); // vec4
 
 					// Triangle 2:  Bottom Left
-					vertexCoordinates.bottomLeft.streamBuffer(primitiveType, outputStream);			// vec2
-					backgroundColor.streamBuffer(primitiveType, outputStream);						// vec4
+					vertexCoordinates.bottomLeft.streamBuffer(primitiveType, outputStream); // vec2
+					backgroundColor.streamBuffer(primitiveType, outputStream); // vec4
 				}
 				break;
-				default:
-					throw simpleException(simpleExt::format("Unhandled primitive type for GLQuad:  {}", primitiveType));
-					break;
+			default:
+				throw simpleException(simpleExt::format("Unhandled primitive type for GLQuad:  {}", primitiveType));
+				break;
 			}
 		}
 
@@ -141,7 +145,6 @@ namespace brogueHd::frontend
 		}
 
 	private:
-
 		void copyImpl(const brogueColorQuad& copy)
 		{
 			location = copy.location;
@@ -150,7 +153,6 @@ namespace brogueHd::frontend
 		}
 
 	public:
-
 		simpleQuad vertexCoordinates;
 
 		vec4 backgroundColor;

@@ -19,10 +19,15 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="brogueCell.h" />
+    <ClInclude Include="brogueCellDisplay.h" />
     <ClInclude Include="brogueContentGrid.h" />
     <ClInclude Include="brogueDesignRect.h" />
+    <ClInclude Include="brogueGame.h" />
+    <ClInclude Include="brogueGlyphMap.h" />
     <ClInclude Include="brogueLayout.h" />
     <ClInclude Include="brogueLevel.h" />
+    <ClInclude Include="brogueRememberedCell.h" />
     <ClInclude Include="brogueRoom.h" />
     <ClInclude Include="cellularAutomataGenerator.h" />
     <ClInclude Include="cellularAutomataParameters.h" />
@@ -40,6 +45,7 @@
     <ClInclude Include="gridRegionConstructor.h" />
     <ClInclude Include="gridRegionExtension.h" />
     <ClInclude Include="gridRegionLocator.h" />
+    <ClInclude Include="layoutCoordinateConverter.h" />
     <ClInclude Include="layoutGenerator.h" />
     <ClInclude Include="mazeGenerator.h" />
     <ClInclude Include="noiseGenerator.h" />
@@ -48,6 +54,9 @@
     <ClInclude Include="rectanglePackingAlgorithm.h" />
     <ClInclude Include="roomGenerator.h" />
     <ClInclude Include="terrainGenerator.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="gridRect.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
@@ -75,6 +84,7 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
@@ -101,6 +111,13 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>..\brogue-hd.model;C:\Backup\_Source\Git\simple\simple.core;C:\Backup\_Source\Git\simple\simple.math;$(IncludePath)</IncludePath>
+    <ExternalIncludePath>..\brogue-hd.model;C:\Backup\_Source\Git\simple\simple.core;C:\Backup\_Source\Git\simple\simple.math;$(ExternalIncludePath)</ExternalIncludePath>
+    <ReferencePath>C:\Backup\_Source\Git\simple\x64\Debug;$(ReferencePath)</ReferencePath>
+    <LibraryPath>C:\Backup\_Source\Git\simple\x64\Debug;$(LibraryPath)</LibraryPath>
+    <SourcePath>..\brogue-hd.model;C:\Backup\_Source\Git\simple\simple.core;C:\Backup\_Source\Git\simple\simple.math;$(SourcePath)</SourcePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -141,16 +158,23 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdclatest</LanguageStandard_C>
+      <AdditionalIncludeDirectories>..\brogue-hd.model;C:\Backup\_Source\Git\simple\simple.core;C:\Backup\_Source\Git\simple\simple.math;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>
       </SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <Lib>
+      <AdditionalDependencies>simple.core.lib;simple.math.lib;brogue-hd.model.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Backup\_Source\Git\simple\x64\Debug;C:\Backup\_Source\Git\brogue-v1.7.5\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>

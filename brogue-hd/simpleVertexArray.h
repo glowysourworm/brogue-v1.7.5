@@ -8,15 +8,15 @@
 #include "simpleLogger.h"
 #include "simpleVertexBuffer.h"
 
-using namespace brogueHd::simple;
-
 namespace brogueHd::frontend
 {
+	using namespace simple;
+
 	/// <summary>
 	/// Corresponds to the VAO objects in OpenGL. These are used to manage the VBO Vertex Buffer objects
 	/// that are stored on the GL backend
 	/// </summary>
-	template<typename T>
+	template <typename T>
 	class simpleVertexArray : public simpleGlObject
 	{
 	public:
@@ -32,6 +32,7 @@ namespace brogueHd::frontend
 		{
 			return this->handle != simpleGlObject::HandleNull && openglHelper::getVAOCreated(this->handle);
 		}
+
 		bool isBound() const override
 		{
 			return openglHelper::getVAOBinding(this->handle);
@@ -65,28 +66,26 @@ namespace brogueHd::frontend
 		}
 
 	protected:
-
 		/// <summary>
 		/// Have to handle lazy initialization of the VBO for zero-data cases during compilation.
 		/// </summary>
 		void initializeVertexBuffer();
 
 	private:
-
 		// Primary VBO vertex buffer objects indexed by the OpenGL BufferIndex
 		GLenum _primitiveType;
 		simpleVertexBuffer<T>* _vertexBuffer;
 		GLuint _programHandle;
 	};
 
-	template<typename T>
+	template <typename T>
 	simpleVertexArray<T>::simpleVertexArray()
 	{
 		_vertexBuffer = new simpleVertexBuffer<T>();
 		_programHandle = simpleGlObject::HandleNull;
 	}
 
-	template<typename T>
+	template <typename T>
 	simpleVertexArray<T>::simpleVertexArray(const GLenum& primitiveType, simpleVertexBuffer<T>* vertexBuffer)
 	{
 		_primitiveType = primitiveType;
@@ -94,14 +93,14 @@ namespace brogueHd::frontend
 		_programHandle = simpleGlObject::HandleNull;
 	}
 
-	template<typename T>
+	template <typename T>
 	simpleVertexArray<T>::~simpleVertexArray()
 	{
 		// THESE ARE (MAY BE) CREATED BY THE SCENE BUILDER!
 		delete _vertexBuffer;
 	}
 
-	template<typename T>
+	template <typename T>
 	void simpleVertexArray<T>::glCreate(GLuint programHandle)
 	{
 		if (this->isCreated())
@@ -128,10 +127,10 @@ namespace brogueHd::frontend
 			initializeVertexBuffer();
 
 		if (!this->isCreated())
-			simpleLogger::logColor(brogueConsoleColor::Yellow, "simpleVertexArray error creating the VAO");
+			simpleLogger::logColor(simpleConsoleColor::Yellow, "simpleVertexArray error creating the VAO");
 	}
 
-	template<typename T>
+	template <typename T>
 	void simpleVertexArray<T>::initializeVertexBuffer()
 	{
 		if (!this->isCreated())
@@ -146,16 +145,16 @@ namespace brogueHd::frontend
 		_vertexBuffer->glCreate(_programHandle);
 	}
 
-	template<typename T>
+	template <typename T>
 	void simpleVertexArray<T>::showActives() const
 	{
 		if (!_vertexBuffer->isCreated())
-			simpleLogger::logColor(brogueConsoleColor::Blue, "Vertex Buffer Not Yet Created:  VAO={}", this->handle);
+			simpleLogger::logColor(simpleConsoleColor::Blue, "Vertex Buffer Not Yet Created:  VAO={}", this->handle);
 
 		_vertexBuffer->showActives();
 	}
 
-	template<typename T>
+	template <typename T>
 	void simpleVertexArray<T>::reBuffer(GLuint programHandle, bool forceNew)
 	{
 		if (!this->isCreated())
@@ -173,7 +172,7 @@ namespace brogueHd::frontend
 			_vertexBuffer->reBuffer(programHandle, forceNew);
 	}
 
-	template<typename T>
+	template <typename T>
 	simpleDataStream* simpleVertexArray<T>::getStream() const
 	{
 		if (!this->isCreated())
@@ -182,15 +181,16 @@ namespace brogueHd::frontend
 		return _vertexBuffer->getStream();
 	}
 
-	template<typename T>
+	template <typename T>
 	void simpleVertexArray<T>::teardown()
 	{
 		if (!this->isCreated())
 		{
-			simpleLogger::logColor(brogueConsoleColor::Yellow, "simpleVertexArray already deleted from the backend");
-			simpleLogger::logColor(brogueConsoleColor::Yellow, "simpleVertexArray-> Continuing on to try and delete other GPU resources");
+			simpleLogger::logColor(simpleConsoleColor::Yellow, "simpleVertexArray already deleted from the backend");
+			simpleLogger::logColor(simpleConsoleColor::Yellow,
+			                       "simpleVertexArray-> Continuing on to try and delete other GPU resources");
 		}
-			
+
 
 		// Teardown vertex buffers
 		if (_vertexBuffer->isCreated())
@@ -202,7 +202,7 @@ namespace brogueHd::frontend
 		this->handle = simpleGlObject::HandleNull;
 	}
 
-	template<typename T>
+	template <typename T>
 	void simpleVertexArray<T>::draw()
 	{
 		if (!this->isCreated())
@@ -222,7 +222,7 @@ namespace brogueHd::frontend
 		glDrawArrays(_primitiveType, 0, _vertexBuffer->getBufferLength());
 	}
 
-	template<typename T>
+	template <typename T>
 	void simpleVertexArray<T>::bind()
 	{
 		if (!this->isCreated())

@@ -9,16 +9,15 @@
 #include "simpleException.h"
 #include "simpleString.h"
 
-using namespace brogueHd::simple;
-using namespace brogueHd::component;
-using namespace brogueHd::backend::model;
-
 namespace brogueHd::frontend
 {
+	using namespace simple;
+	using namespace brogueHd::component;
+	using namespace brogueHd::backend;
+
 	class brogueUIText
 	{
 	public:
-
 		brogueUIText(const gridRect& sceneBoundary, const gridRect& boundary, const simpleString& text);
 		brogueUIText(const gridRect& sceneBoundary, const gridRect& boundary, const colorString& text);
 		~brogueUIText();
@@ -30,18 +29,17 @@ namespace brogueHd::frontend
 
 		void setLine(int row, const colorString& text, brogueTextAlignment alignment);
 		void setLine(int row, const simpleString& text, brogueTextAlignment alignment);
-		void setLine(int row, const simpleString& text, const color& foreground, const color& hotkeyForeground, int hotkeyIndex, brogueTextAlignment alignment);
+		void setLine(int row, const simpleString& text, const color& foreground, const color& hotkeyForeground,
+		             int hotkeyIndex, brogueTextAlignment alignment);
 		void setText(const colorString& text);
 		void setText(const simpleString& text);
 
 		void set(int column, int row, const color& foreground, char character);
 
 	private:
-
 		int calculateTextOffset(brogueTextAlignment alignment, int lineCount);
 
 	private:
-
 		grid<color>* _foregroundGrid;
 		grid<char>* _characterGrid;
 	};
@@ -53,6 +51,7 @@ namespace brogueHd::frontend
 
 		setText(text);
 	}
+
 	brogueUIText::brogueUIText(const gridRect& sceneBoundary, const gridRect& boundary, const simpleString& text)
 	{
 		_foregroundGrid = new grid<color>(sceneBoundary, boundary);
@@ -60,11 +59,13 @@ namespace brogueHd::frontend
 
 		setText(text);
 	}
+
 	brogueUIText::~brogueUIText()
 	{
 		delete _foregroundGrid;
 		delete _characterGrid;
 	}
+
 	brogueUIText::brogueUIText(const brogueUIText& copy)
 	{
 		brogueUIText* that = this;
@@ -72,7 +73,7 @@ namespace brogueHd::frontend
 		_foregroundGrid = new grid<color>(copy.getBoundary(), copy.getBoundary());
 		_characterGrid = new grid<char>(copy.getBoundary(), copy.getBoundary());
 
-		copy.getBoundary().iterate([&that, &copy] (int column, int row)
+		copy.getBoundary().iterate([&that, &copy](int column, int row)
 		{
 			that->set(column, row, copy.getForeground(column, row), copy.getCharacter(column, row));
 
@@ -87,37 +88,42 @@ namespace brogueHd::frontend
 
 		switch (alignment)
 		{
-			case brogueTextAlignment::Left:
-				break;
-			case brogueTextAlignment::Right:
-				textBeginIndex = boundary.right() - textLength - boundary.column;
-				break;
-			case brogueTextAlignment::Center:
-				textBeginIndex = ((boundary.right() - textLength - boundary.column) / 2) + 1;
-				break;
-			default:
-				throw simpleException("Unhandled brogueTextAlignment:  brogueUIText.h");
+		case brogueTextAlignment::Left:
+			break;
+		case brogueTextAlignment::Right:
+			textBeginIndex = boundary.right() - textLength - boundary.column;
+			break;
+		case brogueTextAlignment::Center:
+			textBeginIndex = ((boundary.right() - textLength - boundary.column) / 2) + 1;
+			break;
+		default:
+			throw simpleException("Unhandled brogueTextAlignment:  brogueUIText.h");
 		}
 
 		return textBeginIndex;
 	}
+
 	gridRect brogueUIText::getBoundary() const
 	{
 		return _characterGrid->getRelativeBoundary();
 	}
+
 	color brogueUIText::getForeground(int column, int row) const
 	{
 		return _foregroundGrid->get(column, row);
 	}
+
 	char brogueUIText::getCharacter(int column, int row) const
 	{
 		return _characterGrid->get(column, row);
 	}
+
 	void brogueUIText::set(int column, int row, const color& foreground, char character)
 	{
 		_foregroundGrid->set(column, row, foreground, true);
 		_characterGrid->set(column, row, character, true);
 	}
+
 	void brogueUIText::setLine(int row, const colorString& text, brogueTextAlignment alignment)
 	{
 		if (this->getBoundary().top() > row ||
@@ -136,13 +142,16 @@ namespace brogueHd::frontend
 			_characterGrid->set(columnIndex, row, text.getChar(index - textOffset), true);
 		}
 	}
+
 	void brogueUIText::setLine(int row, const simpleString& text, brogueTextAlignment alignment)
 	{
 		colorString colorText(text.c_str(), colors::white());
 
 		setLine(row, colorText, alignment);
 	}
-	void brogueUIText::setLine(int row, const simpleString& text, const color& foreground, const color& hotkeyForeground, int hotkeyIndex, brogueTextAlignment alignment)
+
+	void brogueUIText::setLine(int row, const simpleString& text, const color& foreground,
+	                           const color& hotkeyForeground, int hotkeyIndex, brogueTextAlignment alignment)
 	{
 		colorString result(text.c_str(), foreground);
 
@@ -150,6 +159,7 @@ namespace brogueHd::frontend
 
 		setLine(row, result, alignment);
 	}
+
 	void brogueUIText::setText(const colorString& text)
 	{
 		if (this->getBoundary().area() < text.getCount())
@@ -166,7 +176,8 @@ namespace brogueHd::frontend
 		int wordIndex = 0;
 		int paragraphIndex = 0;
 
-		for (int rowIndex = boundary.top(); rowIndex <= boundary.bottom() && paragraphIndex < text.getCount(); rowIndex++)
+		for (int rowIndex = boundary.top(); rowIndex <= boundary.bottom() && paragraphIndex < text.getCount(); rowIndex
+		     ++)
 		{
 			int wordIndexTemp = wordIndex;
 			int wordLength = 0;
@@ -194,6 +205,7 @@ namespace brogueHd::frontend
 			wordIndex = wordIndexTemp;
 		}
 	}
+
 	void brogueUIText::setText(const simpleString& text)
 	{
 		if (this->getBoundary().area() < text.count())

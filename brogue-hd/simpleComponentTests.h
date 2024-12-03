@@ -1,27 +1,30 @@
 #pragma once
 
 #include "brogueObject.h"
-#include "brogueTestFunction.h"
-#include "brogueTestPackage.h"
-#include "simpleHash.h"
+#include <simpleTestFunction.h>
+#include <simpleTestPackage.h>
+#include <simpleHash.h>
 #include <functional>
-
-using namespace brogueHd::backend::model;
-using namespace brogueHd::simple;
 
 namespace brogueHd::test
 {
-	class simpleComponentTests : public brogueTestPackage
+	using namespace brogueHd::model;
+	using namespace simple::test;
+	using namespace simple;
+
+	class brogueComponentTests : public simpleTestPackage
 	{
 	public:
-		simpleComponentTests() : brogueTestPackage("Simple Component Tests")
+		brogueComponentTests() : simpleTestPackage("Simple Component Tests")
 		{
-			this->addTest(brogueTestFunction("create_simpleHash_brogueObject", std::bind(&simpleComponentTests::create_simpleHash_brogueObject, this)));
+			this->addTest(simpleTestFunction("create_simpleHash_brogueObject",
+			                                 std::bind(&brogueComponentTests::create_simpleHash_brogueObject, this)));
 		}
-		~simpleComponentTests()
-		{
 
+		~brogueComponentTests()
+		{
 		}
+
 		bool create_simpleHash_brogueObject()
 		{
 			simpleHash<brogueObject, int> hash;

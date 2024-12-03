@@ -20,45 +20,42 @@
 #include "simpleList.h"
 #include "simpleMouseState.h"
 
-using namespace brogueHd::simple;
-
 namespace brogueHd::frontend
 {
+	using namespace brogueHd::component;
+
 	class brogueScrollView : public brogueViewGridCore<brogueCellQuad>
 	{
 	public:
-
 		brogueScrollView(brogueCoordinateConverter* coordinateConverter,
-						 resourceController* resourceController,
-						 eventController* eventController,
-						 const brogueUIProgramPartId& partId,
-						 const brogueUIData& data);
+		                 resourceController* resourceController,
+		                 eventController* eventController,
+		                 const brogueUIProgramPartId& partId,
+		                 const brogueUIData& data);
 		~brogueScrollView();
 
 		virtual void update(int millisecondsLapsed, bool forceUpdate) override;
 
 		virtual void checkUpdate(const brogueKeyboardState& keyboardState,
-								 const brogueMouseState& mouseState,
-								 int millisecondsLapsed) override;
+		                         const brogueMouseState& mouseState,
+		                         int millisecondsLapsed) override;
 
 		void add(brogueUIColorText* item);
 		void addRange(const simpleList<brogueUIColorText*>& items);
 
 	private:
-
 		void updateImpl(int millisecondsLapsed, bool forceUpdate);
 
 	protected:
-
 		simpleList<brogueUIColorText*>* _list;
-		int _cursor;								// Zero-th item at the top of the list
+		int _cursor; // Zero-th item at the top of the list
 	};
 
 	brogueScrollView::brogueScrollView(brogueCoordinateConverter* coordinateConverter,
-									   resourceController* resourceController,
-									   eventController* eventController,
-									   const brogueUIProgramPartId& partId,
-									   const brogueUIData& data)
+	                                   resourceController* resourceController,
+	                                   eventController* eventController,
+	                                   const brogueUIProgramPartId& partId,
+	                                   const brogueUIData& data)
 		: brogueViewGridCore(coordinateConverter, resourceController, eventController, partId, data, true)
 	{
 		_list = new simpleList<brogueUIColorText*>();
@@ -76,6 +73,7 @@ namespace brogueHd::frontend
 
 		brogueViewGridCore::invalidate();
 	}
+
 	void brogueScrollView::addRange(const simpleList<brogueUIColorText*>& items)
 	{
 		_list->addRange(items);
@@ -84,8 +82,8 @@ namespace brogueHd::frontend
 	}
 
 	void brogueScrollView::checkUpdate(const brogueKeyboardState& keyboardState,
-									   const brogueMouseState& mouseState,
-										  int millisecondsLapsed)
+	                                   const brogueMouseState& mouseState,
+	                                   int millisecondsLapsed)
 	{
 		// Update mouse data
 		brogueViewGridCore<brogueCellQuad>::checkUpdate(keyboardState, mouseState, millisecondsLapsed);
@@ -127,7 +125,7 @@ namespace brogueHd::frontend
 		int cursor = _cursor;
 
 		// Initialize to use the background color
-		boundary.iterate([&that, &textItems, &boundary, &cursor] (int column, int row)
+		boundary.iterate([&that, &textItems, &boundary, &cursor](int column, int row)
 		{
 			brogueCellDisplay cell(column, row);
 
@@ -142,7 +140,7 @@ namespace brogueHd::frontend
 				{
 					cell.foreColor = textItems->get(listIndex)->getText().getColor(textIndex);
 					cell.character = textItems->get(listIndex)->getText().getChar(textIndex);
-				}					
+				}
 			}
 
 			// Background

@@ -6,14 +6,11 @@
 #include "simple.h"
 #include "simpleList.h"
 
-using namespace brogueHd::simple;
-
 namespace brogueHd::backend::model
 {
 	class brogueMessageQueue
 	{
 	public:
-
 		brogueMessageQueue();
 		~brogueMessageQueue();
 
@@ -32,7 +29,6 @@ namespace brogueHd::backend::model
 		void updateFlavorText(char* message, color foreColor);
 
 	private:
-
 		int _currentMessageIndex;
 
 		simpleList<messageData>* _messages;
@@ -86,7 +82,7 @@ namespace brogueHd::backend::model
 		if (!needsConfirmation)
 		{
 			// Auto-confirm all messages
-			_messages->forEach([] (messageData amessage)
+			_messages->forEach([](messageData amessage)
 			{
 				amessage.confirmed = true;
 
@@ -133,4 +129,3 @@ namespace brogueHd::backend::model
 		_flavorMessage.update(message, foreColor, true);
 	}
 }
-

@@ -1,9 +1,9 @@
 #pragma once
 
-#include <simple.h>
 #include "gridDefinitions.h"
 #include "gridRegionConstructor.h"
 #include "gridRegion.h"
+#include <simple.h>
 
 namespace brogueHd::component
 {

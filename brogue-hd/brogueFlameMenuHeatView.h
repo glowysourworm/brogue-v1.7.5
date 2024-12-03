@@ -17,12 +17,11 @@
 #include "simple.h"
 #include "simplePeriodCounter.h"
 
-using namespace brogueHd::simple;
-using namespace brogueHd::backend;
-using namespace brogueHd::backend::model;
-
 namespace brogueHd::frontend
 {
+	using namespace simple;
+	using namespace brogueHd::backend;
+
 	/// <summary>
 	/// Component responsibility is to provide "heat" constants to the GPU. The data stream of brogueFlameQuad 
 	/// elements will provide the constant colors below. This view will keep track of a random sequence to provide
@@ -32,20 +31,20 @@ namespace brogueHd::frontend
 	{
 	public:
 		brogueFlameMenuHeatView(brogueCoordinateConverter* coordinateConverter,
-								resourceController* resourceController,
-								eventController* eventController,
-								randomGenerator* randomGenerator,
-								const brogueUIProgramPartId& partId,
-								const brogueUIData& data,
-								int fadePeriodMilliseconds);
+		                        resourceController* resourceController,
+		                        eventController* eventController,
+		                        randomGenerator* randomGenerator,
+		                        const brogueUIProgramPartId& partId,
+		                        const brogueUIData& data,
+		                        int fadePeriodMilliseconds);
 		~brogueFlameMenuHeatView();
 
 		void update(int millisecondsLapsed,
-					bool forceUpdate) override;
+		            bool forceUpdate) override;
 
 		void checkUpdate(const brogueKeyboardState& keyboardState,
-						 const brogueMouseState& mouseState,
-						 int millisecondsLapsed) override;
+		                 const brogueMouseState& mouseState,
+		                 int millisecondsLapsed) override;
 
 		void clearUpdate() override;
 
@@ -63,10 +62,12 @@ namespace brogueHd::frontend
 		{
 			return _fadePeriodRandom1;
 		}
+
 		int currentFadePeriodRandom2() const
 		{
 			return _fadePeriodRandom2;
 		}
+
 		/// <summary>
 		/// Returns total number of fade periods so far
 		/// </summary>
@@ -76,18 +77,15 @@ namespace brogueHd::frontend
 		}
 
 	public:
-
 		bool isTheText(int column, int row) const
 		{
 			return _titleGrid->isTheText(column, row);
 		}
 
 	private:
-
 		void updateImpl(int millisecondsLapsed, int forceUpdate);
 
 	public:
-
 		const color FlameBottomColor1 = color(1.0f, 0.0f, 0.0f, 1);
 		const color FlameBottomColor2 = color(1.0f, 1.0f, 0.6f, 1);
 		const color FlameBottomColor3 = color(1.0f, 1.0f, 0.8f, 1);
@@ -97,7 +95,6 @@ namespace brogueHd::frontend
 		const color FlameTitleColor3 = color(0.0f, 0.0f, 1.0f, 1);
 
 	private:
-
 		randomGenerator* _randomGenerator;
 		brogueTitleGrid* _titleGrid;
 
@@ -109,12 +106,12 @@ namespace brogueHd::frontend
 	};
 
 	brogueFlameMenuHeatView::brogueFlameMenuHeatView(brogueCoordinateConverter* coordinateConverter,
-													 resourceController* resourceController,
-													 eventController* eventController,
-													 randomGenerator* randomGenerator,
-													 const brogueUIProgramPartId& partId,
-													 const brogueUIData& data,
-													 int fadePeriodMilliseconds)
+	                                                 resourceController* resourceController,
+	                                                 eventController* eventController,
+	                                                 randomGenerator* randomGenerator,
+	                                                 const brogueUIProgramPartId& partId,
+	                                                 const brogueUIData& data,
+	                                                 int fadePeriodMilliseconds)
 		: brogueViewGridCore(coordinateConverter, resourceController, eventController, partId, data, true)
 	{
 		_randomGenerator = randomGenerator;
@@ -126,14 +123,16 @@ namespace brogueHd::frontend
 
 		update(0, true);
 	}
+
 	brogueFlameMenuHeatView::~brogueFlameMenuHeatView()
 	{
 		delete _periodCounter;
 		delete _fadePeriodCounter;
 	}
+
 	void brogueFlameMenuHeatView::checkUpdate(const brogueKeyboardState& keyboardState,
-											  const brogueMouseState& mouseState,
-											  int millisecondsLapsed)
+	                                          const brogueMouseState& mouseState,
+	                                          int millisecondsLapsed)
 	{
 		// Heat source fade over the fade period; and then they're cycled to the next
 		// color.
@@ -157,6 +156,7 @@ namespace brogueHd::frontend
 		// Mouse Interaction
 		brogueViewGridCore::checkUpdate(keyboardState, mouseState, millisecondsLapsed);
 	}
+
 	bool brogueFlameMenuHeatView::needsUpdate() const
 	{
 		if (_fadePeriodCounter->pending())
@@ -169,6 +169,7 @@ namespace brogueHd::frontend
 		//return _periodCounter->pending();
 		return false;
 	}
+
 	void brogueFlameMenuHeatView::clearUpdate()
 	{
 		_periodCounter->reset();
@@ -182,7 +183,7 @@ namespace brogueHd::frontend
 		brogueTitleGrid* titleGrid = _titleGrid;
 		gridRect sceneBounds = _titleGrid->sceneBounds();
 
-		sceneBounds.iterate([&that, &titleGrid, &sceneBounds] (int column, int row)
+		sceneBounds.iterate([&that, &titleGrid, &sceneBounds](int column, int row)
 		{
 			brogueCellDisplay cell(column, row);
 

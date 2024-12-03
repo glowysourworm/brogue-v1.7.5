@@ -4,12 +4,11 @@
 #include "brogueUIConstants.h"
 #include "brogueUITagAction.h"
 
-using namespace brogueHd::frontend;
-
 namespace brogueHd::backend
 {
+	using namespace brogueHd::frontend;
+
 	class brogueUIEvent : public brogueEventBase<brogueUIProgram, brogueUITagAction>
 	{
-
 	};
 }

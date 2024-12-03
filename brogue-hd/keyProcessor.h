@@ -3,14 +3,13 @@
 #include "simpleHash.h"
 #include "simpleString.h"
 
-using namespace brogueHd::simple;
-
 namespace brogueHd::backend
 {
+	using namespace simple;
+
 	class keyProcessor
 	{
 	public:
-
 		keyProcessor();
 		~keyProcessor();
 
@@ -20,7 +19,6 @@ namespace brogueHd::backend
 		void addKeyMap(const char* inputCharacter, const char* outputCharacter);
 
 	private:
-
 		simpleHash<simpleString, simpleString>* _keyMap;
 	};
 
@@ -40,4 +38,3 @@ namespace brogueHd::backend
 			_keyMap->add(simpleString(inputCharacter), simpleString(outputCharacter));
 	}
 }
-

@@ -12,33 +12,33 @@
 #include "simpleLogger.h"
 #include <SDL_surface.h>
 
-
-using namespace brogueHd::simple;
-
 namespace brogueHd::frontend
 {
+	using namespace simple;
+
 	struct simpleTexture : public simpleGlObject
 	{
 	public:
-
 		// Corresponds to the level of the nth mipmap for the texture (see texture rendering to learn about minimaps)
 		//
 		const GLuint TEXTURE_MIPMAP_LEVEL = 0;
 
 	public:
-
 		simpleTexture();
 		simpleTexture(const simpleTexture& copy);
 		simpleTexture(SDL_Surface* pixelBuffer,
-					  GLsizei width,
-					  GLsizei height,
-					  GLuint textureIndex,
-					  GLenum textureUnit,
-					  GLenum pixelFormat,
-					  GLenum pixelInternalFormat,
-					  GLuint pixelAlignment,
-					  GLenum pixelType);
-		~simpleTexture() {};
+		              GLsizei width,
+		              GLsizei height,
+		              GLuint textureIndex,
+		              GLenum textureUnit,
+		              GLenum pixelFormat,
+		              GLenum pixelInternalFormat,
+		              GLuint pixelAlignment,
+		              GLenum pixelType);
+
+		~simpleTexture()
+		{
+		};
 
 		void operator=(const simpleTexture& copy);
 
@@ -51,6 +51,7 @@ namespace brogueHd::frontend
 		{
 			return this->handle != simpleGlObject::HandleNull && openglHelper::getTextureCreated(this->handle);
 		}
+
 		bool isBound() const override
 		{
 			return openglHelper::getTextureBinding(this->handle);
@@ -60,6 +61,7 @@ namespace brogueHd::frontend
 		{
 			return _textureUnit;
 		}
+
 		GLuint getTextureIndex() const
 		{
 			return _textureIndex;
@@ -69,44 +71,48 @@ namespace brogueHd::frontend
 		{
 			return _pixelBuffer;
 		}
+
 		GLsizei getWidth() const
 		{
 			return _width;
 		}
+
 		GLsizei getHeight() const
 		{
 			return _height;
 		}
+
 		GLenum getPixelFormat() const
 		{
 			return _pixelFormat;
 		}
+
 		GLenum getPixelInternalFormat() const
 		{
 			return _pixelInternalFormat;
 		}
+
 		GLuint getPixelAlignment() const
 		{
 			return _pixelAlignment;
 		}
+
 		GLenum getPixelType() const
 		{
 			return _pixelType;
 		}
 
 	public:
-
 		size_t getHash() const override
 		{
-			return hashGenerator::generateHash(_textureUnit, _textureIndex, _pixelBuffer, _width, _height, _pixelFormat, _pixelInternalFormat, _pixelAlignment, _pixelType);
+			return hashGenerator::generateHash(_textureUnit, _textureIndex, _pixelBuffer, _width, _height, _pixelFormat,
+			                                   _pixelInternalFormat, _pixelAlignment, _pixelType);
 		}
 
 	private:
-
 		void copyImpl(const simpleTexture& copy);
 
 	private:
-
 		GLenum _textureUnit;
 		GLuint _textureIndex;
 
@@ -132,19 +138,21 @@ namespace brogueHd::frontend
 		_pixelAlignment = NULL;
 		_pixelInternalFormat = NULL;
 	}
+
 	simpleTexture::simpleTexture(const simpleTexture& copy)
 	{
 		copyImpl(copy);
 	}
+
 	simpleTexture::simpleTexture(SDL_Surface* pixelBuffer,
-								 GLsizei width,
-								 GLsizei height,
-								 GLuint textureIndex,
-								 GLenum textureUnit,
-								 GLenum pixelFormat,
-								 GLenum pixelInternalFormat,
-								 GLuint pixelAlignment,
-								 GLenum pixelType)
+	                             GLsizei width,
+	                             GLsizei height,
+	                             GLuint textureIndex,
+	                             GLenum textureUnit,
+	                             GLenum pixelFormat,
+	                             GLenum pixelInternalFormat,
+	                             GLuint pixelAlignment,
+	                             GLenum pixelType)
 	{
 		_textureUnit = textureUnit;
 		_textureIndex = textureIndex;
@@ -207,13 +215,13 @@ namespace brogueHd::frontend
 
 		// Apply the pixel data to the backend
 		glTextureImage2DEXT(this->handle,
-							GL_TEXTURE_2D,
-							TEXTURE_MIPMAP_LEVEL,
-							_pixelInternalFormat,          // specific pixel format
-							_width, _height, 0,            // width, height, border (set = 0)
-							_pixelFormat,                  // symbolic (base) pixel format
-							_pixelType,
-							_pixelBuffer != nullptr ? _pixelBuffer->pixels : NULL);                // Pixel data in byte array
+		                    GL_TEXTURE_2D,
+		                    TEXTURE_MIPMAP_LEVEL,
+		                    _pixelInternalFormat, // specific pixel format
+		                    _width, _height, 0, // width, height, border (set = 0)
+		                    _pixelFormat, // symbolic (base) pixel format
+		                    _pixelType,
+		                    _pixelBuffer != nullptr ? _pixelBuffer->pixels : NULL); // Pixel data in byte array
 
 		//if (_pixelBuffer != nullptr)
 		//    glTextureSubImage2DEXT(this->handle, GL_TEXTURE_2D, TEXTURE_MIPMAP_LEVEL, 0, 0, _width, _height, _pixelFormat, _pixelType, _pixelBuffer->getBuffer());
@@ -239,7 +247,8 @@ namespace brogueHd::frontend
 			throw simpleException("simpleTexture not active before trying to clear color");
 
 		vec4 clearColor(color.red, color.green, color.blue, color.alpha);
-		simpleDataStream clearStream(1, clearColor.getElementVertexSize(GL_POINTS), clearColor.getStreamSize(GL_POINTS));
+		simpleDataStream clearStream(1, clearColor.getElementVertexSize(GL_POINTS),
+		                             clearColor.getStreamSize(GL_POINTS));
 
 		// GL substitutes data using the clear color stream
 		glClearTexImage(this->handle, 0, _pixelFormat, _pixelType, clearStream.getData());
@@ -248,12 +257,13 @@ namespace brogueHd::frontend
 	void simpleTexture::teardown()
 	{
 		if (!this->isCreated())
-			simpleLogger::logColor(brogueConsoleColor::Yellow, "simpleTexture already deleted from the backend");
+			simpleLogger::logColor(simpleConsoleColor::Yellow, "simpleTexture already deleted from the backend");
 
 		glDeleteTextures(1, &_textureIndex);
 
 		if (this->isCreated())
-			simpleLogger::logColor(brogueConsoleColor::Yellow, "simpleTexture still registered after deletion glIsTexture(..)");
+			simpleLogger::logColor(simpleConsoleColor::Yellow,
+			                       "simpleTexture still registered after deletion glIsTexture(..)");
 
 		this->handle = simpleGlObject::HandleNull;
 	}

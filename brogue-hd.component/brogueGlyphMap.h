@@ -4,15 +4,13 @@
 #include "simpleException.h"
 #include "simpleHash.h"
 
-using namespace brogueHd::simple;
-using namespace brogueHd::component;
-
-namespace brogueHd::frontend
+namespace brogueHd::component
 {
+	using namespace simple;
+
 	class brogueGlyphMap
 	{
 	public:
-
 		static const int GlyphSheetColumns = 16;
 		static const int GlyphSheetRows = 14;
 
@@ -22,7 +20,6 @@ namespace brogueHd::frontend
 		static const int GlyphSheetRowOffset = 2;
 
 	public:
-
 		static const int Empty = (int)' ';
 
 		static const int FloorUnicode = 0x00b7;
@@ -60,7 +57,6 @@ namespace brogueHd::frontend
 		static const int GoodMagicUnicode = 0x29F3;
 
 	public:
-
 		brogueGlyphMap();
 		~brogueGlyphMap();
 
@@ -70,7 +66,6 @@ namespace brogueHd::frontend
 		bool isGlyphDefined(char character);
 
 	protected:
-
 		void initialize();
 
 		simpleHash<int, gridLocator>* _glyphLocations;
@@ -82,6 +77,7 @@ namespace brogueHd::frontend
 
 		initialize();
 	}
+
 	brogueGlyphMap::~brogueGlyphMap()
 	{
 		delete _glyphLocations;
@@ -244,6 +240,7 @@ namespace brogueHd::frontend
 	{
 		return _glyphLocations->contains(character);
 	}
+
 	bool brogueGlyphMap::isGlyphDefined(char character)
 	{
 		return isGlyphDefined((int)character);

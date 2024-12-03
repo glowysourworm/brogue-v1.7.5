@@ -14,11 +14,11 @@
 #include <iostream>
 #include <thread>
 
-using namespace brogueHd::simple;
-using namespace brogueHd::backend;
-
 namespace brogueHd::console
 {
+	using namespace simple;
+	using namespace brogueHd::backend;
+
 	class gameConsole : public brogueConsole
 	{
 	public:
@@ -30,11 +30,9 @@ namespace brogueHd::console
 		void printHelp(std::ostream& stream) override;
 
 	private:
-
 		void printScores(std::ostream& stream);
 
 	private:
-
 		resourceController* _resourceController;
 		gameController* _gameController;
 	};
@@ -43,12 +41,14 @@ namespace brogueHd::console
 	{
 		this->consoleName = "Brogue Game Console";
 	}
+
 	gameConsole::gameConsole(resourceController* resourceController)
 	{
 		_resourceController = resourceController;
 		_gameController = new gameController(resourceController);
 		this->consoleName = "Brogue GAME";
 	}
+
 	gameConsole::~gameConsole()
 	{
 		delete _gameController;
@@ -69,6 +69,7 @@ namespace brogueHd::console
 		//stream << "-o filename[.broguesave]   open a save file (extension optional)" << std::endl;
 		//stream << "-v recording[.broguerec]   view a recording (extension optional)" << std::endl;
 	}
+
 	void gameConsole::printScores(std::ostream& stream)
 	{
 		//int mostRecent = 0;
@@ -122,7 +123,6 @@ namespace brogueHd::console
 				//
 				throw simpleException("Brogue Program Error ~ Please see error log for details");
 			}
-
 		}
 
 		_gameController->closeGame();
