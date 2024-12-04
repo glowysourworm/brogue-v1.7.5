@@ -20,7 +20,7 @@ namespace brogueHd::component
 	/// of the parent grid. Each function and call will be protected to utilize only this region. No grid
 	/// offsets are required for use.
 	/// </summary>
-	template <isGridLocator T>
+	template <typename T>
 	class gridRegion : public simpleObject
 	{
 	public:
@@ -48,6 +48,7 @@ namespace brogueHd::component
 		simpleArray<T> getEdgeLocations() const;
 
 		int getLocationCount() const;
+		int getEdgeLocationCount() const;
 
 		/// <summary>
 		/// MODIFIES LAYOUT! Translates the grid region data by the provided amount without
@@ -87,6 +88,9 @@ namespace brogueHd::component
 		/// </summary>
 		T get(int column, int row) const;
 
+		T getLocation(int index) const;
+		T getEdgeLocation(int index) const;
+
 		/// <summary>
 		/// Returns true if a cell is defined for the region
 		/// </summary>
@@ -101,6 +105,11 @@ namespace brogueHd::component
 		/// Returns true if an edge cell is defined
 		/// </summary>
 		bool isEdge(int column, int row) const;
+
+		/// <summary>
+		/// Returns true if the edge is exposed in the direction specified.
+		/// </summary>
+		bool isExposedEdge(int column, int row, brogueCompass direction) const;
 
 		/// <summary>
 		/// Iterates the locations of the region and calls the user method
@@ -149,7 +158,7 @@ namespace brogueHd::component
 		simpleArray<T>* _southWestCornerLocations;
 	};
 
-	template <isGridLocator T>
+	template <typename T>
 	gridRegion<T>::gridRegion(const simpleArray<T>& locations,
 	                          const simpleArray<T>& edgeLocations,
 	                          const simpleArray<T>& northExposedLocations,
@@ -199,7 +208,7 @@ namespace brogueHd::component
 		}
 	}
 
-	template <isGridLocator T>
+	template <typename T>
 	gridRegion<T>::~gridRegion()
 	{
 		// MEMORY!  gridRegionConstructor (new T) -> gridRegion(...)
@@ -228,19 +237,37 @@ namespace brogueHd::component
 		delete _southWestCornerLocations;
 	}
 
-	template <isGridLocator T>
+	template <typename T>
 	T gridRegion<T>::get(int column, int row) const
 	{
 		return _grid->get(column, row);
 	}
 
-	template <isGridLocator T>
+	template <typename T>
+	T gridRegion<T>::getLocation(int index) const
+	{
+		return _locations->get(index);
+	}
+
+	template <typename T>
+	T gridRegion<T>::getEdgeLocation(int index) const
+	{
+		return _edgeLocations->get(index);
+	}
+
+	template <typename T>
 	int gridRegion<T>::getLocationCount() const
 	{
 		return _locations->count();
 	}
 
-	template <isGridLocator T>
+	template <typename T>
+	int gridRegion<T>::getEdgeLocationCount() const
+	{
+		return _edgeLocations->count();
+	}
+
+	template <typename T>
 	bool gridRegion<T>::isDefined(int column, int row) const
 	{
 		// Checking "bounds" for a region isn't really an appropriate meaning for
@@ -253,19 +280,25 @@ namespace brogueHd::component
 		return _grid->isDefined(column, row);
 	}
 
-	template <isGridLocator T>
+	template <typename T>
 	bool gridRegion<T>::isDefined(const gridLocator& locator) const
 	{
 		return isDefined(locator.column, locator.row);
 	}
 
-	template <isGridLocator T>
+	template <typename T>
 	bool gridRegion<T>::isEdge(int column, int row) const
 	{
 		return _edgeGrid->isDefined(column, row);
 	}
 
-	template <isGridLocator T>
+	template <typename T>
+	bool gridRegion<T>::isExposedEdge(int column, int row, brogueCompass direction) const
+	{
+		return _edgeGrid->isExposedEdge(column, row, direction);
+	}
+
+	template <typename T>
 	void gridRegion<T>::translate_HeapLike(int column, int row)
 	{
 		// NOT SURE HOW THIS METHOD MIGHT WORK:  The template must understand
@@ -284,7 +317,7 @@ namespace brogueHd::component
 		});
 	}
 
-	template <isGridLocator T>
+	template <typename T>
 	void gridRegion<T>::translate_StackLike(int column, int row)
 	{
 		// Translates the coordinate boundary (relative boundary)
@@ -386,19 +419,19 @@ namespace brogueHd::component
 		});
 	}
 
-	template <isGridLocator T>
+	template <typename T>
 	simpleArray<T> gridRegion<T>::getLocations() const
 	{
 		return *_locations;
 	}
 
-	template <isGridLocator T>
+	template <typename T>
 	simpleArray<T> gridRegion<T>::getEdgeLocations() const
 	{
 		return *_edgeLocations;
 	}
 
-	template <isGridLocator T>
+	template <typename T>
 	simpleArray<T> gridRegion<T>::getEdges(brogueCompass direction) const
 	{
 		switch (direction)
@@ -416,7 +449,7 @@ namespace brogueHd::component
 		}
 	}
 
-	template <isGridLocator T>
+	template <typename T>
 	simpleOrderedList<T> gridRegion<T>::getBestEdges(brogueCompass direction) const
 	{
 		gridRect boundary = this->getBoundary();
@@ -472,7 +505,7 @@ namespace brogueHd::component
 		}
 	}
 
-	template <isGridLocator T>
+	template <typename T>
 	simpleArray<T> gridRegion<T>::getCorners(brogueCompass nonCardinalDirection) const
 	{
 		switch (nonCardinalDirection)
@@ -490,25 +523,25 @@ namespace brogueHd::component
 		}
 	}
 
-	template <isGridLocator T>
+	template <typename T>
 	gridRect gridRegion<T>::getBoundary() const
 	{
 		return _grid->getRelativeBoundary();
 	}
 
-	template <isGridLocator T>
+	template <typename T>
 	gridRect gridRegion<T>::getParentBoundary() const
 	{
 		return _grid->getParentBoundary();
 	}
 
-	template <isGridLocator T>
+	template <typename T>
 	gridRect gridRegion<T>::getLargestSubRectangle() const
 	{
 		return _largestRectangularSubRegion;
 	}
 
-	template <isGridLocator T>
+	template <typename T>
 	void gridRegion<T>::iterateLocations(gridCallback<T> callback) const
 	{
 		_locations->forEach([&callback](T item)
@@ -517,7 +550,7 @@ namespace brogueHd::component
 		});
 	}
 
-	template <isGridLocator T>
+	template <typename T>
 	void gridRegion<T>::iterateEdges(gridCallback<T> callback) const
 	{
 		_edgeLocations->forEach([&callback](T item)
@@ -526,7 +559,7 @@ namespace brogueHd::component
 		});
 	}
 
-	template <isGridLocator T>
+	template <typename T>
 	bool gridRegion<T>::overlaps(gridRegion<T>* region) const
 	{
 		bool overlap = false;

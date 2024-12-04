@@ -32,6 +32,8 @@ namespace brogueHd::component
 
 		gridRect convertToGridRect(const simpleRectangle<int> rectangle) const;
 
+		simpleRectangle<int> getOutlineUI(const gridLocator& location) const;
+
 		simpleRectangle<int> convertToUI(const gridRect& rect, bool moveToCellCenter = false) const;
 		simpleLine<int> convertToUI(const gridLocatorEdge& edge, bool moveToCellCenter = false) const;
 		simplePoint<int> convertToUI(const gridLocator& location, bool moveToCellCenter = false) const;
@@ -88,6 +90,17 @@ namespace brogueHd::component
 		simpleRect rect = rectangle.getSimpleRect();
 
 		return gridRect(rect);
+	}
+
+	simpleRectangle<int> layoutCoordinateConverter::getOutlineUI(const gridLocator& location) const
+	{
+		// Use SE cell to get the bottom right UI coordinate for this cell
+		gridLocator southEast(location.column + 1, location.row + 1);
+
+		simplePoint<int> topLeftUI = convertToUI(location, false);
+		simplePoint<int> bottomRightUI = convertToUI(southEast, false);
+
+		return simpleRectangle<int>(topLeftUI, bottomRightUI);
 	}
 
 	simplePoint<int> layoutCoordinateConverter::convertToUI(const gridLocator& location, bool moveToCellCenter) const

@@ -97,20 +97,25 @@ namespace brogueHd::component
 		bool isEdge(int column, int row) const;
 
 		/// <summary>
+		/// Returns true if the location is an edge in the direction provided.
+		/// </summary>
+		bool isExposedEdge(int column, int row, brogueCompass direction) const;
+
+		/// <summary>
 		/// Returns true if the location is at the edge of the grid (using default_value::value comparison), or 
 		/// the provided predicate.
 		/// </summary>
 		bool isEdgeWhere(int column, int row, gridPredicate<T> predicate) const;
 
 		/// <summary>
-		/// Returns true if the adjacent element is positive with respect to the provided predicate OR is
-		/// out of bounds OR is default_value::value FOR the provided direction.
+		/// Returns true if the adjacent element is negative with respect to the provided predicate OR (is
+		/// out of bounds OR is default_value::value FOR the provided direction)
 		/// </summary>
 		/// <param name="direction">Compass direction treated with DIRECT EQUALITY! (DOESN'T USE FLAGS)</param>
 		bool isExposedEdge(int column, int row, brogueCompass direction, gridPredicate<T> predicate) const;
 
 		/// <summary>
-		/// Returns true if the adjacent element is positive with respect to the provided predicate OR is
+		/// Returns true if the adjacent element is negative with respect to the provided predicate OR is
 		/// out of bounds OR is default_value::value FOR the provided NON-CARDINAL direction.
 		/// </summary>
 		/// <param name="direction">Compass direction treated with DIRECT EQUALITY! (DOESN'T USE FLAGS)</param>
@@ -527,6 +532,15 @@ namespace brogueHd::component
 	}
 
 	template <isHashable T>
+	bool grid<T>::isExposedEdge(int column, int row, brogueCompass direction) const
+	{
+		return this->isExposedEdge(column, row, direction, [] (int acol, int arow, T item)
+		{
+			return true;
+		});
+	}
+
+	template <isHashable T>
 	bool grid<T>::isEdge(int column, int row) const
 	{
 		return this->isEdgeWhere(column, row, [](int acolumn, int arow, T item)
@@ -547,22 +561,14 @@ namespace brogueHd::component
 		T southEast = this->getUnsafe(column + 1, row + 1);
 		T southWest = this->getUnsafe(column - 1, row + 1);
 
-		return (north == default_value::value<T>() || (north != default_value::value<T>() && !predicate(
-				column, row - 1, north))) ||
-			(south == default_value::value<T>() || (south != default_value::value<T>() && !predicate(
-				column, row + 1, south))) ||
-			(east == default_value::value<T>() || (east != default_value::value<T>() && !predicate(
-				column + 1, row, east))) ||
-			(west == default_value::value<T>() || (west != default_value::value<T>() && !predicate(
-				column - 1, row, west))) ||
-			(northEast == default_value::value<T>() || (northEast != default_value::value<T>() && !predicate(
-				column + 1, row - 1, northEast))) ||
-			(northWest == default_value::value<T>() || (northWest != default_value::value<T>() && !predicate(
-				column - 1, row - 1, northWest))) ||
-			(southEast == default_value::value<T>() || (southEast != default_value::value<T>() && !predicate(
-				column + 1, row + 1, southEast))) ||
-			(southWest == default_value::value<T>() || (southWest != default_value::value<T>() && !predicate(
-				column - 1, row + 1, southWest)));
+		return (north == default_value::value<T>() || !predicate(column, row - 1, north)) ||
+			   (south == default_value::value<T>() || !predicate(column, row + 1, south)) ||  
+			   (east == default_value::value<T>() || !predicate(column + 1, row, east)) ||
+			   (west == default_value::value<T>() || !predicate(column - 1, row, west)) ||  
+			   (northEast == default_value::value<T>() || !predicate(column + 1, row - 1, northEast)) ||
+			   (northWest == default_value::value<T>() || !predicate(column - 1, row - 1, northWest)) ||
+			   (southEast == default_value::value<T>() || !predicate(column + 1, row + 1, southEast)) ||
+			   (southWest == default_value::value<T>() || !predicate(column - 1, row + 1, southWest));
 	}
 
 	template <isHashable T>
@@ -574,20 +580,16 @@ namespace brogueHd::component
 		T west = this->getUnsafe(column - 1, row);
 
 		if (direction == brogueCompass::N)
-			return north == default_value::value<T>() || (north != default_value::value<T>() && !predicate(
-				column, row - 1, north));
+			return north == default_value::value<T>() || !predicate(column, row - 1, north);
 
 		else if (direction == brogueCompass::S)
-			return south == default_value::value<T>() || (south != default_value::value<T>() && !predicate(
-				column, row + 1, south));
+			return south == default_value::value<T>() || !predicate(column, row + 1, south);
 
 		else if (direction == brogueCompass::E)
-			return east == default_value::value<T>() || (east != default_value::value<T>() && !predicate(
-				column + 1, row, east));
+			return east == default_value::value<T>() || !predicate(column + 1, row, east);
 
 		else if (direction == brogueCompass::W)
-			return west == default_value::value<T>() || (west != default_value::value<T>() && !predicate(
-				column - 1, row, west));
+			return west == default_value::value<T>() || !predicate(column - 1, row, west);
 
 		else
 			throw simpleException("Invalid use of direction parameter:  grid.isExposedEdge");

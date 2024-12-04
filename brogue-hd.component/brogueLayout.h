@@ -4,6 +4,8 @@
 #include "gridDefinitions.h"
 #include "gridLocator.h"
 #include "gridLocatorEdge.h"
+#include "gridLayer.h"
+#include "gridConnectionLayer.h"
 #include "gridRegion.h"
 #include "brogueRoom.h"
 
@@ -27,7 +29,7 @@ namespace brogueHd::component
 	class brogueLayout
 	{
 	public:
-		brogueLayout(const gridRect& levelParentBoundary, const gridRect& levelBoundary);
+		brogueLayout(grid<brogueCell*>* mainGrid, gridConnectionLayer<brogueCell*>* connectionLayer);
 		~brogueLayout();
 
 		bool isDefined(int column, int row) const;
@@ -59,77 +61,87 @@ namespace brogueHd::component
 		void iterateWhereDefined(gridCallback<brogueCell*> callback) const;
 
 		/// <summary>
-		/// Ensures that the layout has cells in the specified locations.
-		/// </summary>
-		template <isGridLocator T>
-		void createCells(gridRegion<T>* region, const brogueCell& prototype, bool overwrite = false);
-
-		/// <summary>
-		/// Ensures that cell is created for specified location
-		/// </summary>
-		template <isGridLocator T>
-		void createCells(const T& locator, const brogueCell& prototype, bool overwrite = false);
-
-		/// <summary>
 		/// Gets sub-rectangle from the layout - the largest possible
 		/// </summary>
 		gridRect getLargestUnusedRectangle(const gridRect& minSize);
-
-		/// <summary>
-		/// Sets graph of rooms for the layout
-		/// </summary>
-		void setRoomConnectionGraph(simpleGraph<gridLocator, gridLocatorEdge>* connectionGraph);
-
-		void setCorridorConnections(const simpleList<gridLocatorEdge>& connections);
-
-		simpleList<gridLocatorEdge> getCorridorConnections()
-		{
-			return *_corridorConnections;
-		}
 
 		/// <summary>
 		/// Iterates all graph edges and callsback to the user code
 		/// </summary>
 		void iterateRoomConnections(graphSimpleEdgeIterator<gridLocator, gridLocatorEdge> callback);
 
-	private:
-		simpleList<brogueRoom*>* _rooms;
+		/// <summary>
+		/// Queries the connection layer (which run's a very small dijkstra iteration on the graph of
+		/// connection points) for the next location -> in the directin of travel. Use this before
+		/// calling dijkstra's map for the character.
+		/// </summary>
+		gridLocator getNextConnectionPoint(const gridLocator& source, const gridLocator& destination);
 
-		// May need to break into separate grids
+	private:
+
+		// Builds all of the grids from the main grid
+		void initialize(grid<brogueCell*>* mainGrid, gridConnectionLayer<brogueCell*>* connectionLayer);
+
+	private:
+
+		// Main Grid for the identity of the brogueCell*. All other layers may be derived
+		// from this grid during serialization.
 		grid<brogueCell*>* _mainGrid;
 
-		// Grid containing permanent dungeon layers
-		grid<permanentDungeonLayers>* _permanentGrid;
+		// Permanent Layers (shared pointers with the main grid)
+		gridLayer<brogueCell*>* _wallLayer;
+		gridLayer<brogueCell*>* _wallIndestructibleLayer;
+		gridLayer<brogueCell*>* _cellLayer;
+		gridLayer<brogueCell*>* _chasmLayer;
+		gridLayer<brogueCell*>* _terrainLayer;						// All Terrain
+		gridLayer<brogueCell*>* _terrainLavaLayer;					// Lava Terrain (only)
+		gridLayer<brogueCell*>* _terrainWaterLayer;					// Water Terrain (only) (permanent)
+		gridLayer<brogueCell*>* _terrainCombustibleLayer;			// Combustible Terrain (only) (permanent)
+		gridLayer<brogueCell*>* _alteredLayer;						// Other movement altering (permanent) cell flags
 
-		// Grid containing temporary dungeon layers
-		grid<temporaryDungeonLayers>* _temporaryGrid;
+		// Temporary Layers (shared pointers with the main grid)
+		gridLayer<brogueCell*>* _temporaryChasmLayer;
+		gridLayer<brogueCell*>* _temporaryTerrainLayer;				// All Terrain (temporary only)
+		gridLayer<brogueCell*>* _temporaryWaterTerrainLayer;		// Water Terrain (temporary only)
+		gridLayer<brogueCell*>* _temporaryPoisonVineTerrainLayer;	// Poisonous Vine Terrain (temporary only)
+		gridLayer<brogueCell*>* _flameLayer;						// Flame Terrain (temporary)
+		gridLayer<brogueCell*>* _causticGasLayer;
+		gridLayer<brogueCell*>* _nauseaGasLayer;
+		gridLayer<brogueCell*>* _temporaryAlteredLayer;				// Other movement altering (temporary only) cell flags
 
-		// Grid containing flag-enum for categories of features:  TODO
-		grid<dungeonFeatureCategories>* _featureCategoriesGrid;
+		// Connection Layer:  Used for movement / travel (region queries)
+		gridConnectionLayer<brogueCell*>* _connectionLayer;
 
-		simpleGraph<gridLocator, gridLocatorEdge>* _connectionGraph;
-
-		simpleList<gridLocatorEdge>* _corridorConnections;
-
-		//int cost;
-
-		//enum dungeonLayers layerFlags;					// Designate which of the layers the cell inhabits
-		//unsigned long flags;							// non-terrain cell flags
-		//unsigned int volume;							// quantity of gas in cell
-
-		//unsigned char machineNumber;
-
-
-		// REFACTORED VOLUME:  Separates gases
-		//unsigned int poisonGasVolume;
-		//unsigned int swampGasVolume;
 	};
 
-	brogueLayout::brogueLayout(const gridRect& levelParentBoundary, const gridRect& levelBoundary)
+	brogueLayout::brogueLayout(grid<brogueCell*>* mainGrid, gridConnectionLayer<brogueCell*>* connectionLayer)
 	{
-		_mainGrid = new grid<brogueCell*>(levelParentBoundary, levelBoundary);
-		_connectionGraph = nullptr;
-		_corridorConnections = new simpleList<gridLocatorEdge>();
+		_mainGrid = nullptr;
+
+		// Permanent Layers
+		_wallLayer = nullptr;
+		_wallIndestructibleLayer = nullptr;
+		_cellLayer = nullptr;
+		_chasmLayer = nullptr;
+		_terrainLayer = nullptr;
+		_terrainLavaLayer = nullptr;
+		_terrainWaterLayer = nullptr;
+		_terrainCombustibleLayer = nullptr;
+		_alteredLayer = nullptr;
+
+		// Temporary Layers
+		_temporaryChasmLayer = nullptr;
+		_temporaryTerrainLayer = nullptr;
+		_temporaryWaterTerrainLayer = nullptr;
+		_temporaryPoisonVineTerrainLayer = nullptr;
+		_flameLayer = nullptr;
+		_causticGasLayer = nullptr;
+		_nauseaGasLayer = nullptr;
+		_temporaryAlteredLayer = nullptr;
+
+		_connectionLayer = nullptr;
+
+		initialize(mainGrid, connectionLayer);
 	}
 
 	brogueLayout::~brogueLayout()
@@ -142,6 +154,34 @@ namespace brogueHd::component
 		});
 
 		delete _mainGrid;
+	}
+
+	void brogueLayout::initialize(grid<brogueCell*>* mainGrid, gridConnectionLayer<brogueCell*>* connectionLayer)
+	{
+		_mainGrid = mainGrid;
+
+		// Permanent Layers
+		_wallLayer = nullptr;
+		_wallIndestructibleLayer = nullptr;
+		_cellLayer = nullptr;
+		_chasmLayer = nullptr;
+		_terrainLayer = nullptr;
+		_terrainLavaLayer = nullptr;
+		_terrainWaterLayer = nullptr;
+		_terrainCombustibleLayer = nullptr;
+		_alteredLayer = nullptr;
+
+		// Temporary Layers
+		_temporaryChasmLayer = nullptr;
+		_temporaryTerrainLayer = nullptr;
+		_temporaryWaterTerrainLayer = nullptr;
+		_temporaryPoisonVineTerrainLayer = nullptr;
+		_flameLayer = nullptr;
+		_causticGasLayer = nullptr;
+		_nauseaGasLayer = nullptr;
+		_temporaryAlteredLayer = nullptr;
+
+		_connectionLayer = connectionLayer;
 	}
 
 	gridRect brogueLayout::getBoundary() const
@@ -267,5 +307,10 @@ namespace brogueHd::component
 		                           });
 
 		return result;
+	}
+
+	gridLocator brogueLayout::getNextConnectionPoint(const gridLocator& source, const gridLocator& destination)
+	{
+		throw simpleException("TODO:  brogueLayout");
 	}
 }

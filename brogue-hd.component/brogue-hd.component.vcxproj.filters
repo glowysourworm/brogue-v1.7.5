@@ -129,6 +129,36 @@
     <ClInclude Include="brogueGlyphMap.h">
       <Filter>Header Files\model</Filter>
     </ClInclude>
+    <ClInclude Include="gridRegionCollection.h">
+      <Filter>Header Files\layout</Filter>
+    </ClInclude>
+    <ClInclude Include="gridLayer.h">
+      <Filter>Header Files\layout</Filter>
+    </ClInclude>
+    <ClInclude Include="gridConnectionLayer.h">
+      <Filter>Header Files\layout</Filter>
+    </ClInclude>
+    <ClInclude Include="regionOutlineGenerator.h">
+      <Filter>Header Files\generator</Filter>
+    </ClInclude>
+    <ClInclude Include="regionOutlineGrid.h">
+      <Filter>Header Files\generator</Filter>
+    </ClInclude>
+    <ClInclude Include="gridCellOutline.h">
+      <Filter>Header Files\layout</Filter>
+    </ClInclude>
+    <ClInclude Include="gridCellOutlineSegment.h">
+      <Filter>Header Files\layout</Filter>
+    </ClInclude>
+    <ClInclude Include="gridCellOutlineSegmentHorizontalComparer.h">
+      <Filter>Header Files\layout</Filter>
+    </ClInclude>
+    <ClInclude Include="gridCellOutlineSegmentVerticalComparer.h">
+      <Filter>Header Files\layout</Filter>
+    </ClInclude>
+    <ClInclude Include="gridRegionOutline.h">
+      <Filter>Header Files\layout</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="gridRect.cpp">

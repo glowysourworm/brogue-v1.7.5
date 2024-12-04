@@ -112,4 +112,138 @@ Brogue Layout Generator:
 	for this layout process will be part of making this very simple to use. So, most of the 
 	parameterization will be put there; and set to mimic Brogue v1.7.5.
 		 
-		
+
+Brouge Layout:
+
+	The layout will be broken up into several layers; and region collections.
+
+	Layers: The "Full Layer" would be the entire map. In Brogue, the walls are breakable; and, so, need
+			to be declared up front (well, not necessarily; but this will be the design).
+
+		- Cell Layer:  		This is the "Full Layer" (minus) the Wall Layer.
+		- Wall Layer:  		Every other location that is NOT a cell. 
+		- Walkable Layer: 	The layer of cells that is also (currently) walkable. This would exclude 
+							impassable terrain (lava, chasms, traps, and (for some creatures) santuary tiles).
+
+		First Caveat:  How will the "Walkable Layer" depend on the creature? 
+
+		Solution:	   The "walkable layer" query will include a creature type selector enum. So, these
+					   must be queries for creature/character movement. So, the API will reflect that 
+					   the layer specification won't need to be changed for various types of characters.
+
+		- Room Layer:		Cells that have been declared rooms
+		- Corridor Layer:	Cells that have been declared corridors
+		- Terrain Layer(s):	Cells that have been marked with terrain
+
+		Second (set) of Issues: Essentially, this is the idea behind the design - to separate concerns for
+		the map layer data management from the character play. The terrain, itself, is one example of 
+		temporary layout topology change.
+
+		Layout Topology:  Static topology would be the:  Cell Layer, Wall Layer, Permanent Terrain, etc..
+
+			Permanent Layers: (except for a static topology change)
+
+				- Cell Layer
+				- Wall Layer 
+					(These will end up as sub-sets of the prior two)
+					- Indestructible Wall Layer (see below)
+					- Chasm Layer
+					- Terrain Layer (could have vaporizing of water, burning of grass, etc...)
+					- Altered Layer (generic term for anything that affects movement - sanctuary tiles is an example - 
+									 in a way that is entirely impassable)
+
+			Temporary Layers:
+
+				- Temporary Terrain
+				- Temporary Chasm
+				- Altered Layer (crystallis (sp?) layer, sanctuary tiles, machine special tiles, etc...
+								 where those tiles make movement impassable)
+				- Flame Layer (see below)
+				- Gaseous Layer (non-flame gasses) (these would be separated for easier querying behind the scenes)
+
+			Flames and Fires and Flame layers: The use of fire to alter terrain doesn't make it "impassable". so,
+			the dijkstra's path finder would have a different input for character movement. This is separate from
+			the concern of keeping layer data consistent.
+
+			The gasses, and flames, and other layout flags (data), would be best to keep on separate layers so as
+			to have them available for query. 
+
+			Usage Example: Player ally is in a room with caustic gas.
+
+				1) Dijkstra has a penalty for the character based on its health, distance to goal, and any other
+				   modifier that might be contextual (see character behavior)
+
+				2) Query to brougeLayout* (class) would have an iterateAdjacent function to collect caustic gas 
+				   cells. 
+
+				3) During a turn, the character's dijkstra map utilized, with a callback function for the cost. 
+				   This would be inserted by the caller. 
+
+			Contextual data would be available for the character to "make a break for it". So, you might want
+			to take a few extra steps to program how you might want the behavior. (payoff (minus) price of movement)
+
+		Topology Change:
+
+			A topology change event will signal that the layers were updated. Any such event may, or may not, 
+			have any listeners. The most recent iteration of the backend will be updated as usual. Visibility 
+			calculation will show the update; and the characters will have pass-through queries to these layers.
+
+			The only exception to the rule would be caching of data for other reasons. 
+
+				- Region polygons (potentially..)
+
+
+	Connection Layer: The layers of tiles (or cell locations) described above require a simple means of connecting
+	what would otherwise be the "rooms" for identifying regions of play. These "regions" are located using flood
+	fill methods - a bread-and-butter algorithm for the layout generator.
+
+		Grid Region:  An amorphous set of tiles that are cardinally connected. These would satisfy the flood fill
+		algorithm (being cardinally connected) so that they're identified in one pass over the entire (main / master)
+		grid.
+
+		Grid Region Graph:  The set of regions would play nicely into a graph abstraction. This would be accompanied
+		by edges that are laid as corridors.
+
+		Grid Corridor Region:  The set of tiles for the corridor.
+
+		Grid Room Region:  The set of tiles for the room.
+
+	So, the design of the "connection layer" comes out very easily as a graph of rooms. However, there are some
+	primary differences.
+
+		- The graph of rooms doesn't define corridors. Corridors are drawn from a delaunay triangulation of room
+		centroids. This triangulation "usually" provides a simple, and robust, means of putting down corridors that
+		you'd want to see as part of the layout.
+
+		(see separate design on connection triangulation)
+
+		- The connection layer must deal with the fact that the points of interest, for character movement, are
+		those that piece together the actual path between rooms as it emerges.
+
+		Connection Layer Points:
+
+			1) Room Center (centroid center):  This is the center of the largest sub-rectangle of the region.
+			2) Corridor Connection Points:	   These are the connection points re-triangulated after finding
+											   the delaunay graph of the room centroid-centers.
+
+		These points define the "connection layer"; and the accompanying data structure is very much like the 
+		layout layer - with the added methods for path finding that allow very few points to be iterated.
+
+		Usage Example: Character wishes to travel to player location at the far end of the map.
+
+			1) Connectin Layer Dijkstra's Algorithm:  Graph algorithm applied to the connection layer points of 
+			   interest.
+
+			2) Deal with dijkstra's algorithm as usual (for #1), which would leave the character with their first
+			   stop along the journey to the player's location.
+
+			3) Use this point as the target cell for the actual dijsktra's map algorithm and find the first actual
+			   point towards the corridor connection point (or room center, depending on where the character
+			   started).
+
+		This will speed up ALL iterations of ALL non-player characters by a large amount! So, quite a good idea
+		to take the time to set this up for the character behavior component to use.
+
+
+
+

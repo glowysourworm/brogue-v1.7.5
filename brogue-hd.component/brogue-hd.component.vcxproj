@@ -36,15 +36,23 @@
     <ClInclude Include="gameGenerator.h" />
     <ClInclude Include="grid.h" />
     <ClInclude Include="gridCell.h" />
+    <ClInclude Include="gridCellOutline.h" />
+    <ClInclude Include="gridCellOutlineSegment.h" />
+    <ClInclude Include="gridCellOutlineSegmentHorizontalComparer.h" />
+    <ClInclude Include="gridCellOutlineSegmentVerticalComparer.h" />
+    <ClInclude Include="gridConnectionLayer.h" />
     <ClInclude Include="gridDefinitions.h" />
+    <ClInclude Include="gridLayer.h" />
     <ClInclude Include="gridLocator.h" />
     <ClInclude Include="gridLocatorEdge.h" />
     <ClInclude Include="gridMethods.h" />
     <ClInclude Include="gridRect.h" />
     <ClInclude Include="gridRegion.h" />
+    <ClInclude Include="gridRegionCollection.h" />
     <ClInclude Include="gridRegionConstructor.h" />
     <ClInclude Include="gridRegionExtension.h" />
     <ClInclude Include="gridRegionLocator.h" />
+    <ClInclude Include="gridRegionOutline.h" />
     <ClInclude Include="layoutCoordinateConverter.h" />
     <ClInclude Include="layoutGenerator.h" />
     <ClInclude Include="mazeGenerator.h" />
@@ -52,6 +60,8 @@
     <ClInclude Include="perlinNoiseGenerator.h" />
     <ClInclude Include="randomGenerator.h" />
     <ClInclude Include="rectanglePackingAlgorithm.h" />
+    <ClInclude Include="regionOutlineGenerator.h" />
+    <ClInclude Include="regionOutlineGrid.h" />
     <ClInclude Include="roomGenerator.h" />
     <ClInclude Include="terrainGenerator.h" />
   </ItemGroup>

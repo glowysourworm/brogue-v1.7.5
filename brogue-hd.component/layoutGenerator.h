@@ -1,39 +1,35 @@
 #pragma once
 
+#include <brogueLevelProfile.h>
+#include <brogueRoomTemplate.h>
+#include <color.h>
+#include <delaunayAlgorithm.h>
+#include <dungeonConstants.h>
+#include <limits>
+#include <primsAlgorithm.h>
 #include <simple.h>
 #include <simpleArray.h>
 #include <simpleException.h>
+#include <simpleGraph.h>
 #include <simpleHash.h>
 #include <simpleLine.h>
 #include <simpleList.h>
-#include <color.h>
-
 #include <simplePoint.h>
 #include <simpleRectangle.h>
-#include <simpleGraph.h>
-#include <delaunayAlgorithm.h>
-#include <primsAlgorithm.h>
-#include <dungeonConstants.h>
-#include <brogueRoomTemplate.h>
 
-#include <brogueLevelProfile.h>
-
+#include "brogueCell.h"
 #include "brogueDesignRect.h"
 #include "brogueLayout.h"
-#include "brogueCell.h"
-
-#include "randomGenerator.h"
-#include "roomGenerator.h"
-#include "layoutCoordinateConverter.h"
-
+#include "dijkstra.h"
 #include "gridLocator.h"
 #include "gridLocatorEdge.h"
 #include "gridRect.h"
 #include "gridRegion.h"
+#include "layoutCoordinateConverter.h"
 #include "noiseGenerator.h"
+#include "randomGenerator.h"
 #include "rectanglePackingAlgorithm.h"
-#include <limits>
-#include "dijkstra.h"
+#include "roomGenerator.h"
 
 namespace brogueHd::component
 {
@@ -60,14 +56,21 @@ namespace brogueHd::component
 	private:
 		void initialize(brogueLevelProfile* profile);
 
-		void createRooms();
+		simpleList<brogueDesignRect*>* createRooms();
 
 		//bool attemptConnection(brogueDesignRect* roomTile, const gridRect& attemptRect, int interRoomPadding) const;
 
 		//void designateMachineRooms();
 
-		void triangulateRooms();
-		void triangulateRoomConnections();
+		/// <summary>
+		/// Filters the room connections from delaunay room graph -> those that will become corridors; and also fills out
+		/// the entire list of connection layer edges.
+		/// </summary>
+		simpleList<gridLocatorEdge> filterRoomConnections(simpleGraph<gridLocator, gridLocatorEdge>* roomGraph, 
+														  simpleList<gridLocatorEdge>& connectionLayerEdges);
+
+		simpleGraph<gridLocator, gridLocatorEdge>* triangulateRooms();
+		simpleGraph<gridLocator, gridLocatorEdge>* triangulateRoomConnections();
 
 		void connectRooms();
 
@@ -78,14 +81,6 @@ namespace brogueHd::component
 		roomGenerator* _roomGenerator;
 		randomGenerator* _randomGenerator;
 		layoutCoordinateConverter* _coordinateConverter;
-
-		// Generation Data Stores:
-		//
-		brogueLayout* _layout;
-		brogueLevelProfile* _profile;
-		simpleList<brogueDesignRect*>* _roomTiles;
-		simpleGraph<gridLocator, gridLocatorEdge>* _roomGraph;
-		simpleGraph<gridLocator, gridLocatorEdge>* _connectionGraph;
 	};
 
 
@@ -95,52 +90,12 @@ namespace brogueHd::component
 		_randomGenerator = randomGenerator;
 		_roomGenerator = new roomGenerator(randomGenerator);
 		_coordinateConverter = new layoutCoordinateConverter(layoutParentBoundary, zoomLevel);
-
-		// Layout Data
-		_layout = nullptr;
-		_profile = nullptr;
-		_roomTiles = nullptr;
-		_roomGraph = nullptr;
-		_connectionGraph = nullptr;
 	}
 
 	layoutGenerator::~layoutGenerator()
 	{
-		// Accretion tiles can now be deleted from the previous run
-		for (int index = 0; index < _roomTiles->count(); index++)
-		{
-			// gridRegion instances handled separately
-			delete _roomTiles->get(index);
-		}
-
-		delete _roomTiles;
-
 		delete _roomGenerator;
 		delete _coordinateConverter;
-	}
-
-	void layoutGenerator::initialize(brogueLevelProfile* profile)
-	{
-		// Accretion tiles can now be deleted from the previous run
-		if (_roomTiles != nullptr)
-		{
-			for (int index = 0; index < _roomTiles->count(); index++)
-			{
-				// gridRegion instances handled separately
-				delete _roomTiles->get(index);
-			}
-			delete _roomTiles;
-		}
-
-		// Create the level boundary (add 1 to the layout (parent) boundary)
-		gridRect levelBoundary = _coordinateConverter->getLayoutBoundary();
-		gridRect levelPaddedBoundary = levelBoundary.createPadded(1);
-
-		_layout = new brogueLayout(levelBoundary, levelPaddedBoundary);
-		_profile = profile;
-		_roomTiles = new simpleList<brogueDesignRect*>();
-		_roomGraph = nullptr;
-		_connectionGraph = nullptr;
 	}
 
 	brogueLayout* layoutGenerator::generateLayout(brogueLevelProfile* profile)
@@ -186,13 +141,25 @@ namespace brogueHd::component
 		//          -> Store the results (adds to difficulty rating of cells)
 		//
 
-		// Create Rooms (new _roomTiles)
-		createRooms();
+
+		// Generation Data Stores: These will be "garbage collected" by another component (TODO)
+		//
+		grid<brogueCell*>* layoutGrid;
+		simpleList<brogueDesignRect*>* roomTiles;
+		simpleGraph<gridLocator, gridLocatorEdge>* roomGraph;
+		simpleGraph<gridLocator, gridLocatorEdge>* connectionGraph;
+
+		// Create the level boundary (add 1 to the layout (parent) boundary)
+		gridRect levelBoundary = _coordinateConverter->getLayoutBoundary();
+		gridRect levelPaddedBoundary = levelBoundary.createPadded(1);
+
+		// Create Rooms (new roomTiles)
+		roomTiles = createRooms();
 
 		// Machine Rooms
 
 		// Triangulate Rooms:  Creates Delaunay Triangulation of the connection point vertices (new _delaunayGraph)
-		triangulateRooms();
+		roomGraph = triangulateRooms();
 		triangulateRoomConnections();
 
 		// Connect Rooms:  Create cells in the grid for the delaunay triangulation of the 
@@ -200,7 +167,12 @@ namespace brogueHd::component
 		//				   create corridor cells inside the brogueLayout*
 		connectRooms();
 
-		return _layout;
+		gridRegionCollection()
+		gridLayer<brogueCell*>* cellLayer = new gridLayer<brogueCell*>()
+
+		gridConnectionLayer<brogueCell*>* connectionLayer = new gridConnectionLayer<brogueCell*>(_connectionGraph, )
+
+		return new brogueLayout(_layoutGrid, _connectionLayer);
 	}
 
 	void layoutGenerator::createRooms()
@@ -527,23 +499,22 @@ namespace brogueHd::component
 		return resultGraph;
 	}
 
-	void layoutGenerator::triangulateRooms()
+	simpleGraph<gridLocator, gridLocatorEdge>* layoutGenerator::triangulateRooms(simpleList<brogueDesignRect*>* roomTiles)
 	{
 		// What to triangulate? Utilize the "biggest sub-rectangle" center. Create corridors using nearest neighbors
 		// from the region edge locations + dijkstra's algorithm.
 		//
-		simpleList<gridLocator> roomCenters = _roomTiles->select<gridLocator>([](brogueDesignRect* designRect)
+		simpleList<gridLocator> roomCenters = roomTiles->select<gridLocator>([](brogueDesignRect* designRect)
 		{
 			return designRect->getRegion()->getLargestSubRectangle().center();
 		});
 
 		// (MEMORY!) Calculate the room graph
-		_roomGraph = triangulate(roomCenters);
-
-		_layout->setRoomConnectionGraph(_roomGraph);
+		return triangulate(roomCenters);
 	}
 
-	void layoutGenerator::triangulateRoomConnections()
+	simpleGraph<gridLocator, gridLocatorEdge>* layoutGenerator::triangulateRoomConnections(simpleGraph<gridLocator, gridLocatorEdge>* roomGraph, 
+																						   simpleList<brogueDesignRect*>* roomTiles)
 	{
 		// _roomGraph must be initialized
 
@@ -563,20 +534,84 @@ namespace brogueHd::component
 
 		layoutCoordinateConverter* coordinateConverter = _coordinateConverter;
 
-		simpleList<brogueDesignRect*>* roomTiles = _roomTiles;
+
+
+
+
+		// Final Verification:  Make sure that each edge does not intersect any other region except for 
+		//						the ones that they're connecting.
+		//
+		for (int index = corridorEdges.count() - 1; index >= 0; index--)
+		{
+			gridLocatorEdge edge = corridorEdges.get(index);
+
+			// Room 1
+			brogueDesignRect* designRect1 = roomTiles->first([&edge](brogueDesignRect* rect)
+			{
+				return rect->getRegion()->isDefined(edge.node1);
+			});
+
+			// Room 2
+			brogueDesignRect* designRect2 = roomTiles->first([&edge](brogueDesignRect* rect)
+			{
+				return rect->getRegion()->isDefined(edge.node2);
+			});
+
+			for (int roomIndex = 0; roomIndex < roomTiles->count(); roomIndex++)
+			{
+				if (roomTiles->get(roomIndex) == designRect1 ||
+					roomTiles->get(roomIndex) == designRect2)
+					continue;
+
+				simpleRectangle<float> roomRectUIReal = coordinateConverter->convertToUIReal(
+					roomTiles->get(roomIndex)->getActualBoundary(), true);
+				simpleLine<float> lineUIReal = coordinateConverter->convertToUIReal(edge, true);
+
+				// Found Intersection with another room
+				//if (roomRectUIReal.intersects(lineUIReal))
+				//{
+				//	corridorEdges.removeAt(index);
+				//	break;
+				//}
+			}
+		}
+
+
+		_layout->setCorridorConnections(corridorEdges);
+	}
+
+	simpleList<gridLocatorEdge> layoutGenerator::filterRoomConnections(simpleGraph<gridLocator, gridLocatorEdge>* roomGraph, 
+																	   simpleList<gridLocatorEdge>& connectionLayerEdges)
+	{
+		// Procedure
+		//
+		// 1) Take roomGraph (delaunay) and look for edges that don't intersect
+		//	  other room-region polygons (can use rect's for now)
+		//		-> If Intersection:  Create partial connection to the graph
+		//							 where it intersects the first room node.
+		//		-> Else: (continue)
+		// 2) Create graph of nearest neighbor connection points
+		// 3) Run Prim's Algorithm on THIS graph for the MST
+		// 4) Choose the final set of corridor edges from between the MST
+		//	  and the delaunay version (of the connection point graph)
+		//		-> Return:  The corridor edges
+		//		-> Set:		The full connection point edge list
+		//
+
+
 		simpleList<gridLocator> connectionNodes;
 
 		// Nearest neighbor edges
-		_roomGraph->iterateEdges([&roomTiles, &connectionNodes, &coordinateConverter](const gridLocatorEdge& edge)
+		roomGraph->iterateEdges([&roomTiles, &connectionNodes, &coordinateConverter] (const gridLocatorEdge& edge)
 		{
 			// Room 1
-			brogueDesignRect* designRect1 = roomTiles->first([&edge](brogueDesignRect* rect)
+			brogueDesignRect* designRect1 = roomTiles->first([&edge] (brogueDesignRect* rect)
 			{
 				return rect->getRegion()->getLargestSubRectangle().center() == edge.node1;
 			});
 
 			// Room 2
-			brogueDesignRect* designRect2 = roomTiles->first([&edge](brogueDesignRect* rect)
+			brogueDesignRect* designRect2 = roomTiles->first([&edge] (brogueDesignRect* rect)
 			{
 				return rect->getRegion()->getLargestSubRectangle().center() == edge.node2;
 			});
@@ -622,131 +657,86 @@ namespace brogueHd::component
 		// (MEMORY!) Re-triangulate with these nearest edge locations
 		simpleGraph<gridLocator, gridLocatorEdge>* connectionGraph = triangulate(connectionNodes);
 
-		_connectionGraph = connectionGraph;
-
-		//_layout->setRoomConnectionGraph(connectionGraph);
-
 		simpleList<gridLocatorEdge> corridorEdges;
 
 		// Retrieve the room-edge where the connection was drawn from
 		//
-		_roomGraph->iterateEdges(
-			[&connectionGraph, &corridorEdges, &roomTiles, &coordinateConverter](const gridLocatorEdge& roomEdge)
+		roomGraph->iterateEdges(
+			[&connectionGraph, &corridorEdges, &roomTiles, &coordinateConverter] (const gridLocatorEdge& roomEdge)
+		{
+			// Room 1
+			brogueDesignRect* designRect1 = roomTiles->first([&roomEdge] (brogueDesignRect* rect)
 			{
-				// Room 1
-				brogueDesignRect* designRect1 = roomTiles->first([&roomEdge](brogueDesignRect* rect)
-				{
-					return rect->getRegion()->isDefined(roomEdge.node1);
-				});
+				return rect->getRegion()->isDefined(roomEdge.node1);
+			});
 
-				// Room 2
-				brogueDesignRect* designRect2 = roomTiles->first([&roomEdge](brogueDesignRect* rect)
-				{
-					return rect->getRegion()->isDefined(roomEdge.node2);
-				});
+			// Room 2
+			brogueDesignRect* designRect2 = roomTiles->first([&roomEdge] (brogueDesignRect* rect)
+			{
+				return rect->getRegion()->isDefined(roomEdge.node2);
+			});
 
-				if (designRect1 == designRect2)
+			if (designRect1 == designRect2)
+			{
+				return iterationCallback::iterate;
+			}
+
+			float distance = std::numeric_limits<float>::max();
+			gridLocatorEdge minEdge = default_value::value<gridLocatorEdge>();
+
+			// Remove self-referential edges; look for the best edge connection; and store the result as corridor edges
+			connectionGraph->iterateEdges(
+				[&minEdge, &designRect1, &designRect2, &distance, &coordinateConverter] (const gridLocatorEdge& edge)
+			{
+				if (edge.node1 == default_value::value<gridLocator>() ||
+					edge.node2 == default_value::value<gridLocator>())
 				{
-					return iterationCallback::iterate;
+					throw simpleException(
+						"No edge found for corridor placement:  layoutGenerator::triangulateRoomConnections");
 				}
 
-				float distance = std::numeric_limits<float>::max();
-				gridLocatorEdge minEdge = default_value::value<gridLocatorEdge>();
+				// Edge forward
+				if (designRect1->getRegion()->isDefined(edge.node1) &&
+					designRect2->getRegion()->isDefined(edge.node2))
+				{
+					simplePoint<int> point1UI = coordinateConverter->convertToUI(edge.node1);
+					simplePoint<int> point2UI = coordinateConverter->convertToUI(edge.node2);
 
-				// Remove self-referential edges; look for the best edge connection; and store the result as corridor edges
-				connectionGraph->iterateEdges(
-					[&minEdge, &designRect1, &designRect2, &distance, &coordinateConverter](const gridLocatorEdge& edge)
+					if (point1UI.distance(point2UI) < distance)
 					{
-						if (edge.node1 == default_value::value<gridLocator>() ||
-							edge.node2 == default_value::value<gridLocator>())
-						{
-							throw simpleException(
-								"No edge found for corridor placement:  layoutGenerator::triangulateRoomConnections");
-						}
-
-						// Edge forward
-						if (designRect1->getRegion()->isDefined(edge.node1) &&
-							designRect2->getRegion()->isDefined(edge.node2))
-						{
-							simplePoint<int> point1UI = coordinateConverter->convertToUI(edge.node1);
-							simplePoint<int> point2UI = coordinateConverter->convertToUI(edge.node2);
-
-							if (point1UI.distance(point2UI) < distance)
-							{
-								distance = point1UI.distance(point2UI);
-								minEdge = edge;
-							}
-						}
-
-						// Edge reverse
-						if (designRect1->getRegion()->isDefined(edge.node2) &&
-							designRect2->getRegion()->isDefined(edge.node1))
-						{
-							simplePoint<int> point1UI = coordinateConverter->convertToUI(edge.node2);
-							simplePoint<int> point2UI = coordinateConverter->convertToUI(edge.node1);
-
-							if (point1UI.distance(point2UI) < distance)
-							{
-								distance = point1UI.distance(point2UI);
-								minEdge = edge;
-							}
-						}
-
-						return iterationCallback::iterate;
-					});
-
-				if (minEdge.node1 == default_value::value<gridLocator>() ||
-					minEdge.node2 == default_value::value<gridLocator>())
-				{
-					// TODO: Figure out what happened to triangulation
-					//throw simpleException("No edge found for corridor placement:  layoutGenerator::triangulateRoomConnections");
+						distance = point1UI.distance(point2UI);
+						minEdge = edge;
+					}
 				}
-				else
-					corridorEdges.add(minEdge);
+
+				// Edge reverse
+				if (designRect1->getRegion()->isDefined(edge.node2) &&
+					designRect2->getRegion()->isDefined(edge.node1))
+				{
+					simplePoint<int> point1UI = coordinateConverter->convertToUI(edge.node2);
+					simplePoint<int> point2UI = coordinateConverter->convertToUI(edge.node1);
+
+					if (point1UI.distance(point2UI) < distance)
+					{
+						distance = point1UI.distance(point2UI);
+						minEdge = edge;
+					}
+				}
 
 				return iterationCallback::iterate;
 			});
 
-		// Final Verification:  Make sure that each edge does not intersect any other region except for 
-		//						the ones that they're connecting.
-		//
-		for (int index = corridorEdges.count() - 1; index >= 0; index--)
-		{
-			gridLocatorEdge edge = corridorEdges.get(index);
-
-			// Room 1
-			brogueDesignRect* designRect1 = roomTiles->first([&edge](brogueDesignRect* rect)
+			if (minEdge.node1 == default_value::value<gridLocator>() ||
+				minEdge.node2 == default_value::value<gridLocator>())
 			{
-				return rect->getRegion()->isDefined(edge.node1);
-			});
-
-			// Room 2
-			brogueDesignRect* designRect2 = roomTiles->first([&edge](brogueDesignRect* rect)
-			{
-				return rect->getRegion()->isDefined(edge.node2);
-			});
-
-			for (int roomIndex = 0; roomIndex < roomTiles->count(); roomIndex++)
-			{
-				if (roomTiles->get(roomIndex) == designRect1 ||
-					roomTiles->get(roomIndex) == designRect2)
-					continue;
-
-				simpleRectangle<float> roomRectUIReal = coordinateConverter->convertToUIReal(
-					roomTiles->get(roomIndex)->getActualBoundary(), true);
-				simpleLine<float> lineUIReal = coordinateConverter->convertToUIReal(edge, true);
-
-				// Found Intersection with another room
-				//if (roomRectUIReal.intersects(lineUIReal))
-				//{
-				//	corridorEdges.removeAt(index);
-				//	break;
-				//}
+				// TODO: Figure out what happened to triangulation
+				//throw simpleException("No edge found for corridor placement:  layoutGenerator::triangulateRoomConnections");
 			}
-		}
+			else
+				corridorEdges.add(minEdge);
 
-
-		_layout->setCorridorConnections(corridorEdges);
+			return iterationCallback::iterate;
+		});
 	}
 
 	void layoutGenerator::connectRooms()
