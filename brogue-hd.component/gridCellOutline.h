@@ -61,6 +61,21 @@ namespace brogueHd::component
 	        }
         }
 
+        void translate(const gridLocator& translationGrid, const simplePoint<int>& translationUI)
+        {
+            if (northSegment != nullptr)
+                northSegment->translate(translationGrid, translationUI);
+
+            if (southSegment != nullptr)
+                southSegment->translate(translationGrid, translationUI);
+
+            if (eastSegment != nullptr)
+                eastSegment->translate(translationGrid, translationUI);
+
+            if (westSegment != nullptr)
+                westSegment->translate(translationGrid, translationUI);
+        }
+
         size_t getHash() const override
         {
             size_t north = 0;

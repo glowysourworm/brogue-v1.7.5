@@ -13,24 +13,24 @@ namespace brogueHd::component
 	{
 	public:
 
-		gridRegionOutline(simplePolygon* exterior, const simpleList<simplePolygon*>& interiorPolygons);
+		gridRegionOutline(simplePolygon* exterior, const simpleList<simplePolygon<int>*>& interiorPolygons);
 		~gridRegionOutline();
 
 		int getInteriorPolygonCount() const;
 
-		simplePolygon* getExterior() const;
-		simplePolygon* getInterior(int index) const;
+		simplePolygon<int>* getExterior() const;
+		simplePolygon<int>* getInterior(int index) const;
 
 	private:
 
-		simplePolygon* _exterior;
-		simpleList<simplePolygon*>* _interiorPolygons;
+		simplePolygon<int>* _exterior;
+		simpleList<simplePolygon<int>*>* _interiorPolygons;
 	};
 
-	gridRegionOutline::gridRegionOutline(simplePolygon* exterior, const simpleList<simplePolygon*>& interiorPolygons)
+	gridRegionOutline::gridRegionOutline(simplePolygon<int>* exterior, const simpleList<simplePolygon<int>*>& interiorPolygons)
 	{
 		_exterior = exterior;
-		_interiorPolygons = new simpleList<simplePolygon*>(interiorPolygons);
+		_interiorPolygons = new simpleList<simplePolygon<int>*>(interiorPolygons);
 	}
 	gridRegionOutline::~gridRegionOutline()
 	{
@@ -40,11 +40,11 @@ namespace brogueHd::component
 	{
 		return _interiorPolygons->count();
 	}
-	simplePolygon* gridRegionOutline::getExterior() const
+	simplePolygon<int>* gridRegionOutline::getExterior() const
 	{
 		return _exterior;
 	}
-	simplePolygon* gridRegionOutline::getInterior(int index) const
+	simplePolygon<int>* gridRegionOutline::getInterior(int index) const
 	{
 		return _interiorPolygons->get(index);
 	}

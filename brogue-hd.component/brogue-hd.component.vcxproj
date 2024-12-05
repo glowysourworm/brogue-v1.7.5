@@ -22,7 +22,6 @@
     <ClInclude Include="brogueCell.h" />
     <ClInclude Include="brogueCellDisplay.h" />
     <ClInclude Include="brogueContentGrid.h" />
-    <ClInclude Include="brogueDesignRect.h" />
     <ClInclude Include="brogueGame.h" />
     <ClInclude Include="brogueGlyphMap.h" />
     <ClInclude Include="brogueLayout.h" />
@@ -42,6 +41,11 @@
     <ClInclude Include="gridCellOutlineSegmentVerticalComparer.h" />
     <ClInclude Include="gridConnectionLayer.h" />
     <ClInclude Include="gridDefinitions.h" />
+    <ClInclude Include="gridRegionGraphEdge.h" />
+    <ClInclude Include="gridRegionGraphNode.h" />
+    <ClInclude Include="layoutDijkstraParameters.h" />
+    <ClInclude Include="layoutPartialConnectionData.h" />
+    <ClInclude Include="layoutDesignRect.h" />
     <ClInclude Include="gridLayer.h" />
     <ClInclude Include="gridLocator.h" />
     <ClInclude Include="gridLocatorEdge.h" />
@@ -53,13 +57,16 @@
     <ClInclude Include="gridRegionExtension.h" />
     <ClInclude Include="gridRegionLocator.h" />
     <ClInclude Include="gridRegionOutline.h" />
+    <ClInclude Include="layoutConnectionBuilder.h" />
     <ClInclude Include="layoutCoordinateConverter.h" />
     <ClInclude Include="layoutGenerator.h" />
+    <ClInclude Include="layoutGeneratorData.h" />
     <ClInclude Include="mazeGenerator.h" />
     <ClInclude Include="noiseGenerator.h" />
     <ClInclude Include="perlinNoiseGenerator.h" />
     <ClInclude Include="randomGenerator.h" />
     <ClInclude Include="rectanglePackingAlgorithm.h" />
+    <ClInclude Include="layoutConnectionData.h" />
     <ClInclude Include="regionOutlineGenerator.h" />
     <ClInclude Include="regionOutlineGrid.h" />
     <ClInclude Include="roomGenerator.h" />

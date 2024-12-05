@@ -3,6 +3,9 @@
 #include "gridLocator.h"
 #include "gridRegion.h"
 #include "gridRect.h"
+#include "gridRegionOutline.h"
+#include "layoutCoordinateConverter.h"
+
 #include <simple.h>
 #include <simpleRect.h>
 #include <simpleException.h>
@@ -16,27 +19,30 @@ namespace brogueHd::component
 	using namespace brogueHd::model;
 
 	/// <summary>
-	/// Accretion tile is used to help design the layout. The connection points are desired
-	/// locations for doors - which may or may not be on the edge of the region
+	/// Design-time grid rect / tile data structure used for storing region, region outline, and
+	/// room (or) other region configuration data during design.
 	/// </summary>
-	struct brogueDesignRect : simpleStruct
+	class layoutDesignRect : simpleObject
 	{
 	public:
-		brogueDesignRect()
+		layoutDesignRect()
 		{
+			_coordinateConverter = nullptr;
 			_configuration = default_value::value<brogueRoomTemplate>();
 			_boundary = default_value::value<gridRect>();
 			_minSize = default_value::value<gridRect>();
 			_complete = false;
 			_region = nullptr;
+			_regionOutline = nullptr;
 		};
 
 		/// <summary>
 		/// Creates a design rectangle with EXTRA padding: which will be honored until the constraint
 		/// boundary isn't large enough. 
 		/// </summary>
-		brogueDesignRect(const brogueRoomTemplate& configuration, const gridRect& constraint, int padding)
+		layoutDesignRect(layoutCoordinateConverter* coordinateConverter, const brogueRoomTemplate& configuration, const gridRect& constraint, int padding)
 		{
+			_coordinateConverter = coordinateConverter;
 			_configuration = configuration;
 			_complete = false;
 			_region = nullptr;
@@ -44,41 +50,46 @@ namespace brogueHd::component
 			applyConstraintImpl(constraint, true, padding);
 		}
 
-		brogueDesignRect(const brogueDesignRect& copy)
+		layoutDesignRect(const layoutDesignRect& copy)
 		{
 			copyImpl(copy);
 		}
 
-		~brogueDesignRect()
+		~layoutDesignRect()
 		{
 			// Nothing to do.
 		}
 
-		void operator=(const brogueDesignRect& copy)
+		void operator=(const layoutDesignRect& copy)
 		{
 			copyImpl(copy);
 		}
 
-		bool operator==(const brogueDesignRect& other)
+		bool operator==(const layoutDesignRect& other)
 		{
 			return compare(other);
 		}
 
-		bool operator!=(const brogueDesignRect& other)
+		bool operator!=(const layoutDesignRect& other)
 		{
 			return !compare(other);
 		}
 
-		void complete(gridRegion<gridLocator>* finalRegion)
+		void complete(gridRegion<gridLocator>* finalRegion, gridRegionOutline* finalRegionOutline)
 		{
 			if (_complete)
-				throw simpleException("Already called complete() on brogueDesignRect");
+				throw simpleException("Already called complete() on layoutDesignRect");
 
 			if (!_boundary.contains(finalRegion->getBoundary()))
-				throw simpleException("Actual boundary outside the padded boundary of the brogueDesignRect.");
+				throw simpleException("Actual boundary outside the padded boundary of the layoutDesignRect.");
+
+			if (finalRegion == nullptr ||
+				finalRegionOutline == nullptr)
+				throw simpleException("Null reference exception:  Must set region and region outline in layoutDesignRect.h");
 
 			_complete = true;
 			_region = finalRegion;
+			_regionOutline = finalRegionOutline;
 		}
 
 		void setOffset(const gridLocator& location, bool actualOnly = false)
@@ -93,9 +104,13 @@ namespace brogueHd::component
 
 		void translate(int columnOffset, int rowOffset, bool actualOnly = false)
 		{
+			gridLocator translationGrid = gridLocator(columnOffset, rowOffset);
+			simplePoint<int> translationUI = _coordinateConverter->convertToUI(translationGrid);
+
 			if (actualOnly && _complete)
 			{
 				_region->translate_StackLike(columnOffset, rowOffset);
+				_regionOutline->translate(translationGrid, translationUI);
 			}
 
 			else
@@ -105,12 +120,13 @@ namespace brogueHd::component
 				if (_complete)
 				{
 					_region->translate_StackLike(columnOffset, rowOffset);
+					_regionOutline->translate(translationGrid, translationUI);
 				}
 			}
 
 			// Validate
 			if (_complete && !_boundary.contains(_region->getBoundary()))
-				throw simpleException("Actual boundary outside the padded boundary of the brogueDesignRect.");
+				throw simpleException("Actual boundary outside the padded boundary of the layoutDesignRect.");
 		}
 
 		size_t getHash() const override
@@ -124,6 +140,11 @@ namespace brogueHd::component
 		gridRegion<gridLocator>* getRegion() const
 		{
 			return _region;
+		}
+
+		gridRegionOutline* getRegionOutline() const
+		{
+			return _regionOutline;
 		}
 
 		brogueRoomTemplate getConfiguration() const
@@ -145,7 +166,7 @@ namespace brogueHd::component
 		{
 			if (!_complete)
 				throw simpleException(
-					"Cannot retrieve actual boundary from the design rect until it is complete:  brogueDesignRect.h");
+					"Cannot retrieve actual boundary from the design rect until it is complete:  layoutDesignRect.h");
 
 			return _region->getBoundary();
 		}
@@ -159,7 +180,7 @@ namespace brogueHd::component
 		void applyConstraintImpl(const gridRect& constraint, bool forceUpdate, int padding)
 		{
 			if (_complete)
-				throw simpleException("Trying to apply constraint to a completed brogueDesignRect");
+				throw simpleException("Trying to apply constraint to a completed layoutDesignRect");
 
 			if (!constraint.contains(_boundary) || forceUpdate)
 			{
@@ -177,11 +198,11 @@ namespace brogueHd::component
 
 				if (_boundary.width < _minSize.width ||
 					_boundary.height < _minSize.height)
-					throw simpleException("Invalid design rect:  brogueDesignRect::applyConstraintImpl");
+					throw simpleException("Invalid design rect:  layoutDesignRect::applyConstraintImpl");
 			}
 		}
 
-		bool compare(const brogueDesignRect& other)
+		bool compare(const layoutDesignRect& other)
 		{
 			return _configuration == other.getConfiguration() &&
 				_boundary == other.getBoundary() &&
@@ -190,7 +211,7 @@ namespace brogueHd::component
 				_region == other.getRegion();
 		}
 
-		void copyImpl(const brogueDesignRect& copy)
+		void copyImpl(const layoutDesignRect& copy)
 		{
 			_configuration = copy.getConfiguration();
 			_boundary = copy.getBoundary();
@@ -200,8 +221,12 @@ namespace brogueHd::component
 		}
 
 	private:
+
+		layoutCoordinateConverter* _coordinateConverter;
+
 		// Final (Actual) Region
 		gridRegion<gridLocator>* _region;
+		gridRegionOutline* _regionOutline;
 
 		// Room / Region configuration
 		brogueRoomTemplate _configuration;

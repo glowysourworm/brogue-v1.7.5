@@ -43,7 +43,7 @@ namespace brogueHd::component
 	/// <summary>
 	/// Locator Callback:  Provides locator instances to the algorithm
 	/// </summary>
-	template <typename T>
+	template <isGridLocator T>
 	using dijkstraLocatorCallback = std::function<T(int column, int row)>;
 
 	template <isGridLocator T>

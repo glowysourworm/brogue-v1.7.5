@@ -28,6 +28,13 @@ namespace brogueHd::component
 		{
 			return gridCellOutlineSegment(vertex2, vertex1, location2, location1);
 		}
+		void translate(const gridLocator& translationGrid, const simplePoint<int>& translationUI)
+		{
+			location1.translate(translationGrid.column, translationGrid.row);
+			location2.translate(translationGrid.column, translationGrid.row);
+			vertex1.translate(translationUI.x, translationUI.y);
+			vertex2.translate(translationUI.x, translationUI.y);
+		}
 		void set(const gridCellOutlineSegment& other)
 		{
 			copyImpl(other);

@@ -9,10 +9,12 @@
 #include <simpleMath.h>
 #include <simplePoint.h>
 #include <simpleRectangle.h>
+#include <simplePolygon.h>
 
 namespace brogueHd::component
 {
 	using namespace simple;
+	using namespace simple::math;
 
 	class layoutCoordinateConverter
 	{
@@ -38,6 +40,7 @@ namespace brogueHd::component
 		simpleLine<int> convertToUI(const gridLocatorEdge& edge, bool moveToCellCenter = false) const;
 		simplePoint<int> convertToUI(const gridLocator& location, bool moveToCellCenter = false) const;
 
+		simplePolygon<float>* convertToUIReal(const simplePolygon<int>*& polygonUI) const;
 		simpleRectangle<float> convertToUIReal(const gridRect& edge, bool moveToCellCenter = false) const;
 		simpleLine<float> convertToUIReal(const gridLocatorEdge& edge, bool moveToCellCenter = false) const;
 		simplePoint<float> convertToUIReal(const gridLocator& location, bool moveToCellCenter = false) const;
@@ -132,7 +135,19 @@ namespace brogueHd::component
 
 		return simpleRectangle<int>(topLeftUI, bottomRightUI);
 	}
+	simplePolygon<float>* layoutCoordinateConverter::convertToUIReal(const simplePolygon<int>*& polygonUI) const
+	{
+		simpleList<simpleLine<float>> segments;
 
+		for (int index = 0; index < polygonUI->getSegmentCount() ;index++)
+		{
+			simpleLine<float> segmentUIReal = convertToUIReal(polygonUI->getSegment(index));
+
+			segments.add(segmentUIReal);
+		}
+
+		return new simplePolygon<float>(segments, polygonUI->isClosed());
+	}
 	simpleRectangle<float> layoutCoordinateConverter::convertToUIReal(const gridRect& rect, bool moveToCellCenter) const
 	{
 		gridLocator topLeft = rect.topLeft();
