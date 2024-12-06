@@ -16,17 +16,27 @@ namespace brogueHd::component
 	class gridRectAdjacency : public gridRect
 	{
 	public:
-
+		gridRectAdjacency()
+		{
+			_adjacency = brogueCompass::None;
+		}
 		gridRectAdjacency(const gridRect& rect, brogueCompass adjacency) : gridRect(rect)
 		{
 			_adjacency = adjacency;
 		}
 		gridRectAdjacency(const gridRectAdjacency& copy)
-			: gridRect(copy)
 		{
+			this->width = copy.width;
+			this->height = copy.height;
+			this->column = copy.column;
+			this->row = copy.row;
+
 			_adjacency = copy.getAdjacency();
 		}
-		~gridRectAdjacency();
+		~gridRectAdjacency()
+		{
+			
+		}
 
 		void operator=(const gridRectAdjacency& copy)
 		{

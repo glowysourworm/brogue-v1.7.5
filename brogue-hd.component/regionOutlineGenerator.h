@@ -179,8 +179,12 @@ namespace brogueHd::component
         // the exterior of the Polygon. These will be stored and used later on for other
         // algorithms.
         //
+        simpleList<simpleLine<int>> segments = outline.getKeys().select<simpleLine<int>>([] (const gridCellOutlineSegment& segment)
+        {
+            return simpleLine<int>(segment.vertex1, segment.vertex2);
+        });
 
-        return new simplePolygon<int>(outline.getKeys(), true);
+        return new simplePolygon<int>(segments, true);
     }
 
     template<isGridLocator T>
@@ -202,11 +206,11 @@ namespace brogueHd::component
                 // NORTH on a WEST face: Turn E, or W
 
                 // Is the current segment's endpoint a CORNER or a CROTCH point?
-                int crotchColumn = lastSegment.vertex1.column - 1;
-                int crotchRow = lastSegment.vertex1.row - 1;
+                int crotchColumn = lastSegment.location1.column - 1;
+                int crotchRow = lastSegment.location1.row - 1;
 
-                int cornerColumn = lastSegment.vertex1.column;
-                int cornerRow = lastSegment.vertex1.row;
+                int cornerColumn = lastSegment.location1.column;
+                int cornerRow = lastSegment.location1.row;
 
                 // CROTCH
                 if (algorithmGrid->hasSegment(crotchColumn, crotchRow, brogueCompass::S))
@@ -237,11 +241,11 @@ namespace brogueHd::component
                 // Tracing SOUTH on an EAST face
 
                 // Is the current segment's endpoint a CORNER or a CROTCH point?
-                int crotchColumn = lastSegment.vertex2.column + 1;
-                int crotchRow = lastSegment.vertex2.row + 1;
+                int crotchColumn = lastSegment.location2.column + 1;
+                int crotchRow = lastSegment.location2.row + 1;
 
-                int cornerColumn = lastSegment.vertex2.column;
-                int cornerRow = lastSegment.vertex2.row;
+                int cornerColumn = lastSegment.location2.column;
+                int cornerRow = lastSegment.location2.row;
 
                 // CROTCH
                 if (algorithmGrid->hasSegment(crotchColumn, crotchRow, brogueCompass::N))
@@ -272,11 +276,11 @@ namespace brogueHd::component
                 // Tracing EAST on a NORTH face
 
                 // Is the current segment's endpoint a CORNER or a CROTCH point?
-                int crotchColumn = lastSegment.vertex2.column + 1;
-                int crotchRow = lastSegment.vertex2.row - 1;
+                int crotchColumn = lastSegment.location2.column + 1;
+                int crotchRow = lastSegment.location2.row - 1;
 
-                int cornerColumn = lastSegment.vertex2.column;
-                int cornerRow = lastSegment.vertex2.row;
+                int cornerColumn = lastSegment.location2.column;
+                int cornerRow = lastSegment.location2.row;
 
                 // CROTCH
                 if (algorithmGrid->hasSegment(crotchColumn, crotchRow, brogueCompass::W))
@@ -307,11 +311,11 @@ namespace brogueHd::component
                 // Tracing WEST on a SOUTH face
 
                 // Is the current segment's endpoint a CORNER or a CROTCH point?
-                int crotchColumn = lastSegment.vertex1.column - 1;
-                int crotchRow = lastSegment.vertex1.row + 1;
+                int crotchColumn = lastSegment.location1.column - 1;
+                int crotchRow = lastSegment.location1.row + 1;
 
-                int cornerColumn = lastSegment.vertex1.column;
-                int cornerRow = lastSegment.vertex1.row;
+                int cornerColumn = lastSegment.location1.column;
+                int cornerRow = lastSegment.location1.row;
 
                 // CROTCH
                 if (algorithmGrid->hasSegment(crotchColumn, crotchRow, brogueCompass::E))
@@ -370,11 +374,11 @@ namespace brogueHd::component
                 // Tracing NORTH on a EAST face
 
                 // Is the current segment's endpoint a CORNER or a CROTCH point?
-                int crotchColumn = lastSegment.vertex1.column + 1;
-                int crotchRow = lastSegment.vertex1.row - 1;
+                int crotchColumn = lastSegment.location1.column + 1;
+                int crotchRow = lastSegment.location1.row - 1;
 
-                int cornerColumn = lastSegment.vertex1.column;
-                int cornerRow = lastSegment.vertex1.row;
+                int cornerColumn = lastSegment.location1.column;
+                int cornerRow = lastSegment.location1.row;
 
                 // CROTCH
                 if (algorithmGrid->hasSegment(crotchColumn, crotchRow, brogueCompass::S))
@@ -408,11 +412,11 @@ namespace brogueHd::component
                 // Tracing SOUTH on a WEST face
 
                 // Is the current segment's endpoint a CORNER or a CROTCH point?
-                int crotchColumn = lastSegment.vertex2.column - 1;
-                int crotchRow = lastSegment.vertex2.row + 1;
+                int crotchColumn = lastSegment.location2.column - 1;
+                int crotchRow = lastSegment.location2.row + 1;
 
-                int cornerColumn = lastSegment.vertex2.column;
-                int cornerRow = lastSegment.vertex2.row;
+                int cornerColumn = lastSegment.location2.column;
+                int cornerRow = lastSegment.location2.row;
 
                 // CROTCH
                 if (algorithmGrid->hasSegment(crotchColumn, crotchRow, brogueCompass::N))
@@ -446,11 +450,11 @@ namespace brogueHd::component
                 // Tracing EAST on a SOUTH face
 
                 // Is the current segment's endpoint a CORNER or a CROTCH point?
-                int crotchColumn = lastSegment.vertex2.column + 1;
-                int crotchRow = lastSegment.vertex2.row + 1;
+                int crotchColumn = lastSegment.location2.column + 1;
+                int crotchRow = lastSegment.location2.row + 1;
 
-                int cornerColumn = lastSegment.vertex2.column;
-                int cornerRow = lastSegment.vertex2.row;
+                int cornerColumn = lastSegment.location2.column;
+                int cornerRow = lastSegment.location2.row;
 
                 // CROTCH
                 if (algorithmGrid->hasSegment(crotchColumn, crotchRow, brogueCompass::W))
@@ -484,11 +488,11 @@ namespace brogueHd::component
                 // Tracing WEST on a NORTH face
 
                 // Is the current segment's endpoint a CORNER or a CROTCH point?
-                int crotchColumn = lastSegment.vertex1.column - 1;
-                int crotchRow = lastSegment.vertex1.row - 1;
+                int crotchColumn = lastSegment.location1.column - 1;
+                int crotchRow = lastSegment.location1.row - 1;
 
-                int cornerColumn = lastSegment.vertex1.column;
-                int cornerRow = lastSegment.vertex1.row;
+                int cornerColumn = lastSegment.location1.column;
+                int cornerRow = lastSegment.location1.row;
 
                 // CROTCH
                 if (algorithmGrid->hasSegment(crotchColumn, crotchRow, brogueCompass::E))

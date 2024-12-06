@@ -23,6 +23,7 @@
 #include "dijkstra.h"
 #include "gridLocator.h"
 #include "gridLocatorEdge.h"
+#include "gridRectAdjacency.h"
 #include "gridRect.h"
 #include "gridRegion.h"
 #include "gridRegionGraphNode.h"
@@ -431,9 +432,9 @@ namespace brogueHd::component
 				});
 
 				// (MEMORY!) Transfer tiling to the layout generator data (see teardown for layoutGeneratorData*)
-				gridRegionGraphNode<gridLocator> node(designRect->getRegion(), rect.center());
-				gridRegionGraphNode<gridLocator> adjacentNode(adjacentDesignRect->getRegion(), adjacentRect.center());
-				gridRegionGraphEdge<gridLocator> graphEdge(node, adjacentNode);
+				gridRegionGraphNode node(designRect->getRegion(), rect.center());
+				gridRegionGraphNode adjacentNode(adjacentDesignRect->getRegion(), adjacentRect.center());
+				gridRegionGraphEdge graphEdge(node, adjacentNode);
 
 				// Directly create the room graph.
 				data->getRoomGraph()->addEdge(graphEdge);
@@ -446,7 +447,7 @@ namespace brogueHd::component
 		layoutCoordinateConverter* coordinateConverter = _coordinateConverter;
 
 		// Room Graph (centroid center graph) -> Nearest neighbor edge points graph
-		data->getRoomGraph()->iterateEdges([&data, &coordinateConverter] (const gridRegionGraphEdge<gridLocator>& edge)
+		data->getRoomGraph()->iterateEdges([&data, &coordinateConverter] (const gridRegionGraphEdge& edge)
 		{
 			simpleArray<gridLocator> edges1 = edge.node1.getRegion()->getEdgeLocations();
 			simpleArray<gridLocator> edges2 = edge.node2.getRegion()->getEdgeLocations();
@@ -559,14 +560,15 @@ namespace brogueHd::component
 																nextConnection->getConnectionPoint2(),
 																data->getTrialDijkstraParameters());
 
-				layoutDesignRect* interruptingRegion = nullptr;
+				gridRegionGraphNode interruptingRegion = default_value::value<gridRegionGraphNode>();
 				gridLocator interruptingLocation = default_value::value<gridLocator>();
 
 				// Validate the path data
 				if (!validateConnection(data,
 					nextConnection->getNode1(),
 					nextConnection->getNode2(),
-					pathData, interruptingRegion, interruptingLocation))
+					pathData, interruptingRegion, 
+					interruptingLocation))
 				{
 					// Change connection to partial; and continue
 					data->getConnectionBuilder()->changeConnectionToPartial(nextConnection, interruptingRegion, interruptingLocation);
@@ -593,12 +595,12 @@ namespace brogueHd::component
 																nextConnection->getInterruptingLocation(),
 																data->getTrialDijkstraParameters());
 
-				layoutDesignRect* nextInterruptingRegion = nullptr;
+				gridRegionGraphNode nextInterruptingRegion = default_value::value<gridRegionGraphNode>();
 				gridLocator nextInterruptingLocation = default_value::value<gridLocator>();
 
 				// Validate the path data
 				if (!validateConnection(data,
-					nextConnection->getRegion1Rect(),
+					nextConnection->getNode1(),
 					nextConnection->getInterruptingRegion(),
 					pathData, nextInterruptingRegion, nextInterruptingLocation))
 				{
@@ -614,7 +616,7 @@ namespace brogueHd::component
 				//			been solved.
 				else
 				{
-					nextConnection->completePartial(closestRegionRect, pathData);
+					nextConnection->completePartial(pathData);
 				}
 			}
 			else
@@ -648,7 +650,7 @@ namespace brogueHd::component
 		/// 4) store these components in the layoutGeneratorData*.
 		//
 
-		data->getRoomGraph()->
+		//data->getRoomGraph()->
 
 	}
 
@@ -795,35 +797,35 @@ namespace brogueHd::component
 
 	template<isGridLocator T>
 	bool layoutGenerator::validateConnection(layoutGeneratorData* data,
-											 layoutDesignRect* sourceRect,
-											 layoutDesignRect* destRect,
-											 const simpleArray<T>& pathData, 
-											 layoutDesignRect* interruptingRegion,
+											 const gridRegionGraphNode& sourceNode,
+											 const gridRegionGraphNode& destNode,
+											 const simpleArray<T>& pathData,
+											 gridRegionGraphNode& interruptingNode,
 											 gridLocator& interruptingLocation)
 	{
 		// Verify that the path does not intersect any other region except for the source / destination
 		for (int index = 0; index < pathData.count(); index++)
 		{
 			// Source Region
-			if (sourceRect->getRegion()->isDefined(pathData.get(index)))
+			if (sourceNode.getRegion()->isDefined(pathData.get(index)))
 				continue;
 
 			// Destination Region
-			if (destRect->getRegion()->isDefined(pathData.get(index)))
+			if (destNode.getRegion()->isDefined(pathData.get(index)))
 				continue;
 
-			for (int regionIndex = 0; regionIndex < data->getRoomTiles()->count(); regionIndex++)
+			for (int regionIndex = 0; regionIndex < data->getRoomGraph()->getNodes().count(); regionIndex++)
 			{
-				layoutDesignRect* regionRect = data->getRoomTiles()->get(regionIndex);
+				gridRegionGraphNode regionNode = data->getRoomGraph()->getNodes().get(regionIndex);
 
-				if (regionRect == sourceRect ||
-					regionRect == destRect)
+				if (regionNode == sourceNode ||
+					regionNode == destNode)
 					continue;
 
-				if (regionRect->getRegion()->isDefined(pathData.get(index)))
+				if (regionNode.getRegion()->isDefined(pathData.get(index)))
 				{
 					interruptingLocation = pathData.get(index);
-					interruptingRegion = regionRect;
+					interruptingNode = regionNode;
 					return false;
 				}
 			}

@@ -13,6 +13,7 @@ namespace brogueHd::component
 	{
 	public:
 
+		gridRegionGraphNode();
 		gridRegionGraphNode(gridRegion<gridLocator>* region, const gridLocator& node);
 		gridRegionGraphNode(const gridRegionGraphNode& copy);
 		~gridRegionGraphNode();
@@ -33,6 +34,11 @@ namespace brogueHd::component
 		gridLocator _nodeLocation;
 	};
 
+	gridRegionGraphNode::gridRegionGraphNode()
+	{
+		_region = nullptr;
+		_nodeLocation = default_value::value<gridLocator>();
+	}
 	gridRegionGraphNode::gridRegionGraphNode(gridRegion<gridLocator>* region, const gridLocator& nodeLocation)
 	{
 		_region = region;

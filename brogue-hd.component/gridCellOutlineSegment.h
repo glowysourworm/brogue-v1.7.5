@@ -43,11 +43,11 @@ namespace brogueHd::component
 		{
 			copyImpl(copy);
 		}
-		bool operator==(const gridCellOutlineSegment& other)
+		bool operator==(const gridCellOutlineSegment& other) const
 		{
 			return compare(other);
 		}
-		bool operator!=(const gridCellOutlineSegment& other)
+		bool operator!=(const gridCellOutlineSegment& other) const
 		{
 			return !compare(other);
 		}
@@ -73,7 +73,7 @@ namespace brogueHd::component
 			location2 = copy.location2;
 		}
 
-		bool compare(const gridCellOutlineSegment& other)
+		bool compare(const gridCellOutlineSegment& other) const
 		{
 			return vertex1 == other.vertex1 &&
 				vertex2 == other.vertex2 &&

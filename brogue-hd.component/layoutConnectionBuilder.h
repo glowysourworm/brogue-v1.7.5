@@ -37,12 +37,14 @@ namespace brogueHd::component
 		void addConnection(layoutPartialConnectionData* connection);
 
 		void changeConnectionToPartial(layoutConnectionData* connection, 
-									   layoutDesignRect* interruptingRegion, 
+									   const gridRegionGraphNode& interruptingRegion,
 									   const gridLocator& interruptingLocation);
 
 		// Tries to complete partial connections using normal connections that
 		// have already completed.
-		void reconcilePartials(simpleGraph<gridRegionGraphNode<gridLocator>, gridRegionGraphEdge<gridLocator>>* roomGraph);
+		void reconcilePartials(simpleGraph<gridRegionGraphNode, gridRegionGraphEdge>* roomGraph);
+
+		void iteratePartials(simpleListCallback<layoutPartialConnectionData*> callback);
 
 	private:
 
@@ -102,7 +104,7 @@ namespace brogueHd::component
 		_connections->add(connection, connection);
 	}
 	void layoutConnectionBuilder::changeConnectionToPartial(layoutConnectionData* connection,
-														    layoutDesignRect* interruptingRegion,
+															const gridRegionGraphNode& interruptingRegion,
 														    const gridLocator& interruptingLocation)
 	{
 		_connections->remove(connection);
@@ -133,13 +135,13 @@ namespace brogueHd::component
 		// Normal, complete connections
 		simpleList<layoutConnectionData*> normalConnections = _connections->getKeys().where([] (layoutConnectionData* connection)
 		{
-			return typeid(connection) == typeid(layoutConnectionData) && connection.isComplete();
+			return (typeid(connection) == typeid(layoutConnectionData)) && connection->isComplete();
 		});
 
 		if (normalConnections.count() > 0)
 		{
 			// Make sure each partial has been routed
-			this->iteratePartials([&normalConnections, &roomGraph, &partialsReconciled] (layoutPartialConnectionData* partial)
+			this->iteratePartials([&normalConnections, &roomGraph] (layoutPartialConnectionData* partial)
 			{
 				if (!partial->isComplete())
 					return iterationCallback::iterate;
@@ -148,32 +150,26 @@ namespace brogueHd::component
 					return iterationCallback::iterate;
 
 				// Run Dijkstra's Algorithm (graph version) on the room graph (of largest-sub-rectangle centers)
-				dijkstrasAlgorithm algorithm(roomGraph);
+				dijkstrasAlgorithm<gridRegionGraphNode, gridRegionGraphEdge> algorithm(roomGraph);
 
 				// Source = interrupting region node (center), Destination = original connection destination
-				algorithm.initialize(partial->getInterruptingRegion()->getRegion()->getLargestSubRectangle().center(), partial->getNode2()->getNode());
+				algorithm.initialize(partial->getInterruptingRegion(), partial->getNode2());
 
 				// Run Dijkstra's Algorithm (small graph)
-				simpleArray<gridLocator> route = algorithm.run();
+				simpleArray<gridRegionGraphNode> route = algorithm.run();
 
-				if (route == default_value::value<simpleArray<gridLocator>>())
+				if (route == default_value::value<simpleArray<gridRegionGraphNode>>())
 					return iterationCallback::iterate;
 
 				// Validate the route with completed connections
 				for (int index = 0; index < route.count() ;index++)
 				{
-					gridLocator currentNode = route.get(index);
+					gridRegionGraphNode currentNode = route.get(index);
 
 					// Find connection that satisfies the route
-					bool valid = normalConnections->any([&currentNode] (layoutConnectionData* connection)
+					bool valid = normalConnections.any([&currentNode] (layoutConnectionData* connection)
 					{
-						if (connection->getNode1()->getNode() == currentNode)
-							return true;
-
-						else if (connection->getNode2()->getNode() == currentNode)
-							return true;
-
-						return false;
+						return connection->getNode1() == currentNode || connection->getNode2() == currentNode;
 					});
 
 					// NO ROUTE FOUND! (Must wait until other connections have finished)
@@ -184,6 +180,8 @@ namespace brogueHd::component
 				// Valid Connection! Mark it as 'reconciled'.
 				//
 				partial->setReconciled(true);
+
+				return iterationCallback::iterate;
 			});
 		}
 	}

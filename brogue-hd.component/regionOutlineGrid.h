@@ -11,8 +11,6 @@
 #include "gridDefinitions.h"
 #include "gridCellOutline.h"
 #include "gridCellOutlineSegment.h"
-#include "gridCellOutlineSegmentHorizontalComparer.h"
-#include "gridCellOutlineSegmentVerticalComparer.h"
 #include "layoutCoordinateConverter.h"
 
 namespace brogueHd::component
@@ -40,6 +38,13 @@ namespace brogueHd::component
         gridCellOutlineSegment getSegment(int column, int row, brogueCompass segmentFace);
 
         void removeSegment(const gridCellOutlineSegment& segment);
+
+    private:
+
+        static constexpr bool SegmentCompareOverlapExceptions = true;
+
+    	static int segmentHorizontalComparer(const gridCellOutlineSegment& segment1, const gridCellOutlineSegment& segment2);
+        static int segmentVerticalComparer(const gridCellOutlineSegment& segment1, const gridCellOutlineSegment& segment2);
 
     private:
 
@@ -76,12 +81,11 @@ namespace brogueHd::component
         _coordinateConverter = coordinateConverter;
         _grid = new grid<gridCellOutline*>(region->getParentBoundary(), region->getBoundary());
         _region = region;
-        _zoomFactor = zoomFactor;
 
-        _northSegments = new simpleHash<simpleLine<int>, simpleLine<int>>();
-        _southSegments = new simpleHash<simpleLine<int>, simpleLine<int>>();
-        _eastSegments = new simpleHash<simpleLine<int>, simpleLine<int>>();
-        _westSegments = new simpleHash<simpleLine<int>, simpleLine<int>>();
+        _northSegments = new simpleHash<gridCellOutlineSegment, gridCellOutlineSegment>();
+        _southSegments = new simpleHash<gridCellOutlineSegment, gridCellOutlineSegment>();
+        _eastSegments = new simpleHash<gridCellOutlineSegment, gridCellOutlineSegment>();
+        _westSegments = new simpleHash<gridCellOutlineSegment, gridCellOutlineSegment>();
 
         initialize();
     }
@@ -264,38 +268,38 @@ namespace brogueHd::component
             if (north != default_value::value<gridCellOutlineSegment>())
             {
                 if (!northSegments.contains(location.row))
-                    northSegments.add(location.row, new simpleOrderedList<gridCellOutlineSegment>(gridCellOutlineSegmentHorizontalComparer(true)));
+                    northSegments.add(location.row, new simpleOrderedList<gridCellOutlineSegment>(&segmentHorizontalComparer));
 
-                northSegments.get(location.row).add(north);
+                northSegments.get(location.row)->add(north);
             }
 
             if (south != default_value::value<gridCellOutlineSegment>())
             {
                 if (!southSegments.contains(location.row))
-                    southSegments.add(location.row, new simpleOrderedList<gridCellOutlineSegment>(gridCellOutlineSegmentHorizontalComparer(true)));
+                    southSegments.add(location.row, new simpleOrderedList<gridCellOutlineSegment>(&segmentHorizontalComparer));
 
-                southSegments.get(location.row).add(south);
+                southSegments.get(location.row)->add(south);
             }
 
             if (west != default_value::value<gridCellOutlineSegment>())
             {
                 if (!westSegments.contains(location.row))
-                    westSegments.add(location.row, new simpleOrderedList<gridCellOutlineSegment>(gridCellOutlineSegmentVerticalComparer(true)));
+                    westSegments.add(location.row, new simpleOrderedList<gridCellOutlineSegment>(&segmentVerticalComparer));
 
-                westSegments.get(location.row).add(west);
+                westSegments.get(location.row)->add(west);
             }
 
             if (east != default_value::value<gridCellOutlineSegment>())
             {
                 if (!eastSegments.contains(location.row))
-                    eastSegments.add(location.row, new simpleOrderedList<gridCellOutlineSegment>(gridCellOutlineSegmentVerticalComparer(true)));
+                    eastSegments.add(location.row, new simpleOrderedList<gridCellOutlineSegment>(&segmentVerticalComparer));
 
-                eastSegments.get(location.row).add(east);
+                eastSegments.get(location.row)->add(east);
             }
         }
 
         // Take ordered list of segments and connect them down the axis
-        for (int column = _region.getBoundary().left(); column <= _region.getBoundary().right(); column++)
+        for (int column = _region->getBoundary().left(); column <= _region->getBoundary().right(); column++)
         {
             // E
             if (eastSegments.contains(column))
@@ -308,14 +312,14 @@ namespace brogueHd::component
             // Apply segments to the private collections
             if (eastSegments.contains(column))
             {
-                for (int index = 0; index < eastSegments.count(); index++)
-                    _eastSegments->add(eastSegments.get(index), eastSegments.get(index));
+                for (int index = 0; index < eastSegments.get(column)->count(); index++)
+                    _eastSegments->add(eastSegments.get(column)->get(index), eastSegments.get(column)->get(index));
             }
 
             if (westSegments.contains(column))
             {
-                for (int index = 0; index < westSegments.count(); index++)
-                    _westSegments->add(westSegments.get(index), westSegments.get(index));
+                for (int index = 0; index < westSegments.get(column)->count(); index++)
+                    _westSegments->add(westSegments.get(column)->get(index), westSegments.get(column)->get(index));
             }
         }
 
@@ -332,13 +336,13 @@ namespace brogueHd::component
             // Apply segments to the private collections
             if (northSegments.contains(row))
             {
-                for (int index = 0; index < northSegments.count(); index++)
-                    _northSegments->add(northSegments.get(index), northSegments.get(index));
+                for (int index = 0; index < northSegments.get(row)->count(); index++)
+                    _northSegments->add(northSegments.get(row)->get(index), northSegments.get(row)->get(index));
             }
             if (southSegments.contains(row))
             {
                 for (int index = 0; index < southSegments.count(); index++)
-                    _southSegments->add(southSegments.get(index), southSegments.get(index));
+                    _southSegments->add(southSegments.get(row)->get(index), southSegments.get(row)->get(index));
             }
         }
 
@@ -347,44 +351,66 @@ namespace brogueHd::component
         // Add segments to the grid
         _northSegments->iterate([&grid] (const gridCellOutlineSegment& segment, const gridCellOutlineSegment& value)
         {
-            for (index = segment.location1.column; index <= segment.location2.column; index++)
-                grid->set(index, segment.location1.row, new gridCellOutline(segment, nullptr, nullptr, nullptr));
+            for (int index = segment.location1.column; index <= segment.location2.column; index++)
+            {
+                grid->set(index, segment.location1.row, new gridCellOutline(segment,
+                          default_value::value<gridCellOutlineSegment>(),
+                          default_value::value<gridCellOutlineSegment>(),
+                          default_value::value<gridCellOutlineSegment>()));
+            }
+
+            return iterationCallback::iterate;
         });
 
         _southSegments->iterate([&grid] (const gridCellOutlineSegment& segment, const gridCellOutlineSegment& value)
         {
             for (int index = segment.location1.column; index <= segment.location2.column; index++)
             {
-                if (_grid->get(index, segment.location1.row) == nullptr)
-                    _grid->get(index, segment.location1.row) = new gridCellOutline(nullptr, segment, nullptr, nullptr);
+                if (grid->get(index, segment.location1.row) == nullptr)
+                    grid->set(index, segment.location1.row, new gridCellOutline(default_value::value<gridCellOutlineSegment>(),
+                                                                                segment, 
+                                                                                default_value::value<gridCellOutlineSegment>(), 
+                                                                                default_value::value<gridCellOutlineSegment>()));
 
                 else
-                    _grid->get(index, segment.location1.row)->setSegment(segment, brogueCompass::S);
+                    grid->get(index, segment.location1.row)->setSegment(segment, brogueCompass::S);
             }
+
+            return iterationCallback::iterate;
         });
 
         _eastSegments->iterate([&grid] (const gridCellOutlineSegment& segment, const gridCellOutlineSegment& value)
         {
             for (int index = segment.location1.row; index <= segment.location2.row; index++)
             {
-                if (_grid->get(segment.location1.column, index) == nullptr)
-                    _grid->get(segment.location1.column, index) = new gridCellOutline(nullptr, nullptr, segment, nullptr);
+                if (grid->get(segment.location1.column, index) == nullptr)
+                    grid->set(segment.location1.column, index, new gridCellOutline(default_value::value<gridCellOutlineSegment>(),
+													                               default_value::value<gridCellOutlineSegment>(),
+																					segment,
+													                               default_value::value<gridCellOutlineSegment>()));
 
                 else
-                    _grid->get(segment.location1.column, index)->setSegment(segment, brogueCompass::E);
+                    grid->get(segment.location1.column, index)->setSegment(segment, brogueCompass::E);
             }
+
+            return iterationCallback::iterate;
         });
 
         _westSegments->iterate([&grid] (const gridCellOutlineSegment& segment, const gridCellOutlineSegment& value)
         {
             for (int index = segment.location1.row; index <= segment.location2.row; index++)
             {
-                if (_grid->get(segment.location1.column, index) == nullptr)
-                    _grid->get(segment.location1.column, index) = new gridCellOutline(nullptr, nullptr, nullptr, segment);
+                if (grid->get(segment.location1.column, index) == nullptr)
+                    grid->set(segment.location1.column, index, new gridCellOutline(default_value::value<gridCellOutlineSegment>(),
+														                           default_value::value<gridCellOutlineSegment>(),
+														                           default_value::value<gridCellOutlineSegment>(),
+														                           segment));
 
                 else
-                    _grid->get(segment.location1.column, index)->setSegment(segment, brogueCompass::W);
+                    grid->get(segment.location1.column, index)->setSegment(segment, brogueCompass::W);
             }
+
+            return iterationCallback::iterate;
         });
 
         // Set the north-most segment
@@ -423,10 +449,10 @@ namespace brogueHd::component
         for (int index = collection->count() - 1; index > 0; index--)
         {
             // Descending order (segment1 is the lower in UI coordinates)
-            gridCellOutlineSegment segment1 = collection.get(index - 1);
-            gridCellOutlineSegment segment2 = collection.get(index);
+            gridCellOutlineSegment segment1 = collection->get(index - 1);
+            gridCellOutlineSegment segment2 = collection->get(index);
 
-            if (segment1.vertex2 == segment2.vertex1))
+            if (segment1.vertex2 == segment2.vertex1)
             {
                 // Remove UPPER segment (BEFORE MODIFYING!)
                 collection->removeAt(index);
@@ -438,5 +464,53 @@ namespace brogueHd::component
                 segment1.location2 = segment2.location2;
             }
         }
+    }
+
+    template<isGridLocator T>
+    int regionOutlineGrid<T>::segmentHorizontalComparer(const gridCellOutlineSegment& segment1, const gridCellOutlineSegment& segment2)
+    {
+        int minX1 = simpleMath::minOf(segment1.vertex1.x, segment1.vertex2.x);
+        int minX2 = simpleMath::minOf(segment2.vertex1.x, segment2.vertex2.x);
+
+        int maxX1 = simpleMath::maxOf(segment1.vertex1.x, segment1.vertex2.x);
+        int maxX2 = simpleMath::maxOf(segment2.vertex1.x, segment2.vertex2.x);
+
+        // DON'T ALLOW OVERLAP (CAREFUL WITH END POINTS)
+        if (!(minX1 < maxX2) && !(minX2 < maxX1) && regionOutlineGrid::SegmentCompareOverlapExceptions)
+            throw simpleException("Overlapping outline segments:  segmentHorizontalComparer");
+
+        if (minX1 < minX2)
+            return -1;
+
+        else if (minX2 < minX1)
+            return 1;
+
+        // OVERLAP EXCEPTION DOESN'T APPLY TO EQUALITY!
+        else
+            return 0;
+    }
+
+    template<isGridLocator T>
+    int regionOutlineGrid<T>::segmentVerticalComparer(const gridCellOutlineSegment& segment1, const gridCellOutlineSegment& segment2)
+    {
+        int minY1 = simpleMath::minOf(segment1.vertex1.y, segment1.vertex2.y);
+        int minY2 = simpleMath::minOf(segment2.vertex1.y, segment2.vertex2.y);
+
+        int maxY1 = simpleMath::maxOf(segment1.vertex1.y, segment1.vertex2.y);
+        int maxY2 = simpleMath::maxOf(segment2.vertex1.y, segment2.vertex2.y);
+
+        // DON'T ALLOW OVERLAP (CAREFUL WITH END POINTS)
+        if (!(minY1 < maxY2) && !(minY2 < maxY1) && regionOutlineGrid::SegmentCompareOverlapExceptions)
+            throw simpleException("Overlapping outline segments:  segmentVerticalComparer");
+
+        if (minY1 < minY2)
+            return -1;
+
+        else if (minY2 < minY1)
+            return 1;
+
+        // OVERLAP EXCEPTION DOESN'T APPLY TO EQUALITY!
+        else
+            return 0;
     }
 }

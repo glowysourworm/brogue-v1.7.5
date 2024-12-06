@@ -12,10 +12,10 @@ namespace brogueHd::component
 
     struct gridCellOutline : simpleStruct
     {
-        gridCellOutline(gridCellOutlineSegment* north,
-                        gridCellOutlineSegment* south,
-                        gridCellOutlineSegment* east,
-                        gridCellOutlineSegment* west)
+        gridCellOutline(const gridCellOutlineSegment& north,
+                        const gridCellOutlineSegment& south,
+                        const gridCellOutlineSegment& east,
+                        const gridCellOutlineSegment& west)
         {
             northSegment = north;
             southSegment = south;
@@ -28,13 +28,13 @@ namespace brogueHd::component
             switch (face)
             {
                 case brogueCompass::N:
-                    return northSegment == nullptr ? default_value::value<gridCellOutlineSegment>() : *northSegment;
+                    return northSegment;
                 case brogueCompass::S:
-                    return southSegment == nullptr ? default_value::value<gridCellOutlineSegment>() : *southSegment;
+                    return southSegment;
                 case brogueCompass::E:
-                    return eastSegment == nullptr ? default_value::value<gridCellOutlineSegment>() : *eastSegment;
+                    return eastSegment;
                 case brogueCompass::W:
-                    return westSegment == nullptr ? default_value::value<gridCellOutlineSegment>() : *westSegment;
+                    return westSegment;
                 default:
                     throw simpleException("Mishandled outline face direction:  gridCellOutline.h");
             }
@@ -45,16 +45,16 @@ namespace brogueHd::component
 	        switch (face)
 	        {
 	        case brogueCompass::N:
-                northSegment->set(segment);
+                northSegment.set(segment);
                 break;
             case brogueCompass::S:
-                southSegment->set(segment);
+                southSegment.set(segment);
                 break;
             case brogueCompass::E:
-                eastSegment->set(segment);
+                eastSegment.set(segment);
                 break;
             case brogueCompass::W:
-                westSegment->set(segment);
+                westSegment.set(segment);
                 break;
 	        default:
                 throw simpleException("Mishandled outline face direction:  gridCellOutline.h");
@@ -63,17 +63,17 @@ namespace brogueHd::component
 
         void translate(const gridLocator& translationGrid, const simplePoint<int>& translationUI)
         {
-            if (northSegment != nullptr)
-                northSegment->translate(translationGrid, translationUI);
+            if (northSegment != default_value::value<gridCellOutlineSegment>())
+                northSegment.translate(translationGrid, translationUI);
 
-            if (southSegment != nullptr)
-                southSegment->translate(translationGrid, translationUI);
+            if (southSegment != default_value::value<gridCellOutlineSegment>())
+                southSegment.translate(translationGrid, translationUI);
 
-            if (eastSegment != nullptr)
-                eastSegment->translate(translationGrid, translationUI);
+            if (eastSegment != default_value::value<gridCellOutlineSegment>())
+                eastSegment.translate(translationGrid, translationUI);
 
-            if (westSegment != nullptr)
-                westSegment->translate(translationGrid, translationUI);
+            if (westSegment != default_value::value<gridCellOutlineSegment>())
+                westSegment.translate(translationGrid, translationUI);
         }
 
         size_t getHash() const override
@@ -83,16 +83,16 @@ namespace brogueHd::component
             size_t east = 0;
             size_t west = 0;
 
-            if (northSegment != nullptr)
+            if (northSegment != default_value::value<gridCellOutlineSegment>())
                 north = hashGenerator::generateHash(northSegment);
 
-            if (southSegment != nullptr)
+            if (southSegment != default_value::value<gridCellOutlineSegment>())
                 south = hashGenerator::generateHash(southSegment);
 
-            if (eastSegment != nullptr)
+            if (eastSegment != default_value::value<gridCellOutlineSegment>())
                 east = hashGenerator::generateHash(eastSegment);
 
-            if (westSegment != nullptr)
+            if (westSegment != default_value::value<gridCellOutlineSegment>())
                 west = hashGenerator::generateHash(westSegment);
 
             return hashGenerator::combineHash(north, south, east, west);
@@ -100,9 +100,9 @@ namespace brogueHd::component
 
     private:
 
-        gridCellOutlineSegment* northSegment;           // UI Coordinates (typically)
-        gridCellOutlineSegment* southSegment;
-        gridCellOutlineSegment* eastSegment;
-        gridCellOutlineSegment* westSegment;
+        gridCellOutlineSegment northSegment;           // UI Coordinates (typically)
+        gridCellOutlineSegment southSegment;
+        gridCellOutlineSegment eastSegment;
+        gridCellOutlineSegment westSegment;
 	};
 }

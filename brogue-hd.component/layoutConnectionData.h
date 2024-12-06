@@ -72,11 +72,11 @@ namespace brogueHd::component
 		return _connectionPoint2;
 	}
 
-	gridRegionGraphNode<gridLocator> layoutConnectionData::getNode1() const
+	gridRegionGraphNode layoutConnectionData::getNode1() const
 	{
 		return *_regionNode1;
 	}
-	gridRegionGraphNode<gridLocator> layoutConnectionData::getNode2() const
+	gridRegionGraphNode layoutConnectionData::getNode2() const
 	{
 		return *_regionNode2;
 	}

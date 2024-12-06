@@ -114,7 +114,8 @@ namespace brogueHd::component
 		// TODO: Padding (Define a padding around the region cells in the planning stage)
 		//
 		bool collision = false;
-		_roomGraph->iterateNodes([&collision, &column, &row] (const gridRegionGraphNode<gridLocator>& node)
+
+		_roomGraph->iterateNodes([&collision, &column, &row] (const gridRegionGraphNode& node)
 		{
 			if (node.getRegion()->isDefined(column, row))
 			{

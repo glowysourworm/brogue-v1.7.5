@@ -144,12 +144,6 @@
     <ClInclude Include="gridCellOutlineSegment.h">
       <Filter>Header Files\layout</Filter>
     </ClInclude>
-    <ClInclude Include="gridCellOutlineSegmentHorizontalComparer.h">
-      <Filter>Header Files\layout</Filter>
-    </ClInclude>
-    <ClInclude Include="gridCellOutlineSegmentVerticalComparer.h">
-      <Filter>Header Files\layout</Filter>
-    </ClInclude>
     <ClInclude Include="gridRegionOutline.h">
       <Filter>Header Files\layout</Filter>
     </ClInclude>

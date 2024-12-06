@@ -32,7 +32,7 @@ namespace brogueHd::component
 		/// </summary>
 		void completePartial(const simpleArray<gridLocator>& pathData);
 
-		gridRegionGraphNode<gridLocator> getInterruptingRegion() const;
+		gridRegionGraphNode getInterruptingRegion() const;
 		gridLocator getInterruptingLocation() const;
 
 		void setReconciled(bool value);
@@ -40,7 +40,7 @@ namespace brogueHd::component
 
 	private:
 
-		gridRegionGraphNode<gridLocator>* _interruptingRegion;
+		gridRegionGraphNode* _interruptingRegion;
 		gridLocator _locationInterrupted;
 
 		bool _reconciled;
@@ -54,7 +54,7 @@ namespace brogueHd::component
 															 const gridLocator& locationInterrupted) : 
 	layoutConnectionData(source, destination, locationSource, locationDest)
 	{
-		_interruptingRegion = new gridRegionGraphNode<gridLocator>(interruptingRegion);
+		_interruptingRegion = new gridRegionGraphNode(interruptingRegion);
 		_locationInterrupted = locationInterrupted;
 		_reconciled = false;
 	}
@@ -84,7 +84,7 @@ namespace brogueHd::component
 	{
 		return _locationInterrupted;
 	}
-	gridRegionGraphNode<gridLocator> layoutPartialConnectionData::getInterruptingRegion() const
+	gridRegionGraphNode layoutPartialConnectionData::getInterruptingRegion() const
 	{
 		return *_interruptingRegion;
 	}

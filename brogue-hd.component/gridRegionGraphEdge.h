@@ -13,6 +13,7 @@ namespace brogueHd::component
 	{
 	public:
 
+		gridRegionGraphEdge();
 		gridRegionGraphEdge(const gridRegionGraphNode& anode1, const gridRegionGraphNode& anode2);
 		gridRegionGraphEdge(const gridRegionGraphEdge& copy);
 		~gridRegionGraphEdge();
@@ -28,6 +29,8 @@ namespace brogueHd::component
 		bool compareImpl(const gridRegionGraphEdge& other) const;
 	};
 
+	gridRegionGraphEdge::gridRegionGraphEdge()
+	{}
 	gridRegionGraphEdge::gridRegionGraphEdge(const gridRegionGraphNode& anode1, const gridRegionGraphNode& anode2)
 		: simpleGraphEdge<gridRegionGraphNode>(anode1, anode2)
 	{}

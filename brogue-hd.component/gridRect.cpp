@@ -146,9 +146,6 @@ namespace brogueHd::component
 			height -= bottom() - constraint.bottom();
 	}
 
-	/// <summary>
-	/// If this result is true, then the direction carries a SINGLE cardinal result.
-	/// </summary>
 	bool gridRect::isAdjacent(const gridRect& rect, brogueCompass& direction) const
 	{
 		int adjacentEdges = 0;
@@ -361,4 +358,10 @@ namespace brogueHd::component
 			count++;
 		}
 	}
+
+	size_t gridRect::getHash() const
+	{
+		return hashGenerator::generateHash(column, row, width, height);
+	}
+
 }

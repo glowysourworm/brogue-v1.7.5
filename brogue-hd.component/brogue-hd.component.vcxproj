@@ -37,8 +37,6 @@
     <ClInclude Include="gridCell.h" />
     <ClInclude Include="gridCellOutline.h" />
     <ClInclude Include="gridCellOutlineSegment.h" />
-    <ClInclude Include="gridCellOutlineSegmentHorizontalComparer.h" />
-    <ClInclude Include="gridCellOutlineSegmentVerticalComparer.h" />
     <ClInclude Include="gridConnectionLayer.h" />
     <ClInclude Include="gridDefinitions.h" />
     <ClInclude Include="gridRectAdjacency.h" />
