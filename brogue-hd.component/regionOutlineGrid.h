@@ -341,7 +341,7 @@ namespace brogueHd::component
             }
             if (southSegments.contains(row))
             {
-                for (int index = 0; index < southSegments.count(); index++)
+                for (int index = 0; index < southSegments.get(row)->count(); index++)
                     _southSegments->add(southSegments.get(row)->get(index), southSegments.get(row)->get(index));
             }
         }

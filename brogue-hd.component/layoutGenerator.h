@@ -225,24 +225,42 @@ namespace brogueHd::component
 		// NOTE:  We're instantiating ALL grid cells. So, nullptr has no meaning for the brogueLayout*
 		layoutData->getTrialGrid()->iterate([&layoutGrid] (int column, int row, const gridLocator& item)
 		{
+			// (Memory!) (see brogueLayout*)
 			layoutGrid->set(column, row, new brogueCell(column, row));
 			return iterationCallback::iterate;
 		});
 
-		//// NOTE: Sharing pointers for regions with the primary layout!
-		//regions.forEach([&layoutGrid, &layoutRegions] (gridRegion<gridLocator>* region)
-		//{
-		//	gridRegionConstructor<brogueCell>
-		//	return iterationCallback::iterate;
-		//});
+		// NOTE: Sharing pointers for regions with the primary layout!
+		regions.forEach([&layoutGrid, &layoutRegions] (gridRegion<gridLocator>* region)
+		{
+			gridRegionConstructor<brogueCell*> regionConstructor(region->getParentBoundary(), true);
 
+			region->iterateLocations([&regionConstructor] (int column, int row, const gridLocator& location)
+			{
+				color foreColor(1, 1, 1, 1);
+				color backColor(0, 0, 0.5f, 1.0f);
+				char character = '.';
 
-		gridRegionCollection<brogueCell*>* regionCollection = nullptr;
-		gridLayer<brogueCell*>* cellLayer = nullptr;
+				regionConstructor.add(column, row, new brogueCell(column, row, backColor, foreColor, character));
+				return iterationCallback::iterate;
+			});
 
-		gridConnectionLayer<brogueCell*>* connectionLayer = nullptr;
+			// (MEMORY!) These will be inside the region collection (below) -> brogueLayout*
+			gridRegion<brogueCell*>* finalRegion = regionConstructor.complete();
 
-		return new brogueLayout(layoutGrid, connectionLayer);
+			layoutRegions.add(finalRegion);
+
+			return iterationCallback::iterate;
+		});
+
+		// (MEMORY!) gridRegionCollection* -> gridLayer* -> gridConnectionLayer* -> brogueLayout*
+		gridRegionCollection<brogueCell*>* regionCollection = new gridRegionCollection<brogueCell*>(layoutData->getParentBoundary(), layoutRegions);
+
+		gridLayer<brogueCell*>* cellLayer = new gridLayer<brogueCell*>(regionCollection);
+
+		gridConnectionLayer<brogueCell*>* connectionLayer = new gridConnectionLayer<brogueCell*>(nullptr, cellLayer);
+
+		brogueLayout* layout = new brogueLayout(layoutGrid, connectionLayer);
 	}
 
 	void layoutGenerator::createRooms(layoutGeneratorData* data)
@@ -370,7 +388,8 @@ namespace brogueHd::component
 																		 data->getBoundary());
 
 			// (MEMORY!) Creates a polygon outline (with interior polygons) for the region
-			gridRegionOutline* regionOutline = _regionOutlineGenerator->createOutline(region);
+			//gridRegionOutline* regionOutline = _regionOutlineGenerator->createOutline(region);
+			gridRegionOutline* regionOutline = nullptr;
 
 			// Set the actual region boundary (can still translate)
 			designRect->complete(region, regionOutline);

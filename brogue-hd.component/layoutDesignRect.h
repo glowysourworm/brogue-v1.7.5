@@ -110,7 +110,7 @@ namespace brogueHd::component
 			if (actualOnly && _complete)
 			{
 				_region->translate_StackLike(columnOffset, rowOffset);
-				_regionOutline->translate(translationUI);
+				//_regionOutline->translate(translationUI);
 			}
 
 			else
@@ -120,7 +120,7 @@ namespace brogueHd::component
 				if (_complete)
 				{
 					_region->translate_StackLike(columnOffset, rowOffset);
-					_regionOutline->translate(translationUI);
+					//_regionOutline->translate(translationUI);
 				}
 			}
 

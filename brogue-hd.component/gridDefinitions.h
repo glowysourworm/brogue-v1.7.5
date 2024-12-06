@@ -32,6 +32,9 @@ namespace brogueHd::component
 	template <typename T>
 	concept isGridLocator = std::convertible_to<T, gridLocator>;
 
+	template <typename T>
+	concept isGridLocatorReference = std::is_pointer<T>::value || std::convertible_to<typename std::pointer_traits<T>::element_type, gridLocator>;
+
 	/// <summary>
 	/// Delegate for mapping different types of grid locators.
 	/// </summary>
