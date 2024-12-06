@@ -9,67 +9,76 @@ namespace brogueHd::component
 {
 	using namespace simple::math;
 
-	template<isGridLocator T>
 	class gridRegionGraphNode : public simpleGraphNode
 	{
 	public:
 
-		gridRegionGraphNode(gridRegion<T>* region);
+		gridRegionGraphNode(gridRegion<gridLocator>* region, const gridLocator& node);
 		gridRegionGraphNode(const gridRegionGraphNode& copy);
 		~gridRegionGraphNode();
 
 		void operator=(const gridRegionGraphNode& copy);
+		bool operator==(const gridRegionGraphNode& other) const;
+		bool operator!=(const gridRegionGraphNode& other) const;
 
 		gridLocator getNode() const;
-		gridRegion<T>* getRegion() const;
+		gridRegion<gridLocator>* getRegion() const;
 
 		size_t getHash() const override;
 
 	private:
 
-		gridRegion<T>* _region;
+		gridRegion<gridLocator>* _region;
+
+		gridLocator _nodeLocation;
 	};
 
-	template<isGridLocator T>
-	gridRegionGraphNode<T>::gridRegionGraphNode(gridRegion<T>* region)
+	gridRegionGraphNode::gridRegionGraphNode(gridRegion<gridLocator>* region, const gridLocator& nodeLocation)
 	{
 		_region = region;
+		_nodeLocation = nodeLocation;
 	}
 
-	template<isGridLocator T>
-	gridRegionGraphNode<T>::~gridRegionGraphNode()
+	gridRegionGraphNode::~gridRegionGraphNode()
 	{
 		// Be aware of region memory. There is no deletion until the final layout is understood.		
 	}
 
-	template<isGridLocator T>
-	gridRegionGraphNode<T>::gridRegionGraphNode(const gridRegionGraphNode& copy)
+	gridRegionGraphNode::gridRegionGraphNode(const gridRegionGraphNode& copy)
 	{
 		_region = copy.getRegion();
+		_nodeLocation = copy.getNode();
 	}
 
-	template<isGridLocator T>
-	void gridRegionGraphNode<T>::operator=(const gridRegionGraphNode& copy)
+	void gridRegionGraphNode::operator=(const gridRegionGraphNode& copy)
 	{
 		_region = copy.getRegion();
+		_nodeLocation = copy.getNode();
 	}
 
-	template<isGridLocator T>
-	gridLocator gridRegionGraphNode<T>::getNode() const
+	bool gridRegionGraphNode::operator==(const gridRegionGraphNode& other) const
 	{
-		return _region->getLargestSubRectangle().center();
+		return _region == other.getRegion() && _nodeLocation == other.getNode();
 	}
 
-	template<isGridLocator T>
-	gridRegion<T>* gridRegionGraphNode<T>::getRegion() const
+	bool gridRegionGraphNode::operator!=(const gridRegionGraphNode& other) const
+	{
+		return _region != other.getRegion() || _nodeLocation != other.getNode();	
+	}
+
+	gridLocator gridRegionGraphNode::getNode() const
+	{
+		return _nodeLocation;
+	}
+
+	gridRegion<gridLocator>* gridRegionGraphNode::getRegion() const
 	{
 		return _region;
 	}
 
-	template<isGridLocator T>
-	size_t gridRegionGraphNode<T>::getHash() const
+	size_t gridRegionGraphNode::getHash() const
 	{
 		// Use region pointer for hash code
-		return hashGenerator::generateHash(_region);
+		return hashGenerator::generateHash(_region, _nodeLocation);
 	}
 }

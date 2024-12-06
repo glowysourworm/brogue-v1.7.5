@@ -183,6 +183,9 @@
     <ClInclude Include="gridRegionGraphEdge.h">
       <Filter>Header Files\layout</Filter>
     </ClInclude>
+    <ClInclude Include="gridRectAdjacency.h">
+      <Filter>Header Files\layout</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="gridRect.cpp">

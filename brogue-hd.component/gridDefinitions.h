@@ -2,12 +2,14 @@
 
 #include "gridLocator.h"
 #include <simple.h>
+#include <simpleGraphDefinitions.h>
 #include <functional>
 #include <type_traits>
 
 namespace brogueHd::component
 {
 	using namespace simple;
+	using namespace simple::math;
 
 	/// <summary>
 	/// Defines directions for character movement
@@ -37,6 +39,18 @@ namespace brogueHd::component
 	/// <typeparam name="T">Source type</typeparam>
 	template <isGridLocator TResult, isGridLocator T>
 	using gridLocatorMapper = std::function<TResult(const T& item)>;
+
+	/// <summary>
+	/// Simple graph (.lib) extension for the grid components. Defines a gridLocator node.
+	/// </summary>
+	template<typename TNode, typename TEdge>
+	concept isGridLocatorNode = isGraphNode<TNode> && isGridLocator<TNode>;
+
+	/// <summary>
+	/// Simple graph (.lib) extension for the grid components. Defines a gridLocator edge.
+	/// </summary>
+	template<typename TNode, typename TEdge>
+	concept isGridLocatorEdge = isGraphEdge<TNode, TEdge> && isGridLocator<TNode>;
 
 	/// <summary>
 	/// Simple iteration callback. Set the return value to either continue / break.

@@ -25,6 +25,9 @@
 #include "gridLocatorEdge.h"
 #include "gridRect.h"
 #include "gridRegion.h"
+#include "gridRegionGraphNode.h"
+#include "gridRegionGraphEdge.h"
+#include "gridRegionCollection.h"
 
 #include "layoutConnectionBuilder.h"
 #include "layoutPartialConnectionData.h"
@@ -59,81 +62,72 @@ namespace brogueHd::component
 
 		/// <summary>
 		/// Creates the room regions; and packs them using the rectangle packing algorithm. Also, creates
-		/// region outlilne polygons and stores them with the data store.
+		/// region outlilne polygons and stores them with the data store. Finally, creates the base "room
+		/// graph", which will be drawn on later to create the connection point delaunay graph.
 		/// </summary>
 		void createRooms(layoutGeneratorData* data);
 
 		/// <summary>
-		/// Creates the base delaunay region graph for the layout. This is the room graph.
-		/// </summary>
-		void triangulateRooms(layoutGeneratorData* data);
-
-		/// <summary>
-		/// Creates nearest neighbor locator connections for the delaunay region graph. These are stored
+		/// Creates nearest neighbor locator connections for the room graph. These are stored
 		/// with the connection builder (see attemptRoomConnections)
 		/// </summary>
 		void createNearestNeighbors(layoutGeneratorData* data);
 
 		/// <summary>
-		/// Checks nearest neighbors for polygon intersection with other rooms. Creates partial
-		/// connection data inside of the connection builder for later use. (see attemptRoomConnections)
+		/// Creates the data for the layout connection builder connections. This is drawn from
+		/// the nearest neighbors collection. The resulting connection data will be used to
+		/// create the trial layout.
 		/// </summary>
-		void checkRoomConnections(layoutGeneratorData* data);
+		void initializeConnectionBuilder(layoutGeneratorData* data);
 
 		/// <summary>
-		/// Iterates on the room connections - checking for partials - until the trial grid is complete.
-		/// (see the function implementation for notes). The idea being:  the full delaunay must be tried
-		/// in a planning phase to be sure there are viable corridors. Each of these will be validated
-		/// before transferring cells to the layout grid. So, the final graph is still modifiable
-		/// between the MST / Delaunay; and the corridors are already planned. So, the final step will
-		/// be just to create the final grid, graph, and connection layer that define the level layout.
+		/// Iterates on the nearest neighbors - which are now the connection builder connections.
+		/// These are attempted, using dijsktra's algorithm, to create corridor trial cells. If
+		/// there are any interruptions, partial connections are made to modify the original room
+		/// graph. These are then reconciled to be sure that the (modified) room graph will still
+		/// function.
 		/// </summary>
 		void attemptRoomConnections(layoutGeneratorData* data);
 
 		/// <summary>
-		/// Selects the final graph of rooms from the (modified) delaunay graph - with partial connections
-		/// already accounted for. The MST graph must be drawn from the modified delaunay graph of connection
-		/// points. (e.g. source -> (partial) interrupting location -> destination) This modified graph is
-		/// still a "room graph". So, the first step is to create the (modified delaunay) graph of connection
-		/// points. This graph is, tentatively, the "connection layer" graph. The MST will be a subset of this
-		/// graph that still connects the level. Once this MST is derived, the finalization of the layout will
-		/// choose corridors at random from between the MST (and) modified delaunay.
+		/// Using the connection builder data from the trial room connection attempt, we: 1) define
+		/// the (modified) room graph, 2) create the delaunay triangulated connection-point graph, 3)
+		/// create the MST connection-point graph. Define and store these components in the layoutGeneratorData*.
 		/// </summary>
-		/// <param name="data"></param>
 		void defineConnectionLayer(layoutGeneratorData* data);
 
 		/// <summary>
 		/// Transfers the data to the final layout - also selecting corridors from the trial data using the
-		/// MST and modified delaunay connection graphs. This will define the final "connection layer". The
-		/// region cells, and corridor cells, are now transferred to the final layout, to create brogueCell*
-		/// instances.
+		/// MST and delaunay connection graphs. This will define the final "connection layer". The region cells,
+		/// and corridor cells, are now transferred to the final layout, to create brogueCell* instances.
 		/// </summary>
 		void finalizeLayout(layoutGeneratorData* data);
 
 	private:
 
-		simpleGraph<gridLocator, gridLocatorEdge>* triangulate(const simpleList<gridLocator>& locations);
+		template<isGridLocatorNode TNode, isGridLocatorEdge TEdge>
+		simpleGraph<TNode, TEdge>* triangulate(const simpleList<TNode>& nodes, graphEdgeConstructor<TNode, TEdge> edgeConstructor);
 
 		template<isGridLocator T>
 		simpleArray<T> runDijkstra(const T& source, const T& destination, layoutDijkstraParameters<T>* parameters);
 
 		template<isGridLocator T>
 		bool validateConnection(layoutGeneratorData* data,
-								 layoutDesignRect* sourceRect,
-								 layoutDesignRect* destRect,
+								 const gridRegionGraphNode& sourceNode,
+								 const gridRegionGraphNode& destNode,
 								 const simpleArray<T>& pathData,
-								 layoutDesignRect* interruptingRegion,
+								 gridRegionGraphNode& interruptingNode,
 								 gridLocator& interruptingLocation);
 
 	private:
 		roomGenerator* _roomGenerator;
 		randomGenerator* _randomGenerator;
 		layoutCoordinateConverter* _coordinateConverter;
-		regionOutlineGenerator* _regionOutlineGenerator;
+		regionOutlineGenerator<gridLocator>* _regionOutlineGenerator;
 	};
 
 
-	layoutGenerator::layoutGenerator(randomGenerator* randomGenerator, const gridRect& layoutParentBoundary,int zoomLevel)
+	layoutGenerator::layoutGenerator(randomGenerator* randomGenerator, const gridRect& layoutParentBoundary, int zoomLevel)
 	{
 		_randomGenerator = randomGenerator;
 		_roomGenerator = new roomGenerator(randomGenerator);
@@ -194,34 +188,60 @@ namespace brogueHd::component
 
 		// Generation Data Stores: These will be "garbage collected" by another component (TODO)
 		//
-		layoutGeneratorData* layoutData = new layoutGeneratorData(levelBoundary, levelPaddedBoundary);
+		layoutGeneratorData* layoutData = new layoutGeneratorData(profile, levelBoundary, levelPaddedBoundary);
 
 		// Create Rooms (new roomTiles)
 		createRooms(layoutData);
 
 		// Triangulate Rooms:  Creates Delaunay Triangulation of the connection point vertices
-		triangulateRooms(layoutData);
+		//triangulateRooms(layoutData);
 
 		// Create Nearest Neighbor (edge locations):  Locate nearest neighbor edge cells from the delaunay graph.
-		createNearestNeighbors(layoutData);
+		//createNearestNeighbors(layoutData);
 
 		// Filter these nearest neighbors to avoid collisions with other rooms (modifies the graphs)
-		filterRoomConnections(layoutData);
+		//filterRoomConnections(layoutData);
 
 		// Create the graph of these points (delaunay, and MST, to provide further corridor filtering)
-		triangulateRoomConnections(layoutData);
+		//triangulateRoomConnections(layoutData);
 
 		// Connect Rooms:  Create cells in the grid for the delaunay triangulation of the 
 		//                 connection points (remaining) of the room tiles. Runs dijkstra's algorithm to
 		//				   create corridor cells inside the layout grid.
-		connectRooms(layoutData);
+		//connectRooms(layoutData);
 
-		//gridRegionCollection()
-		//gridLayer<brogueCell*>* cellLayer = new gridLayer<brogueCell*>()
+		simpleList<gridRegionGraphNode> regionNodes = layoutData->getRoomGraph()->getNodes();
+		simpleList<gridRegion<gridLocator>*> regions = regionNodes.select<gridRegion<gridLocator>*>([] (const gridRegionGraphNode& node)
+		{
+			return node.getRegion();
+		});
 
-		//gridConnectionLayer<brogueCell*>* connectionLayer = new gridConnectionLayer<brogueCell*>(_connectionGraph, )
+		// Finalize the (new) data. Be sure we've garbage collected everything else!
+		grid<brogueCell*>* layoutGrid = new grid<brogueCell*>(layoutData->getParentBoundary(), layoutData->getBoundary());
 
-		return new brogueLayout(_layoutGrid, _connectionLayer);
+		simpleList<gridRegion<brogueCell*>*> layoutRegions;
+
+		// NOTE:  We're instantiating ALL grid cells. So, nullptr has no meaning for the brogueLayout*
+		layoutData->getTrialGrid()->iterate([&layoutGrid] (int column, int row, const gridLocator& item)
+		{
+			layoutGrid->set(column, row, new brogueCell(column, row));
+			return iterationCallback::iterate;
+		});
+
+		//// NOTE: Sharing pointers for regions with the primary layout!
+		//regions.forEach([&layoutGrid, &layoutRegions] (gridRegion<gridLocator>* region)
+		//{
+		//	gridRegionConstructor<brogueCell>
+		//	return iterationCallback::iterate;
+		//});
+
+
+		gridRegionCollection<brogueCell*>* regionCollection = nullptr;
+		gridLayer<brogueCell*>* cellLayer = nullptr;
+
+		gridConnectionLayer<brogueCell*>* connectionLayer = nullptr;
+
+		return new brogueLayout(layoutGrid, connectionLayer);
 	}
 
 	void layoutGenerator::createRooms(layoutGeneratorData* data)
@@ -231,8 +251,32 @@ namespace brogueHd::component
 		//
 		// Update:  (see backlog.txt) This will now be done using a tiling method.
 		//
-
-		rectanglePackingAlgorithm algorithm(_randomGenerator, _layout->getParentBoundary(), _layout->getBoundary());
+		// Procedure:
+		//
+		// 1) Fetch a room template randomly from the configuration
+		// 2) Utilize the rectangle packing algorithm to situate the
+		//    next rectangle as close as possible to the first using
+		//    using the focal point (gridLocator). Leave room-padding
+		//	  for the actual grid cell layout afterwards.
+		// 3) Set the tile into the packing.
+		// 4) Layout the room cells using the roomGenerator*. There will
+		//    be space left over for some layouts. 
+		// 5) Repack the result into the packing; and use the translate
+		//    method to put the region into place.
+		// 6) Call the adjacency of room tiles from the packing algorithm.
+		// 7) Use this adjacency to create the room graph and set this
+		//    into the layoutGeneratorData*.
+		//
+		// MEMORY:  The gridRegion<T>*, and gridRegionOutline<T>* are the
+		//		    primary bi-products of this phase of the layout. These
+		//			should be maintained in the brogueLayout*, which is
+		//			the primary output of this class' functions.
+		//
+		//			the layoutGeneratorData* will step around these two
+		//			data structures - deleting only that which is not required
+		//			by the brogueLayout*. (see class destructors)
+		//
+		rectanglePackingAlgorithm algorithm(_randomGenerator, data->getParentBoundary(), data->getBoundary());
 
 		// Keep track of the actual tiles in the layout. The algorithm must have a copy with which to
 		// work; and will not see the fidgeting with our copy of the gridRect on the stack.
@@ -245,11 +289,11 @@ namespace brogueHd::component
 
 		while (iteration < maxIterations)
 		{
-			int randomRoomIndex = _randomGenerator->randomRangeExclusive(0, _profile->getRoomInfoCount());
+			int randomRoomIndex = _randomGenerator->randomRangeExclusive(0, data->getProfile()->getRoomInfoCount());
 
 			brogueRoomTemplate configuration = (iteration == 0)
-				                                   ? _profile->getEntranceRoom()
-				                                   : _profile->getRoomInfo(randomRoomIndex);
+												? data->getProfile()->getEntranceRoom()
+												: data->getProfile()->getRoomInfo(randomRoomIndex);
 			layoutDesignRect* designRect = nullptr;
 			int roomPadding = iteration == 0 ? 0 : 1;
 
@@ -257,11 +301,12 @@ namespace brogueHd::component
 			//
 			if (iteration == 0)
 			{
-				designRect = new layoutDesignRect(configuration, _layout->getBoundary().createPadded(1), roomPadding);
+				// (MEMORY!) These will go to the layoutGeneratorData*
+				designRect = new layoutDesignRect(_coordinateConverter, configuration, data->getBoundary().createPadded(1), roomPadding);
 
 				gridLocator topLeft = gridLocator(
-					_layout->getBoundary().centerX() - (designRect->getBoundary().width / 2),
-					_layout->getBoundary().bottom() - designRect->getBoundary().height);
+					data->getBoundary().centerX() - (designRect->getBoundary().width / 2),
+					data->getBoundary().bottom() - designRect->getBoundary().height);
 				designRect->setOffset(topLeft);
 
 				rectPackingFocus.column = designRect->getBoundary().centerX();
@@ -287,7 +332,7 @@ namespace brogueHd::component
 					continue;
 				}
 
-				layoutDesignRect designRectPreLayout(configuration, largestSubRect, roomPadding);
+				layoutDesignRect designRectPreLayout(_coordinateConverter, configuration, largestSubRect, roomPadding);
 
 				if (!largestSubRect.contains(designRectPreLayout.getBoundary())) // Check room space constraints
 				{
@@ -302,30 +347,11 @@ namespace brogueHd::component
 				gridRect paddedBoundary = designRectPreLayout.getBoundary();
 				algorithm.addRectangle(paddedBoundary);
 
-				// Store the result as the constrained boundary (removing the padding)
-				designRect = new layoutDesignRect(configuration, paddedBoundary, 0);
+				// (MEMORY!) Store the result as the constrained boundary (removing the padding)
+				designRect = new layoutDesignRect(_coordinateConverter, configuration, paddedBoundary, 0);
 
 				// Update the tiling
 				tiling.add(designRect, paddedBoundary);
-
-				// Offset randomly inside the available space
-				//gridLocator translation(_randomGenerator->randomRangeInclusive(0, largestSubRect.width - designRect->getBoundary().width),
-				//						_randomGenerator->randomRangeInclusive(0, largestSubRect.height - designRect->getBoundary().height));
-
-
-				//designRect->translate(translation);
-
-				// Give the algorithm a rectangle to tile
-				//gridRect nextRect = designRect->getBoundary();
-
-				// Success
-				//if (algorithm.addRectangle(nextRect))
-				//{
-				// Use the rectangle to translate the design rect
-				//designRect->setOffset(nextRect.topLeft());
-
-				//tiling.add(designRect);
-				//}
 			}
 
 			// Complete:
@@ -338,157 +364,92 @@ namespace brogueHd::component
 
 			// (MEMORY!) These must be deleted; and the stack-like gridLocator instances will be copied into the brogueLayout* grid.
 			gridRegion<gridLocator>* region = _roomGenerator->designRoom(designRect->getConfiguration().getRoomType(),
-			                                                             designRect->getBoundary().createPadded(roomPadding),
-			                                                             designRect->getMinSize(),
-			                                                             _layout->getBoundary());
+																		 designRect->getBoundary().createPadded(roomPadding),
+																		 designRect->getMinSize(),
+																		 data->getBoundary());
 
 			// (MEMORY!) Creates a polygon outline (with interior polygons) for the region
-			gridRegionOutline* regionOutline _regionOutlineGenerator->createOutline(region);
+			gridRegionOutline* regionOutline = _regionOutlineGenerator->createOutline(region);
 
-			// Set the actual region boundary
+			// Set the actual region boundary (can still translate)
 			designRect->complete(region, regionOutline);
 
 			// Repack the rectangle if it is not the entrance
 			if (iteration != 0)
 			{
-				// Since the design rect was built with a padded boundary (for the room generator), the
-				// tile in the packing should still have room for the padded boundary of the actual rect.
-				// 
-				// This "actual rect" will be the exact smallest boundary for the region. To fit this 
-				// properly into the layout we have to expand by the size of the padding; and move it
-				// inside the design rect's boundary.
+				// Padding:  Added during rectangle packing 1 (above), removed during layout (above), now
+				//			 the "actual" boundary lives inside of that rectangle. So, re-pack the first rect
+				//			 by 1) Removing it from the tiling; and 2) Adding the "actual" boundary, but
+				//			 expanded by the roomPadding amount. Translate the final region into position
+				//			 using gridRegion::translate; and update our hash of designRect instances.
 				//
-				gridRect actualRect = designRect->getActualBoundary();
-				gridRect boundary = designRect->getBoundary();
 
-				// Add the padding back to the actual rect
-				gridRect actualRectPadded = actualRect.createExpanded(roomPadding);
-				gridLocator translation(0, 0);
+				gridRect paddedBoundaryPacked = tiling.get(designRect);
+				gridRect actualBoundaryExpanded = designRect->getActualBoundary().createExpanded(roomPadding);
 
-				// Check the boundary to see where it falls outside the prescribed bounds.
-				if (actualRectPadded.left() < boundary.left())
-					translation.column = boundary.left() - actualRectPadded.left();
+				if (!paddedBoundaryPacked.contains(actualBoundaryExpanded))
+					throw simpleException("Mishandled room layout boundary:  layoutGenerator.h");
 
-				if (actualRectPadded.right() > boundary.right())
-					translation.column = boundary.right() - actualRectPadded.right();
+				// Pack this into position:  modifies the gridRect
+				algorithm.removeRectangle(paddedBoundaryPacked);
+				algorithm.addRectangle(actualBoundaryExpanded);
 
-				if (actualRectPadded.top() < boundary.top())
-					translation.row = boundary.top() - actualRectPadded.top();
+				// Update our hash table
+				tiling.set(designRect, actualBoundaryExpanded);
 
-				if (actualRectPadded.bottom() > boundary.bottom())
-					translation.row = boundary.bottom() - actualRectPadded.bottom();
+				gridLocator translation = designRect->getActualBoundary().createExpanded(roomPadding)
+																		 .getTranslation(actualBoundaryExpanded);
 
-				// Modify the region using a translation
-				designRect->translate(translation, true);
+				if (translation.column != 0 && 
+					translation.row != 0)
+				{
+					// Will also translate the region outline
+					designRect->translate(translation);
+				}
 			}
 
 			iteration++;
 		}
 
-		// Place Region Data
-		brogueLayout* layout = _layout;
-		simpleList<layoutDesignRect*>* roomTiles = _roomTiles;
-
-		tiling.forEach([&layout, &roomTiles](layoutDesignRect* designRect, const gridRect& boundary)
+		// Transfer the tiling straight onto the room graph
+		for (int index = 0; index < tiling.count(); index++)
 		{
-			// Design Tile
-			boundary.iterate([&layout](int column, int row)
+			gridRect rect = tiling.getAt(index)->getValue();
+			layoutDesignRect* designRect = tiling.getAt(index)->getKey();
+
+			// Get adjacency from the packing algorithm data cache
+			simpleList<gridRectAdjacency> adjacentRects = algorithm.getAdjacentRectangles(rect);
+
+			for (int adjacentIndex = 0; adjacentIndex < adjacentRects.count(); adjacentIndex++)
 			{
-				brogueCell prototype(column, row, color(0.0f, 0.0f, 0.3f, 0.2f), colors::white(),
-				                     brogueGlyphMap::Empty);
+				gridRectAdjacency adjacentRect = adjacentRects.get(adjacentIndex);
 
-				layout->createCells(gridLocator(column, row), prototype);
-
-				return iterationCallback::iterate;
-			});
-
-			// Design Boundary
-			designRect->getBoundary().iterate([&layout](int column, int row)
-			{
-				brogueCell prototype(column, row, color(0.3f, 0.0f, 0.3f, 0.2f), colors::white(),
-				                     brogueGlyphMap::Empty);
-
-				layout->createCells(gridLocator(column, row), prototype, true);
-
-				return iterationCallback::iterate;
-			});
-
-			// Actual Boundary
-			designRect->getActualBoundary().iterate([&layout](int column, int row)
-			{
-				brogueCell prototype(column, row, color(0.0f, 0.5f, 1.0f, 0.2f), colors::white(),
-				                     brogueGlyphMap::Empty);
-
-				layout->createCells(gridLocator(column, row), prototype, true);
-
-				return iterationCallback::iterate;
-			});
-
-			// Room Floor
-			designRect->getRegion()->iterateLocations(
-				[&layout, &designRect](int column, int row, const gridLocator& location)
+				// Get the design rect for this tile
+				layoutDesignRect* adjacentDesignRect = tiling.firstKey([&adjacentRect] (layoutDesignRect* key, const gridRect& value)
 				{
-					color backColor(0.3f, 0.3f, 0.3f, 0.5f);
-
-					//if (designRect->getConfiguration().getRoomType() == brogueRoomType::ChunkyRoom)
-					//{
-					//	backColor.red = 1;
-					//}
-
-					brogueCell prototype(column, row, backColor, colors::white(), '.');
-
-					layout->createCells(gridLocator(column, row), prototype, true);
-
-					return iterationCallback::iterate;
+					return adjacentRect == value;
 				});
 
-			// Set room tiles (DON'T FORGET REGION MEMORY)
-			roomTiles->add(designRect);
+				// (MEMORY!) Transfer tiling to the layout generator data (see teardown for layoutGeneratorData*)
+				gridRegionGraphNode<gridLocator> node(designRect->getRegion(), rect.center());
+				gridRegionGraphNode<gridLocator> adjacentNode(adjacentDesignRect->getRegion(), adjacentRect.center());
+				gridRegionGraphEdge<gridLocator> graphEdge(node, adjacentNode);
 
-			return iterationCallback::iterate;
-		});
-	}
-
-	void layoutGenerator::triangulateRooms(layoutGeneratorData* data)
-	{
-		// What to triangulate? Utilize the "biggest sub-rectangle" center. Create corridors using nearest neighbors
-		// from the region edge locations + dijkstra's algorithm.
-		//
-		simpleList<gridLocator> roomCenters = roomTiles->select<gridLocator>([](layoutDesignRect* designRect)
-		{
-			return designRect->getRegion()->getLargestSubRectangle().center();
-		});
-
-		// (MEMORY!) Calculate the room graph
-		data->roomGraph = triangulate(roomCenters);
+				// Directly create the room graph.
+				data->getRoomGraph()->addEdge(graphEdge);
+			}
+		}
 	}
 
 	void layoutGenerator::createNearestNeighbors(layoutGeneratorData* data)
 	{
 		layoutCoordinateConverter* coordinateConverter = _coordinateConverter;
 
-		// Nearest neighbor edges
-		data->roomGraph->iterateEdges([&data, &coordinateConverter] (const gridLocatorEdge& edge)
+		// Room Graph (centroid center graph) -> Nearest neighbor edge points graph
+		data->getRoomGraph()->iterateEdges([&data, &coordinateConverter] (const gridRegionGraphEdge<gridLocator>& edge)
 		{
-			// Room 1
-			layoutDesignRect* designRect1 = data->roomTiles->first([&edge] (layoutDesignRect* rect)
-			{
-				return rect->getRegion()->getLargestSubRectangle().center() == edge.node1;
-			});
-
-			// Room 2
-			layoutDesignRect* designRect2 = data->roomTiles->first([&edge] (layoutDesignRect* rect)
-			{
-				return rect->getRegion()->getLargestSubRectangle().center() == edge.node2;
-			});
-
-			if (designRect1 == designRect2)
-			{
-				return iterationCallback::iterate;
-			}
-
-			simpleArray<gridLocator> edges1 = designRect1->getRegion()->getEdgeLocations();
-			simpleArray<gridLocator> edges2 = designRect2->getRegion()->getEdgeLocations();
+			simpleArray<gridLocator> edges1 = edge.node1.getRegion()->getEdgeLocations();
+			simpleArray<gridLocator> edges2 = edge.node2.getRegion()->getEdgeLocations();
 
 			gridLocator minlocation1 = default_value::value<gridLocator>();
 			gridLocator minlocation2 = default_value::value<gridLocator>();
@@ -511,14 +472,39 @@ namespace brogueHd::component
 				}
 			}
 
-			if (!data->roomNearestNeighbors->contains(minlocation1))
-				data->roomNearestNeighbors->add(minlocation1);
+			gridRegionGraphNode node1(edge.node1.getRegion(), minlocation1);
+			gridRegionGraphNode node2(edge.node2.getRegion(), minlocation2);
+			gridRegionGraphEdge graphEdge(node1, node2);
 
-			if (!data->roomNearestNeighbors->contains(minlocation2))
-				data->roomNearestNeighbors->add(minlocation2);
+			if (!data->getRoomNearestNeighbors()->any([&graphEdge](const gridRegionGraphEdge& otherEdge)
+			{
+				return graphEdge == otherEdge;	// Compares both orientations
+			}))
+			{
+				data->getRoomNearestNeighbors()->add(graphEdge);
+			}
 
 			return iterationCallback::iterate;
 		});
+	}
+
+	void layoutGenerator::initializeConnectionBuilder(layoutGeneratorData* data)
+	{
+		// Procedure:
+		//
+		// 1) Iterate room nearest-neighbor edges
+		// 2) Create normal connection for each (non-partial)
+		//
+
+		for (int index = 0; index < data->getRoomNearestNeighbors()->count(); index++)
+		{
+			gridRegionGraphEdge edge = data->getRoomNearestNeighbors()->get(index);
+
+			// (MEMORY!) (see layoutGeneratorData* destructor)
+			layoutConnectionData* connection = new layoutConnectionData(edge.node1, edge.node2, edge.node1.getNode(), edge.node2.getNode());
+
+			data->getConnectionBuilder()->addConnection(connection);
+		}
 	}
 
 	void layoutGenerator::attemptRoomConnections(layoutGeneratorData* data)
@@ -578,8 +564,8 @@ namespace brogueHd::component
 
 				// Validate the path data
 				if (!validateConnection(data,
-					nextConnection->getRegion1Rect(),
-					nextConnection->getRegion2Rect(),
+					nextConnection->getNode1(),
+					nextConnection->getNode2(),
 					pathData, interruptingRegion, interruptingLocation))
 				{
 					// Change connection to partial; and continue
@@ -652,249 +638,27 @@ namespace brogueHd::component
 		}
 	}
 
-	void layoutGenerator::triangulateRoomConnections(layoutGeneratorData* data)
+	void layoutGenerator::defineConnectionLayer(layoutGeneratorData* data)
 	{
 		// Procedure
 		//
-		// 1) Create nearest neighbor connections between delaunay rooms using edge locations
-		//		-> Condition 1: The room connection line must not intersect any other room 
-		//						polygon except the two rooms in question. 
-		// 
-		// 2) Use these to re-triangulate the connections
-		// 3) Remove self-referencing edges
-		// 4) Store the result as corridor connections
-		// 5) Store the larger result as the "connection graph" for the level.
-		//		-> TODO
+		/// 1) define the (modified) room graph
+		/// 2) create the delaunay triangulated connection-point graph
+		/// 3) create the MST connection-point graph.
+		/// 4) store these components in the layoutGeneratorData*.
 		//
 
-		simpleList<gridLocatorEdge> roomEdges = roomGraph->getEdges();
-
-		// Final Verification:  Make sure that each edge does not intersect any other region except for 
-		//						the ones that they're connecting.
-		//
-		for (int index = roomEdges.count() - 1; index >= 0; index--)
-		{
-			gridLocatorEdge edge = roomEdges.get(index);
-
-			// Room 1
-			layoutDesignRect* designRect1 = roomTiles->first([&edge](layoutDesignRect* rect)
-			{
-				return rect->getRegion()->isDefined(edge.node1);
-			});
-
-			// Room 2
-			layoutDesignRect* designRect2 = roomTiles->first([&edge](layoutDesignRect* rect)
-			{
-				return rect->getRegion()->isDefined(edge.node2);
-			});
-
-			bool intersectionFound = false;
-
-			for (int roomIndex = 0; roomIndex < roomTiles->count() && !intersectionFound; roomIndex++)
-			{
-				if (roomTiles->get(roomIndex) == designRect1 ||
-					roomTiles->get(roomIndex) == designRect2)
-					continue;
-
-				// (Memory!) Create deep copy of the polygon data (needed for stack operation convenience)
-				simplePolygon<int>* regionPolygonUI = roomTiles->get(roomIndex)->getRegionOutline()->getExterior()->copy();
-
-				// (Memory!) Create a real number version of the polygon for this stack check
-				simplePolygon<float>* regionPolygonUIReal = coordinateConverter->convertToUIReal(regionPolygonUI);
-
-				// Move to the center to avoid co-linear points with the outline
-				simpleLine<float> lineUIReal = coordinateConverter->convertToUIReal(edge, true);
-
-				// Found Intersection with another room
-				if (regionPolygonUIReal->intersects(lineUIReal))
-				{
-					//roomEdges.removeAt(index);
-					intersectionFound = true;
-				}
-
-				delete regionPolygonUI;
-				delete regionPolygonUIReal;
-			}
-		}
-
+		data->getRoomGraph()->
 
 	}
 
-	void layoutGenerator::checkRoomConnections(layoutGeneratorData* data)
+	void layoutGenerator::finalizeLayout(layoutGeneratorData* data)
 	{
-		// Procedure
-		//
-		// 1) Take roomGraph (delaunay) and look for edges that don't intersect
-		//	  other room-region polygons
-		//		-> If Intersection:  Create partial connection to the graph
-		//							 where it intersects the first room node.
-		//		-> Else: (continue)
-		//
-		// 2) Store these partials for later use
-		//
 
-		// Nearest neighbor edges (also, fill out modified graph)
-		for (int index = 0; index < data->roomNearestNeighbors->count(); index++)
-		{
-			gridLocatorEdge edge = data->roomNearestNeighbors->get(index);
-
-			// Room 1
-			layoutDesignRect* designRect1 = data->roomTiles->first([&edge] (layoutDesignRect* rect)
-			{
-				return rect->getRegion()->isDefined(edge.node1);
-			});
-
-			// Room 2
-			layoutDesignRect* designRect2 = data->roomTiles->first([&edge] (layoutDesignRect* rect)
-			{
-				return rect->getRegion()->isDefined(edge.node2);
-			});
-
-			// Non-modified data
-			gridLocator node1 = designRect1->getRegion()->getLargestSubRectangle().center();
-			gridLocator node2 = designRect1->getRegion()->getLargestSubRectangle().center();
-			gridLocatorEdge originalEdge(node1, node2);
-
-			// Fill in the modified room graph
-			if (!data->roomGraphModified->containsEdge(originalEdge))
-				data->roomGraphModified->addEdge(originalEdge);
-
-			// Filter self-referential edges
-			if (designRect1 == designRect2)
-			{
-				continue;
-			}
-
-			// Calculate intersection in real numbers
-			simpleLine<float> edgeUIReal = _coordinateConverter->convertToUIReal(edge, true);
-
-			// Look for other polygon intersections
-			for (int roomIndex = 0; roomIndex < data->roomTiles->count(); roomIndex++)
-			{
-				layoutDesignRect* nextRoom = data->roomTiles->get(roomIndex);
-
-				// These are the source and destination rooms
-				if (nextRoom == designRect1 ||
-					nextRoom == designRect2)
-					continue;
-
-				// (MEMORY!) Need to use some heap allocation for these polygons...
-				simplePolygon<float>* regionUIReal = _coordinateConverter->convertToUIReal(nextRoom->getRegionOutline()->getExterior());
-
-				// Could either be single-point or collinear
-				if (regionUIReal->calculateIntersection(edgeUIReal) != simpleLineIntersectionResult::None)
-				{
-					// Create a partial connection for this intersection; and continue. These will be used
-					// later on.
-					layoutPartialConnectionData* partial = data->connectionPartials->firstOrDefault(
-					[&node1, &node2] (gridDesignPartialConnection* partial)
-					{
-						// Checks both directions
-						return partial->hasOriginalConnection(node1, node2);
-					});
-
-					// Create / Update Partial
-					if (partial != nullptr)
-						partial->addInterruptingRegion(nextRoom);
-
-					else
-					{
-						// (MEMORY!) Add this to our layout data heap
-						partial = new layoutPartialConnectionData(designRect1, designRect2, node1, node2);
-						partial->addInterruptingRegion(nextRoom);
-						data->connectionPartials->add(partial);
-					}
-				}
-
-				// Be sure to clean up local memory...
-				delete regionUIReal;
-
-				return result;
-			}
-		}
 	}
 
-	void layoutGenerator::connectRooms(layoutGeneratorData* data)
-	{
-		// Procedure
-		//
-		// 1) Iterate Edges: (DELAUNAY GRAPH) (actually, use the corridor edges.. need to clean up)
-		//      -> Find edges that are not self-referential (use room tiles) (corridor edges)
-		//      -> Collect these edges to pass to dijkstra
-		//
-		// 2) Run Dijkstra to set cells in the primary grid
-		//
-
-		brogueLayout* layout = _layout;
-		const simpleList<layoutDesignRect*>* roomTiles = _roomTiles;
-
-		// (MEMORY!) Use the corridor edges to call dijkstra (on stack usgae has predicate copying)
-		dijkstra<gridLocator>* algorithm = new dijkstra<gridLocator>(
-			_layout->getParentBoundary(),
-			_layout->getBoundary(),
-			true, // Cardinal Movement (for laying corridors)
-
-			// Primary Inclusion Predicate (is it in the grid?)
-			[&layout](int column, int row)
-			{
-				return layout->isDefined(column, row);
-			},
-
-			// Then, the map cost is queried (what is the movement cost?)
-			[&layout, &roomTiles](int column, int row)
-			{
-				//// TODO: Remove this and clean up the layout generator
-				//if (roomTiles->any([&column, &row] (layoutDesignRect* designRect)
-				//{
-				//	return designRect->getRegion()->isDefined(column, row);
-				//}))
-				//{
-				//	return 10;
-				//}
-
-				//else
-				return 1;
-			},
-
-			// Then, it will need the locators from the grid to keep its internal data temporarily
-			[&layout](int column, int row)
-			{
-				// May need design change for this problem (needed to copy grid locators back for dijkstra)
-				return gridLocator(column, row);
-			});
-
-		// Iterate each corridor edge and run dijkstra to finalize the connection
-		_layout->getCorridorConnections().forEach([&algorithm, &layout](const gridLocatorEdge& edge)
-		{
-			gridLocator source = edge.node1;
-			gridLocator targets[1] = {edge.node2};
-
-			// Run Dijkstra
-			algorithm->initialize(source, simpleArray<gridLocator>(targets, 1));
-			algorithm->run();
-
-			simpleArray<gridLocator> resultPath = algorithm->getResultPath(targets[0]);
-
-			// Set corridors
-			resultPath.forEach([&layout](gridLocator locator)
-			{
-				color backColor(0.3f, 0.3f, 0.3f, 0.5f);
-
-				brogueCell cell(locator.column, locator.row, backColor, colors::white(), '.');
-
-				layout->createCells(locator, cell, true);
-
-				return iterationCallback::iterate;
-			});
-
-			return iterationCallback::iterate;
-		});
-
-		// Clean up memory
-		delete algorithm;
-	}
-
-	simpleGraph<gridLocator, gridLocatorEdge>* layoutGenerator::triangulate(const simpleList<gridLocator>& locations)
+	template<isGridLocatorNode TNode, isGridLocatorEdge TEdge>
+	simpleGraph<TNode, TEdge>* layoutGenerator::triangulate(const simpleList<TNode>& nodes, graphEdgeConstructor<TNode, TEdge> edgeConstructor)
 	{
 		// Procedure
 		//
@@ -907,8 +671,7 @@ namespace brogueHd::component
 		//
 
 		// Create delaunay triangulator with graph edge constructor
-		//delaunayAlgorithm triangulator;
-		primsAlgorithm triangulator;
+		delaunayAlgorithm triangulator;
 
 		// Convert grid locators to real number coordinates: This is to run bowyer-watson
 		//
@@ -916,7 +679,7 @@ namespace brogueHd::component
 
 		// Convert the locators
 		//
-		simpleList<simplePoint<float>> connectionNodes = locations.select<simplePoint<float>>(
+		simpleList<simplePoint<float>> connectionNodes = nodes.select<simplePoint<float>>(
 			[&converter] (const gridLocator& center)
 		{
 			// Scales by the cell size; and flips the y-axis
@@ -926,20 +689,19 @@ namespace brogueHd::component
 
 		// (MEMORY!) Create delaunay graph
 		simpleGraph<simplePoint<float>, simpleLine<float>>* delaunayGraph = triangulator.run(connectionNodes,
-			[] (const simplePoint<float>& node1, const simplePoint<float>& node2)
+		[] (const simplePoint<float>& node1, const simplePoint<float>& node2)
 		{
 			// This constructor is for default graphs (3 or less nodes)
 			return simpleLine<float>(node1, node2);
 		});
 
 		// (MEMORY!) Re-scale back to the grid locators
-		simpleGraph<gridLocator, gridLocatorEdge>* resultGraph = new simpleGraph<gridLocator, gridLocatorEdge>();
+		simpleGraph<TNode, TEdge>* resultGraph = new simpleGraph<TNode, TEdge>();
 
 		// Convert Back / Validate
 		//
-		delaunayGraph->iterate(
-			[&converter, &resultGraph, &locations](const simplePoint<float>& node,
-			const simpleList<simpleLine<float>>& adjacentEdges)
+		delaunayGraph->iterate([&converter, &resultGraph, &nodes, &edgeConstructor]
+		(const simplePoint<float>& node,const simpleList<simpleLine<float>>& adjacentEdges)
 		{
 			// Iterate the graph's edges (per node) and convert back to the room graph
 			for (int index = 0; index < adjacentEdges.count(); index++)
@@ -950,39 +712,44 @@ namespace brogueHd::component
 				bool node2Found = false;
 
 				// Validate the edge points with the room centers
-				for (int searchIndex = 0; searchIndex < locations.count() && (!node1Found || !node2Found);
-					 searchIndex++)
+				for (int searchIndex = 0; searchIndex < nodes.count() && (!node1Found || !node2Found); searchIndex++)
 				{
-					if (edge.node1 == locations.get(searchIndex))
+					if (edge.node1 == nodes.get(searchIndex))
 						node1Found = true;
 
-					if (edge.node2 == locations.get(searchIndex))
+					if (edge.node2 == nodes.get(searchIndex))
 						node2Found = true;
 				}
 
 				if (!node1Found || !node2Found)
 					throw simpleException("Invalid triangulation:  layoutGenerator::triangulate");
 
-				// Will take care of the node(s)
-				if (!resultGraph->containsEdge(edge))
-					resultGraph->addEdge(edge);
+				if (edge.node1 == edge.node2)
+					throw simpleException("Invalid self-referential node:  layoutGenerator::triangulate");
+
+				// Call the user's edge constructor
+				TEdge graphEdge = edgeConstructor(edge.node1, edge.node2);
+
+				// Add the new edge to the result graph
+				if (!resultGraph->containsEdge(graphEdge))
+					resultGraph->addEdge(graphEdge);
 			}
 
 			return iterationCallback::iterate;
 		});
 
 		// VALIDATE:
-		if (resultGraph->getNodeCount() != locations.count())
+		if (resultGraph->getNodeCount() != nodes.count())
 			throw simpleException("Location node not found in delaunay graph:  layoutGenerator.h");
 
 		// Verify that the graph contains each room 
-		for (int index = 0; index < locations.count(); index++)
+		for (int index = 0; index < nodes.count(); index++)
 		{
-			if (!resultGraph->containsNode(locations.get(index)))
+			if (!resultGraph->containsNode(nodes.get(index)))
 			{
 				throw simpleException("Room node not found in delaunay room graph:  layoutGenerator.h");
 			}
-			if (resultGraph->getAdjacentEdges(locations.get(index)).count() == 0)
+			if (resultGraph->getAdjacentEdges(nodes.get(index)).count() == 0)
 			{
 				throw simpleException("Room node has zero adjacent edges in delaunay room graph:  layoutGenerator.h");
 			}

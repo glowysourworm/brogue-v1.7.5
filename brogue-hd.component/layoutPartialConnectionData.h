@@ -14,55 +14,55 @@ namespace brogueHd::component
 	class layoutPartialConnectionData : public layoutConnectionData
 	{
 	public:
-		layoutPartialConnectionData(layoutDesignRect* source,
-		                            layoutDesignRect* destination,
-									layoutDesignRect* interruptingRegion,
-									const gridLocator& locationSource, 
-									const gridLocator& locationDest,
-									const gridLocator& locationInterrupted);
-		layoutPartialConnectionData(layoutConnectionData* connection,
-									layoutDesignRect* interruptingRegion,
+		layoutPartialConnectionData(const gridRegionGraphNode& source,
+									 const gridRegionGraphNode& destination,
+									 const gridRegionGraphNode& interruptingRegion,
+									 const gridLocator& locationSource,
+									 const gridLocator& locationDest,
+									 const gridLocator& locationInterrupted);
+
+		layoutPartialConnectionData(const layoutConnectionData* connection,
+									const gridRegionGraphNode& interruptingRegion,
 									const gridLocator& interruptingLocation);
 		~layoutPartialConnectionData();
 
-		void completePartial(layoutDesignRect* interruptingRegion, const simpleArray<gridLocator>& pathData);
+		/// <summary>
+		/// Sets the data for the path of the source -> the location interrupted. This is saved for path
+		/// reconciliation with the graph.
+		/// </summary>
+		void completePartial(const simpleArray<gridLocator>& pathData);
 
-		layoutDesignRect* getInterruptingRegion() const;
+		gridRegionGraphNode<gridLocator> getInterruptingRegion() const;
 		gridLocator getInterruptingLocation() const;
 
-		bool hasOriginalConnection(const gridLocator& locationSource, const gridLocator& locationDest);
-
-		void setReconciled();
+		void setReconciled(bool value);
 		bool getReconciled() const;
 
 	private:
 
-		layoutDesignRect* _interruptingRegion;
+		gridRegionGraphNode<gridLocator>* _interruptingRegion;
 		gridLocator _locationInterrupted;
 
 		bool _reconciled;
 	};
 
-	layoutPartialConnectionData::layoutPartialConnectionData(layoutDesignRect* source,
-															 layoutDesignRect* destination,
-															 layoutDesignRect* interruptingRegion,
+	layoutPartialConnectionData::layoutPartialConnectionData(const gridRegionGraphNode& source,
+															 const gridRegionGraphNode& destination,
+															 const gridRegionGraphNode& interruptingRegion,
 															 const gridLocator& locationSource,
 															 const gridLocator& locationDest,
 															 const gridLocator& locationInterrupted) : 
 	layoutConnectionData(source, destination, locationSource, locationDest)
 	{
-		_interruptingRegions = interruptingRegion;
+		_interruptingRegion = new gridRegionGraphNode<gridLocator>(interruptingRegion);
 		_locationInterrupted = locationInterrupted;
-
-		_interruptingRegions->add(interruptingRegion);
-
 		_reconciled = false;
 	}
-	layoutPartialConnectionData::layoutPartialConnectionData(layoutConnectionData* connection,
-															 layoutDesignRect* interruptingRegion,
+	layoutPartialConnectionData::layoutPartialConnectionData(const layoutConnectionData* connection,
+															 const gridRegionGraphNode& interruptingRegion,
 															 const gridLocator& interruptingLocation) :
-	layoutPartialConnectionData(connection->getRegion1Rect(),
-								connection->getRegion2Rect(),
+	layoutPartialConnectionData(connection->getNode1(),
+								connection->getNode2(),
 								interruptingRegion,
 								connection->getConnectionPoint1(),
 								connection->getConnectionPoint2(),
@@ -70,32 +70,23 @@ namespace brogueHd::component
 	{}
 	layoutPartialConnectionData::~layoutPartialConnectionData()
 	{
+		delete _interruptingRegion;
 	}
 
-	void layoutPartialConnectionData::completePartial(layoutDesignRect* interruptingRegion, const simpleArray<gridLocator>& pathData)
+	void layoutPartialConnectionData::completePartial(const simpleArray<gridLocator>& pathData)
 	{
 		if (_reconciled)
 			throw simpleException("Trying to complete a connection marked 'reconciled'. This implies that the connection was already completed");
 
-		_interruptingRegionOnCompletion = interruptingRegion;
-
 		layoutConnectionData::complete(pathData);
-	}
-	layoutDesignRect* layoutPartialConnectionData::getInterruptingRegionOnCompletion() const
-	{
-		return _interruptingRegionOnCompletion;
-	}
-	int layoutPartialConnectionData::getInterruptingRegionCount() const
-	{
-		return _interruptingRegions->count();
 	}
 	gridLocator layoutPartialConnectionData::getInterruptingLocation() const
 	{
 		return _locationInterrupted;
 	}
-	layoutDesignRect* layoutPartialConnectionData::getInterruptingRegion(int index) const
+	gridRegionGraphNode<gridLocator> layoutPartialConnectionData::getInterruptingRegion() const
 	{
-		return _interruptingRegions->get(index);
+		return *_interruptingRegion;
 	}
 	void layoutPartialConnectionData::setReconciled(bool value)
 	{

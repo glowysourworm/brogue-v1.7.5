@@ -68,7 +68,7 @@ namespace brogueHd::component
 		/// Checks adjacency with the other gridRect. The condition is that it must share
 		/// an edge; and that corners don't count.
 		/// </summary>
-		bool isAdjacent(const gridRect& rect) const;
+		bool isAdjacent(const gridRect& rect, brogueCompass& direction) const;
 
 		void translate(int columnOffset, int rowOffset);
 		void translate(const gridLocator& translation);
@@ -85,5 +85,7 @@ namespace brogueHd::component
 		/// will continue for the specified distance.
 		/// </summary>
 		void iterateOutsideAdjacent(int distance, const gridRect& constraint, gridRectDirectionalIterator callback) const;
+
+		size_t getHash() const override;
 	};
 }

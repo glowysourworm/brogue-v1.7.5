@@ -11,8 +11,8 @@ namespace brogueHd::component
 	{
 	public:
 
-		layoutConnectionData(layoutDesignRect* region1,
-							 layoutDesignRect* region2,
+		layoutConnectionData(const gridRegionGraphNode& node1,
+							 const gridRegionGraphNode& node2,
 							 const gridLocator& connection1,
 							 const gridLocator& connection2);
 		~layoutConnectionData();
@@ -20,8 +20,8 @@ namespace brogueHd::component
 		gridLocator getConnectionPoint1() const;
 		gridLocator getConnectionPoint2() const;
 
-		gridRegionGraphNode* getRegion1Rect() const;
-		gridRegionGraphNode* getRegion2Rect() const;
+		gridRegionGraphNode getNode1() const;
+		gridRegionGraphNode getNode2() const;
 
 		void complete(const simpleList<gridLocator>& pathData);
 		void fail();
@@ -43,13 +43,13 @@ namespace brogueHd::component
 		bool _failed;
 	};
 
-	layoutConnectionData::layoutConnectionData(layoutDesignRect* region1,
-												 layoutDesignRect* region2,
-												 const gridLocator& connection1,
-												 const gridLocator& connection2)
+	layoutConnectionData::layoutConnectionData(const gridRegionGraphNode& node1,
+											   const gridRegionGraphNode& node2,
+											   const gridLocator& connection1,
+											   const gridLocator& connection2)
 	{
-		_regionNode1 = new gridRegionGraphNode(region1->getRegion());
-		_regionNode2 = new gridRegionGraphNode(region2->getRegion());
+		_regionNode1 = new gridRegionGraphNode(node1);
+		_regionNode2 = new gridRegionGraphNode(node2);
 		_connectionPoint1 = connection1;
 		_connectionPoint2 = connection2;
 		_pathData = new simpleList<gridLocator>();
@@ -72,13 +72,13 @@ namespace brogueHd::component
 		return _connectionPoint2;
 	}
 
-	gridRegionGraphNode* layoutConnectionData::getNode1() const
+	gridRegionGraphNode<gridLocator> layoutConnectionData::getNode1() const
 	{
-		return _regionNode1;
+		return *_regionNode1;
 	}
-	gridRegionGraphNode* layoutConnectionData::getNode2() const
+	gridRegionGraphNode<gridLocator> layoutConnectionData::getNode2() const
 	{
-		return _regionNode2;
+		return *_regionNode2;
 	}
 
 	void layoutConnectionData::complete(const simpleList<gridLocator>& pathData)
@@ -105,7 +105,7 @@ namespace brogueHd::component
 	{
 		return _complete;
 	}
-	bool isFailed() const
+	bool layoutConnectionData::isFailed() const
 	{
 		return _failed;
 	}

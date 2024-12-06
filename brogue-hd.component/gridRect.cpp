@@ -146,27 +146,43 @@ namespace brogueHd::component
 			height -= bottom() - constraint.bottom();
 	}
 
-	bool gridRect::isAdjacent(const gridRect& rect) const
+	/// <summary>
+	/// If this result is true, then the direction carries a SINGLE cardinal result.
+	/// </summary>
+	bool gridRect::isAdjacent(const gridRect& rect, brogueCompass& direction) const
 	{
 		int adjacentEdges = 0;
+		direction = brogueCompass::None;
 
 		if (left() == rect.right() + 1)
+		{
 			adjacentEdges++;
+			direction = direction | brogueCompass::W;
+		}
 
 		if (right() == rect.left() - 1)
+		{
 			adjacentEdges++;
+			direction = direction | brogueCompass::E;
+		}
 
 		if (top() == rect.bottom() + 1)
+		{
 			adjacentEdges++;
+			direction = direction | brogueCompass::N;
+		}
 
 		if (bottom() == rect.top() - 1)
+		{
 			adjacentEdges++;
+			direction = direction | brogueCompass::S;
+		}
 
 		bool indicesOverlapX = (rect.left() >= left() && rect.left() <= right()) ||
-			(rect.right() <= right() && rect.right() >= left());
+							   (rect.right() <= right() && rect.right() >= left());
 
 		bool indicesOverlapY = (rect.top() >= top() && rect.top() <= bottom()) ||
-			(rect.bottom() <= bottom() && rect.bottom() >= top());
+							   (rect.bottom() <= bottom() && rect.bottom() >= top());
 
 		return !overlaps(rect) && adjacentEdges > 0 && (indicesOverlapX || indicesOverlapY);
 	}

@@ -27,10 +27,10 @@ namespace brogueHd::component
 		void iterateWhereDefined(gridCallback<brogueCell*> callback) const;
 		void iterateRoomConnections(graphSimpleEdgeIterator<gridLocator, gridLocatorEdge> callback) const;
 
-		simpleList<gridLocatorEdge> getCorridorConnections() const
-		{
-			return _layout->getCorridorConnections();
-		}
+		//simpleList<gridLocatorEdge> getCorridorConnections() const
+		//{
+		//	return _layout->getCorridorConnections();
+		//}
 
 		void clearUpdate();
 		bool needsUpdate();

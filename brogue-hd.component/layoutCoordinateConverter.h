@@ -41,6 +41,8 @@ namespace brogueHd::component
 		simplePoint<int> convertToUI(const gridLocator& location, bool moveToCellCenter = false) const;
 
 		simplePolygon<float>* convertToUIReal(const simplePolygon<int>*& polygonUI) const;
+		simpleLine<float> convertToUIReal(const simpleLine<int>& lineUI) const;
+		simplePoint<float> convertToUIReal(const simplePoint<int>& pointUI) const;
 		simpleRectangle<float> convertToUIReal(const gridRect& edge, bool moveToCellCenter = false) const;
 		simpleLine<float> convertToUIReal(const gridLocatorEdge& edge, bool moveToCellCenter = false) const;
 		simplePoint<float> convertToUIReal(const gridLocator& location, bool moveToCellCenter = false) const;
@@ -139,7 +141,7 @@ namespace brogueHd::component
 	{
 		simpleList<simpleLine<float>> segments;
 
-		for (int index = 0; index < polygonUI->getSegmentCount() ;index++)
+		for (int index = 0; index < polygonUI->segmentCount() ;index++)
 		{
 			simpleLine<float> segmentUIReal = convertToUIReal(polygonUI->getSegment(index));
 
@@ -147,6 +149,17 @@ namespace brogueHd::component
 		}
 
 		return new simplePolygon<float>(segments, polygonUI->isClosed());
+	}
+	simpleLine<float> layoutCoordinateConverter::convertToUIReal(const simpleLine<int>& lineUI) const
+	{
+		simplePoint<float> point1UIReal = convertToUIReal(lineUI.node1);
+		simplePoint<float> point2UIReal = convertToUIReal(lineUI.node2);
+
+		return simpleLine<float>(point1UIReal, point2UIReal);
+	}
+	simplePoint<float> layoutCoordinateConverter::convertToUIReal(const simplePoint<int>& pointUI) const
+	{
+		return simplePoint<float>(pointUI.x, pointUI.y * -1.0f);
 	}
 	simpleRectangle<float> layoutCoordinateConverter::convertToUIReal(const gridRect& rect, bool moveToCellCenter) const
 	{

@@ -13,13 +13,15 @@ namespace brogueHd::component
 	{
 	public:
 
-		gridRegionOutline(simplePolygon* exterior, const simpleList<simplePolygon<int>*>& interiorPolygons);
+		gridRegionOutline(simplePolygon<int>* exterior, const simpleList<simplePolygon<int>*>& interiorPolygons);
 		~gridRegionOutline();
 
 		int getInteriorPolygonCount() const;
 
 		simplePolygon<int>* getExterior() const;
 		simplePolygon<int>* getInterior(int index) const;
+
+		void translate(const simplePoint<int>& offsetUI);
 
 	private:
 
@@ -47,5 +49,14 @@ namespace brogueHd::component
 	simplePolygon<int>* gridRegionOutline::getInterior(int index) const
 	{
 		return _interiorPolygons->get(index);
+	}
+	void gridRegionOutline::translate(const simplePoint<int>& offsetUI)
+	{
+		_exterior->translate(offsetUI);
+
+		for (int index = 0; index < _interiorPolygons->count(); index++)
+		{
+			_interiorPolygons->get(index)->translate(offsetUI);
+		}
 	}
 }

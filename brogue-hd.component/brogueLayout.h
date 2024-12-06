@@ -214,54 +214,12 @@ namespace brogueHd::component
 		});
 	}
 
-	template <isGridLocator T>
-	void brogueLayout::createCells(const T& locator, const brogueCell& prototype, bool overwrite)
-	{
-		brogueCellDisplay display = prototype.getDisplay();
-
-		_mainGrid->set(locator.column,
-		               locator.row,
-		               new brogueCell(locator.column, locator.row, display.backColor, display.foreColor,
-		                              display.character),
-		               overwrite);
-	}
-
-	template <isGridLocator T>
-	void brogueLayout::createCells(gridRegion<T>* region, const brogueCell& prototype, bool overwrite)
-	{
-		grid<brogueCell*>* mainGrid = _mainGrid;
-		brogueCellDisplay display = prototype.getDisplay();
-
-		// Check cells
-		region->iterateLocations([&mainGrid, &display, &overwrite](int column, int row, const T& locator)
-		{
-			mainGrid->set(locator.column,
-			              locator.row,
-			              new brogueCell(locator.column, locator.row, display.backColor, display.foreColor,
-			                             display.character),
-			              overwrite);
-
-			return iterationCallback::iterate;
-		});
-	}
-
-	void brogueLayout::setRoomConnectionGraph(simpleGraph<gridLocator, gridLocatorEdge>* connectionGraph)
-	{
-		_connectionGraph = connectionGraph;
-	}
-
-	void brogueLayout::setCorridorConnections(const simpleList<gridLocatorEdge>& connections)
-	{
-		_corridorConnections->clear();
-		_corridorConnections->addRange(connections);
-	}
-
 	void brogueLayout::iterateRoomConnections(graphSimpleEdgeIterator<gridLocator, gridLocatorEdge> callback)
 	{
-		if (_connectionGraph == nullptr)
-			throw simpleException("Trying to iterate room graph before setting it");
+		//if (_connectionGraph == nullptr)
+		//	throw simpleException("Trying to iterate room graph before setting it");
 
-		_connectionGraph->iterateEdges(callback);
+		//_connectionGraph->iterateEdges(callback);
 	}
 
 	void brogueLayout::iterateAdjacentCells(int column, int row, gridCallback<brogueCell*> callback)

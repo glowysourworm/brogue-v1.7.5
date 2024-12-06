@@ -42,7 +42,7 @@ namespace brogueHd::component
 
 		// Tries to complete partial connections using normal connections that
 		// have already completed.
-		void reconcilePartials(simpleGraph<gridRegionGraphNode, gridRegionGraphEdge>* roomGraph);
+		void reconcilePartials(simpleGraph<gridRegionGraphNode<gridLocator>, gridRegionGraphEdge<gridLocator>>* roomGraph);
 
 	private:
 
@@ -64,9 +64,9 @@ namespace brogueHd::component
 	}
 	bool layoutConnectionBuilder::hasPendingPartial() const
 	{
-		return _connections->any([] (layoutPartialConnectionData* key, layoutPartialConnectionData* value)
+		return _connections->any([] (layoutConnectionData* key, layoutConnectionData* value)
 		{
-			return typeid(key) == typeid(layoutPartialConnectionData) && !key->isComplete();
+			return (typeid(key) == typeid(layoutPartialConnectionData)) && !key->isComplete();
 		});
 	}
 	bool layoutConnectionBuilder::hasPendingNormal() const
@@ -79,16 +79,18 @@ namespace brogueHd::component
 
 	bool layoutConnectionBuilder::hasCompletedPartial() const
 	{
-		return _connections->any([] (layoutPartialConnectionData* key, layoutPartialConnectionData* value)
+		return _connections->any([] (layoutConnectionData* key, layoutConnectionData* value)
 		{
 			return typeid(key) == typeid(layoutPartialConnectionData) && key->isComplete();
 		});
 	}
 	bool layoutConnectionBuilder::hasCompletedUnreconciledPartials() const
 	{
-		return _connections->any([] (layoutPartialConnectionData* key, layoutPartialConnectionData* value)
+		return _connections->any([] (layoutConnectionData* key, layoutConnectionData* value)
 		{
-			return typeid(key) == typeid(layoutPartialConnectionData) && key->isComplete() && !key->getReconciled();
+			layoutPartialConnectionData* partial = (layoutPartialConnectionData*)key;
+
+			return (typeid(key) == typeid(layoutPartialConnectionData)) && key->isComplete() && !partial->getReconciled();
 		});
 	}
 	void layoutConnectionBuilder::addConnection(layoutConnectionData* connection)

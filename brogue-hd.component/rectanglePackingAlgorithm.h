@@ -11,6 +11,8 @@
 #include <simpleVector.h>
 #include <limits>
 
+#include "gridRectAdjacency.h"
+
 namespace brogueHd::component
 {
 	using namespace simple;
@@ -24,11 +26,10 @@ namespace brogueHd::component
 	{
 	public:
 		rectanglePackingAlgorithm(randomGenerator* randomGenerator, const gridRect& parentBoundary,
-		                          const gridRect& relativeBoundary);
+								  const gridRect& relativeBoundary);
 		~rectanglePackingAlgorithm();
 
 		void initialize(const gridRect& firstRect, const gridLocator& focalPoint);
-		void initialize(const simpleList<gridRect>& rects, const gridLocator& focalPoint);
 
 		/// <summary>
 		/// Adds a rectangle to the tiling - moving it into position
@@ -36,9 +37,20 @@ namespace brogueHd::component
 		bool addRectangle(gridRect& rect);
 
 		/// <summary>
+		/// Removes rectangle from the tiling whose rect is value-equivalent to the provided rect.
+		/// </summary>
+		void removeRectangle(const gridRect& rect);
+
+		/// <summary>
 		/// Clears out all rectangles from the packing
 		/// </summary>
 		void clearRectangles();
+
+		/// <summary>
+		/// Returns list of adjacent rectangles with their adjacency set relative to
+		/// the user's query rect. (e.g. brogueCompass::N => "north of rect" (and) "directly adjacent")
+		/// </summary>
+		simpleList<gridRectAdjacency> getAdjacentRectangles(const gridRect& rect);
 
 		/// <summary>
 		/// Gets the largest unused space with respect to this packing
@@ -57,12 +69,14 @@ namespace brogueHd::component
 
 		grid<gridLocator>* _tilingGrid;
 
+		// Be careful with hashing. If tiles are re-arranged the hash codes must
+		// be updated.
 		simpleHash<gridRect, gridRect>* _rectangles;
 	};
 
 	rectanglePackingAlgorithm::rectanglePackingAlgorithm(randomGenerator* randomGenerator,
-	                                                     const gridRect& parentBoundary,
-	                                                     const gridRect& relativeBoundary)
+														 const gridRect& parentBoundary,
+														 const gridRect& relativeBoundary)
 	{
 		_randomGenerator = randomGenerator;
 		_rectangles = new simpleHash<gridRect, gridRect>();
@@ -87,7 +101,7 @@ namespace brogueHd::component
 
 		grid<gridLocator>* grid = _tilingGrid;
 
-		_tilingGrid->iterate([&grid, &firstRect](int column, int row, const gridLocator& item)
+		_tilingGrid->iterate([&grid, &firstRect] (int column, int row, const gridLocator& item)
 		{
 			if (firstRect.contains(column, row))
 				grid->set(column, row, gridLocator(column, row), true);
@@ -99,32 +113,21 @@ namespace brogueHd::component
 		});
 	}
 
-	void rectanglePackingAlgorithm::initialize(const simpleList<gridRect>& rects, const gridLocator& focalPoint)
+	void rectanglePackingAlgorithm::removeRectangle(const gridRect& rect)
 	{
-		_focalPoint->column = focalPoint.column;
-		_focalPoint->row = focalPoint.row;
+		if (!_rectangles->contains(rect))
+			throw simpleException("Rectangle not found in the packing:  rectanglePackingAlgorithm.h");
 
-		_rectangles->clear();
+		_rectangles->remove(rect);
 
-		for (int index = 0; index < rects.count(); index++)
+		grid<gridLocator>* grid = _tilingGrid;
+
+		rect.iterate([&grid] (int column, int row)
 		{
-			gridRect rect = rects.get(index);
+			grid->set(column, row, default_value::value<gridLocator>(), true);
 
-			_rectangles->add(rect, rect);
-
-			grid<gridLocator>* grid = _tilingGrid;
-
-			_tilingGrid->iterate([&grid, &rect](int column, int row, const gridLocator& item)
-			{
-				if (rect.contains(column, row))
-					grid->set(column, row, gridLocator(column, row), true);
-
-				else
-					grid->set(column, row, default_value::value<gridLocator>(), true);
-
-				return iterationCallback::iterate;
-			});
-		}
+			return iterationCallback::iterate;
+		});
 	}
 
 	void rectanglePackingAlgorithm::clearRectangles()
@@ -133,12 +136,33 @@ namespace brogueHd::component
 
 		grid<gridLocator>* grid = _tilingGrid;
 
-		_tilingGrid->iterate([&grid](int column, int row, const gridLocator& item)
+		_tilingGrid->iterate([&grid] (int column, int row, const gridLocator& item)
 		{
 			grid->set(column, row, default_value::value<gridLocator>(), true);
 
 			return iterationCallback::iterate;
 		});
+	}
+
+	simpleList<gridRectAdjacency> rectanglePackingAlgorithm::getAdjacentRectangles(const gridRect& rect)
+	{
+		if (!_rectangles->contains(rect))
+			throw simpleException("Rect not found in rectangle packing:  rectanglePackingAlgorithm::getAdjacentRectangles");
+
+		simpleList<gridRectAdjacency> result;
+
+		for (int index = 0; index < _rectangles->count(); index++)
+		{
+			gridRect otherRect = _rectangles->getAt(index)->getKey();
+			brogueCompass direction = brogueCompass::None;
+
+			if (rect.isAdjacent(otherRect, direction))
+			{
+				result.add(gridRectAdjacency(otherRect, direction));
+			}
+		}
+
+		return result;
 	}
 
 	simpleList<gridRect> rectanglePackingAlgorithm::getResult() const
@@ -167,8 +191,7 @@ namespace brogueHd::component
 		_rectangles->iterate([&rect](const gridRect& tileKey, const gridRect& tile)
 		{
 			if (rect.overlaps(tile))
-				throw simpleException(
-					"Trying to add gridRect over the top of an existing tile:  rectanglePackingAlgorithm.h");
+				throw simpleException("Trying to add gridRect over the top of an existing tile:  rectanglePackingAlgorithm.h");
 
 			return iterationCallback::iterate;
 		});

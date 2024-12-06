@@ -41,6 +41,7 @@
     <ClInclude Include="gridCellOutlineSegmentVerticalComparer.h" />
     <ClInclude Include="gridConnectionLayer.h" />
     <ClInclude Include="gridDefinitions.h" />
+    <ClInclude Include="gridRectAdjacency.h" />
     <ClInclude Include="gridRegionGraphEdge.h" />
     <ClInclude Include="gridRegionGraphNode.h" />
     <ClInclude Include="layoutDijkstraParameters.h" />
