@@ -10,58 +10,52 @@ namespace brogueHd::component
 {
 	using namespace simple;
 
-	template<typename T>
 	class gridRegionCollection
 	{
 	public:
 
-		gridRegionCollection(const gridRect& levelParentBoundary, const simpleList<gridRegion<T>*>& regions);
+		gridRegionCollection(const gridRect& levelParentBoundary, const simpleList<gridRegion*>& regions);
 		~gridRegionCollection();
 
 		int getCount();
 
-		T get(int column, int row) const;
-		T get(const gridLocator& location) const;
+		gridLocator get(int column, int row) const;
 
-		gridRegion<T>* getRegion(int column, int row) const;
-		gridRegion<T>* getRegion(const gridLocator& location) const;
+		gridRegion* getRegion(int column, int row) const;
+		gridRegion* getRegion(const gridLocator& location) const;
 
 		bool isDefined(int column, int row) const;
 		bool isDefined(const gridLocator& location) const;
 
 	public:
 
-		void iterate(gridCallback<T> callback) const;
-		void iterateAdjacent(int column, int row, gridCallback<T> callback) const;
+		void iterate(gridCallbackConst<gridLocator> callback) const;
+		void iterateAdjacent(int column, int row, gridCallbackConst<gridLocator> callback) const;
 
 	private:
 
-		simpleList<gridRegion<T>*>* _regions;
+		simpleList<gridRegion*>* _regions;
 		gridRect* _levelParentBoundary;
 	};
 
-	template<typename T>
-	gridRegionCollection<T>::gridRegionCollection(const gridRect& levelParentBoundary, const simpleList<gridRegion<T>*>& regions)
+	gridRegionCollection::gridRegionCollection(const gridRect& levelParentBoundary, const simpleList<gridRegion*>& regions)
 	{
-		_regions = new simpleList<gridRegion<T>*>(regions);
+		_regions = new simpleList<gridRegion*>(regions);
 		_levelParentBoundary = new gridRect(levelParentBoundary);
 	}
 
-	template<typename T>
-	gridRegionCollection<T>::~gridRegionCollection()
+	gridRegionCollection::~gridRegionCollection()
 	{
 		delete _regions;
 		delete _levelParentBoundary;
 	}
 
-	template<typename T>
-	int gridRegionCollection<T>::getCount()
+	int gridRegionCollection::getCount()
 	{
 		return _regions->count();
 	}
 
-	template<typename T>
-	T gridRegionCollection<T>::get(int column, int row) const
+	gridLocator gridRegionCollection::get(int column, int row) const
 	{
 		for (int index = 0; index < _regions->count(); index++)
 		{
@@ -69,22 +63,10 @@ namespace brogueHd::component
 				return _regions->get(index)->get(column, row);
 		}
 
-		return default_value::value<T>();
+		return default_value::value<gridLocator>();
 	}
 
-	template<typename T>
-	T gridRegionCollection<T>::get(const gridLocator& location) const
-	{
-		for (int index = 0; index < _regions->count(); index++)
-		{
-			if (_regions->get(index)->isDefined(location))
-				return _regions->get(index)->get(location);
-		}
-
-		return default_value::value<T>();
-	}
-	template<typename T>
-	gridRegion<T>* gridRegionCollection<T>::getRegion(int column, int row) const
+	gridRegion* gridRegionCollection::getRegion(int column, int row) const
 	{
 		for (int index = 0; index < _regions->count(); index++)
 		{
@@ -95,8 +77,7 @@ namespace brogueHd::component
 		return nullptr;
 	}
 
-	template<typename T>
-	gridRegion<T>* gridRegionCollection<T>::getRegion(const gridLocator& location) const
+	gridRegion* gridRegionCollection::getRegion(const gridLocator& location) const
 	{
 		for (int index = 0; index < _regions->count(); index++)
 		{
@@ -107,8 +88,7 @@ namespace brogueHd::component
 		return nullptr;
 	}
 
-	template<typename T>
-	bool gridRegionCollection<T>::isDefined(int column, int row) const
+	bool gridRegionCollection::isDefined(int column, int row) const
 	{
 		for (int index = 0; index < _regions->count(); index++)
 		{
@@ -119,8 +99,7 @@ namespace brogueHd::component
 		return false;
 	}
 
-	template<typename T>
-	bool gridRegionCollection<T>::isDefined(const gridLocator& location) const
+	bool gridRegionCollection::isDefined(const gridLocator& location) const
 	{
 		for (int index = 0; index < _regions->count(); index++)
 		{
@@ -131,35 +110,39 @@ namespace brogueHd::component
 		return false;
 	}
 
-	template<typename T>
-	void gridRegionCollection<T>::iterate(gridCallback<T> callback) const
+	void gridRegionCollection::iterate(gridCallbackConst<gridLocator> callback) const
 	{
-		_levelParentBoundary->iterate([&callback] (int column, int row)
+		simpleList<gridRegion*>* regions = _regions;
+
+		_levelParentBoundary->iterate([&callback, &regions] (int column, int row)
 		{
-			for (int index = 0; index < _regions->count(); index++)
+			for (int index = 0; index < regions->count(); index++)
 			{
-				if (_regions->get(index)->isDefined(column, row))
+				if (regions->get(index)->isDefined(column, row))
 				{
-					callback(column, row, _regions->get(index)->get(column, row));
-					return iterationCallback::breakAndReturn;
+					return callback(column, row, regions->get(index)->get(column, row));
 				}
 			}
+
+			return iterationCallback::iterate;
 		});
 	}
 
-	template<typename T>
-	void gridRegionCollection<T>::iterateAdjacent(int column, int row, gridCallback<T> callback) const
+	void gridRegionCollection::iterateAdjacent(int column, int row, gridCallbackConst<gridLocator> callback) const
 	{
-		_levelParentBoundary->iterateAdjacent([&callback] (int column, int row)
+		simpleList<gridRegion*>* regions = _regions;
+
+		_levelParentBoundary->iterateAdjacent(column, row, [&callback, &regions] (int column, int row)
 		{
-			for (int index = 0; index < _regions->count(); index++)
+			for (int index = 0; index < regions->count(); index++)
 			{
-				if (_regions->get(index)->isDefined(column, row))
+				if (regions->get(index)->isDefined(column, row))
 				{
-					callback(column, row, _regions->get(index)->get(column, row));
-					return iterationCallback::breakAndReturn;
+					return callback(column, row, regions->get(index)->get(column, row));
 				}
 			}
+
+			return iterationCallback::iterate;
 		});
 	}
 }

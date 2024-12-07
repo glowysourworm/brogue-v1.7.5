@@ -57,9 +57,6 @@
     <ClInclude Include="gridRegionConstructor.h">
       <Filter>Header Files\layout</Filter>
     </ClInclude>
-    <ClInclude Include="gridRegionExtension.h">
-      <Filter>Header Files\layout</Filter>
-    </ClInclude>
     <ClInclude Include="gridRegionLocator.h">
       <Filter>Header Files\layout</Filter>
     </ClInclude>

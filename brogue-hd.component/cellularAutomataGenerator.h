@@ -18,13 +18,12 @@ namespace brogueHd::component
 		~cellularAutomataGenerator();
 
 		void initialize(cellularAutomataParameters* parameters);
-		void run(const gridRect& parentBoundary, const gridRect& relativeBoundary,
-		         gridCallback<bool> callback) override;
+		void run(const gridRect& parentBoundary, const gridRect& relativeBoundary, gridCallbackConst<bool> callback) override;
 
 	private:
 		void runImpl(const gridRect& parentBoundary,
 		             const gridRect& relativeBoundary,
-		             gridCallback<bool> callback);
+		             gridCallbackConst<bool> callback);
 
 		void runIteration(grid<bool>& resultGrid,
 		                  const simpleList<cellularAutomataRule>* rules,
@@ -52,14 +51,14 @@ namespace brogueHd::component
 	}
 
 	void cellularAutomataGenerator::run(const gridRect& parentBoundary, const gridRect& relativeBoundary,
-	                                    gridCallback<bool> callback)
+	                                    gridCallbackConst<bool> callback)
 	{
 		runImpl(parentBoundary, relativeBoundary, callback);
 	}
 
 	void cellularAutomataGenerator::runImpl(const gridRect& parentBoundary,
 	                                        const gridRect& relativeBoundary,
-	                                        gridCallback<bool> callback)
+	                                        gridCallbackConst<bool> callback)
 	{
 		// Procedure
 		//

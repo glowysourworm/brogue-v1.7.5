@@ -29,7 +29,7 @@ namespace brogueHd::component
 	class brogueLayout
 	{
 	public:
-		brogueLayout(grid<brogueCell*>* mainGrid, gridConnectionLayer<brogueCell*>* connectionLayer);
+		brogueLayout(grid<brogueCell*>* mainGrid, gridConnectionLayer* connectionLayer);
 		~brogueLayout();
 
 		bool isDefined(int column, int row) const;
@@ -48,17 +48,17 @@ namespace brogueHd::component
 		/// <summary>
 		/// Iterates adjacent cells and calls the user callback
 		/// </summary>
-		void iterateAdjacentCells(int column, int row, gridCallback<brogueCell*> callback);
+		void iterateAdjacentCells(int column, int row, gridCallbackConst<brogueCell*> callback);
 
 		/// <summary>
 		/// Iterates cells and calls the user callback
 		/// </summary>
-		void iterate(gridCallback<brogueCell*> callback) const;
+		void iterate(gridCallbackConst<brogueCell*> callback) const;
 
 		/// <summary>
 		/// Iterates cells where there is layout defined
 		/// </summary>
-		void iterateWhereDefined(gridCallback<brogueCell*> callback) const;
+		void iterateWhereDefined(gridCallbackConst<brogueCell*> callback) const;
 
 		/// <summary>
 		/// Gets sub-rectangle from the layout - the largest possible
@@ -80,7 +80,7 @@ namespace brogueHd::component
 	private:
 
 		// Builds all of the grids from the main grid
-		void initialize(grid<brogueCell*>* mainGrid, gridConnectionLayer<brogueCell*>* connectionLayer);
+		void initialize(grid<brogueCell*>* mainGrid, gridConnectionLayer* connectionLayer);
 
 	private:
 
@@ -89,32 +89,32 @@ namespace brogueHd::component
 		grid<brogueCell*>* _mainGrid;
 
 		// Permanent Layers (shared pointers with the main grid)
-		gridLayer<brogueCell*>* _wallLayer;
-		gridLayer<brogueCell*>* _wallIndestructibleLayer;
-		gridLayer<brogueCell*>* _cellLayer;
-		gridLayer<brogueCell*>* _chasmLayer;
-		gridLayer<brogueCell*>* _terrainLayer;						// All Terrain
-		gridLayer<brogueCell*>* _terrainLavaLayer;					// Lava Terrain (only)
-		gridLayer<brogueCell*>* _terrainWaterLayer;					// Water Terrain (only) (permanent)
-		gridLayer<brogueCell*>* _terrainCombustibleLayer;			// Combustible Terrain (only) (permanent)
-		gridLayer<brogueCell*>* _alteredLayer;						// Other movement altering (permanent) cell flags
+		gridLayer* _wallLayer;
+		gridLayer* _wallIndestructibleLayer;
+		gridLayer* _cellLayer;
+		gridLayer* _chasmLayer;
+		gridLayer* _terrainLayer;						// All Terrain
+		gridLayer* _terrainLavaLayer;					// Lava Terrain (only)
+		gridLayer* _terrainWaterLayer;					// Water Terrain (only) (permanent)
+		gridLayer* _terrainCombustibleLayer;			// Combustible Terrain (only) (permanent)
+		gridLayer* _alteredLayer;						// Other movement altering (permanent) cell flags
 
 		// Temporary Layers (shared pointers with the main grid)
-		gridLayer<brogueCell*>* _temporaryChasmLayer;
-		gridLayer<brogueCell*>* _temporaryTerrainLayer;				// All Terrain (temporary only)
-		gridLayer<brogueCell*>* _temporaryWaterTerrainLayer;		// Water Terrain (temporary only)
-		gridLayer<brogueCell*>* _temporaryPoisonVineTerrainLayer;	// Poisonous Vine Terrain (temporary only)
-		gridLayer<brogueCell*>* _flameLayer;						// Flame Terrain (temporary)
-		gridLayer<brogueCell*>* _causticGasLayer;
-		gridLayer<brogueCell*>* _nauseaGasLayer;
-		gridLayer<brogueCell*>* _temporaryAlteredLayer;				// Other movement altering (temporary only) cell flags
+		gridLayer* _temporaryChasmLayer;
+		gridLayer* _temporaryTerrainLayer;				// All Terrain (temporary only)
+		gridLayer* _temporaryWaterTerrainLayer;			// Water Terrain (temporary only)
+		gridLayer* _temporaryPoisonVineTerrainLayer;	// Poisonous Vine Terrain (temporary only)
+		gridLayer* _flameLayer;							// Flame Terrain (temporary)
+		gridLayer* _causticGasLayer;
+		gridLayer* _nauseaGasLayer;
+		gridLayer* _temporaryAlteredLayer;				// Other movement altering (temporary only) cell flags
 
 		// Connection Layer:  Used for movement / travel (region queries)
-		gridConnectionLayer<brogueCell*>* _connectionLayer;
+		gridConnectionLayer* _connectionLayer;
 
 	};
 
-	brogueLayout::brogueLayout(grid<brogueCell*>* mainGrid, gridConnectionLayer<brogueCell*>* connectionLayer)
+	brogueLayout::brogueLayout(grid<brogueCell*>* mainGrid, gridConnectionLayer* connectionLayer)
 	{
 		_mainGrid = nullptr;
 
@@ -156,7 +156,7 @@ namespace brogueHd::component
 		delete _mainGrid;
 	}
 
-	void brogueLayout::initialize(grid<brogueCell*>* mainGrid, gridConnectionLayer<brogueCell*>* connectionLayer)
+	void brogueLayout::initialize(grid<brogueCell*>* mainGrid, gridConnectionLayer* connectionLayer)
 	{
 		_mainGrid = mainGrid;
 
@@ -222,7 +222,7 @@ namespace brogueHd::component
 		//_connectionGraph->iterateEdges(callback);
 	}
 
-	void brogueLayout::iterateAdjacentCells(int column, int row, gridCallback<brogueCell*> callback)
+	void brogueLayout::iterateAdjacentCells(int column, int row, gridCallbackConst<brogueCell*> callback)
 	{
 		_mainGrid->iterateAdjacent(column, row, true,
 		                           [&callback](int column, int row, brogueCompass direction, brogueCell* item)
@@ -231,12 +231,12 @@ namespace brogueHd::component
 		                           });
 	}
 
-	void brogueLayout::iterate(gridCallback<brogueCell*> callback) const
+	void brogueLayout::iterate(gridCallbackConst<brogueCell*> callback) const
 	{
 		_mainGrid->iterate(callback);
 	}
 
-	void brogueLayout::iterateWhereDefined(gridCallback<brogueCell*> callback) const
+	void brogueLayout::iterateWhereDefined(gridCallbackConst<brogueCell*> callback) const
 	{
 		_mainGrid->iterate([&callback](int column, int row, brogueCell* cell)
 		{

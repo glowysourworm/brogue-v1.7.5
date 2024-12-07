@@ -124,7 +124,7 @@ namespace brogueHd::component
 		roomGenerator* _roomGenerator;
 		randomGenerator* _randomGenerator;
 		layoutCoordinateConverter* _coordinateConverter;
-		regionOutlineGenerator<gridLocator>* _regionOutlineGenerator;
+		regionOutlineGenerator* _regionOutlineGenerator;
 	};
 
 
@@ -133,7 +133,7 @@ namespace brogueHd::component
 		_randomGenerator = randomGenerator;
 		_roomGenerator = new roomGenerator(randomGenerator);
 		_coordinateConverter = new layoutCoordinateConverter(layoutParentBoundary, zoomLevel);
-		_regionOutlineGenerator = new regionOutlineGenerator<gridLocator>(_coordinateConverter);
+		_regionOutlineGenerator = new regionOutlineGenerator(_coordinateConverter);
 	}
 
 	layoutGenerator::~layoutGenerator()
@@ -212,7 +212,7 @@ namespace brogueHd::component
 		//connectRooms(layoutData);
 
 		simpleList<gridRegionGraphNode> regionNodes = layoutData->getRoomGraph()->getNodes();
-		simpleList<gridRegion<gridLocator>*> regions = regionNodes.select<gridRegion<gridLocator>*>([] (const gridRegionGraphNode& node)
+		simpleList<gridRegion*> regions = regionNodes.select<gridRegion*>([] (const gridRegionGraphNode& node)
 		{
 			return node.getRegion();
 		});
@@ -220,7 +220,7 @@ namespace brogueHd::component
 		// Finalize the (new) data. Be sure we've garbage collected everything else!
 		grid<brogueCell*>* layoutGrid = new grid<brogueCell*>(layoutData->getParentBoundary(), layoutData->getBoundary());
 
-		simpleList<gridRegion<brogueCell*>*> layoutRegions;
+		simpleList<gridRegion*> layoutRegions;
 
 		// NOTE:  We're instantiating ALL grid cells. So, nullptr has no meaning for the brogueLayout*
 		layoutData->getTrialGrid()->iterate([&layoutGrid] (int column, int row, const gridLocator& item)
@@ -231,36 +231,28 @@ namespace brogueHd::component
 		});
 
 		// NOTE: Sharing pointers for regions with the primary layout!
-		regions.forEach([&layoutGrid, &layoutRegions] (gridRegion<gridLocator>* region)
+		regions.forEach([&layoutGrid, &layoutRegions] (gridRegion* region)
 		{
-			gridRegionConstructor<brogueCell*> regionConstructor(region->getParentBoundary(), true);
-
-			region->iterateLocations([&regionConstructor] (int column, int row, const gridLocator& location)
+			region->iterateLocations([&layoutGrid] (int column, int row, const gridLocator& location)
 			{
-				color foreColor(1, 1, 1, 1);
 				color backColor(0, 0, 0.5f, 1.0f);
-				char character = '.';
 
-				regionConstructor.add(column, row, new brogueCell(column, row, backColor, foreColor, character));
+				layoutGrid->get(column, row)->setUI(brogueCellDisplay(column, row, backColor));
+
 				return iterationCallback::iterate;
 			});
-
-			// (MEMORY!) These will be inside the region collection (below) -> brogueLayout*
-			gridRegion<brogueCell*>* finalRegion = regionConstructor.complete();
-
-			layoutRegions.add(finalRegion);
 
 			return iterationCallback::iterate;
 		});
 
 		// (MEMORY!) gridRegionCollection* -> gridLayer* -> gridConnectionLayer* -> brogueLayout*
-		gridRegionCollection<brogueCell*>* regionCollection = new gridRegionCollection<brogueCell*>(layoutData->getParentBoundary(), layoutRegions);
+		gridRegionCollection* regionCollection = new gridRegionCollection(layoutData->getParentBoundary(), layoutRegions);
 
-		gridLayer<brogueCell*>* cellLayer = new gridLayer<brogueCell*>(regionCollection);
+		gridLayer* cellLayer = new gridLayer(regionCollection);
 
-		gridConnectionLayer<brogueCell*>* connectionLayer = new gridConnectionLayer<brogueCell*>(nullptr, cellLayer);
+		gridConnectionLayer* connectionLayer = new gridConnectionLayer(nullptr, cellLayer);
 
-		brogueLayout* layout = new brogueLayout(layoutGrid, connectionLayer);
+		return new brogueLayout(layoutGrid, connectionLayer);
 	}
 
 	void layoutGenerator::createRooms(layoutGeneratorData* data)
@@ -286,7 +278,7 @@ namespace brogueHd::component
 		// 7) Use this adjacency to create the room graph and set this
 		//    into the layoutGeneratorData*.
 		//
-		// MEMORY:  The gridRegion<T>*, and gridRegionOutline<T>* are the
+		// MEMORY:  The gridRegion*, and gridRegionOutline* are the
 		//		    primary bi-products of this phase of the layout. These
 		//			should be maintained in the brogueLayout*, which is
 		//			the primary output of this class' functions.
@@ -382,10 +374,10 @@ namespace brogueHd::component
 			//
 
 			// (MEMORY!) These must be deleted; and the stack-like gridLocator instances will be copied into the brogueLayout* grid.
-			gridRegion<gridLocator>* region = _roomGenerator->designRoom(designRect->getConfiguration().getRoomType(),
-																		 designRect->getBoundary().createPadded(roomPadding),
-																		 designRect->getMinSize(),
-																		 data->getBoundary());
+			gridRegion* region = _roomGenerator->designRoom(designRect->getConfiguration().getRoomType(),
+															 designRect->getBoundary().createPadded(roomPadding),
+															 designRect->getMinSize(),
+															 data->getBoundary());
 
 			// (MEMORY!) Creates a polygon outline (with interior polygons) for the region
 			//gridRegionOutline* regionOutline = _regionOutlineGenerator->createOutline(region);
@@ -420,7 +412,7 @@ namespace brogueHd::component
 				gridLocator translation = designRect->getActualBoundary().createExpanded(roomPadding)
 																		 .getTranslation(actualBoundaryExpanded);
 
-				if (translation.column != 0 && 
+				if (translation.column != 0 ||
 					translation.row != 0)
 				{
 					// Will also translate the region outline
@@ -456,7 +448,8 @@ namespace brogueHd::component
 				gridRegionGraphEdge graphEdge(node, adjacentNode);
 
 				// Directly create the room graph.
-				data->getRoomGraph()->addEdge(graphEdge);
+				if (!data->getRoomGraph()->containsEdge(graphEdge))
+					data->getRoomGraph()->addEdge(graphEdge);
 			}
 		}
 	}

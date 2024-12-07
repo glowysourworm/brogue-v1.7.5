@@ -12,7 +12,6 @@ namespace brogueHd::component
 {
     using namespace simple;
 
-    template<isGridLocator T>
 	class regionOutlineGenerator
 	{
 	public:
@@ -20,14 +19,14 @@ namespace brogueHd::component
         regionOutlineGenerator(layoutCoordinateConverter* coordinateConverter);
         ~regionOutlineGenerator();
 
-        gridRegionOutline* createOutline(gridRegion<T>* region);
+        gridRegionOutline* createOutline(gridRegion* region);
 
     private:
 
         simplePolygon<int>* createClockwiseOutline(const gridCellOutlineSegment& firstSegment,
                                                    brogueCompass firstTraceDirection,
                                                    bool interiorPolygon,
-                                                   regionOutlineGrid<T>* algorithmGrid);
+                                                   regionOutlineGrid* algorithmGrid);
 
         bool isTraceCompleted(const gridCellOutlineSegment& firstSegment,
                               const gridCellOutlineSegment& lastSegment,
@@ -36,11 +35,11 @@ namespace brogueHd::component
 
         gridCellOutlineSegment calculateNextTraceExterior(const gridCellOutlineSegment& lastSegment,
                                                           brogueCompass& traceDirection,
-                                                          regionOutlineGrid<T>* algorithmGrid);
+                                                          regionOutlineGrid* algorithmGrid);
 
         gridCellOutlineSegment calculateNextTraceInterior(const gridCellOutlineSegment& lastSegment,
 														  brogueCompass& traceDirection,
-                                                          regionOutlineGrid<T>* algorithmGrid);
+                                                          regionOutlineGrid* algorithmGrid);
 
         /// <summary>
         /// Returns true if the coordinates are flipped with respect to the trace direction and interior / exterior face
@@ -52,23 +51,20 @@ namespace brogueHd::component
         layoutCoordinateConverter* _coordinateConverter;
 	};
 
-    template<isGridLocator T>
-    regionOutlineGenerator<T>::regionOutlineGenerator(layoutCoordinateConverter* coordinateConverter)
+    regionOutlineGenerator::regionOutlineGenerator(layoutCoordinateConverter* coordinateConverter)
     {
         _coordinateConverter = coordinateConverter;
     }
 
-    template<isGridLocator T>
-    regionOutlineGenerator<T>::~regionOutlineGenerator()
+    regionOutlineGenerator::~regionOutlineGenerator()
     {
 	    
     }
 
-    template<isGridLocator T>
-    gridRegionOutline* regionOutlineGenerator<T>::createOutline(gridRegion<T>* region)
+    gridRegionOutline* regionOutlineGenerator::createOutline(gridRegion* region)
     {
         // Initializes the grid needed to perform the outline calculation
-        regionOutlineGrid<T>* algorithmGrid = new regionOutlineGrid(region, _coordinateConverter);
+        regionOutlineGrid* algorithmGrid = new regionOutlineGrid(region, _coordinateConverter);
 
         // Procedure
         //
@@ -127,11 +123,10 @@ namespace brogueHd::component
         return new gridRegionOutline(exteriorOutline, interiorOutlines);
     }
 
-    template<isGridLocator T>
-    simplePolygon<int>* regionOutlineGenerator<T>::createClockwiseOutline(const gridCellOutlineSegment& firstSegment,
-							                                              brogueCompass firstTraceDirection,
-							                                              bool interiorPolygon,
-							                                              regionOutlineGrid<T>* algorithmGrid)
+    simplePolygon<int>* regionOutlineGenerator::createClockwiseOutline(const gridCellOutlineSegment& firstSegment,
+						                                               brogueCompass firstTraceDirection,
+						                                               bool interiorPolygon,
+						                                               regionOutlineGrid* algorithmGrid)
     {
         // Setup for tracing in the specified direction
         gridCellOutlineSegment lastSegment = firstSegment;
@@ -187,10 +182,9 @@ namespace brogueHd::component
         return new simplePolygon<int>(segments, true);
     }
 
-    template<isGridLocator T>
-    gridCellOutlineSegment regionOutlineGenerator<T>::calculateNextTraceExterior(const gridCellOutlineSegment& lastSegment,
-																				 brogueCompass& traceDirection,
-							                                                     regionOutlineGrid<T>* algorithmGrid)
+    gridCellOutlineSegment regionOutlineGenerator::calculateNextTraceExterior(const gridCellOutlineSegment& lastSegment,
+																			  brogueCompass& traceDirection,
+						                                                      regionOutlineGrid* algorithmGrid)
     {
         // Create CLOCKWISE trace of exterior edge - favor CROTCH points to stay on the exterior of the region
         //
@@ -356,10 +350,9 @@ namespace brogueHd::component
         return nextSegment;
     }
 
-    template<isGridLocator T>
-    gridCellOutlineSegment regionOutlineGenerator<T>::calculateNextTraceInterior(const gridCellOutlineSegment& lastSegment,
-																				 brogueCompass& traceDirection,
-							                                                     regionOutlineGrid<T>* algorithmGrid)
+    gridCellOutlineSegment regionOutlineGenerator::calculateNextTraceInterior(const gridCellOutlineSegment& lastSegment,
+																			  brogueCompass& traceDirection,
+						                                                      regionOutlineGrid* algorithmGrid)
     {
         // Create a CLOCKWISE trace of an interior edge favoring CROTCH points. This will separate locations
         // that touch at the corners. 
@@ -536,8 +529,7 @@ namespace brogueHd::component
         return nextSegment;
     }
 
-    template<isGridLocator T>
-    bool regionOutlineGenerator<T>::isSegmentFlipped(brogueCompass traceDirection)
+    bool regionOutlineGenerator::isSegmentFlipped(brogueCompass traceDirection)
     {
         // Check trace direction considering CLOCKWISE orientation
         //
@@ -573,11 +565,10 @@ namespace brogueHd::component
         }
     }
 
-    template<isGridLocator T>
-    bool regionOutlineGenerator<T>::isTraceCompleted(const gridCellOutlineSegment& firstSegment, 
-                                                     const gridCellOutlineSegment& lastSegment, 
-                                                     bool interiorPolygon, 
-                                                     brogueCompass lastDirection)
+    bool regionOutlineGenerator::isTraceCompleted(const gridCellOutlineSegment& firstSegment, 
+                                                  const gridCellOutlineSegment& lastSegment, 
+                                                  bool interiorPolygon, 
+                                                  brogueCompass lastDirection)
     {
         switch (lastDirection)
         {

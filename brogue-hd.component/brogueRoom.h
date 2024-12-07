@@ -2,7 +2,6 @@
 #include "gridDefinitions.h"
 #include "gridLocator.h"
 #include "gridRegion.h"
-#include "gridRegionExtension.h"
 
 #include <simple.h>
 #include <brogueCell.h>
@@ -15,7 +14,7 @@ namespace brogueHd::component
 	{
 	public:
 		template <isGridLocator T>
-		brogueRoom(gridRegion<T>* region,
+		brogueRoom(gridRegion* region,
 		           const gridLocator& connectionPointN,
 		           const gridLocator& connectionPointS,
 		           const gridLocator& connectionPointE,
@@ -59,7 +58,7 @@ namespace brogueHd::component
 		}
 
 	private:
-		gridRegion<brogueCell>* _region;
+		gridRegion* _region;
 
 		// Connection points are inside the region:  THEY ARE NOT DOORS!
 		gridLocator* _connectionPointN;

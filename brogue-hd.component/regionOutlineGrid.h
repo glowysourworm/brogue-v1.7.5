@@ -18,11 +18,10 @@ namespace brogueHd::component
     using namespace simple;
     using namespace simple::math;
 
-    template<isGridLocator T>
 	class regionOutlineGrid
 	{
     public:
-        regionOutlineGrid(gridRegion<T>* region, layoutCoordinateConverter* coordinateConverter);
+        regionOutlineGrid(gridRegion* region, layoutCoordinateConverter* coordinateConverter);
         ~regionOutlineGrid();
 
         gridCellOutlineSegment getNorthmostSegment() const;
@@ -62,9 +61,7 @@ namespace brogueHd::component
 
         grid<gridCellOutline*>* _grid;
 
-        gridRegion<T>* _region;
-
-        int _zoomLevel;
+        gridRegion* _region;
 
         // This should be the first segment called to begin the algorithm
         gridCellOutlineSegment _northMostSegment;
@@ -75,8 +72,7 @@ namespace brogueHd::component
         simpleHash<gridCellOutlineSegment, gridCellOutlineSegment>* _westSegments;
 	};
 
-    template<isGridLocator T>
-    regionOutlineGrid<T>::regionOutlineGrid(gridRegion<T>* region, layoutCoordinateConverter* coordinateConverter)
+    regionOutlineGrid::regionOutlineGrid(gridRegion* region, layoutCoordinateConverter* coordinateConverter)
     {
         _coordinateConverter = coordinateConverter;
         _grid = new grid<gridCellOutline*>(region->getParentBoundary(), region->getBoundary());
@@ -90,8 +86,7 @@ namespace brogueHd::component
         initialize();
     }
 
-    template<isGridLocator T>
-    regionOutlineGrid<T>::~regionOutlineGrid()
+    regionOutlineGrid::~regionOutlineGrid()
     {
         _grid->iterate([] (int column, int row, gridCellOutline* item)
         {
@@ -106,14 +101,12 @@ namespace brogueHd::component
         delete _westSegments;
     }
 
-    template<isGridLocator T>
-    gridCellOutlineSegment regionOutlineGrid<T>::getNorthmostSegment() const
+    gridCellOutlineSegment regionOutlineGrid::getNorthmostSegment() const
     {
         return _northMostSegment;
     }
 
-    template<isGridLocator T>
-    int regionOutlineGrid<T>::getSegmentCount(brogueCompass segmentFace) const
+    int regionOutlineGrid::getSegmentCount(brogueCompass segmentFace) const
     {
 	    switch (segmentFace)
 	    {
@@ -130,8 +123,7 @@ namespace brogueHd::component
 	    }
     }
 
-    template<isGridLocator T>
-    bool regionOutlineGrid<T>::hasSegment(int column, int row, brogueCompass segmentFace)
+    bool regionOutlineGrid::hasSegment(int column, int row, brogueCompass segmentFace)
     {
         if (!_grid->isDefined(column, row))
             return false;
@@ -156,14 +148,12 @@ namespace brogueHd::component
         return false;
     }
 
-    template<isGridLocator T>
-    gridCellOutlineSegment regionOutlineGrid<T>::getSegment(int column, int row, brogueCompass segmentFace)
+    gridCellOutlineSegment regionOutlineGrid::getSegment(int column, int row, brogueCompass segmentFace)
     {
         return _grid->get(column, row)->getSegment(segmentFace);
     }
 
-    template<isGridLocator T>
-    gridCellOutlineSegment regionOutlineGrid<T>::getAnySegment(brogueCompass segmentFace) const
+    gridCellOutlineSegment regionOutlineGrid::getAnySegment(brogueCompass segmentFace) const
     {
         switch (segmentFace)
         {
@@ -180,8 +170,7 @@ namespace brogueHd::component
         }
     }
 
-    template<isGridLocator T>
-    void regionOutlineGrid<T>::removeSegment(const gridCellOutlineSegment& segment)
+    void regionOutlineGrid::removeSegment(const gridCellOutlineSegment& segment)
     {
         if (_northSegments->contains(segment))
             _northSegments->remove(segment);
@@ -199,8 +188,7 @@ namespace brogueHd::component
             throw simpleException("Segment not found in regionOutlineGrid:  regionOutlineGrid::removeSegment");
     }
 
-    template<isGridLocator T>
-    void regionOutlineGrid<T>::initialize()
+    void regionOutlineGrid::initialize()
     {
         // Sorting:
         //
@@ -221,7 +209,7 @@ namespace brogueHd::component
         // Edges:  Ordered by angle with the X-axis. 
         for (int index = 0; index < _region->getEdgeLocationCount(); index++)
         {
-            T location = _region->getEdgeLocation(index);
+            gridLocator location = _region->getEdgeLocation(index);
 
             // Get outline for this location's cell
             simpleRectangle<int> rectUI = _coordinateConverter->getOutlineUI(location);
@@ -443,8 +431,7 @@ namespace brogueHd::component
 	/// Reduces the horizontal and vertical segments where they're connected
 	/// </summary>
 	/// <param name="collection">N, S, E, or W segment collection - ordered ascendingly</param>
-	template<isGridLocator T>
-    void regionOutlineGrid<T>::reduceSegments(simpleOrderedList<gridCellOutlineSegment>* collection)
+    void regionOutlineGrid::reduceSegments(simpleOrderedList<gridCellOutlineSegment>* collection)
     {
         for (int index = collection->count() - 1; index > 0; index--)
         {
@@ -466,8 +453,7 @@ namespace brogueHd::component
         }
     }
 
-    template<isGridLocator T>
-    int regionOutlineGrid<T>::segmentHorizontalComparer(const gridCellOutlineSegment& segment1, const gridCellOutlineSegment& segment2)
+    int regionOutlineGrid::segmentHorizontalComparer(const gridCellOutlineSegment& segment1, const gridCellOutlineSegment& segment2)
     {
         int minX1 = simpleMath::minOf(segment1.vertex1.x, segment1.vertex2.x);
         int minX2 = simpleMath::minOf(segment2.vertex1.x, segment2.vertex2.x);
@@ -490,8 +476,7 @@ namespace brogueHd::component
             return 0;
     }
 
-    template<isGridLocator T>
-    int regionOutlineGrid<T>::segmentVerticalComparer(const gridCellOutlineSegment& segment1, const gridCellOutlineSegment& segment2)
+    int regionOutlineGrid::segmentVerticalComparer(const gridCellOutlineSegment& segment1, const gridCellOutlineSegment& segment2)
     {
         int minY1 = simpleMath::minOf(segment1.vertex1.y, segment1.vertex2.y);
         int minY2 = simpleMath::minOf(segment2.vertex1.y, segment2.vertex2.y);

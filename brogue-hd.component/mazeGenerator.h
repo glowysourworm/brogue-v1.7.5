@@ -27,7 +27,7 @@ namespace brogueHd::component
 		         double horizontalVerticalBias,
 		         brogueMazeType mazeType,
 		         gridPredicate<gridLocator> inclusionPredicate,
-		         gridCallback<bool> callback);
+				 gridCallbackConst<bool> callback);
 
 	private:
 		// Scales [0, 1] fill ratio to a safe scale
@@ -103,7 +103,7 @@ namespace brogueHd::component
 	                        double horizontalVerticalBias,
 	                        brogueMazeType mazeType,
 	                        gridPredicate<gridLocator> inclusionPredicate,
-	                        gridCallback<bool> callback)
+							gridCallbackConst<bool> callback)
 	{
 		// Recursive Backtracker
 		//
@@ -203,14 +203,9 @@ namespace brogueHd::component
 
 				// Run query to see whether this cell can be used in the maze
 				//
-				bool viableLocation = (mazeType == brogueMazeType::Filled)
-					                      ? fiveAdjacentWallsDirectionalRule(
-						                      currentLocation, nextLocation,
-						                      _mazeGrid->getAdjacentElementsUnsafe(
-							                      nextLocation.column, nextLocation.row))
-					                      : fiveAdjacentWallsRule(currentLocation, nextLocation,
-					                                              _mazeGrid->getAdjacentElementsUnsafe(
-						                                              nextLocation.column, nextLocation.row));
+				bool viableLocation = (mazeType == brogueMazeType::Filled) ? 
+									   fiveAdjacentWallsDirectionalRule(currentLocation, nextLocation, _mazeGrid->getAdjacentElementsUnsafe(nextLocation.column, nextLocation.row)) :
+									   fiveAdjacentWallsRule(currentLocation, nextLocation, _mazeGrid->getAdjacentElementsUnsafe(nextLocation.column, nextLocation.row));
 
 				// If any neighbor cells CAN be visited - then push the current one on the stack
 				if (viableLocation)

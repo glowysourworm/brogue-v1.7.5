@@ -33,7 +33,8 @@ namespace brogueHd::component
 	concept isGridLocator = std::convertible_to<T, gridLocator>;
 
 	template <typename T>
-	concept isGridLocatorReference = std::is_pointer<T>::value || std::convertible_to<typename std::pointer_traits<T>::element_type, gridLocator>;
+	concept isGridLocatorReference = (std::is_pointer<T>::value && std::convertible_to<typename std::pointer_traits<T>::element_type, gridLocator>) ||
+									 isGridLocator<T>;
 
 	/// <summary>
 	/// Delegate for mapping different types of grid locators.
@@ -63,9 +64,16 @@ namespace brogueHd::component
 
 	/// <summary>
 	/// Iteration callback that includes the indices. Set the return value to either continue / break.
+	/// Uses (const T&) item referencing.
 	/// </summary>
 	template <typename T>
-	using gridCallback = std::function<iterationCallback(int column, int row, const T& current)>;
+	using gridCallbackConst = std::function<iterationCallback(int column, int row, const T& current)>;
+
+	/// <summary>
+	/// Iteration callback that includes the indices. Uses reference callback to modify items.
+	/// </summary>
+	template <typename T>
+	using gridCallback = std::function<iterationCallback(int column, int row, T& current)>;
 
 	/// <summary>
 	/// Iteration callback that includes the indices. Set the return value to either continue / break. Adds the

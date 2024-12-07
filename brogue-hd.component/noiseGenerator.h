@@ -15,7 +15,7 @@ namespace brogueHd::component
 		noiseGenerator(randomGenerator* randomGenerator);
 		virtual ~noiseGenerator();
 
-		virtual void run(const gridRect& parentBoundary, const gridRect& relativeBoundary, gridCallback<bool> callback);
+		virtual void run(const gridRect& parentBoundary, const gridRect& relativeBoundary, gridCallbackConst<bool> callback);
 	};
 
 	noiseGenerator::noiseGenerator(randomGenerator* randomGenerator)
@@ -27,7 +27,7 @@ namespace brogueHd::component
 	}
 
 	void noiseGenerator::run(const gridRect& parentBoundary, const gridRect& relativeBoundary,
-	                         gridCallback<bool> callback)
+							 gridCallbackConst<bool> callback)
 	{
 		throw simpleException("Run method must be overridden in child class:  noiseGenerator.h");
 	}

@@ -21,7 +21,7 @@ namespace brogueHd::component
 
 		void run(const gridRect& parentBoundary,
 		         const gridRect& relativeBoundary,
-		         gridCallback<bool> callback) override;
+				 gridCallbackConst<bool> callback) override;
 
 	private:
 		double perlinFade(double unitValue);
@@ -57,7 +57,7 @@ namespace brogueHd::component
 
 	void perlinNoiseGenerator::run(const gridRect& parentBoundary,
 	                               const gridRect& relativeBoundary,
-	                               gridCallback<bool> callback)
+								   gridCallbackConst<bool> callback)
 	{
 		// Perlin Noise Generation: The definition of this is simply a random map that allows
 		//                          for a smooth elevation transition between map (mesh) cells.

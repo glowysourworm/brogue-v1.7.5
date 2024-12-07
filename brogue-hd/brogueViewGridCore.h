@@ -117,15 +117,14 @@ namespace brogueHd::frontend
 		/// <summary>
 		/// Iterates the view's cells. This will happen in the view's relative boundary.
 		/// </summary>
-		void iterate(gridCallback<brogueCellDisplay> callback) const;
+		void iterate(gridCallbackConst<brogueCellDisplay> callback) const;
 
 		/// <summary>
 		/// Iterates the view's cells, inside the view's relative boundary, starting
 		/// from the start location -> end location. This will mirror the way the data
 		/// stream for openGL is built. So, it would be useful to use for stream operations.
 		/// </summary>
-		void iterateFrom(const gridLocator& start, const gridLocator& end,
-		                 gridCallback<brogueCellDisplay> callback) const;
+		void iterateFrom(const gridLocator& start, const gridLocator& end, gridCallbackConst<brogueCellDisplay> callback) const;
 
 		/// <summary>
 		/// Starts animation sequences for the UI. Normal reports are drawn from checkUpdate; but the
@@ -569,14 +568,13 @@ namespace brogueHd::frontend
 	}
 
 	template <isGLStream TStream>
-	void brogueViewGridCore<TStream>::iterate(gridCallback<brogueCellDisplay> callback) const
+	void brogueViewGridCore<TStream>::iterate(gridCallbackConst<brogueCellDisplay> callback) const
 	{
 		_view->iterateWhereDefined(callback);
 	}
 
 	template <isGLStream TStream>
-	void brogueViewGridCore<TStream>::iterateFrom(const gridLocator& start, const gridLocator& end,
-	                                              gridCallback<brogueCellDisplay> callback) const
+	void brogueViewGridCore<TStream>::iterateFrom(const gridLocator& start, const gridLocator& end, gridCallbackConst<brogueCellDisplay> callback) const
 	{
 		_view->iterateFrom(start, end, callback);
 	}

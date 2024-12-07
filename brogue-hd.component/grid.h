@@ -130,23 +130,28 @@ namespace brogueHd::component
 		/// <summary>
 		/// Iterates entire grid and calls user callback
 		/// </summary>
-		void iterate(gridCallback<T> callback) const;
+		void iterate(gridCallbackConst<T> callback) const;
+
+		/// <summary>
+		/// Iterates entire grid (non-const) and calls user callback
+		/// </summary>
+		void iterateModify(gridCallback<T> callbackRef);
 
 		/// <summary>
 		/// Iterates only where there are cells defined.
 		/// </summary>
-		void iterateWhereDefined(gridCallback<T> callback) const;
+		void iterateWhereDefined(gridCallbackConst<T> callback) const;
 
 		/// <summary>
 		/// Iterates the grid in the same manner as "iterate", column first, then row. So, the start and end
 		/// locations will be honored as such.
 		/// </summary>
-		void iterateFrom(const gridLocator& start, const gridLocator& end, gridCallback<T> callback) const;
+		void iterateFrom(const gridLocator& start, const gridLocator& end, gridCallbackConst<T> callback) const;
 
 		/// <summary>
 		/// Iterates around a specific point by one-cell in the 4 cardinal directions
 		/// </summary>
-		void iterateAroundCardinal(int column, int row, bool withinBounds, gridCallback<T> callback) const;
+		void iterateAroundCardinal(int column, int row, bool withinBounds, gridCallbackConst<T> callback) const;
 
 		/// <summary>
 		/// Iterates around a specific point by one-cell in all 8 directions
@@ -156,12 +161,12 @@ namespace brogueHd::component
 		/// <summary>
 		/// Iterates grid within specific boundary constraint
 		/// </summary>
-		void iterateIn(gridRect boundary, gridCallback<T> callback) const;
+		void iterateIn(gridRect boundary, gridCallbackConst<T> callback) const;
 
 		/// <summary>
 		/// Iterates outward from center location to specified distance
 		/// </summary>
-		void iterateOutward(int centerColumn, int centerRow, int distance, gridCallback<T> callback) const;
+		void iterateOutward(int centerColumn, int centerRow, int distance, gridCallbackConst<T> callback) const;
 
 		/// <summary>
 		/// Calculates the largest sub-rectangle in the grid.  The predicate is used to determine what to include 
@@ -648,7 +653,7 @@ namespace brogueHd::component
 	}
 
 	template <isHashable T>
-	void grid<T>::iterate(gridCallback<T> callback) const
+	void grid<T>::iterate(gridCallbackConst<T> callback) const
 	{
 		bool userBreak = false;
 
@@ -665,7 +670,30 @@ namespace brogueHd::component
 	}
 
 	template <isHashable T>
-	void grid<T>::iterateWhereDefined(gridCallback<T> callback) const
+	void grid<T>::iterateModify(gridCallback<T> callbackRef)
+	{
+		bool userBreak = false;
+
+		gridRect boundary = this->getRelativeBoundary();
+
+		for (int i = boundary.left(); i <= boundary.right() && !userBreak; i++)
+		{
+			for (int j = boundary.top(); j <= boundary.bottom() && !userBreak; j++)
+			{
+				// Use the data to modify the grid. May either be stack / heap type. So,
+				// we have to draw the data, first, from the grid; and then re-enter it.
+				T item = this->get(i, j);
+
+				if (callbackRef(i, j, item) == iterationCallback::breakAndReturn)
+					userBreak = true;
+
+				this->set(i, j, item, true);
+			}
+		}
+	}
+
+	template <isHashable T>
+	void grid<T>::iterateWhereDefined(gridCallbackConst<T> callback) const
 	{
 		bool userBreak = false;
 
@@ -686,7 +714,7 @@ namespace brogueHd::component
 	}
 
 	template <isHashable T>
-	void grid<T>::iterateFrom(const gridLocator& start, const gridLocator& end, gridCallback<T> callback) const
+	void grid<T>::iterateFrom(const gridLocator& start, const gridLocator& end, gridCallbackConst<T> callback) const
 	{
 		if (start.row > end.row ||
 			(start.row == end.row && start.column > end.column))
@@ -724,7 +752,7 @@ namespace brogueHd::component
 	void grid<T>::iterateOutward(int centerColumn,
 	                             int centerRow,
 	                             int distance,
-	                             gridCallback<T> callback) const
+								 gridCallbackConst<T> callback) const
 	{
 		bool userBreak = false;
 
@@ -746,7 +774,7 @@ namespace brogueHd::component
 	}
 
 	template <isHashable T>
-	void grid<T>::iterateIn(gridRect boundary, gridCallback<T> callback) const
+	void grid<T>::iterateIn(gridRect boundary, gridCallbackConst<T> callback) const
 	{
 		bool userBreak = false;
 
@@ -812,7 +840,7 @@ namespace brogueHd::component
 	}
 
 	template <isHashable T>
-	void grid<T>::iterateAroundCardinal(int column, int row, bool withinBounds, gridCallback<T> callback) const
+	void grid<T>::iterateAroundCardinal(int column, int row, bool withinBounds, gridCallbackConst<T> callback) const
 	{
 		iterationCallback response = iterationCallback::iterate;
 

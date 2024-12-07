@@ -14,7 +14,7 @@ namespace brogueHd::component
 	public:
 
 		gridRegionGraphNode();
-		gridRegionGraphNode(gridRegion<gridLocator>* region, const gridLocator& node);
+		gridRegionGraphNode(gridRegion* region, const gridLocator& node);
 		gridRegionGraphNode(const gridRegionGraphNode& copy);
 		~gridRegionGraphNode();
 
@@ -23,13 +23,13 @@ namespace brogueHd::component
 		bool operator!=(const gridRegionGraphNode& other) const;
 
 		gridLocator getNode() const;
-		gridRegion<gridLocator>* getRegion() const;
+		gridRegion* getRegion() const;
 
 		size_t getHash() const override;
 
 	private:
 
-		gridRegion<gridLocator>* _region;
+		gridRegion* _region;
 
 		gridLocator _nodeLocation;
 	};
@@ -39,7 +39,7 @@ namespace brogueHd::component
 		_region = nullptr;
 		_nodeLocation = default_value::value<gridLocator>();
 	}
-	gridRegionGraphNode::gridRegionGraphNode(gridRegion<gridLocator>* region, const gridLocator& nodeLocation)
+	gridRegionGraphNode::gridRegionGraphNode(gridRegion* region, const gridLocator& nodeLocation)
 	{
 		_region = region;
 		_nodeLocation = nodeLocation;
@@ -77,7 +77,7 @@ namespace brogueHd::component
 		return _nodeLocation;
 	}
 
-	gridRegion<gridLocator>* gridRegionGraphNode::getRegion() const
+	gridRegion* gridRegionGraphNode::getRegion() const
 	{
 		return _region;
 	}

@@ -75,7 +75,7 @@ namespace brogueHd::component
 			return !compare(other);
 		}
 
-		void complete(gridRegion<gridLocator>* finalRegion, gridRegionOutline* finalRegionOutline)
+		void complete(gridRegion* finalRegion, gridRegionOutline* finalRegionOutline)
 		{
 			if (_complete)
 				throw simpleException("Already called complete() on layoutDesignRect");
@@ -83,13 +83,13 @@ namespace brogueHd::component
 			if (!_boundary.contains(finalRegion->getBoundary()))
 				throw simpleException("Actual boundary outside the padded boundary of the layoutDesignRect.");
 
-			if (finalRegion == nullptr ||
-				finalRegionOutline == nullptr)
-				throw simpleException("Null reference exception:  Must set region and region outline in layoutDesignRect.h");
+			//if (finalRegion == nullptr ||
+			//	finalRegionOutline == nullptr)
+			//	throw simpleException("Null reference exception:  Must set region and region outline in layoutDesignRect.h");
 
 			_complete = true;
 			_region = finalRegion;
-			_regionOutline = finalRegionOutline;
+			//_regionOutline = finalRegionOutline;
 		}
 
 		void setOffset(const gridLocator& location, bool actualOnly = false)
@@ -109,7 +109,7 @@ namespace brogueHd::component
 
 			if (actualOnly && _complete)
 			{
-				_region->translate_StackLike(columnOffset, rowOffset);
+				_region->translate(columnOffset, rowOffset);
 				//_regionOutline->translate(translationUI);
 			}
 
@@ -119,7 +119,7 @@ namespace brogueHd::component
 
 				if (_complete)
 				{
-					_region->translate_StackLike(columnOffset, rowOffset);
+					_region->translate(columnOffset, rowOffset);
 					//_regionOutline->translate(translationUI);
 				}
 			}
@@ -137,7 +137,7 @@ namespace brogueHd::component
 		}
 
 	public:
-		gridRegion<gridLocator>* getRegion() const
+		gridRegion* getRegion() const
 		{
 			return _region;
 		}
@@ -225,7 +225,7 @@ namespace brogueHd::component
 		layoutCoordinateConverter* _coordinateConverter;
 
 		// Final (Actual) Region
-		gridRegion<gridLocator>* _region;
+		gridRegion* _region;
 		gridRegionOutline* _regionOutline;
 
 		// Room / Region configuration

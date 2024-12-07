@@ -6,20 +6,32 @@
 
 #include <simpleGraph.h>
 
+#include "gridRegionGraphNode.h"
+#include "gridRegionGraphEdge.h"
+
 namespace brogueHd::component
 {
-	template<typename T>
 	class gridConnectionLayer
 	{
 	public:
-		gridConnectionLayer(simpleGraph<gridLocator, gridLocatorEdge>* connectionGraph, gridLayer<T>* cellLayer);
+		gridConnectionLayer(simpleGraph<gridRegionGraphNode, gridRegionGraphEdge>* connectionGraph, gridLayer* cellLayer);
 		~gridConnectionLayer();
 
 	private:
 
-		simpleGraph<gridLocator, gridLocatorEdge>* _connectionGraph;
+		simpleGraph<gridRegionGraphNode, gridRegionGraphEdge>* _connectionGraph;
 
 		// Permanent Cell Layer (shared pointer)(this may change during a topology change)
-		gridLayer<T>* _cellLayer;
+		gridLayer* _cellLayer;
 	};
+
+	gridConnectionLayer::gridConnectionLayer(simpleGraph<gridRegionGraphNode, gridRegionGraphEdge>* connectionGraph, gridLayer* cellLayer)
+	{
+		_connectionGraph = connectionGraph;
+		_cellLayer = cellLayer;
+	}
+	gridConnectionLayer::~gridConnectionLayer()
+	{
+		
+	}
 }

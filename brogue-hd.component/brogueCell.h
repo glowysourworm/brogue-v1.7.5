@@ -55,6 +55,11 @@ namespace brogueHd::component
 			return *_display;
 		}
 
+		void setUI(const brogueCellDisplay& display)
+		{
+			_display->setUI(display);
+		}
+
 	public:
 		brogueCellDisplay* _display;
 

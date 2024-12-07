@@ -31,7 +31,7 @@ namespace brogueHd::component
 		roomGenerator(randomGenerator* randomGenerator);
 		~roomGenerator();
 
-		gridRegion<gridLocator>* designRoom(brogueRoomType roomType, const gridRect& designRect,
+		gridRegion* designRoom(brogueRoomType roomType, const gridRect& designRect,
 		                                    const gridRect& minSize, const gridRect& parentBoundary);
 
 	private:
@@ -86,7 +86,7 @@ namespace brogueHd::component
 		delete _mazeGenerator;
 	}
 
-	gridRegion<gridLocator>* roomGenerator::designRoom(brogueRoomType roomType, const gridRect& designRect,
+	gridRegion* roomGenerator::designRoom(brogueRoomType roomType, const gridRect& designRect,
 	                                                   const gridRect& minSize, const gridRect& parentBoundary)
 	{
 		grid<gridLocator> designGrid(parentBoundary, designRect);
@@ -136,7 +136,7 @@ namespace brogueHd::component
 		gridRegionLocator<gridLocator> regionLocator;
 
 		// (MEMORY!)
-		simpleList<gridRegion<gridLocator>*> regions = regionLocator.locateRegions(designGrid);
+		simpleList<gridRegion*> regions = regionLocator.locateRegions(designGrid);
 
 		// Create Default Region:
 		if (regions.count() == 0)
@@ -144,7 +144,7 @@ namespace brogueHd::component
 			designDefault(designGrid, true);
 
 			// (MEMORY!)
-			simpleList<gridRegion<gridLocator>*> defaultRegions = regionLocator.locateRegions(designGrid);
+			simpleList<gridRegion*> defaultRegions = regionLocator.locateRegions(designGrid);
 
 			if (defaultRegions.count() != 1)
 				throw simpleException("No default region found:  roomGenerator::designRoom");
@@ -154,7 +154,7 @@ namespace brogueHd::component
 
 
 		// Take region with max location count
-		gridRegion<gridLocator>* region = regions.withMax<int>([](gridRegion<gridLocator>* region)
+		gridRegion* region = regions.withMax<int>([](gridRegion* region)
 		{
 			return region->getLocationCount();
 		});
@@ -199,15 +199,15 @@ namespace brogueHd::component
 		                                });
 
 		// Locate regions using flood fill method:  Find the max area region
-		gridRegion<gridLocator>* maxRegion;
-		simpleList<gridRegion<gridLocator>*> validRegions;
+		gridRegion* maxRegion;
+		simpleList<gridRegion*> validRegions;
 		bool defaultRegion = false;
 
 		// (MEMORY) Locate Regions
-		simpleList<gridRegion<gridLocator>*> regions = regionLocator.locateRegions(designGrid);
+		simpleList<gridRegion*> regions = regionLocator.locateRegions(designGrid);
 
 		// Filter regions to comply to size constraints
-		validRegions = regions.where([&minSize](gridRegion<gridLocator>* region)
+		validRegions = regions.where([&minSize](gridRegion* region)
 		{
 			return region->getBoundary().width >= minSize.width &&
 				region->getBoundary().height >= minSize.height;
@@ -216,7 +216,7 @@ namespace brogueHd::component
 		// Default
 		if (regions.count() == 0 || validRegions.count() == 0)
 		{
-			gridRegionConstructor<gridLocator> constructor(designGrid.getParentBoundary(), true);
+			gridRegionConstructor constructor(designGrid.getParentBoundary(), true);
 
 			designGrid.getRelativeBoundary().iterate([&constructor](int column, int row)
 			{
@@ -233,7 +233,7 @@ namespace brogueHd::component
 		// Otherwise, take the largest region
 		else
 		{
-			maxRegion = regions.withMax<int>([](gridRegion<gridLocator>* region)
+			maxRegion = regions.withMax<int>([](gridRegion* region)
 			{
 				return region->getLocationCount();
 			});
