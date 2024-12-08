@@ -46,6 +46,8 @@ namespace brogueHd::component
 
 		void iteratePartials(simpleListCallback<layoutPartialConnectionData*> callback);
 
+		void iterateNormals(simpleListCallback<layoutConnectionData*> callback);
+
 	private:
 
 		simpleHash<layoutConnectionData*, layoutConnectionData*>* _connections;
@@ -68,14 +70,14 @@ namespace brogueHd::component
 	{
 		return _connections->any([] (layoutConnectionData* key, layoutConnectionData* value)
 		{
-			return (typeid(key) == typeid(layoutPartialConnectionData)) && !key->isComplete();
+			return (typeid(key) == typeid(layoutPartialConnectionData*)) && !key->isComplete();
 		});
 	}
 	bool layoutConnectionBuilder::hasPendingNormal() const
 	{
 		return _connections->any([] (layoutConnectionData* key, layoutConnectionData* value)
 		{
-			return typeid(key) == typeid(layoutConnectionData) && !key->isComplete();
+			return typeid(key) == typeid(layoutConnectionData*) && !key->isComplete();
 		});
 	}
 
@@ -83,7 +85,7 @@ namespace brogueHd::component
 	{
 		return _connections->any([] (layoutConnectionData* key, layoutConnectionData* value)
 		{
-			return typeid(key) == typeid(layoutPartialConnectionData) && key->isComplete();
+			return typeid(key) == typeid(layoutPartialConnectionData*) && key->isComplete();
 		});
 	}
 	bool layoutConnectionBuilder::hasCompletedUnreconciledPartials() const
@@ -92,7 +94,7 @@ namespace brogueHd::component
 		{
 			layoutPartialConnectionData* partial = (layoutPartialConnectionData*)key;
 
-			return (typeid(key) == typeid(layoutPartialConnectionData)) && key->isComplete() && !partial->getReconciled();
+			return (typeid(key) == typeid(layoutPartialConnectionData*)) && key->isComplete() && !partial->getReconciled();
 		});
 	}
 	void layoutConnectionBuilder::addConnection(layoutConnectionData* connection)
@@ -117,14 +119,14 @@ namespace brogueHd::component
 	{
 		return (layoutPartialConnectionData*)_connections->firstKey([] (layoutConnectionData* key, layoutConnectionData* value)
 		{
-			return typeid(key) == typeid(layoutPartialConnectionData) && !key->isComplete();
+			return typeid(key) == typeid(layoutPartialConnectionData*) && !key->isComplete();
 		});
 	}
 	layoutConnectionData* layoutConnectionBuilder::getNextNormal() const
 	{
 		return _connections->firstKey([] (layoutConnectionData* key, layoutConnectionData* value)
 		{
-			return typeid(key) == typeid(layoutConnectionData) && !key->isComplete();
+			return typeid(key) == typeid(layoutConnectionData*) && !key->isComplete();
 		});
 	}
 
@@ -135,7 +137,7 @@ namespace brogueHd::component
 		// Normal, complete connections
 		simpleList<layoutConnectionData*> normalConnections = _connections->getKeys().where([] (layoutConnectionData* connection)
 		{
-			return (typeid(connection) == typeid(layoutConnectionData)) && connection->isComplete();
+			return (typeid(connection) == typeid(layoutConnectionData*)) && connection->isComplete();
 		});
 
 		if (normalConnections.count() > 0)
@@ -190,8 +192,19 @@ namespace brogueHd::component
 	{
 		return _connections->iterate([&callback] (layoutConnectionData* key, layoutConnectionData* value)
 		{
-			if (typeid(key) == typeid(layoutConnectionData) && !key->isComplete())
+			if (typeid(key) == typeid(layoutPartialConnectionData*))
 				return callback((layoutPartialConnectionData*)key);
+
+			return iterationCallback::iterate;
+		});
+	}
+
+	void layoutConnectionBuilder::iterateNormals(simpleListCallback<layoutConnectionData*> callback)
+	{
+		return _connections->iterate([&callback] (layoutConnectionData* key, layoutConnectionData* value)
+		{
+			if (typeid(key) != typeid(layoutPartialConnectionData*))
+				return callback(key);
 
 			return iterationCallback::iterate;
 		});

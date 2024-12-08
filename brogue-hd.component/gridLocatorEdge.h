@@ -1,6 +1,7 @@
 #pragma once
 
 #include "gridLocator.h"
+#include "gridLocatorNode.h"
 #include <simple.h>
 #include <simplePoint.h>
 #include <simpleGraphEdge.h>
@@ -10,43 +11,42 @@ namespace brogueHd::component
 	using namespace simple;
 	using namespace simple::math;
 
-	struct gridLocatorEdge : public simpleGraphEdge<gridLocator>
+	template<isHashable T>
+	struct gridLocatorEdge : public simpleGraphEdge<gridLocatorNode<T>>
 	{
 	public:
 		gridLocatorEdge()
 		{
-			node1 = default_value::value<gridLocator>();
-			node2 = default_value::value<gridLocator>();
+			this->node1 = default_value::value<gridLocatorNode<T>>();
+			this->node2 = default_value::value<gridLocatorNode<T>>();
 		}
 
-		gridLocatorEdge(const gridLocatorEdge& copy)
+		gridLocatorEdge(const gridLocatorEdge<T>& copy)
 		{
-			node1 = copy.node1;
-			node2 = copy.node2;
+			this->node1 = copy.node1;
+			this->node2 = copy.node2;
 		}
 
-		gridLocatorEdge(gridLocator anode1, gridLocator anode2)
+		gridLocatorEdge(const gridLocatorNode<T>& node1, const gridLocatorNode<T>& node2)
 		{
-			node1 = anode1;
-			node2 = anode2;
+			this->node1 = node1;
+			this->node2 = node2;
 		}
 
-		void operator=(const gridLocatorEdge& copy)
+		void operator=(const gridLocatorEdge<T>& copy)
 		{
-			node1 = copy.node1;
-			node2 = copy.node2;
+			this->node1 = copy.node1;
+			this->node2 = copy.node2;
 		}
 
-		bool operator==(const gridLocatorEdge& edge) const
+		bool operator==(const gridLocatorEdge<T>& edge) const
 		{
-			return node1 == edge.node1 &&
-				node2 == edge.node2;
+			return compare(edge);
 		}
 
-		bool operator!=(const gridLocatorEdge& edge) const
+		bool operator!=(const gridLocatorEdge<T>& edge) const
 		{
-			return node1 != edge.node1 ||
-				node2 != edge.node2;
+			return !compare(edge);
 		}
 
 		/// <summary>
@@ -54,25 +54,33 @@ namespace brogueHd::component
 		/// </summary>
 		float weight() const override
 		{
-			return node1.distance(node2);
+			return this->node1.getLocator().distance(this->node2.getLocator());
 		}
 
 		template <typename T>
-		bool isEquivalent(simplePoint<T> point1, simplePoint<T> point2) const
+		bool isEquivalent(const simplePoint<T>& point1, const simplePoint<T>& point2) const
 		{
-			return (node1.column == point1.x &&
-					node1.row == point1.y &&
-					node2.column == point2.x &&
-					node2.row == point2.y) ||
-				(node1.column == point2.x &&
-					node1.row == point2.y &&
-					node2.column == point1.x &&
-					node2.row == point1.y);
+			return (this->node1.getLocator().column == point1.x &&
+					this->node1.getLocator().row == point1.y &&
+					this->node2.getLocator().column == point2.x &&
+					this->node2.getLocator().row == point2.y) ||
+				   (this->node1.getLocator().column == point2.x &&
+					this->node1.getLocator().row == point2.y &&
+					this->node2.getLocator().column == point1.x &&
+					this->node2.getLocator().row == point1.y);
 		}
 
 		virtual size_t getHash() const override
 		{
-			return hashGenerator::generateHash(node1, node2);
+			return hashGenerator::generateHash(this->node1, this->node2);
+		}
+
+	private:
+
+		bool compare(const gridLocatorEdge<T>& other)
+		{
+			return (this->node1 == other.node1 && this->node2 == other.node2) ||
+				   (this->node1 == other.node2 && this->node2 == other.node1);
 		}
 	};
 }

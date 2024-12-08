@@ -44,18 +44,15 @@ namespace brogueHd::frontend
 		gridRect calculateSceneBoundaryUI() const;
 
 		simpleRectangle<int> convertToUI(const gridRect& rect, bool moveToCellCenter = false);
-		simpleLine<int> convertToUI(const gridLocatorEdge& edge, bool moveToCellCenter = false);
+		simpleLine<int> convertToUI(const gridLocator& location1, const gridLocator& location2, bool moveToCellCenter = false);
 		simplePoint<int> convertToUI(const gridLocator& location, bool moveToCellCenter = false);
 
 		simpleRectangle<float> convertToUIReal(const gridRect& edge, bool moveToCellCenter = false);
-		simpleLine<float> convertToUIReal(const gridLocatorEdge& edge, bool moveToCellCenter = false);
+		simpleLine<float> convertToUIReal(const gridLocator& location1, const gridLocator& location2, bool moveToCellCenter = false);
 		simplePoint<float> convertToUIReal(const gridLocator& location, bool moveToCellCenter = false);
 
 		gridLocator convertUIToGrid(const simplePoint<int> pointUI, bool centerOffsetUsed);
-		gridLocatorEdge convertUIToGrid(const simpleLine<int> lineUI, bool centerOffsetUsed);
-
 		gridLocator convertUIRealToGrid(const simplePoint<float> pointUIReal, bool centerOffsetUsed);
-		gridLocatorEdge convertUIRealToGrid(const simpleLine<float> lineUIReal, bool centerOffsetUsed);
 
 		simpleQuad createFrameQuadXY();
 		simpleQuad createFrameQuadUV();
@@ -136,9 +133,9 @@ namespace brogueHd::frontend
 		return _layoutConverter->convertToUI(location, moveToCellCenter);
 	}
 
-	simpleLine<int> brogueCoordinateConverter::convertToUI(const gridLocatorEdge& edge, bool moveToCellCenter)
+	simpleLine<int> brogueCoordinateConverter::convertToUI(const gridLocator& location1, const gridLocator& location2, bool moveToCellCenter)
 	{
-		return _layoutConverter->convertToUI(edge, moveToCellCenter);
+		return _layoutConverter->convertToUI(location1, location2, moveToCellCenter);
 	}
 
 	simpleRectangle<int> brogueCoordinateConverter::convertToUI(const gridRect& rect, bool moveToCellCenter)
@@ -151,9 +148,9 @@ namespace brogueHd::frontend
 		return _layoutConverter->convertToUIReal(rect, moveToCellCenter);
 	}
 
-	simpleLine<float> brogueCoordinateConverter::convertToUIReal(const gridLocatorEdge& edge, bool moveToCellCenter)
+	simpleLine<float> brogueCoordinateConverter::convertToUIReal(const gridLocator& location1, const gridLocator& location2, bool moveToCellCenter)
 	{
-		return _layoutConverter->convertToUIReal(edge, moveToCellCenter);
+		return _layoutConverter->convertToUIReal(location1, location2, moveToCellCenter);
 	}
 
 	simplePoint<float> brogueCoordinateConverter::convertToUIReal(const gridLocator& location, bool moveToCellCenter)
@@ -166,21 +163,10 @@ namespace brogueHd::frontend
 		return _layoutConverter->convertUIToGrid(pointUI, centerOffsetUsed);
 	}
 
-	gridLocatorEdge brogueCoordinateConverter::convertUIToGrid(const simpleLine<int> lineUI, bool centerOffsetUsed)
-	{
-		return _layoutConverter->convertUIToGrid(lineUI, centerOffsetUsed);
-	}
-
 	gridLocator brogueCoordinateConverter::convertUIRealToGrid(const simplePoint<float> pointUIReal,
 	                                                           bool centerOffsetUsed)
 	{
 		return _layoutConverter->convertUIRealToGrid(pointUIReal, centerOffsetUsed);
-	}
-
-	gridLocatorEdge brogueCoordinateConverter::convertUIRealToGrid(const simpleLine<float> lineUIReal,
-	                                                               bool centerOffsetUsed)
-	{
-		return _layoutConverter->convertUIRealToGrid(lineUIReal, centerOffsetUsed);
 	}
 
 	simpleQuad brogueCoordinateConverter::createFrameQuadXY()

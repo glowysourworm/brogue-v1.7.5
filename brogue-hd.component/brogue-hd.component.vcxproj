@@ -37,8 +37,11 @@
     <ClInclude Include="gridCell.h" />
     <ClInclude Include="gridCellOutline.h" />
     <ClInclude Include="gridCellOutlineSegment.h" />
+    <ClInclude Include="gridConnectionEdge.h" />
     <ClInclude Include="gridConnectionLayer.h" />
+    <ClInclude Include="gridConnectionNode.h" />
     <ClInclude Include="gridDefinitions.h" />
+    <ClInclude Include="gridLocatorNode.h" />
     <ClInclude Include="gridRectAdjacency.h" />
     <ClInclude Include="gridRegionGraphEdge.h" />
     <ClInclude Include="gridRegionGraphNode.h" />

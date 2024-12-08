@@ -28,6 +28,10 @@ namespace brogueHd::model
 		{
 			return _roomInfo->count();
 		}
+		float getExtraCorridorProbability() const
+		{
+			return _extraCorridorProbability;
+		}
 
 	private:
 		brogueRoomTemplate createRoomInfo(brogueRoomType roomType);
@@ -43,6 +47,7 @@ namespace brogueHd::model
 
 		int _depth;
 		levelTypes _levelType;
+		float _extraCorridorProbability;
 	};
 
 	/*  Brogue v1.7.5
@@ -77,6 +82,7 @@ namespace brogueHd::model
 		_corridorFrequencyMap = new simpleHash<levelTypes, int>();
 		_levelType = type;
 		_depth = depth;
+		_extraCorridorProbability = 0.5;
 
 		simpleHash<brogueRoomType, int>* basicMap = new simpleHash<brogueRoomType, int>();
 		simpleHash<brogueRoomType, int>* basicFirstRoomMap = new simpleHash<brogueRoomType, int>();

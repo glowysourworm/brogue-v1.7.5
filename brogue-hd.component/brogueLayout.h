@@ -68,7 +68,7 @@ namespace brogueHd::component
 		/// <summary>
 		/// Iterates all graph edges and callsback to the user code
 		/// </summary>
-		void iterateRoomConnections(graphSimpleEdgeIterator<gridLocator, gridLocatorEdge> callback);
+		void iterateRoomConnections(graphSimpleEdgeIterator<gridLocatorNode<gridLocator>, gridLocatorEdge<gridLocator>> callback);
 
 		/// <summary>
 		/// Queries the connection layer (which run's a very small dijkstra iteration on the graph of
@@ -154,6 +154,9 @@ namespace brogueHd::component
 		});
 
 		delete _mainGrid;
+
+		// Build Process Artifacts* (We're responsible for this memory afterward)
+		delete _connectionLayer;
 	}
 
 	void brogueLayout::initialize(grid<brogueCell*>* mainGrid, gridConnectionLayer* connectionLayer)
@@ -214,7 +217,7 @@ namespace brogueHd::component
 		});
 	}
 
-	void brogueLayout::iterateRoomConnections(graphSimpleEdgeIterator<gridLocator, gridLocatorEdge> callback)
+	void brogueLayout::iterateRoomConnections(graphSimpleEdgeIterator<gridLocatorNode<gridLocator>, gridLocatorEdge<gridLocator>> callback)
 	{
 		//if (_connectionGraph == nullptr)
 		//	throw simpleException("Trying to iterate room graph before setting it");

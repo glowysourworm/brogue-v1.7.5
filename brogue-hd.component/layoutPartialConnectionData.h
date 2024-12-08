@@ -36,6 +36,11 @@ namespace brogueHd::component
 		gridLocator getInterruptingLocation() const;
 
 		void setReconciled(bool value);
+
+		/// <summary>
+		/// Returns true if the partial connection was completed successfully, either by reconciling
+		/// or by direct-means.
+		/// </summary>
 		bool getReconciled() const;
 
 	private:
@@ -77,6 +82,9 @@ namespace brogueHd::component
 	{
 		if (_reconciled)
 			throw simpleException("Trying to complete a connection marked 'reconciled'. This implies that the connection was already completed");
+
+		// Go ahead and mark "reconciled"
+		_reconciled = true;
 
 		layoutConnectionData::complete(pathData);
 	}

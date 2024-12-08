@@ -36,7 +36,15 @@ namespace brogueHd::component
 
 	gridLayer::~gridLayer()
 	{
-		
+		// NOTE: This is an artifact of the build process. So, this component is the one responsible for deleting
+		//		 it; and all of it's gridRegion* instances (!!!) (These were buried during the layout process)
+		_regionCollection->iterateRegions([] (gridRegion* region)
+		{
+			delete region;
+			return iterationCallback::iterate;
+		});
+
+		delete _regionCollection;
 	}
 
 	gridLocator gridLayer::get(int column, int row) const

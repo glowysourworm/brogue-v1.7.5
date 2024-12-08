@@ -39,13 +39,13 @@ namespace brogueHd::component
 			row = copy.row;
 		}
 
-		bool operator==(const gridLocator& cell) const
+		virtual bool operator==(const gridLocator& cell) const
 		{
 			return column == cell.column &&
 				row == cell.row;
 		}
 
-		bool operator!=(const gridLocator& cell) const
+		virtual bool operator!=(const gridLocator& cell) const
 		{
 			return column != cell.column ||
 				row != cell.row;
@@ -95,7 +95,7 @@ namespace brogueHd::component
 			return gridLocator(-1, -1);
 		}
 
-		size_t getHash() const override
+		virtual size_t getHash() const override
 		{
 			return hashGenerator::generateHash(column, row);
 		}

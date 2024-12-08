@@ -6,6 +6,9 @@
 #include <functional>
 #include <type_traits>
 
+#include "gridLocatorEdge.h"
+#include "gridLocatorNode.h"
+
 namespace brogueHd::component
 {
 	using namespace simple;
@@ -32,10 +35,6 @@ namespace brogueHd::component
 	template <typename T>
 	concept isGridLocator = std::convertible_to<T, gridLocator>;
 
-	template <typename T>
-	concept isGridLocatorReference = (std::is_pointer<T>::value && std::convertible_to<typename std::pointer_traits<T>::element_type, gridLocator>) ||
-									 isGridLocator<T>;
-
 	/// <summary>
 	/// Delegate for mapping different types of grid locators.
 	/// </summary>
@@ -47,15 +46,15 @@ namespace brogueHd::component
 	/// <summary>
 	/// Simple graph (.lib) extension for the grid components. Defines a gridLocator node.
 	/// </summary>
-	template<typename TNode, typename TEdge>
-	concept isGridLocatorNode = isGraphNode<TNode> && isGridLocator<TNode>;
+	template<typename TNode, typename TNodeData>
+	concept isGridLocatorNode = std::convertible_to<TNode, gridLocatorNode<TNodeData>>;
 
 	/// <summary>
 	/// Simple graph (.lib) extension for the grid components. Defines a gridLocator edge.
 	/// </summary>
-	template<typename TNode, typename TEdge>
-	concept isGridLocatorEdge = isGraphEdge<TNode, TEdge> && isGridLocator<TNode>;
-
+	template<typename TEdge, typename TNode, typename TNodeData>
+	concept isGridLocatorEdge = isGridLocatorNode<TNode, TNodeData>&& std::convertible_to<TEdge, simpleGraphEdge<TNode>>;
+	
 	/// <summary>
 	/// Simple iteration callback. Set the return value to either continue / break.
 	/// </summary>

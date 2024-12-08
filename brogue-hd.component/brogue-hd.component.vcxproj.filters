@@ -177,6 +177,15 @@
     <ClInclude Include="gridRectAdjacency.h">
       <Filter>Header Files\layout</Filter>
     </ClInclude>
+    <ClInclude Include="gridConnectionNode.h">
+      <Filter>Header Files\layout</Filter>
+    </ClInclude>
+    <ClInclude Include="gridConnectionEdge.h">
+      <Filter>Header Files\layout</Filter>
+    </ClInclude>
+    <ClInclude Include="gridLocatorNode.h">
+      <Filter>Header Files\layout</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="gridRect.cpp">

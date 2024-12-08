@@ -1,48 +1,29 @@
 #pragma once
 
-#include <simpleGraphNode.h>
-
-#include "gridDefinitions.h"
+#include "gridLocator.h"
+#include "gridLocatorNode.h"
 #include "gridRegion.h"
 
 namespace brogueHd::component
 {
 	using namespace simple::math;
 
-	class gridRegionGraphNode : public simpleGraphNode
+	class gridRegionGraphNode : public gridLocatorNode<gridRegion*>
 	{
 	public:
 
 		gridRegionGraphNode();
 		gridRegionGraphNode(gridRegion* region, const gridLocator& node);
 		gridRegionGraphNode(const gridRegionGraphNode& copy);
-		~gridRegionGraphNode();
-
-		void operator=(const gridRegionGraphNode& copy);
-		bool operator==(const gridRegionGraphNode& other) const;
-		bool operator!=(const gridRegionGraphNode& other) const;
-
-		gridLocator getNode() const;
-		gridRegion* getRegion() const;
-
-		size_t getHash() const override;
-
-	private:
-
-		gridRegion* _region;
-
-		gridLocator _nodeLocation;
+		~gridRegionGraphNode() override;
 	};
 
 	gridRegionGraphNode::gridRegionGraphNode()
 	{
-		_region = nullptr;
-		_nodeLocation = default_value::value<gridLocator>();
 	}
 	gridRegionGraphNode::gridRegionGraphNode(gridRegion* region, const gridLocator& nodeLocation)
+		: gridLocatorNode<gridRegion*>(region, nodeLocation)
 	{
-		_region = region;
-		_nodeLocation = nodeLocation;
 	}
 
 	gridRegionGraphNode::~gridRegionGraphNode()
@@ -51,40 +32,7 @@ namespace brogueHd::component
 	}
 
 	gridRegionGraphNode::gridRegionGraphNode(const gridRegionGraphNode& copy)
+		: gridLocatorNode<gridRegion*>(copy.getData(), copy.getLocator())
 	{
-		_region = copy.getRegion();
-		_nodeLocation = copy.getNode();
-	}
-
-	void gridRegionGraphNode::operator=(const gridRegionGraphNode& copy)
-	{
-		_region = copy.getRegion();
-		_nodeLocation = copy.getNode();
-	}
-
-	bool gridRegionGraphNode::operator==(const gridRegionGraphNode& other) const
-	{
-		return _region == other.getRegion() && _nodeLocation == other.getNode();
-	}
-
-	bool gridRegionGraphNode::operator!=(const gridRegionGraphNode& other) const
-	{
-		return _region != other.getRegion() || _nodeLocation != other.getNode();	
-	}
-
-	gridLocator gridRegionGraphNode::getNode() const
-	{
-		return _nodeLocation;
-	}
-
-	gridRegion* gridRegionGraphNode::getRegion() const
-	{
-		return _region;
-	}
-
-	size_t gridRegionGraphNode::getHash() const
-	{
-		// Use region pointer for hash code
-		return hashGenerator::generateHash(_region, _nodeLocation);
 	}
 }

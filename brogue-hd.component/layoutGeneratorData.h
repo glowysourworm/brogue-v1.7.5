@@ -9,6 +9,8 @@
 #include "gridLocatorEdge.h"
 #include "gridRegionGraphEdge.h"
 #include "gridRegionGraphNode.h"
+#include "gridConnectionNode.h"
+#include "gridConnectionEdge.h"
 #include "layoutConnectionBuilder.h"
 #include "layoutDesignRect.h"
 #include "layoutPartialConnectionData.h"
@@ -36,9 +38,10 @@ namespace brogueHd::component
 		layoutDijkstraParameters<gridLocator>* getTrialDijkstraParameters() const;
 
 		grid<gridLocator>* getTrialGrid() const;
+		simpleList<gridRegionGraphNode>* getRoomNodes() const;
 		simpleList<gridRegionGraphEdge>* getRoomNearestNeighbors() const;
 		simpleGraph<gridRegionGraphNode, gridRegionGraphEdge>* getRoomGraph() const;
-		simpleGraph<gridLocator, gridLocatorEdge>* getConnectionGraph() const;
+		simpleGraph<gridConnectionNode, gridConnectionEdge>* getConnectionGraph() const;
 
 	private:	// Dijkstra's map predicates (sometimes it's nice to have actual functions!)
 
@@ -54,9 +57,10 @@ namespace brogueHd::component
 		layoutDijkstraParameters<gridLocator>* _trialDijkstraParameters;
 
 		grid<gridLocator>* _trialGrid;
+		simpleList<gridRegionGraphNode>* _roomNodes;
 		simpleList<gridRegionGraphEdge>* _roomNearestNeighbors;
 		simpleGraph<gridRegionGraphNode, gridRegionGraphEdge>* _roomGraph;
-		simpleGraph<gridLocator, gridLocatorEdge>* _connectionGraph;
+		simpleGraph<gridConnectionNode, gridConnectionEdge>* _connectionGraph;
 	};
 
 	layoutGeneratorData::layoutGeneratorData(brogueLevelProfile* profile, const gridRect& layoutParentBoundary, const gridRect& layoutRelativeBoundary)
@@ -65,11 +69,12 @@ namespace brogueHd::component
 		_connectionBuilder = new layoutConnectionBuilder();
 
 		_trialGrid = new grid<gridLocator>(layoutParentBoundary, layoutRelativeBoundary);
+		_roomNodes = new simpleList<gridRegionGraphNode>();
 		_roomNearestNeighbors = new simpleList<gridRegionGraphEdge>();
 
 		// Graph instances are created by the triangulator algorithms
 		_roomGraph = new simpleGraph<gridRegionGraphNode, gridRegionGraphEdge>();
-		_connectionGraph = nullptr;
+		_connectionGraph = new simpleGraph<gridConnectionNode, gridConnectionEdge>();
 
 		_trialDijkstraParameters = new layoutDijkstraParameters<gridLocator>(layoutParentBoundary,
 																			 layoutRelativeBoundary,
@@ -83,11 +88,13 @@ namespace brogueHd::component
 		delete _connectionBuilder;
 
 		// Layout Grid is passed on (no deletion here)
+		// Connection Graph is pass on (no deletion here)
 
 		delete _trialGrid;
 		delete _roomGraph;
-		delete _connectionGraph;
+		delete _roomNodes;
 		delete _roomNearestNeighbors;
+		delete _trialDijkstraParameters;
 	}
 	brogueLevelProfile* layoutGeneratorData::getProfile() const
 	{
@@ -117,7 +124,7 @@ namespace brogueHd::component
 
 		_roomGraph->iterateNodes([&collision, &column, &row] (const gridRegionGraphNode& node)
 		{
-			if (node.getRegion()->isDefined(column, row))
+			if (node.getData()->isDefined(column, row))
 			{
 				collision = true;
 				return iterationCallback::breakAndReturn;
@@ -131,12 +138,17 @@ namespace brogueHd::component
 	}
 	gridLocator layoutGeneratorData::trialLayoutLocatorCallback(int column, int row)
 	{
-		return _trialGrid->get(column, row);
+		// Trial grid is not yet filled in
+		return gridLocator(column, row);
 	}
 
 	grid<gridLocator>* layoutGeneratorData::getTrialGrid() const
 	{
 		return _trialGrid;
+	}
+	simpleList<gridRegionGraphNode>* layoutGeneratorData::getRoomNodes() const
+	{
+		return _roomNodes;
 	}
 	simpleList<gridRegionGraphEdge>* layoutGeneratorData::getRoomNearestNeighbors() const
 	{
@@ -150,7 +162,7 @@ namespace brogueHd::component
 	{
 		return _roomGraph;
 	}
-	simpleGraph<gridLocator, gridLocatorEdge>* layoutGeneratorData::getConnectionGraph() const
+	simpleGraph<gridConnectionNode, gridConnectionEdge>* layoutGeneratorData::getConnectionGraph() const
 	{	
 		return _connectionGraph;
 	}

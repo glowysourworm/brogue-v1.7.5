@@ -31,6 +31,7 @@ namespace brogueHd::component
 
 		void iterate(gridCallbackConst<gridLocator> callback) const;
 		void iterateAdjacent(int column, int row, gridCallbackConst<gridLocator> callback) const;
+		void iterateRegions(simpleListCallback<gridRegion*> callback) const;
 
 	private:
 
@@ -144,5 +145,10 @@ namespace brogueHd::component
 
 			return iterationCallback::iterate;
 		});
+	}
+
+	void gridRegionCollection::iterateRegions(simpleListCallback<gridRegion*> callback) const
+	{
+		_regions->forEach(callback);
 	}
 }

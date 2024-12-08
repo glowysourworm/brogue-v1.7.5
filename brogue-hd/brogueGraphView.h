@@ -32,7 +32,7 @@ namespace brogueHd::frontend
 		~brogueGraphView();
 
 	public:
-		void setGraph(simpleGraph<gridLocator, gridLocatorEdge>* graph);
+		void setGraph(simpleGraph<gridLocatorNode<gridLocator>, gridLocatorEdge<gridLocator>>* graph);
 	};
 
 	brogueGraphView::brogueGraphView(brogueCoordinateConverter* coordinateConverter,
@@ -48,21 +48,21 @@ namespace brogueHd::frontend
 	{
 	}
 
-	void brogueGraphView::setGraph(simpleGraph<gridLocator, gridLocatorEdge>* agraph)
+	void brogueGraphView::setGraph(simpleGraph<gridLocatorNode<gridLocator>, gridLocatorEdge<gridLocator>>* agraph)
 	{
 		brogueUIData* uiData = this->getUIData();
 		brogueGraphView* that = this;
 
-		agraph->iterate([&that, &uiData](const gridLocator& node, const simpleList<gridLocatorEdge>& edges)
+		agraph->iterate([&that, &uiData](const gridLocatorNode<gridLocator>& node, const simpleList<gridLocatorEdge<gridLocator>>& edges)
 		{
 			simplePoint<int> vertex(brogueCellDisplay::CellWidth(uiData->getZoomLevel()) * node.column,
 			                        brogueCellDisplay::CellHeight(uiData->getZoomLevel()) * node.row);
 
 			for (int index = 0; index < edges.count(); index++)
 			{
-				gridLocator adjacentNode = edges.get(index).node1 == node
-					                           ? edges.get(index).node2
-					                           : edges.get(index).node1;
+				gridLocatorNode<gridLocator> adjacentNode = edges.get(index).node1 == node
+								                           ? edges.get(index).node2
+								                           : edges.get(index).node1;
 
 				simplePoint<int> adjacentVertex(
 					brogueCellDisplay::CellWidth(uiData->getZoomLevel()) * adjacentNode.column,

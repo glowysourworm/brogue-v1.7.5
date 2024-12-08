@@ -23,6 +23,8 @@ namespace brogueHd::component
 		gridRegionGraphNode getNode1() const;
 		gridRegionGraphNode getNode2() const;
 
+		simpleArray<gridLocator> getPathData() const;
+
 		void complete(const simpleList<gridLocator>& pathData);
 		void fail();
 
@@ -89,11 +91,16 @@ namespace brogueHd::component
 		if (_failed)
 			throw simpleException("Trying to utilize failed connection. Must re-start the layout process.");
 
-		for (int index = 0; index < pathData.count(); index++)
-		{
-			_pathData->set(index, pathData.get(index));
-		}
+		_pathData->addRange(pathData);
 		_complete = true;
+	}
+
+	simpleArray<gridLocator> layoutConnectionData::getPathData() const
+	{
+		if (!_complete || _failed)
+			throw simpleException("Trying to access path data for a layout connection that either failed, or is not yet complete.");
+
+		return _pathData->toArray();
 	}
 
 	void layoutConnectionData::fail()

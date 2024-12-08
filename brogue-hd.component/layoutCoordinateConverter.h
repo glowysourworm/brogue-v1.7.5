@@ -37,21 +37,18 @@ namespace brogueHd::component
 		simpleRectangle<int> getOutlineUI(const gridLocator& location) const;
 
 		simpleRectangle<int> convertToUI(const gridRect& rect, bool moveToCellCenter = false) const;
-		simpleLine<int> convertToUI(const gridLocatorEdge& edge, bool moveToCellCenter = false) const;
+		simpleLine<int> convertToUI(const gridLocator& location1, const gridLocator& location2, bool moveToCellCenter = false) const;
 		simplePoint<int> convertToUI(const gridLocator& location, bool moveToCellCenter = false) const;
 
 		simplePolygon<float>* convertToUIReal(const simplePolygon<int>*& polygonUI) const;
 		simpleLine<float> convertToUIReal(const simpleLine<int>& lineUI) const;
 		simplePoint<float> convertToUIReal(const simplePoint<int>& pointUI) const;
 		simpleRectangle<float> convertToUIReal(const gridRect& edge, bool moveToCellCenter = false) const;
-		simpleLine<float> convertToUIReal(const gridLocatorEdge& edge, bool moveToCellCenter = false) const;
+		simpleLine<float> convertToUIReal(const gridLocator& location1, const gridLocator& location2, bool moveToCellCenter = false) const;
 		simplePoint<float> convertToUIReal(const gridLocator& location, bool moveToCellCenter = false) const;
 
 		gridLocator convertUIToGrid(const simplePoint<int> pointUI, bool centerOffsetUsed) const;
-		gridLocatorEdge convertUIToGrid(const simpleLine<int> lineUI, bool centerOffsetUsed) const;
-
 		gridLocator convertUIRealToGrid(const simplePoint<float> pointUIReal, bool centerOffsetUsed) const;
-		gridLocatorEdge convertUIRealToGrid(const simpleLine<float> lineUIReal, bool centerOffsetUsed) const;
 
 	public:
 		int getZoomLevel() const
@@ -119,10 +116,10 @@ namespace brogueHd::component
 		return point;
 	}
 
-	simpleLine<int> layoutCoordinateConverter::convertToUI(const gridLocatorEdge& edge, bool moveToCellCenter) const
+	simpleLine<int> layoutCoordinateConverter::convertToUI(const gridLocator& location1, const gridLocator& location2, bool moveToCellCenter) const
 	{
-		simplePoint<int> point1 = convertToUI(edge.node1, moveToCellCenter);
-		simplePoint<int> point2 = convertToUI(edge.node2, moveToCellCenter);
+		simplePoint<int> point1 = convertToUI(location1, moveToCellCenter);
+		simplePoint<int> point2 = convertToUI(location2, moveToCellCenter);
 
 		return simpleLine<int>(point1, point2);
 	}
@@ -172,10 +169,9 @@ namespace brogueHd::component
 		return simpleRectangle<float>(topLeftUIReal, bottomRightUIReal);
 	}
 
-	simpleLine<float> layoutCoordinateConverter::convertToUIReal(const gridLocatorEdge& edge,
-	                                                             bool moveToCellCenter) const
+	simpleLine<float> layoutCoordinateConverter::convertToUIReal(const gridLocator& location1, const gridLocator& location2, bool moveToCellCenter) const
 	{
-		simpleLine<int> line = convertToUI(edge, moveToCellCenter);
+		simpleLine<int> line = convertToUI(location1, location2, moveToCellCenter);
 
 		// Flip y-coordinate to go from UI -> Real Numbers
 		line.node1.y = line.node1.y * -1;
@@ -209,33 +205,11 @@ namespace brogueHd::component
 		return locator;
 	}
 
-	gridLocatorEdge layoutCoordinateConverter::convertUIToGrid(const simpleLine<int> lineUI,
-	                                                           bool centerOffsetUsed) const
-	{
-		gridLocator location1 = convertUIToGrid(lineUI.node1, centerOffsetUsed);
-		gridLocator location2 = convertUIToGrid(lineUI.node2, centerOffsetUsed);
-
-		return gridLocatorEdge(location1, location2);
-	}
-
-	gridLocator layoutCoordinateConverter::convertUIRealToGrid(const simplePoint<float> pointUIReal,
-	                                                           bool centerOffsetUsed) const
+	gridLocator layoutCoordinateConverter::convertUIRealToGrid(const simplePoint<float> pointUIReal, bool centerOffsetUsed) const
 	{
 		// Flip y-coordinate to go from Real Numbers -> UI coordinates
 		simplePoint<int> pointUI(pointUIReal.x, -1 * pointUIReal.y);
 
 		return convertUIToGrid(pointUI, centerOffsetUsed);
-	}
-
-	gridLocatorEdge layoutCoordinateConverter::convertUIRealToGrid(const simpleLine<float> lineUIReal,
-	                                                               bool centerOffsetUsed) const
-	{
-		// Flip y-coordinate to go from Real Numbers -> UI coordinates
-		simplePoint<int> point1UI(lineUIReal.node1.x, lineUIReal.node1.y * -1);
-		simplePoint<int> point2UI(lineUIReal.node2.x, lineUIReal.node2.y * -1);
-
-		simpleLine<int> lineUI(point1UI, point2UI);
-
-		return convertUIToGrid(lineUI, centerOffsetUsed);
 	}
 }

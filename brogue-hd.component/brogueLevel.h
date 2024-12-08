@@ -25,7 +25,7 @@ namespace brogueHd::component
 		int getDepth() const;
 
 		void iterateWhereDefined(gridCallbackConst<brogueCell*> callback) const;
-		void iterateRoomConnections(graphSimpleEdgeIterator<gridLocator, gridLocatorEdge> callback) const;
+		void iterateRoomConnections(graphSimpleEdgeIterator<gridLocatorNode<gridLocator>, gridLocatorEdge<gridLocator>> callback) const;
 
 		//simpleList<gridLocatorEdge> getCorridorConnections() const
 		//{
@@ -79,7 +79,7 @@ namespace brogueHd::component
 		_layout->iterateWhereDefined(callback);
 	}
 
-	void brogueLevel::iterateRoomConnections(graphSimpleEdgeIterator<gridLocator, gridLocatorEdge> callback) const
+	void brogueLevel::iterateRoomConnections(graphSimpleEdgeIterator<gridLocatorNode<gridLocator>, gridLocatorEdge<gridLocator>> callback) const
 	{
 		_layout->iterateRoomConnections(callback);
 	}
