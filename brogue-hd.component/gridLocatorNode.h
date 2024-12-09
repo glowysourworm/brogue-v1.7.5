@@ -34,7 +34,6 @@ namespace brogueHd::component
 	private:
 
 		T _data;
-		gridLocator _locator;
 	};
 
 	template<isHashable T>
@@ -92,12 +91,12 @@ namespace brogueHd::component
 	template<isHashable T>
 	gridLocator gridLocatorNode<T>::getLocator() const
 	{
-		return _locator;
+		return gridLocator(this->column, this->row);
 	}
 
 	template<isHashable T>
 	size_t gridLocatorNode<T>::getHash() const
 	{
-		return hashGenerator::generateHash(_data, _locator);
+		return hashGenerator::generateHash(_data, this->column, this->row);
 	}
 }

@@ -659,10 +659,10 @@ namespace brogueHd::component
 	{
 		// Procedure
 		//
-		/// 1) define the (modified) room graph
-		/// 2) create the delaunay triangulated connection-point graph
-		/// 3) create the MST connection-point graph.
-		/// 4) store these components in the layoutGeneratorData*.
+		// 1) define the (modified) room graph
+		// 2) create the delaunay triangulated connection-point graph
+		// 3) create the MST connection-point graph.
+		// 4) store these components in the layoutGeneratorData*.
 		//
 
 		simpleGraph<gridRegionGraphNode, gridRegionGraphEdge> modifiedRoomGraph;
@@ -678,13 +678,22 @@ namespace brogueHd::component
 			if (normalConnection->isFailed())
 				throw simpleException("Normal connection failed. Must re-analyze the layout graph:  layoutGenerator::defineConnectionLayer");
 
+			if (normalConnection->getConnectionPoint1() == normalConnection->getConnectionPoint2())
+				throw simpleException("Layout connection has the same source and destination:  layoutGenerator::defineConnectionLayer");
+
+			// Nodes may be used in more than one connection
 			gridConnectionNode node1(normalConnection->getNode1().getData(), normalConnection->getConnectionPoint1());
 			gridConnectionNode node2(normalConnection->getNode2().getData(), normalConnection->getConnectionPoint2());
 			gridConnectionEdge nodeEdge(node1, node2);
 
-			connectionNodes.add(node1);
-			connectionNodes.add(node2);
-			connectionEdges.add(nodeEdge, normalConnection->getPathData());
+			if (!connectionNodes.contains(node1))
+				connectionNodes.add(node1);
+
+			if (!connectionNodes.contains(node2))
+				connectionNodes.add(node2);
+
+			if (!connectionEdges.contains(nodeEdge))
+				connectionEdges.add(nodeEdge, normalConnection->getPathData());
 
 			// Modified Room Edge
 			gridRegionGraphEdge edge(normalConnection->getNode1(), normalConnection->getNode2());
@@ -707,13 +716,28 @@ namespace brogueHd::component
 			if (!partialConnection->getReconciled())
 				throw simpleException("Mishandled partial connection:  (non-reconciled) layoutGenerator::defineConnectionLayer");
 
+			if (partialConnection->getConnectionPoint1() == default_value::value<gridLocator>())
+				throw simpleException("Invalid partial connection point:  layoutGenerator::defineConnectionLayer");
+
+			if (partialConnection->getInterruptingLocation() == default_value::value<gridLocator>())
+				throw simpleException("Invalid partial connection point:  layoutGenerator::defineConnectionLayer");
+
+			if (partialConnection->getConnectionPoint1() == partialConnection->getInterruptingLocation())
+				throw simpleException("Layout connection has the same source and destination:  layoutGenerator::defineConnectionLayer");
+
+			// Nodes may be used in more than one connection
 			gridConnectionNode node1(partialConnection->getNode1().getData(), partialConnection->getConnectionPoint1());
 			gridConnectionNode node2(partialConnection->getInterruptingRegion().getData(), partialConnection->getInterruptingLocation());
 			gridConnectionEdge nodeEdge(node1, node2, partialConnection->getPathData());
 
-			connectionNodes.add(node1);
-			connectionNodes.add(node2);
-			connectionEdges.add(nodeEdge, partialConnection->getPathData());
+			if (!connectionNodes.contains(node1))
+				connectionNodes.add(node1);
+
+			if (!connectionNodes.contains(node2))
+				connectionNodes.add(node2);
+
+			if (!connectionEdges.contains(nodeEdge))
+				connectionEdges.add(nodeEdge, partialConnection->getPathData());
 
 			// Modified Room Edge
 			gridRegionGraphEdge edge(partialConnection->getNode1(), partialConnection->getInterruptingRegion());
@@ -761,8 +785,8 @@ namespace brogueHd::component
 
 			gridConnectionEdge finalEdge(edge.node1, edge.node2, pathData);
 
-			if (!data->getConnectionGraph()->containsEdge(finalEdge) &&
-				randGenerator->next() < data->getProfile()->getExtraCorridorProbability())
+			if (!data->getConnectionGraph()->containsEdge(finalEdge))// &&
+				//randGenerator->next() < data->getProfile()->getExtraCorridorProbability())
 			{
 				data->getConnectionGraph()->addEdge(finalEdge);
 			}
@@ -819,7 +843,7 @@ namespace brogueHd::component
 			for (int index = 0; index < pathData.count(); index++)
 			{
 				gridLocator location = pathData.get(index);
-				color backColor(0, 0.1f, 0.3f, 1.0f);
+				color backColor(0, 0.3f, 0.5f, 1.0f);
 				layoutGrid->get(location.column, location.row)->setUI(brogueCellDisplay(location.column, location.row, backColor));
 			}
 
