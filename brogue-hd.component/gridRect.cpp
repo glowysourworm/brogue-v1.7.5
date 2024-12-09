@@ -186,8 +186,8 @@ namespace brogueHd::component
 
 	void gridRect::translate(int columnOffset, int rowOffset)
 	{
-		column += columnOffset;
-		row += rowOffset;
+		column = column + columnOffset;
+		row = row + rowOffset;
 	}
 
 	void gridRect::translate(const gridLocator& translation)

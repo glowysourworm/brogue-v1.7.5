@@ -120,11 +120,15 @@ namespace brogueHd::component
 		}
 
 		brogueCellDisplay(int column, int row, const color& abackColor)
+			: brogueCellDisplay(column, row, abackColor, colors::transparent(), brogueGlyphMap::Empty)
+		{
+		}
+		brogueCellDisplay(int column, int row, const color& abackColor, const color& aforeColor, char symbol)
 		{
 			this->column = column;
 			this->row = row;
-			character = brogueGlyphMap::Empty;
-			foreColor = default_value::value<color>();
+			character = symbol;
+			foreColor = aforeColor;
 			backColor = abackColor;
 			opacity = 1.0f;
 			needsUpdate = false;

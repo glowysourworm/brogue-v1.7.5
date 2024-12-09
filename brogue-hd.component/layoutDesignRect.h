@@ -12,6 +12,8 @@
 #include <simpleMath.h>
 #include <brogueRoomTemplate.h>
 
+#include "gridRectAdjacency.h"
+
 namespace brogueHd::component
 {
 	using namespace simple;
@@ -29,6 +31,7 @@ namespace brogueHd::component
 		{
 			_coordinateConverter = nullptr;
 			_configuration = default_value::value<brogueRoomTemplate>();
+			_constraint = default_value::value<gridRect>();
 			_boundary = default_value::value<gridRect>();
 			_minSize = default_value::value<gridRect>();
 			_complete = false;
@@ -44,8 +47,10 @@ namespace brogueHd::component
 		{
 			_coordinateConverter = coordinateConverter;
 			_configuration = configuration;
+			_constraint = constraint;
 			_complete = false;
 			_region = nullptr;
+			_regionOutline = nullptr;
 
 			applyConstraintImpl(constraint, true, padding);
 		}
@@ -57,7 +62,7 @@ namespace brogueHd::component
 
 		~layoutDesignRect()
 		{
-			// Nothing to do.
+			delete _adjacentRects;
 		}
 
 		void operator=(const layoutDesignRect& copy)
@@ -152,6 +157,11 @@ namespace brogueHd::component
 			return _configuration;
 		}
 
+		gridRect getConstraintBoundary() const
+		{
+			return _constraint;
+		}
+
 		gridRect getBoundary() const
 		{
 			return _boundary;
@@ -208,16 +218,19 @@ namespace brogueHd::component
 				_boundary == other.getBoundary() &&
 				_minSize == other.getMinSize() &&
 				_complete == other.getIsComplete() &&
-				_region == other.getRegion();
+				_region == other.getRegion() &&
+				_constraint == other.getConstraintBoundary();
 		}
 
 		void copyImpl(const layoutDesignRect& copy)
 		{
 			_configuration = copy.getConfiguration();
+			_constraint = copy.getConstraintBoundary();
 			_boundary = copy.getBoundary();
 			_minSize = copy.getMinSize();
 			_complete = copy.getIsComplete();
-			_region = copy.getRegion(); // Pointer Only!
+			_region = copy.getRegion();					// Pointer Only!
+			_regionOutline = copy.getRegionOutline();	// Pointer Only!
 		}
 
 	private:
@@ -227,9 +240,11 @@ namespace brogueHd::component
 		// Final (Actual) Region
 		gridRegion* _region;
 		gridRegionOutline* _regionOutline;
+		simpleList<gridRectAdjacency>* _adjacentRects;
 
 		// Room / Region configuration
 		brogueRoomTemplate _configuration;
+		gridRect _constraint;
 		gridRect _boundary;
 		gridRect _minSize;
 

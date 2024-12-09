@@ -56,7 +56,7 @@ namespace brogueHd::component
 		/// <summary>
 		/// Returns true if grid cell locations are adjacent
 		/// </summary>
-		bool areAdjacent(T location, T otherLocation) const;
+		bool areAdjacent(const T& location, const T& otherLocation) const;
 
 		/// <summary>
 		/// Returns the relative boundary of the grid (parent boundary contains this boundary)
@@ -81,7 +81,7 @@ namespace brogueHd::component
 		/// <summary>
 		/// Sets the value to the grid, clipping it to the max and min values, and handling exceptions
 		/// </summary>
-		void set(int column, int row, T setValue, bool overwrite = false);
+		void set(int column, int row, const T& setValue, bool overwrite = false);
 
 		/// <summary>
 		/// Searches grid for requested value based on comparison. Each truthy aggregateComparator result will store
@@ -161,7 +161,7 @@ namespace brogueHd::component
 		/// <summary>
 		/// Iterates grid within specific boundary constraint
 		/// </summary>
-		void iterateIn(gridRect boundary, gridCallbackConst<T> callback) const;
+		void iterateIn(const gridRect& boundary, gridCallbackConst<T> callback) const;
 
 		/// <summary>
 		/// Iterates outward from center location to specified distance
@@ -508,7 +508,7 @@ namespace brogueHd::component
 	}
 
 	template <isHashable T>
-	void grid<T>::set(int column, int row, T value, bool overwrite)
+	void grid<T>::set(int column, int row, const T& value, bool overwrite)
 	{
 		if (!this->isInBounds(column, row))
 			throw simpleException("Grid out of bounds:  grid.cpp");
@@ -624,7 +624,7 @@ namespace brogueHd::component
 	}
 
 	template <isHashable T>
-	bool grid<T>::areAdjacent(T location, T otherLocation) const
+	bool grid<T>::areAdjacent(const T& location, const T& otherLocation) const
 	{
 		if (!this->isDefined(location.column, location.row))
 			return false;
@@ -774,7 +774,7 @@ namespace brogueHd::component
 	}
 
 	template <isHashable T>
-	void grid<T>::iterateIn(gridRect boundary, gridCallbackConst<T> callback) const
+	void grid<T>::iterateIn(const gridRect& boundary, gridCallbackConst<T> callback) const
 	{
 		bool userBreak = false;
 
@@ -1128,428 +1128,3 @@ namespace brogueHd::component
 		}
 	}
 }
-
-
-/*
-// Procedure
-//
-// 1) For each row:  - Count across and add to row counters foreach non-null cell
-//                   - For each NULL cell -> reset the counters
-//                   - Then, take contiguous sums of counters with the Max(Min(counter value))
-//                     This represents a rectangle from the previous rows. Update this best fit.
-//
-//
-// TODO: Use a stack-based approach to cut down on iterating
-
-gridRect boundary = this->getRelativeBoundary();
-int rowCountersLength = boundary.width;
-simpleArray<int> rowCounters(rowCountersLength);
-
-int bestStartColumn = -1;
-int bestEndColumn = -1;
-int bestStartRow = -1;
-int bestEndRow = -1;
-int bestArea = 0;
-
-for (int row = boundary.top(); row <= boundary.bottom(); row++)
-{
-	for (int column = boundary.left(); column <= boundary.right(); column++)
-	{
-		int index = column - boundary.left();
-
-		// FIRST, INCREMENT ROW COUNTERS
-		if (predicate(column, row, this->getUnsafe(column, row)))
-			rowCounters.set(index, rowCounters.get(index) + 1);
-		else
-			rowCounters.set(index, 0);
-	}
-
-	// From the Left
-	for (int index1 = 0; index1 < rowCountersLength; index1++)
-	{
-		// Initialize min-height for the next sweep (from the left)
-		int minHeight = rowCounters.get(index1);
-
-		// From the left
-		for (int index2 = index1; index2 < rowCountersLength && minHeight > 0; index2++)
-		{
-			minHeight = simpleMath::minOf(minHeight, rowCounters.get(index1), rowCounters.get(index2));
-
-			// Current column against previous
-			if (rowCounters.get(index1) > bestArea)
-			{
-				bestStartColumn = index1 + boundary.left();
-				bestEndColumn = index1 + boundary.left();
-				bestStartRow = row - rowCounters.get(index1) + 1;
-				bestEndRow = row;
-
-				bestArea = rowCounters.get(index1);
-			}
-
-			// Current column check
-			if (rowCounters.get(index2) > bestArea)
-			{
-				bestStartColumn = index2 + boundary.left();
-				bestEndColumn = index2 + boundary.left();
-				bestStartRow = row - rowCounters.get(index2) + 1;
-				bestEndRow = row;
-
-				bestArea = rowCounters.get(index2);
-			}
-
-			// Current min-block check
-			if (minHeight * ((index2 - index1) + 1) > bestArea)
-			{
-				bestStartColumn = index1 + boundary.left();
-				bestEndColumn = index2 + boundary.left();
-				bestStartRow = row - minHeight + 1;
-				bestEndRow = row;
-
-				bestArea = minHeight * ((index2 - index1) + 1);
-			}
-		}
-	}
-
-	// From the Right
-	for (int index1 = rowCountersLength - 1; index1 >= 0; index1--)
-	{
-		// Initialize min-height for the next sweep (from the right)
-		int minHeight = rowCounters.get(index1);
-
-		// From the right
-		for (int index2 = index1; index2 >= 0 && minHeight > 0; index2--)
-		{
-			minHeight = simpleMath::minOf(minHeight, rowCounters.get(index1), rowCounters.get(index2));
-
-			// Current column against previous
-			if (rowCounters.get(index1) > bestArea)
-			{
-				bestStartColumn = index1 + boundary.left();
-				bestEndColumn = index1 + boundary.left();
-				bestStartRow = row - rowCounters.get(index1) + 1;
-				bestEndRow = row;
-
-				bestArea = rowCounters.get(index1);
-			}
-
-			// Current column check
-			if (rowCounters.get(index2) > bestArea)
-			{
-				bestStartColumn = index2 + boundary.left();
-				bestEndColumn = index2 + boundary.left();
-				bestStartRow = row - rowCounters.get(index2) + 1;
-				bestEndRow = row;
-
-				bestArea = rowCounters.get(index2);
-			}
-
-			// Current min-block check
-			if (minHeight * ((index1 - index2) + 1) > bestArea)
-			{
-				// Columns are reversed
-				bestStartColumn = index2 + boundary.left();
-				bestEndColumn = index1 + boundary.left();
-				bestStartRow = row - minHeight + 1;
-				bestEndRow = row;
-
-				bestArea = minHeight * ((index1 - index2) + 1);
-			}
-		}
-	}
-}
-
-if (bestArea == 0)
-	return default_value::value<gridRect>();
-
-// Validation: Check boundaries; check that the predicate passes
-//
-const grid<T>* that = this;
-gridRect result(bestStartColumn, bestStartRow, (bestEndColumn - bestStartColumn) + 1, (bestEndRow - bestStartRow) + 1);
-
-if (!boundary.contains(result))
-	throw simpleException("Invalid sub-region rectangle calculation:  gridRegionConstructor::calculateLargestRectangle");
-
-result.iterate([&that, &predicate] (int column, int row)
-{
-	if (!predicate(column, row, that->getUnsafe(column, row)))
-		throw simpleException("Invalid sub-region rectangle calculation:  gridRegionConstructor::calculateLargestRectangle");
-
-	return iterationCallback::iterate;
-});
-
-return result;
-*/
-//}
-
-///// <summary>
-///// Checks for grid adjacency using an AND mask with the provided compass constrained direction.
-///// </summary>
-//public static CompassConstrained GetAdjacency<T>(this Grid<T> grid, int column, int row)
-//{
-//    CompassConstrained result = CompassConstrained.Null;
-
-//    if (grid.IsDefined(column, row - 1))
-//        result |= CompassConstrained.N;
-
-//    if (grid.IsDefined(column, row + 1))
-//        result |= CompassConstrained.S;
-
-//    if (grid.IsDefined(column + 1, row))
-//        result |= CompassConstrained.E;
-
-//    if (grid.IsDefined(column - 1, row))
-//        result |= CompassConstrained.W;
-
-//    if (grid.IsDefined(column + 1, row - 1))
-//        result |= CompassConstrained.NE;
-
-//    if (grid.IsDefined(column - 1, row - 1))
-//        result |= CompassConstrained.NW;
-
-//    if (grid.IsDefined(column + 1, row + 1))
-//        result |= CompassConstrained.SE;
-
-//    if (grid.IsDefined(column - 1, row + 1))
-//        result |= CompassConstrained.SW;
-
-//    return result;
-//}
-
-
-//// Takes a grid as a mask of valid locations, chooses one randomly and returns it as (x, y).
-//// If there are no valid locations, returns (-1, -1).
-
-//template<isHashable T>
-//void grid<T>::randomLocationInGrid(int* x, int* y, int validValue) 
-//{
-//    const int locationCount = validLocationCount(grid, validValue);
-//    int i, j;
-
-//    if (locationCount <= 0) {
-//        *x = *y = -1;
-//        return;
-//    }
-//    int index = rand_range(0, locationCount - 1);
-//    for (i = 0; i < DCOLS && index >= 0; i++) {
-//        for (j = 0; j < DROWS && index >= 0; j++) {
-//            if (grid[i][j] == validValue) {
-//                if (index == 0) {
-//                    *x = i;
-//                    *y = j;
-//                }
-//                index--;
-//            }
-//        }
-//    }
-//    return;
-//}
-
-//// Finds the lowest positive number in a grid, chooses one location with that number randomly and returns it as (x, y).
-//// If there are no valid locations, returns (-1, -1).
-
-//template<isHashable T>
-//void grid<T>::randomLeastPositiveLocationInGrid(int** grid, int* x, int* y, boolean deterministic) {
-//    const int targetValue = leastPositiveValueInGrid(grid);
-//    int locationCount;
-//    int i, j, index;
-
-//    if (targetValue == 0) {
-//        *x = *y = -1;
-//        return;
-//    }
-
-//    locationCount = 0;
-//    for (i = 0; i < DCOLS; i++) {
-//        for (j = 0; j < DROWS; j++) {
-//            if (grid[i][j] == targetValue) {
-//                locationCount++;
-//            }
-//        }
-//    }
-
-//    if (deterministic) {
-//        index = locationCount / 2;
-//    }
-//    else {
-//        index = rand_range(0, locationCount - 1);
-//    }
-
-//    for (i = 0; i < DCOLS && index >= 0; i++) {
-//        for (j = 0; j < DROWS && index >= 0; j++) {
-//            if (grid[i][j] == targetValue) {
-//                if (index == 0) {
-//                    *x = i;
-//                    *y = j;
-//                }
-//                index--;
-//            }
-//        }
-//    }
-//    return;
-//}
-
-//template<isHashable T>
-//boolean grid<T>::getQualifyingPathLocNear(int* retValX, int* retValY,
-//    int x, int y,
-//    boolean hallwaysAllowed,
-//    unsigned long blockingTerrainFlags,
-//    unsigned long blockingMapFlags,
-//    unsigned long forbiddenTerrainFlags,
-//    unsigned long forbiddenMapFlags,
-//    boolean deterministic) {
-//    int** grid, ** costMap;
-//    int loc[2];
-
-//    // First check the given location to see if it works, as an optimization.
-//    if (!cellHasTerrainFlag(x, y, blockingTerrainFlags | forbiddenTerrainFlags)
-//        && !(pmap[x][y].flags & (blockingMapFlags | forbiddenMapFlags))
-//        && (hallwaysAllowed || passableArcCount(x, y) <= 1)) {
-
-//        *retValX = x;
-//        *retValY = y;
-//        return true;
-//    }
-
-//    // Allocate the grids.
-//    grid = allocGrid();
-//    costMap = allocGrid();
-
-//    // Start with a base of a high number everywhere.
-//    fillGrid(grid, 30000);
-//    fillGrid(costMap, 1);
-
-//    // Block off the pathing blockers.
-//    getTerrainGrid(costMap, PDS_FORBIDDEN, blockingTerrainFlags, blockingMapFlags);
-//    if (blockingTerrainFlags & (T_OBSTRUCTS_DIAGONAL_MOVEMENT | T_OBSTRUCTS_PASSABILITY)) {
-//        getTerrainGrid(costMap, PDS_OBSTRUCTION, T_OBSTRUCTS_DIAGONAL_MOVEMENT, 0);
-//    }
-
-//    // Run the distance scan.
-//    grid[x][y] = 1;
-//    costMap[x][y] = 1;
-//    dijkstraScan(grid, costMap, true);
-//    findReplaceGrid(grid, 30000, 30000, 0);
-
-//    // Block off invalid targets that aren't pathing blockers.
-//    getTerrainGrid(grid, 0, forbiddenTerrainFlags, forbiddenMapFlags);
-//    if (!hallwaysAllowed) {
-//        getPassableArcGrid(grid, 2, 10, 0);
-//    }
-
-//    // Get the solution.
-//    randomLeastPositiveLocationInGrid(grid, retValX, retValY, deterministic);
-
-//    //    dumpLevelToScreen();
-//    //    displayGrid(grid);
-//    //    if (coordinatesAreInMap(*retValX, *retValY)) {
-//    //        hiliteCell(*retValX, *retValY, &yellow, 100, true);
-//    //    }
-//    //    temporaryMessage("Qualifying path selected:", true);
-
-//    freeGrid(grid);
-//    freeGrid(costMap);
-
-//    // Fall back to a pathing-agnostic alternative if there are no solutions.
-//    if (*retValX == -1 && *retValY == -1) {
-//        if (getQualifyingLocNear(loc, x, y, hallwaysAllowed, NULL,
-//            (blockingTerrainFlags | forbiddenTerrainFlags),
-//            (blockingMapFlags | forbiddenMapFlags),
-//            false, deterministic)) {
-//            *retValX = loc[0];
-//            *retValY = loc[1];
-//            return true; // Found a fallback solution.
-//        }
-//        else {
-//            return false; // No solutions.
-//        }
-//    }
-//    else {
-//        return true; // Found a primary solution.
-//    }
-//}
-
-
-//template<gridCellConstraint T>
-//int grid<T>::fillContiguousRegion(int column, int row, T fillValue) 
-//{
-//    int numberOfCells = 1;
-
-//    // Fill current cell value
-//    //
-//    this->set(column, row, fillValue);
-
-//    // Recurse through in a flood-fill fashion
-//    //
-//    iterateAroundCardinal(this, column, row, true, [](int x, int y)
-//    {
-//        // If the neighbor is an unmarked region cell
-//        //
-//        if (!this->isZeroValue(x,y))
-//        { 
-//            numberOfCells += this->fillContiguousRegion(x, y, fillValue); // then recurse.
-//        }
-//    });
-
-//    return numberOfCells;
-//}
-
-//template<gridCellConstraint T>
-//std::vector<gridRegion<T>*> grid<T>::locateRegions(function<bool(T)> predicate, T fillValue)
-//{
-//    std::vector<gridRegion<T>*> result;
-
-//    iterate(this, [](int column, int row)
-//    {
-//        // Check history
-//        for (int index = 0; index < result.size(); index++)
-//        {
-//            // Return from iterator (only)
-//            if (predicate(result[i][column, row]))
-//                return;
-//        }
-
-//        // Check to see if we're at a valid location
-//        if (predicate(_grid[column, row]))
-//        {
-//            // Start a new region
-//            grid<T>* regionGrid = new grid<T>(_columns, _rows, _zeroValue, _maxValue);
-
-//            // Keep track of the boundary
-//            gridRect boundary(column, row, 0, 0);
-
-//            // Set initial value
-//            regionGrid->set(column, row, fillValue);
-
-//            // Recurse to fill out the grid
-//            this->locateRegionRecurse(regionGrid, column, row, predicate, fillValue, predicate);
-
-//            // Set result
-//            result.push_back(new gridRegion<T>(regionGrid, boundary));
-//        }
-//    });
-
-//    return result;
-//}
-
-//template<gridCellConstraint T>
-//void grid<T>::locateRegionRecurse(grid<T>* regionGrid, gridRect& boundary, int currentColumn, int currentRow, T fillValue, function<bool(T)> predicate)
-//{
-//    // Recurse through in a flood-fill fashion
-//    //
-//    iterateAroundCardinal(this, currentColumn, currentRow, true, [](int x, int y)
-//    {
-//        // Neighbor Cell:  Protect from infinite recursion by checking region grid
-//        //
-//        if (predicate(this, x,y) && !predicate(regionGrid, x, y))
-//        {
-//            // Mark as region
-//            regionGrid->set(x, y, fillValue);
-
-//            // Expand boundary
-//            boundary.expand(x, y);
-
-//            // Recurse
-//            locateRegionRecurse(regionGrid, boundary, x, y, fillValue, predicate);
-//        }
-//    });
-//}

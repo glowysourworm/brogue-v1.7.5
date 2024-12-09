@@ -32,7 +32,7 @@ namespace brogueHd::component
 		simpleRectangle<int> getLayoutBoundaryUI() const;
 		simpleRectangle<float> getLayoutBoundaryUIReal() const;
 
-		gridRect convertToGridRect(const simpleRectangle<int> rectangle) const;
+		gridRect convertToGridRect(const simpleRectangle<int>& rectangleUI, bool centerOffsetUsed) const;
 
 		simpleRectangle<int> getOutlineUI(const gridLocator& location) const;
 
@@ -43,7 +43,7 @@ namespace brogueHd::component
 		simplePolygon<float>* convertToUIReal(const simplePolygon<int>*& polygonUI) const;
 		simpleLine<float> convertToUIReal(const simpleLine<int>& lineUI) const;
 		simplePoint<float> convertToUIReal(const simplePoint<int>& pointUI) const;
-		simpleRectangle<float> convertToUIReal(const gridRect& edge, bool moveToCellCenter = false) const;
+		simpleRectangle<float> convertToUIReal(const gridRect& rect, bool moveToCellCenter = false) const;
 		simpleLine<float> convertToUIReal(const gridLocator& location1, const gridLocator& location2, bool moveToCellCenter = false) const;
 		simplePoint<float> convertToUIReal(const gridLocator& location, bool moveToCellCenter = false) const;
 
@@ -87,11 +87,12 @@ namespace brogueHd::component
 		return this->convertToUIReal(*_parentBoundary, false);
 	}
 
-	gridRect layoutCoordinateConverter::convertToGridRect(const simpleRectangle<int> rectangle) const
+	gridRect layoutCoordinateConverter::convertToGridRect(const simpleRectangle<int>& rectangleUI, bool centerOffsetUsed) const
 	{
-		simpleRect rect = rectangle.getSimpleRect();
+		gridLocator topLeft = convertUIToGrid(rectangleUI.getTopLeft(), centerOffsetUsed);
+		gridLocator bottomRight = convertUIToGrid(rectangleUI.getBottomRight(), centerOffsetUsed);
 
-		return gridRect(rect);
+		return gridRect(topLeft.column, topLeft.row, bottomRight.column - topLeft.column + 1, bottomRight.row - topLeft.row + 1);
 	}
 
 	simpleRectangle<int> layoutCoordinateConverter::getOutlineUI(const gridLocator& location) const
@@ -162,6 +163,9 @@ namespace brogueHd::component
 	{
 		gridLocator topLeft = rect.topLeft();
 		gridLocator bottomRight = rect.bottomRight();
+
+		// NOTE:  Must expand by one to make up for the index offset
+		bottomRight.translate(1, 1);
 
 		simplePoint<float> topLeftUIReal = convertToUIReal(topLeft, moveToCellCenter);
 		simplePoint<float> bottomRightUIReal = convertToUIReal(bottomRight, moveToCellCenter);

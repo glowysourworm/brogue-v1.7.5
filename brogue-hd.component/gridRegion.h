@@ -133,7 +133,7 @@ namespace brogueHd::component
 		grid<gridLocator>* _grid;
 		grid<gridLocator>* _edgeGrid;
 
-		gridRect _largestRectangularSubRegion;
+		gridRect* _largestRectangularSubRegion;
 
 		simpleArray<gridLocator>* _locations;
 		simpleArray<gridLocator>* _edgeLocations;
@@ -168,7 +168,7 @@ namespace brogueHd::component
 		_grid = new grid<gridLocator>(parentBoundary, relativeBoundary);
 		_edgeGrid = new grid<gridLocator>(parentBoundary, relativeBoundary);
 
-		_largestRectangularSubRegion = largestRectangularSubRegion;
+		_largestRectangularSubRegion = new gridRect(largestRectangularSubRegion);
 
 		_locations = new simpleArray<gridLocator>(locations);
 		_edgeLocations = new simpleArray<gridLocator>(edgeLocations);
@@ -194,7 +194,7 @@ namespace brogueHd::component
 
 		for (int index = 0; index < edgeLocations.count(); index++)
 		{
-			gridLocator item = locations.get(index);
+			gridLocator item = edgeLocations.get(index);
 
 			_edgeGrid->set(item.column, item.row, item);
 		}
@@ -213,6 +213,8 @@ namespace brogueHd::component
 
 		delete _grid;
 		delete _edgeGrid;
+
+		delete _largestRectangularSubRegion;
 
 		delete _locations;
 		delete _edgeLocations;
@@ -284,6 +286,10 @@ namespace brogueHd::component
 	{
 		// Translates the coordinate boundary (relative boundary)
 		_grid->translate(columnOffset, rowOffset);
+		_edgeGrid->translate(columnOffset, rowOffset);
+
+		// Largest Sub-Rectangle
+		_largestRectangularSubRegion->translate(columnOffset, rowOffset);
 
 		// Data must all be copied over (each collection)
 		_grid->iterateModify([&columnOffset, &rowOffset](int column, int row, gridLocator& item)
@@ -481,7 +487,7 @@ namespace brogueHd::component
 
 	gridRect gridRegion::getLargestSubRectangle() const
 	{
-		return _largestRectangularSubRegion;
+		return *_largestRectangularSubRegion;
 	}
 
 	void gridRegion::iterateLocations(gridCallbackConst<gridLocator> callback) const

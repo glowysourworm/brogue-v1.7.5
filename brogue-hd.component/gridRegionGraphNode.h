@@ -3,17 +3,18 @@
 #include "gridLocator.h"
 #include "gridLocatorNode.h"
 #include "gridRegion.h"
+#include "layoutDesignRect.h"
 
 namespace brogueHd::component
 {
 	using namespace simple::math;
 
-	class gridRegionGraphNode : public gridLocatorNode<gridRegion*>
+	class gridRegionGraphNode : public gridLocatorNode<layoutDesignRect*>
 	{
 	public:
 
 		gridRegionGraphNode();
-		gridRegionGraphNode(gridRegion* region, const gridLocator& node);
+		gridRegionGraphNode(layoutDesignRect* region, const gridLocator& node);
 		gridRegionGraphNode(const gridRegionGraphNode& copy);
 		~gridRegionGraphNode() override;
 	};
@@ -21,8 +22,8 @@ namespace brogueHd::component
 	gridRegionGraphNode::gridRegionGraphNode()
 	{
 	}
-	gridRegionGraphNode::gridRegionGraphNode(gridRegion* region, const gridLocator& nodeLocation)
-		: gridLocatorNode<gridRegion*>(region, nodeLocation)
+	gridRegionGraphNode::gridRegionGraphNode(layoutDesignRect* region, const gridLocator& nodeLocation)
+		: gridLocatorNode<layoutDesignRect*>(region, nodeLocation)
 	{
 	}
 
@@ -32,7 +33,7 @@ namespace brogueHd::component
 	}
 
 	gridRegionGraphNode::gridRegionGraphNode(const gridRegionGraphNode& copy)
-		: gridLocatorNode<gridRegion*>(copy.getData(), copy.getLocator())
+		: gridLocatorNode<layoutDesignRect*>(copy.getData(), copy.getLocator())
 	{
 	}
 }

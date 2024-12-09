@@ -124,7 +124,7 @@ namespace brogueHd::component
 
 		_roomGraph->iterateNodes([&collision, &column, &row] (const gridRegionGraphNode& node)
 		{
-			if (node.getData()->isDefined(column, row))
+			if (node.getData()->getRegion()->isDefined(column, row))
 			{
 				collision = true;
 				return iterationCallback::breakAndReturn;

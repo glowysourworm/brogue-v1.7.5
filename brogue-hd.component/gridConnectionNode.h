@@ -10,7 +10,7 @@ namespace brogueHd::component
 {
 	using namespace simple::math;
 
-	class gridConnectionNode : public gridRegionGraphNode
+	class gridConnectionNode : public gridLocatorNode<gridRegion*>
 	{
 	public:
 
@@ -24,11 +24,11 @@ namespace brogueHd::component
 	{
 	}
 	gridConnectionNode::gridConnectionNode(gridRegion* region, const gridLocator& connectionPoint)
-		: gridRegionGraphNode(region, connectionPoint)
+		: gridLocatorNode<gridRegion*>(region, connectionPoint)
 	{
 	}
 	gridConnectionNode::gridConnectionNode(const gridConnectionNode& copy)
-		: gridRegionGraphNode(copy.getData(), copy.getLocator())
+		: gridLocatorNode<gridRegion*>(copy.getData(), copy.getLocator())
 	{
 	}
 	gridConnectionNode::~gridConnectionNode() 

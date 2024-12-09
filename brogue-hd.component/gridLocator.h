@@ -48,13 +48,13 @@ namespace brogueHd::component
 		virtual bool operator!=(const gridLocator& cell) const
 		{
 			return column != cell.column ||
-				row != cell.row;
+					row != cell.row;
 		}
 
 		void translate(int columnOffset, int rowOffset)
 		{
-			column += columnOffset;
-			row += rowOffset;
+			column = column + columnOffset;
+			row = row + rowOffset;
 		}
 
 		gridLocator add(const gridLocator& cell)

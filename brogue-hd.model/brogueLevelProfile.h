@@ -82,7 +82,7 @@ namespace brogueHd::model
 		_corridorFrequencyMap = new simpleHash<levelTypes, int>();
 		_levelType = type;
 		_depth = depth;
-		_extraCorridorProbability = 0.5;
+		_extraCorridorProbability = 1.0;
 
 		simpleHash<brogueRoomType, int>* basicMap = new simpleHash<brogueRoomType, int>();
 		simpleHash<brogueRoomType, int>* basicFirstRoomMap = new simpleHash<brogueRoomType, int>();
