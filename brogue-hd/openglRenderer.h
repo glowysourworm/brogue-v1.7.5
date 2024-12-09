@@ -512,12 +512,12 @@ namespace brogueHd::frontend
 		//	return iterationCallback::iterate;
 		//});
 
-		//level->iterateRoomConnections([&program] (const gridLocatorEdge& connection)
-		//{
-		//	program->setDebugPolygonUpdate(connection);
+		level->iterateRoomGraph([&program] (const gridConnectionEdge& connection)
+		{
+			program->setDebugPolygonUpdate(connection);
 
-		//	return iterationCallback::iterate;
-		//});
+			return iterationCallback::iterate;
+		});
 
 
 		_threadLock->unlock();

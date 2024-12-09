@@ -14,7 +14,7 @@
 #include "eventController.h"
 #include "gl.h"
 #include "gridLocator.h"
-#include "gridLocatorEdge.h"
+#include "gridConnectionEdge.h"
 #include "gridRect.h"
 #include "openglHelper.h"
 #include "resourceController.h"
@@ -92,7 +92,7 @@ namespace brogueHd::frontend
 		/// <summary>
 		/// Sets the debug polygon data for the level room graph
 		/// </summary>
-		void setDebugPolygonUpdate(const gridLocatorEdge<gridLocator>& roomConnection);
+		void setDebugPolygonUpdate(const gridConnectionEdge& roomConnection);
 
 	private:
 		void clearAllTextures();
@@ -317,7 +317,7 @@ namespace brogueHd::frontend
 		_uiPrograms->get(brogueUIProgram::GameProgram)->setGridProgram(partId, data);
 	}
 
-	void brogueMainProgram::setDebugPolygonUpdate(const gridLocatorEdge<gridLocator>& roomConnection)
+	void brogueMainProgram::setDebugPolygonUpdate(const gridConnectionEdge& roomConnection)
 	{
 		brogueUIProgramPartId partId(brogueUIProgram::GameProgram, brogueUIProgramPart::Polygon, 0);
 

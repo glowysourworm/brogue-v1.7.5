@@ -381,28 +381,28 @@ namespace brogueHd::component
 				//			 using gridRegion::translate; and update our hash of designRect instances.
 				//
 
-				gridRect paddedBoundaryPacked = tiling.get(designRect);
-				gridRect actualBoundaryExpanded = designRect->getActualBoundary().createExpanded(roomPadding);
+				//gridRect paddedBoundaryPacked = tiling.get(designRect);
+				//gridRect actualBoundaryExpanded = designRect->getActualBoundary().createExpanded(roomPadding);
 
-				if (!paddedBoundaryPacked.contains(actualBoundaryExpanded))
-					throw simpleException("Mishandled room layout boundary:  layoutGenerator.h");
+				//if (!paddedBoundaryPacked.contains(actualBoundaryExpanded))
+				//	throw simpleException("Mishandled room layout boundary:  layoutGenerator.h");
 
-				// Pack this into position:  modifies the gridRect
-				algorithm.removeRectangle(paddedBoundaryPacked);
-				algorithm.addRectangle(actualBoundaryExpanded);
+				//// Pack this into position:  modifies the gridRect
+				//algorithm.removeRectangle(paddedBoundaryPacked);
+				//algorithm.addRectangle(actualBoundaryExpanded);
 
-				// Update our hash table
-				tiling.set(designRect, actualBoundaryExpanded);
+				//// Update our hash table
+				//tiling.set(designRect, actualBoundaryExpanded);
 
-				gridLocator translation = designRect->getActualBoundary().createExpanded(roomPadding)
-																		 .getTranslation(actualBoundaryExpanded);
+				//gridLocator translation = designRect->getActualBoundary().createExpanded(roomPadding)
+				//														 .getTranslation(actualBoundaryExpanded);
 
-				if (translation.column != 0 ||
-					translation.row != 0)
-				{
-					// Will also translate the region outline
-					designRect->translate(translation);
-				}
+				//if (translation.column != 0 ||
+				//	translation.row != 0)
+				//{
+				//	// Will also translate the region outline
+				//	designRect->translate(translation);
+				//}
 			}
 
 			iteration++;
@@ -488,6 +488,10 @@ namespace brogueHd::component
 				}
 			}
 
+			if (minlocation1 == default_value::value<gridLocator>() ||
+				minlocation2 == default_value::value<gridLocator>())
+				throw simpleException("Error finding nearest neighbors:  layoutGenerator::createNearestNeighbors");
+
 			gridRegionGraphNode node1(edge.node1.getData(), minlocation1);
 			gridRegionGraphNode node2(edge.node2.getData(), minlocation2);
 			gridRegionGraphEdge graphEdge(node1, node2);
@@ -517,7 +521,7 @@ namespace brogueHd::component
 			gridRegionGraphEdge edge = data->getRoomNearestNeighbors()->get(index);
 
 			// (MEMORY!) (see layoutGeneratorData* destructor)
-			layoutConnectionData* connection = new layoutConnectionData(edge.node1, edge.node2, edge.node1.getLocator(), edge.node2.getLocator());
+			layoutConnectionData* connection = new layoutConnectionData(edge.node1, edge.node2);
 
 			data->getConnectionBuilder()->addConnection(connection);
 		}
@@ -571,9 +575,12 @@ namespace brogueHd::component
 				layoutConnectionData* nextConnection = data->getConnectionBuilder()->getNextNormal();
 
 				// Run Dijkstra on the trial grid
-				simpleArray<gridLocator> pathData = runDijkstra(nextConnection->getConnectionPoint1(),
-																nextConnection->getConnectionPoint2(),
+				simpleArray<gridLocator> pathData = runDijkstra(nextConnection->getNode1().getLocator(),
+																nextConnection->getNode2().getLocator(),
 																data->getTrialDijkstraParameters());
+
+				if (pathData.count() == 0)
+					throw simpleException("Dijkstra created empty path:  layoutGenerator::attemptRoomConnections");
 
 				gridRegionGraphNode interruptingRegion = default_value::value<gridRegionGraphNode>();
 				gridLocator interruptingLocation = default_value::value<gridLocator>();
@@ -606,9 +613,12 @@ namespace brogueHd::component
 				layoutPartialConnectionData* nextConnection = data->getConnectionBuilder()->getNextPartial();
 
 				// Run Dijkstra (Partial 1) on the trial grid (using closest interrupting region to source location)
-				simpleArray<gridLocator> pathData = runDijkstra(nextConnection->getConnectionPoint1(),
+				simpleArray<gridLocator> pathData = runDijkstra(nextConnection->getNode1().getLocator(),
 																nextConnection->getInterruptingLocation(),
 																data->getTrialDijkstraParameters());
+
+				if (pathData.count() == 0)
+					throw simpleException("Dijkstra created empty path:  layoutGenerator::attemptRoomConnections");
 
 				gridRegionGraphNode nextInterruptingRegion = default_value::value<gridRegionGraphNode>();
 				gridLocator nextInterruptingLocation = default_value::value<gridLocator>();
@@ -678,12 +688,12 @@ namespace brogueHd::component
 			if (normalConnection->isFailed())
 				throw simpleException("Normal connection failed. Must re-analyze the layout graph:  layoutGenerator::defineConnectionLayer");
 
-			if (normalConnection->getConnectionPoint1() == normalConnection->getConnectionPoint2())
+			if (normalConnection->getNode1().getLocator() == normalConnection->getNode2().getLocator())
 				throw simpleException("Layout connection has the same source and destination:  layoutGenerator::defineConnectionLayer");
 
 			// Nodes may be used in more than one connection
-			gridConnectionNode node1(normalConnection->getNode1().getData(), normalConnection->getConnectionPoint1());
-			gridConnectionNode node2(normalConnection->getNode2().getData(), normalConnection->getConnectionPoint2());
+			gridConnectionNode node1(normalConnection->getNode1().getData(), normalConnection->getNode1().getLocator());
+			gridConnectionNode node2(normalConnection->getNode2().getData(), normalConnection->getNode2().getLocator());
 			gridConnectionEdge nodeEdge(node1, node2);
 
 			if (!connectionNodes.contains(node1))
@@ -716,17 +726,17 @@ namespace brogueHd::component
 			if (!partialConnection->getReconciled())
 				throw simpleException("Mishandled partial connection:  (non-reconciled) layoutGenerator::defineConnectionLayer");
 
-			if (partialConnection->getConnectionPoint1() == default_value::value<gridLocator>())
+			if (partialConnection->getNode1().getLocator() == default_value::value<gridLocator>())
 				throw simpleException("Invalid partial connection point:  layoutGenerator::defineConnectionLayer");
 
 			if (partialConnection->getInterruptingLocation() == default_value::value<gridLocator>())
 				throw simpleException("Invalid partial connection point:  layoutGenerator::defineConnectionLayer");
 
-			if (partialConnection->getConnectionPoint1() == partialConnection->getInterruptingLocation())
+			if (partialConnection->getNode1().getLocator() == partialConnection->getInterruptingLocation())
 				throw simpleException("Layout connection has the same source and destination:  layoutGenerator::defineConnectionLayer");
 
 			// Nodes may be used in more than one connection
-			gridConnectionNode node1(partialConnection->getNode1().getData(), partialConnection->getConnectionPoint1());
+			gridConnectionNode node1(partialConnection->getNode1().getData(), partialConnection->getNode1().getLocator());
 			gridConnectionNode node2(partialConnection->getInterruptingRegion().getData(), partialConnection->getInterruptingLocation());
 			gridConnectionEdge nodeEdge(node1, node2, partialConnection->getPathData());
 
@@ -755,22 +765,22 @@ namespace brogueHd::component
 		randomGenerator* randGenerator = _randomGenerator;
 
 		// Add all MST edges. These are required.
-		connectionMST->iterateEdges([&data, &connectionEdges] (const gridConnectionEdge& edge)
-		{
-			// Find the edge data we already cached (the nodes should still match)
-			simpleArray<gridLocator> pathData = connectionEdges.firstValue([&edge] (const gridConnectionEdge& otherEdge, 
-																					const simpleArray<gridLocator>& pathData)
-			{
-				return (edge.node1 == otherEdge.node1 && edge.node2 == otherEdge.node2) ||
-					   (edge.node1 == otherEdge.node2 && edge.node2 == otherEdge.node1);
-			});
+		//connectionMST->iterateEdges([&data, &connectionEdges] (const gridConnectionEdge& edge)
+		//{
+		//	// Find the edge data we already cached (the nodes should still match)
+		//	simpleArray<gridLocator> pathData = connectionEdges.firstValue([&edge] (const gridConnectionEdge& otherEdge, 
+		//																			const simpleArray<gridLocator>& pathData)
+		//	{
+		//		return (edge.node1 == otherEdge.node1 && edge.node2 == otherEdge.node2) ||
+		//			   (edge.node1 == otherEdge.node2 && edge.node2 == otherEdge.node1);
+		//	});
 
-			gridConnectionEdge finalEdge(edge.node1, edge.node2, pathData);
+		//	gridConnectionEdge finalEdge(edge.node1, edge.node2, pathData);
 
-			data->getConnectionGraph()->addEdge(finalEdge);
+		//	data->getConnectionGraph()->addEdge(finalEdge);
 
-			return iterationCallback::iterate;
-		});
+		//	return iterationCallback::iterate;
+		//});
 
 		// Add Delaunay edges based on probability
 		connectionDelaunay->iterateEdges([&data, &randGenerator, &connectionEdges] (const gridConnectionEdge& edge)
@@ -823,9 +833,9 @@ namespace brogueHd::component
 		// NOTE: Sharing pointers for regions with the primary layout!
 		regions.forEach([&layoutGrid, &layoutRegions] (gridRegion* region)
 		{
-			region->iterateLocations([&layoutGrid] (int column, int row, const gridLocator& location)
+			region->iterateLocations([&layoutGrid, &region] (int column, int row, const gridLocator& location)
 			{
-				color backColor(0, 0, 0.5f, 1.0f);
+				color backColor = location == region->getLargestSubRectangle().center() ? color(1, 0, 0.5f, 1.0f) : color(0, 0, 0.5f, 1.0f);
 
 				layoutGrid->get(column, row)->setUI(brogueCellDisplay(column, row, backColor));
 
@@ -857,7 +867,23 @@ namespace brogueHd::component
 
 		gridConnectionLayer* connectionLayer = new gridConnectionLayer(data->getConnectionGraph(), cellLayer);
 
-		return new brogueLayout(layoutGrid, connectionLayer);
+		// DEBUG DATA
+		simpleList<gridConnectionEdge> roomGraph = data->getRoomGraph()->getEdges().select<gridConnectionEdge>([] (const gridRegionGraphEdge& edge)
+		{
+			gridConnectionNode node1(edge.node1.getData(), edge.node1.getLocator());
+			gridConnectionNode node2(edge.node2.getData(), edge.node2.getLocator());
+
+			return gridConnectionEdge(node1, node2);
+		});
+		simpleList<gridConnectionEdge> nearestNeighbors = data->getRoomNearestNeighbors()->select<gridConnectionEdge>([] (const gridRegionGraphEdge& edge)
+		{
+			gridConnectionNode node1(edge.node1.getData(), edge.node1.getLocator());
+			gridConnectionNode node2(edge.node2.getData(), edge.node2.getLocator());
+
+			return gridConnectionEdge(node1, node2);
+		});
+
+		return new brogueLayout(layoutGrid, connectionLayer, nearestNeighbors, roomGraph);
 	}
 
 	template<isHashable T, isGridLocatorNode<T> TNode, isGridLocatorEdge<TNode, T> TEdge>

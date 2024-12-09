@@ -29,7 +29,10 @@ namespace brogueHd::component
 	class brogueLayout
 	{
 	public:
-		brogueLayout(grid<brogueCell*>* mainGrid, gridConnectionLayer* connectionLayer);
+		brogueLayout(grid<brogueCell*>* mainGrid, 
+					 gridConnectionLayer* connectionLayer, 
+					 const simpleList<gridConnectionEdge>& roomNearestNeighbors, 
+					 const simpleList<gridConnectionEdge>& roomGraph);
 		~brogueLayout();
 
 		bool isDefined(int column, int row) const;
@@ -66,9 +69,14 @@ namespace brogueHd::component
 		gridRect getLargestUnusedRectangle(const gridRect& minSize);
 
 		/// <summary>
+		/// Iterates the room "centroid" graph to be able to visulize it for debugging
+		/// </summary>
+		void iterateRoomGraph(graphSimpleEdgeIterator<gridConnectionNode, gridConnectionEdge> callback) const;
+
+		/// <summary>
 		/// Iterates all graph edges and callsback to the user code
 		/// </summary>
-		void iterateRoomConnections(graphSimpleEdgeIterator<gridLocatorNode<gridLocator>, gridLocatorEdge<gridLocator>> callback);
+		void iterateRoomConnections(graphSimpleEdgeIterator<gridConnectionNode, gridConnectionEdge> callback) const;
 
 		/// <summary>
 		/// Queries the connection layer (which run's a very small dijkstra iteration on the graph of
@@ -112,10 +120,30 @@ namespace brogueHd::component
 		// Connection Layer:  Used for movement / travel (region queries)
 		gridConnectionLayer* _connectionLayer;
 
+		// DEBUG DATA
+		simpleList<gridConnectionEdge*>* _roomNearestNeighbors;
+		simpleList<gridConnectionEdge*>* _roomGraph;
+
 	};
 
-	brogueLayout::brogueLayout(grid<brogueCell*>* mainGrid, gridConnectionLayer* connectionLayer)
+	brogueLayout::brogueLayout(grid<brogueCell*>* mainGrid, 
+							   gridConnectionLayer* connectionLayer, 
+							   const simpleList<gridConnectionEdge>& roomNearestNeighbors,
+							   const simpleList<gridConnectionEdge>& roomGraph)
 	{
+		// DEBUG DATA
+		_roomNearestNeighbors = new simpleList<gridConnectionEdge*>();
+		_roomGraph = new simpleList<gridConnectionEdge*>();
+
+		for (int index = 0; index < roomNearestNeighbors.count(); index++)
+		{
+			_roomNearestNeighbors->add(new gridConnectionEdge(roomNearestNeighbors.get(index)));
+		}
+		for (int index = 0; index < roomGraph.count(); index++)
+		{
+			_roomGraph->add(new gridConnectionEdge(roomGraph.get(index)));
+		}
+
 		_mainGrid = nullptr;
 
 		// Permanent Layers
@@ -217,12 +245,21 @@ namespace brogueHd::component
 		});
 	}
 
-	void brogueLayout::iterateRoomConnections(graphSimpleEdgeIterator<gridLocatorNode<gridLocator>, gridLocatorEdge<gridLocator>> callback)
+	void brogueLayout::iterateRoomGraph(graphSimpleEdgeIterator<gridConnectionNode, gridConnectionEdge> callback) const
 	{
-		//if (_connectionGraph == nullptr)
-		//	throw simpleException("Trying to iterate room graph before setting it");
+		_roomGraph->forEach([&callback] (gridConnectionEdge* edge)
+		{
+			return callback(*edge);
+		});
+	}
 
-		//_connectionGraph->iterateEdges(callback);
+	void brogueLayout::iterateRoomConnections(graphSimpleEdgeIterator<gridConnectionNode, gridConnectionEdge> callback) const
+	{
+		//_connectionLayer->iterateConnections(callback);
+		_roomNearestNeighbors->forEach([&callback](gridConnectionEdge* edge)
+		{
+			return callback(*edge);
+		});
 	}
 
 	void brogueLayout::iterateAdjacentCells(int column, int row, gridCallbackConst<brogueCell*> callback)

@@ -5,6 +5,7 @@
 #include "gridLayer.h"
 
 #include <simpleGraph.h>
+#include <simpleGraphDefinitions.h>
 
 #include "gridConnectionEdge.h"
 #include "gridConnectionNode.h"
@@ -13,11 +14,15 @@
 
 namespace brogueHd::component
 {
+	using namespace simple::math;
+
 	class gridConnectionLayer
 	{
 	public:
 		gridConnectionLayer(simpleGraph<gridConnectionNode, gridConnectionEdge>* connectionGraph, gridLayer* cellLayer);
 		~gridConnectionLayer();
+
+		void iterateConnections(graphSimpleEdgeIterator<gridConnectionNode, gridConnectionEdge> callback) const;
 
 	private:
 
@@ -38,5 +43,10 @@ namespace brogueHd::component
 		//		 it.
 		delete _connectionGraph;
 		delete _cellLayer;
+	}
+
+	void gridConnectionLayer::iterateConnections(graphSimpleEdgeIterator<gridConnectionNode, gridConnectionEdge> callback) const
+	{
+		_connectionGraph->iterateEdges(callback);
 	}
 }

@@ -12,13 +12,8 @@ namespace brogueHd::component
 	public:
 
 		layoutConnectionData(const gridRegionGraphNode& node1,
-							 const gridRegionGraphNode& node2,
-							 const gridLocator& connection1,
-							 const gridLocator& connection2);
+							 const gridRegionGraphNode& node2);
 		~layoutConnectionData();
-
-		gridLocator getConnectionPoint1() const;
-		gridLocator getConnectionPoint2() const;
 
 		gridRegionGraphNode getNode1() const;
 		gridRegionGraphNode getNode2() const;
@@ -36,9 +31,6 @@ namespace brogueHd::component
 		gridRegionGraphNode* _regionNode1;
 		gridRegionGraphNode* _regionNode2;
 		
-		gridLocator _connectionPoint1;
-		gridLocator _connectionPoint2;
-
 		simpleList<gridLocator>* _pathData;
 
 		bool _complete;
@@ -46,14 +38,10 @@ namespace brogueHd::component
 	};
 
 	layoutConnectionData::layoutConnectionData(const gridRegionGraphNode& node1,
-											   const gridRegionGraphNode& node2,
-											   const gridLocator& connection1,
-											   const gridLocator& connection2)
+											   const gridRegionGraphNode& node2)
 	{
 		_regionNode1 = new gridRegionGraphNode(node1);
 		_regionNode2 = new gridRegionGraphNode(node2);
-		_connectionPoint1 = connection1;
-		_connectionPoint2 = connection2;
 		_pathData = new simpleList<gridLocator>();
 		_complete = false;
 		_failed = false;
@@ -63,15 +51,6 @@ namespace brogueHd::component
 		delete _pathData;
 		delete _regionNode1;		// Leave rest of region data for other components
 		delete _regionNode2;		// Leave rest of region data for other components
-	}
-
-	gridLocator layoutConnectionData::getConnectionPoint1() const
-	{
-		return _connectionPoint1;
-	}
-	gridLocator layoutConnectionData::getConnectionPoint2() const
-	{
-		return _connectionPoint2;
 	}
 
 	gridRegionGraphNode layoutConnectionData::getNode1() const

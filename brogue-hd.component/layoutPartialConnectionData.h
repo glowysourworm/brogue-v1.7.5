@@ -17,9 +17,7 @@ namespace brogueHd::component
 		layoutPartialConnectionData(const gridRegionGraphNode& source,
 									 const gridRegionGraphNode& destination,
 									 const gridRegionGraphNode& interruptingRegion,
-									 const gridLocator& locationSource,
-									 const gridLocator& locationDest,
-									 const gridLocator& locationInterrupted);
+									const gridLocator& interruptingLocation);
 
 		layoutPartialConnectionData(const layoutConnectionData* connection,
 									const gridRegionGraphNode& interruptingRegion,
@@ -54,13 +52,11 @@ namespace brogueHd::component
 	layoutPartialConnectionData::layoutPartialConnectionData(const gridRegionGraphNode& source,
 															 const gridRegionGraphNode& destination,
 															 const gridRegionGraphNode& interruptingRegion,
-															 const gridLocator& locationSource,
-															 const gridLocator& locationDest,
-															 const gridLocator& locationInterrupted) : 
-	layoutConnectionData(source, destination, locationSource, locationDest)
+															 const gridLocator& interruptingLocation) :
+	layoutConnectionData(source, destination)
 	{
 		_interruptingRegion = new gridRegionGraphNode(interruptingRegion);
-		_locationInterrupted = locationInterrupted;
+		_locationInterrupted = interruptingLocation;
 		_reconciled = false;
 	}
 	layoutPartialConnectionData::layoutPartialConnectionData(const layoutConnectionData* connection,
@@ -69,8 +65,6 @@ namespace brogueHd::component
 	layoutPartialConnectionData(connection->getNode1(),
 								connection->getNode2(),
 								interruptingRegion,
-								connection->getConnectionPoint1(),
-								connection->getConnectionPoint2(),
 								interruptingLocation)
 	{}
 	layoutPartialConnectionData::~layoutPartialConnectionData()
