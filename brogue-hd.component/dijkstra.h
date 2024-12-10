@@ -56,11 +56,12 @@ namespace brogueHd::component
 		/// <param name="mapCostPredicate">Delegate used to fetch a cost for the specified column / row of the grid</param>
 		/// <param name="mapPredicate">Delegate used to mask off areas of the map from the entire algorithm. Set to TRUE to ALLOW use of the location for the algorithm.</param>
 		dijkstra(const gridRect& parentBoundary,
-		         const gridRect& relativeBoundary,
-		         bool obeyCardinalMovement,
-		         const dijkstraPredicate& mapPredicate,
-		         const dijkstraCostCallback& mapCostPredicate,
-		         const dijkstraLocatorCallback<T>& locatorCallback);
+				 const gridRect& relativeBoundary,
+				 bool obeyCardinalMovement,
+				 bool includeEndpointsInResult,
+				 const dijkstraPredicate& mapPredicate,
+				 const dijkstraCostCallback& mapCostPredicate,
+				 const dijkstraLocatorCallback<T>& locatorCallback);
 
 		~dijkstra();
 
@@ -144,19 +145,22 @@ namespace brogueHd::component
 		bool _initialized = false;
 		bool _finished = false;
 		bool _obeyCardinalMovement = false;
+		bool _includeEndpoints = false;
 	};
 
 	template <isGridLocator T>
 	dijkstra<T>::dijkstra(const gridRect& parentBoundary,
-	                      const gridRect& relativeBoundary,
-	                      bool obeyCardinalMovement,
-	                      const dijkstraPredicate& mapPredicate,
-	                      const dijkstraCostCallback& mapCostPredicate,
-	                      const dijkstraLocatorCallback<T>& locatorCallback)
+						  const gridRect& relativeBoundary,
+						  bool obeyCardinalMovement,
+						  bool includeEndpointsInResult,
+						  const dijkstraPredicate& mapPredicate,
+						  const dijkstraCostCallback& mapCostPredicate,
+						  const dijkstraLocatorCallback<T>& locatorCallback)
 	{
 		_parentBoundary = parentBoundary;
 		_relativeBoundary = relativeBoundary;
 		_obeyCardinalMovement = obeyCardinalMovement;
+		_includeEndpoints = includeEndpointsInResult;
 		_mapPredicate = mapPredicate;
 		_mapCostPredicate = mapCostPredicate;
 		_locatorCallback = locatorCallback;
@@ -181,7 +185,7 @@ namespace brogueHd::component
 		delete _validPaths;
 
 		// Must delete the allocated hash table memory
-		_frontier->iterate([](float key, simpleHash<T, T>* value)
+		_frontier->iterate([] (float key, simpleHash<T, T>* value)
 		{
 			delete value; // -> ~simpleBSTNode()
 
@@ -198,7 +202,7 @@ namespace brogueHd::component
 		_targetLocations = new simpleArray<T>(targets);
 
 		// Clear out the frontier
-		_frontier->iterate([](float key, simpleHash<T, T>* value)
+		_frontier->iterate([] (float key, simpleHash<T, T>* value)
 		{
 			// MEMORY!
 			delete value;
@@ -221,9 +225,9 @@ namespace brogueHd::component
 
 				// Initialize output map (set to infinity for initialization
 				int outputValue = ((column == _sourceLocation.column) && (row == _sourceLocation.row) &&
-					                  passesPredicate)
-					                  ? 0
-					                  : std::numeric_limits<int>::max();
+									  passesPredicate)
+					? 0
+					: std::numeric_limits<int>::max();
 
 				_outputMap->set(column, row, outputValue, true);
 
@@ -263,10 +267,10 @@ namespace brogueHd::component
 
 		// Iterate while any target not reached (AND) not visited
 		while (!_visitedMap->get(column, row) &&
-			goalDict.any([](T key, bool value)
-			{
-				return !value;
-			}))
+			goalDict.any([] (T key, bool value)
+		{
+			return !value;
+		}))
 		{
 			// Set current parameters
 			float currentWeight = _outputMap->get(column, row);
@@ -340,7 +344,7 @@ namespace brogueHd::component
 			lastLocator = _locatorCallback(column, row);
 
 			// Get locator from the goal dictionary
-			T goalLocator = goalDict.firstOrDefaultKey([&lastLocator](T key, bool value)
+			T goalLocator = goalDict.firstOrDefaultKey([&lastLocator] (T key, bool value)
 			{
 				return key.column == lastLocator.column && key.row == lastLocator.row;
 			});
@@ -362,11 +366,11 @@ namespace brogueHd::component
 				T nextNode = default_value::value<T>();
 
 				// CHECK FOR GOAL LOCATION!
-				goalDict.forEach([&nextNode, &nextCostDict](T location, bool value)
+				goalDict.forEach([&nextNode, &nextCostDict] (T location, bool value)
 				{
 					if (!value)
 					{
-						nextNode = nextCostDict->firstOrDefaultKey([&location](T ckey, T cvalue)
+						nextNode = nextCostDict->firstOrDefaultKey([&location] (T ckey, T cvalue)
 						{
 							return ckey.column == location.column &&
 								ckey.row == location.row;
@@ -402,14 +406,14 @@ namespace brogueHd::component
 		}
 
 		// No goals were found for the last locator; OR any failed paths were found (TODO: Take a look at fail conditions)
-		if (!goalDict.any([&lastLocator](T key, bool value)
-			{
-				return key.column == lastLocator.column && key.row == lastLocator.row;
-			}) ||
-			goalDict.any([](T key, bool value)
-			{
-				return !value;
-			}))
+		if (!goalDict.any([&lastLocator] (T key, bool value)
+		{
+			return key.column == lastLocator.column && key.row == lastLocator.row;
+		}) ||
+			goalDict.any([] (T key, bool value)
+		{
+			return !value;
+		}))
 		{
 			throw simpleException("Dijkstra's Map was unable to find the current goal location");
 		}
@@ -524,7 +528,7 @@ namespace brogueHd::component
 			currentLocation = lowestWeightLocation;
 
 			// Add this to the path
-			if (!result.any([&lowestWeightLocation](T alocation)
+			if (!result.any([&lowestWeightLocation] (T alocation)
 			{
 				return alocation == lowestWeightLocation;
 			}))
@@ -547,15 +551,22 @@ namespace brogueHd::component
 		// VAILDATE
 		valid &= _mapPredicate(goalLocation.column, goalLocation.row);
 
-		// NOTE:  ADD SOURCE LOCATION FOR INCLUSIVE PATH (not needed)
+		if (!valid)
+			throw simpleException("Invalid path generated:  source point is not included in the map predicate:  dijkstra.h");
 
-		// Reverse the path to build a result array
-		simpleArray<T> resultArray(result.count());
+		// Final location
+		result.add(goalLocation);
 
-		for (int index = result.count() - 1; index >= 0; index--)
-			resultArray.set(result.count() - 1 - index, result.get(index));
+		// Remove endpoints (optional)
+		for (int index = result.count() - 1; index >= 0 && !_includeEndpoints; index--)
+		{
+			if (result.get(index) == _sourceLocation ||
+				result.get(index) == goalLocation)
+				result.removeAt(index);
+		}
 
-		return resultArray;
+		// Reverse the array for the proper solution
+		return result.toArray().reverse();
 	}
 
 	template <isGridLocator T>
@@ -583,7 +594,7 @@ namespace brogueHd::component
 
 		// Update the output map
 		_outputMap->set(destColumn, destRow,
-		                simpleMath::minOf(_outputMap->get(destColumn, destRow), currentWeight + cost), true);
+						simpleMath::minOf(_outputMap->get(destColumn, destRow), currentWeight + cost), true);
 
 		// Update the frontier
 		int newWeight = _outputMap->get(destColumn, destRow);
@@ -697,316 +708,4 @@ namespace brogueHd::component
 			}
 		}
 	}
-
-	//void dijkstra::pdsUpdate(pdsMap* map) 
-	//{
-	//	int dir, dirs;
-	//	pdsLink* left = NULL, * right = NULL, * link = NULL;
-
-	//	dirs = map->eightWays ? 8 : 4;
-
-	//	pdsLink* head = map->front.right;
-	//	map->front.right = NULL;
-
-	//	while (head != NULL) 
-	//	{
-	//		for (dir = 0; dir < dirs; dir++) 
-	//		{
-	//			link = head + (nbDirs[dir][0] + DCOLS * nbDirs[dir][1]);
-	//			if (link < map->links || link >= map->links + DCOLS * DROWS) continue;
-
-	//			// verify passability
-	//			if (link->cost < 0) 
-	//				continue;
-
-	//			if (dir >= 4) 
-	//			{
-	//				pdsLink* way1, * way2;
-	//				way1 = head + nbDirs[dir][0];
-	//				way2 = head + DCOLS * nbDirs[dir][1];
-	//				if (way1->cost == PDS_OBSTRUCTION || way2->cost == PDS_OBSTRUCTION) 
-	//					continue;
-	//			}
-
-	//			if (head->distance + link->cost < link->distance) 
-	//			{
-	//				link->distance = head->distance + link->cost;
-
-	//				// reinsert the touched cell; it'll be close to the beginning of the list now, so
-	//				// this will be very fast.  start by removing it.
-
-	//				if (link->right != NULL) link->right->left = link->left;
-	//				if (link->left != NULL) link->left->right = link->right;
-
-	//				left = head;
-	//				right = head->right;
-	//				while (right != NULL && right->distance < link->distance) {
-	//					left = right;
-	//					right = right->right;
-	//				}
-	//				if (left != NULL) left->right = link;
-	//				link->right = right;
-	//				link->left = left;
-	//				if (right != NULL) right->left = link;
-	//			}
-	//		}
-
-	//		right = head->right;
-
-	//		head->left = NULL;
-	//		head->right = NULL;
-
-	//		head = right;
-	//	}
-	//}
-
-	//void dijkstra::pdsClear(pdsMap* map, int maxDistance, boolean eightWays) 
-	//{
-	//	int i;
-
-	//	map->eightWays = eightWays;
-
-	//	map->front.right = NULL;
-
-	//	for (i = 0; i < DCOLS * DROWS; i++) {
-	//		map->links[i].distance = maxDistance;
-	//		map->links[i].left = map->links[i].right = NULL;
-	//	}
-	//}
-
-	//int dijkstra::pdsGetDistance(pdsMap* map, int x, int y) 
-	//{
-	//	pdsUpdate(map);
-	//	return PDS_CELL(map, x, y)->distance;
-	//}
-
-	//void dijkstra::pdsSetDistance(pdsMap* map, int x, int y, int distance)
-	//{
-	//	pdsLink* left, * right, * link;
-
-	//	if (x > 0 && y > 0 && x < DCOLS - 1 && y < DROWS - 1) 
-	//	{
-	//		link = PDS_CELL(map, x, y);
-
-	//		if (link->distance > distance) 
-	//		{
-	//			link->distance = distance;
-
-	//			if (link->right != NULL) link->right->left = link->left;
-	//			if (link->left != NULL) link->left->right = link->right;
-
-	//			left = &map->front;
-	//			right = map->front.right;
-
-	//			while (right != NULL && right->distance < link->distance) 
-	//			{
-	//				left = right;
-	//				right = right->right;
-	//			}
-
-	//			link->right = right;
-	//			link->left = left;
-	//			left->right = link;
-	//			if (right != NULL) right->left = link;
-	//		}
-	//	}
-	//}
-
-	//void dijkstra::pdsSetCosts(pdsMap* map, int** costMap)
-	//{
-	//	int i, j;
-
-	//	for (i = 0; i < DCOLS; i++) {
-	//		for (j = 0; j < DROWS; j++) {
-	//			if (i != 0 && j != 0 && i < DCOLS - 1 && j < DROWS - 1) {
-	//				PDS_CELL(map, i, j)->cost = costMap[i][j];
-	//			}
-	//			else {
-	//				PDS_CELL(map, i, j)->cost = PDS_FORBIDDEN;
-	//			}
-	//		}
-	//	}
-	//}
-
-	//void dijkstra::pdsBatchInput(pdsMap* map, int** distanceMap, int** costMap, int maxDistance, boolean eightWays) 
-	//{
-	//	int i, j;
-	//	pdsLink* left, * right;
-
-	//	map->eightWays = eightWays;
-
-	//	left = NULL;
-	//	right = NULL;
-
-	//	map->front.right = NULL;
-
-	//	for (i = 0; i < DCOLS; i++) 
-	//	{
-	//		for (j = 0; j < DROWS; j++) 
-	//		{
-	//			pdsLink* link = PDS_CELL(map, i, j);
-
-	//			if (distanceMap != NULL) 
-	//			{
-	//				link->distance = distanceMap[i][j];
-	//			}
-	//			else 
-	//			{
-	//				if (costMap != NULL) 
-	//				{
-	//					// totally hackish; refactor
-	//					link->distance = maxDistance;
-	//				}
-	//			}
-
-	//			int cost;
-
-	//			if (i == 0 || j == 0 || i == DCOLS - 1 || j == DROWS - 1) 
-	//			{
-	//				cost = PDS_OBSTRUCTION;
-	//			}
-	//			else if (costMap == NULL) 
-	//			{
-	//				if (cellHasTerrainFlag(i, j, T_OBSTRUCTS_PASSABILITY) && cellHasTerrainFlag(i, j, T_OBSTRUCTS_DIAGONAL_MOVEMENT))
-	//				{
-	//					cost = PDS_OBSTRUCTION;
-	//				}
-
-	//				else
-	//				{
-	//					cost = PDS_FORBIDDEN;
-	//				}
-	//			}
-	//			else 
-	//			{
-	//				cost = costMap[i][j];
-	//			}
-
-	//			link->cost = cost;
-
-	//			if (cost > 0) {
-	//				if (link->distance < maxDistance) {
-	//					if (right == NULL || right->distance > link->distance) {
-	//						// left and right are used to traverse the list; if many cells have similar values,
-	//						// some time can be saved by not clearing them with each insertion.  this time,
-	//						// sadly, we have to start from the front.
-
-	//						left = &map->front;
-	//						right = map->front.right;
-	//					}
-
-	//					while (right != NULL && right->distance < link->distance) {
-	//						left = right;
-	//						right = right->right;
-	//					}
-
-	//					link->right = right;
-	//					link->left = left;
-	//					left->right = link;
-	//					if (right != NULL) right->left = link;
-
-	//					left = link;
-	//				}
-	//				else {
-	//					link->right = NULL;
-	//					link->left = NULL;
-	//				}
-	//			}
-	//			else {
-	//				link->right = NULL;
-	//				link->left = NULL;
-	//			}
-	//		}
-	//	}
-	//}
-
-	//void dijkstra::pdsBatchOutput(pdsMap* map, int** distanceMap) 
-	//{
-	//	int i, j;
-
-	//	pdsUpdate(map);
-	//	// transfer results to the distanceMap
-	//	for (i = 0; i < DCOLS; i++) {
-	//		for (j = 0; j < DROWS; j++) {
-	//			distanceMap[i][j] = PDS_CELL(map, i, j)->distance;
-	//		}
-	//	}
-	//}
-
-	//void dijkstra::pdsInvalidate(pdsMap* map, int maxDistance)
-	//{
-	//	pdsBatchInput(map, NULL, NULL, maxDistance, map->eightWays);
-	//}
-
-	//void dijkstra::dijkstraScan(int** distanceMap, int** costMap, boolean useDiagonals) 
-	//{
-	//	static pdsMap map;
-
-	//	pdsBatchInput(&map, distanceMap, costMap, 30000, useDiagonals);
-	//	pdsBatchOutput(&map, distanceMap);
-	//}
-
-	//void dijkstra::calculateDistances(int** distanceMap,
-	//								  int destinationX, 
-	//								  int destinationY,
-	//								  unsigned long blockingTerrainFlags,
-	//								  creature* traveler,
-	//								  boolean canUseSecretDoors,
-	//								  boolean eightWays) 
-	//{
-	//	creature* monst;
-	//	static pdsMap map;
-
-	//	int i, j;
-
-	//	for (i = 0; i < DCOLS; i++) 
-	//	{
-	//		for (j = 0; j < DROWS; j++) 
-	//		{
-	//			char cost;
-	//			monst = monsterAtLoc(i, j);
-	//			if (monst
-	//				&& (monst->info.flags & (MONST_IMMUNE_TO_WEAPONS | MONST_INVULNERABLE))
-	//				&& (monst->info.flags & (MONST_IMMOBILE | MONST_GETS_TURN_ON_ACTIVATION))) {
-
-	//				// Always avoid damage-immune stationary monsters.
-	//				cost = PDS_FORBIDDEN;
-	//			}
-	//			else if (canUseSecretDoors
-	//				&& cellHasTMFlag(i, j, TM_IS_SECRET)
-	//				&& cellHasTerrainFlag(i, j, T_OBSTRUCTS_PASSABILITY)
-	//				&& !(discoveredTerrainFlagsAtLoc(i, j) & T_OBSTRUCTS_PASSABILITY)) 
-	//			{
-	//				cost = 1;
-	//			}
-	//			else if (cellHasTerrainFlag(i, j, T_OBSTRUCTS_PASSABILITY)
-	//				|| (traveler && traveler == &player && !(pmap[i][j].flags & (DISCOVERED | MAGIC_MAPPED)))) 
-	//			{
-	//				cost = cellHasTerrainFlag(i, j, T_OBSTRUCTS_DIAGONAL_MOVEMENT) ? PDS_OBSTRUCTION : PDS_FORBIDDEN;
-	//			}
-	//			else if ((traveler && monsterAvoids(traveler, i, j)) || cellHasTerrainFlag(i, j, blockingTerrainFlags)) 
-	//			{
-	//				cost = PDS_FORBIDDEN;
-	//			}
-	//			else {
-	//				cost = 1;
-	//			}
-
-	//			PDS_CELL(&map, i, j)->cost = cost;
-	//		}
-	//	}
-
-	//	pdsClear(&map, 30000, eightWays);
-	//	pdsSetDistance(&map, destinationX, destinationY, 0);
-	//	pdsBatchOutput(&map, distanceMap);
-	//}
-
-	//int dijkstra::pathingDistance(int x1, int y1, int x2, int y2, unsigned long blockingTerrainFlags) 
-	//{
-	//	int retval, ** distanceMap = allocGrid();
-	//	calculateDistances(distanceMap, x2, y2, blockingTerrainFlags, NULL, true, true);
-	//	retval = distanceMap[x1][y1];
-	//	freeGrid(distanceMap);
-	//	return retval;
-	//}
 }

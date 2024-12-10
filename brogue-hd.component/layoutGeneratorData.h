@@ -79,6 +79,7 @@ namespace brogueHd::component
 		_trialDijkstraParameters = new layoutDijkstraParameters<gridLocator>(layoutParentBoundary,
 																			 layoutRelativeBoundary,
 																			 true,
+																			 false,
 																			 std::bind(&layoutGeneratorData::trialLayoutInclusionPredicate, this, std::placeholders::_1, std::placeholders::_2),
 																			 std::bind(&layoutGeneratorData::trialLayoutCostPredicate, this, std::placeholders::_1, std::placeholders::_2),
 																			 std::bind(&layoutGeneratorData::trialLayoutLocatorCallback, this, std::placeholders::_1, std::placeholders::_2));

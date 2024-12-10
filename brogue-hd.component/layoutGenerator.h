@@ -650,7 +650,7 @@ namespace brogueHd::component
 					pathData, interruptingRegion, 
 					interruptingLocation))
 				{
-					// Change connection to partial; and continue
+					// Change connection to partial; and continue (region / corridor interruption)
 					data->getConnectionBuilder()->changeConnectionToPartial(nextConnection, interruptingRegion, interruptingLocation);
 
 					// Delete this connection
@@ -660,6 +660,14 @@ namespace brogueHd::component
 				// Success! (Normal)
 				else
 				{
+					// Transfer the data to the trial grid
+					for (int index = 0; index < pathData.count(); index++)
+					{
+						gridLocator corridorLocation = pathData.get(index);
+						data->getTrialGrid()->set(corridorLocation.column, corridorLocation.row, corridorLocation);
+					}
+
+					// Store the completed path
 					nextConnection->complete(pathData);
 				}
 			}
@@ -699,6 +707,14 @@ namespace brogueHd::component
 				//			been solved.
 				else
 				{
+					// Transfer the data to the trial grid
+					for (int index = 0; index < pathData.count(); index++)
+					{
+						gridLocator corridorLocation = pathData.get(index);
+						data->getTrialGrid()->set(corridorLocation.column, corridorLocation.row, corridorLocation);
+					}
+
+					// Store the completed path
 					nextConnection->completePartial(pathData);
 				}
 			}
@@ -1032,6 +1048,7 @@ namespace brogueHd::component
 			parameters->getParentBoundary(),
 			parameters->getRelativeBoundary(),
 			parameters->getObeyCardinalMovement(),
+			parameters->getIncludeEndpoints(),
 			parameters->getMapPredicate(),
 			parameters->getMapCostPredicate(),
 			parameters->getLocatorCallback());
@@ -1069,6 +1086,7 @@ namespace brogueHd::component
 			if (destNode.getData()->getRegion()->isDefined(pathData.get(index)))
 				continue;
 
+			// Region Collision
 			for (int regionIndex = 0; regionIndex < data->getRoomGraph()->getNodes().count(); regionIndex++)
 			{
 				gridRegionGraphNode regionNode = data->getRoomGraph()->getNodes().get(regionIndex);
@@ -1083,6 +1101,14 @@ namespace brogueHd::component
 					interruptingNode = regionNode;
 					return false;
 				}
+			}
+
+			// Corridor Collision
+			if (data->getTrialGrid()->isDefined(pathData.get(index).column, pathData.get(index).row))
+			{
+				interruptingLocation = pathData.get(index);
+				interruptingNode = default_value::value<gridRegionGraphNode>();
+				return false;
 			}
 		}
 

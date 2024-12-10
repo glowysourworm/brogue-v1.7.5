@@ -30,6 +30,9 @@ namespace brogueHd::component
 		/// </summary>
 		void completePartial(const simpleArray<gridLocator>& pathData);
 
+		bool isCorridorCollision() const;
+		bool isRegionCollision() const;
+
 		gridRegionGraphNode getInterruptingRegion() const;
 		gridLocator getInterruptingLocation() const;
 
@@ -81,6 +84,14 @@ namespace brogueHd::component
 		_reconciled = true;
 
 		layoutConnectionData::complete(pathData);
+	}
+	bool layoutPartialConnectionData::isCorridorCollision() const
+	{
+		return !isRegionCollision();
+	}
+	bool layoutPartialConnectionData::isRegionCollision() const
+	{
+		return *_interruptingRegion == default_value::value<gridRegionGraphNode>();
 	}
 	gridLocator layoutPartialConnectionData::getInterruptingLocation() const
 	{

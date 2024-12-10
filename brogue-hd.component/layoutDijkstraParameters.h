@@ -19,6 +19,7 @@ namespace brogueHd::component
 		layoutDijkstraParameters(const gridRect& layoutParentBoundary,
 								 const gridRect& layoutRelativeBoundary,
 		                         bool obeyCardinalMovement,
+								 bool includeEndpoints,
 								 const dijkstraPredicate& mapPredicate,
 								 const dijkstraCostCallback& mapCostPredicate,
 								 const dijkstraLocatorCallback<T>& locatorCallback);
@@ -27,6 +28,7 @@ namespace brogueHd::component
 		gridRect getParentBoundary() const;
 		gridRect getRelativeBoundary() const;
 		bool getObeyCardinalMovement() const;
+		bool getIncludeEndpoints() const;
 		dijkstraPredicate getMapPredicate() const;
 		dijkstraCostCallback getMapCostPredicate() const;
 		dijkstraLocatorCallback<T> getLocatorCallback() const;
@@ -36,6 +38,7 @@ namespace brogueHd::component
 		gridRect _layoutParentBoundary;
 		gridRect _layoutRelativeBoundary;
 		bool _obeyCardinalMovement;
+		bool _includeEndpointsInResult;
 		dijkstraPredicate _mapPredicate;
 		dijkstraCostCallback _mapCostPredicate;
 		dijkstraLocatorCallback<T> _locatorCallback;
@@ -45,6 +48,7 @@ namespace brogueHd::component
 	layoutDijkstraParameters<T>::layoutDijkstraParameters(const gridRect& layoutParentBoundary,
 														 const gridRect& layoutRelativeBoundary,
 														 bool obeyCardinalMovement,
+														 bool includeEndpoints,
 														 const dijkstraPredicate& mapPredicate,
 														 const dijkstraCostCallback& mapCostPredicate,
 														 const dijkstraLocatorCallback<T>& locatorCallback)
@@ -52,6 +56,7 @@ namespace brogueHd::component
 		_layoutParentBoundary = layoutParentBoundary;
 		_layoutRelativeBoundary = layoutRelativeBoundary;
 		_obeyCardinalMovement = obeyCardinalMovement;
+		_includeEndpointsInResult = includeEndpoints;
 		_mapPredicate = mapPredicate;
 		_mapCostPredicate = mapCostPredicate;
 		_locatorCallback = locatorCallback;
@@ -73,6 +78,12 @@ namespace brogueHd::component
 	bool layoutDijkstraParameters<T>::getObeyCardinalMovement() const
 	{
 		return _obeyCardinalMovement;
+	}
+
+	template<isGridLocator T>
+	bool layoutDijkstraParameters<T>::getIncludeEndpoints() const
+	{
+		return _includeEndpointsInResult;
 	}
 
 	template<isGridLocator T>
