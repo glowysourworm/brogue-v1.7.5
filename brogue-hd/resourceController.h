@@ -266,7 +266,21 @@ namespace brogueHd::backend
 		// (move this to private member list and delete later)
 		brogueGameTemplate* result = new brogueGameTemplate();
 
-		brogueLevelTemplate* level = new brogueLevelTemplate(1, levelTypes::DP_BASIC_FIRST_ROOM);
+		brogueLevelTemplate* level = new brogueLevelTemplate(1, brogueLevelTilingType::MainEntrance, 1.0f);
+
+		brogueRoomTemplate mainRoom(brogueRoomType::MainEntranceRoom, 1.0f, simpleSize(20, 12));
+		brogueRoomTemplate medChunky(brogueRoomType::ChunkyRoom, 0.5f, simpleSize(10, 8));
+		brogueRoomTemplate circular(brogueRoomType::CircularRoom, 0.4f, simpleSize(16, 20));
+		brogueRoomTemplate crossRoom(brogueRoomType::CrossRoom, 0.5f, simpleSize(10, 8));
+		brogueRoomTemplate cavernNS(brogueRoomType::Cavern, 0.5f, simpleSize(12, 20));
+		brogueRoomTemplate cavernEW(brogueRoomType::Cavern, 0.5f, simpleSize(40, 12));
+
+		level->setMainEntrance(mainRoom);
+		level->addRoom(medChunky);
+		level->addRoom(circular);
+		level->addRoom(crossRoom);
+		level->addRoom(cavernNS);
+		level->addRoom(cavernEW);
 
 		result->addLevel(level);
 

@@ -16,7 +16,7 @@ namespace brogueHd::component
 
 		gridConnectionEdge();
 		gridConnectionEdge(const gridConnectionNode& anode1, const gridConnectionNode& anode2);
-		gridConnectionEdge(const gridConnectionNode& anode1, const gridConnectionNode& anode2, const simpleArray<gridLocator>& pathData);
+		gridConnectionEdge(const gridConnectionNode& anode1, const gridConnectionNode& anode2, simpleArray<gridLocator>* pathData);
 		gridConnectionEdge(const gridConnectionEdge& copy);
 		~gridConnectionEdge() override;
 
@@ -24,7 +24,7 @@ namespace brogueHd::component
 		bool operator==(const gridConnectionEdge& other) const;
 		bool operator!=(const gridConnectionEdge& other) const;
 
-		simpleArray<gridLocator> getPathData() const;
+		simpleArray<gridLocator>* getPathData() const;
 		void setPathData(const simpleArray<gridLocator>& pathData);
 
 		virtual float weight() const override;
@@ -48,10 +48,10 @@ namespace brogueHd::component
 	{
 		_pathData = new simpleArray<gridLocator>();
 	}
-	gridConnectionEdge::gridConnectionEdge(const gridConnectionNode& anode1, const gridConnectionNode& anode2, const simpleArray<gridLocator>& pathData)
+	gridConnectionEdge::gridConnectionEdge(const gridConnectionNode& anode1, const gridConnectionNode& anode2, simpleArray<gridLocator>* pathData)
 		: simpleGraphEdge<gridConnectionNode>(anode1, anode2)
 	{
-		_pathData = new simpleArray<gridLocator>(pathData);
+		_pathData = new simpleArray<gridLocator>(*pathData);
 	}
 
 	gridConnectionEdge::~gridConnectionEdge()
@@ -64,7 +64,7 @@ namespace brogueHd::component
 	{
 		this->node1 = copy.node1;
 		this->node2 = copy.node2;
-		_pathData = new simpleArray<gridLocator>(copy.getPathData());
+		_pathData = new simpleArray<gridLocator>(*copy.getPathData());
 	}
 
 	void gridConnectionEdge::operator=(const gridConnectionEdge& copy)
@@ -75,7 +75,7 @@ namespace brogueHd::component
 		this->node2 = copy.node2;
 
 		// Go ahead and let this hand off happen, for now.
-		_pathData = new simpleArray<gridLocator>(copy.getPathData());
+		_pathData = new simpleArray<gridLocator>(*copy.getPathData());
 	}
 
 	bool gridConnectionEdge::operator==(const gridConnectionEdge& other) const
@@ -94,9 +94,9 @@ namespace brogueHd::component
 		return (float)this->node1.getLocator().distance(this->node2.getLocator());
 	}
 
-	simpleArray<gridLocator> gridConnectionEdge::getPathData() const
+	simpleArray<gridLocator>* gridConnectionEdge::getPathData() const
 	{
-		return *_pathData;
+		return _pathData;
 	}
 	void gridConnectionEdge::setPathData(const simpleArray<gridLocator>& pathData)
 	{
@@ -108,8 +108,8 @@ namespace brogueHd::component
 	{
 		simpleArray<gridLocator> reversePath = _pathData->reverse();
 
-		bool valueEquivalent = (*_pathData) == other.getPathData() ||
-							    reversePath == other.getPathData();
+		bool valueEquivalent = (*_pathData) == *other.getPathData() ||
+							    reversePath == *other.getPathData();
 
 		// Let the pointer comparison for path data work, for now.
 		return ((this->node1 == other.node1 && this->node2 == other.node2) ||

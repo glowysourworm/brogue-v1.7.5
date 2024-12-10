@@ -122,6 +122,11 @@ namespace brogueHd::component
 		bool isExposedCorner(int column, int row, brogueCompass direction, gridPredicate<T> predicate) const;
 
 		/// <summary>
+		/// Returns true if the two adjacent edges (using brogueCompass) are outside the bounds, or default_value.
+		/// </summary>
+		bool isExposedCorner(int column, int row, brogueCompass direction) const;
+
+		/// <summary>
 		/// MODIFIES LAYOUT!  This will translate the grid's sub-grid by the specified amount. The result
 		/// must lie within the parent boundary.
 		/// </summary>
@@ -172,13 +177,13 @@ namespace brogueHd::component
 		/// Calculates the largest sub-rectangle in the grid.  The predicate is used to determine what to include 
 		/// in the search. The getUnsafe method is used - which has a potential to return nullptr's or default data.
 		/// </summary>
-		gridRect calculateLargestRectangle(const gridRect& minSize, gridPredicate<T> predicate) const;
+		gridRect calculateLargestRectangle(const simpleSize& minSize, gridPredicate<T> predicate) const;
 
 		/// <summary>
 		/// Calculates the largest sub-rectangle in the grid. This will use the grid::isDefined as its decision
 		/// maker.
 		/// </summary>
-		gridRect calculateLargestRectangle(const gridRect& minSize) const;
+		gridRect calculateLargestRectangle(const simpleSize& minSize) const;
 
 		/// <summary>
 		/// Returns a list of elements that satisy the given predicate
@@ -605,22 +610,39 @@ namespace brogueHd::component
 	{
 		if (direction == brogueCompass::NW)
 			return isExposedEdge(column, row, brogueCompass::N, predicate) &&
-				isExposedEdge(column, row, brogueCompass::W, predicate);
+					isExposedEdge(column, row, brogueCompass::W, predicate) &&
+					!isExposedEdge(column, row, brogueCompass::S, predicate) &&
+					!isExposedEdge(column, row, brogueCompass::E, predicate);
 
 		else if (direction == brogueCompass::NE)
 			return isExposedEdge(column, row, brogueCompass::N, predicate) &&
-				isExposedEdge(column, row, brogueCompass::E, predicate);
+					isExposedEdge(column, row, brogueCompass::E, predicate) &&
+					!isExposedEdge(column, row, brogueCompass::S, predicate) &&
+					!isExposedEdge(column, row, brogueCompass::W, predicate);
 
 		else if (direction == brogueCompass::SE)
 			return isExposedEdge(column, row, brogueCompass::S, predicate) &&
-				isExposedEdge(column, row, brogueCompass::E, predicate);
+					isExposedEdge(column, row, brogueCompass::E, predicate) &&
+					!isExposedEdge(column, row, brogueCompass::N, predicate) &&
+					!isExposedEdge(column, row, brogueCompass::W, predicate);
 
 		else if (direction == brogueCompass::SW)
 			return isExposedEdge(column, row, brogueCompass::S, predicate) &&
-				isExposedEdge(column, row, brogueCompass::W, predicate);
+					isExposedEdge(column, row, brogueCompass::W, predicate) &&
+					!isExposedEdge(column, row, brogueCompass::N, predicate) &&
+					!isExposedEdge(column, row, brogueCompass::E, predicate);
 
 		else
 			throw simpleException("Invalid use of direction parameter:  grid.isExposedCorner");
+	}
+
+	template <isHashable T>
+	bool grid<T>::isExposedCorner(int column, int row, brogueCompass direction) const
+	{
+		return this->isExposedCorner(column, row, direction, [] (int column, int row, const gridLocator& location)
+		{
+			return location != default_value::value<gridLocator>();
+		});
 	}
 
 	template <isHashable T>
@@ -997,7 +1019,7 @@ namespace brogueHd::component
 
 
 	template <isHashable T>
-	gridRect grid<T>::calculateLargestRectangle(const gridRect& minSize) const
+	gridRect grid<T>::calculateLargestRectangle(const simpleSize& minSize) const
 	{
 		const grid<T>* that = this;
 
@@ -1008,7 +1030,7 @@ namespace brogueHd::component
 	}
 
 	template <isHashable T>
-	gridRect grid<T>::calculateLargestRectangle(const gridRect& minSize, gridPredicate<T> predicate) const
+	gridRect grid<T>::calculateLargestRectangle(const simpleSize& minSize, gridPredicate<T> predicate) const
 	{
 		const grid<T>* that = this;
 		gridRect boundary = this->getRelativeBoundary();

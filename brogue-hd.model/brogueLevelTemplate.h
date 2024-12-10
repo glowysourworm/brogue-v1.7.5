@@ -1,34 +1,84 @@
 #pragma once
-#include "brogueLevelProfile.h"
 #include "dungeonConstants.h"
+#include "randomGenerator.h"
 #include "simple.h"
 
 namespace brogueHd::model
 {
-	class brogueLevelTemplate
+	class brogueLevelTemplate : public simpleObject
 	{
 	public:
-		brogueLevelTemplate()
+		brogueLevelTemplate() : brogueLevelTemplate(1, brogueLevelTilingType::MainEntrance, 1.0f)
 		{
-			_profile = nullptr;
+
+		}
+		brogueLevelTemplate(int depth, brogueLevelTilingType tilingType, float extraCorridorProbability)
+		{
+			_roomTemplates = new simpleList<brogueRoomTemplate*>();
+			_mainEntrance = new brogueRoomTemplate();
+			_depth = depth;
+			_extraCorridorProbability = extraCorridorProbability;
+			_tilingType = tilingType;
+		}
+		~brogueLevelTemplate() override
+		{
+			for (int index = 0; index < _roomTemplates->count(); index++)
+			{
+				delete _roomTemplates->get(index);
+			}
+
+			delete _mainEntrance;
+			delete _roomTemplates;
 		}
 
-		brogueLevelTemplate(int depth, levelTypes types)
+		void addRoom(const brogueRoomTemplate& roomTemplate)
 		{
-			_profile = new brogueLevelProfile(depth, types);
-		};
+			brogueRoomTemplate* room = new brogueRoomTemplate(roomTemplate);
 
-		~brogueLevelTemplate()
-		{
-			delete _profile;
-		};
+			_roomTemplates->add(room);
+		}
 
-		brogueLevelProfile* getProfile() const
+		void setMainEntrance(const brogueRoomTemplate& roomTemplate)
 		{
-			return _profile;
+			delete _mainEntrance;
+
+			_mainEntrance = new brogueRoomTemplate(roomTemplate);
+		}
+
+		brogueRoomTemplate* getRoom(randomGenerator* randomGenerator) const
+		{
+			int randomIndex = randomGenerator->randomRangeExclusive(0, _roomTemplates->count());
+
+			return _roomTemplates->get(randomIndex);
+		}
+
+		brogueRoomTemplate* getMainEntrance() const
+		{
+			return _mainEntrance;
+		}
+
+		int getDepth() const
+		{
+			return _depth;
+		}
+		float getExtraCorridorProbability() const
+		{
+			return _extraCorridorProbability;
+		}
+		brogueLevelTilingType getTilingType() const
+		{
+			return _tilingType;
 		}
 
 	private:
-		brogueLevelProfile* _profile;
+
+		simpleList<brogueRoomTemplate*>* _roomTemplates;
+
+		// Specific main entrance room
+		brogueRoomTemplate* _mainEntrance;
+
+		int _depth;
+		float _extraCorridorProbability;
+		brogueLevelTilingType _tilingType;
 	};
 }

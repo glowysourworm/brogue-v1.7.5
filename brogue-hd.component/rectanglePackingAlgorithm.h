@@ -34,7 +34,7 @@ namespace brogueHd::component
 		/// <summary>
 		/// Adds a rectangle to the tiling - moving it into position
 		/// </summary>
-		bool addRectangle(gridRect& rect);
+		bool addRectangle(gridRect& rect, const gridRect& constraint);
 
 		/// <summary>
 		/// Removes rectangle from the tiling whose rect is value-equivalent to the provided rect.
@@ -55,7 +55,7 @@ namespace brogueHd::component
 		/// <summary>
 		/// Gets the largest unused space with respect to this packing
 		/// </summary>
-		gridRect getLargestUnusedRectangle(const gridRect& minSize);
+		gridRect getLargestUnusedRectangle(const simpleSize& minSize);
 
 		/// <summary>
 		/// Returns current list of result rectangles
@@ -170,7 +170,7 @@ namespace brogueHd::component
 		return _rectangles->getKeys();
 	}
 
-	gridRect rectanglePackingAlgorithm::getLargestUnusedRectangle(const gridRect& minSize)
+	gridRect rectanglePackingAlgorithm::getLargestUnusedRectangle(const simpleSize& minSize)
 	{
 		grid<gridLocator>* grid = _tilingGrid;
 
@@ -180,10 +180,13 @@ namespace brogueHd::component
 		});
 	}
 
-	bool rectanglePackingAlgorithm::addRectangle(gridRect& rect)
+	bool rectanglePackingAlgorithm::addRectangle(gridRect& rect, const gridRect& constraint)
 	{
 		if (_rectangles->count() == 0)
 			throw simpleException("Must first initialize the algorithm:  call rectanglePackingAlgorithm::initialize()");
+
+		if (!_tilingGrid->getRelativeBoundary().contains(constraint))
+			throw simpleException("Constraint boundary not within the bounds of the layout:  rectanglePackingAlgorithm.h");
 
 		// Validate that the caller is not trying to add rectangle that overlaps
 		// any existing rectangle
@@ -209,7 +212,6 @@ namespace brogueHd::component
 		// 3) Set the result and break the loop
 		//
 
-		gridRect constraint = _tilingGrid->getRelativeBoundary();
 		simpleVector<float> heuristic;
 		simpleVector<float> nextHeuristic;
 
@@ -268,7 +270,7 @@ namespace brogueHd::component
 			// Look for largest sub-rectangle in the constraint area
 			//
 			gridRect nextLargestBoundary = _tilingGrid->calculateLargestRectangle(
-				rect, [](int column, int row, const gridLocator& item)
+				rect.getSize(), [] (int column, int row, const gridLocator& item)
 				{
 					// Use the predicate to look for negative space
 					return item == default_value::value<gridLocator>();

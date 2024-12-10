@@ -41,6 +41,12 @@ namespace brogueHd::component
 		void add(int column, int row, const gridLocator& item);
 
 		/// <summary>
+		/// Sets the amount of translation applied to new cells, for the region constructor. This is
+		/// applied on add().
+		/// </summary>
+		void setTranslationFilter(int columnOffset, int rowOffset);
+
+		/// <summary>
 		/// Checks to see whether or not the region constructor contains the specified item
 		/// </summary>
 		bool contains(const gridLocator& item) const;
@@ -76,6 +82,8 @@ namespace brogueHd::component
 
 		gridRect* _calculatedBoundary;
 
+		gridLocator* _translationFilter;
+
 		int _top;
 		int _left;
 		int _right;
@@ -93,10 +101,10 @@ namespace brogueHd::component
 			return true; // Default inclusion predicate
 		}, unsafeMode)
 	{
+		_translationFilter = new gridLocator(0,0);
 	}
 
-	gridRegionConstructor::gridRegionConstructor(const gridRect& parentBoundary, gridPredicate<gridLocator> inclusionPredicate,
-	                                                bool unsafeMode)
+	gridRegionConstructor::gridRegionConstructor(const gridRect& parentBoundary, gridPredicate<gridLocator> inclusionPredicate, bool unsafeMode)
 	{
 		// This component is pretty much free-standing
 		// _regionCentroidCalculator = IocContainer.Get<IRegionCentroidCalculator>();
@@ -119,6 +127,8 @@ namespace brogueHd::component
 		_seCorners = new simpleHash<gridLocator, gridLocator>();
 		_swCorners = new simpleHash<gridLocator, gridLocator>();
 
+		_translationFilter = new gridLocator(0, 0);
+
 		_top = std::numeric_limits<int>::max();
 		_left = std::numeric_limits<int>::max();
 		_right = std::numeric_limits<int>::min();
@@ -133,6 +143,8 @@ namespace brogueHd::component
 	{
 		delete _grid;
 		delete _predicate;
+
+		delete _translationFilter;
 
 		delete _locations;
 		delete _edgeLocations;
@@ -153,7 +165,7 @@ namespace brogueHd::component
 		completeImpl();
 		validate();
 
-		gridRect largestSubRegionRect = _grid->calculateLargestRectangle(gridRect(0, 0, 1, 1));
+		gridRect largestSubRegionRect = _grid->calculateLargestRectangle(simpleSize(1, 1));
 
 		simpleArray<gridLocator> locations = _locations->getKeys().toArray();
 		simpleArray<gridLocator> edgeLocations = _edgeLocations->getKeys().toArray();
@@ -182,11 +194,16 @@ namespace brogueHd::component
 
 	void gridRegionConstructor::add(int column, int row, const gridLocator& location)
 	{
+		// Translation Filter:  Apply Here!
+		gridLocator translatedLocation(location.column + _translationFilter->column, location.row + _translationFilter->row);
+		int columnTranslated = column + _translationFilter->column;
+		int rowTranslated = row + _translationFilter->row;
+
 		if (_completed)
 			throw simpleException(
 				"Trying to add location to a completed region constructor:  gridRegionConstructor.add");
 
-		else if (_locations->contains(location))
+		else if (_locations->contains(translatedLocation))
 			throw simpleException(
 				"Trying to add duplicate location to a region constructor:  gridRegionConstructor.add");
 
@@ -195,18 +212,24 @@ namespace brogueHd::component
 			// Unsafe Mode:  Doesn't check adjacency while adding locations
 			if (!_unsafeMode)
 			{
-				if (_locations->count() > 0 && !isConnected(column, row, location))
+				if (_locations->count() > 0 && !isConnected(columnTranslated, rowTranslated, translatedLocation))
 					throw simpleException(
 						"Trying to add un-connected cell to the region:  gridRegionConstructor.add (try unsafe non-flood fill mode?)");
 			}
 
 			// Keep locations up to date
-			_grid->set(column, row, location);
-			_locations->add(location, location);
+			_grid->set(columnTranslated, rowTranslated, translatedLocation);
+			_locations->add(translatedLocation, translatedLocation);
 
 			// Expand the boundary
-			addBoundary(column, row, location);
+			addBoundary(columnTranslated, rowTranslated, translatedLocation);
 		}
+	}
+
+	void gridRegionConstructor::setTranslationFilter(int columnOffset, int rowOffset)
+	{
+		_translationFilter->column = columnOffset;
+		_translationFilter->row = rowOffset;
 	}
 
 	void gridRegionConstructor::completeImpl()

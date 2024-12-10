@@ -5,6 +5,9 @@
 #include <simple.h>
 #include <simpleException.h>
 
+#include "brogueSymbolTemplate.h"
+#include "simpleSize.h"
+
 namespace brogueHd::model
 {
 	using namespace simple;
@@ -34,21 +37,39 @@ namespace brogueHd::model
 
 	*/
 
-	struct brogueRoomTemplate : simpleStruct
+	class brogueRoomTemplate : public simpleObject
 	{
 	public:
 		brogueRoomTemplate()
 		{
-			init(brogueRoomType::MainEntranceRoom, 0.0);
+			_roomType = brogueRoomType::SmallRoom;		// Default Room Parameters
+			_frequency = 1.0f;
+			_tileSize = new simpleSize(2, 2);
+			_wallSymbol = new brogueSymbolTemplate();
+			_floorSymbol = new brogueSymbolTemplate();
+		}
+		~brogueRoomTemplate() override
+		{
+			delete _tileSize;
+			delete _wallSymbol;
+			delete _floorSymbol;
 		}
 
-		brogueRoomTemplate(const simpleRect& levelBoundary, brogueRoomType type, float frequency)
+		brogueRoomTemplate(brogueRoomType type, float frequency, const simpleSize& tileSize)
 		{
-			init(type, frequency);
+			_roomType = type;
+			_frequency = frequency;
+			_tileSize = new simpleSize(tileSize);
+			_wallSymbol = new brogueSymbolTemplate();
+			_floorSymbol = new brogueSymbolTemplate();
 		}
 
 		brogueRoomTemplate(const brogueRoomTemplate& copy)
 		{
+			_wallSymbol = nullptr;
+			_floorSymbol = nullptr;
+			_tileSize = nullptr;
+
 			copyImpl(copy);
 		}
 
@@ -69,126 +90,64 @@ namespace brogueHd::model
 
 		size_t getHash() const override
 		{
-			return hashGenerator::generateHash(roomType, startLocation, minSize, maxSize, frequency);
+			return hashGenerator::generateHash(_roomType, _frequency, _tileSize, _wallSymbol, _floorSymbol);
 		}
 
-		simpleRect getMaxSize() const
+		simpleSize getTileSize() const
 		{
-			return maxSize;
-		}
-
-		simpleRect getMinSize() const
-		{
-			return minSize;
+			return *_tileSize;
 		}
 
 		brogueRoomType getRoomType() const
 		{
-			return roomType;
+			return _roomType;
 		}
 
 		float getFrequency() const
 		{
-			return frequency;
+			return _frequency;
+		}
+
+		brogueSymbolTemplate getWallSymbol() const
+		{
+			return *_wallSymbol;
+		}
+		brogueSymbolTemplate getFloorSymbol() const
+		{
+			return *_floorSymbol;
 		}
 
 	private:
-		brogueStartLocation startLocation;
-		brogueRoomType roomType;
-		simpleRect minSize;
-		simpleRect maxSize;
-		float frequency;
+
+		brogueRoomType _roomType;
+		simpleSize* _tileSize;
+		float _frequency;
+
+		brogueSymbolTemplate* _wallSymbol;
+		brogueSymbolTemplate* _floorSymbol;
 
 	private:
+
 		void copyImpl(const brogueRoomTemplate& copy)
 		{
-			roomType = copy.roomType;
-			startLocation = copy.startLocation;
-			minSize = copy.minSize;
-			maxSize = copy.maxSize;
-			frequency = copy.frequency;
+			delete _tileSize;
+			delete _wallSymbol;
+			delete _floorSymbol;
+
+			_roomType = copy.getRoomType();
+			_frequency = copy.getFrequency();
+			_tileSize = new simpleSize(copy.getTileSize());
+			_wallSymbol = new brogueSymbolTemplate(copy.getWallSymbol());
+			_floorSymbol = new brogueSymbolTemplate(copy.getFloorSymbol());
 		}
 
 		bool compare(const brogueRoomTemplate& other) const
 		{
-			return roomType == other.roomType &&
-				startLocation == other.startLocation &&
-				minSize == other.minSize &&
-				maxSize == other.maxSize &&
-				frequency == other.frequency;
-		}
-
-		void init(brogueRoomType type, float afrequency)
-		{
-			roomType = type;
-			startLocation = brogueStartLocation::MainEntrance;
-			frequency = afrequency;
-
-			getSize(type, minSize, maxSize);
-		}
-
-		void getSize(brogueRoomType type, simpleRect& aminSize, simpleRect& amaxSize) const
-		{
-			switch (type)
-			{
-			case brogueRoomType::Default:
-				aminSize = simpleRect(0, 0, 2, 2);
-				amaxSize = simpleRect(0, 0, 2, 2);
-				break;
-
-			case brogueRoomType::CaveCompact:
-				aminSize = simpleRect(0, 0, 3, 4);
-				amaxSize = simpleRect(0, 0, 12, 8);
-				break;
-
-			case brogueRoomType::CaveLargeNS:
-				aminSize = simpleRect(0, 0, 3, 15);
-				amaxSize = simpleRect(0, 0, 12, DROWS);
-				break;
-
-			case brogueRoomType::CaveLargeEW:
-				aminSize = simpleRect(0, 0, 20, 4);
-				amaxSize = simpleRect(0, 0, DCOLS, 8);
-				break;
-
-			case brogueRoomType::Cavern:
-				aminSize = simpleRect(0, 0, CAVE_MIN_WIDTH, CAVE_MIN_HEIGHT);
-				amaxSize = simpleRect(0, 0, DCOLS, DROWS);
-				break;
-
-			case brogueRoomType::ChunkyRoom:
-				aminSize = simpleRect(0, 0, 2, 2);
-				amaxSize = simpleRect(0, 0, 7, 7);
-				break;
-
-			case brogueRoomType::CircularRoom:
-				aminSize = simpleRect(0, 0, 4, 4);
-				amaxSize = simpleRect(0, 0, 20, 20);
-				break;
-
-			case brogueRoomType::CrossRoom:
-				aminSize = simpleRect(0, 0, 4, 3);
-				amaxSize = simpleRect(0, 0, 20, 7);
-				break;
-
-			case brogueRoomType::MainEntranceRoom:
-				aminSize = simpleRect(0, 0, 20, 10);
-				amaxSize = simpleRect(0, 0, 20, 10);
-				break;
-
-			case brogueRoomType::SmallRoom:
-				aminSize = simpleRect(0, 0, 3, 2);
-				amaxSize = simpleRect(0, 0, 6, 4);
-				break;
-
-			case brogueRoomType::SmallSymmetricalCrossRoom:
-				aminSize = simpleRect(0, 0, 4, 4);
-				amaxSize = simpleRect(0, 0, 8, 5);
-				break;
-
-			default:
-				throw simpleException("Unhandled room type:  brogueRoomInfo::init");
-			}
+			return _roomType == other.getRoomType() &&
+				_frequency == other.getFrequency() &&
+				*_tileSize == other.getTileSize() &&
+				*_wallSymbol == other.getWallSymbol() &&
+				*_floorSymbol == other.getFloorSymbol();
 		}
 	};
 }

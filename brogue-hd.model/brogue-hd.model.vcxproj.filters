@@ -54,9 +54,6 @@
     <ClInclude Include="brogueItem.h">
       <Filter>Header Files\game</Filter>
     </ClInclude>
-    <ClInclude Include="brogueLevelProfile.h">
-      <Filter>Header Files\template</Filter>
-    </ClInclude>
     <ClInclude Include="brogueLevelTemplate.h">
       <Filter>Header Files\template</Filter>
     </ClInclude>
@@ -155,6 +152,9 @@
     </ClInclude>
     <ClInclude Include="playerCharacter.h">
       <Filter>Header Files\game</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueSymbolTemplate.h">
+      <Filter>Header Files\template</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

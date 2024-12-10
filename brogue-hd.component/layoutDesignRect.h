@@ -13,6 +13,8 @@
 #include <brogueRoomTemplate.h>
 
 #include "gridRectAdjacency.h"
+#include "gridRegionConstructor.h"
+#include "simpleSize.h"
 
 namespace brogueHd::component
 {
@@ -24,35 +26,32 @@ namespace brogueHd::component
 	/// Design-time grid rect / tile data structure used for storing region, region outline, and
 	/// room (or) other region configuration data during design.
 	/// </summary>
-	class layoutDesignRect : simpleObject
+	class layoutDesignRect : public simpleObject
 	{
 	public:
+
 		layoutDesignRect()
 		{
 			_coordinateConverter = nullptr;
 			_configuration = default_value::value<brogueRoomTemplate>();
-			_constraint = default_value::value<gridRect>();
 			_boundary = default_value::value<gridRect>();
-			_minSize = default_value::value<gridRect>();
 			_complete = false;
 			_region = nullptr;
 			_regionOutline = nullptr;
-		};
+		}
 
 		/// <summary>
 		/// Creates a design rectangle with EXTRA padding: which will be honored until the constraint
 		/// boundary isn't large enough. 
 		/// </summary>
-		layoutDesignRect(layoutCoordinateConverter* coordinateConverter, const brogueRoomTemplate& configuration, const gridRect& constraint, int padding)
+		layoutDesignRect(layoutCoordinateConverter* coordinateConverter, const brogueRoomTemplate& configuration, const gridLocator& roomLocation)
 		{
 			_coordinateConverter = coordinateConverter;
 			_configuration = configuration;
-			_constraint = constraint;
 			_complete = false;
 			_region = nullptr;
 			_regionOutline = nullptr;
-
-			applyConstraintImpl(constraint, true, padding);
+			_boundary = gridRect(roomLocation, configuration.getTileSize());
 		}
 
 		layoutDesignRect(const layoutDesignRect& copy)
@@ -60,10 +59,8 @@ namespace brogueHd::component
 			copyImpl(copy);
 		}
 
-		~layoutDesignRect()
-		{
-			delete _adjacentRects;
-		}
+		~layoutDesignRect() override
+		{}
 
 		void operator=(const layoutDesignRect& copy)
 		{
@@ -97,41 +94,63 @@ namespace brogueHd::component
 			//_regionOutline = finalRegionOutline;
 		}
 
-		void setOffset(const gridLocator& location, bool actualOnly = false)
+		void translateBoundary(int columnOffset, int rowOffset)
 		{
-			translate(location.column - _boundary.column, location.row - _boundary.row, actualOnly);
+			if (_complete)
+				throw simpleException("Cannot further translate the boundary after calling complete:  layoutDesignRect.h");
+
+			_boundary.translate(columnOffset, rowOffset);
 		}
 
-		void translate(const gridLocator& locator, bool actualOnly = false)
+		void finalize(const gridRect& finalBoundary, const gridRect& finalActualBoundary)
 		{
-			translate(locator.column, locator.row, actualOnly);
-		}
+			if (!_complete)
+				throw simpleException("Must call complete before finalize:  layoutDesignRect.h");
 
-		void translate(int columnOffset, int rowOffset, bool actualOnly = false)
-		{
-			gridLocator translationGrid = gridLocator(columnOffset, rowOffset);
-			simplePoint<int> translationUI = _coordinateConverter->convertToUI(translationGrid);
+			// The final "actual" boundary is produced by the rectangle packing - translating
+			// the region (boundary) into place. It will not retain the padding for the region;
+			// and so must be the same size as the region boundary. The padding will be part of
+			// the "final" boundary (this boundary) - which is essentially the tile boundary.
+			//
 
-			if (actualOnly && _complete)
+			// Validate
+			if (_region->getBoundary().getSize() != finalActualBoundary.getSize())
+				throw simpleException("Invalid finalization boundary:  layoutDesignRect::finalize");
+
+			// Translate the region / region outline
+			if (_region->getBoundary().topLeft() != finalActualBoundary.topLeft())
 			{
-				_region->translate(columnOffset, rowOffset);
-				//_regionOutline->translate(translationUI);
-			}
+				gridLocator translation = _region->getBoundary().getTranslation(finalActualBoundary);
 
-			else
-			{
-				_boundary.translate(columnOffset, rowOffset);
+				// Use Region Constructor:
+				gridRegionConstructor constructor(_region->getParentBoundary(), true);
 
-				if (_complete)
+				// Apply translation to new cells
+				constructor.setTranslationFilter(translation.column, translation.row);
+
+				// Add cells from the region
+				_region->iterateLocations([&constructor] (int column, int row, const gridLocator& location)
 				{
-					_region->translate(columnOffset, rowOffset);
-					//_regionOutline->translate(translationUI);
-				}
+					constructor.add(column, row, location);
+					return iterationCallback::iterate;
+				});
+
+				// (MEMORY!) Created new region
+				gridRegion* translatedRegion = constructor.complete();
+
+				delete _region;
+
+				_region = translatedRegion;
+
+				//_regionOutline->translate(translationUI);
+
+				// Set the tile boundary to be this boundary
+				_boundary = finalBoundary;
 			}
 
 			// Validate
-			if (_complete && !_boundary.contains(_region->getBoundary()))
-				throw simpleException("Actual boundary outside the padded boundary of the layoutDesignRect.");
+			if (!_boundary.contains(_region->getBoundary()))
+				throw simpleException("Actual boundary outside the tile boundary of the layoutDesignRect.");
 		}
 
 		size_t getHash() const override
@@ -157,19 +176,14 @@ namespace brogueHd::component
 			return _configuration;
 		}
 
-		gridRect getConstraintBoundary() const
+		simpleSize getTileSize() const
 		{
-			return _constraint;
+			return _configuration.getTileSize();
 		}
 
 		gridRect getBoundary() const
 		{
 			return _boundary;
-		}
-
-		gridRect getMinSize() const
-		{
-			return _minSize;
 		}
 
 		gridRect getActualBoundary() const
@@ -187,47 +201,20 @@ namespace brogueHd::component
 		}
 
 	private:
-		void applyConstraintImpl(const gridRect& constraint, bool forceUpdate, int padding)
-		{
-			if (_complete)
-				throw simpleException("Trying to apply constraint to a completed layoutDesignRect");
-
-			if (!constraint.contains(_boundary) || forceUpdate)
-			{
-				_minSize = _configuration.getMinSize();
-
-				gridRect maxSize(_configuration.getMaxSize());
-
-				_boundary = maxSize.createExpanded(padding);
-
-				_boundary.column = constraint.column;
-				_boundary.row = constraint.row;
-
-				_boundary.width = simpleMath::clamp(_boundary.width, _minSize.width, constraint.width);
-				_boundary.height = simpleMath::clamp(_boundary.height, _minSize.height, constraint.height);
-
-				if (_boundary.width < _minSize.width ||
-					_boundary.height < _minSize.height)
-					throw simpleException("Invalid design rect:  layoutDesignRect::applyConstraintImpl");
-			}
-		}
 
 		bool compare(const layoutDesignRect& other)
 		{
 			return _configuration == other.getConfiguration() &&
 				_boundary == other.getBoundary() &&
-				_minSize == other.getMinSize() &&
 				_complete == other.getIsComplete() &&
 				_region == other.getRegion() &&
-				_constraint == other.getConstraintBoundary();
+				_regionOutline == other.getRegionOutline();
 		}
 
 		void copyImpl(const layoutDesignRect& copy)
 		{
 			_configuration = copy.getConfiguration();
-			_constraint = copy.getConstraintBoundary();
 			_boundary = copy.getBoundary();
-			_minSize = copy.getMinSize();
 			_complete = copy.getIsComplete();
 			_region = copy.getRegion();					// Pointer Only!
 			_regionOutline = copy.getRegionOutline();	// Pointer Only!
@@ -240,13 +227,10 @@ namespace brogueHd::component
 		// Final (Actual) Region
 		gridRegion* _region;
 		gridRegionOutline* _regionOutline;
-		simpleList<gridRectAdjacency>* _adjacentRects;
 
 		// Room / Region configuration
 		brogueRoomTemplate _configuration;
-		gridRect _constraint;
 		gridRect _boundary;
-		gridRect _minSize;
 
 		bool _complete;
 	};

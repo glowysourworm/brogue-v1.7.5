@@ -27,12 +27,12 @@
     <ClInclude Include="broguefile.h" />
     <ClInclude Include="brogueGameTemplate.h" />
     <ClInclude Include="brogueItem.h" />
-    <ClInclude Include="brogueLevelProfile.h" />
     <ClInclude Include="brogueLevelTemplate.h" />
     <ClInclude Include="brogueMachine.h" />
     <ClInclude Include="brogueObject.h" />
     <ClInclude Include="broguePlayer.h" />
     <ClInclude Include="brogueRoomTemplate.h" />
+    <ClInclude Include="brogueSymbolTemplate.h" />
     <ClInclude Include="colorConstants.h" />
     <ClInclude Include="creature.h" />
     <ClInclude Include="creatureBehavior.h" />

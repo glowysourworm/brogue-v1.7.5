@@ -6,19 +6,15 @@ namespace brogueHd::model
 {
 	using namespace simple;
 
-	enum levelTypes : int
-	{
-		DP_BASIC,
-		DP_BASIC_FIRST_ROOM,
+	//enum levelTypes : int
+	//{
+	//	DP_BASIC,
+	//	DP_BASIC_FIRST_ROOM,
 
-		DP_GOBLIN_WARREN,
-		DP_SENTINEL_SANCTUARY
-	};
+	//	DP_GOBLIN_WARREN,
+	//	DP_SENTINEL_SANCTUARY
+	//};
 
-	enum class brogueStartLocation
-	{
-		MainEntrance = 0
-	};
 
 	enum class brogueRoomType
 	{
@@ -40,6 +36,44 @@ namespace brogueHd::model
 
 		// Upside-down T room at the start of depth 1
 		MainEntranceRoom
+	};
+
+	enum class brogueLevelTilingType
+	{
+		/// <summary>
+		/// Specific tiling type to the first level. Uses bottom-center focus.
+		/// </summary>
+		MainEntrance = 0,
+
+		/// <summary>
+		/// Similar to main entrance; but the layoutGenerator chooses a random
+		/// edge on which to put the entrance staircase.
+		/// </summary>
+		RandomLevelEdge = 1,
+
+		/// <summary>
+		/// Similar to random edge; but does not enforce tile packing against
+		/// the level boundary.
+		/// </summary>
+		RandomOuterRoom = 2,
+
+		/// <summary>
+		/// The entrance staircase is centered in the level; and the rest of
+		/// the tiles are packed against it.
+		/// </summary>
+		CenterFocus = 3,
+
+		/// <summary>
+		/// Chooses two opposing corners; and packs the entrance, and exit tiles,
+		/// against those, taking turns as the level rooms are placed.
+		/// </summary>
+		RandomDualFocusCorners = 4,
+
+		/// <summary>
+		/// Chooses two opposing sides; and packs the entrance, and exit tiles,
+		/// against those, taking turns as the level rooms are placed.
+		/// </summary>
+		RandomDualFocusEdges = 5
 	};
 
 	enum class brogueMazeType

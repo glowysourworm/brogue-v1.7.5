@@ -25,10 +25,10 @@ namespace brogueHd::component
 	{
 	public:
 
-		layoutGeneratorData(brogueLevelProfile* profile, const gridRect& layoutParentBoundary, const gridRect& layoutRelativeBoundary);
+		layoutGeneratorData(brogueLevelTemplate* profile, const gridRect& layoutParentBoundary, const gridRect& layoutRelativeBoundary);
 		~layoutGeneratorData();
 
-		brogueLevelProfile* getProfile() const;
+		brogueLevelTemplate* getTemplate() const;
 
 		gridRect getParentBoundary() const;
 		gridRect getBoundary() const;
@@ -51,7 +51,7 @@ namespace brogueHd::component
 
 	private:
 
-		brogueLevelProfile* _profile;
+		brogueLevelTemplate* _template;
 
 		layoutConnectionBuilder* _connectionBuilder;
 		layoutDijkstraParameters<gridLocator>* _trialDijkstraParameters;
@@ -63,9 +63,9 @@ namespace brogueHd::component
 		simpleGraph<gridConnectionNode, gridConnectionEdge>* _connectionGraph;
 	};
 
-	layoutGeneratorData::layoutGeneratorData(brogueLevelProfile* profile, const gridRect& layoutParentBoundary, const gridRect& layoutRelativeBoundary)
+	layoutGeneratorData::layoutGeneratorData(brogueLevelTemplate* levelTemplate, const gridRect& layoutParentBoundary, const gridRect& layoutRelativeBoundary)
 	{
-		_profile = profile;
+		_template = levelTemplate;
 		_connectionBuilder = new layoutConnectionBuilder();
 
 		_trialGrid = new grid<gridLocator>(layoutParentBoundary, layoutRelativeBoundary);
@@ -96,9 +96,9 @@ namespace brogueHd::component
 		delete _roomNearestNeighbors;
 		delete _trialDijkstraParameters;
 	}
-	brogueLevelProfile* layoutGeneratorData::getProfile() const
+	brogueLevelTemplate* layoutGeneratorData::getTemplate() const
 	{
-		return _profile;
+		return _template;
 	}
 	gridRect layoutGeneratorData::getParentBoundary() const
 	{

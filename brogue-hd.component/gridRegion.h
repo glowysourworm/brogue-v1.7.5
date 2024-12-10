@@ -50,12 +50,6 @@ namespace brogueHd::component
 		int getEdgeLocationCount() const;
 
 		/// <summary>
-		/// MODIFIES LAYOUT! Translates the grid region data by the provided amount without
-		/// re-allocating memory. (Assumes copied data)
-		/// </summary>
-		void translate(int columnOffset, int rowOffset);
-
-		/// <summary>
 		/// Checks for location overlap
 		/// </summary>
 		bool overlaps(gridRegion* region) const;
@@ -103,6 +97,11 @@ namespace brogueHd::component
 		/// Returns true if the edge is exposed in the direction specified.
 		/// </summary>
 		bool isExposedEdge(int column, int row, brogueCompass direction) const;
+
+		/// <summary>
+		/// Returns true if the edge is a any corner
+		/// </summary>
+		bool isCorner(int column, int row) const;
 
 		/// <summary>
 		/// Iterates the locations of the region and calls the user method
@@ -279,101 +278,15 @@ namespace brogueHd::component
 
 	bool gridRegion::isExposedEdge(int column, int row, brogueCompass direction) const
 	{
-		return _edgeGrid->isExposedEdge(column, row, direction);
+		return _grid->isExposedEdge(column, row, direction);
 	}
 
-	void gridRegion::translate(int columnOffset, int rowOffset)
+	bool gridRegion::isCorner(int column, int row) const
 	{
-		// Translates the coordinate boundary (relative boundary)
-		_grid->translate(columnOffset, rowOffset);
-		_edgeGrid->translate(columnOffset, rowOffset);
-
-		// Largest Sub-Rectangle
-		_largestRectangularSubRegion->translate(columnOffset, rowOffset);
-
-		// Data must all be copied over (each collection)
-		_grid->iterateModify([&columnOffset, &rowOffset](int column, int row, gridLocator& item)
-		{
-			item.translate(columnOffset, rowOffset);
-			return iterationCallback::iterate;
-		});
-
-		_edgeGrid->iterateModify([&columnOffset, &rowOffset](int column, int row, gridLocator& item)
-		{
-			item.translate(columnOffset, rowOffset);
-
-			return iterationCallback::iterate;
-		});
-
-		// Locations
-		_locations->iterateModify([&columnOffset, &rowOffset](gridLocator& item)
-		{
-			item.translate(columnOffset, rowOffset);
-			return iterationCallback::iterate;
-		});
-
-		// Edges
-		_edgeLocations->iterateModify([&columnOffset, &rowOffset](gridLocator& item)
-		{
-			item.translate(columnOffset, rowOffset);
-			return iterationCallback::iterate;
-		});
-
-		// N Edges
-		_northExposedLocations->iterateModify([&columnOffset, &rowOffset](gridLocator& item)
-		{
-			item.translate(columnOffset, rowOffset);
-			return iterationCallback::iterate;
-		});
-
-		// S Edges
-		_southExposedLocations->iterateModify([&columnOffset, &rowOffset](gridLocator& item)
-		{
-			item.translate(columnOffset, rowOffset);
-			return iterationCallback::iterate;
-		});
-
-		// E Edges
-		_eastExposedLocations->iterateModify([&columnOffset, &rowOffset](gridLocator& item)
-		{
-			item.translate(columnOffset, rowOffset);
-			return iterationCallback::iterate;
-		});
-
-		// W Edges
-		_westExposedLocations->iterateModify([&columnOffset, &rowOffset](gridLocator& item)
-		{
-			item.translate(columnOffset, rowOffset);
-			return iterationCallback::iterate;
-		});
-
-		// NE Corners
-		_northEastCornerLocations->iterateModify([&columnOffset, &rowOffset](gridLocator& item)
-		{
-			item.translate(columnOffset, rowOffset);
-			return iterationCallback::iterate;
-		});
-
-		// NW Corners
-		_northWestCornerLocations->iterateModify([&columnOffset, &rowOffset](gridLocator& item)
-		{
-			item.translate(columnOffset, rowOffset);
-			return iterationCallback::iterate;
-		});
-
-		// SE Corners
-		_southEastCornerLocations->iterateModify([&columnOffset, &rowOffset](gridLocator& item)
-		{
-			item.translate(columnOffset, rowOffset);
-			return iterationCallback::iterate;
-		});
-
-		// SW Corners
-		_southWestCornerLocations->iterateModify([&columnOffset, &rowOffset](gridLocator& item)
-		{
-			item.translate(columnOffset, rowOffset);
-			return iterationCallback::iterate;
-		});
+		return _grid->isExposedCorner(column, row, brogueCompass::NE) ||
+			_grid->isExposedCorner(column, row, brogueCompass::NW) ||
+			_grid->isExposedCorner(column, row, brogueCompass::SE) ||
+			_grid->isExposedCorner(column, row, brogueCompass::SW);
 	}
 
 	simpleArray<gridLocator> gridRegion::getLocations() const

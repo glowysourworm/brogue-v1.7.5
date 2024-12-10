@@ -10,6 +10,8 @@
 #include <simpleRect.h>
 #include <functional>
 
+#include "simpleSize.h"
+
 namespace brogueHd::component
 {
 	using namespace simple;
@@ -17,6 +19,18 @@ namespace brogueHd::component
 
 	gridRect::gridRect()
 	{
+	}
+
+	gridRect::gridRect(const gridLocator& location, const simpleSize& size)
+		: gridRect(location.column, location.row, size.width, size.height)
+	{
+		
+	}
+
+	gridRect::gridRect(int acolumn, int arow, const simpleSize& size)
+		: gridRect(acolumn, arow, size.width, size.height)
+	{
+		
 	}
 
 	gridRect::gridRect(const gridRect& copy) : simpleRect(copy)
@@ -105,6 +119,11 @@ namespace brogueHd::component
 	bool gridRect::contains(const gridRect& rect) const
 	{
 		return simpleRect::contains(rect);
+	}
+
+	simpleSize gridRect::getSize() const
+	{
+		return simpleSize(this->width, this->height);
 	}
 
 	gridRect gridRect::createExpanded(int amount) const
@@ -288,11 +307,9 @@ namespace brogueHd::component
 
 				// From equation for an ellipse
 				float yLimit = simpleMath::squareRoot(
-					heightRadius * heightRadius - ((heightRadius / (float)widthRadius) * (heightRadius / (float)
-					widthRadius) * dx * dx));
+					heightRadius * heightRadius - ((heightRadius / (float)widthRadius) * (heightRadius / (float)widthRadius) * dx * dx));
 				float xLimit = simpleMath::squareRoot(
-					widthRadius * widthRadius - ((widthRadius / (float)heightRadius) * (widthRadius / (float)
-					heightRadius) * dy * dy));
+					widthRadius * widthRadius - ((widthRadius / (float)heightRadius) * (widthRadius / (float)heightRadius) * dy * dy));
 
 				if (simpleMath::abs(dy) <= yLimit &&
 					simpleMath::abs(dx) <= xLimit)

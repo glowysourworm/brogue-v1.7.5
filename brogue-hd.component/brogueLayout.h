@@ -66,7 +66,7 @@ namespace brogueHd::component
 		/// <summary>
 		/// Gets sub-rectangle from the layout - the largest possible
 		/// </summary>
-		gridRect getLargestUnusedRectangle(const gridRect& minSize);
+		gridRect getLargestUnusedRectangle(const simpleSize& minSize);
 
 		/// <summary>
 		/// Iterates the room "centroid" graph to be able to visulize it for debugging
@@ -235,7 +235,7 @@ namespace brogueHd::component
 		return _mainGrid->get(column, row);
 	}
 
-	gridRect brogueLayout::getLargestUnusedRectangle(const gridRect& minSize)
+	gridRect brogueLayout::getLargestUnusedRectangle(const simpleSize& minSize)
 	{
 		grid<brogueCell*>* mainGrid = _mainGrid;
 

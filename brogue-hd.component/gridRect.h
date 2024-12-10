@@ -7,7 +7,10 @@
 #include <simpleException.h>
 #include <simpleMath.h>
 #include <simpleRect.h>
+#include <simpleSize.h>
 #include <functional>
+
+#include "simpleSize.h"
 
 namespace brogueHd::component
 {
@@ -31,6 +34,8 @@ namespace brogueHd::component
 		gridRect();
 		gridRect(const gridRect& copy);
 		gridRect(const simpleRect& rect);
+		gridRect(int acolumn, int arow, const simpleSize& size);
+		gridRect(const gridLocator& location, const simpleSize& size);
 		gridRect(int acolumn, int arow, int awidth, int aheight);
 
 		friend gridRect operator+(const gridRect& instance, const gridLocator& translation);
@@ -51,6 +56,8 @@ namespace brogueHd::component
 		bool contains(int acolumn, int arow) const;
 		bool contains(const gridLocator& location) const;
 		bool contains(const gridRect& rect) const;
+
+		simpleSize getSize() const;
 
 		/// <summary>
 		/// Creates a new gridRect, expanded in all directions, by the specified amount.
