@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClInclude Include="brogueCell.h" />
     <ClInclude Include="brogueCellDisplay.h" />
+    <ClInclude Include="brogueCompassMethods.h" />
     <ClInclude Include="brogueContentGrid.h" />
     <ClInclude Include="brogueGame.h" />
     <ClInclude Include="brogueGlyphMap.h" />

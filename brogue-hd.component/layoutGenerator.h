@@ -4,45 +4,54 @@
 #include <brogueRoomTemplate.h>
 #include <color.h>
 #include <delaunayAlgorithm.h>
-#include <dungeonConstants.h>
 #include <limits>
 #include <primsAlgorithm.h>
 #include <simple.h>
 #include <simpleArray.h>
 #include <simpleException.h>
 #include <simpleGraph.h>
+#include <simpleGraphDefinitions.h>
 #include <simpleHash.h>
 #include <simpleLine.h>
 #include <simpleList.h>
 #include <simplePoint.h>
-#include <simpleRectangle.h>
-#include <simpleGraphDefinitions.h>
 #include <windows.h>
 
 #include "brogueCell.h"
-#include "layoutDesignRect.h"
+#include "brogueCompassMethods.h"
 #include "brogueLayout.h"
 #include "dijkstra.h"
 #include "gridLocator.h"
-#include "gridLocatorEdge.h"
-#include "gridRectAdjacency.h"
 #include "gridRect.h"
 #include "gridRegion.h"
-#include "gridRegionGraphNode.h"
-#include "gridRegionGraphEdge.h"
 #include "gridRegionCollection.h"
+#include "gridRegionGraphEdge.h"
+#include "gridRegionGraphNode.h"
+#include "layoutDesignRect.h"
 
 #include "layoutConnectionBuilder.h"
-#include "layoutPartialConnectionData.h"
 #include "layoutCoordinateConverter.h"
 #include "layoutDijkstraParameters.h"
 #include "layoutGeneratorData.h"
+#include "layoutPartialConnectionData.h"
 
-#include "noiseGenerator.h"
+#include "brogueCellDisplay.h"
+#include "grid.h"
+#include "gridConnectionEdge.h"
+#include "gridConnectionLayer.h"
+#include "gridConnectionNode.h"
+#include "gridDefinitions.h"
+#include "gridLayer.h"
+#include "gridRegionOutline.h"
+#include "layoutConnectionData.h"
 #include "randomGenerator.h"
 #include "rectanglePackingAlgorithm.h"
 #include "regionOutlineGenerator.h"
 #include "roomGenerator.h"
+#include <dijkstrasAlgorithm.h>
+#include <functional>
+#include <simpleGraphAlgorithm.h>
+#include <simpleSize.h>
 
 namespace brogueHd::component
 {
@@ -116,20 +125,24 @@ namespace brogueHd::component
 	private:
 
 		template<isHashable T, isGridLocatorNode<T> TNode, isGridLocatorEdge<TNode, T> TEdge>
-		simpleGraph<TNode, TEdge>* triangulate(simpleGraphAlgorithmType algorithmType, 
-											   const simpleList<TNode>& nodes, 
+		simpleGraph<TNode, TEdge>* triangulate(simpleGraphAlgorithmType algorithmType,
+											   const simpleList<TNode>& nodes,
 											   std::function<TEdge(const TNode& node1, const TNode& node2)> edgeConstructor);
 
 		template<isGridLocator T>
 		simpleArray<T> runDijkstra(const T& source, const T& destination, layoutDijkstraParameters<T>* parameters);
 
-		template<isGridLocator T>
-		bool validateConnection(layoutGeneratorData* data,
-								 const gridRegionGraphNode& sourceNode,
-								 const gridRegionGraphNode& destNode,
-								 const simpleArray<T>& pathData,
-								 gridRegionGraphNode& interruptingNode,
-								 gridLocator& interruptingLocation);
+		bool validateConnection(layoutGeneratorData* data, 
+								layoutPartialConnectionData* connection, 
+								const simpleArray<gridLocator>& pathData,
+								gridRegionGraphNode& interruptingNode, 
+								gridLocator& interruptingLocation);
+
+		bool validateConnection(layoutGeneratorData* data, 
+								layoutConnectionData* connection, 
+								const simpleArray<gridLocator>& pathData,
+								gridRegionGraphNode& interruptingNode, 
+								gridLocator& interruptingLocation);
 
 		static gridRegionGraphEdge gridRegionGraphEdgeConstructor(const gridRegionGraphNode& node1, const gridRegionGraphNode& node2)
 		{
@@ -454,8 +467,8 @@ namespace brogueHd::component
 
 			// Don't allow non-adjacent grid rects to produce a graph edge. Afterwards, check the intergrity
 			// of the graph.
-			if (isAdjacentTile && 
-				!data->getRoomGraph()->containsEdge(edge) && 
+			if (isAdjacentTile &&
+				!data->getRoomGraph()->containsEdge(edge) &&
 				randGenerator->next() < data->getTemplate()->getExtraCorridorProbability())
 				data->getRoomGraph()->addEdge(edge);
 
@@ -485,14 +498,57 @@ namespace brogueHd::component
 		// Room Graph (centroid center graph) -> Nearest neighbor edge points graph
 		data->getRoomGraph()->iterateEdges([&data, &coordinateConverter] (const gridRegionGraphEdge& edge)
 		{
+			// Procedure:
+			//
+			// 0) Validate adjacency (get the direction)
+			// 1) Try taking the (random) centered antecedant edge tiles (in terms of direction)
+			// 2) Also, take the nearest neighbor edge
+			// 3) Compare the two and take the best one (this will eliminate equals by choosing centered tiles)
+			//
+
+			brogueCompass direction;
+
+			if (!edge.node1.getData()->getBoundary().isAdjacent(edge.node2.getData()->getBoundary(), direction))
+				throw simpleException("Room graph edge does not have adjacent tiles:  layoutGenerator::createNearestNeighbors");
+
+			brogueCompass oppositeDirection = brogueCompassMethods::getOppositeDirection(direction);
+
+			// Direction = towards the adjacent rectangle
+			simpleArray<gridLocator> edges = edge.node1.getData()->getRegion()->getEdges(direction);
+			simpleArray<gridLocator> adjacentEdges = edge.node2.getData()->getRegion()->getEdges(oppositeDirection);
 			simpleArray<gridLocator> edges1 = edge.node1.getData()->getRegion()->getEdgeLocations();
 			simpleArray<gridLocator> edges2 = edge.node2.getData()->getRegion()->getEdgeLocations();
 
 			gridLocator minlocation1 = default_value::value<gridLocator>();
 			gridLocator minlocation2 = default_value::value<gridLocator>();
 
-			float distance = std::numeric_limits<float>::max();
+			// Combine both heuristics (center node distance + nearest neighbor distance)
+			float distanceHeuristic = std::numeric_limits<float>::max();
 
+			// Use node centers to create a second heuristic
+			simplePoint<int> center1 = coordinateConverter->convertToUI(edge.node1.getLocator(), true);
+			simplePoint<int> center2 = coordinateConverter->convertToUI(edge.node2.getLocator(), true);
+
+			// Antecedent Edges
+			for (int index1 = 0; index1 < edges.count(); index1++)
+			{
+				for (int index2 = 0; index2 < adjacentEdges.count(); index2++)
+				{
+					simplePoint<int> point1UI = coordinateConverter->convertToUI(edges.get(index1), true);
+					simplePoint<int> point2UI = coordinateConverter->convertToUI(adjacentEdges.get(index2), true);
+
+					float nextHeuristic = point1UI.distance(center1) + point2UI.distance(center2) + point1UI.distance(point2UI);
+
+					if (nextHeuristic < distanceHeuristic)
+					{
+						distanceHeuristic = nextHeuristic;
+						minlocation1 = edges.get(index1);
+						minlocation2 = adjacentEdges.get(index2);
+					}
+				}
+			}
+
+			// All Edges
 			for (int index1 = 0; index1 < edges1.count(); index1++)
 			{
 				for (int index2 = 0; index2 < edges2.count(); index2++)
@@ -500,47 +556,13 @@ namespace brogueHd::component
 					simplePoint<int> point1UI = coordinateConverter->convertToUI(edges1.get(index1), true);
 					simplePoint<int> point2UI = coordinateConverter->convertToUI(edges2.get(index2), true);
 
-					if (point1UI.distance(point2UI) < distance)
+					float nextHeuristic = point1UI.distance(center1) + point2UI.distance(center2) + point1UI.distance(point2UI);
+
+					if (nextHeuristic < distanceHeuristic)
 					{
-						bool valid = true;
-						//simpleLine<int> lineUI(point1UI, point2UI);
-						//simpleLine<float> lineUIReal = coordinateConverter->convertToUIReal(lineUI);
-
-						//// Make sure the line doesn't enter another of the rooms
-						//data->getRoomGraph()->iterateEdges([&coordinateConverter, &edge, &valid, &lineUIReal] (const gridRegionGraphEdge& edgeCheck)
-						//{
-						//	if (edge == edgeCheck)
-						//		return iterationCallback::iterate;
-
-						//	// Check that we're not iterating one of the rooms
-						//	if (edge.node1 != edgeCheck.node1 &&
-						//		edge.node2 != edgeCheck.node1)
-						//	{
-						//		simpleRectangle<float> rectUIReal = coordinateConverter->convertToUIReal(edgeCheck.node1.getData()->getBoundary());
-
-						//		valid &= !rectUIReal.intersects(lineUIReal);
-						//	}
-
-						//	if (edge.node1 != edgeCheck.node2 &&
-						//		edge.node2 != edgeCheck.node2)
-						//	{
-						//		simpleRectangle<float> rectUIReal = coordinateConverter->convertToUIReal(edgeCheck.node2.getData()->getBoundary());
-
-						//		valid &= !rectUIReal.intersects(lineUIReal);
-						//	}
-
-						//	if (!valid)
-						//		return iterationCallback::breakAndReturn;
-
-						//	return iterationCallback::iterate;
-						//});
-
-						if (valid)
-						{
-							distance = point1UI.distance(point2UI);
-							minlocation1 = edges1.get(index1);
-							minlocation2 = edges2.get(index2);
-						}
+						distanceHeuristic = nextHeuristic;
+						minlocation1 = edges1.get(index1);
+						minlocation2 = edges2.get(index2);
 					}
 				}
 			}
@@ -548,7 +570,7 @@ namespace brogueHd::component
 			// No valid nearest neighbor found (intersection with another room rectangle)
 			if (minlocation1 == default_value::value<gridLocator>() ||
 				minlocation2 == default_value::value<gridLocator>())
-				return iterationCallback::iterate;
+				throw simpleException("Error generating nearest neighbors:  layoutGenerator.h");
 
 			gridRegionGraphNode node1(edge.node1.getData(), minlocation1);
 			gridRegionGraphNode node2(edge.node2.getData(), minlocation2);
@@ -559,7 +581,7 @@ namespace brogueHd::component
 			//	return graphEdge == otherEdge;	// Compares both orientations
 			//}))
 			//{
-				data->getRoomNearestNeighbors()->add(graphEdge);
+			data->getRoomNearestNeighbors()->add(graphEdge);
 			//}
 
 			return iterationCallback::iterate;
@@ -644,11 +666,7 @@ namespace brogueHd::component
 				gridLocator interruptingLocation = default_value::value<gridLocator>();
 
 				// Validate the path data
-				if (!validateConnection(data,
-					nextConnection->getNode1(),
-					nextConnection->getNode2(),
-					pathData, interruptingRegion, 
-					interruptingLocation))
+				if (!validateConnection(data, nextConnection, pathData, interruptingRegion, interruptingLocation))
 				{
 					// Change connection to partial; and continue (region / corridor interruption)
 					data->getConnectionBuilder()->changeConnectionToPartial(nextConnection, interruptingRegion, interruptingLocation);
@@ -690,10 +708,7 @@ namespace brogueHd::component
 				gridLocator nextInterruptingLocation = default_value::value<gridLocator>();
 
 				// Validate the path data
-				if (!validateConnection(data,
-					nextConnection->getNode1(),
-					nextConnection->getInterruptingRegion(),
-					pathData, nextInterruptingRegion, nextInterruptingLocation))
+				if (!validateConnection(data, nextConnection, pathData, nextInterruptingRegion, nextInterruptingLocation))
 				{
 					// CONNECTION FAILURE! (Need to investigate...) These may be forced; but it is better to
 					// fix underlying layout issues.
@@ -906,8 +921,8 @@ namespace brogueHd::component
 	}
 
 	template<isHashable T, isGridLocatorNode<T> TNode, isGridLocatorEdge<TNode, T> TEdge>
-	simpleGraph<TNode, TEdge>* layoutGenerator::triangulate(simpleGraphAlgorithmType algorithmType, 
-															const simpleList<TNode>& nodes, 
+	simpleGraph<TNode, TEdge>* layoutGenerator::triangulate(simpleGraphAlgorithmType algorithmType,
+															const simpleList<TNode>& nodes,
 															std::function<TEdge(const TNode& node1, const TNode& node2)> edgeConstructor)
 	{
 		// Procedure
@@ -959,7 +974,7 @@ namespace brogueHd::component
 		// Convert Back / Validate
 		//
 		outputGraph->iterate([&converter, &resultGraph, &nodes, &edgeConstructor]
-		(const simplePoint<float>& node,const simpleList<simpleLine<float>>& adjacentEdges)
+		(const simplePoint<float>& node, const simpleList<simpleLine<float>>& adjacentEdges)
 		{
 			// Iterate the graph's edges (per node) and convert back to the room graph
 			for (int index = 0; index < adjacentEdges.count(); index++)
@@ -1067,11 +1082,9 @@ namespace brogueHd::component
 		return pathData;
 	}
 
-	template<isGridLocator T>
 	bool layoutGenerator::validateConnection(layoutGeneratorData* data,
-											 const gridRegionGraphNode& sourceNode,
-											 const gridRegionGraphNode& destNode,
-											 const simpleArray<T>& pathData,
+											 layoutPartialConnectionData* connection,
+											 const simpleArray<gridLocator>& pathData,
 											 gridRegionGraphNode& interruptingNode,
 											 gridLocator& interruptingLocation)
 	{
@@ -1079,11 +1092,62 @@ namespace brogueHd::component
 		for (int index = 0; index < pathData.count(); index++)
 		{
 			// Source Region
-			if (sourceNode.getData()->getRegion()->isDefined(pathData.get(index)))
+			if (connection->getNode1().getData()->getRegion()->isDefined(pathData.get(index)))
 				continue;
 
 			// Destination Region
-			if (destNode.getData()->getRegion()->isDefined(pathData.get(index)))
+			if (connection->getNode2().getData()->getRegion()->isDefined(pathData.get(index)))
+				continue;
+
+			// Corridor Collision (previously, for normal connection)
+			if (connection->isCorridorCollision())
+			{
+				if (data->getTrialGrid()->isDefined(pathData.get(index).column, pathData.get(index).row))
+				{
+					interruptingLocation = pathData.get(index);
+					interruptingNode = default_value::value<gridRegionGraphNode>();
+					return false;
+				}
+			}
+
+			// Region Collision (previously)
+			else
+			{
+				for (int regionIndex = 0; regionIndex < data->getRoomGraph()->getNodes().count(); regionIndex++)
+				{
+					gridRegionGraphNode regionNode = data->getRoomGraph()->getNodes().get(regionIndex);
+
+					if (regionNode == connection->getNode1() ||
+						regionNode == connection->getNode2())
+						continue;
+
+					if (regionNode.getData()->getRegion()->isDefined(pathData.get(index)))
+					{
+						interruptingLocation = pathData.get(index);
+						interruptingNode = regionNode;
+						return false;
+					}
+				}
+			}
+		}
+		return true;
+	}
+
+	bool layoutGenerator::validateConnection(layoutGeneratorData* data, 
+											 layoutConnectionData* connection, 
+											 const simpleArray<gridLocator>& pathData,
+											 gridRegionGraphNode& interruptingNode, 
+											 gridLocator& interruptingLocation)
+	{
+		// Verify that the path does not intersect any other region except for the source / destination
+		for (int index = 0; index < pathData.count(); index++)
+		{
+			// Source Region
+			if (connection->getNode1().getData()->getRegion()->isDefined(pathData.get(index)))
+				continue;
+
+			// Destination Region
+			if (connection->getNode2().getData()->getRegion()->isDefined(pathData.get(index)))
 				continue;
 
 			// Region Collision
@@ -1091,8 +1155,8 @@ namespace brogueHd::component
 			{
 				gridRegionGraphNode regionNode = data->getRoomGraph()->getNodes().get(regionIndex);
 
-				if (regionNode == sourceNode ||
-					regionNode == destNode)
+				if (regionNode == connection->getNode1() ||
+					regionNode == connection->getNode2())
 					continue;
 
 				if (regionNode.getData()->getRegion()->isDefined(pathData.get(index)))

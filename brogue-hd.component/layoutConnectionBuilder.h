@@ -1,16 +1,17 @@
 #pragma once
 
-#include <simpleList.h>
-#include <simpleHash.h>
-#include <simpleGraph.h>
 #include <dijkstrasAlgorithm.h>
+#include <simpleGraph.h>
+#include <simpleHash.h>
+#include <simpleList.h>
 
 #include "gridLocator.h"
-#include "gridRegionGraphNode.h"
 #include "gridRegionGraphEdge.h"
-#include "layoutDesignRect.h"
+#include "gridRegionGraphNode.h"
 #include "layoutConnectionData.h"
 #include "layoutPartialConnectionData.h"
+#include <simple.h>
+#include <simpleArray.h>
 
 namespace brogueHd::component
 {
@@ -36,7 +37,7 @@ namespace brogueHd::component
 		void addConnection(layoutConnectionData* connection);
 		void addConnection(layoutPartialConnectionData* connection);
 
-		void changeConnectionToPartial(layoutConnectionData* connection, 
+		void changeConnectionToPartial(layoutConnectionData* connection,
 									   const gridRegionGraphNode& interruptingRegion,
 									   const gridLocator& interruptingLocation);
 
@@ -51,15 +52,18 @@ namespace brogueHd::component
 	private:
 
 		simpleHash<layoutConnectionData*, layoutConnectionData*>* _connections;
+		simpleHash<layoutPartialConnectionData*, layoutPartialConnectionData*>* _partialConnections;
 	};
 
 	layoutConnectionBuilder::layoutConnectionBuilder()
 	{
 		_connections = new simpleHash<layoutConnectionData*, layoutConnectionData*>();
+		_partialConnections = new simpleHash<layoutPartialConnectionData*, layoutPartialConnectionData*>();
 	}
 	layoutConnectionBuilder::~layoutConnectionBuilder()
 	{
 		delete _connections;
+		delete _partialConnections;
 	}
 
 	bool layoutConnectionBuilder::hasPendingWork() const
@@ -68,33 +72,31 @@ namespace brogueHd::component
 	}
 	bool layoutConnectionBuilder::hasPendingPartial() const
 	{
-		return _connections->any([] (layoutConnectionData* key, layoutConnectionData* value)
+		return _partialConnections->any([] (layoutPartialConnectionData* key, layoutPartialConnectionData* value)
 		{
-			return (typeid(key) == typeid(layoutPartialConnectionData*)) && !key->isComplete();
+			return !key->isComplete() && !key->isFailed();
 		});
 	}
 	bool layoutConnectionBuilder::hasPendingNormal() const
 	{
 		return _connections->any([] (layoutConnectionData* key, layoutConnectionData* value)
 		{
-			return typeid(key) == typeid(layoutConnectionData*) && !key->isComplete();
+			return !key->isComplete() && !key->isFailed();
 		});
 	}
 
 	bool layoutConnectionBuilder::hasCompletedPartial() const
 	{
-		return _connections->any([] (layoutConnectionData* key, layoutConnectionData* value)
+		return _partialConnections->any([] (layoutPartialConnectionData* key, layoutPartialConnectionData* value)
 		{
-			return typeid(key) == typeid(layoutPartialConnectionData*) && key->isComplete();
+			return key->isComplete();
 		});
 	}
 	bool layoutConnectionBuilder::hasCompletedUnreconciledPartials() const
 	{
-		return _connections->any([] (layoutConnectionData* key, layoutConnectionData* value)
+		return _partialConnections->any([] (layoutPartialConnectionData* key, layoutPartialConnectionData* value)
 		{
-			layoutPartialConnectionData* partial = (layoutPartialConnectionData*)key;
-
-			return (typeid(key) == typeid(layoutPartialConnectionData*)) && key->isComplete() && !partial->getReconciled();
+			return key->isComplete() && !key->getReconciled();
 		});
 	}
 	void layoutConnectionBuilder::addConnection(layoutConnectionData* connection)
@@ -103,30 +105,30 @@ namespace brogueHd::component
 	}
 	void layoutConnectionBuilder::addConnection(layoutPartialConnectionData* connection)
 	{
-		_connections->add(connection, connection);
+		_partialConnections->add(connection, connection);
 	}
 	void layoutConnectionBuilder::changeConnectionToPartial(layoutConnectionData* connection,
 															const gridRegionGraphNode& interruptingRegion,
-														    const gridLocator& interruptingLocation)
+															const gridLocator& interruptingLocation)
 	{
 		_connections->remove(connection);
 
 		layoutPartialConnectionData* partialConnection = new layoutPartialConnectionData(connection, interruptingRegion, interruptingLocation);
 
-		_connections->add(partialConnection, partialConnection);
+		_partialConnections->add(partialConnection, partialConnection);
 	}
 	layoutPartialConnectionData* layoutConnectionBuilder::getNextPartial() const
 	{
-		return (layoutPartialConnectionData*)_connections->firstKey([] (layoutConnectionData* key, layoutConnectionData* value)
+		return _partialConnections->firstKey([] (layoutConnectionData* key, layoutConnectionData* value)
 		{
-			return typeid(key) == typeid(layoutPartialConnectionData*) && !key->isComplete();
+			return !key->isComplete() && !key->isFailed();
 		});
 	}
 	layoutConnectionData* layoutConnectionBuilder::getNextNormal() const
 	{
 		return _connections->firstKey([] (layoutConnectionData* key, layoutConnectionData* value)
 		{
-			return typeid(key) == typeid(layoutConnectionData*) && !key->isComplete();
+			return !key->isComplete() && !key->isFailed();
 		});
 	}
 
@@ -137,7 +139,7 @@ namespace brogueHd::component
 		// Normal, complete connections
 		simpleList<layoutConnectionData*> normalConnections = _connections->getKeys().where([] (layoutConnectionData* connection)
 		{
-			return (typeid(connection) == typeid(layoutConnectionData*)) && connection->isComplete();
+			return connection->isComplete();
 		});
 
 		if (normalConnections.count() > 0)
@@ -164,7 +166,7 @@ namespace brogueHd::component
 					return iterationCallback::iterate;
 
 				// Validate the route with completed connections
-				for (int index = 0; index < route.count() ;index++)
+				for (int index = 0; index < route.count(); index++)
 				{
 					gridRegionGraphNode currentNode = route.get(index);
 
@@ -190,12 +192,9 @@ namespace brogueHd::component
 
 	void layoutConnectionBuilder::iteratePartials(simpleListCallback<layoutPartialConnectionData*> callback)
 	{
-		return _connections->iterate([&callback] (layoutConnectionData* key, layoutConnectionData* value)
+		return _partialConnections->iterate([&callback] (layoutPartialConnectionData* key, layoutPartialConnectionData* value)
 		{
-			if (typeid(key) == typeid(layoutPartialConnectionData*))
-				return callback((layoutPartialConnectionData*)key);
-
-			return iterationCallback::iterate;
+			return callback(key);
 		});
 	}
 
@@ -203,10 +202,7 @@ namespace brogueHd::component
 	{
 		return _connections->iterate([&callback] (layoutConnectionData* key, layoutConnectionData* value)
 		{
-			if (typeid(key) != typeid(layoutPartialConnectionData*))
-				return callback(key);
-
-			return iterationCallback::iterate;
+			return callback(key);
 		});
 	}
 }

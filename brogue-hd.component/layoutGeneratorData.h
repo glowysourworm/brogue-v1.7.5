@@ -2,18 +2,20 @@
 
 #include <simpleGraph.h>
 
-#include "brogueCell.h"
-#include "dijkstra.h"
 #include "grid.h"
+#include "gridConnectionEdge.h"
+#include "gridConnectionNode.h"
 #include "gridLocator.h"
-#include "gridLocatorEdge.h"
+#include "gridRect.h"
 #include "gridRegionGraphEdge.h"
 #include "gridRegionGraphNode.h"
-#include "gridConnectionNode.h"
-#include "gridConnectionEdge.h"
 #include "layoutConnectionBuilder.h"
 #include "layoutDesignRect.h"
-#include "layoutPartialConnectionData.h"
+#include "layoutDijkstraParameters.h"
+#include <brogueLevelTemplate.h>
+#include <functional>
+#include <simple.h>
+#include <simpleList.h>
 
 namespace brogueHd::component
 {
@@ -115,7 +117,7 @@ namespace brogueHd::component
 	}
 	bool layoutGeneratorData::trialLayoutInclusionPredicate(int column, int row)
 	{
-		return true;
+		return !_trialGrid->isDefined(column, row);
 	}
 	int layoutGeneratorData::trialLayoutCostPredicate(int column, int row)
 	{
@@ -133,6 +135,9 @@ namespace brogueHd::component
 
 			return iterationCallback::iterate;
 		});
+
+		if (_trialGrid->isDefined(column, row))
+			collision = true;
 
 		// Takes extra steps to forcibly enter another region.
 		return collision ? 5 : 1;
@@ -164,7 +169,7 @@ namespace brogueHd::component
 		return _roomGraph;
 	}
 	simpleGraph<gridConnectionNode, gridConnectionEdge>* layoutGeneratorData::getConnectionGraph() const
-	{	
+	{
 		return _connectionGraph;
 	}
 }

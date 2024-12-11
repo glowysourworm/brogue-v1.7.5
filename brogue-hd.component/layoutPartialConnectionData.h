@@ -1,11 +1,13 @@
 #pragma once
 
-#include <simpleList.h>
 
 #include "gridLocator.h"
 
-#include "layoutDesignRect.h"
+#include "gridRegionGraphNode.h"
 #include "layoutConnectionData.h"
+#include <simple.h>
+#include <simpleArray.h>
+#include <simpleException.h>
 
 namespace brogueHd::component
 {
@@ -56,7 +58,7 @@ namespace brogueHd::component
 															 const gridRegionGraphNode& destination,
 															 const gridRegionGraphNode& interruptingRegion,
 															 const gridLocator& interruptingLocation) :
-	layoutConnectionData(source, destination)
+		layoutConnectionData(source, destination)
 	{
 		_interruptingRegion = new gridRegionGraphNode(interruptingRegion);
 		_locationInterrupted = interruptingLocation;
@@ -65,11 +67,12 @@ namespace brogueHd::component
 	layoutPartialConnectionData::layoutPartialConnectionData(const layoutConnectionData* connection,
 															 const gridRegionGraphNode& interruptingRegion,
 															 const gridLocator& interruptingLocation) :
-	layoutPartialConnectionData(connection->getNode1(),
-								connection->getNode2(),
-								interruptingRegion,
-								interruptingLocation)
-	{}
+		layoutPartialConnectionData(connection->getNode1(),
+									connection->getNode2(),
+									interruptingRegion,
+									interruptingLocation)
+	{
+	}
 	layoutPartialConnectionData::~layoutPartialConnectionData()
 	{
 		delete _interruptingRegion;

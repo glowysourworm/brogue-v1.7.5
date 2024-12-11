@@ -1,9 +1,12 @@
 #pragma once
 
-#include "gridRegion.h"
 #include "gridLocator.h"
-#include "layoutDesignRect.h"
+#include "gridRegion.h"
 #include "gridRegionGraphNode.h"
+#include "layoutDesignRect.h"
+#include <simpleArray.h>
+#include <simpleException.h>
+#include <simpleList.h>
 
 namespace brogueHd::component
 {

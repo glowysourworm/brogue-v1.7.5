@@ -25,6 +25,9 @@
     <Filter Include="Header Files\generator\dataStructures">
       <UniqueIdentifier>{247ded38-cb2a-442b-a6b9-cbabdbc9fca2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\layout\extension">
+      <UniqueIdentifier>{364e1465-b531-4a27-8b2f-9cefea2f6c1b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dijkstra.h">
@@ -185,6 +188,9 @@
     </ClInclude>
     <ClInclude Include="gridLocatorNode.h">
       <Filter>Header Files\layout</Filter>
+    </ClInclude>
+    <ClInclude Include="brogueCompassMethods.h">
+      <Filter>Header Files\layout\extension</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
