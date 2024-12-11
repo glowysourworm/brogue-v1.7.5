@@ -15,7 +15,6 @@
 #include <simpleLine.h>
 #include <simpleList.h>
 #include <simplePoint.h>
-#include <windows.h>
 
 #include "brogueCell.h"
 #include "brogueCompassMethods.h"
@@ -35,22 +34,65 @@
 #include "layoutGeneratorData.h"
 #include "layoutPartialConnectionData.h"
 
+#include "brogueCell.h"
 #include "brogueCellDisplay.h"
+#include "brogueCellDisplay.h"
+#include "brogueCompassMethods.h"
+#include "brogueLayout.h"
+#include "dijkstra.h"
+#include "grid.h"
 #include "grid.h"
 #include "gridConnectionEdge.h"
+#include "gridConnectionEdge.h"
+#include "gridConnectionLayer.h"
 #include "gridConnectionLayer.h"
 #include "gridConnectionNode.h"
+#include "gridConnectionNode.h"
+#include "gridDefinitions.h"
 #include "gridDefinitions.h"
 #include "gridLayer.h"
+#include "gridLayer.h"
+#include "gridLocator.h"
+#include "gridRect.h"
+#include "gridRegion.h"
+#include "gridRegionCollection.h"
+#include "gridRegionGraphEdge.h"
+#include "gridRegionGraphNode.h"
+#include "gridRegionOutline.h"
 #include "gridRegionOutline.h"
 #include "layoutConnectionData.h"
+#include "layoutConnectionData.h"
+#include "layoutCoordinateConverter.h"
+#include "layoutDesignRect.h"
+#include "layoutGeneratorData.h"
+#include "layoutPartialConnectionData.h"
 #include "randomGenerator.h"
+#include "randomGenerator.h"
+#include "rectanglePackingAlgorithm.h"
 #include "rectanglePackingAlgorithm.h"
 #include "regionOutlineGenerator.h"
 #include "roomGenerator.h"
+#include <brogueLevelTemplate.h>
+#include <brogueRoomTemplate.h>
+#include <color.h>
+#include <delaunayAlgorithm.h>
+#include <dijkstrasAlgorithm.h>
 #include <dijkstrasAlgorithm.h>
 #include <functional>
+#include <functional>
+#include <limits>
+#include <primsAlgorithm.h>
+#include <simple.h>
+#include <simpleArray.h>
+#include <simpleException.h>
+#include <simpleGraph.h>
 #include <simpleGraphAlgorithm.h>
+#include <simpleGraphAlgorithm.h>
+#include <simpleGraphDefinitions.h>
+#include <simpleHash.h>
+#include <simpleLine.h>
+#include <simpleList.h>
+#include <simplePoint.h>
 #include <simpleSize.h>
 
 namespace brogueHd::component
@@ -130,7 +172,7 @@ namespace brogueHd::component
 											   std::function<TEdge(const TNode& node1, const TNode& node2)> edgeConstructor);
 
 		template<isGridLocator T>
-		simpleArray<T> runDijkstra(const T& source, const T& destination, layoutDijkstraParameters<T>* parameters);
+		simpleArray<T> runDijkstra(layoutGeneratorData* data, const T& source, const T& destination);
 
 		bool validateConnection(layoutGeneratorData* data, 
 								layoutPartialConnectionData* connection, 
@@ -432,6 +474,14 @@ namespace brogueHd::component
 			// Add Largest Sub-Rectangle -> Center (as Node)
 			//
 			data->getRoomNodes()->add(gridRegionGraphNode(designRect, designRect->getRegion()->getLargestSubRectangle().center()));
+
+			// Add tiles to the trial grid for the regions
+			designRect->getRegion()->iterateLocations([&data] (int column, int row, const gridLocator& location)
+			{
+				data->getTrialGrid()->set(location.column, location.row, location);
+
+				return iterationCallback::iterate;
+			});
 		}
 	}
 
@@ -655,9 +705,7 @@ namespace brogueHd::component
 				layoutConnectionData* nextConnection = data->getConnectionBuilder()->getNextNormal();
 
 				// Run Dijkstra on the trial grid
-				simpleArray<gridLocator> pathData = runDijkstra(nextConnection->getNode1().getLocator(),
-																nextConnection->getNode2().getLocator(),
-																data->getTrialDijkstraParameters());
+				simpleArray<gridLocator> pathData = runDijkstra(data, nextConnection->getNode1().getLocator(), nextConnection->getNode2().getLocator());
 
 				if (pathData.count() == 0)
 					throw simpleException("Dijkstra created empty path:  layoutGenerator::attemptRoomConnections");
@@ -682,7 +730,7 @@ namespace brogueHd::component
 					for (int index = 0; index < pathData.count(); index++)
 					{
 						gridLocator corridorLocation = pathData.get(index);
-						data->getTrialGrid()->set(corridorLocation.column, corridorLocation.row, corridorLocation);
+						data->getTrialGrid()->set(corridorLocation.column, corridorLocation.row, corridorLocation, true);
 					}
 
 					// Store the completed path
@@ -697,9 +745,7 @@ namespace brogueHd::component
 				layoutPartialConnectionData* nextConnection = data->getConnectionBuilder()->getNextPartial();
 
 				// Run Dijkstra (Partial 1) on the trial grid (using closest interrupting region to source location)
-				simpleArray<gridLocator> pathData = runDijkstra(nextConnection->getNode1().getLocator(),
-																nextConnection->getInterruptingLocation(),
-																data->getTrialDijkstraParameters());
+				simpleArray<gridLocator> pathData = runDijkstra(data, nextConnection->getNode1().getLocator(), nextConnection->getInterruptingLocation());
 
 				if (pathData.count() == 0)
 					throw simpleException("Dijkstra created empty path:  layoutGenerator::attemptRoomConnections");
@@ -726,7 +772,7 @@ namespace brogueHd::component
 					for (int index = 0; index < pathData.count(); index++)
 					{
 						gridLocator corridorLocation = pathData.get(index);
-						data->getTrialGrid()->set(corridorLocation.column, corridorLocation.row, corridorLocation);
+						data->getTrialGrid()->set(corridorLocation.column, corridorLocation.row, corridorLocation, true);
 					}
 
 					// Store the completed path
@@ -1051,22 +1097,42 @@ namespace brogueHd::component
 	}
 
 	template<isGridLocator T>
-	simpleArray<T> layoutGenerator::runDijkstra(const T& source, const T& destination, layoutDijkstraParameters<T>* parameters)
+	simpleArray<T> layoutGenerator::runDijkstra(layoutGeneratorData* data, const T& source, const T& destination)
 	{
 		// Procedure
 		//
 		// 1) Make use of the cost callback; and encapsulate the rest of dijkstra's map here.
 		//
 
+		grid<gridLocator>* trialGrid = data->getTrialGrid();
+
+		bool cardinalMovement = true;
+		bool includeEndpoints = false;
+
 		// (MEMORY!) Be sure to delete the algorithm heap afterwards
 		dijkstra<T>* algorithm = new dijkstra<T>(
-			parameters->getParentBoundary(),
-			parameters->getRelativeBoundary(),
-			parameters->getObeyCardinalMovement(),
-			parameters->getIncludeEndpoints(),
-			parameters->getMapPredicate(),
-			parameters->getMapCostPredicate(),
-			parameters->getLocatorCallback());
+			trialGrid->getParentBoundary(),
+			trialGrid->getRelativeBoundary(),
+			cardinalMovement,
+			includeEndpoints,
+			[&trialGrid, &source, &destination] (int column, int row)
+			{
+				return true;
+			},
+			[&trialGrid, &data] (int column, int row)
+			{
+				// Check for adjacent defined cells
+				bool adjacentCells = trialGrid->anyAdjacent(column, row, [&trialGrid] (int acol, int arow, const gridLocator& locator)
+				{
+					return trialGrid->isDefined(acol, arow);
+				});
+
+				return trialGrid->isDefined(column, row) ? 10 : adjacentCells ? 2 : 1;
+			},
+			[&trialGrid] (int column, int row)
+			{
+				return gridLocator(column, row);
+			});
 
 		simpleArray<T> targets(1);
 		targets.set(0, destination);

@@ -3,6 +3,7 @@
 #include "gridDefinitions.h"
 #include "gridLocator.h"
 #include "gridRect.h"
+#include <limits>
 #include <simple.h>
 #include <simpleArray.h>
 #include <simpleException.h>
@@ -10,7 +11,7 @@
 #include <simpleMath.h>
 #include <simpleOrderedList.h>
 #include <simpleRange.h>
-#include <limits>
+#include <simpleSize.h>
 
 namespace brogueHd::component
 {
@@ -222,6 +223,11 @@ namespace brogueHd::component
 		/// </summary>
 		simpleList<T> getCardinallyAdjacentElements(int column, int row, gridPredicate<T> predicate) const;
 
+		/// <summary>
+		/// Returns true if any adjacent elements pass the provided predicate
+		/// </summary>
+		bool anyAdjacent(int column, int row, gridPredicate<T> predicate) const;
+
 	private:
 		T** _grid;
 
@@ -235,12 +241,12 @@ namespace brogueHd::component
 		if (!parentBoundary.contains(relativeBoundary))
 			throw simpleException("Parent boundary does not contain relative boundary: grid.h");
 
-		_grid = new T*[relativeBoundary.width];
+		_grid = new T * [relativeBoundary.width];
 		_parentBoundary = new gridRect(parentBoundary);
 		_relativeBoundary = new gridRect(relativeBoundary);
 
 		for (int index = 0; index < relativeBoundary.width; index++)
-			_grid[index] = new T[relativeBoundary.height]{default_value::value<T>()};
+			_grid[index] = new T[relativeBoundary.height]{ default_value::value<T>() };
 	}
 
 	template <isHashable T>
@@ -287,31 +293,31 @@ namespace brogueHd::component
 	{
 		switch (direction)
 		{
-		case brogueCompass::N:
-			return this->isInBounds(column, row - 1) ? this->get(column, row - 1) : default_value::value<T>();
+			case brogueCompass::N:
+				return this->isInBounds(column, row - 1) ? this->get(column, row - 1) : default_value::value<T>();
 
-		case brogueCompass::S:
-			return this->isInBounds(column, row + 1) ? this->get(column, row + 1) : default_value::value<T>();
+			case brogueCompass::S:
+				return this->isInBounds(column, row + 1) ? this->get(column, row + 1) : default_value::value<T>();
 
-		case brogueCompass::E:
-			return this->isInBounds(column + 1, row) ? this->get(column + 1, row) : default_value::value<T>();
+			case brogueCompass::E:
+				return this->isInBounds(column + 1, row) ? this->get(column + 1, row) : default_value::value<T>();
 
-		case brogueCompass::W:
-			return this->isInBounds(column - 1, row) ? this->get(column - 1, row) : default_value::value<T>();
+			case brogueCompass::W:
+				return this->isInBounds(column - 1, row) ? this->get(column - 1, row) : default_value::value<T>();
 
-		case brogueCompass::NW:
-			return this->isInBounds(column - 1, row - 1) ? this->get(column - 1, row - 1) : default_value::value<T>();
+			case brogueCompass::NW:
+				return this->isInBounds(column - 1, row - 1) ? this->get(column - 1, row - 1) : default_value::value<T>();
 
-		case brogueCompass::NE:
-			return this->isInBounds(column + 1, row - 1) ? this->get(column + 1, row - 1) : default_value::value<T>();
+			case brogueCompass::NE:
+				return this->isInBounds(column + 1, row - 1) ? this->get(column + 1, row - 1) : default_value::value<T>();
 
-		case brogueCompass::SW:
-			return this->isInBounds(column - 1, row + 1) ? this->get(column - 1, row + 1) : default_value::value<T>();
+			case brogueCompass::SW:
+				return this->isInBounds(column - 1, row + 1) ? this->get(column - 1, row + 1) : default_value::value<T>();
 
-		case brogueCompass::SE:
-			return this->isInBounds(column + 1, row + 1) ? this->get(column + 1, row + 1) : default_value::value<T>();
-		default:
-			return default_value::value<T>();
+			case brogueCompass::SE:
+				return this->isInBounds(column + 1, row + 1) ? this->get(column + 1, row + 1) : default_value::value<T>();
+			default:
+				return default_value::value<T>();
 		}
 	}
 
@@ -320,51 +326,51 @@ namespace brogueHd::component
 	{
 		switch (direction)
 		{
-		case brogueCompass::None:
-			return default_value::value<T>();
+			case brogueCompass::None:
+				return default_value::value<T>();
 
-		case brogueCompass::N:
-			if (!this->isInBounds(column, row - 1))
-				throw simpleException("Out of bounds exception:  grid::getAdjacent");
+			case brogueCompass::N:
+				if (!this->isInBounds(column, row - 1))
+					throw simpleException("Out of bounds exception:  grid::getAdjacent");
 
-			return this->get(column, row - 1);
-		case brogueCompass::S:
-			if (!this->isInBounds(column, row + 1))
-				throw simpleException("Out of bounds exception:  grid::getAdjacent");
+				return this->get(column, row - 1);
+			case brogueCompass::S:
+				if (!this->isInBounds(column, row + 1))
+					throw simpleException("Out of bounds exception:  grid::getAdjacent");
 
-			return this->get(column, row + 1);
-		case brogueCompass::E:
-			if (!this->isInBounds(column + 1, row))
-				throw simpleException("Out of bounds exception:  grid::getAdjacent");
+				return this->get(column, row + 1);
+			case brogueCompass::E:
+				if (!this->isInBounds(column + 1, row))
+					throw simpleException("Out of bounds exception:  grid::getAdjacent");
 
-			return this->get(column + 1, row);
-		case brogueCompass::W:
-			if (!this->isInBounds(column - 1, row))
-				throw simpleException("Out of bounds exception:  grid::getAdjacent");
+				return this->get(column + 1, row);
+			case brogueCompass::W:
+				if (!this->isInBounds(column - 1, row))
+					throw simpleException("Out of bounds exception:  grid::getAdjacent");
 
-			return this->get(column - 1, row);
-		case brogueCompass::NW:
-			if (!this->isInBounds(column - 1, row - 1))
-				throw simpleException("Out of bounds exception:  grid::getAdjacent");
+				return this->get(column - 1, row);
+			case brogueCompass::NW:
+				if (!this->isInBounds(column - 1, row - 1))
+					throw simpleException("Out of bounds exception:  grid::getAdjacent");
 
-			return this->get(column - 1, row - 1);
-		case brogueCompass::NE:
-			if (!this->isInBounds(column + 1, row - 1))
-				throw simpleException("Out of bounds exception:  grid::getAdjacent");
+				return this->get(column - 1, row - 1);
+			case brogueCompass::NE:
+				if (!this->isInBounds(column + 1, row - 1))
+					throw simpleException("Out of bounds exception:  grid::getAdjacent");
 
-			return this->get(column + 1, row - 1);
-		case brogueCompass::SW:
-			if (!this->isInBounds(column - 1, row + 1))
-				throw simpleException("Out of bounds exception:  grid::getAdjacent");
+				return this->get(column + 1, row - 1);
+			case brogueCompass::SW:
+				if (!this->isInBounds(column - 1, row + 1))
+					throw simpleException("Out of bounds exception:  grid::getAdjacent");
 
-			return this->get(column - 1, row + 1);
-		case brogueCompass::SE:
-			if (!this->isInBounds(column + 1, row + 1))
-				throw simpleException("Out of bounds exception:  grid::getAdjacent");
+				return this->get(column - 1, row + 1);
+			case brogueCompass::SE:
+				if (!this->isInBounds(column + 1, row + 1))
+					throw simpleException("Out of bounds exception:  grid::getAdjacent");
 
-			return this->get(column + 1, row + 1);
-		default:
-			throw simpleException("Unhandled brogueCompass type:  grid::getAdjacent");
+				return this->get(column + 1, row + 1);
+			default:
+				throw simpleException("Unhandled brogueCompass type:  grid::getAdjacent");
 		}
 	}
 
@@ -373,58 +379,58 @@ namespace brogueHd::component
 	{
 		switch (direction)
 		{
-		case brogueCompass::None:
-			return default_value::value<T>();
+			case brogueCompass::None:
+				return default_value::value<T>();
 
-		case brogueCompass::N:
-			if (!this->isInBounds(column, row - 1))
-				throw simpleException("Out of bounds exception:  grid::getAdjacentLocator");
+			case brogueCompass::N:
+				if (!this->isInBounds(column, row - 1))
+					throw simpleException("Out of bounds exception:  grid::getAdjacentLocator");
 
-			return gridLocator(column, row - 1);
+				return gridLocator(column, row - 1);
 
-		case brogueCompass::S:
-			if (!this->isInBounds(column, row + 1))
-				throw simpleException("Out of bounds exception:  grid::getAdjacentLocator");
+			case brogueCompass::S:
+				if (!this->isInBounds(column, row + 1))
+					throw simpleException("Out of bounds exception:  grid::getAdjacentLocator");
 
-			return gridLocator(column, row + 1);
+				return gridLocator(column, row + 1);
 
-		case brogueCompass::E:
-			if (!this->isInBounds(column + 1, row))
-				throw simpleException("Out of bounds exception:  grid::getAdjacentLocator");
+			case brogueCompass::E:
+				if (!this->isInBounds(column + 1, row))
+					throw simpleException("Out of bounds exception:  grid::getAdjacentLocator");
 
-			return gridLocator(column + 1, row);
+				return gridLocator(column + 1, row);
 
-		case brogueCompass::W:
-			if (!this->isInBounds(column - 1, row))
-				throw simpleException("Out of bounds exception:  grid::getAdjacentLocator");
+			case brogueCompass::W:
+				if (!this->isInBounds(column - 1, row))
+					throw simpleException("Out of bounds exception:  grid::getAdjacentLocator");
 
-			return gridLocator(column - 1, row);
+				return gridLocator(column - 1, row);
 
-		case brogueCompass::NW:
-			if (!this->isInBounds(column - 1, row - 1))
-				throw simpleException("Out of bounds exception:  grid::getAdjacentLocator");
+			case brogueCompass::NW:
+				if (!this->isInBounds(column - 1, row - 1))
+					throw simpleException("Out of bounds exception:  grid::getAdjacentLocator");
 
-			return gridLocator(column - 1, row - 1);
+				return gridLocator(column - 1, row - 1);
 
-		case brogueCompass::NE:
-			if (!this->isInBounds(column + 1, row - 1))
-				throw simpleException("Out of bounds exception:  grid::getAdjacentLocator");
+			case brogueCompass::NE:
+				if (!this->isInBounds(column + 1, row - 1))
+					throw simpleException("Out of bounds exception:  grid::getAdjacentLocator");
 
-			return gridLocator(column + 1, row - 1);
+				return gridLocator(column + 1, row - 1);
 
-		case brogueCompass::SW:
-			if (!this->isInBounds(column - 1, row + 1))
-				throw simpleException("Out of bounds exception:  grid::getAdjacentLocator");
+			case brogueCompass::SW:
+				if (!this->isInBounds(column - 1, row + 1))
+					throw simpleException("Out of bounds exception:  grid::getAdjacentLocator");
 
-			return gridLocator(column - 1, row + 1);
+				return gridLocator(column - 1, row + 1);
 
-		case brogueCompass::SE:
-			if (!this->isInBounds(column + 1, row + 1))
-				throw simpleException("Out of bounds exception:  grid::getAdjacentLocator");
+			case brogueCompass::SE:
+				if (!this->isInBounds(column + 1, row + 1))
+					throw simpleException("Out of bounds exception:  grid::getAdjacentLocator");
 
-			return gridLocator(column + 1, row + 1);
-		default:
-			throw simpleException("Unhandled brogueCompass type:  grid::getAdjacentLocator");
+				return gridLocator(column + 1, row + 1);
+			default:
+				throw simpleException("Unhandled brogueCompass type:  grid::getAdjacentLocator");
 		}
 	}
 
@@ -433,58 +439,58 @@ namespace brogueHd::component
 	{
 		switch (direction)
 		{
-		case brogueCompass::None:
-			return default_value::value<T>();
+			case brogueCompass::None:
+				return default_value::value<T>();
 
-		case brogueCompass::N:
-			if (!this->isInBounds(column, row - 1))
+			case brogueCompass::N:
+				if (!this->isInBounds(column, row - 1))
+					return default_value::value<gridLocator>();
+
+				return gridLocator(column, row - 1);
+
+			case brogueCompass::S:
+				if (!this->isInBounds(column, row + 1))
+					return default_value::value<gridLocator>();
+
+				return gridLocator(column, row + 1);
+
+			case brogueCompass::E:
+				if (!this->isInBounds(column + 1, row))
+					return default_value::value<gridLocator>();
+
+				return gridLocator(column + 1, row);
+
+			case brogueCompass::W:
+				if (!this->isInBounds(column - 1, row))
+					return default_value::value<gridLocator>();
+
+				return gridLocator(column - 1, row);
+
+			case brogueCompass::NW:
+				if (!this->isInBounds(column - 1, row - 1))
+					return default_value::value<gridLocator>();
+
+				return gridLocator(column - 1, row - 1);
+
+			case brogueCompass::NE:
+				if (!this->isInBounds(column + 1, row - 1))
+					return default_value::value<gridLocator>();
+
+				return gridLocator(column + 1, row - 1);
+
+			case brogueCompass::SW:
+				if (!this->isInBounds(column - 1, row + 1))
+					return default_value::value<gridLocator>();
+
+				return gridLocator(column - 1, row + 1);
+
+			case brogueCompass::SE:
+				if (!this->isInBounds(column + 1, row + 1))
+					return default_value::value<gridLocator>();
+
+				return gridLocator(column + 1, row + 1);
+			default:
 				return default_value::value<gridLocator>();
-
-			return gridLocator(column, row - 1);
-
-		case brogueCompass::S:
-			if (!this->isInBounds(column, row + 1))
-				return default_value::value<gridLocator>();
-
-			return gridLocator(column, row + 1);
-
-		case brogueCompass::E:
-			if (!this->isInBounds(column + 1, row))
-				return default_value::value<gridLocator>();
-
-			return gridLocator(column + 1, row);
-
-		case brogueCompass::W:
-			if (!this->isInBounds(column - 1, row))
-				return default_value::value<gridLocator>();
-
-			return gridLocator(column - 1, row);
-
-		case brogueCompass::NW:
-			if (!this->isInBounds(column - 1, row - 1))
-				return default_value::value<gridLocator>();
-
-			return gridLocator(column - 1, row - 1);
-
-		case brogueCompass::NE:
-			if (!this->isInBounds(column + 1, row - 1))
-				return default_value::value<gridLocator>();
-
-			return gridLocator(column + 1, row - 1);
-
-		case brogueCompass::SW:
-			if (!this->isInBounds(column - 1, row + 1))
-				return default_value::value<gridLocator>();
-
-			return gridLocator(column - 1, row + 1);
-
-		case brogueCompass::SE:
-			if (!this->isInBounds(column + 1, row + 1))
-				return default_value::value<gridLocator>();
-
-			return gridLocator(column + 1, row + 1);
-		default:
-			return default_value::value<gridLocator>();
 		}
 	}
 
@@ -532,7 +538,7 @@ namespace brogueHd::component
 
 		grid<T>* grid = this;
 
-		iterate(this, [&grid](int column, int row)
+		iterate(this, [&grid] (int column, int row)
 		{
 			if (aggregateComparator(searchValue, grid->get(column, row)))
 				searchValue = grid->get(column, row);
@@ -553,7 +559,7 @@ namespace brogueHd::component
 	template <isHashable T>
 	bool grid<T>::isEdge(int column, int row) const
 	{
-		return this->isEdgeWhere(column, row, [](int acolumn, int arow, T item)
+		return this->isEdgeWhere(column, row, [] (int acolumn, int arow, T item)
 		{
 			return item != default_value::value<T>();
 		});
@@ -572,13 +578,13 @@ namespace brogueHd::component
 		T southWest = this->getUnsafe(column - 1, row + 1);
 
 		return (north == default_value::value<T>() || !predicate(column, row - 1, north)) ||
-			   (south == default_value::value<T>() || !predicate(column, row + 1, south)) ||  
-			   (east == default_value::value<T>() || !predicate(column + 1, row, east)) ||
-			   (west == default_value::value<T>() || !predicate(column - 1, row, west)) ||  
-			   (northEast == default_value::value<T>() || !predicate(column + 1, row - 1, northEast)) ||
-			   (northWest == default_value::value<T>() || !predicate(column - 1, row - 1, northWest)) ||
-			   (southEast == default_value::value<T>() || !predicate(column + 1, row + 1, southEast)) ||
-			   (southWest == default_value::value<T>() || !predicate(column - 1, row + 1, southWest));
+			(south == default_value::value<T>() || !predicate(column, row + 1, south)) ||
+			(east == default_value::value<T>() || !predicate(column + 1, row, east)) ||
+			(west == default_value::value<T>() || !predicate(column - 1, row, west)) ||
+			(northEast == default_value::value<T>() || !predicate(column + 1, row - 1, northEast)) ||
+			(northWest == default_value::value<T>() || !predicate(column - 1, row - 1, northWest)) ||
+			(southEast == default_value::value<T>() || !predicate(column + 1, row + 1, southEast)) ||
+			(southWest == default_value::value<T>() || !predicate(column - 1, row + 1, southWest));
 	}
 
 	template <isHashable T>
@@ -610,27 +616,27 @@ namespace brogueHd::component
 	{
 		if (direction == brogueCompass::NW)
 			return isExposedEdge(column, row, brogueCompass::N, predicate) &&
-					isExposedEdge(column, row, brogueCompass::W, predicate) &&
-					!isExposedEdge(column, row, brogueCompass::S, predicate) &&
-					!isExposedEdge(column, row, brogueCompass::E, predicate);
+			isExposedEdge(column, row, brogueCompass::W, predicate) &&
+			!isExposedEdge(column, row, brogueCompass::S, predicate) &&
+			!isExposedEdge(column, row, brogueCompass::E, predicate);
 
 		else if (direction == brogueCompass::NE)
 			return isExposedEdge(column, row, brogueCompass::N, predicate) &&
-					isExposedEdge(column, row, brogueCompass::E, predicate) &&
-					!isExposedEdge(column, row, brogueCompass::S, predicate) &&
-					!isExposedEdge(column, row, brogueCompass::W, predicate);
+			isExposedEdge(column, row, brogueCompass::E, predicate) &&
+			!isExposedEdge(column, row, brogueCompass::S, predicate) &&
+			!isExposedEdge(column, row, brogueCompass::W, predicate);
 
 		else if (direction == brogueCompass::SE)
 			return isExposedEdge(column, row, brogueCompass::S, predicate) &&
-					isExposedEdge(column, row, brogueCompass::E, predicate) &&
-					!isExposedEdge(column, row, brogueCompass::N, predicate) &&
-					!isExposedEdge(column, row, brogueCompass::W, predicate);
+			isExposedEdge(column, row, brogueCompass::E, predicate) &&
+			!isExposedEdge(column, row, brogueCompass::N, predicate) &&
+			!isExposedEdge(column, row, brogueCompass::W, predicate);
 
 		else if (direction == brogueCompass::SW)
 			return isExposedEdge(column, row, brogueCompass::S, predicate) &&
-					isExposedEdge(column, row, brogueCompass::W, predicate) &&
-					!isExposedEdge(column, row, brogueCompass::N, predicate) &&
-					!isExposedEdge(column, row, brogueCompass::E, predicate);
+			isExposedEdge(column, row, brogueCompass::W, predicate) &&
+			!isExposedEdge(column, row, brogueCompass::N, predicate) &&
+			!isExposedEdge(column, row, brogueCompass::E, predicate);
 
 		else
 			throw simpleException("Invalid use of direction parameter:  grid.isExposedCorner");
@@ -772,8 +778,8 @@ namespace brogueHd::component
 
 	template <isHashable T>
 	void grid<T>::iterateOutward(int centerColumn,
-	                             int centerRow,
-	                             int distance,
+								 int centerRow,
+								 int distance,
 								 gridCallbackConst<T> callback) const
 	{
 		bool userBreak = false;
@@ -823,42 +829,42 @@ namespace brogueHd::component
 		// N
 		if (!userBreak && (this->isInBounds(column, row - 1) || !withinBounds))
 			userBreak = callback(column, row - 1, brogueCompass::N,
-			                     this->getAdjacentUnsafe(column, row, brogueCompass::N));
+								 this->getAdjacentUnsafe(column, row, brogueCompass::N));
 
 		// S
 		if (!userBreak && (this->isInBounds(column, row + 1) || !withinBounds))
 			userBreak = callback(column, row + 1, brogueCompass::S,
-			                     this->getAdjacentUnsafe(column, row, brogueCompass::S));
+								 this->getAdjacentUnsafe(column, row, brogueCompass::S));
 
 		// E
 		if (!userBreak && (this->isInBounds(column + 1, row) || !withinBounds))
 			userBreak = callback(column + 1, row, brogueCompass::E,
-			                     this->getAdjacentUnsafe(column, row, brogueCompass::E));
+								 this->getAdjacentUnsafe(column, row, brogueCompass::E));
 
 		// W
 		if (!userBreak && (this->isInBounds(column - 1, row) || !withinBounds))
 			userBreak = callback(column - 1, row, brogueCompass::W,
-			                     this->getAdjacentUnsafe(column, row, brogueCompass::W));
+								 this->getAdjacentUnsafe(column, row, brogueCompass::W));
 
 		// NE
 		if (!userBreak && (this->isInBounds(column + 1, row - 1) || !withinBounds))
 			userBreak = callback(column + 1, row - 1, brogueCompass::NE,
-			                     this->getAdjacentUnsafe(column, row, brogueCompass::NE));
+								 this->getAdjacentUnsafe(column, row, brogueCompass::NE));
 
 		// NW
 		if (!userBreak && (this->isInBounds(column - 1, row - 1) || !withinBounds))
 			userBreak = callback(column - 1, row - 1, brogueCompass::NW,
-			                     this->getAdjacentUnsafe(column, row, brogueCompass::NW));
+								 this->getAdjacentUnsafe(column, row, brogueCompass::NW));
 
 		// SE
 		if (!userBreak && (this->isInBounds(column + 1, row + 1) || !withinBounds))
 			userBreak = callback(column + 1, row + 1, brogueCompass::SE,
-			                     this->getAdjacentUnsafe(column, row, brogueCompass::SE));
+								 this->getAdjacentUnsafe(column, row, brogueCompass::SE));
 
 		// SW
 		if (!userBreak && (this->isInBounds(column - 1, row + 1) || !withinBounds))
 			userBreak = callback(column - 1, row + 1, brogueCompass::SW,
-			                     this->getAdjacentUnsafe(column, row, brogueCompass::SW));
+								 this->getAdjacentUnsafe(column, row, brogueCompass::SW));
 	}
 
 	template <isHashable T>
@@ -917,7 +923,7 @@ namespace brogueHd::component
 	{
 		simpleList<T> result;
 
-		this->iterate([&result, &predicate](int column, int row, const T& item)
+		this->iterate([&result, &predicate] (int column, int row, const T& item)
 		{
 			if (predicate(column, row, item))
 				result.add(item);
@@ -933,7 +939,7 @@ namespace brogueHd::component
 	{
 		simpleList<T> result;
 
-		this->iterateAdjacent(column, row, true, [&result](int column, int row, brogueCompass direction, const T& item)
+		this->iterateAdjacent(column, row, true, [&result] (int column, int row, brogueCompass direction, const T& item)
 		{
 			result.add(item);
 			return iterationCallback::iterate;
@@ -947,7 +953,7 @@ namespace brogueHd::component
 	{
 		simpleList<T> result;
 
-		this->iterateAroundCardinal(column, row, true, [&result](int column, int row, const T& item)
+		this->iterateAroundCardinal(column, row, true, [&result] (int column, int row, const T& item)
 		{
 			result.add(item);
 			return iterationCallback::iterate;
@@ -961,7 +967,7 @@ namespace brogueHd::component
 	{
 		simpleList<T> result;
 
-		this->iterateAdjacent(column, row, false, [&result](int column, int row, brogueCompass direction, const T& item)
+		this->iterateAdjacent(column, row, false, [&result] (int column, int row, brogueCompass direction, const T& item)
 		{
 			result.add(item);
 			return iterationCallback::iterate;
@@ -975,7 +981,7 @@ namespace brogueHd::component
 	{
 		simpleList<T> result;
 
-		this->iterateAroundCardinal(column, row, false, [&result](int column, int row, const T& item)
+		this->iterateAroundCardinal(column, row, false, [&result] (int column, int row, const T& item)
 		{
 			result.add(item);
 			return iterationCallback::iterate;
@@ -990,23 +996,7 @@ namespace brogueHd::component
 		simpleList<T> result;
 
 		this->iterateAdjacent(column, row, true,
-		                      [&result, &predicate](int acolumn, int arow, brogueCompass direction, const T& item)
-		                      {
-			                      if (predicate(acolumn, arow, item))
-				                      result.add(item);
-
-			                      return iterationCallback::iterate;
-		                      });
-
-		return result;
-	}
-
-	template <isHashable T>
-	simpleList<T> grid<T>::getCardinallyAdjacentElements(int column, int row, gridPredicate<T> predicate) const
-	{
-		simpleList<T> result;
-
-		this->iterateAroundCardinal(column, row, true, [&result, &predicate](int acolumn, int arow, const T& item)
+							  [&result, &predicate] (int acolumn, int arow, brogueCompass direction, const T& item)
 		{
 			if (predicate(acolumn, arow, item))
 				result.add(item);
@@ -1017,13 +1007,46 @@ namespace brogueHd::component
 		return result;
 	}
 
+	template <isHashable T>
+	simpleList<T> grid<T>::getCardinallyAdjacentElements(int column, int row, gridPredicate<T> predicate) const
+	{
+		simpleList<T> result;
+
+		this->iterateAroundCardinal(column, row, true, [&result, &predicate] (int acolumn, int arow, const T& item)
+		{
+			if (predicate(acolumn, arow, item))
+				result.add(item);
+
+			return iterationCallback::iterate;
+		});
+
+		return result;
+	}
+
+	template <isHashable T>
+	bool grid<T>::anyAdjacent(int column, int row, gridPredicate<T> predicate) const
+	{
+		bool result = false;
+
+		this->iterateAdjacent(column, row, true, [&predicate, &result] (int acol, int arow, brogueCompass direction, const T& item)
+		{
+			if (predicate(acol, arow, item))
+			{
+				result = true;
+				return iterationCallback::breakAndReturn;
+			}
+			return iterationCallback::iterate;
+		});
+
+		return result;
+	}
 
 	template <isHashable T>
 	gridRect grid<T>::calculateLargestRectangle(const simpleSize& minSize) const
 	{
 		const grid<T>* that = this;
 
-		return calculateLargestRectangle(minSize, [&that](int column, int row, const T& item)
+		return calculateLargestRectangle(minSize, [&that] (int column, int row, const T& item)
 		{
 			return that->isDefined(column, row);
 		});
@@ -1043,7 +1066,7 @@ namespace brogueHd::component
 		bool found = false;
 
 		// Keep an ordered list of best rectangle
-		simpleOrderedList<gridRect*> subRectangles([](gridRect* rect1, gridRect* rect2)
+		simpleOrderedList<gridRect*> subRectangles([] (gridRect* rect1, gridRect* rect2)
 		{
 			return rect1->area() - rect2->area();
 		});
@@ -1060,7 +1083,7 @@ namespace brogueHd::component
 			contiguousRange.set(-1, -1);
 
 			// Get best sub-array
-			sum = counters.kadanesAlgorithm<int>(contiguousRange, [&column, &predicate, &that](int rowIndex)
+			sum = counters.kadanesAlgorithm<int>(contiguousRange, [&column, &predicate, &that] (int rowIndex)
 			{
 				return predicate(column, rowIndex, that->get(column, rowIndex)) ? 1 : 0;
 				// Return positive if the cell predicate passes
@@ -1078,7 +1101,7 @@ namespace brogueHd::component
 			gridRect newRect(column, contiguousRange.getLow() + boundary.top(), 1, contiguousRange.size());
 
 			// Update rectangles
-			subRectangles.forEach([&found, &column, &newRect, &boundary](gridRect* rect)
+			subRectangles.forEach([&found, &column, &newRect, &boundary] (gridRect* rect)
 			{
 				// Equals
 				if (rect->top() == newRect.top() &&
@@ -1091,7 +1114,7 @@ namespace brogueHd::component
 
 				// Overlaps (The rect could be LARGER in area if you add this overlap)
 				else if (((rect->top() >= newRect.top() && rect->top() <= newRect.bottom()) ||
-						(rect->bottom() >= newRect.top() && rect->bottom() <= newRect.bottom())) &&
+						 (rect->bottom() >= newRect.top() && rect->bottom() <= newRect.bottom())) &&
 					(rect->right() == column - 1))
 				{
 					int top = simpleMath::maxOf(rect->top(), newRect.top());
@@ -1130,15 +1153,15 @@ namespace brogueHd::component
 		else
 		{
 			// Get result data (checked the height, now we must check the width)
-			simpleList<gridRect*> finalRects = subRectangles.where([&minSize](gridRect* rect)
+			simpleList<gridRect*> finalRects = subRectangles.where([&minSize] (gridRect* rect)
 			{
 				return rect->width >= minSize.width &&
 					rect->height >= minSize.height;
 			});
 
 			gridRect result = finalRects.count() == 0
-				                  ? default_value::value<gridRect>()
-				                  : *(finalRects.get(finalRects.count() - 1));
+				? default_value::value<gridRect>()
+				: *(finalRects.get(finalRects.count() - 1));
 
 			// Clean up memory
 			for (int index = 0; index < subRectangles.count(); index++)

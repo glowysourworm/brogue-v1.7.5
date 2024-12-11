@@ -2,6 +2,7 @@
 
 #include "dijkstra.h"
 #include "gridDefinitions.h"
+#include "gridRect.h"
 
 namespace brogueHd::component
 {

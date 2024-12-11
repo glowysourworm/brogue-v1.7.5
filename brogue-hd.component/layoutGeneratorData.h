@@ -1,6 +1,9 @@
 #pragma once
 
 #include <simpleGraph.h>
+#include <simpleList.h>
+
+#include <brogueLevelTemplate.h>
 
 #include "grid.h"
 #include "gridConnectionEdge.h"
@@ -10,12 +13,7 @@
 #include "gridRegionGraphEdge.h"
 #include "gridRegionGraphNode.h"
 #include "layoutConnectionBuilder.h"
-#include "layoutDesignRect.h"
-#include "layoutDijkstraParameters.h"
-#include <brogueLevelTemplate.h>
-#include <functional>
-#include <simple.h>
-#include <simpleList.h>
+
 
 namespace brogueHd::component
 {
@@ -37,26 +35,17 @@ namespace brogueHd::component
 
 		layoutConnectionBuilder* getConnectionBuilder() const;
 
-		layoutDijkstraParameters<gridLocator>* getTrialDijkstraParameters() const;
-
 		grid<gridLocator>* getTrialGrid() const;
 		simpleList<gridRegionGraphNode>* getRoomNodes() const;
 		simpleList<gridRegionGraphEdge>* getRoomNearestNeighbors() const;
 		simpleGraph<gridRegionGraphNode, gridRegionGraphEdge>* getRoomGraph() const;
 		simpleGraph<gridConnectionNode, gridConnectionEdge>* getConnectionGraph() const;
 
-	private:	// Dijkstra's map predicates (sometimes it's nice to have actual functions!)
-
-		bool trialLayoutInclusionPredicate(int column, int row);
-		int trialLayoutCostPredicate(int column, int row);
-		gridLocator trialLayoutLocatorCallback(int column, int row);
-
 	private:
 
 		brogueLevelTemplate* _template;
 
 		layoutConnectionBuilder* _connectionBuilder;
-		layoutDijkstraParameters<gridLocator>* _trialDijkstraParameters;
 
 		grid<gridLocator>* _trialGrid;
 		simpleList<gridRegionGraphNode>* _roomNodes;
@@ -77,14 +66,6 @@ namespace brogueHd::component
 		// Graph instances are created by the triangulator algorithms
 		_roomGraph = new simpleGraph<gridRegionGraphNode, gridRegionGraphEdge>();
 		_connectionGraph = new simpleGraph<gridConnectionNode, gridConnectionEdge>();
-
-		_trialDijkstraParameters = new layoutDijkstraParameters<gridLocator>(layoutParentBoundary,
-																			 layoutRelativeBoundary,
-																			 true,
-																			 false,
-																			 std::bind(&layoutGeneratorData::trialLayoutInclusionPredicate, this, std::placeholders::_1, std::placeholders::_2),
-																			 std::bind(&layoutGeneratorData::trialLayoutCostPredicate, this, std::placeholders::_1, std::placeholders::_2),
-																			 std::bind(&layoutGeneratorData::trialLayoutLocatorCallback, this, std::placeholders::_1, std::placeholders::_2));
 	};
 	layoutGeneratorData::~layoutGeneratorData()
 	{
@@ -97,7 +78,6 @@ namespace brogueHd::component
 		delete _roomGraph;
 		delete _roomNodes;
 		delete _roomNearestNeighbors;
-		delete _trialDijkstraParameters;
 	}
 	brogueLevelTemplate* layoutGeneratorData::getTemplate() const
 	{
@@ -111,43 +91,6 @@ namespace brogueHd::component
 	{
 		return _trialGrid->getRelativeBoundary();
 	}
-	layoutDijkstraParameters<gridLocator>* layoutGeneratorData::getTrialDijkstraParameters() const
-	{
-		return _trialDijkstraParameters;
-	}
-	bool layoutGeneratorData::trialLayoutInclusionPredicate(int column, int row)
-	{
-		return !_trialGrid->isDefined(column, row);
-	}
-	int layoutGeneratorData::trialLayoutCostPredicate(int column, int row)
-	{
-		// TODO: Padding (Define a padding around the region cells in the planning stage)
-		//
-		bool collision = false;
-
-		_roomGraph->iterateNodes([&collision, &column, &row] (const gridRegionGraphNode& node)
-		{
-			if (node.getData()->getRegion()->isDefined(column, row))
-			{
-				collision = true;
-				return iterationCallback::breakAndReturn;
-			}
-
-			return iterationCallback::iterate;
-		});
-
-		if (_trialGrid->isDefined(column, row))
-			collision = true;
-
-		// Takes extra steps to forcibly enter another region.
-		return collision ? 5 : 1;
-	}
-	gridLocator layoutGeneratorData::trialLayoutLocatorCallback(int column, int row)
-	{
-		// Trial grid is not yet filled in
-		return gridLocator(column, row);
-	}
-
 	grid<gridLocator>* layoutGeneratorData::getTrialGrid() const
 	{
 		return _trialGrid;
